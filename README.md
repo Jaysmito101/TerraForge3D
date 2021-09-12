@@ -9,6 +9,12 @@
 * Test under different lighting!
 * A basic 3D viewer!
 
+# Screenshots
+
+![Screenshot 1](Images/01.png)
+
+![Screenshot 2](Images/02.png)
+
 # Using Without Building
 
 * Download the Latest Release from the releases tab!
