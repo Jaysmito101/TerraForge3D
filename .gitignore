@@ -1,0 +1,7 @@
+.vs
+Release
+Debug
+libs
+
+*.user
+*.filters
