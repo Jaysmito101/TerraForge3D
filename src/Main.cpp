@@ -656,6 +656,7 @@ public:
 			});
 		GetWindow()->SetClearColor({0.1f, 0.1f, 0.1f});
 		GenerateMesh();
+		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
 		CameraPosition[1] = 0.2f;
 		CameraPosition[2] = 3.1f;

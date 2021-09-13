@@ -31,7 +31,7 @@ static void InitGLFW()
 Window::Window() 
 {
 	InitGLFW();
-	m_Window = glfwCreateWindow(640, 480, "SimplyGL - Jaysmito Mukherjee", NULL, NULL);
+	m_Window = glfwCreateWindow(640, 480, "TerraGen3D - Jaysmito Mukherjee", NULL, NULL);
 	if (!m_Window)
 	{
 		glfwTerminate();

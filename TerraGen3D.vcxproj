@@ -542,10 +542,10 @@
     <None Include="include\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="SImplyGL.rc" />
+    <ResourceCompile Include="TerraGen3D.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\icon.ico" />
+    <Image Include=".\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
