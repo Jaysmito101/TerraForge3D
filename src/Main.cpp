@@ -178,6 +178,8 @@ static float mouseSpeed = 25;
 static float scrollSpeed = 0.5f;
 static float mouseScrollAmount = 0;
 static float scale;
+static std::string vertPath = "./vert.glsl";
+static std::string fragPath= "./frag.glsl";
 
 static void Log(const char* log)
 {
@@ -336,6 +338,31 @@ std::string openfilename(HWND owner = NULL) {
 	return std::string("");
 }
 
+std::string ShowOpenFileDialog(HWND owner = NULL) {
+	OPENFILENAME ofn;
+	WCHAR fileName[MAX_PATH];
+	ZeroMemory(fileName, MAX_PATH);
+	ZeroMemory(&ofn, sizeof(ofn));
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = owner;
+	ofn.lpstrFilter = L"*.glsl\0*.*\0";
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = (LPWSTR)"";
+
+	std::string fileNameStr;
+
+	if (GetOpenFileName(&ofn)) {
+		std::wstring ws(ofn.lpstrFile);
+		// your new String
+		std::string str(ws.begin(), ws.end());
+		return str;
+	}
+	return std::string("");
+}
+
 static std::string ExportOBJ() {
 	std::string fileName = openfilename();
 
@@ -458,21 +485,24 @@ static void ResetShader() {
 		delete shd;
 
 	bool res = true;
-	std::string vertSrc = ReadShaderSourceFile("./vert.glsl", &res);
+	std::string vertSrc = ReadShaderSourceFile(vertPath, &res);
 	if (!res) {
 		vertSrc = vs;
-		Log("Could not load vert.glsl! Using default Vertex shader!");
+		Log((std::string("Could not load ") + vertPath + "! Using default Vertex shader!").c_str());
+		vertPath = "Internal";
 	}
 	else {
-		Log("Loaded Vertex shader from vert.glsl");
+		Log((std::string("Loaded Vertex shader from ") + vertPath).c_str());
 	}
-	std::string fragSrc = ReadShaderSourceFile("./frag.glsl", &res);
+	res = true;
+	std::string fragSrc = ReadShaderSourceFile(fragPath, &res);
 	if (!res) {
 		fragSrc = fs;
-		Log("Could not load frag.glsl! Using default Fragment shader!");
+		Log((std::string("Could not load ") + fragPath + "! Using default Fragment shader!").c_str());
+		fragPath = "Internal";
 	}
 	else {
-		Log("Loaded Fragment shader from frag.glsl");
+		Log((std::string("Loaded Fragment shader from ") + fragPath).c_str());
 	}
 
 	shd = new Shader(vertSrc, fragSrc);
@@ -552,6 +582,19 @@ static void ShowTerrainControls()
 	if (ImGui::Button("Refresh Shaders")) {
 		ResetShader();
 	}
+	ImGui::Separator();
+	ImGui::Text("Current: %s", vertPath.c_str());
+	if (ImGui::Button("Use Custom Vertex Shader")) {
+		vertPath = ShowOpenFileDialog();
+		ResetShader();
+	}
+	ImGui::Separator();
+	ImGui::Text("Current: %s", fragPath.c_str());
+
+	if (ImGui::Button("Use Custom Fragment Shader")) {
+		fragPath = ShowOpenFileDialog();
+		ResetShader();
+	}
 
 	ImGui::Separator();
 	if (ImGui::Button("Export as OBJ")) {
@@ -560,6 +603,7 @@ static void ShowTerrainControls()
 	}
 	if (exp) {
 		ImGui::TextColored(ImVec4(0.0f, 0.7f, 0.0f, 1.0f), "Exported mesh as OBJ! (%s)", fileName);
+		ImGui::Separator();
 		ImGui::TextColored(ImVec4(0.0f, 0.7f, 0.0f, 1.0f), "(%s)", fileName);
 	}
 
