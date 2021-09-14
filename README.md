@@ -11,9 +11,9 @@
 
 # Screenshots
 
-![Screenshot 1](Images/01.png)
+![Screenshot 1](Screenshots/Screenshot%20(2).png)
 
-![Screenshot 2](Images/02.png)
+![Screenshot 2](Screenshots/Screenshot%20(3).png)
 
 # Using Without Building
 
