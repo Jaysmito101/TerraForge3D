@@ -108,6 +108,28 @@ struct Stats
 	int vertCount = 0;
 };
 
+struct NoiseLayer {
+
+	NoiseLayer() {
+		noiseType = "Simplex Perlin";
+		strcpy(name, "Noise Layer");
+		strength = 0.0f;
+		enabled = true;
+		active = false;
+		scale = 1;
+		offsetX = 0;
+		offsetY = 0;
+	}
+
+	const char* noiseType;
+	char name[256];
+	float strength;
+	float offsetX, offsetY;
+	float scale;
+	bool enabled;
+	bool active;
+};
+
 static std::string vs = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
@@ -177,9 +199,13 @@ static bool button1, button2, button3;
 static float mouseSpeed = 25;
 static float scrollSpeed = 0.5f;
 static float mouseScrollAmount = 0;
-static float scale;
+static float scale = 1.0f;
+static bool flattenBase = false;
 static std::string vertPath = "./vert.glsl";
 static std::string fragPath= "./frag.glsl";
+static std::vector<NoiseLayer> noiseLayers;
+static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Voronoi"};
+static int numberOfNoiseTypes = 3;
 
 static void Log(const char* log)
 {
@@ -410,8 +436,24 @@ static void RecalculateNormals(Mesh& mesh)
 	for (int i = 0; i < mesh.vertexCount; i++) mesh.vert[i].normal = glm::normalize(mesh.vert[i].normal);
 }
 
+static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
+	if (!noiseLayer.enabled)
+		return 0.0f;
+	float baseNoise = 0;
+	if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
+		baseNoise = SimplexNoise::noise((x/resolution) * noiseLayer.scale + noiseLayer.offsetX, (y/ resolution) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+	}
+	return baseNoise;
+}
+
 static float noise(float x, float y) {
-	float noise = SimplexNoise::noise(x * noiseScale / resolution, y * noiseScale / resolution);
+	float noise = 0;
+	for (NoiseLayer& nl : noiseLayers) {
+		noise += EvaluateNoiseLayer(x, y, nl);
+	}
+	if (flattenBase) {
+		noise = min(0, noise);
+	}
 	if (absolute) {
 		noise = abs(noise);
 	}
@@ -572,10 +614,12 @@ static void ShowTerrainControls()
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
 	ImGui::DragFloat("Noise Scale", &noiseScale, 0.005f);
 	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
-
+	ImGui::NewLine();
 	ImGui::Checkbox("Auto Update", &autoUpdate);
 	ImGui::Checkbox("Absoulute Value", &absolute);
 	ImGui::Checkbox("Square Value", &square);
+	ImGui::Checkbox("Flatten Base", &flattenBase);
+	ImGui::NewLine();
 	if(ImGui::Button("Update Mesh"))
 		RegenerateMesh();
 
@@ -603,10 +647,48 @@ static void ShowTerrainControls()
 	}
 	if (exp) {
 		ImGui::TextColored(ImVec4(0.0f, 0.7f, 0.0f, 1.0f), "Exported mesh as OBJ! (%s)", fileName);
-		ImGui::Separator();
+		ImGui::NewLine();
 		ImGui::TextColored(ImVec4(0.0f, 0.7f, 0.0f, 1.0f), "(%s)", fileName);
 	}
 
+	ImGui::End();
+}
+
+static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
+	ImGui::InputText((std::string("##") + std::to_string(id)).c_str(), (noiseLayer.name), 256);
+	ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
+	ImGui::Text("Noise Type");
+	if (ImGui::BeginCombo((std::string("##noiseType") + std::to_string(id)).c_str(), noiseLayer.noiseType))
+	{
+		for (int i = 0; i < numberOfNoiseTypes; i++)
+		{
+			bool is_selected = (noiseLayer.noiseType == noiseTypes[i]);
+			if (ImGui::Selectable(noiseTypes[i], is_selected)){
+				noiseLayer.noiseType = noiseTypes[i];
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::DragFloat((std::string("Scale##") + std::to_string(id)).c_str(), &(noiseLayer.scale), 0.01f, -200.0f, 200.0f);
+	ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
+	ImGui::DragFloat((std::string("Offset Y##") + std::to_string(id)).c_str(), &(noiseLayer.offsetY), 0.01f);
+}
+
+static void ShowNoiseSettings(){
+	ImGui::Begin("Noise Settings");
+	int id = 0;
+	ImGui::Text("Noise Layers");
+	ImGui::Separator();
+	for (NoiseLayer& nl : noiseLayers) {
+		ShowNoiseLayer(nl, id++);
+		ImGui::Separator();
+	}
+	if (ImGui::Button("Add Noise Layer")) {
+		noiseLayers.push_back(NoiseLayer());
+	}
 	ImGui::End();
 }
 
@@ -679,6 +761,7 @@ public:
 		ShowCameraControls();
 		ShowTerrainControls();
 		ShowLightingControls();
+		ShowNoiseSettings();
 	}
 
 	virtual void OnStart() override
@@ -707,6 +790,7 @@ public:
 		CameraRotation[1] = 2530.0f;
 		autoUpdate = true;
 		scale = 1;
+		noiseLayers.push_back(NoiseLayer());
 	}
 
 	void OnEnd() 
