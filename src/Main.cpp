@@ -612,13 +612,13 @@ static void ShowTerrainControls()
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
-	ImGui::DragFloat("Noise Scale", &noiseScale, 0.005f);
+	//ImGui::DragFloat("Noise Scale", &noiseScale, 0.005f);
 	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
 	ImGui::NewLine();
 	ImGui::Checkbox("Auto Update", &autoUpdate);
+	ImGui::Checkbox("Flatten Base", &flattenBase);
 	ImGui::Checkbox("Absoulute Value", &absolute);
 	ImGui::Checkbox("Square Value", &square);
-	ImGui::Checkbox("Flatten Base", &flattenBase);
 	ImGui::NewLine();
 	if(ImGui::Button("Update Mesh"))
 		RegenerateMesh();
@@ -655,26 +655,28 @@ static void ShowTerrainControls()
 }
 
 static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
-	ImGui::InputText((std::string("##") + std::to_string(id)).c_str(), (noiseLayer.name), 256);
-	ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
-	ImGui::Text("Noise Type");
-	if (ImGui::BeginCombo((std::string("##noiseType") + std::to_string(id)).c_str(), noiseLayer.noiseType))
-	{
-		for (int i = 0; i < numberOfNoiseTypes; i++)
-		{
-			bool is_selected = (noiseLayer.noiseType == noiseTypes[i]);
-			if (ImGui::Selectable(noiseTypes[i], is_selected)){
-				noiseLayer.noiseType = noiseTypes[i];
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
+	if (ImGui::CollapsingHeader((std::string(noiseLayer.name) + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
+		ImGui::InputText((std::string("##") + std::to_string(id)).c_str(), (noiseLayer.name), 256);
+			ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
+			ImGui::Text("Noise Type");
+			if (ImGui::BeginCombo((std::string("##noiseType") + std::to_string(id)).c_str(), noiseLayer.noiseType))
+			{
+				for (int i = 0; i < numberOfNoiseTypes; i++)
+				{
+					bool is_selected = (noiseLayer.noiseType == noiseTypes[i]);
+						if (ImGui::Selectable(noiseTypes[i], is_selected)) {
+							noiseLayer.noiseType = noiseTypes[i];
+								if (is_selected)
+									ImGui::SetItemDefaultFocus();
+						}
+				}
+				ImGui::EndCombo();
 			}
-		}
-		ImGui::EndCombo();
+		ImGui::DragFloat((std::string("Scale##") + std::to_string(id)).c_str(), &(noiseLayer.scale), 0.01f, -200.0f, 200.0f);
+		ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
+		ImGui::DragFloat((std::string("Offset Y##") + std::to_string(id)).c_str(), &(noiseLayer.offsetY), 0.01f);
 	}
-	ImGui::DragFloat((std::string("Scale##") + std::to_string(id)).c_str(), &(noiseLayer.scale), 0.01f, -200.0f, 200.0f);
-	ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
-	ImGui::DragFloat((std::string("Offset Y##") + std::to_string(id)).c_str(), &(noiseLayer.offsetY), 0.01f);
 }
 
 static void ShowNoiseSettings(){
