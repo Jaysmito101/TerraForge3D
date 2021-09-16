@@ -13,6 +13,10 @@
 #include <glm/ext/vector_relational.hpp>
 #include <glm/ext/scalar_relational.hpp>
 #include <SimplexNoise.h>
+#include <FastNoiseLite.h>
+#include <thread>
+#include <time.h>
+#include <mutex>
 #undef near
 #undef far
 
@@ -178,7 +182,8 @@ static glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 static bool vSync = true;
 static Stats s_Stats;
 static char b1[4096], b2[4096];
-static uint32_t vao, vbo, ebo;
+static uint32_t vao, vbo, ebo, fbo;
+static uint32_t depthTex, colorTex;
 static Shader* shd;
 static Camera camera;
 static Mesh mesh;
@@ -204,8 +209,17 @@ static bool flattenBase = false;
 static std::string vertPath = "./vert.glsl";
 static std::string fragPath= "./frag.glsl";
 static std::vector<NoiseLayer> noiseLayers;
-static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Voronoi"};
+static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Cellular"};
 static int numberOfNoiseTypes = 3;
+static FastNoiseLite m_NoiseGen;
+static bool isRemeshing = false;
+std::mutex m_mutex;
+
+static void ToggleSystemConsole() {
+	static bool state = true;
+	state = !state;
+	ShowWindow(GetConsoleWindow(), state?SW_SHOW:SW_HIDE);
+}
 
 static void Log(const char* log)
 {
@@ -443,6 +457,13 @@ static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
 	if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
 		baseNoise = SimplexNoise::noise((x/resolution) * noiseLayer.scale + noiseLayer.offsetX, (y/ resolution) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
 	}
+	else if (strcmp(noiseLayer.noiseType, "Random") == 0) {		
+		return (rand())*noiseLayer.strength*0.0001f;
+	}
+	else if (strcmp(noiseLayer.noiseType, "Cellular") == 0) {
+		m_NoiseGen.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
+		baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + noiseLayer.offsetX, (y / 1)* noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+	}
 	return baseNoise;
 }
 
@@ -452,7 +473,7 @@ static float noise(float x, float y) {
 		noise += EvaluateNoiseLayer(x, y, nl);
 	}
 	if (flattenBase) {
-		noise = min(0, noise);
+		noise = max(0, noise);
 	}
 	if (absolute) {
 		noise = abs(noise);
@@ -463,7 +484,7 @@ static float noise(float x, float y) {
 	return noise * noiseStrength;
 }
 
-static void GenerateVertices(Mesh& mesh)
+static void GenerateVertices()
 {
 	Vert* vertices = new Vert[resolution * resolution];
 	int* inds = new int[(resolution-1) * (resolution-1) * 6];
@@ -478,11 +499,11 @@ static void GenerateVertices(Mesh& mesh)
 			glm::vec3 pointOnPlane = (percent.x - .5f) * 2 * right + (percent.y - .5f) * 2 * front;
 			pointOnPlane *= scale;
 			vertices[i] = Vert();
-			vertices[i].position = glm::vec3(0.0f) ;
-			
-			vertices[i].position.x = pointOnPlane.x ;
-			vertices[i].position.y = pointOnPlane.y + noise(x, y) ;
-			vertices[i].position.z = pointOnPlane.z ;
+			vertices[i].position = glm::vec3(0.0f);
+
+			vertices[i].position.x = pointOnPlane.x;
+			vertices[i].position.y = pointOnPlane.y + noise(x, y);
+			vertices[i].position.z = pointOnPlane.z;
 			vertices[i].normal = glm::vec3(0.0f);
 			if (x != resolution - 1 && y != resolution - 1)
 			{
@@ -497,6 +518,7 @@ static void GenerateVertices(Mesh& mesh)
 			}
 		}
 	}
+	
 	if (mesh.vert)
 		delete mesh.vert;
 	if (mesh.indices)
@@ -514,6 +536,26 @@ static void GenerateVertices(Mesh& mesh)
 	RecalculateNormals(mesh);
 	s_Stats.vertCount = resolution * resolution;
 	s_Stats.triangles = mesh.indexCount / 3;
+}
+
+static void SetupFrameBuffer() {
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glGenTextures(1, &colorTex);
+	glBindTexture(GL_TEXTURE_2D, colorTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTex, 0);
+	glGenTextures(1, &depthTex);
+	glBindTexture(GL_TEXTURE_2D, depthTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
@@ -552,7 +594,7 @@ static void ResetShader() {
 
 static void GenerateMesh() 
 {
-	GenerateVertices(mesh);
+	GenerateVertices();
 
 	ResetShader();
 
@@ -574,8 +616,11 @@ static void GenerateMesh()
 
 }
 
+
 static void RegenerateMesh(){
-	GenerateVertices(mesh);
+	
+	GenerateVertices();
+
 	glBindVertexArray(vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -588,6 +633,7 @@ static void RegenerateMesh(){
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
 	glEnableVertexAttribArray(1);
+	
 }
 
 static void DoTheRederThing(float deltaTime) {
@@ -655,7 +701,10 @@ static void ShowTerrainControls()
 }
 
 static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
-	if (ImGui::CollapsingHeader((std::string(noiseLayer.name) + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
+	bool state = ImGui::CollapsingHeader((std::string("##noiseLayerName") + std::to_string(id)).c_str());
+	ImGui::SameLine();
+	ImGui::Text(noiseLayer.name);
+	if (state) {
 		ImGui::InputText((std::string("##") + std::to_string(id)).c_str(), (noiseLayer.name), 256);
 			ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
 			ImGui::Text("Noise Type");
@@ -673,19 +722,26 @@ static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
 				ImGui::EndCombo();
 			}
 		ImGui::DragFloat((std::string("Scale##") + std::to_string(id)).c_str(), &(noiseLayer.scale), 0.01f, -200.0f, 200.0f);
-		ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.001f);
 		ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
 		ImGui::DragFloat((std::string("Offset Y##") + std::to_string(id)).c_str(), &(noiseLayer.offsetY), 0.01f);
+		if (ImGui::Button((std::string("Remove") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
+			noiseLayers.erase(noiseLayers.begin() + id);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button((std::string("Duplicate") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
+			Log(std::to_string(id).c_str());
+			noiseLayers.push_back(noiseLayers[id]);
+		}
 	}
 }
 
 static void ShowNoiseSettings(){
 	ImGui::Begin("Noise Settings");
-	int id = 0;
 	ImGui::Text("Noise Layers");
 	ImGui::Separator();
-	for (NoiseLayer& nl : noiseLayers) {
-		ShowNoiseLayer(nl, id++);
+	for (int i = 0; i < noiseLayers.size();i++) {
+		ShowNoiseLayer(noiseLayers[i], i);
 		ImGui::Separator();
 	}
 	if (ImGui::Button("Add Noise Layer")) {
@@ -726,16 +782,94 @@ static void MouseScrollCallback(float amount){
 	CameraPosition[2] = pPos.z;
 }
 
-static void MouseButtonCallback(int button, bool state) {
-	if (button == 0) {
-		button1 = state;
+static void ShowMainScene() {
+	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+	auto viewportOffset = ImGui::GetWindowPos();
+
+	ImGui::Begin("Viewport");
+	{
+		ImGui::BeginChild("MainRender");
+		if (ImGui::IsWindowHovered()) {
+			ImGuiIO io = ImGui::GetIO();
+			MouseMoveCallback(io.MousePos.x, io.MousePos.y);
+			MouseScrollCallback(io.MouseWheel);
+			button1 = io.MouseDown[0];
+			button2 = io.MouseDown[2];
+			button3 = io.MouseDown[1];
+		}
+		ImVec2 wsize = ImGui::GetWindowSize();
+		ImGui::Image((ImTextureID)colorTex, wsize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::EndChild();
 	}
-	if (button == 1) {
-		button3 = state;
+	ImGui::End();
+}
+
+static void OnBeforeImGuiRender() {
+
+	static bool dockspaceOpen = true;
+	static bool opt_fullscreen_persistant = true;
+	bool opt_fullscreen = opt_fullscreen_persistant;
+	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	if (opt_fullscreen)
+	{
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->Pos);
+		ImGui::SetNextWindowSize(viewport->Size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.1f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
-	if (button == 2) {
-		button2 = state;
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+		window_flags |= ImGuiWindowFlags_NoBackground;
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+	ImGui::PopStyleVar();
+	if (opt_fullscreen)
+		ImGui::PopStyleVar(2);
+	// DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	float minWinSizeX = style.WindowMinSize.x;
+	style.WindowMinSize.x = 370.0f;
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 	}
+
+	style.WindowMinSize.x = minWinSizeX;
+
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::Button("Exit")) {
+				exit(0);
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Options"))
+		{
+			if (ImGui::Button("Toggle System Console")) {
+				ToggleSystemConsole();
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+}
+
+static void OnImGuiRenderEnd() {
+	ImGui::End();
+}
+
+static void ResizeTexture(uint32_t tex, int w, int h) {
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
 
 class MyApp : public Application 
@@ -743,9 +877,14 @@ class MyApp : public Application
 public:
 	virtual void OnUpdate(float deltatime) override
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glViewport(0, 0, 800, 600);
+		GetWindow()->Clear();
 		s_Stats.deltaTime = deltatime;
 		DoTheRederThing(deltatime);
-		if(autoUpdate)
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		RenderImGui();
+		if (autoUpdate)
 			RegenerateMesh();
 	}
 
@@ -755,8 +894,9 @@ public:
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;
 	}
 
-	virtual void OnImGuiRender(float deltatime) override
+	virtual void OnImGuiRender() override
 	{
+		OnBeforeImGuiRender();
 		ShowGeneralControls();
 		ShowStats();
 		ShowConsole();
@@ -764,24 +904,23 @@ public:
 		ShowTerrainControls();
 		ShowLightingControls();
 		ShowNoiseSettings();
+		ShowMainScene();
+		OnImGuiRenderEnd();
 	}
 
 	virtual void OnStart() override
 	{
 		Log("Started Up App!");
+		srand(time(NULL));
+		m_NoiseGen = FastNoiseLite::FastNoiseLite();
+		SetupFrameBuffer();
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
 		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [] (GLFWwindow* window, int w, int h){
-			glViewport(0, 0, w, h);
 			glfwSwapBuffers(window);
 			});
-		glfwSetCursorPosCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, double x, double y) {
-			MouseMoveCallback((float)x, (float)y);
-			});
-		glfwSetMouseButtonCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, int button, int action, int mods) {
-				MouseButtonCallback(button, action == GLFW_PRESS ? true : false);
-			});
-		glfwSetScrollCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, double, double y) {
-			MouseScrollCallback((float)y);
+		glfwSetScrollCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, double x, double y) {
+			ImGuiIO& io = ImGui::GetIO();
+			io.MouseWheel = y;
 			});
 		GetWindow()->SetClearColor({0.1f, 0.1f, 0.1f});
 		GenerateMesh();
@@ -790,7 +929,7 @@ public:
 		CameraPosition[1] = 0.2f;
 		CameraPosition[2] = 3.1f;
 		CameraRotation[1] = 2530.0f;
-		autoUpdate = true;
+		autoUpdate = false;
 		scale = 1;
 		noiseLayers.push_back(NoiseLayer());
 	}

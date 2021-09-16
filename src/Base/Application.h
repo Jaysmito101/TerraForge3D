@@ -1,4 +1,4 @@
-#pragma once
+                           #pragma once
 
 #include <Window.h>
 
@@ -8,10 +8,12 @@ public:
 	~Application();
 	virtual void OnUpdate(float deltatime) {};
 	virtual void OnOneSecondTick() {};
-	virtual void OnImGuiRender(float deltatime) {};
+	virtual void OnImGuiRender() {};
 	virtual void OnStart() {};
 	virtual void OnEnd() {};
 
+	bool IsActive();
+	void RenderImGui();
 	void Render();
 	void ImGuiRenderBegin();
 	void ImGuiRenderEnd();
@@ -28,4 +30,4 @@ private:
 	Window* m_Window;
 private:
 	static Application* s_App;
-};
+};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

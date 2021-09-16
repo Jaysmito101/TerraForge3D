@@ -28,6 +28,8 @@ static void InitImGui() {
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigViewportsNoAutoMerge = true;
+	io.ConfigViewportsNoTaskBarIcon = true;
 	ImGui::StyleColorsDark();
 	ImGuiStyle& style = ImGui::GetStyle();
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -83,6 +85,17 @@ void Application::ImGuiRenderEnd()
 	}
 }
 
+bool Application::IsActive()
+{
+	return isActive;
+}
+
+void Application::RenderImGui() {
+	ImGuiRenderBegin();
+	OnImGuiRender();
+	ImGuiRenderEnd();
+}
+
 void Application::Run() 
 {
 	InitGlad();
@@ -94,16 +107,12 @@ void Application::Run()
 		float deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 		oneSecCounter += deltaTime;
-		m_Window->Clear();
 		OnUpdate(deltaTime);
-		ImGuiRenderBegin();		
-		OnImGuiRender(deltaTime);
 		if (oneSecCounter >= 1)
 		{
 			OnOneSecondTick();
 			oneSecCounter = 0;
 		}
-		ImGuiRenderEnd();
 		Render();
 		m_Window->Update();
 	}
