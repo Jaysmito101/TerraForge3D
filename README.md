@@ -5,8 +5,9 @@
 
 * Generte 3D Terrain Procedrally using Perlin Noise
 * Export Terrain mesh as OBJ
-* You can write and test your own shaders!
-* Test under different lighting!
+* Layer several noise layers
+* You can write and test your own shaders
+* Test under different lighting
 * A basic 3D viewer!
 
 # Screenshots
