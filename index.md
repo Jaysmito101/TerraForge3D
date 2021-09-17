@@ -1,37 +1,29 @@
-## Welcome to GitHub Pages
+# TerraGen3D
+3D Procedural Terrain Generation Tool in OpenGL/C++
 
-You can use the [editor on GitHub](https://github.com/Jaysmito101/TerraGen3D/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+# What can this do?
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* Generte 3D Terrain Procedrally using Perlin Noise
+* Export Terrain mesh as OBJ
+* Layer several noise layers
+* You can write and test your own shaders
+* Test under different lighting
+* A basic 3D viewer!
 
-### Markdown
+# Screenshots
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+![Screenshot 1](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%202/Screenshot%20(2).png)
 
-```markdown
-Syntax highlighted code block
+![Screenshot 2](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%202/Screenshot%20(7).png)
 
-# Header 1
-## Header 2
-### Header 3
+![Screenshot 3](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%202/Screenshot%20(1).png)
 
-- Bulleted
-- List
+# Using Without Building
 
-1. Numbered
-2. List
+* Download the Latest Release from the releases tab!
+* Run the program!
 
-**Bold** and _Italic_ and `Code` text
+# Building From Source
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Jaysmito101/TerraGen3D/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+* Clone/Download Zip this repository.
+* Open the solution file in Visual Studio to Build!
