@@ -28,10 +28,10 @@ static void InitGLFW()
 }
 
 
-Window::Window() 
+Window::Window(std::string title = "Window") 
 {
 	InitGLFW();
-	m_Window = glfwCreateWindow(640, 480, "TerraGen3D - Jaysmito Mukherjee", NULL, NULL);
+	m_Window = glfwCreateWindow(640, 480, title.c_str(), NULL, NULL);
 	if (!m_Window)
 	{
 		glfwTerminate();

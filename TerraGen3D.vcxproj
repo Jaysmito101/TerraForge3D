@@ -74,12 +74,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)src\;$(SolutionDir)include\imgui;$(SolutionDir)src\Base;$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)src\;$(SolutionDir)include\imgui;$(SolutionDir)src\Base;$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)src\;$(SolutionDir)include\imgui;$(SolutionDir)src\Base;$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)src\;$(SolutionDir)include\imgui;$(SolutionDir)src\Base;$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -96,7 +96,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -111,7 +111,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -155,8 +155,11 @@
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\AppStyles.cpp" />
     <ClCompile Include="src\Base\Application.cpp" />
+    <ClCompile Include="src\Base\EntryPoint.cpp" />
     <ClCompile Include="src\Base\Shader.cpp" />
+    <ClCompile Include="src\Base\SplashScreen.cpp" />
     <ClCompile Include="src\Base\Window.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
@@ -423,12 +426,16 @@
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\AppStyles.h" />
     <ClInclude Include="src\Base\Application.h" />
     <ClInclude Include="src\Base\Base.h" />
     <ClInclude Include="src\Base\EntryPoint.h" />
     <ClInclude Include="src\Base\Shader.h" />
+    <ClInclude Include="src\Base\SplashScreen.h" />
     <ClInclude Include="src\Base\Window.h" />
+    <ClInclude Include="src\FastNoiseLite.h" />
     <ClInclude Include="src\ImGuiConsole.h" />
+    <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\SimplexNoise.h" />
   </ItemGroup>
   <ItemGroup>
@@ -543,9 +550,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TerraGen3D.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include=".\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

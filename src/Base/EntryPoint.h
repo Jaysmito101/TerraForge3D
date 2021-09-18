@@ -1,12 +1,7 @@
 #pragma once
-
 #include <Application.h>
+#include <windows.h>
 
 extern Application* CreateApplication();
 
-int main()
-{
-	Application* app = CreateApplication();
-	app->Run();
-	delete app;
-}
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);

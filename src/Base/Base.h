@@ -38,3 +38,4 @@
 #include <Window.h>
 #include <Application.h>
 #include <Shader.h>
+#include <SplashScreen.h>

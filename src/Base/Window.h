@@ -3,6 +3,7 @@
 struct GLFWwindow;
 
 #include <functional>
+#include <string>
 
 using EventFn = std::function<void(int, int)>;
 
@@ -21,7 +22,7 @@ struct ClearColor {
 
 class Window {
 public:
-	Window();
+	Window(std::string title);
 	~Window();
 
 	void SetShouldCloseCallback(EventFn callbackFunction);

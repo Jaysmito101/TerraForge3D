@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <string>
 
 static void Log(const char* log) {
 	std::cout << log << std::endl;
@@ -49,9 +50,19 @@ static void ImGuiShutdown() {
 
 Application* Application::s_App;
 
-Application::Application() 
+
+
+Application::Application()
 {
-	m_Window = new Window();
+}
+
+void Application::SetTitle(std::string title)
+{
+	m_WindowTitle = title;
+}
+
+void Application::Init() {
+	m_Window = new Window(m_WindowTitle);
 	m_Window->SetVSync(true);
 	isActive = true;
 	s_App = this;
@@ -119,6 +130,7 @@ void Application::Run()
 	OnEnd();
 	ImGuiShutdown();
 }
+
 
 Application::~Application()
 {
