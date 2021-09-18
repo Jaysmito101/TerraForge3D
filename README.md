@@ -12,9 +12,11 @@
 
 # Screenshots
 
-![Screenshot 1](Screenshots/Screenshot%20(2).png)
+![Screenshot 1](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%202/Screenshot%20(2).png)
 
-![Screenshot 2](Screenshots/Screenshot%20(3).png)
+![Screenshot 2](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%202/Screenshot%20(7).png)
+
+![Screenshot 3](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%202/Screenshot%20(1).png)
 
 # Using Without Building
 
