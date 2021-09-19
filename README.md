@@ -3,7 +3,7 @@
 
 # What can this do?
 
-* Generte 3D Terrain Procedrally using Perlin Noise
+* Generte 3D Terrain Procedrally
 * Export Terrain mesh as OBJ
 * Layer several noise layers
 * You can write and test your own shaders
