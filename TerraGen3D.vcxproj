@@ -104,11 +104,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <Optimization>MaxSpeed</Optimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,6 +158,8 @@
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="include\text-editor\TextEditor.cpp" />
+    <ClCompile Include="src\AppShaderEditor.cpp" />
     <ClCompile Include="src\AppStyles.cpp" />
     <ClCompile Include="src\Base\Application.cpp" />
     <ClCompile Include="src\Base\EntryPoint.cpp" />
@@ -425,7 +430,11 @@
     <ClInclude Include="include\imgui\imstb_rectpack.h" />
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
+    <ClInclude Include="include\mini-yaml\Yaml.hpp" />
+    <ClInclude Include="include\text-editor\TextEditor.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\AppShaderEditor.h" />
+    <ClInclude Include="src\AppStructs.h" />
     <ClInclude Include="src\AppStyles.h" />
     <ClInclude Include="src\Base\Application.h" />
     <ClInclude Include="src\Base\Base.h" />

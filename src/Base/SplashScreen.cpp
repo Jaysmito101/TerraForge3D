@@ -17,11 +17,11 @@ namespace SplashScreen {
     HINSTANCE hInstance;
     HWND splashWindow;
     HANDLE splashWindowThread;
+    static bool isRunning;
 
     // For Future Use
     static char splashMessage[256];
     static int splashMessageLength;
-    static bool isRunning;
     static int commandPtr;
 
 
@@ -70,6 +70,7 @@ namespace SplashScreen {
         default:
             return DefWindowProc(hwnd, message, wParam, lParam);
         }
+
         return 0;
     }
 
@@ -142,20 +143,12 @@ namespace SplashScreen {
 
         splashWindow = hwnd;
         // Step 3: The Message Loop
-        while (GetMessage(&Msg, NULL, 0, 0) > 0)
-        {
-            if (commandPtr == 1) {
-                ShowWindow(hwnd, SW_SHOW);
-                commandPtr = 0;
-            }
-            if (commandPtr == 2) {
-                ShowWindow(hwnd, SW_HIDE);
-                commandPtr = 0;
-            }
-
-            TranslateMessage(&Msg);
-            DispatchMessage(&Msg);
-        }
+        GetMessage(&Msg, NULL, 0, 0);
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
+        GetMessage(&Msg, NULL, 0, 0);
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
         return 0;
     }
 

@@ -1,12 +1,48 @@
+#include <json.hpp>
+
+
 #include "AppStyles.h"
 
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
+#include <string>
 #include <stdlib.h>
+#include <fstream>
+#include <Windows.h>
+#include <iostream>
 
 #define MAX(A, B)            (((A) >= (B)) ? (A) : (B))
+
+
+static char themeName[256] = "Custom Theme\0";
+
+
+std::string RequestSaveFileName(HWND owner = NULL) {
+    OPENFILENAME ofn;
+    WCHAR fileName[MAX_PATH];
+    ZeroMemory(fileName, MAX_PATH);
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = owner;
+    ofn.lpstrFilter = L"*.terr3d\0";
+    ofn.lpstrFile = fileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+    ofn.lpstrDefExt = (LPWSTR)"";
+
+    std::string fileNameStr;
+
+    if (GetSaveFileName(&ofn)) {
+        std::wstring ws(ofn.lpstrFile);
+        // your new String
+        std::string str(ws.begin(), ws.end());
+        return str;
+    }
+    return std::string("");
+}
 
 void LoadLightOrngeStyle() {
     auto& style = ImGui::GetStyle();
@@ -90,6 +126,11 @@ void LoadDefaultStyle() {
     style->ScrollbarRounding = 9.0f;
     style->GrabMinSize = 5.0f;
     style->GrabRounding = 3.0f;
+    style->WindowBorderSize = 0;
+    style->ChildBorderSize = 0;
+    style->PopupBorderSize = 0;
+    style->FrameBorderSize = 0;
+    style->TabBorderSize = 0;
 
     style->Colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
     style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
@@ -125,6 +166,18 @@ void LoadDefaultStyle() {
     style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
     style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
     style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+
+    ImVec4* colors = ImGui::GetStyle().Colors;
+
+    colors[ImGuiCol_Tab] = ImVec4(0.146f, 0.113f, 0.146f, 0.86f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.364f, 0.205f, 0.366f, 0.80f);
+    colors[ImGuiCol_TabActive] = ImVec4(51.0f / 255, 31.0f / 255, 49.0f / 255, 0.97f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(51.0f / 255, 31.0f / 255, 49.0f / 255, 0.57f);
+    colors[ImGuiCol_Header] = ImVec4(0.61f, 0.61f, 0.62f, 0.22f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.61f, 0.62f, 0.62f, 0.51f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.61f, 0.62f, 0.62f, 0.83f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(43.0f/255, 17.0f/255, 43.0f/255, 0.97f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.202f, 0.116f, 0.196f, 0.57f);
 }
 
 void LoadDarkCoolStyle()
@@ -213,12 +266,216 @@ void LoadDarkCoolStyle()
 
 }
 
+void LoadBlackAndWhite()
+{
+    ImVec4* colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_Text] = ImVec4(0.78f, 0.78f, 0.78f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.88f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.45f, 0.46f, 0.46f, 0.40f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.35f, 0.36f, 0.37f, 0.67f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+    colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.16f, 0.16f, 0.16f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_CheckMark] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.60f, 0.61f, 0.62f, 1.00f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.37f, 0.37f, 0.37f, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(0.49f, 0.51f, 0.52f, 0.40f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.53f, 0.53f, 0.54f, 0.84f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(0.61f, 0.61f, 0.62f, 0.22f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.61f, 0.62f, 0.62f, 0.51f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.61f, 0.62f, 0.62f, 0.83f);
+    colors[ImGuiCol_Separator] = ImVec4(0.44f, 0.44f, 0.44f, 0.50f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.00f, 0.00f, 0.00f, 0.78f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.29f, 0.29f, 0.29f, 1.00f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.20f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.61f, 0.61f, 0.61f, 0.67f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.23f, 0.23f, 0.23f, 0.95f);
+    colors[ImGuiCol_Tab] = ImVec4(0.22f, 0.22f, 0.22f, 0.86f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.57f, 0.57f, 0.57f, 0.80f);
+    colors[ImGuiCol_TabActive] = ImVec4(0.47f, 0.47f, 0.47f, 1.00f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(0.11f, 0.11f, 0.11f, 0.97f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.21f, 0.21f, 0.21f, 1.00f);
+    colors[ImGuiCol_DockingPreview] = ImVec4(0.00f, 0.00f, 0.00f, 0.70f);
+    colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+    colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
+    colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);
+    colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
+    colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.59f, 0.59f, 0.59f, 0.35f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(0.46f, 0.46f, 0.46f, 1.00f);
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-// TODO: Add Ability To Save Styles
+
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowPadding = ImVec2(12.00f, 12.00f);
+    style.FramePadding = ImVec2(10.00f, 10.00f);
+    style.CellPadding = ImVec2(6.00f, 6.00f);
+    style.ItemSpacing = ImVec2(6.00f, 6.00f);
+    style.ItemInnerSpacing = ImVec2(6.00f, 6.00f);
+    style.TouchExtraPadding = ImVec2(0.00f, 0.00f);
+    style.IndentSpacing = 25;
+    style.ScrollbarSize = 15;
+    style.GrabMinSize = 10;
+    style.WindowBorderSize = 0;
+    style.ChildBorderSize = 0;
+    style.PopupBorderSize = 0;
+    style.FrameBorderSize = 0;
+    style.TabBorderSize = 0;
+    style.WindowRounding = 8;
+    style.ChildRounding = 6;
+    style.FrameRounding = 10;
+    style.PopupRounding = 7;
+    style.ScrollbarRounding = 9;
+    style.GrabRounding = 9;
+    style.LogSliderDeadzone = 4;
+    style.TabRounding = 6;
+    style.WindowMenuButtonPosition = 0;
+
+}
+
+static void ExportImGuiSettings() {
+    std::string outFile = RequestSaveFileName();
+    nlohmann::json output;
+    output["type"] = "THEME";
+    nlohmann::json colors;
+    nlohmann::json styles;
+    nlohmann::json color;
+    nlohmann::json tmp;
+
+    ImGuiStyle& style = ImGui::GetStyle();
+  
+    for (int i = 0; i < ImGuiCol_COUNT; i++)
+    {
+        const ImVec4& col = style.Colors[i];
+        const char* name = ImGui::GetStyleColorName(i);
+        color = nlohmann::json();
+        color["x"] = col.x;
+        color["y"] = col.y;
+        color["z"] = col.z;
+        color["w"] = col.w;
+        colors[std::to_string(i)] = color;
+    }
+
+    output["colors"] = colors;
+    
+
+    tmp["x"] = style.FramePadding.x;
+    tmp["y"] = style.FramePadding.y;
+    styles["FramePadding"] = tmp;
+
+    tmp["x"] = style.WindowPadding.x;
+    tmp["y"] = style.WindowPadding.y;
+    styles["WindowPadding"] = tmp;
+
+    tmp["x"] = style.ItemSpacing.x;
+    tmp["y"] = style.ItemSpacing.y;
+    styles["ItemSpacing"] = tmp;
+
+    tmp["x"] = style.ItemInnerSpacing.x;
+    tmp["y"] = style.ItemInnerSpacing.y;
+    styles["WindowPadding"] = tmp;
+
+    styles["WindowRounding"] = style.WindowRounding;
+    styles["FrameRounding"] = style.FrameRounding;
+    styles["IndentSpacing"] = style.IndentSpacing;
+    styles["ScrollbarSize"] = style.ScrollbarSize;
+    styles["ScrollbarRounding"] = style.ScrollbarRounding;
+    styles["GrabMinSize"] = style.GrabMinSize;
+    styles["GrabRounding"] = style.GrabRounding;
+    styles["WindowBorderSize"] = style.WindowBorderSize;
+    styles["ChildBorderSize"] = style.ChildBorderSize;
+    styles["FrameBorderSize"] = style.FrameBorderSize;
+    styles["TabBorderSize"] = style.TabBorderSize;
+
+    output["styles"] = styles;
+
+    output["themeName"] = themeName;
+    
+    std::ofstream outfile;
+    if (outFile.find(".terr3d") == std::string::npos)
+        outFile = outFile + ".terr3d";
+    outfile.open(outFile);
+    outfile << nlohmann::to_string(output);
+    outfile.close();
+}
+
+
+static bool ImportImGuiSettings(std::string settings) {
+    try {
+        nlohmann::json theme = nlohmann::json::parse(settings);
+        if (std::string(theme["type"]) != "THEME") {
+            return false;
+        }
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        for (int i = 0; i < ImGuiCol_COUNT; i++)
+        {
+            style.Colors[i] = ImVec4((float)(theme["colors"][std::to_string(i)]["x"]), (float)(theme["colors"][std::to_string(i)]["y"]), (float)(theme["colors"][std::to_string(i)]["z"]), (float)(theme["colors"][std::to_string(i)]["w"]));
+        }
+
+        theme = theme["styles"];
+
+        style.FramePadding = ImVec2(theme["FramePadding"]["x"], theme["FramePadding"]["x"]);
+        style.WindowPadding = ImVec2(theme["WindowPadding"]["x"], theme["WindowPadding"]["x"]);
+        style.ItemSpacing = ImVec2(theme["ItemSpacing"]["x"], theme["ItemSpacing"]["x"]);
+        style.WindowPadding = ImVec2(theme["WindowPadding"]["x"], theme["WindowPadding"]["x"]);
+        style.WindowRounding = theme["WindowRounding"];
+        style.FrameRounding = theme["FrameRounding"];
+        style.IndentSpacing = theme["IndentSpacing"];
+        style.ScrollbarSize = theme["ScrollbarSize"];
+        style.ScrollbarRounding = theme["ScrollbarRounding"];
+        style.GrabMinSize = theme["GrabMinSize"];
+        style.GrabRounding = theme["GrabRounding"];
+        style.WindowBorderSize = theme["WindowBorderSize"];
+        style.ChildBorderSize = theme["ChildBorderSize"];
+        style.FrameBorderSize = theme["FrameBorderSize"];
+        style.TabBorderSize = theme["TabBorderSize"];
+    }
+    catch(...){
+        return false;
+    }
+    return true;
+}
+
+bool LoadThemeFromFile(std::string filename) {
+    std::fstream newfile;
+    newfile.open(filename.c_str(), std::ios::in);
+    if (newfile.is_open()) {
+        std::string tp;
+        std::string res = "";
+        getline(newfile, res, '\0');
+        newfile.close();
+        return ImportImGuiSettings(res);
+    }
+    return false;
+}
+
+
 void ShowStyleEditor(bool* pOpen)
 {
     ImGuiStyle* ref = NULL;
-	ImGui::Begin("Style Editor", pOpen);
+    ImGui::Begin("Theme Editor", pOpen);
 
     // You can pass in a reference ImGuiStyle structure to compare to, revert to and save to
     // (without a reference style pointer, we will use one compared locally as a reference)
@@ -235,7 +492,10 @@ void ShowStyleEditor(bool* pOpen)
 
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
 
-
+    ImGui::InputText("Theme Name", themeName, 256);
+    if (ImGui::Button("Save Theme")) {
+        ExportImGuiSettings();
+    }
     // Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
     if (ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))
         style.GrabRounding = style.FrameRounding; // Make GrabRounding always the same value as FrameRounding
@@ -244,14 +504,6 @@ void ShowStyleEditor(bool* pOpen)
     { bool border = (style.FrameBorderSize > 0.0f);  if (ImGui::Checkbox("FrameBorder", &border)) { style.FrameBorderSize = border ? 1.0f : 0.0f; } }
     ImGui::SameLine();
     { bool border = (style.PopupBorderSize > 0.0f);  if (ImGui::Checkbox("PopupBorder", &border)) { style.PopupBorderSize = border ? 1.0f : 0.0f; } }
-
-    // Save/Revert button
-    if (ImGui::Button("Save Ref"))
-        *ref = ref_saved_style = style;
-    ImGui::SameLine();
-    if (ImGui::Button("Revert Ref"))
-        style = *ref;
-    ImGui::SameLine();
     
     ImGui::Separator();
 
@@ -304,25 +556,7 @@ void ShowStyleEditor(bool* pOpen)
         {
             static int output_dest = 0;
             static bool output_only_modified = true;
-            if (ImGui::Button("Export"))
-            {
-                if (output_dest == 0)
-                    ImGui::LogToClipboard();
-                else
-                    ImGui::LogToTTY();
-                ImGui::LogText("ImVec4* colors = ImGui::GetStyle().Colors;" "\r\n");
-                for (int i = 0; i < ImGuiCol_COUNT; i++)
-                {
-                    const ImVec4& col = style.Colors[i];
-                    const char* name = ImGui::GetStyleColorName(i);
-                    if (!output_only_modified || memcmp(&col, &ref->Colors[i], sizeof(ImVec4)) != 0)
-                        ImGui::LogText("colors[ImGuiCol_%s]%*s= ImVec4(%.2ff, %.2ff, %.2ff, %.2ff);" "\r\n",
-                            name, 23 - (int)strlen(name), "", col.x, col.y, col.z, col.w);
-                }
-                ImGui::LogFinish();
-            }
-            ImGui::SameLine(); ImGui::SetNextItemWidth(120); ImGui::Combo("##output_type", &output_dest, "To Clipboard\0To TTY\0");
-            ImGui::SameLine(); ImGui::Checkbox("Only Modified Colors", &output_only_modified);
+           
 
             static ImGuiTextFilter filter;
             filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
@@ -356,89 +590,6 @@ void ShowStyleEditor(bool* pOpen)
             }
             ImGui::PopItemWidth();
             ImGui::EndChild();
-
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Fonts"))
-        {
-            ImGuiIO& io = ImGui::GetIO();
-            ImFontAtlas* atlas = io.Fonts;
-     
-
-            // Post-baking font scaling. Note that this is NOT the nice way of scaling fonts, read below.
-            // (we enforce hard clamping manually as by default DragFloat/SliderFloat allows CTRL+Click text to get out of bounds).
-            const float MIN_SCALE = 0.3f;
-            const float MAX_SCALE = 2.0f;
-
-            static float window_scale = 1.0f;
-            ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
-            if (ImGui::DragFloat("window scale", &window_scale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp)) // Scale only this window
-                ImGui::SetWindowFontScale(window_scale);
-            ImGui::DragFloat("global scale", &io.FontGlobalScale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp); // Scale everything
-            ImGui::PopItemWidth();
-
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Rendering"))
-        {
-            ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines);
-            ImGui::SameLine();
-            
-
-            ImGui::Checkbox("Anti-aliased lines use texture", &style.AntiAliasedLinesUseTex);
-            ImGui::SameLine();
-
-            ImGui::Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
-            ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
-            ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
-            if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
-
-            // When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
-            ImGui::DragFloat("Circle Tessellation Max Error", &style.CircleTessellationMaxError, 0.005f, 0.10f, 5.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
-            if (ImGui::IsItemActive())
-            {
-                ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
-                ImGui::BeginTooltip();
-                ImGui::TextUnformatted("(R = radius, N = number of segments)");
-                ImGui::Spacing();
-                ImDrawList* draw_list = ImGui::GetWindowDrawList();
-                const float min_widget_width = ImGui::CalcTextSize("N: MMM\nR: MMM").x;
-                for (int n = 0; n < 8; n++)
-                {
-                    const float RAD_MIN = 5.0f;
-                    const float RAD_MAX = 70.0f;
-                    const float rad = RAD_MIN + (RAD_MAX - RAD_MIN) * (float)n / (8.0f - 1.0f);
-
-                    ImGui::BeginGroup();
-
-                    ImGui::Text("R: %.f\nN: %d", rad, draw_list->_CalcCircleAutoSegmentCount(rad));
-
-                    const float canvas_width = MAX(min_widget_width, rad * 2.0f);
-                    const float offset_x = floorf(canvas_width * 0.5f);
-                    const float offset_y = floorf(RAD_MAX);
-
-                    const ImVec2 p1 = ImGui::GetCursorScreenPos();
-                    draw_list->AddCircle(ImVec2(p1.x + offset_x, p1.y + offset_y), rad, ImGui::GetColorU32(ImGuiCol_Text));
-                    ImGui::Dummy(ImVec2(canvas_width, RAD_MAX * 2));
-
-                    /*
-                    const ImVec2 p2 = ImGui::GetCursorScreenPos();
-                    draw_list->AddCircleFilled(ImVec2(p2.x + offset_x, p2.y + offset_y), rad, ImGui::GetColorU32(ImGuiCol_Text));
-                    ImGui::Dummy(ImVec2(canvas_width, RAD_MAX * 2));
-                    */
-
-                    ImGui::EndGroup();
-                    ImGui::SameLine();
-                }
-                ImGui::EndTooltip();
-            }
-            ImGui::SameLine();
-
-            ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
-            ImGui::DragFloat("Disabled Alpha", &style.DisabledAlpha, 0.005f, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); 
-            ImGui::PopItemWidth();
 
             ImGui::EndTabItem();
         }

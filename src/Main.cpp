@@ -4,6 +4,7 @@
 #include <Base/EntryPoint.h>
 #include <ImGuiConsole.h>
 #include <AppStyles.h>
+#include <AppShaderEditor.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
 #include <windows.h>
 #include <string.h>
@@ -22,123 +23,7 @@
 #undef near
 #undef far
 
-struct Vec2 {
-	float x = 0;
-	float y = 0;
-};
-
-struct Vec3 {
-	float x = 0;
-	float y = 0;
-	float z = 0;
-};
-
-struct Vec4 {
-	float x = 0;
-	float y = 0;
-	float z = 0;
-	float w = 0;
-};
-
-struct Vert {
-	glm::vec3 position;
-	glm::vec3 normal;
-};
-
-struct Mesh {
-	Vert* vert;
-	int* indices;
-	int vertexCount;
-	int indexCount;
-};
-
-struct Camera {
-	glm::mat4 view;
-	glm::mat4 pers;
-	glm::mat4 pv;
-	glm::vec3 position;
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	glm::vec3 rotation;
-	float pitch;
-	float yaw;
-	float roll;
-	float fov;
-	float far;
-	float aspect;
-	float near;
-
-	Camera() {
-		fov = 45;
-		near = 0.01f;
-		far = 100.0f;
-		aspect = 16.0f / 9.0f;
-		pitch = yaw = roll = 0;
-		view = glm::mat4(1.0f);
-		pv = glm::mat4(1.0f);
-		pers = glm::perspective(fov, aspect, near, far);
-		position = glm::vec3(0.0f, 0.0f, 3.0f);
-		rotation = glm::vec3(1.0f);
-	}
-
-	void UpdateRotation()
-	{
-		pitch = rotation.x;
-		yaw = rotation.y;
-		roll = rotation.z;
-	}
-
-	void UpdateCamera(float* pos, float* rot)
-	{
-		position.x = pos[0];
-		position.y = pos[1];
-		position.z = pos[2];
-		rotation.x = glm::radians(rot[0]);
-		rotation.y = glm::radians(rot[1]);
-		rotation.z = glm::radians(rot[2]);
-		UpdateRotation();
-		view = glm::lookAt(position, position + cameraFront, cameraUp);
-		view = glm::rotate(view, glm::radians(rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-		pers = glm::perspective(fov, aspect, near, far);
-		pv = pers * view;
-	}
-};
-
-struct Stats
-{
-	float deltaTime = 1;
-	float frameRate = 1;
-	int triangles = 0;
-	int vertCount = 0;
-};
-
-struct NoiseLayer {
-
-	NoiseLayer() {
-		noiseType = "Simplex Perlin";
-		strcpy(name, "Noise Layer");
-		strength = 0.0f;
-		enabled = true;
-		active = false;
-		scale = 1;
-		offsetX = 0;
-		offsetY = 0;
-	}
-
-	const char* noiseType;
-	char name[256];
-	float strength;
-	float offsetX, offsetY;
-	float scale;
-	bool enabled;
-	bool active;
-};
-
-struct ActiveWindows {
-	bool styleEditor = false;;
-};
+#include <AppStructs.h>
 
 static std::string vs = R"(
 #version 330 core
@@ -222,7 +107,7 @@ static bool isRemeshing = false;
 static ActiveWindows activeWindows;
 
 static void ToggleSystemConsole() {
-	static bool state = true;
+	static bool state = false;
 	state = !state;
 	ShowWindow(GetConsoleWindow(), state?SW_SHOW:SW_HIDE);
 }
@@ -255,7 +140,7 @@ static std::string ReadShaderSourceFile(std::string path, bool* result) {
 
 static void ShowStats() 
 {
-	ImGui::Begin("Statistics");
+	ImGui::Begin("Statistics", &activeWindows.statsWindow);
 
 	// Frame Rate
 	{
@@ -329,7 +214,7 @@ static void ShowCameraControls() {
 	ImGui::Begin("Camera Controls");
 
 	ImGui::Text("Camera Position");
-	ImGui::DragFloat3("##cameraPosition", CameraPosition, 0.1);
+	ImGui::DragFloat3("##cameraPosition", CameraPosition, 0.1f);
 	ImGui::Separator();
 	ImGui::Separator();
 	ImGui::Text("Camera Rotation");
@@ -338,10 +223,10 @@ static void ShowCameraControls() {
 	ImGui::Separator();
 	ImGui::Text("Projection Settings");
 	ImGui::Separator();
-	ImGui::DragFloat("FOV", &(camera.fov), 0.01);
-	ImGui::DragFloat("Aspect Ratio", &(camera.aspect), 0.01);
-	ImGui::DragFloat("Near Clipping", &(camera.near), 0.01);
-	ImGui::DragFloat("Far Clipping", &(camera.far), 0.01);
+	ImGui::DragFloat("FOV", &(camera.fov), 0.01f);
+	ImGui::DragFloat("Aspect Ratio", &(camera.aspect), 0.01f);
+	ImGui::DragFloat("Near Clipping", &(camera.near), 0.01f);
+	ImGui::DragFloat("Far Clipping", &(camera.far), 0.01f);
 
 	ImGui::End();
 }
@@ -350,7 +235,7 @@ static void ShowLightingControls() {
 	ImGui::Begin("Light Controls");
 
 	ImGui::Text("Light Position");
-	ImGui::DragFloat3("##lightPosition", &LightPosition[0], 0.1);
+	ImGui::DragFloat3("##lightPosition", &LightPosition[0], 0.1f);
 	ImGui::Separator();
 	ImGui::Separator();
 	ImGui::Text("Light Color");
@@ -432,6 +317,9 @@ static std::string ExportOBJ() {
 	}
 
 	outfile.close();
+
+	Log((std::string("Exported Mesh to ") + fileName).c_str());
+
 	return fileName;
 
 }
@@ -507,9 +395,9 @@ static void GenerateVertices()
 			vertices[i] = Vert();
 			vertices[i].position = glm::vec3(0.0f);
 
-			vertices[i].position.x = pointOnPlane.x;
-			vertices[i].position.y = pointOnPlane.y + noise(x, y);
-			vertices[i].position.z = pointOnPlane.z;
+			vertices[i].position.x = (float)pointOnPlane.x;
+			vertices[i].position.y = (float)(pointOnPlane.y + noise((float)x, (float)y));
+			vertices[i].position.z = (float)pointOnPlane.z;
 			vertices[i].normal = glm::vec3(0.0f);
 			if (x != resolution - 1 && y != resolution - 1)
 			{
@@ -625,6 +513,7 @@ static void GenerateMesh()
 
 static void RegenerateMesh(){
 	
+
 	GenerateVertices();
 
 	glBindVertexArray(vao);
@@ -639,7 +528,7 @@ static void RegenerateMesh(){
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
 	glEnableVertexAttribArray(1);
-	
+
 }
 
 static void DoTheRederThing(float deltaTime) {
@@ -664,7 +553,6 @@ static void ShowTerrainControls()
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
-	//ImGui::DragFloat("Noise Scale", &noiseScale, 0.005f);
 	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
 	ImGui::NewLine();
 	ImGui::Checkbox("Auto Update", &autoUpdate);
@@ -693,16 +581,6 @@ static void ShowTerrainControls()
 	}
 
 	ImGui::Separator();
-	if (ImGui::Button("Export as OBJ")) {
-		fileName = ExportOBJ();
-		exp = true;
-	}
-	if (exp) {
-		ImGui::TextColored(ImVec4(0.0f, 0.7f, 0.0f, 1.0f), "Exported mesh as OBJ! (%s)", fileName);
-		ImGui::NewLine();
-		ImGui::TextColored(ImVec4(0.0f, 0.7f, 0.0f, 1.0f), "(%s)", fileName);
-	}
-
 	ImGui::End();
 }
 
@@ -746,7 +624,7 @@ static void ShowNoiseSettings(){
 	ImGui::Begin("Noise Settings");
 	ImGui::Text("Noise Layers");
 	ImGui::Separator();
-	for (int i = 0; i < noiseLayers.size();i++) {
+	for (unsigned int i = 0; i < noiseLayers.size();i++) {
 		ShowNoiseLayer(noiseLayers[i], i);
 		ImGui::Separator();
 	}
@@ -812,11 +690,14 @@ static void ShowMainScene() {
 }
 
 static void ShowWindowMenuItem(const char* title, bool* val) {
+	/*
 	if (ImGui::MenuItem(title)) {
 		*val = !(*val);
 	}
 	ImGui::SameLine();
 	ImGui::Checkbox((std::string("##") + std::string(title) + "MenuItem").c_str(), val);
+	*/
+	ImGui::Checkbox(title, val);
 }
 
 static void ShowMenu() {
@@ -824,6 +705,13 @@ static void ShowMenu() {
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::BeginMenu("Export As")) {
+				if (ImGui::MenuItem("Export as OBJ")) {
+					fileName = ExportOBJ();
+				}
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::MenuItem("Exit")) {
 				exit(0);
 			}
@@ -840,12 +728,20 @@ static void ShowMenu() {
 					LoadDefaultStyle();
 				}
 
+				if (ImGui::MenuItem("Black & White")) {
+					LoadBlackAndWhite();
+				}
+
 				if (ImGui::MenuItem("Cool Dark")) {
 					LoadDarkCoolStyle();
 				}
 
 				if (ImGui::MenuItem("Light Orange")) {
 					LoadLightOrngeStyle();
+				}
+
+				if (ImGui::MenuItem("Load Theme From File")) {
+					LoadThemeFromFile(openfilename());
 				}
 				ImGui::EndMenu();
 			}
@@ -854,7 +750,11 @@ static void ShowMenu() {
 		}
 		if (ImGui::BeginMenu("Widnows"))
 		{
-			ShowWindowMenuItem("Style Editor", &activeWindows.styleEditor);
+			ShowWindowMenuItem("Statistics", &activeWindows.statsWindow);
+
+			ShowWindowMenuItem("Theme Editor", &activeWindows.styleEditor);
+
+			ShowWindowMenuItem("Shader Editor", &activeWindows.shaderEditorWindow);
 			
 			ImGui::EndMenu();
 		}
@@ -945,7 +845,6 @@ public:
 	{
 		OnBeforeImGuiRender();
 		ShowGeneralControls();
-		ShowStats();
 		ShowConsole();
 		ShowCameraControls();
 		ShowTerrainControls();
@@ -955,8 +854,15 @@ public:
 
 		// Optional Windows
 
+		if (activeWindows.statsWindow)
+			ShowStats();
+
+
 		if (activeWindows.styleEditor)
 			ShowStyleEditor(&activeWindows.styleEditor);
+
+		if (activeWindows.shaderEditorWindow)
+			ShowShaderEditor(&activeWindows.shaderEditorWindow);
 
 		OnImGuiRenderEnd();
 	}
@@ -964,7 +870,7 @@ public:
 	virtual void OnStart() override
 	{
 		Log("Started Up App!");
-		srand(time(NULL));
+		srand((unsigned int)time(NULL));
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
 		SetupFrameBuffer();
@@ -974,7 +880,7 @@ public:
 			});
 		glfwSetScrollCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, double x, double y) {
 			ImGuiIO& io = ImGui::GetIO();
-			io.MouseWheel = y;
+			io.MouseWheel = (float)y;
 			});
 		GetWindow()->SetClearColor({0.1f, 0.1f, 0.1f});
 		GenerateMesh();

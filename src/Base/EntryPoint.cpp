@@ -21,6 +21,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		SplashScreen::Destory();
 	}
 	AllocateConsole();
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
 	app->Init();
 	app->Run();
 	delete app;

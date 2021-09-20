@@ -55,17 +55,17 @@ float cml(float val, float min, float max){
 // One big problem is I cannot figure out how to blend the boundaries properly.
 vec3 getHeightBasedColor(vec3 pos){
 	vec3 outCol = vec3(0.0f);
-	float ns =noise(pos*10000);
-	float y = (pos.y*5)+ns*0.8f;
+	float ns =noise(pos*100);
+	float y = (pos.y*5)+ns*0.5f;
 	if(y < 0.05f)
 		outCol = outCol + blue ;
-	if(y < 0.15f)
+	else if(y < 0.50f)
 		outCol = outCol + seablue;
-	if(y < 1.0f)
+	else if(y < 1.5f)
 		outCol = outCol+  dgreen;
-	if(y < 1.6f)
+	else if(y < 2.0f)
 		outCol = outCol +   green;
-	if(y > 1.6f)
+	else if(y > 2.0f)
 		outCol = outCol +  brown;
 	return outCol;
 }
