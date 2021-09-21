@@ -1,5 +1,10 @@
 #pragma once
 #include <imgui.h>
-#include <text-editor/TextEditor.h>
+#include <string>
 
 void ShowShaderEditor(bool* pOpen);
+
+void SetupShaderManager();
+bool ReqRefresh();
+std::string GetVertexShaderSource();
+std::string GetFragmentShaderSource();

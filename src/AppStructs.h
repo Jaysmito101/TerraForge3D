@@ -106,7 +106,7 @@ struct NoiseLayer {
 
 	NoiseLayer() {
 		noiseType = "Simplex Perlin";
-		strcpy(name, "Noise Layer");
+		strcpy_s(name, "Noise Layer");
 		strength = 0.0f;
 		enabled = true;
 		active = false;

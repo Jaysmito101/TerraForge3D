@@ -7,7 +7,7 @@
 #include <AppShaderEditor.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
 #include <windows.h>
-#include <string.h>
+#include <string>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -25,47 +25,7 @@
 
 #include <AppStructs.h>
 
-static std::string vs = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNorm;
 
-uniform mat4 _PV;
-
-out vec3 FragPos;
-out vec3 Normal;
-
-void main()
-{
-    gl_Position = _PV * vec4(aPos.x, aPos.y, aPos.z, 1.0);
-	FragPos = aPos;
-	Normal = aNorm;
-}
-)";
-
-static std::string fs = R"(
-
-#version 330 core
-out vec4 FragColor;
-
-uniform vec3 _LightPosition;
-uniform vec3 _LightColor;
-
-in vec3 FragPos;
-in vec3 Normal;
-
-void main()
-{	
-	//vec3 objectColor = vec3(0.34f, 0.49f, 0.27f);
-	vec3 objectColor = vec3(1, 1, 1);
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(_LightPosition - FragPos);
-	float diff = max(dot(norm, lightDir), 0.0f);
-	vec3 diffuse = diff * _LightColor;
-	vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;
-	FragColor = vec4(result, 1.0);
-} 
-)";
 static Application* myApp;
 static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 static glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -97,8 +57,6 @@ static float scrollSpeed = 0.5f;
 static float mouseScrollAmount = 0;
 static float scale = 1.0f;
 static bool flattenBase = false;
-static std::string vertPath = "./vert.glsl";
-static std::string fragPath= "./frag.glsl";
 static std::vector<NoiseLayer> noiseLayers;
 static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Cellular"};
 static int numberOfNoiseTypes = 3;
@@ -203,13 +161,6 @@ static void ShowConsole()
 {
 }
 
-static void InitGlad() {
-	if (!gladLoadGL()) {
-		Log("Failed to Initialize GLAD!");
-		exit(-1);
-	}
-}
-
 static void ShowCameraControls() {
 	ImGui::Begin("Camera Controls");
 
@@ -298,6 +249,10 @@ static std::string ExportOBJ() {
 	std::string fileName = openfilename();
 
 	std::ofstream outfile;
+
+	if (fileName.find(".obj") == std::string::npos)
+		fileName += ".obj";
+	
 	outfile.open(fileName + ".obj");
 
 
@@ -461,29 +416,7 @@ static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 static void ResetShader() {
 	if (shd)
 		delete shd;
-
-	bool res = true;
-	std::string vertSrc = ReadShaderSourceFile(vertPath, &res);
-	if (!res) {
-		vertSrc = vs;
-		Log((std::string("Could not load ") + vertPath + "! Using default Vertex shader!").c_str());
-		vertPath = "Internal";
-	}
-	else {
-		Log((std::string("Loaded Vertex shader from ") + vertPath).c_str());
-	}
-	res = true;
-	std::string fragSrc = ReadShaderSourceFile(fragPath, &res);
-	if (!res) {
-		fragSrc = fs;
-		Log((std::string("Could not load ") + fragPath + "! Using default Fragment shader!").c_str());
-		fragPath = "Internal";
-	}
-	else {
-		Log((std::string("Loaded Fragment shader from ") + fragPath).c_str());
-	}
-
-	shd = new Shader(vertSrc, fragSrc);
+	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource());
 }
 
 static void GenerateMesh() 
@@ -567,17 +500,9 @@ static void ShowTerrainControls()
 		ResetShader();
 	}
 	ImGui::Separator();
-	ImGui::Text("Current: %s", vertPath.c_str());
-	if (ImGui::Button("Use Custom Vertex Shader")) {
-		vertPath = ShowOpenFileDialog();
-		ResetShader();
-	}
-	ImGui::Separator();
-	ImGui::Text("Current: %s", fragPath.c_str());
-
-	if (ImGui::Button("Use Custom Fragment Shader")) {
-		fragPath = ShowOpenFileDialog();
-		ResetShader();
+	
+	if (ImGui::Button("Use Custom Shaders")) {
+		activeWindows.shaderEditorWindow = true;
 	}
 
 	ImGui::Separator();
@@ -701,7 +626,7 @@ static void ShowWindowMenuItem(const char* title, bool* val) {
 }
 
 static void ShowMenu() {
-	if (ImGui::BeginMenuBar())
+	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
@@ -758,7 +683,7 @@ static void ShowMenu() {
 			
 			ImGui::EndMenu();
 		}
-		ImGui::EndMenuBar();
+		ImGui::EndMainMenuBar();
 	}
 }
 
@@ -833,6 +758,9 @@ public:
 		RenderImGui();
 		if (autoUpdate)
 			RegenerateMesh();
+
+		if (ReqRefresh())
+			ResetShader();
 	}
 
 	virtual void OnOneSecondTick() override 
@@ -871,6 +799,8 @@ public:
 	{
 		Log("Started Up App!");
 		srand((unsigned int)time(NULL));
+		SetupShaderManager();
+		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
 		SetupFrameBuffer();

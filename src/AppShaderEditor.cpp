@@ -1,83 +1,322 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <text-editor/TextEditor.h>
 #include "AppShaderEditor.h"
+#include <AppStructs.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <Windows.h>
+
+static std::string defaultBaseVertexShader = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNorm;
+
+uniform mat4 _PV;
+
+out vec3 FragPos;
+out vec3 Normal;
+
+void main()
+{
+    gl_Position = _PV * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+	FragPos = aPos;
+	Normal = aNorm;
+}
+)";
+
+static std::string defaultBaseFragmentShader = R"(
+
+#version 330 core
+out vec4 FragColor;
+
+uniform vec3 _LightPosition;
+uniform vec3 _LightColor;
+
+in vec3 FragPos;
+in vec3 Normal;
+
+void main()
+{	
+	//vec3 objectColor = vec3(0.34f, 0.49f, 0.27f);
+	vec3 objectColor = vec3(1, 1, 1);
+	vec3 norm = normalize(Normal);
+	vec3 lightDir = normalize(_LightPosition - FragPos);
+	float diff = max(dot(norm, lightDir), 0.0f);
+	vec3 diffuse = diff * _LightColor;
+	vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;
+	FragColor = vec4(result, 1.0);
+} 
+)";
+
+enum ShaderType {
+	Vertex = 0,
+	Fragment = 1
+};
+
+struct ShaderFile {
+	char* shaderSource;
+	std::string filePath;
+	int sourceSize;
+	ShaderType shaderType;
+
+	ShaderFile(ShaderType type = ShaderType::Vertex, int size = 1024*1024*10, bool initialize = true) 
+	{
+		sourceSize = size;
+		shaderType = type;
+		shaderSource = (char*)malloc(size);
+		filePath = (shaderType == ShaderType::Vertex ? "vert.glsl":"frag.glsl");
+		if (initialize) {
+			std::string src = (shaderType == ShaderType::Vertex ? defaultBaseVertexShader : defaultBaseFragmentShader);
+			memset(shaderSource, 0, size);
+			strcat(shaderSource, src.c_str());
+		}
+	}
+
+	void SetSource(std::string source) {
+		memset(shaderSource, 0, sourceSize);
+		strcat(shaderSource, source.c_str());
+	}
+
+	std::string GetSource() {
+		if (shaderSource)
+			return std::string(shaderSource);
+		else
+			return "";
+	}
+
+	~ShaderFile() {
+		delete shaderSource;
+	}
+};
+
 
 static TextEditor::ErrorMarkers markers;
-static TextEditor editor;
+static TextEditor Veditor, Feditor;
+bool isCurrVertexShader = true;
+static std::vector<ShaderFile> shaderFiles;
+static ShaderFile vertShaderFile(ShaderType::Vertex);
+static ShaderFile fragShaderFile(ShaderType::Fragment);
+ShaderType current;
+static bool reqRfrsh = false;
+static void ApplyShaders();
+static bool isVs = false;
+static bool isFs = false;
 
-// TEMP
-static bool hasStup = false;
-// TEMP
-static void setup() {
-	if (hasStup) {
-		return;
+static std::string ReadShaderSourceFile(std::string path, bool* result) {
+	std::fstream newfile;
+	newfile.open(path.c_str(), std::ios::in);
+	if (newfile.is_open()) {
+		std::string tp;
+		std::string res = "";
+		getline(newfile, res, '\0');
+		newfile.close();
+		return res;
 	}
-	hasStup = true;
-	auto lang = TextEditor::LanguageDefinition::CPlusPlus();
-
-	// set your own known preprocessor symbols...
-	static const char* ppnames[] = { "NULL", "PM_REMOVE",
-		"ZeroMemory", "DXGI_SWAP_EFFECT_DISCARD", "D3D_FEATURE_LEVEL", "D3D_DRIVER_TYPE_HARDWARE", "WINAPI","D3D11_SDK_VERSION", "assert" };
-	// ... and their corresponding values
-	static const char* ppvalues[] = {
-		"#define NULL ((void*)0)",
-		"#define PM_REMOVE (0x0001)",
-		"Microsoft's own memory zapper function\n(which is a macro actually)\nvoid ZeroMemory(\n\t[in] PVOID  Destination,\n\t[in] SIZE_T Length\n); ",
-		"enum DXGI_SWAP_EFFECT::DXGI_SWAP_EFFECT_DISCARD = 0",
-		"enum D3D_FEATURE_LEVEL",
-		"enum D3D_DRIVER_TYPE::D3D_DRIVER_TYPE_HARDWARE  = ( D3D_DRIVER_TYPE_UNKNOWN + 1 )",
-		"#define WINAPI __stdcall",
-		"#define D3D11_SDK_VERSION (7)",
-		" #define assert(expression) (void)(                                                  \n"
-		"    (!!(expression)) ||                                                              \n"
-		"    (_wassert(_CRT_WIDE(#expression), _CRT_WIDE(__FILE__), (unsigned)(__LINE__)), 0) \n"
-		" )"
-	};
-
-	for (int i = 0; i < sizeof(ppnames) / sizeof(ppnames[0]); ++i)
-	{
-		TextEditor::Identifier id;
-		id.mDeclaration = ppvalues[i];
-		lang.mPreprocIdentifiers.insert(std::make_pair(std::string(ppnames[i]), id));
+	else {
+		*result = false;
 	}
-
-	// set your own identifiers
-	static const char* identifiers[] = {
-		"HWND", "HRESULT", "LPRESULT","D3D11_RENDER_TARGET_VIEW_DESC", "DXGI_SWAP_CHAIN_DESC","MSG","LRESULT","WPARAM", "LPARAM","UINT","LPVOID",
-		"ID3D11Device", "ID3D11DeviceContext", "ID3D11Buffer", "ID3D11Buffer", "ID3D10Blob", "ID3D11VertexShader", "ID3D11InputLayout", "ID3D11Buffer",
-		"ID3D10Blob", "ID3D11PixelShader", "ID3D11SamplerState", "ID3D11ShaderResourceView", "ID3D11RasterizerState", "ID3D11BlendState", "ID3D11DepthStencilState",
-		"IDXGISwapChain", "ID3D11RenderTargetView", "ID3D11Texture2D", "TextEditor" };
-	static const char* idecls[] =
-	{
-		"typedef HWND_* HWND", "typedef long HRESULT", "typedef long* LPRESULT", "struct D3D11_RENDER_TARGET_VIEW_DESC", "struct DXGI_SWAP_CHAIN_DESC",
-		"typedef tagMSG MSG\n * Message structure","typedef LONG_PTR LRESULT","WPARAM", "LPARAM","UINT","LPVOID",
-		"ID3D11Device", "ID3D11DeviceContext", "ID3D11Buffer", "ID3D11Buffer", "ID3D10Blob", "ID3D11VertexShader", "ID3D11InputLayout", "ID3D11Buffer",
-		"ID3D10Blob", "ID3D11PixelShader", "ID3D11SamplerState", "ID3D11ShaderResourceView", "ID3D11RasterizerState", "ID3D11BlendState", "ID3D11DepthStencilState",
-		"IDXGISwapChain", "ID3D11RenderTargetView", "ID3D11Texture2D", "class TextEditor" };
-	for (int i = 0; i < sizeof(identifiers) / sizeof(identifiers[0]); ++i)
-	{
-		TextEditor::Identifier id;
-		id.mDeclaration = std::string(idecls[i]);
-		lang.mIdentifiers.insert(std::make_pair(std::string(identifiers[i]), id));
-	}
-	editor.SetLanguageDefinition(lang);
-	//editor.SetPalette(TextEditor::GetLightPalette());
-
-	// error markers
-	markers.insert(std::make_pair<int, std::string>(6, "Example error here:\nInclude file not found: \"TextEditor.h\""));
-	markers.insert(std::make_pair<int, std::string>(41, "Another example error"));
-	editor.SetErrorMarkers(markers);
-
-	// "breakpoint" markers
-	//TextEditor::Breakpoints bpts;
-	//bpts.insert(24);
-	//bpts.insert(47);
-	//editor.SetBreakpoints(bpts);
-
+	return std::string("");
 }
+
+static void Log(const char* log)
+{
+	std::cout << log << std::endl;
+};
+
+bool ReqRefresh() {
+	bool t = reqRfrsh;
+	reqRfrsh = false;
+	return t;
+}
+
+static std::string ShowSaveFileDialog(HWND owner = NULL) {
+	OPENFILENAME ofn;
+	WCHAR fileName[MAX_PATH];
+	ZeroMemory(fileName, MAX_PATH);
+	ZeroMemory(&ofn, sizeof(ofn));
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = owner;
+	ofn.lpstrFilter = L"*.glsl\0";
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = (LPWSTR)"";
+
+	std::string fileNameStr;
+
+	if (GetSaveFileName(&ofn)) {
+		std::wstring ws(ofn.lpstrFile);
+		// your new String
+		std::string str(ws.begin(), ws.end());
+		return str;
+	}
+	return std::string("");
+}
+
+static std::string ShowOpenFileDialog(HWND owner = NULL) {
+	OPENFILENAME ofn;
+	WCHAR fileName[MAX_PATH];
+	ZeroMemory(fileName, MAX_PATH);
+	ZeroMemory(&ofn, sizeof(ofn));
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = owner;
+	ofn.lpstrFilter = L"*.glsl\0*.*\0";
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = (LPWSTR)"";
+
+	std::string fileNameStr;
+
+	if (GetOpenFileName(&ofn)) {
+		std::wstring ws(ofn.lpstrFile);
+		// your new String
+		std::string str(ws.begin(), ws.end());
+		return str;
+	}
+	return std::string("");
+}
+
+
+void SetupShaderManager() {
+	auto lang = TextEditor::LanguageDefinition::GLSL();
+	Veditor.SetLanguageDefinition(lang);
+	Veditor.SetText(vertShaderFile.GetSource());
+	Feditor.SetLanguageDefinition(lang);
+	Feditor.SetText(fragShaderFile.GetSource());
+	current = ShaderType::Vertex;
+}
+
+std::string GetVertexShaderSource()
+{
+	return vertShaderFile.GetSource();
+}
+
+std::string GetFragmentShaderSource()
+{
+	return fragShaderFile.GetSource();
+}
+
+static void CreateShader(ShaderType type) {
+	std::string fileName = ShowSaveFileDialog();
+	std::ofstream outfile;
+	if (fileName.find(".glsl") == std::string::npos)
+		fileName += ".glsl";
+	outfile.open(fileName);
+
+	if (type == ShaderType::Vertex) {
+		vertShaderFile.filePath = fileName;
+		outfile << vertShaderFile.GetSource();
+		Veditor.SetText(vertShaderFile.GetSource());
+	}
+	else if (type == ShaderType::Fragment) {
+		outfile << fragShaderFile.GetSource();
+		fragShaderFile.filePath = fileName;
+		Feditor.SetText(fragShaderFile.GetSource());
+	}
+
+	outfile.close();
+}
+
+static void OpenShader(ShaderType type) {
+	std::string fileName = ShowOpenFileDialog();
+
+	bool res = true;
+
+	std::string ss = ReadShaderSourceFile(fileName, &res);
+	if (!res)
+		ss = "Failed to Load " + fileName;
+
+	if (type == ShaderType::Vertex) {
+		vertShaderFile.filePath = fileName;
+		vertShaderFile.SetSource(ss);
+		Veditor.SetText(vertShaderFile.GetSource());
+	}
+	if (type == ShaderType::Fragment) {
+		fragShaderFile.filePath = fileName;
+		fragShaderFile.SetSource(ss);
+		Feditor.SetText(fragShaderFile.GetSource());
+	}
+}
+
+static void ApplyShaders() {
+	reqRfrsh = true;
+	vertShaderFile.SetSource(Veditor.GetText());
+	fragShaderFile.SetSource(Feditor.GetText());
+}
+
+static void SaveShaders() {
+	isVs = true;
+	isFs = true;
+	ShaderFile file = current == ShaderType::Vertex ? vertShaderFile : fragShaderFile;
+	std::string fileName = file.filePath;
+	std::ofstream outfile;
+	outfile.open(fileName);
+	if (current == ShaderType::Vertex)
+		outfile << vertShaderFile.GetSource();
+	if (current == ShaderType::Fragment)
+		outfile << fragShaderFile.GetSource();
+	outfile.close();
+}
+
+
 
 void ShowShaderEditor(bool* pOpen)
 {
-	setup();
+	static bool showCreateShaderPopup = false;
+
 	ImGui::Begin("Shader Editor Window (Beta)");
-	editor.Render("Shader Editor");
+
+	if (ImGui::Button("Create Shader")) {
+		CreateShader(current);
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("Open Shader")) {
+		OpenShader(current);
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("Apply##shaderEditor")) {
+		ApplyShaders();
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("Save & Apply##shaderEditor")) {
+		ApplyShaders();
+		SaveShaders();
+	}
+	ImGui::NewLine();
+
+	if ((current == ShaderType::Vertex && !isVs) || (current == ShaderType::Fragment && !isFs))
+		ImGui::Text("[UNSAVED]");
+	else
+		ImGui::Text("[SAVED]");
+
+	if (ImGui::BeginTabBar("##shaderEditorTabs", ImGuiTabBarFlags_None))
+	{
+		bool rout = ImGui::BeginTabItem("Vertex Shader");
+		if (rout)
+		{
+			current = ShaderType::Vertex;
+			Veditor.Render("Vertex Shader Editor");
+			ImGui::EndTabItem();
+		}
+
+		rout = ImGui::BeginTabItem("Fragment Shader");
+		if (rout)
+		{
+			current = ShaderType::Fragment;
+			Feditor.Render("Fragment Shader Editor");
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
 	ImGui::End();
 }
