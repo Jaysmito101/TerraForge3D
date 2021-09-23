@@ -253,17 +253,31 @@ static void ApplyShaders() {
 static void SaveShaders() {
 	isVs = true;
 	isFs = true;
-	ShaderFile file = current == ShaderType::Vertex ? vertShaderFile : fragShaderFile;
-	std::string fileName = file.filePath;
+	std::string fileName = (current == ShaderType::Vertex ? vertShaderFile : fragShaderFile).filePath;
 	std::ofstream outfile;
 	outfile.open(fileName);
 	if (current == ShaderType::Vertex)
-		outfile << vertShaderFile.GetSource();
+		outfile << Veditor.GetText();;
 	if (current == ShaderType::Fragment)
-		outfile << fragShaderFile.GetSource();
+		outfile << Feditor.GetText();;
 	outfile.close();
 }
 
+void SecondlyShaderEditorUpdate() 
+{
+	if (current == ShaderType::Vertex) 
+	{
+		if (vertShaderFile.GetSource() != Veditor.GetText()) {
+			isVs = false;
+		}
+	}
+	else if (current == ShaderType::Fragment) 
+	{
+		if (fragShaderFile.GetSource() != Feditor.GetText()) {
+			isFs = false;
+		}
+	}
+}
 
 
 void ShowShaderEditor(bool* pOpen)

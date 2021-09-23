@@ -1,0 +1,17 @@
+PROJECT_NAME           = "AVIR"
+PROJECT_BRIEF          = "High-quality pro image resizing library"
+OUTPUT_DIRECTORY       = ./
+BRIEF_MEMBER_DESC      = NO
+SHORT_NAMES            = YES
+TAB_SIZE               = 4
+OPTIMIZE_OUTPUT_FOR_C  = NO
+INLINE_INFO            = NO
+SORT_BRIEF_DOCS        = YES
+SORT_MEMBERS_CTORS_1ST = YES
+SHOW_USED_FILES        = NO
+SHOW_NAMESPACES        = NO
+WARN_NO_PARAMDOC       = YES
+INPUT                  = ./
+HTML_OUTPUT            = Documentation
+GENERATE_LATEX         = NO
+EXCLUDE                = README.md

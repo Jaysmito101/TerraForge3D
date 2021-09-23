@@ -4,7 +4,9 @@
 #include <Base/EntryPoint.h>
 #include <ImGuiConsole.h>
 #include <AppStyles.h>
+#include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
+#include <ElevationNodeEditor.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
 #include <windows.h>
 #include <string>
@@ -33,8 +35,7 @@ static glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 static bool vSync = true;
 static Stats s_Stats;
 static char b1[4096], b2[4096];
-static uint32_t vao, vbo, ebo, fbo;
-static uint32_t depthTex, colorTex;
+static uint32_t vao, vbo, ebo;
 static Shader* shd;
 static Camera camera;
 static Mesh mesh;
@@ -351,7 +352,8 @@ static void GenerateVertices()
 			vertices[i].position = glm::vec3(0.0f);
 
 			vertices[i].position.x = (float)pointOnPlane.x;
-			vertices[i].position.y = (float)(pointOnPlane.y + noise((float)x, (float)y));
+			//vertices[i].position.y = (float)(pointOnPlane.y + noise((float)x, (float)y));
+			vertices[i].position.y = (float)(pointOnPlane.y + GetElevation((float)x, (float)y));
 			vertices[i].position.z = (float)pointOnPlane.z;
 			vertices[i].normal = glm::vec3(0.0f);
 			if (x != resolution - 1 && y != resolution - 1)
@@ -387,25 +389,6 @@ static void GenerateVertices()
 	s_Stats.triangles = mesh.indexCount / 3;
 }
 
-static void SetupFrameBuffer() {
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glGenTextures(1, &colorTex);
-	glBindTexture(GL_TEXTURE_2D, colorTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTex, 0);
-	glGenTextures(1, &depthTex);
-	glBindTexture(GL_TEXTURE_2D, depthTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
 
 static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 	glDeleteBuffers(1, &a);
@@ -608,7 +591,7 @@ static void ShowMainScene() {
 			button3 = io.MouseDown[1];
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
-		ImGui::Image((ImTextureID)colorTex, wsize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
 	ImGui::End();
@@ -680,6 +663,8 @@ static void ShowMenu() {
 			ShowWindowMenuItem("Theme Editor", &activeWindows.styleEditor);
 
 			ShowWindowMenuItem("Shader Editor", &activeWindows.shaderEditorWindow);
+
+			ShowWindowMenuItem("Elevation Node Editor", &activeWindows.elevationNodeEditorWindow);
 			
 			ImGui::EndMenu();
 		}
@@ -749,7 +734,7 @@ public:
 
 	virtual void OnUpdate(float deltatime) override
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
 		glViewport(0, 0, 800, 600);
 		GetWindow()->Clear();
 		s_Stats.deltaTime = deltatime;
@@ -767,6 +752,8 @@ public:
 	{
 		GetWindow()->SetVSync(vSync);
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;
+
+		SecondlyShaderEditorUpdate();
 	}
 
 	virtual void OnImGuiRender() override
@@ -792,6 +779,10 @@ public:
 		if (activeWindows.shaderEditorWindow)
 			ShowShaderEditor(&activeWindows.shaderEditorWindow);
 
+		if (activeWindows.elevationNodeEditorWindow)
+			ShowElevationNodeEditor(&activeWindows.elevationNodeEditorWindow);
+
+
 		OnImGuiRenderEnd();
 	}
 
@@ -800,10 +791,11 @@ public:
 		Log("Started Up App!");
 		srand((unsigned int)time(NULL));
 		SetupShaderManager();
+		SetupElevationManager();
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
-		SetupFrameBuffer();
+		SetupViewportFrameBuffer();
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
 		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [] (GLFWwindow* window, int w, int h){
 			glfwSwapBuffers(window);
@@ -822,10 +814,14 @@ public:
 		autoUpdate = false;
 		scale = 1;
 		noiseLayers.push_back(NoiseLayer());
+
+		// For Debug Only
+		autoUpdate = true;
 	}
 
 	void OnEnd() 
 	{
+		ShutdownElevationNodeEditor();
 		delete shd;
 	}
 };
