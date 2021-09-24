@@ -354,8 +354,7 @@ void LoadBlackAndWhite()
 
 }
 
-static void ExportImGuiSettings() {
-    std::string outFile = RequestSaveFileName();
+std::string GetStyleData() {
     nlohmann::json output;
     output["type"] = "THEME";
     nlohmann::json colors;
@@ -364,7 +363,7 @@ static void ExportImGuiSettings() {
     nlohmann::json tmp;
 
     ImGuiStyle& style = ImGui::GetStyle();
-  
+
     for (int i = 0; i < ImGuiCol_COUNT; i++)
     {
         const ImVec4& col = style.Colors[i];
@@ -378,7 +377,7 @@ static void ExportImGuiSettings() {
     }
 
     output["colors"] = colors;
-    
+
 
     tmp["x"] = style.FramePadding.x;
     tmp["y"] = style.FramePadding.y;
@@ -411,12 +410,19 @@ static void ExportImGuiSettings() {
     output["styles"] = styles;
 
     output["themeName"] = themeName;
+
+    return nlohmann::to_string(output);
+}
+
+static void ExportImGuiSettings() {
+    std::string outFile = RequestSaveFileName();
+    
     
     std::ofstream outfile;
     if (outFile.find(".terr3d") == std::string::npos)
         outFile = outFile + ".terr3d";
     outfile.open(outFile);
-    outfile << nlohmann::to_string(output);
+    outfile << GetStyleData();
     outfile.close();
 }
 
@@ -456,6 +462,10 @@ static bool ImportImGuiSettings(std::string settings) {
         return false;
     }
     return true;
+}
+
+bool LoadThemeFromStr(std::string data) {
+    return ImportImGuiSettings(data);
 }
 
 bool LoadThemeFromFile(std::string filename) {

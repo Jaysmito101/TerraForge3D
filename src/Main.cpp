@@ -19,9 +19,14 @@
 #include <SimplexNoise.h>
 #include <FastNoiseLite.h>
 #include <thread>
+#include <CubeMap.h>
 #include <time.h>
 #include <mutex>
 #include <json.hpp>
+
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
 #undef near
 #undef far
 
@@ -29,6 +34,7 @@
 
 
 static Application* myApp;
+static bool skyboxEnabled = false;
 static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 static glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 static glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -40,11 +46,9 @@ static Shader* shd;
 static Camera camera;
 static Mesh mesh;
 static glm::vec3 LightPosition = glm::vec3(0.0f);
-static std::string fileName = "";
 static bool autoUpdate = false;
 static float CameraPosition[3];
 static float CameraRotation[3];
-static float noiseScale = 0.01f;
 static float noiseStrength = 1.0f;
 static bool absolute = false;
 static bool square = false;
@@ -63,7 +67,10 @@ static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Cellular"};
 static int numberOfNoiseTypes = 3;
 static FastNoiseLite m_NoiseGen;
 static bool isRemeshing = false;
+std::string fileName = "";
+static bool noiseBased = false;
 static ActiveWindows activeWindows;
+
 
 static void ToggleSystemConsole() {
 	static bool state = false;
@@ -90,6 +97,7 @@ static std::string ReadShaderSourceFile(std::string path, bool* result) {
 		std::string res = "";
 		getline(newfile, res, '\0');
 		newfile.close();
+		*result = true;
 		return res;
 	}else{
 		*result = false;
@@ -196,6 +204,31 @@ static void ShowLightingControls() {
 	ImGui::End();
 }
 
+std::string ShowSaveFileDialog(std::string ext = ".terr3d", HWND owner = NULL) {
+	OPENFILENAME ofn;
+	WCHAR fileName[MAX_PATH];
+	ZeroMemory(fileName, MAX_PATH);
+	ZeroMemory(&ofn, sizeof(ofn));
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = owner;
+	ofn.lpstrFilter = L"*.terr3d\0";
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = (LPWSTR)"";
+
+	std::string fileNameStr;
+
+	if (GetSaveFileName(&ofn)) {
+		std::wstring ws(ofn.lpstrFile);
+		// your new String
+		std::string str(ws.begin(), ws.end());
+		return str;
+	}
+	return std::string("");
+}
+
 std::string openfilename(HWND owner = NULL) {
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
@@ -221,7 +254,7 @@ std::string openfilename(HWND owner = NULL) {
 	return std::string("");
 }
 
-std::string ShowOpenFileDialog(HWND owner = NULL) {
+std::string ShowOpenFileDialog(const char* ext = "*.glsl\0*.*\0", HWND owner = NULL) {
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
@@ -229,7 +262,7 @@ std::string ShowOpenFileDialog(HWND owner = NULL) {
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.glsl\0*.*\0";
+	ofn.lpstrFilter = (LPWSTR)ext;
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -254,7 +287,7 @@ static std::string ExportOBJ() {
 	if (fileName.find(".obj") == std::string::npos)
 		fileName += ".obj";
 	
-	outfile.open(fileName + ".obj");
+	outfile.open(fileName);
 
 
 	outfile << "# TerraGenV1.0 OBJ" << std::endl << std::endl;;
@@ -352,8 +385,10 @@ static void GenerateVertices()
 			vertices[i].position = glm::vec3(0.0f);
 
 			vertices[i].position.x = (float)pointOnPlane.x;
-			//vertices[i].position.y = (float)(pointOnPlane.y + noise((float)x, (float)y));
-			vertices[i].position.y = (float)(pointOnPlane.y + GetElevation((float)x, (float)y));
+			if(noiseBased)
+				vertices[i].position.y = (float)(pointOnPlane.y + noise((float)x, (float)y));
+			else
+				vertices[i].position.y = (float)(pointOnPlane.y + GetElevation((float)x, (float)y));
 			vertices[i].position.z = (float)pointOnPlane.z;
 			vertices[i].normal = glm::vec3(0.0f);
 			if (x != resolution - 1 && y != resolution - 1)
@@ -451,6 +486,8 @@ static void DoTheRederThing(float deltaTime) {
 	static float time;
 	time += deltaTime;
 	camera.UpdateCamera(CameraPosition, CameraRotation);
+	if(skyboxEnabled)
+		RenderSkybox(camera.pv);
 	shd->SetTime(&time);
 	shd->SetMPV(camera.pv);
 	shd->SetLightCol(LightColor);
@@ -464,7 +501,7 @@ static void DoTheRederThing(float deltaTime) {
 static void ShowTerrainControls()
 {
 	static bool exp = false;
-	ImGui::Begin("Terrain Controls");
+	ImGui::Begin("Dashboard");
 
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
@@ -475,6 +512,7 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Flatten Base", &flattenBase);
 	ImGui::Checkbox("Absoulute Value", &absolute);
 	ImGui::Checkbox("Square Value", &square);
+	ImGui::Checkbox("Use Skybox", &skyboxEnabled);
 	ImGui::NewLine();
 	if(ImGui::Button("Update Mesh"))
 		RegenerateMesh();
@@ -486,6 +524,18 @@ static void ShowTerrainControls()
 	
 	if (ImGui::Button("Use Custom Shaders")) {
 		activeWindows.shaderEditorWindow = true;
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::Button("Change Mode##4584"))
+		noiseBased = !noiseBased;
+
+	if (noiseBased) {
+		ImGui::Text("Using Layer Based Workflow");
+	}
+	else {
+		ImGui::Text("Using Node Based Workflow");
 	}
 
 	ImGui::Separator();
@@ -597,22 +647,81 @@ static void ShowMainScene() {
 	ImGui::End();
 }
 
+static void SaveFile() {
+	std::string file = ShowSaveFileDialog();
+	if (file.size() == 0)
+		return;
+	if (file.find(".terr3d") == std::string::npos)
+		file += ".terr3d";
+
+	nlohmann::json data;
+	data["type"] = "SAVEFILE";
+	data["version"] = "3.0";
+	data["name"] = "TerraGen3D v3.0";
+	data["EnodeEditor"] = GetElevationNodeEditorSaveData();
+	data["styleData"] = GetStyleData();
+	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
+	std::ofstream outfile;
+	outfile.open(file);
+
+	outfile << data;
+
+	outfile.close();
+}
+
+static void OpenSaveFile() {
+
+	// For Now it dows not do anything id any error has occured but in later versions this will be reported to user!
+
+	std::string file = ShowOpenFileDialog(".terr3d\0");
+	if (file.size() == 0)
+		return;
+	if (file.find(".terr3d") == std::string::npos)
+		file += ".terr3d";
+	bool flagRd = true;
+	std::string sdata = ReadShaderSourceFile(file, &flagRd);
+	if (!flagRd)
+		return;
+	if (sdata.size() == 0)
+		return;
+	nlohmann::json data = nlohmann::json::parse(sdata);
+	if (data["type"] != "SAVEFILE")
+		return;
+	
+	SetElevationNodeEditorSaveData(data["EnodeEditor"]);
+	LoadThemeFromStr(data["styleData"]);
+	data["imguiData"] = ImGui::SaveIniSettingsToMemory();
+
+	// For Future
+	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size());
+	
+	std::ofstream outfile;
+	outfile.open(file);
+
+	outfile << data;
+
+	outfile.close();
+}
+
 static void ShowWindowMenuItem(const char* title, bool* val) {
-	/*
-	if (ImGui::MenuItem(title)) {
-		*val = !(*val);
-	}
-	ImGui::SameLine();
-	ImGui::Checkbox((std::string("##") + std::string(title) + "MenuItem").c_str(), val);
-	*/
 	ImGui::Checkbox(title, val);
 }
+
 
 static void ShowMenu() {
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("Open")) {
+				OpenSaveFile();
+			}
+
+			if (ImGui::MenuItem("Save")) {
+				SaveFile();
+			}
+
+
 			if (ImGui::BeginMenu("Export As")) {
 				if (ImGui::MenuItem("Export as OBJ")) {
 					fileName = ExportOBJ();
@@ -722,13 +831,27 @@ static void ResizeTexture(uint32_t tex, int w, int h) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
 
+static void SetUpIcon() {
+	HWND hwnd = glfwGetWin32Window(myApp->GetWindow()->GetNativeWindow());
+	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
+	if (hIcon) {
+		//Change both icons to the same icon handle.
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+
+		//This will ensure that the application icon gets changed too.
+		SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+		SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+	}
+}
+
 
 class MyApp : public Application 
 {
 public:
 	virtual void OnPreload() override {
-		
 		SetTitle("TerraGen3D - Jaysmito Mukherjee");
+		
 		Sleep(1000);
 	}
 
@@ -788,8 +911,9 @@ public:
 
 	virtual void OnStart() override
 	{
-		Log("Started Up App!");
+		SetUpIcon();
 		srand((unsigned int)time(NULL));
+		SetupCubemap();
 		SetupShaderManager();
 		SetupElevationManager();
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
@@ -814,6 +938,7 @@ public:
 		autoUpdate = false;
 		scale = 1;
 		noiseLayers.push_back(NoiseLayer());
+		Log("Started Up App!");
 
 		// For Debug Only
 		autoUpdate = true;

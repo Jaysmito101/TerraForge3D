@@ -21,8 +21,15 @@ static int GenerateId() {
 
 enum NodeType
 {
-	FloatNode = 0,
-	Vec3Node
+	FloatNodeI = 0,
+	FloatNodeO,
+	Add,
+	Sub,
+	Mul,
+	Div,
+	Sin,
+	Cos,
+	MeshCoord
 };
 
 struct Link
@@ -30,6 +37,24 @@ struct Link
 	int id;
 	int start_attr, end_attr;
 	void* other;
+
+	virtual nlohmann::json Save() {
+		nlohmann::json data;
+		data["id"] = id;
+		data["start_attr"] = start_attr;
+		data["end_attr"] = end_attr;
+		return data;
+	};
+	virtual void Load(nlohmann::json data) {
+		id = data["id"];
+		start_attr = data["start_attr"];
+		end_attr = data["end_attr"];
+	};
+
+	bool operator==(const Link& a) const
+	{
+		return (id == a.id);
+	}
 };
 
 
@@ -42,8 +67,11 @@ public:
 	virtual bool Render() = 0;
 	virtual void Setup() {};
 	virtual float EvaluatePin(float x, float y, int id) = 0;
+	virtual std::vector<void*>  GetPins() = 0;
 
-	NodeType type;
+	virtual nlohmann::json Save() = 0;
+	virtual void Load(nlohmann::json data) = 0;
+
 	int id = -1;
 	std::string name;
 };
@@ -67,6 +95,22 @@ public:
 		isLinked = false;
 	}
 
+	virtual nlohmann::json Save() {
+		nlohmann::json data;
+		data["link"] = link.Save();
+		data["isLinked"] = isLinked;
+		data["type"] = type;
+		data["id"] = id;
+		return data;
+	};
+
+	virtual void Load(nlohmann::json data) {
+		link.Load(data["link"]);
+		isLinked = data["isLinked"];
+		type = data["type"];
+		id = data["id"];
+	};
+
 	int id = -1;
 	Link link;
 	Node* node;
@@ -81,6 +125,35 @@ struct Editor
 	std::vector<Link>     links;
 	std::vector<Pin*>     pins;
 	int                   current_id = 0;
+
+	nlohmann::json Save(int outputID) {
+		nlohmann::json data;
+		data["context"] = ImNodes::SaveEditorStateToIniString(context);
+		data["type"] = "EDITOR";
+		std::vector<nlohmann::json> nodesPositionSave;
+		std::vector<nlohmann::json> nodesSave;
+		ImVec2 pos;
+		for (Node* n : nodes) {
+			nodesSave.push_back(n->Save());
+			pos = ImNodes::GetNodeEditorSpacePos(n->id);
+			nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", n->id} }));
+		}
+		data["nodes"] = nodesSave;
+		data["nodePositions"] = nodesPositionSave;
+
+		std::vector<nlohmann::json> linksSave;
+		for (Link& l : links) {
+			linksSave.push_back(l.Save());
+		}
+		data["links"] = linksSave;
+
+
+
+		return data;
+	}
+	void Load(nlohmann::json data) {
+
+	}
 
 	Pin* FindPin(int id) {
 		for (Pin* p : pins) {
@@ -135,6 +208,29 @@ public:
 		return value;
 	}
 
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::FloatNodeI;
+		data["inputPin"] = inputPin.Save();
+		data["value"] = value;
+		data["oID"] = oiID;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPin.Load(data["inputPin"]);
+		inputPin.node = this;
+		value = data["value"];
+		oiID = data["oID"];
+		id = data["id"];
+		name = data["name"];
+	}
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPin });
+	};
+
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);
 
@@ -177,7 +273,6 @@ public:
 		return value;
 	}
 
-	uint32_t outputImage = -1;
 	FloatPin inputPin = FloatPin(this);
 	float value = 0.0f;
 private:
@@ -193,6 +288,28 @@ public:
 	virtual void Setup() override {
 		outputPin.node = this;
 	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::FloatNodeO;
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
+	}
+
 
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);
@@ -230,6 +347,29 @@ public:
 	virtual void Setup() override {
 		outputPin.node = this;
 		inputPin.node = this;
+	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPin, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Sin;
+		data["inputPin"] = inputPin.Save();
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPin.Load(data["inputPin"]);
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
 	}
 
 	virtual bool Render() override {
@@ -285,6 +425,29 @@ public:
 		inputPin.node = this;
 	}
 
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPin, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Cos;
+		data["inputPin"] = inputPin.Save();
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPin.Load(data["inputPin"]);
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
+	}
+
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);
 
@@ -337,6 +500,36 @@ public:
 		inputPinX.node = this;
 		inputPinY.node = this;
 		outputPin.node = this;
+	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPinX, &inputPinY, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Add;
+		data["inputPinX"] = inputPinX.Save();
+		data["inputPinY"] = inputPinY.Save();
+		data["outputPin"] = outputPin.Save();
+		data["xv"] = xv;
+		data["yv"] = yv;
+		data["useXY"] = useXY;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPinX.Load(data["inputPinX"]);
+		inputPinY.Load(data["inputPinY"]);
+		outputPin.Load(data["outputPin"]);
+		xv = data["xv"];
+		yv = data["yv"];
+		useXY = data["useXY"];
+		id = data["id"];
+		name = data["name"];
+		Setup();
 	}
 
 	virtual bool Render() override {
@@ -423,6 +616,35 @@ public:
 		outputPin.node = this;
 	}
 
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Sub;
+		data["inputPinX"] = inputPinX.Save();
+		data["inputPinY"] = inputPinY.Save();
+		data["outputPin"] = outputPin.Save();
+		data["xv"] = xv;
+		data["yv"] = yv;
+		data["useXY"] = useXY;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPinX.Load(data["inputPinX"]);
+		inputPinY.Load(data["inputPinY"]);
+		outputPin.Load(data["outputPin"]);
+		xv = data["xv"];
+		yv = data["yv"];
+		useXY = data["useXY"];
+		id = data["id"];
+		name = data["name"];
+		Setup();
+	}
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPinX, &inputPinY, &outputPin });
+	};
+
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);
 
@@ -507,6 +729,35 @@ public:
 		outputPin.node = this;
 	}
 
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Mul;
+		data["inputPinX"] = inputPinX.Save();
+		data["inputPinY"] = inputPinY.Save();
+		data["outputPin"] = outputPin.Save();
+		data["xv"] = xv;
+		data["yv"] = yv;
+		data["useXY"] = useXY;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPinX.Load(data["inputPinX"]);
+		inputPinY.Load(data["inputPinY"]);
+		outputPin.Load(data["outputPin"]);
+		xv = data["xv"];
+		yv = data["yv"];
+		useXY = data["useXY"];
+		id = data["id"];
+		name = data["name"];
+		Setup();
+	}
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPinX, &inputPinY, &outputPin });
+	};
+
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);
 
@@ -590,6 +841,35 @@ public:
 		inputPinY.node = this;
 		outputPin.node = this;
 	}
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Div;
+		data["inputPinX"] = inputPinX.Save();
+		data["inputPinY"] = inputPinY.Save();
+		data["outputPin"] = outputPin.Save();
+		data["xv"] = xv;
+		data["yv"] = yv;
+		data["useXY"] = useXY;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPinX.Load(data["inputPinX"]);
+		inputPinY.Load(data["inputPinY"]);
+		outputPin.Load(data["outputPin"]);
+		xv = data["xv"];
+		yv = data["yv"];
+		useXY = data["useXY"];
+		id = data["id"];
+		name = data["name"];
+		Setup();
+	}
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPinX, &inputPinY, &outputPin });
+	};
 
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);
@@ -679,6 +959,29 @@ public:
 		outputPinX.node = this;
 		outputPinY.node = this;
 	}
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::MeshCoord;
+		data["outputPinX"] = outputPinX.Save();
+		data["outputPinY"] = outputPinY.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		outputPinX.Load(data["outputPinX"]);
+		outputPinY.Load(data["outputPinY"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
+		Setup();
+	}
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &outputPinX, &outputPinX });
+	};
 
 	virtual bool Render() override {
 		ImNodes::BeginNode(id);

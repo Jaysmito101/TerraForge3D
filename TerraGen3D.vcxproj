@@ -169,6 +169,7 @@
     <ClCompile Include="src\Base\SplashScreen.cpp" />
     <ClCompile Include="src\Base\Texture2D.cpp" />
     <ClCompile Include="src\Base\Window.cpp" />
+    <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\ElevationNodeEditor.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
@@ -480,6 +481,7 @@
     <ClInclude Include="src\Base\SplashScreen.h" />
     <ClInclude Include="src\Base\Texture2D.h" />
     <ClInclude Include="src\Base\Window.h" />
+    <ClInclude Include="src\CubeMap.h" />
     <ClInclude Include="src\ElevationNodeEditor.h" />
     <ClInclude Include="src\FastNoiseLite.h" />
     <ClInclude Include="src\ImGuiConsole.h" />

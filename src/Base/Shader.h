@@ -20,6 +20,5 @@ public:
 
 	inline int GetNativeShader() { return m_Shader; }
 
-private:
 	int m_Shader, m_UniformId, m_LightPosUniformID, m_LightColUniformID, m_TimeUniformID;
 };
