@@ -488,11 +488,11 @@ static void DoTheRederThing(float deltaTime) {
 	camera.UpdateCamera(CameraPosition, CameraRotation);
 	if(skyboxEnabled)
 		RenderSkybox(camera.pv);
+	shd->Bind();
 	shd->SetTime(&time);
 	shd->SetMPV(camera.pv);
 	shd->SetLightCol(LightColor);
 	shd->SetLightPos(LightPosition);
-	shd->Bind();
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

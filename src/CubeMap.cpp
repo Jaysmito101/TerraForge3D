@@ -22,8 +22,8 @@ uniform mat4 _PV;
 
 void main()
 {
-    TexCoords = aPos*50;
-    gl_Position = _PV * vec4(aPos*50, 1.0);
+    TexCoords = aPos*70;
+    gl_Position = _PV * vec4(aPos*70, 1.0);
 }  
 )";
 static std::string fragShader = R"(
@@ -95,7 +95,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++)
     {
-        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 3);
         if (data)
         {
             std::cout << "Loaded " << faces[i] << "\n";
