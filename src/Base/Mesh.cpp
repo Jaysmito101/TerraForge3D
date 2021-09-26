@@ -34,6 +34,7 @@ void Mesh::RecalculateNormals()
 
 void Mesh::GeneratePlane(int resolution, float scale)
 {
+	res = resolution;
 	Vert* vertices = new Vert[resolution * resolution];
 	int* inds = new int[(resolution-1) * (resolution-1) * 6];
 	int triIndex = 0;
@@ -76,7 +77,7 @@ void Mesh::GeneratePlane(int resolution, float scale)
 	memset(vert, 0, sizeof(Vert) * vertexCount);
 	memcpy(vert, vertices, sizeof(Vert)*vertexCount);
 	indexCount = (resolution - 1) * (resolution - 1) * 6;
-	indices = new int[(*resolution - 1) * (*resolution - 1) * 6];
+	indices = new int[(resolution - 1) * (resolution - 1) * 6];
 	memset(indices, 0, indexCount);
 	memcpy(indices, inds, sizeof(int) * indexCount);
 	delete vertices;
@@ -86,13 +87,13 @@ void Mesh::GeneratePlane(int resolution, float scale)
 void Mesh::SetElevation(float elevation, int x, int y){
 	if(!vert)
 		return;
-	int i = x + y * resolution;
+	int i = x + y * res;
 	vert[i].position.y = elevation;
 }
 
 void Mesh::AddElevation(float elevation, int x, int y){
 	if(!vert)
 		return;
-	int i = x + y * resolution;
+	int i = x + y * res;
 	vert[i].position.y += elevation;
 }

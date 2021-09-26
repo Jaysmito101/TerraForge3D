@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 
 
 struct Vert 
@@ -25,6 +26,7 @@ public:
 	int* indices;
 	int vertexCount;
 	int indexCount;
+	int res;
 
 private:
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);

@@ -176,6 +176,7 @@
     <ClCompile Include="src\ElevationNodeEditor.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
     <ClCompile Include="src\ViewportFramebuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -494,6 +495,7 @@
     <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\NodeEditorNodes.h" />
     <ClInclude Include="src\SimplexNoise.h" />
+    <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\ViewportFramebuffer.h" />
   </ItemGroup>
   <ItemGroup>

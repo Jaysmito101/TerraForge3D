@@ -24,6 +24,8 @@
 #include <mutex>
 #include <json.hpp>
 
+#include <Utils.h>
+
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
@@ -79,10 +81,7 @@ static void ToggleSystemConsole() {
 	ShowWindow(GetConsoleWindow(), state?SW_SHOW:SW_HIDE);
 }
 
-static void Log(const char* log)
-{
-	std::cout << log << std::endl;
-};
+
 
 void OnAppClose(int x, int y)
 {
@@ -205,80 +204,6 @@ static void ShowLightingControls() {
 	ImGui::End();
 }
 
-std::string ShowSaveFileDialog(std::string ext = ".terr3d", HWND owner = NULL) {
-	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
-	ZeroMemory(fileName, MAX_PATH);
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.terr3d\0";
-	ofn.lpstrFile = fileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
-
-	std::string fileNameStr;
-
-	if (GetSaveFileName(&ofn)) {
-		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
-	}
-	return std::string("");
-}
-
-std::string openfilename(HWND owner = NULL) {
-	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
-	ZeroMemory(fileName, MAX_PATH);
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.obj\0";
-	ofn.lpstrFile = fileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
-
-	std::string fileNameStr;
-
-	if (GetSaveFileName(&ofn)) {
-		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
-	}
-	return std::string("");
-}
-
-std::string ShowOpenFileDialog(const char* ext = "*.glsl\0*.*\0", HWND owner = NULL) {
-	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
-	ZeroMemory(fileName, MAX_PATH);
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = (LPWSTR)ext;
-	ofn.lpstrFile = fileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
-
-	std::string fileNameStr;
-
-	if (GetOpenFileName(&ofn)) {
-		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
-	}
-	return std::string("");
-}
 
 static std::string ExportOBJ() {
 	std::string fileName = openfilename();
@@ -495,7 +420,10 @@ static void DoTheRederThing(float deltaTime) {
 	shd->SetLightCol(LightColor);
 	shd->SetLightPos(LightPosition);
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+	if(wireFrameMode)
+		glDrawElements(GL_LINE_STRIP, mesh.indexCount, GL_UNSIGNED_INT, 0);
+	else
+		glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
@@ -507,12 +435,9 @@ static void ShowTerrainControls()
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
-	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
 	ImGui::NewLine();
 	ImGui::Checkbox("Auto Update", &autoUpdate);
-	ImGui::Checkbox("Flatten Base", &flattenBase);
-	ImGui::Checkbox("Absoulute Value", &absolute);
-	ImGui::Checkbox("Square Value", &square);
+	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
 	ImGui::Checkbox("Use Skybox", &skyboxEnabled);
 	ImGui::NewLine();
 	if(ImGui::Button("Update Mesh"))
@@ -581,6 +506,14 @@ static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
 
 static void ShowNoiseSettings(){
 	ImGui::Begin("Noise Settings");
+
+	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
+	ImGui::Checkbox("Flatten Base", &flattenBase);
+	ImGui::Checkbox("Absoulute Value", &absolute);
+	ImGui::Checkbox("Square Value", &square);
+
+	ImGui::Separator();
+
 	ImGui::Text("Noise Layers");
 	ImGui::Separator();
 	for (unsigned int i = 0; i < noiseLayers.size();i++) {
@@ -670,6 +603,7 @@ static void SaveFile() {
 	tmp["absolute"] = absolute;
 	tmp["flattenBase"] = flattenBase;
 	tmp["noiseBased"] = noiseBased;
+	tmp["wireFrameMode"] = wireFrameMode;
 	tmp["skyboxEnabled"] = skyboxEnabled;
 	tmp["vSync"] = vSync;
 	tmp["mouseSpeed"] = mouseSpeed;
@@ -718,6 +652,7 @@ static void OpenSaveFile() {
 	noiseBased = tmp["noiseBased"];
 	skyboxEnabled = tmp["skyboxEnabled"];
 	vSync = tmp["vSync"];
+	wireFrameMode = tmp["wireFrameMode"];
 	mouseSpeed = tmp["mouseSpeed"];
 	scrollSpeed = tmp["scrollSpeed"];
 	mouseScrollAmount = tmp["mouseScrollAmount"];
