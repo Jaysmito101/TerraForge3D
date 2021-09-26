@@ -1,5 +1,7 @@
 #include <Utils.h>
+#include <fstream>
 #include <iostream>
+
 
 std::string ShowSaveFileDialog(std::string ext , HWND owner ) {
 	OPENFILENAME ofn;
@@ -75,6 +77,24 @@ std::string ShowOpenFileDialog(const char* ext, HWND owner) {
 	}
 	return std::string("");
 }
+
+std::string ReadShaderSourceFile(std::string path, bool* result) {
+	std::fstream newfile;
+	newfile.open(path.c_str(), std::ios::in);
+	if (newfile.is_open()) {
+		std::string tp;
+		std::string res = "";
+		getline(newfile, res, '\0');
+		newfile.close();
+		*result = true;
+		return res;
+	}
+	else {
+		*result = false;
+	}
+	return std::string("");
+}
+
 
 void Log(const char* log)
 {

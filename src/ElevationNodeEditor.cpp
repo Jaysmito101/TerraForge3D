@@ -73,7 +73,9 @@ static void UpdateHeightMap() {
             heightMap[i * currRes * 3 + j * 3 + 2] = (unsigned char)(t * 255);
         }
     }
-    hMap->SetData(heightMap, currRes*currRes*3);
+    if (*resolution != currRes)
+        return;
+    hMap->SetData(heightMap, currRes * currRes * 3);
 }
 
 
@@ -564,4 +566,8 @@ void ShowElevationNodeEditor(bool* pOpen)
 
 float GetElevation(float x, float y) {
     return heightMapData[(int)x*currRes+(int)y];
+}
+
+void ElevationNodeEditorTick() {
+    
 }

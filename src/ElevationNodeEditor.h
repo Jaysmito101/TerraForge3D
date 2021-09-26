@@ -5,6 +5,7 @@
 float GetElevation(float x, float y);
 nlohmann::json GetElevationNodeEditorSaveData();
 
+void ElevationNodeEditorTick();
 void SetupElevationManager(int* resolution);
 void ShutdownElevationNodeEditor();
 void ShowElevationNodeEditor(bool* pOpen);

@@ -16,15 +16,58 @@ layout (location = 1) in vec3 aNorm;
 
 uniform mat4 _PV;
 
-out vec3 FragPos;
-out vec3 Normal;
+out DATA
+{
+    vec3  FragPos;
+    vec3 Normal;
+} data_out; 
 
 void main()
 {
     gl_Position = _PV * vec4(aPos.x, aPos.y, aPos.z, 1.0);
-	FragPos = aPos;
-	Normal = aNorm;
+	data_out.FragPos = aPos;
+	data_out.Normal = aNorm;
 }
+)";
+
+static std::string defaultBaseGeometryShader = R"(
+
+#version 330 core
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+uniform vec3 _LightPosition;
+uniform vec3 _LightColor;
+
+out vec3 Normal;
+out vec3 FragPos;
+
+in DATA
+{
+    vec3  FragPos;
+    vec3 Normal;
+} data_in[]; 
+
+void main()
+{	
+	gl_Position = gl_in[0].gl_Position;
+	Normal = data_in[0].Normal;
+	FragPos = data_in[0].FragPos;
+	EmitVertex();
+
+	gl_Position = gl_in[1].gl_Position;
+	Normal = data_in[1].Normal;
+	FragPos = data_in[1].FragPos;
+	EmitVertex();
+
+	gl_Position = gl_in[2].gl_Position;
+	Normal = data_in[2].Normal;
+	FragPos = data_in[2].FragPos;
+	EmitVertex();
+
+	EndPrimitive();
+} 
 )";
 
 static std::string defaultBaseFragmentShader = R"(
@@ -51,9 +94,11 @@ void main()
 } 
 )";
 
+
 enum ShaderType {
 	Vertex = 0,
-	Fragment = 1
+	Fragment = 1,
+	Geometry = 2
 };
 
 struct ShaderFile {
@@ -202,6 +247,11 @@ std::string GetFragmentShaderSource()
 	return fragShaderFile.GetSource();
 }
 
+std::string GetGeometryShaderSource()
+{
+	return defaultBaseGeometryShader;
+}
+
 static void CreateShader(ShaderType type) {
 	std::string fileName = ShowSaveFileDialog();
 	std::ofstream outfile;
@@ -284,7 +334,7 @@ void ShowShaderEditor(bool* pOpen)
 {
 	static bool showCreateShaderPopup = false;
 
-	ImGui::Begin("Shader Editor Window (Beta)");
+	ImGui::Begin("Shader Editor Window (Beta)", pOpen);
 
 	if (ImGui::Button("Create Shader")) {
 		CreateShader(current);

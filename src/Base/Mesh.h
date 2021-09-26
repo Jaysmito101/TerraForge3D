@@ -14,6 +14,8 @@ class Mesh
 public:
 	Mesh();
 
+	~Mesh();
+
 	void RecalculateNormals();
 
 	void GeneratePlane(int resolution, float scale);
@@ -22,11 +24,14 @@ public:
 
 	void AddElevation(float elevation, int x, int y);
 
+	bool IsValid();
+
 	Vert* vert;
 	int* indices;
 	int vertexCount;
 	int indexCount;
 	int res;
+	float sc;
 
 private:
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);

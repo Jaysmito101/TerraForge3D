@@ -23,55 +23,61 @@
 #include <time.h>
 #include <mutex>
 #include <json.hpp>
+#include <atomic>
 
 #include <Utils.h>
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
-#undef near
-#undef far
+
 
 #include <AppStructs.h>
 
+static Model terrain("Terrain");
 
 static Application* myApp;
-static bool skyboxEnabled = false;
+static Shader* shd;
+static Camera camera;
+static Stats s_Stats;
+static ActiveWindows activeWindows;
+static std::vector<NoiseLayer> noiseLayers;
+static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Cellular"};
+static FastNoiseLite m_NoiseGen;
+
 static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 static glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 static glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
-static bool vSync = true;
-static Stats s_Stats;
-static char b1[4096], b2[4096];
-static uint32_t vao, vbo, ebo;
-static Shader* shd;
-static Camera camera;
-static Mesh mesh;
 static glm::vec3 LightPosition = glm::vec3(0.0f);
-static bool autoUpdate = false;
+static float LightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 static float CameraPosition[3];
 static float CameraRotation[3];
-static float noiseStrength = 1.0f;
+static Vec2 prevMousePos;
+static char b1[4096], b2[4096];
+
+static bool skyboxEnabled = false;
+static bool vSync = true;
+static bool autoUpdate = false;
+static bool flattenBase = false;
+static bool button1, button2, button3;
+static std::atomic<bool> noiseBased = false;
+static bool wireFrameMode = false;
 static bool absolute = false;
 static bool square = false;
+static std::atomic<bool> isRemeshing = false;
+
+
+
+static uint32_t vao, vbo, ebo;
+
+static float noiseStrength = 1.0f;
 static int resolution = 256;
-static float LightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static Vec2 prevMousePos;
-static bool button1, button2, button3;
 static float mouseSpeed = 25;
 static float scrollSpeed = 0.5f;
 static float mouseScrollAmount = 0;
 static float scale = 1.0f;
-static bool flattenBase = false;
-static std::vector<NoiseLayer> noiseLayers;
-static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Cellular"};
 static int numberOfNoiseTypes = 3;
-static FastNoiseLite m_NoiseGen;
-static bool isRemeshing = false;
 std::string fileName = "";
-static bool noiseBased = false;
-static bool wireFrameMode = false;
-static ActiveWindows activeWindows;
 static nlohmann::json appData;
 
 
@@ -89,21 +95,6 @@ void OnAppClose(int x, int y)
 	myApp->Close();
 }
 
-static std::string ReadShaderSourceFile(std::string path, bool* result) {
-	std::fstream newfile;
-	newfile.open(path.c_str(), std::ios::in);
-	if (newfile.is_open()) {
-		std::string tp;
-		std::string res = "";
-		getline(newfile, res, '\0');
-		newfile.close();
-		*result = true;
-		return res;
-	}else{
-		*result = false;
-	}
-	return std::string("");
-}
 
 static void ShowStats() 
 {
@@ -158,16 +149,10 @@ static void ShowGeneralControls()
 	ImGui::DragFloat("Zoom Speed", &scrollSpeed);
 
 	if (ImGui::Button("Exit")) {
-		delete mesh.vert;
-		delete mesh.indices;
 		exit(0);
 	}
 
 	ImGui::End();
-}
-
-static void ShowConsole() 
-{
 }
 
 static void ShowCameraControls() {
@@ -218,17 +203,17 @@ static std::string ExportOBJ() {
 
 	outfile << "# TerraGenV1.0 OBJ" << std::endl << std::endl;;
 
-	for (int i = 0; i < mesh.vertexCount; i++) 
+	for (int i = 0; i < terrain.mesh.vertexCount; i++) 
 	{
-		outfile << "v " << mesh.vert[i].position.x << " " << mesh.vert[i].position.y << " " << mesh.vert[i].position.z << " "  << std::endl;
+		outfile << "v " << terrain.mesh.vert[i].position.x << " " << terrain.mesh.vert[i].position.y << " " << terrain.mesh.vert[i].position.z << " "  << std::endl;
 	}
 
 	outfile << std::endl;
 	outfile << std::endl;
 
-	for (int i = 0; i < mesh.indexCount; i += 3)
+	for (int i = 0; i < terrain.mesh.indexCount; i += 3)
 	{
-		outfile << "f " << mesh.indices[i] + 1 << " " << mesh.indices[i + 1] + 1 << " " << mesh.indices[i + 2] + 1 << " " << std::endl;
+		outfile << "f " << terrain.mesh.indices[i] + 1 << " " << terrain.mesh.indices[i + 1] + 1 << " " << terrain.mesh.indices[i + 2] + 1 << " " << std::endl;
 	}
 
 	outfile.close();
@@ -237,26 +222,6 @@ static std::string ExportOBJ() {
 
 	return fileName;
 
-}
-
-static void RecalculateNormals(Mesh& mesh) 
-{
-	for (int i = 0; i < mesh.indexCount; i += 3)
-	{
-		const int ia = mesh.indices[i];
-		const int ib = mesh.indices[i + 1];
-		const int ic = mesh.indices[i + 2];
-
-		const glm::vec3 e1 = mesh.vert[ia].position - mesh.vert[ib].position;
-		const glm::vec3 e2 = mesh.vert[ic].position - mesh.vert[ib].position;
-		const glm::vec3 no = cross(e1, e2);
-
-		mesh.vert[ia].normal += no;
-		mesh.vert[ib].normal += no;
-		mesh.vert[ic].normal += no;
-	}
-
-	for (int i = 0; i < mesh.vertexCount; i++) mesh.vert[i].normal = glm::normalize(mesh.vert[i].normal);
 }
 
 static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
@@ -282,7 +247,7 @@ static float noise(float x, float y) {
 		noise += EvaluateNoiseLayer(x, y, nl);
 	}
 	if (flattenBase) {
-		noise = max(0, noise);
+		noise = MAX(0, noise);
 	}
 	if (absolute) {
 		noise = abs(noise);
@@ -293,6 +258,7 @@ static float noise(float x, float y) {
 	return noise * noiseStrength;
 }
 
+/*
 static void GenerateVertices()
 {
 	Vert* vertices = new Vert[resolution * resolution];
@@ -349,7 +315,7 @@ static void GenerateVertices()
 	s_Stats.vertCount = resolution * resolution;
 	s_Stats.triangles = mesh.indexCount / 3;
 }
-
+*/
 
 static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 	glDeleteBuffers(1, &a);
@@ -363,22 +329,48 @@ static void ResetShader() {
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource());
 }
 
-static void GenerateMesh() 
-{
-	GenerateVertices();
+static void FillMeshData() {
 
-	ResetShader();
+	if (terrain.mesh.res == resolution && terrain.mesh.sc == scale) {
+		for (int y = 0; y < resolution; y++)
+		{
+			for (int x = 0; x < resolution; x++)
+			{
+				if(noiseBased)
+					terrain.mesh.SetElevation(noise(x, y), x, y);
+				else
+					terrain.mesh.SetElevation(GetElevation(x, y), x, y);
+			}
+		}
+		terrain.mesh.RecalculateNormals();
+	}
+	else {
+		terrain.mesh.GeneratePlane(resolution, scale);
+		s_Stats.triangles = terrain.mesh.indexCount / 3;
+		s_Stats.vertCount = terrain.mesh.vertexCount;
+		for (int y = 0; y < resolution; y++)
+		{
+			for (int x = 0; x < resolution; x++)
+			{
+				terrain.mesh.SetElevation(noise(x, y), x, y);
+			}
+		}
+		terrain.mesh.RecalculateNormals();
+	}
+	isRemeshing = false;
+}
 
-	glGenVertexArrays(1, &vao);
+static void UploadMeshToGPU() {
+	if (!terrain.mesh.IsValid())
+		return;
+
 	glBindVertexArray(vao);
 
-	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh.vertexCount, mesh.vert, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * terrain.mesh.vertexCount, terrain.mesh.vert, GL_DYNAMIC_DRAW);
 
-	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh.indexCount, mesh.indices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * terrain.mesh.indexCount, terrain.mesh.indices, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
 	glEnableVertexAttribArray(0);
@@ -387,19 +379,37 @@ static void GenerateMesh()
 
 }
 
-
 static void RegenerateMesh(){
+
+	if (isRemeshing)
+		return;
+
+	UploadMeshToGPU();
+
+	isRemeshing = true;
 	
+	std::thread worker(FillMeshData);
+	worker.detach();
 
-	GenerateVertices();
 
+}
+
+static void GenerateMesh() 
+{
+	FillMeshData();
+
+	ResetShader();
+
+	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh.vertexCount, mesh.vert, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * terrain.mesh.vertexCount, terrain.mesh.vert, GL_DYNAMIC_DRAW);
 
+	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh.indexCount, mesh.indices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * terrain.mesh.indexCount, terrain.mesh.indices, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
 	glEnableVertexAttribArray(0);
@@ -420,10 +430,12 @@ static void DoTheRederThing(float deltaTime) {
 	shd->SetLightCol(LightColor);
 	shd->SetLightPos(LightPosition);
 	glBindVertexArray(vao);
-	if(wireFrameMode)
-		glDrawElements(GL_LINE_STRIP, mesh.indexCount, GL_UNSIGNED_INT, 0);
-	else
-		glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+	if (wireFrameMode) {
+		glDrawElements(GL_LINE_STRIP, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
+	}
+	else {
+		glDrawElements(GL_TRIANGLES, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
+	}
 	glBindVertexArray(0);
 }
 
@@ -454,8 +466,9 @@ static void ShowTerrainControls()
 
 	ImGui::Separator();
 
-	if (ImGui::Button("Change Mode##4584"))
+	if (ImGui::Button("Change Mode##4584")) {
 		noiseBased = !noiseBased;
+	}
 
 	if (noiseBased) {
 		ImGui::Text("Using Layer Based Workflow");
@@ -602,7 +615,7 @@ static void SaveFile() {
 	tmp["square"] = square;
 	tmp["absolute"] = absolute;
 	tmp["flattenBase"] = flattenBase;
-	tmp["noiseBased"] = noiseBased;
+	tmp["noiseBased"] = noiseBased?true:false;
 	tmp["wireFrameMode"] = wireFrameMode;
 	tmp["skyboxEnabled"] = skyboxEnabled;
 	tmp["vSync"] = vSync;
@@ -673,7 +686,6 @@ static void OpenSaveFile() {
 static void ShowWindowMenuItem(const char* title, bool* val) {
 	ImGui::Checkbox(title, val);
 }
-
 
 static void ShowMenu() {
 	if (ImGui::BeginMainMenuBar())
@@ -771,8 +783,9 @@ static void OnBeforeImGuiRender() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
 	ImGui::PopStyleVar();
-	if (opt_fullscreen)
+	if (opt_fullscreen) {
 		ImGui::PopStyleVar(2);
+	}
 	// DockSpace
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -842,7 +855,7 @@ public:
 	{
 		GetWindow()->SetVSync(vSync);
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;
-
+		ElevationNodeEditorTick();
 		SecondlyShaderEditorUpdate();
 	}
 
@@ -850,7 +863,6 @@ public:
 	{
 		OnBeforeImGuiRender();
 		ShowGeneralControls();
-		ShowConsole();
 		ShowCameraControls();
 		ShowTerrainControls();
 		ShowLightingControls();

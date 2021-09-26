@@ -9,3 +9,4 @@ void SetupShaderManager();
 bool ReqRefresh();
 std::string GetVertexShaderSource();
 std::string GetFragmentShaderSource();
+std::string GetGeometryShaderSource();

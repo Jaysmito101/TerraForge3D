@@ -12,6 +12,13 @@ Mesh::Mesh()
 	
 }
 
+Mesh::~Mesh() {
+	if (vert)
+		delete vert;
+	if (indices)
+		delete indices;
+}
+
 void Mesh::RecalculateNormals()
 {
 	for (int i = 0; i < indexCount; i += 3)
@@ -35,6 +42,7 @@ void Mesh::RecalculateNormals()
 void Mesh::GeneratePlane(int resolution, float scale)
 {
 	res = resolution;
+	sc = scale;
 	Vert* vertices = new Vert[resolution * resolution];
 	int* inds = new int[(resolution-1) * (resolution-1) * 6];
 	int triIndex = 0;
@@ -88,6 +96,8 @@ void Mesh::SetElevation(float elevation, int x, int y){
 	if(!vert)
 		return;
 	int i = x + y * res;
+	if (i > vertexCount)
+		return;
 	vert[i].position.y = elevation;
 }
 
@@ -95,5 +105,13 @@ void Mesh::AddElevation(float elevation, int x, int y){
 	if(!vert)
 		return;
 	int i = x + y * res;
+	if (i > vertexCount)
+		return;
 	vert[i].position.y += elevation;
+}
+
+bool Mesh::IsValid() {
+	if (vert && indices)
+		return true;
+	return false;
 }

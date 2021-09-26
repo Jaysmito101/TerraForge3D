@@ -62,6 +62,8 @@ Texture2D::~Texture2D()
 
 void Texture2D::SetData(void* data, uint32_t size)
 {
+	if (!data)
+		return;
 	uint32_t bpp = 3;
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);

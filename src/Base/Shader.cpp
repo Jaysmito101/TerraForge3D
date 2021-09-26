@@ -34,10 +34,40 @@ static int CreateProgram() {
 	return program;
 }
 
-Shader::Shader(std::string vertexSrc, std::string fragmentSrc) 
+Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geometrySource)
 {
 	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER);
 	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER);
+	GLuint geomShader = CompileShader(fragmentSrc, GL_GEOMETRY_SHADER);
+	m_Shader = CreateProgram();
+	glAttachShader(m_Shader, vertShader);
+	glAttachShader(m_Shader, fragShader);
+	glAttachShader(m_Shader, geomShader);
+	glLinkProgram(m_Shader);
+	GLint isLinked = 0;
+	glGetProgramiv(m_Shader, GL_LINK_STATUS, (int*)&isLinked);
+	if (isLinked == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetProgramiv(m_Shader, GL_INFO_LOG_LENGTH, &maxLength);
+		char* errorLog = (char*)malloc(maxLength);
+		memset(errorLog, 0, maxLength);
+		glGetProgramInfoLog(m_Shader, maxLength, &maxLength, errorLog);
+		glDeleteProgram(m_Shader);
+		glDeleteShader(vertShader);
+		glDeleteShader(fragShader);
+		Log(errorLog);
+	}
+	glDetachShader(m_Shader, vertShader);
+	glDetachShader(m_Shader, fragShader);
+	glDetachShader(m_Shader, geomShader);
+}
+
+
+Shader::Shader(std::string vertexSrc, std::string fragmentSrc)
+{
+	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER);
+	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER);;
 	m_Shader = CreateProgram();
 	glAttachShader(m_Shader, vertShader);
 	glAttachShader(m_Shader, fragShader);
@@ -59,6 +89,7 @@ Shader::Shader(std::string vertexSrc, std::string fragmentSrc)
 	glDetachShader(m_Shader, vertShader);
 	glDetachShader(m_Shader, fragShader);
 }
+
 
 void Shader::Bind()
 {
@@ -95,6 +126,32 @@ void Shader::SetMPV(glm::mat4 pv)
 		m_UniformId = glGetUniformLocation(m_Shader, "_PV");
 	}
 	glUniformMatrix4fv(m_UniformId, 1, GL_FALSE, glm::value_ptr(pv));
+}
+
+void Shader::SetUniformf(std::string name, float value)
+{
+	if (uniformLocations.find(name) == uniformLocations.end()) {
+		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+		uniformLocations.insert(std::make_pair(name, loc));
+		glUniform1f(loc, value);
+	}
+	else {
+		uint32_t loc = uniformLocations[name];
+		glUniform1f(loc, value);
+	}
+}
+
+void Shader::SetUniformMAt4(std::string name, glm::mat4 value)
+{
+	if (uniformLocations.find(name) == uniformLocations.end()) {
+		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+		uniformLocations.insert(std::make_pair(name, loc));
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+	}
+	else {
+		uint32_t loc = uniformLocations[name];
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+	}
 }
 
 void Shader::Unbind()

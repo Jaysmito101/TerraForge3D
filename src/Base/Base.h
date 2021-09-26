@@ -39,3 +39,5 @@
 #include <Application.h>
 #include <Shader.h>
 #include <SplashScreen.h>
+#include <Camera.h>
+#include <Model.h>
