@@ -53,7 +53,6 @@ static float noiseStrength = 1.0f;
 static bool absolute = false;
 static bool square = false;
 static int resolution = 256;
-static float fadeOFf = 0.1f;
 static float LightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 static Vec2 prevMousePos;
 static bool button1, button2, button3;
@@ -69,7 +68,9 @@ static FastNoiseLite m_NoiseGen;
 static bool isRemeshing = false;
 std::string fileName = "";
 static bool noiseBased = false;
+static bool wireFrameMode = false;
 static ActiveWindows activeWindows;
+static nlohmann::json appData;
 
 
 static void ToggleSystemConsole() {
@@ -660,7 +661,24 @@ static void SaveFile() {
 	data["name"] = "TerraGen3D v3.0";
 	data["EnodeEditor"] = GetElevationNodeEditorSaveData();
 	data["styleData"] = GetStyleData();
+	data["appData"] = appData;
 	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
+
+	nlohmann::json tmp;
+	tmp["autoUpdate"] = autoUpdate;
+	tmp["square"] = square;
+	tmp["absolute"] = absolute;
+	tmp["flattenBase"] = flattenBase;
+	tmp["noiseBased"] = noiseBased;
+	tmp["skyboxEnabled"] = skyboxEnabled;
+	tmp["vSync"] = vSync;
+	tmp["mouseSpeed"] = mouseSpeed;
+	tmp["scrollSpeed"] = scrollSpeed;
+	tmp["mouseScrollAmount"] = mouseScrollAmount;
+	tmp["scale"] = scale;
+
+	data["generals"] = tmp;
+
 	std::ofstream outfile;
 	outfile.open(file);
 
@@ -691,6 +709,20 @@ static void OpenSaveFile() {
 	SetElevationNodeEditorSaveData(data["EnodeEditor"]);
 	LoadThemeFromStr(data["styleData"]);
 	data["imguiData"] = ImGui::SaveIniSettingsToMemory();
+	appData = data["appData"];
+	nlohmann::json tmp = data["generals"];
+	autoUpdate = tmp["autoUpdate"];
+	square = tmp["square"];
+	absolute = tmp["absolute"];
+	flattenBase = tmp["flattenBase"];
+	noiseBased = tmp["noiseBased"];
+	skyboxEnabled = tmp["skyboxEnabled"];
+	vSync = tmp["vSync"];
+	mouseSpeed = tmp["mouseSpeed"];
+	scrollSpeed = tmp["scrollSpeed"];
+	mouseScrollAmount = tmp["mouseScrollAmount"];
+	scale = tmp["scale"];
+
 
 	// For Future
 	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size());
@@ -913,13 +945,13 @@ public:
 	{
 		SetUpIcon();
 		srand((unsigned int)time(NULL));
+		SetupViewportFrameBuffer();
 		SetupCubemap();
 		SetupShaderManager();
-		SetupElevationManager();
+		SetupElevationManager(&resolution);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
-		SetupViewportFrameBuffer();
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
 		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [] (GLFWwindow* window, int w, int h){
 			glfwSwapBuffers(window);

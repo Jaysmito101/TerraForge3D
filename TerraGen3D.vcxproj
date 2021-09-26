@@ -164,7 +164,10 @@
     <ClCompile Include="src\AppShaderEditor.cpp" />
     <ClCompile Include="src\AppStyles.cpp" />
     <ClCompile Include="src\Base\Application.cpp" />
+    <ClCompile Include="src\Base\Camera.cpp" />
     <ClCompile Include="src\Base\EntryPoint.cpp" />
+    <ClCompile Include="src\Base\Mesh.cpp" />
+    <ClCompile Include="src\Base\Model.cpp" />
     <ClCompile Include="src\Base\Shader.cpp" />
     <ClCompile Include="src\Base\SplashScreen.cpp" />
     <ClCompile Include="src\Base\Texture2D.cpp" />
@@ -476,7 +479,10 @@
     <ClInclude Include="src\AppStyles.h" />
     <ClInclude Include="src\Base\Application.h" />
     <ClInclude Include="src\Base\Base.h" />
+    <ClInclude Include="src\Base\Camera.h" />
     <ClInclude Include="src\Base\EntryPoint.h" />
+    <ClInclude Include="src\Base\Mesh.h" />
+    <ClInclude Include="src\Base\Model.h" />
     <ClInclude Include="src\Base\Shader.h" />
     <ClInclude Include="src\Base\SplashScreen.h" />
     <ClInclude Include="src\Base\Texture2D.h" />

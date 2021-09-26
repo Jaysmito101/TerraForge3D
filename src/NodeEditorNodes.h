@@ -126,7 +126,7 @@ struct Editor
 	std::vector<Pin*>     pins;
 	int                   current_id = 0;
 
-	nlohmann::json Save(int outputID) {
+	nlohmann::json Save(Node* outputNode) {
 		nlohmann::json data;
 		data["context"] = ImNodes::SaveEditorStateToIniString(context);
 		data["type"] = "EDITOR";
@@ -138,9 +138,11 @@ struct Editor
 			pos = ImNodes::GetNodeEditorSpacePos(n->id);
 			nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", n->id} }));
 		}
+		pos = ImNodes::GetNodeEditorSpacePos(outputNode->id);
+		nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", outputNode->id} }));
 		data["nodes"] = nodesSave;
 		data["nodePositions"] = nodesPositionSave;
-
+		data["outputNode"] = outputNode->Save().dump();
 		std::vector<nlohmann::json> linksSave;
 		for (Link& l : links) {
 			linksSave.push_back(l.Save());
@@ -255,7 +257,7 @@ public:
 		if (true) {
 			ImNodes::BeginStaticAttribute(oiID);
 			ImGui::Dummy(ImVec2(100, 110));
-			ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), ImVec2(100, -100));
+			ImGui::Image((ImTextureID)outputTex, ImVec2(100, -100));
 			ImNodes::EndStaticAttribute();
 		}
 
@@ -273,6 +275,7 @@ public:
 		return value;
 	}
 
+	uint32_t outputTex;
 	FloatPin inputPin = FloatPin(this);
 	float value = 0.0f;
 private:

@@ -13,17 +13,24 @@
 #include <string>
 #include <fstream>
 #include <map>
-
+#include <Texture2D.h>
 #include <GLFW/glfw3.h>
 #include <Application.h>
 
-Editor editorM;
+static Editor editorM;
 static float zoom = 1.0f;
 static bool flag = false;
+static bool showHMap = false;
 static bool showNodeMaker = false;
 static bool drop_make_node = false;
 static int drop_midway_start = -1;
-FloatValueI* outputNode;
+static FloatValueI* outputNode;
+static int* resolution;
+static int currRes;
+static float* heightMapData;
+static unsigned char* heightMap;
+static bool autoUpdate = false;
+static Texture2D* hMap;
 
 static std::string ReadrSourceFile(std::string path, bool* result) {
     std::fstream newfile;
@@ -41,12 +48,46 @@ static std::string ReadrSourceFile(std::string path, bool* result) {
     return std::string("");
 }
 
-void SetupElevationManager() {
+static void SetUpHeightMap(int res) {
+    if (heightMapData)
+        delete[] heightMapData;
+    if (heightMap)
+        delete[] heightMap;
+    if (hMap)
+        delete hMap;
+    hMap = new Texture2D(currRes, currRes);
+    heightMapData = new float[res * res];
+    memset(heightMapData, 0, res*res);
+    heightMap = new unsigned char[res * res * 3];
+    memset(heightMap, 0, res * res * 3);
+}
+
+static void UpdateHeightMap() {
+    float t = 0;
+    for (int i = 0; i < currRes; i++) {
+        for (int j = 0; j < currRes; j++) {
+            heightMapData[i * currRes + j] = outputNode->Evaluate(i, j);
+            t = heightMapData[i * currRes + j] * 0.5f + 0.5f;
+            heightMap[i * currRes * 3 + j * 3 + 0] = (unsigned char)(t * 255);
+            heightMap[i * currRes * 3 + j * 3 + 1] = (unsigned char)(t * 255);
+            heightMap[i * currRes * 3 + j * 3 + 2] = (unsigned char)(t * 255);
+        }
+    }
+    hMap->SetData(heightMap, currRes*currRes*3);
+}
+
+
+void SetupElevationManager(int* res) {
+    resolution = res;
+    currRes = *resolution;
+    SetUpHeightMap(currRes);
     editorM.context = ImNodes::EditorContextCreate();
     ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
     outputNode = new FloatValueI("Elevation Output");
     outputNode->Setup();
+    outputNode->outputTex = GetViewportFramebufferColorTextureId();
     editorM.pins.push_back(&(outputNode)->inputPin);
+    UpdateHeightMap();
 }
 
 void ShutdownElevationNodeEditor() {
@@ -99,9 +140,6 @@ static void MakeLink(Pin* start, Pin* end) {
     editorM.links.push_back(lnk);
     drop_midway_start = -1;
 }
-
-
-
 
 static Node* MakeNode(nlohmann::json& nodedata) {
     if (nodedata["type"] == NodeType::FloatNodeI) {
@@ -159,9 +197,24 @@ static Node* MakeNode(nlohmann::json& nodedata) {
     }
 }
 
+static void FixPinPointers() {
+    for (Pin* p : editorM.pins) {
+        int st = p->link.start_attr;
+        int en = p->link.end_attr;
+        int oid;
+        oid = st;
+        if (st == p->link.id)
+            oid = en;
+        Pin* otherPin = editorM.FindPin(oid);
+        p->link.other = otherPin;
+    }
+}
+
 static void LoadEditorData(Editor& editor, nlohmann::json data) {
     ImNodes::LoadEditorStateFromIniString(editor.context, data["context"].dump().c_str(), data["context"].dump().size());
     for (Node* n : editor.nodes) {
+        if (n->id == outputNode->id)
+            continue;
         delete n;
     }
     editor.nodes = std::vector<Node*>();
@@ -169,11 +222,6 @@ static void LoadEditorData(Editor& editor, nlohmann::json data) {
         editor.nodes.push_back(MakeNode(node));
     }
 
-    editor.links = std::vector<Link>();
-    for (nlohmann::json link : data["links"]) {
-        editor.links.push_back(Link());
-        editor.links.back().Load(link);
-    }
 
     editor.pins = std::vector<Pin*>();
     for (Node* n : editor.nodes) {
@@ -182,6 +230,20 @@ static void LoadEditorData(Editor& editor, nlohmann::json data) {
             editor.pins.push_back((Pin*)pn);
         }
     }
+    editor.pins.push_back(&(outputNode)->inputPin);
+
+
+    editor.links = std::vector<Link>();
+    for (nlohmann::json link : data["links"]) {
+        editor.links.push_back(Link());
+        editor.links.back().Load(link);
+        if (editor.links.back().end_attr == outputNode->inputPin.id) {
+            outputNode->inputPin.isLinked = true;
+            outputNode->inputPin.link = editor.links.back();
+            outputNode->inputPin.link.other = editor.FindPin(outputNode->inputPin.link.start_attr);
+        }
+    }
+    FixPinPointers();
 
     ImNodes::EditorContextSet(editor.context);
     for (nlohmann::json nodePos : data["nodePositions"]) {
@@ -193,8 +255,23 @@ void SetElevationNodeEditorSaveData(nlohmann::json data) {
     LoadEditorData(editorM, data);
 }
 
+static void ResetNodeEditor() {
+    ImNodes::EditorContextFree(editorM.context);
+    editorM.context = ImNodes::EditorContextCreate();
+    delete outputNode;
+    outputNode = new FloatValueI("Elevation Output");
+    outputNode->Setup();
+    for (Node* n : editorM.nodes) {
+        delete n;
+    }
+    editorM.nodes = std::vector<Node*>();
+    editorM.links = std::vector<Link>();
+    editorM.pins = std::vector<Pin*>();
+    editorM.pins.push_back(&(outputNode)->inputPin);
+}
+
 nlohmann::json GetElevationNodeEditorSaveData() {
-    return editorM.Save(outputNode->id);
+    return editorM.Save(outputNode);
 }
 
 static void ShowNodeMaker(Pin* start_drop) {
@@ -364,8 +441,29 @@ static void UpdateNodeDeletion() {
 }
 
 static void ShowEditor(const char* editor_name, Editor& editor) {
-
     ImGui::Checkbox("Drop To Make Node (Beta)", &drop_make_node);
+    ImGui::Checkbox("Auto Update Node Output", &autoUpdate);
+    if (ImGui::Button("Reset Node Editor"))
+        ResetNodeEditor();
+    ImGui::SameLine();
+    if (ImGui::Button("Update Node Output"))
+        UpdateHeightMap();
+    ImGui::SameLine();
+    if (!showHMap) {
+        if (ImGui::Button("Show Heightmap on Output Node")) {
+            if (outputNode) {
+                outputNode->outputTex = hMap->GetRendererID();
+                showHMap = true;
+            }
+        }
+    }else{
+        if (ImGui::Button("Show Viewport on Output Node")) {
+            if (outputNode) {
+                outputNode->outputTex = GetViewportFramebufferColorTextureId();
+                showHMap = false;
+            }
+        }
+    }
 
     if (ImGui::GetIO().KeysDown[ImGuiKey_A]) {
         showNodeMaker = true;
@@ -449,7 +547,14 @@ static void ShowEditor(const char* editor_name, Editor& editor) {
 
 void ShowElevationNodeEditor(bool* pOpen)
 {
-    
+    if (currRes != *resolution) {
+        currRes = *resolution;
+        SetUpHeightMap(currRes);
+        UpdateHeightMap();
+    }
+    if (autoUpdate) {
+        UpdateHeightMap();
+    }
 	ImGui::Begin("Elevation Node Editor", pOpen);
 
     ShowEditor("editor1", editorM);
@@ -458,5 +563,5 @@ void ShowElevationNodeEditor(bool* pOpen)
 }
 
 float GetElevation(float x, float y) {
-    return outputNode->Evaluate(x, y);
+    return heightMapData[(int)x*currRes+(int)y];
 }
