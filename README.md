@@ -20,6 +20,8 @@
 # TerraGen3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
+<a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
+
 # What can this do?
 
 * Generte 3D Terrain Procedrally
