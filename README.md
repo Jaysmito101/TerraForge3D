@@ -1,3 +1,22 @@
+<br/>
+<p align="center">
+    <a href="https://jaysmito101.github.io/TerraGen3D/" target="_blank">
+        <img width="10%" src="https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/resources/icons-png/icon-9.png" alt="Logo">
+    </a>
+</p>
+
+<br/>
+<p align="center">
+  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Jaysmito101/TerraGen3D?style=for-the-badge">
+  <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/Jaysmito101/TerraGen3D?style=for-the-badge">
+  <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/Jaysmito101/TerraGen3D/total?style=for-the-badge">
+  <img alt="GitHub" src="https://img.shields.io/github/license/Jaysmito101/Terragen3D?style=for-the-badge">
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/Jaysmito101/TerraGen3D?style=for-the-badge">
+  
+</p>
+<br/>
+
+
 # TerraGen3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
