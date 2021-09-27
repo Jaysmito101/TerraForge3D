@@ -13,6 +13,8 @@ std::string ShowOpenFileDialog(const char* ext = "*.glsl\0*.*\0", HWND owner = N
 
 std::string ReadShaderSourceFile(std::string path, bool* result);
 
+std::string GetExecutableDir();
+
 void Log(const char* log);
 
 void Log(std::string log);

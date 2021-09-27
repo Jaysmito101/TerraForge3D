@@ -25,11 +25,12 @@ static void InitGlad() {
 	}
 }
 
-static void InitImGui() {
+static void InitImGui(std::string& configPath) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImNodes::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.IniFilename = configPath.c_str();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -59,6 +60,11 @@ Application* Application::s_App;
 
 Application::Application()
 {
+}
+
+void Application::SetWindowConfigPath(std::string path)
+{
+	windowConfigPath = path;
 }
 
 void Application::SetTitle(std::string title)
@@ -115,7 +121,7 @@ void Application::RenderImGui() {
 void Application::Run() 
 {
 	InitGlad();
-	InitImGui();
+	InitImGui(windowConfigPath);
 	OnStart();
 	float oneSecCounter = 0;
 	while (isActive) {

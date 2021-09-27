@@ -13,10 +13,12 @@ Mesh::Mesh()
 }
 
 Mesh::~Mesh() {
-	if (vert)
-		delete vert;
-	if (indices)
-		delete indices;
+	if (deleteOnDestruction) {
+		if (vert)
+			delete vert;
+		if (indices)
+			delete indices;
+	}
 }
 
 void Mesh::RecalculateNormals()
@@ -108,6 +110,21 @@ void Mesh::AddElevation(float elevation, int x, int y){
 	if (i > vertexCount)
 		return;
 	vert[i].position.y += elevation;
+}
+
+Mesh Mesh::Clone()
+{
+	Mesh cloneMesh;
+	cloneMesh.res = res;
+	cloneMesh.sc = sc;
+	cloneMesh.deleteOnDestruction = false;
+	cloneMesh.vertexCount = vertexCount;
+	cloneMesh.indexCount = indexCount;
+	cloneMesh.vert = new Vert[res * res];
+	memcpy(cloneMesh.vert, vert, sizeof(Vert) * vertexCount);
+	cloneMesh.indices = new int[(res - 1) * (res - 1) * 6];
+	memcpy(cloneMesh.indices, indices, sizeof(int) * indexCount);
+	return cloneMesh;
 }
 
 bool Mesh::IsValid() {

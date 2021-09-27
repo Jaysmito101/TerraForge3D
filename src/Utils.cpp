@@ -1,6 +1,22 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+
 #include <Utils.h>
 #include <fstream>
 #include <iostream>
+
+static std::string getExecutablePath() {
+	char rawPathName[MAX_PATH];
+	GetModuleFileNameA(NULL, rawPathName, MAX_PATH);
+	return std::string(rawPathName);
+}
+
+static std::string getExecutableDir() {
+	std::string executablePath = getExecutablePath();
+	std::string directory = executablePath.substr(0, executablePath.find_last_of("\\/"));
+	return directory;
+}
+
 
 
 std::string ShowSaveFileDialog(std::string ext , HWND owner ) {
@@ -95,6 +111,11 @@ std::string ReadShaderSourceFile(std::string path, bool* result) {
 	return std::string("");
 }
 
+std::string GetExecutableDir()
+{
+	return getExecutableDir();
+}
+
 
 void Log(const char* log)
 {
@@ -106,3 +127,4 @@ void Log(std::string log)
 {
 	std::cout << log << std::endl;
 };
+

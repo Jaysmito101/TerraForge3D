@@ -4,6 +4,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
+
 Texture2D::Texture2D(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height)
 {

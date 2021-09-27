@@ -15,6 +15,8 @@ public:
 	virtual void OnEnd() {};
 	virtual void OnPreload() {};
 
+	
+	void SetWindowConfigPath(std::string title);
 	void SetTitle(std::string title);
 	void Init();
 	bool IsActive();
@@ -29,8 +31,10 @@ public:
 	Window* GetWindow() { return m_Window; }
 
 	static inline Application* Get() { return s_App; }
+
 private:
 	std::string m_WindowTitle = "Main Window";
+	std::string windowConfigPath = "windowconfigs.terr3d";
 	float previousTime;
 	bool isActive;
 	Window* m_Window;

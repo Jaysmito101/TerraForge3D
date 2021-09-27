@@ -98,7 +98,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -174,6 +174,7 @@
     <ClCompile Include="src\Base\Window.cpp" />
     <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\ElevationNodeEditor.cpp" />
+    <ClCompile Include="src\ExportManager.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
     <ClCompile Include="src\Utils.cpp" />
@@ -490,9 +491,11 @@
     <ClInclude Include="src\Base\Window.h" />
     <ClInclude Include="src\CubeMap.h" />
     <ClInclude Include="src\ElevationNodeEditor.h" />
+    <ClInclude Include="src\ExportManager.h" />
     <ClInclude Include="src\FastNoiseLite.h" />
     <ClInclude Include="src\ImGuiConsole.h" />
     <ClInclude Include="src\json.hpp" />
+    <ClInclude Include="src\MathUtils.h" />
     <ClInclude Include="src\NodeEditorNodes.h" />
     <ClInclude Include="src\SimplexNoise.h" />
     <ClInclude Include="src\Utils.h" />

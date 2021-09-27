@@ -7,6 +7,7 @@
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
 #include <ElevationNodeEditor.h>
+#include <ExportManager.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
 #include <windows.h>
 #include <string>
@@ -36,13 +37,14 @@
 
 static Model terrain("Terrain");
 
-static Application *myApp;
-static Shader *shd, *meshNormalsShader, *wireframeShader;
+static Application* myApp;
+static Shader* shd, * meshNormalsShader, * wireframeShader;
 static Camera camera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
 static std::vector<NoiseLayer> noiseLayers;
-static const char* noiseTypes[] = {"Simplex Perlin", "Random", "Cellular"};
+static std::vector<NoiseLayer> noiseLayersTmp;
+static const char* noiseTypes[] = { "Simplex Perlin", "Random", "Cellular" };
 static FastNoiseLite m_NoiseGen;
 
 static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -65,6 +67,7 @@ static bool wireFrameMode = false;
 static bool absolute = false;
 static bool square = false;
 static std::atomic<bool> isRemeshing = false;
+static std::atomic<bool> isRuinning = true;
 
 
 
@@ -77,14 +80,15 @@ static float scrollSpeed = 0.5f;
 static float mouseScrollAmount = 0;
 static float scale = 1.0f;
 static int numberOfNoiseTypes = 3;
-std::string fileName = "";
 static nlohmann::json appData;
+
+static std::string errorMessage = "";
 
 
 static void ToggleSystemConsole() {
 	static bool state = false;
 	state = !state;
-	ShowWindow(GetConsoleWindow(), state?SW_SHOW:SW_HIDE);
+	ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);
 }
 
 
@@ -96,7 +100,7 @@ void OnAppClose(int x, int y)
 }
 
 
-static void ShowStats() 
+static void ShowStats()
 {
 	ImGui::Begin("Statistics", &activeWindows.statsWindow);
 
@@ -110,10 +114,10 @@ static void ShowStats()
 		strcat_s(b1, "FPS         : ");
 		strcat_s(b1, b2);
 		ImGui::Text(b1);
-		
+
 		memset(b1, 0, 100);
 		memset(b2, 0, 100);
-		_gcvt_s(b2, s_Stats.deltaTime*1000, 6);
+		_gcvt_s(b2, s_Stats.deltaTime * 1000, 6);
 		strcat_s(b1, "Frame Time  : ");
 		strcat_s(b1, b2);
 		strcat_s(b1, "ms");
@@ -137,7 +141,7 @@ static void ShowStats()
 	ImGui::End();
 }
 
-static void ShowGeneralControls() 
+static void ShowGeneralControls()
 {
 	ImGui::Begin("General Controls");
 
@@ -190,53 +194,25 @@ static void ShowLightingControls() {
 }
 
 
-static std::string ExportOBJ() {
-	std::string fileName = openfilename();
-
-	std::ofstream outfile;
-
-	if (fileName.find(".obj") == std::string::npos)
-		fileName += ".obj";
-	
-	outfile.open(fileName);
-
-
-	outfile << "# TerraGenV1.0 OBJ" << std::endl << std::endl;;
-
-	for (int i = 0; i < terrain.mesh.vertexCount; i++) 
-	{
-		outfile << "v " << terrain.mesh.vert[i].position.x << " " << terrain.mesh.vert[i].position.y << " " << terrain.mesh.vert[i].position.z << " "  << std::endl;
-	}
-
-	outfile << std::endl;
-	outfile << std::endl;
-
-	for (int i = 0; i < terrain.mesh.indexCount; i += 3)
-	{
-		outfile << "f " << terrain.mesh.indices[i] + 1 << " " << terrain.mesh.indices[i + 1] + 1 << " " << terrain.mesh.indices[i + 2] + 1 << " " << std::endl;
-	}
-
-	outfile.close();
-
-	Log((std::string("Exported Mesh to ") + fileName).c_str());
-
-	return fileName;
-
-}
 
 static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
 	if (!noiseLayer.enabled)
 		return 0.0f;
 	float baseNoise = 0;
-	if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
-		baseNoise = SimplexNoise::noise((x/resolution) * noiseLayer.scale + noiseLayer.offsetX, (y/ resolution) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+	try {
+		if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
+			baseNoise = SimplexNoise::noise((x / resolution) * noiseLayer.scale + noiseLayer.offsetX, (y / resolution) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+		}
+		else if (strcmp(noiseLayer.noiseType, "Random") == 0) {
+			return (rand()) * noiseLayer.strength * 0.0001f;
+		}
+		else if (strcmp(noiseLayer.noiseType, "Cellular") == 0) {
+			m_NoiseGen.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
+			baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + noiseLayer.offsetX, (y / 1) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+		}
 	}
-	else if (strcmp(noiseLayer.noiseType, "Random") == 0) {		
-		return (rand())*noiseLayer.strength*0.0001f;
-	}
-	else if (strcmp(noiseLayer.noiseType, "Cellular") == 0) {
-		m_NoiseGen.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-		baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + noiseLayer.offsetX, (y / 1)* noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+	catch (...) {
+		baseNoise = 0.0f;
 	}
 	return baseNoise;
 }
@@ -258,65 +234,6 @@ static float noise(float x, float y) {
 	return noise * noiseStrength;
 }
 
-/*
-static void GenerateVertices()
-{
-	Vert* vertices = new Vert[resolution * resolution];
-	int* inds = new int[(resolution-1) * (resolution-1) * 6];
-	int triIndex = 0;
-
-	for (int y = 0; y < resolution; y++)
-	{
-		for (int x = 0; x < resolution; x++)
-		{
-			int i = x + y * resolution;
-			glm::vec2 percent = glm::vec2(x, y) / ((float)resolution - 1);
-			glm::vec3 pointOnPlane = (percent.x - .5f) * 2 * right + (percent.y - .5f) * 2 * front;
-			pointOnPlane *= scale;
-			vertices[i] = Vert();
-			vertices[i].position = glm::vec3(0.0f);
-
-			vertices[i].position.x = (float)pointOnPlane.x;
-			if(noiseBased)
-				vertices[i].position.y = (float)(pointOnPlane.y + noise((float)x, (float)y));
-			else
-				vertices[i].position.y = (float)(pointOnPlane.y + GetElevation((float)x, (float)y));
-			vertices[i].position.z = (float)pointOnPlane.z;
-			vertices[i].normal = glm::vec3(0.0f);
-			if (x != resolution - 1 && y != resolution - 1)
-			{
-				inds[triIndex] = i;
-				inds[triIndex + 1] = i + resolution + 1;
-				inds[triIndex + 2] = i + resolution;
-
-				inds[triIndex + 3] = i;
-				inds[triIndex + 4] = i + 1;
-				inds[triIndex + 5] = i + resolution + 1;
-				triIndex += 6;
-			}
-		}
-	}
-	
-	if (mesh.vert)
-		delete mesh.vert;
-	if (mesh.indices)
-		delete mesh.indices;
-	mesh.vertexCount = resolution * resolution;
-	mesh.vert = new Vert[resolution * resolution];
-	memset(mesh.vert, 0, sizeof(Vert) * mesh.vertexCount);
-	memcpy(mesh.vert, vertices, sizeof(Vert)*mesh.vertexCount);
-	mesh.indexCount = (resolution - 1) * (resolution - 1) * 6;
-	mesh.indices = new int[(resolution - 1) * (resolution - 1) * 6];
-	memset(mesh.indices, 0, mesh.indexCount);
-	memcpy(mesh.indices, inds, sizeof(int) * mesh.indexCount);
-	delete vertices;
-	delete inds;
-	RecalculateNormals(mesh);
-	s_Stats.vertCount = resolution * resolution;
-	s_Stats.triangles = mesh.indexCount / 3;
-}
-*/
-
 static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 	glDeleteBuffers(1, &a);
 	glDeleteBuffers(1, &b);
@@ -326,39 +243,32 @@ static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 static void ResetShader() {
 	if (shd)
 		delete shd;
-	if(!wireframeShader)
+	if (!wireframeShader)
 		wireframeShader = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
 static void FillMeshData() {
 
-	if (terrain.mesh.res == resolution && terrain.mesh.sc == scale) {
-		for (int y = 0; y < resolution; y++)
-		{
-			for (int x = 0; x < resolution; x++)
-			{
-				if(noiseBased)
-					terrain.mesh.SetElevation(noise(x, y), x, y);
-				else
-					terrain.mesh.SetElevation(GetElevation(x, y), x, y);
-			}
-		}
-		terrain.mesh.RecalculateNormals();
-	}
-	else {
+	if (terrain.mesh.res != resolution || terrain.mesh.sc != scale) {
+
 		terrain.mesh.GeneratePlane(resolution, scale);
 		s_Stats.triangles = terrain.mesh.indexCount / 3;
 		s_Stats.vertCount = terrain.mesh.vertexCount;
-		for (int y = 0; y < resolution; y++)
-		{
-			for (int x = 0; x < resolution; x++)
-			{
-				terrain.mesh.SetElevation(noise(x, y), x, y);
-			}
-		}
-		terrain.mesh.RecalculateNormals();
 	}
+
+	for (int y = 0; y < resolution; y++)
+	{
+		for (int x = 0; x < resolution; x++)
+		{
+			if(noiseBased)
+				terrain.mesh.SetElevation(noise(x, y), x, y);
+			else
+				terrain.mesh.SetElevation(GetElevation(x, y), x, y);
+		}
+	}
+	terrain.mesh.RecalculateNormals();
+
 	isRemeshing = false;
 }
 
@@ -381,7 +291,7 @@ static void UploadMeshToGPU() {
 
 }
 
-static void RegenerateMesh(){
+static void RegenerateMesh() {
 
 	if (isRemeshing)
 		return;
@@ -389,14 +299,14 @@ static void RegenerateMesh(){
 	UploadMeshToGPU();
 
 	isRemeshing = true;
-	
+
 	std::thread worker(FillMeshData);
 	worker.detach();
 
 
 }
 
-static void GenerateMesh() 
+static void GenerateMesh()
 {
 	FillMeshData();
 
@@ -425,7 +335,7 @@ static void DoTheRederThing(float deltaTime) {
 	time += deltaTime;
 	camera.UpdateCamera(CameraPosition, CameraRotation);
 	Shader* shader;
-	if(skyboxEnabled)
+	if (skyboxEnabled)
 		RenderSkybox(camera.pv);
 	if (wireFrameMode)
 		shader = wireframeShader;
@@ -460,14 +370,14 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
 	ImGui::Checkbox("Use Skybox", &skyboxEnabled);
 	ImGui::NewLine();
-	if(ImGui::Button("Update Mesh"))
+	if (ImGui::Button("Update Mesh"))
 		RegenerateMesh();
 
 	if (ImGui::Button("Refresh Shaders")) {
 		ResetShader();
 	}
 	ImGui::Separator();
-	
+
 	if (ImGui::Button("Use Custom Shaders")) {
 		activeWindows.shaderEditorWindow = true;
 	}
@@ -495,21 +405,22 @@ static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
 	ImGui::Text(noiseLayer.name);
 	if (state) {
 		ImGui::InputText((std::string("##") + std::to_string(id)).c_str(), (noiseLayer.name), 256);
-			ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
-			ImGui::Text("Noise Type");
-			if (ImGui::BeginCombo((std::string("##noiseType") + std::to_string(id)).c_str(), noiseLayer.noiseType))
+		ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
+		ImGui::Text("Noise Type");
+		if (ImGui::BeginCombo((std::string("##noiseType") + std::to_string(id)).c_str(), noiseLayer.noiseType))
+		{
+			for (int i = 0; i < numberOfNoiseTypes; i++)
 			{
-				for (int i = 0; i < numberOfNoiseTypes; i++)
-				{
-					bool is_selected = (noiseLayer.noiseType == noiseTypes[i]);
-						if (ImGui::Selectable(noiseTypes[i], is_selected)) {
-							noiseLayer.noiseType = noiseTypes[i];
-								if (is_selected)
-									ImGui::SetItemDefaultFocus();
-						}
+				bool is_selected = (noiseLayer.noiseType == noiseTypes[i]);
+				if (ImGui::Selectable(noiseTypes[i], is_selected)) {
+					memset(noiseLayer.noiseType, 0, 1024);
+					strcpy(noiseLayer.noiseType, noiseTypes[i]);
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
 				}
-				ImGui::EndCombo();
 			}
+			ImGui::EndCombo();
+		}
 		ImGui::DragFloat((std::string("Scale##") + std::to_string(id)).c_str(), &(noiseLayer.scale), 0.01f, -200.0f, 200.0f);
 		ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.001f);
 		ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
@@ -520,12 +431,12 @@ static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
 		ImGui::SameLine();
 		if (ImGui::Button((std::string("Duplicate") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
 			Log(std::to_string(id).c_str());
-			noiseLayers.push_back(noiseLayers[id]);
+			noiseLayersTmp.push_back(noiseLayers[id]);
 		}
 	}
 }
 
-static void ShowNoiseSettings(){
+static void ShowNoiseSettings() {
 	ImGui::Begin("Noise Settings");
 
 	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
@@ -537,12 +448,12 @@ static void ShowNoiseSettings(){
 
 	ImGui::Text("Noise Layers");
 	ImGui::Separator();
-	for (unsigned int i = 0; i < noiseLayers.size();i++) {
+	for (unsigned int i = 0; i < noiseLayers.size(); i++) {
 		ShowNoiseLayer(noiseLayers[i], i);
 		ImGui::Separator();
 	}
 	if (ImGui::Button("Add Noise Layer")) {
-		noiseLayers.push_back(NoiseLayer());
+		noiseLayersTmp.push_back(NoiseLayer());
 	}
 	ImGui::End();
 }
@@ -567,10 +478,10 @@ static void MouseMoveCallback(float x, float y) {
 
 	prevMousePos.x = x;
 	prevMousePos.y = y;
-	
+
 }
 
-static void MouseScrollCallback(float amount){
+static void MouseScrollCallback(float amount) {
 	mouseScrollAmount = amount;
 	glm::vec3 pPos = glm::vec3(CameraPosition[0], CameraPosition[1], CameraPosition[2]);
 	pPos += front * amount * scrollSpeed;
@@ -618,12 +529,22 @@ static void SaveFile() {
 	data["appData"] = appData;
 	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
 
+	nlohmann::json noiseLayersSave;
+	noiseLayersSave["type"] = "NOISE LAYERS";
+	std::vector<nlohmann::json> noiseLayersSaveData;
+	for (int i = 0; i < noiseLayers.size(); i++) {
+		nlohmann::json t = noiseLayers[i].Save();
+		t["id"] = i;
+		noiseLayersSaveData.push_back(t);
+	}
+	noiseLayersSave["data"] = noiseLayersSaveData;
+	data["noiseLayers"] = noiseLayersSave;
 	nlohmann::json tmp;
 	tmp["autoUpdate"] = autoUpdate;
 	tmp["square"] = square;
 	tmp["absolute"] = absolute;
 	tmp["flattenBase"] = flattenBase;
-	tmp["noiseBased"] = noiseBased?true:false;
+	tmp["noiseBased"] = noiseBased ? true : false;
 	tmp["wireFrameMode"] = wireFrameMode;
 	tmp["skyboxEnabled"] = skyboxEnabled;
 	tmp["vSync"] = vSync;
@@ -660,11 +581,22 @@ static void OpenSaveFile() {
 	nlohmann::json data = nlohmann::json::parse(sdata);
 	if (data["type"] != "SAVEFILE")
 		return;
-	
+
 	SetElevationNodeEditorSaveData(data["EnodeEditor"]);
 	LoadThemeFromStr(data["styleData"]);
 	data["imguiData"] = ImGui::SaveIniSettingsToMemory();
 	appData = data["appData"];
+
+	// This should be replaced with something better
+	while (isRemeshing);
+	noiseLayers.clear();
+
+	std::vector<nlohmann::json> noiseLayersSaveData = data["noiseLayers"]["data"];
+	for (int i = 0; i < noiseLayersSaveData.size(); i++) {
+		noiseLayersTmp.push_back(NoiseLayer());
+		noiseLayersTmp.back().Load(noiseLayersSaveData[i]);
+	}
+
 	nlohmann::json tmp = data["generals"];
 	autoUpdate = tmp["autoUpdate"];
 	square = tmp["square"];
@@ -682,7 +614,7 @@ static void OpenSaveFile() {
 
 	// For Future
 	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size());
-	
+
 	std::ofstream outfile;
 	outfile.open(file);
 
@@ -710,8 +642,22 @@ static void ShowMenu() {
 
 
 			if (ImGui::BeginMenu("Export As")) {
-				if (ImGui::MenuItem("Export as OBJ")) {
-					fileName = ExportOBJ();
+				if (ImGui::MenuItem("Wavefont OBJ")) {
+					if (ExportOBJ(terrain.mesh.Clone(), openfilename())) {
+					}
+					else {
+						errorMessage = "One Export is already in progress!";
+						ImGui::BeginPopup("Error Messages");
+					}
+				}
+
+				if (ImGui::MenuItem("PNG Heightmap")) {
+					if (ExportHeightmapPNG(terrain.mesh.Clone(), openfilename())) {
+					}
+					else {
+						errorMessage = "One Export is already in progress!";
+						ImGui::BeginPopup("Error Messages");
+					}
 				}
 				ImGui::EndMenu();
 			}
@@ -761,10 +707,16 @@ static void ShowMenu() {
 			ShowWindowMenuItem("Shader Editor", &activeWindows.shaderEditorWindow);
 
 			ShowWindowMenuItem("Elevation Node Editor", &activeWindows.elevationNodeEditorWindow);
-			
+
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
+	}
+}
+
+static void ShowErrorModal() {
+	if (ImGui::BeginPopupModal("Error Messages")) {
+		ImGui::TextColored(ImVec4(0.7f, 0.2f, 0.2f, 1.0f), errorMessage.c_str());
 	}
 }
 
@@ -834,17 +786,26 @@ static void SetUpIcon() {
 }
 
 
-class MyApp : public Application 
+class MyApp : public Application
 {
 public:
 	virtual void OnPreload() override {
 		SetTitle("TerraGen3D - Jaysmito Mukherjee");
-		
+		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowcnfigs.terr3d");
 		Sleep(1000);
 	}
 
 	virtual void OnUpdate(float deltatime) override
 	{
+		if(!isRuinning)
+			return;
+
+		if (!isRemeshing) {
+			for (NoiseLayer n : noiseLayersTmp)
+				noiseLayers.push_back(n);
+			noiseLayersTmp.clear();
+		}
+
 		glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
 		glViewport(0, 0, 800, 600);
 		GetWindow()->Clear();
@@ -859,8 +820,11 @@ public:
 			ResetShader();
 	}
 
-	virtual void OnOneSecondTick() override 
+	virtual void OnOneSecondTick() override
 	{
+		if (!isRuinning)
+			return;
+
 		GetWindow()->SetVSync(vSync);
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;
 		ElevationNodeEditorTick();
@@ -898,8 +862,8 @@ public:
 
 	virtual void OnStart() override
 	{
-		SetUpIcon();
 		srand((unsigned int)time(NULL));
+		SetUpIcon();
 		SetupViewportFrameBuffer();
 		SetupCubemap();
 		SetupShaderManager();
@@ -908,14 +872,14 @@ public:
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
-		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [] (GLFWwindow* window, int w, int h){
+		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow* window, int w, int h) {
 			glfwSwapBuffers(window);
 			});
 		glfwSetScrollCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, double x, double y) {
 			ImGuiIO& io = ImGui::GetIO();
 			io.MouseWheel = (float)y;
 			});
-		GetWindow()->SetClearColor({0.1f, 0.1f, 0.1f});
+		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
 		GenerateMesh();
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
@@ -924,17 +888,18 @@ public:
 		CameraRotation[1] = 2530.0f;
 		autoUpdate = false;
 		scale = 1;
-		noiseLayers.push_back(NoiseLayer());
+		noiseLayersTmp.push_back(NoiseLayer());
 		Log("Started Up App!");
 
 		// For Debug Only
 		autoUpdate = true;
 	}
 
-	void OnEnd() 
+	void OnEnd()
 	{
 		ShutdownElevationNodeEditor();
 		delete shd;
+		delete wireframeShader;
 	}
 };
 

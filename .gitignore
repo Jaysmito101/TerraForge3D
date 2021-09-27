@@ -1,8 +1,9 @@
 .vs
-Binaries
 Release
 Debug
 libs
 
 *.user
 *.filters
+*.aps
+*.ini

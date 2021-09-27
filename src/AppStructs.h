@@ -39,7 +39,9 @@ struct Stats
 struct NoiseLayer {
 
 	NoiseLayer() {
-		noiseType = "Simplex Perlin";
+		noiseType = (char*)malloc(1024);
+		memset(noiseType, 0, 1024);
+		strcpy(noiseType, "Simplex Perlin");
 		strcpy_s(name, "Noise Layer");
 		strength = 0.0f;
 		enabled = true;
@@ -49,7 +51,36 @@ struct NoiseLayer {
 		offsetY = 0;
 	}
 
-	const char* noiseType;
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = std::string(noiseType);
+		data["strength"] = strength;
+		data["name"] = std::string(name);
+		data["scale"] = scale;
+		data["offsetX"] = offsetX;
+		data["offsetY"] = offsetY;
+		data["enabled"] = enabled;
+		data["active"] = active;
+		return data;
+	}
+
+	void Load(nlohmann::json data) {
+		if(noiseType)
+			delete noiseType;
+		memset(noiseType, 0, 1024);
+		noiseType = (char*)malloc(1024);
+		strcpy(noiseType, std::string(data["type"]).c_str());
+		std::string t = std::string(data["name"]);
+		memcpy_s(name, 256, t.c_str(), 256);
+		strength = data["strength"];
+		scale = data["scale"];
+		offsetX = data["offsetX"];
+		offsetY = data["offsetY"];
+		enabled = data["enabled"];
+		active = data["active"];
+	}
+
+	char* noiseType;
 	char name[256];
 	float strength;
 	float offsetX, offsetY;
