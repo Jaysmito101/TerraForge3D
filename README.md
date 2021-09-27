@@ -1,8 +1,6 @@
 <br/>
 <p align="center">
-    <a href="https://jaysmito101.github.io/TerraGen3D/" target="_blank">
-        <img width="10%" src="https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/resources/icons-png/icon-9.png" alt="Logo">
-    </a>
+    <img src="./resources/ReadmeHeader.png" border="0"></
 </p>
 
 <br/>
