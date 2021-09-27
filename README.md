@@ -65,6 +65,14 @@
 # Support
 
 I am just a Highschool student so I may not have the best quality of code but still i am trying my best to write good code!
+
 Any support would be highly appretiated!
+
 For example you could add a feature and contribute via pull requests or you could even report any issues with the program!
+
 And the best thing you could do to support this project is spread word about this so that more people who might be interested in this may use this!
+
+Please considering tweeting about this! 
+
+
+<a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
