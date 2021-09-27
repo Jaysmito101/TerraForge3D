@@ -8,7 +8,11 @@ static void Log(const char* log) {
 	std::cout << log << std::endl;
 };
 
-static int CompileShader(std::string shaderSrc, GLenum shaderType) {
+static void Log(std::string log) {
+	std::cout << log << std::endl;
+};
+
+static int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name) {
 	GLuint shader = glCreateShader(shaderType);
 	const GLchar* source = (const GLchar*)shaderSrc.c_str();
 	glShaderSource(shader, 1, &source, 0);
@@ -22,7 +26,7 @@ static int CompileShader(std::string shaderSrc, GLenum shaderType) {
 		char* errorLog = (char*)malloc(maxLength);
 		memset(errorLog, 0, maxLength);
 		glGetShaderInfoLog(shader, maxLength, &maxLength, errorLog);
-		Log("Error in Compiling Shader : ");
+		Log(std::string("Error in Compiling ") + name + " Shader : ");
 		Log(errorLog);
 		glDeleteShader(shader);
 	}
@@ -36,13 +40,13 @@ static int CreateProgram() {
 
 Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geometrySource)
 {
-	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER);
-	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER);
-	GLuint geomShader = CompileShader(fragmentSrc, GL_GEOMETRY_SHADER);
+	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER, "Vertex");
+	GLuint geomShader = CompileShader(geometrySource, GL_GEOMETRY_SHADER, "Geometry");
+	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER, "Fragment");
 	m_Shader = CreateProgram();
 	glAttachShader(m_Shader, vertShader);
-	glAttachShader(m_Shader, fragShader);
 	glAttachShader(m_Shader, geomShader);
+	glAttachShader(m_Shader, fragShader);
 	glLinkProgram(m_Shader);
 	GLint isLinked = 0;
 	glGetProgramiv(m_Shader, GL_LINK_STATUS, (int*)&isLinked);
@@ -66,8 +70,8 @@ Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geome
 
 Shader::Shader(std::string vertexSrc, std::string fragmentSrc)
 {
-	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER);
-	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER);;
+	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER, "Vertex");
+	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER, "Fragment");
 	m_Shader = CreateProgram();
 	glAttachShader(m_Shader, vertShader);
 	glAttachShader(m_Shader, fragShader);
@@ -96,7 +100,7 @@ void Shader::Bind()
 	glUseProgram(m_Shader);
 }
 
-void Shader::SetLightPos(glm::vec3 pos)
+void Shader::SetLightPos(glm::vec3& pos)
 {
 	if (m_LightPosUniformID <= 0) {
 		m_LightPosUniformID = glGetUniformLocation(m_Shader, "_LightPosition");
@@ -120,7 +124,7 @@ void Shader::SetTime(float* time)
 	glUniform1fv(m_TimeUniformID, 1, time);
 }
 
-void Shader::SetMPV(glm::mat4 pv)
+void Shader::SetMPV(glm::mat4& pv)
 {
 	if (m_UniformId <= 0) {
 		m_UniformId = glGetUniformLocation(m_Shader, "_PV");
@@ -141,7 +145,7 @@ void Shader::SetUniformf(std::string name, float value)
 	}
 }
 
-void Shader::SetUniformMAt4(std::string name, glm::mat4 value)
+void Shader::SetUniformMAt4(std::string name, glm::mat4& value)
 {
 	if (uniformLocations.find(name) == uniformLocations.end()) {
 		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());

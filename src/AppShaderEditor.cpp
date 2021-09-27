@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <Windows.h>
+#include <Utils.h>
 
 static std::string defaultBaseVertexShader = R"(
 #version 330 core
@@ -15,53 +16,54 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
 
 uniform mat4 _PV;
+uniform mat4 _Model;
 
 out DATA
 {
+
     vec3  FragPos;
     vec3 Normal;
+	mat4 PV;
 } data_out; 
 
 void main()
 {
-    gl_Position = _PV * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position =  vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	data_out.FragPos = aPos;
 	data_out.Normal = aNorm;
+	data_out.PV = _PV;
 }
 )";
 
 static std::string defaultBaseGeometryShader = R"(
-
 #version 330 core
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-uniform vec3 _LightPosition;
-uniform vec3 _LightColor;
-
-out vec3 Normal;
 out vec3 FragPos;
+out vec3 Normal;
 
 in DATA
 {
     vec3  FragPos;
     vec3 Normal;
+	mat4 PV;
 } data_in[]; 
 
 void main()
 {	
-	gl_Position = gl_in[0].gl_Position;
+	gl_Position = data_in[0].PV * gl_in[0].gl_Position;
 	Normal = data_in[0].Normal;
 	FragPos = data_in[0].FragPos;
 	EmitVertex();
 
-	gl_Position = gl_in[1].gl_Position;
+	gl_Position = data_in[0].PV * gl_in[1].gl_Position;
 	Normal = data_in[1].Normal;
 	FragPos = data_in[1].FragPos;
 	EmitVertex();
 
-	gl_Position = gl_in[2].gl_Position;
+	gl_Position =  data_in[0].PV * gl_in[2].gl_Position;
 	Normal = data_in[2].Normal;
 	FragPos = data_in[2].FragPos;
 	EmitVertex();
@@ -112,9 +114,9 @@ struct ShaderFile {
 		sourceSize = size;
 		shaderType = type;
 		shaderSource = (char*)malloc(size);
-		filePath = (shaderType == ShaderType::Vertex ? "vert.glsl":"frag.glsl");
+		filePath = (shaderType == ShaderType::Vertex ? "vert.glsl":(shaderType == ShaderType::Geometry?"geom.glsl": "frag.glsl"));
 		if (initialize) {
-			std::string src = (shaderType == ShaderType::Vertex ? defaultBaseVertexShader : defaultBaseFragmentShader);
+			std::string src = (shaderType == ShaderType::Vertex ? defaultBaseVertexShader : (shaderType == ShaderType::Geometry ? defaultBaseGeometryShader : defaultBaseFragmentShader));
 			memset(shaderSource, 0, size);
 			strcat(shaderSource, src.c_str());
 		}
@@ -139,32 +141,18 @@ struct ShaderFile {
 
 
 static TextEditor::ErrorMarkers markers;
-static TextEditor Veditor, Feditor;
+static TextEditor Veditor, Feditor, Geditor;
 bool isCurrVertexShader = true;
 static std::vector<ShaderFile> shaderFiles;
 static ShaderFile vertShaderFile(ShaderType::Vertex);
 static ShaderFile fragShaderFile(ShaderType::Fragment);
+static ShaderFile geomShaderFile(ShaderType::Geometry);
 ShaderType current;
 static bool reqRfrsh = false;
 static void ApplyShaders();
 static bool isVs = false;
 static bool isFs = false;
-
-static std::string ReadShaderSourceFile(std::string path, bool* result) {
-	std::fstream newfile;
-	newfile.open(path.c_str(), std::ios::in);
-	if (newfile.is_open()) {
-		std::string tp;
-		std::string res = "";
-		getline(newfile, res, '\0');
-		newfile.close();
-		return res;
-	}
-	else {
-		*result = false;
-	}
-	return std::string("");
-}
+static bool isGs = false;
 
 static void Log(const char* log)
 {
@@ -177,7 +165,7 @@ bool ReqRefresh() {
 	return t;
 }
 
-static std::string ShowSaveFileDialog(HWND owner = NULL) {
+static std::string ShowSaveFileDialogSh(HWND owner = NULL) {
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
@@ -202,7 +190,7 @@ static std::string ShowSaveFileDialog(HWND owner = NULL) {
 	return std::string("");
 }
 
-static std::string ShowOpenFileDialog(HWND owner = NULL) {
+static std::string ShowOpenFileDialogSh(HWND owner = NULL) {
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
@@ -234,6 +222,8 @@ void SetupShaderManager() {
 	Veditor.SetText(vertShaderFile.GetSource());
 	Feditor.SetLanguageDefinition(lang);
 	Feditor.SetText(fragShaderFile.GetSource());
+	Geditor.SetLanguageDefinition(lang);
+	Geditor.SetText(geomShaderFile.GetSource());
 	current = ShaderType::Vertex;
 }
 
@@ -249,11 +239,22 @@ std::string GetFragmentShaderSource()
 
 std::string GetGeometryShaderSource()
 {
-	return defaultBaseGeometryShader;
+	return geomShaderFile.GetSource();
+}
+
+// This will be updated later
+std::string GetMeshNormalsGeometryShaderSource()
+{
+	return std::regex_replace(defaultBaseGeometryShader, std::regex("triangle_strip"), "line_strip");
+}
+
+std::string GetWireframeGeometryShaderSource()
+{
+	return std::regex_replace(defaultBaseGeometryShader, std::regex("triangle_strip"), "line_strip");
 }
 
 static void CreateShader(ShaderType type) {
-	std::string fileName = ShowSaveFileDialog();
+	std::string fileName = ShowSaveFileDialogSh();
 	std::ofstream outfile;
 	if (fileName.find(".glsl") == std::string::npos)
 		fileName += ".glsl";
@@ -269,12 +270,17 @@ static void CreateShader(ShaderType type) {
 		fragShaderFile.filePath = fileName;
 		Feditor.SetText(fragShaderFile.GetSource());
 	}
+	else if (type == ShaderType::Geometry) {
+		outfile << geomShaderFile.GetSource();
+		geomShaderFile.filePath = fileName;
+		Geditor.SetText(geomShaderFile.GetSource());
+	}
 
 	outfile.close();
 }
 
 static void OpenShader(ShaderType type) {
-	std::string fileName = ShowOpenFileDialog();
+	std::string fileName = ShowOpenFileDialogSh();
 
 	bool res = true;
 
@@ -287,10 +293,15 @@ static void OpenShader(ShaderType type) {
 		vertShaderFile.SetSource(ss);
 		Veditor.SetText(vertShaderFile.GetSource());
 	}
-	if (type == ShaderType::Fragment) {
+	else if (type == ShaderType::Fragment) {
 		fragShaderFile.filePath = fileName;
 		fragShaderFile.SetSource(ss);
 		Feditor.SetText(fragShaderFile.GetSource());
+	}
+	else if (type == ShaderType::Geometry) {
+		geomShaderFile.filePath = fileName;
+		geomShaderFile.SetSource(ss);
+		Geditor.SetText(geomShaderFile.GetSource());
 	}
 }
 
@@ -298,18 +309,21 @@ static void ApplyShaders() {
 	reqRfrsh = true;
 	vertShaderFile.SetSource(Veditor.GetText());
 	fragShaderFile.SetSource(Feditor.GetText());
+	geomShaderFile.SetSource(Geditor.GetText());
 }
 
 static void SaveShaders() {
 	isVs = true;
 	isFs = true;
-	std::string fileName = (current == ShaderType::Vertex ? vertShaderFile : fragShaderFile).filePath;
+	std::string fileName = (current == ShaderType::Vertex ? vertShaderFile : (current == ShaderType::Geometry ? geomShaderFile : fragShaderFile)).filePath;
 	std::ofstream outfile;
 	outfile.open(fileName);
 	if (current == ShaderType::Vertex)
 		outfile << Veditor.GetText();;
 	if (current == ShaderType::Fragment)
 		outfile << Feditor.GetText();;
+	if (current == ShaderType::Geometry)
+		outfile << Geditor.GetText();;
 	outfile.close();
 }
 
@@ -325,6 +339,12 @@ void SecondlyShaderEditorUpdate()
 	{
 		if (fragShaderFile.GetSource() != Feditor.GetText()) {
 			isFs = false;
+		}
+	}
+	else if (current == ShaderType::Geometry)
+	{
+		if (geomShaderFile.GetSource() != Geditor.GetText()) {
+			isGs = false;
 		}
 	}
 }
@@ -357,7 +377,7 @@ void ShowShaderEditor(bool* pOpen)
 	}
 	ImGui::NewLine();
 
-	if ((current == ShaderType::Vertex && !isVs) || (current == ShaderType::Fragment && !isFs))
+	if ((current == ShaderType::Vertex && !isVs) || (current == ShaderType::Fragment && !isFs) || (current == ShaderType::Geometry && !isGs))
 		ImGui::Text("[UNSAVED]");
 	else
 		ImGui::Text("[SAVED]");
@@ -369,6 +389,14 @@ void ShowShaderEditor(bool* pOpen)
 		{
 			current = ShaderType::Vertex;
 			Veditor.Render("Vertex Shader Editor");
+			ImGui::EndTabItem();
+		}
+
+		rout = ImGui::BeginTabItem("Geometry Shader");
+		if (rout)
+		{
+			current = ShaderType::Geometry;
+			Geditor.Render("Geometry Shader Editor");
 			ImGui::EndTabItem();
 		}
 

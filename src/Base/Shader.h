@@ -13,13 +13,13 @@ public:
 
 	void Bind();
 
-	void SetLightPos(glm::vec3);
+	void SetLightPos(glm::vec3&);
 	void SetLightCol(float*);
 	void SetTime(float*);
-	void SetMPV(glm::mat4);
+	void SetMPV(glm::mat4&);
 
 	void SetUniformf(std::string name, float value);
-	void SetUniformMAt4(std::string name, glm::mat4 value);
+	void SetUniformMAt4(std::string name, glm::mat4& value);
 
 	void Unbind();
 

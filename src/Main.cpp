@@ -36,8 +36,8 @@
 
 static Model terrain("Terrain");
 
-static Application* myApp;
-static Shader* shd;
+static Application *myApp;
+static Shader *shd, *meshNormalsShader, *wireframeShader;
 static Camera camera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
@@ -326,7 +326,9 @@ static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 static void ResetShader() {
 	if (shd)
 		delete shd;
-	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource());
+	if(!wireframeShader)
+		wireframeShader = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetWireframeGeometryShaderSource());
+	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
 static void FillMeshData() {
@@ -422,13 +424,19 @@ static void DoTheRederThing(float deltaTime) {
 	static float time;
 	time += deltaTime;
 	camera.UpdateCamera(CameraPosition, CameraRotation);
+	Shader* shader;
 	if(skyboxEnabled)
 		RenderSkybox(camera.pv);
-	shd->Bind();
-	shd->SetTime(&time);
-	shd->SetMPV(camera.pv);
-	shd->SetLightCol(LightColor);
-	shd->SetLightPos(LightPosition);
+	if (wireFrameMode)
+		shader = wireframeShader;
+	else
+		shader = shd;
+	shader->Bind();
+	shader->SetTime(&time);
+	shader->SetMPV(camera.pv);
+	shader->SetUniformMAt4("_Model", terrain.modelMatrix);
+	shader->SetLightCol(LightColor);
+	shader->SetLightPos(LightPosition);
 	glBindVertexArray(vao);
 	if (wireFrameMode) {
 		glDrawElements(GL_LINE_STRIP, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
