@@ -48,7 +48,7 @@
 
 # Things that may be added
 
-* Lua scripting to add custom algotrithms
+* [Wren](https://wren.io/) scripting to add custom algotrithms
 * Procedural grass and foliage
 * Fix more bugs!
 
