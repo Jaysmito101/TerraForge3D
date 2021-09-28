@@ -82,6 +82,7 @@ static float scale = 1.0f;
 static int numberOfNoiseTypes = 3;
 static nlohmann::json appData;
 
+static std::string successMessage = "";
 static std::string errorMessage = "";
 
 
@@ -267,6 +268,7 @@ static void FillMeshData() {
 				terrain.mesh.SetElevation(GetElevation(x, y), x, y);
 		}
 	}
+
 	terrain.mesh.RecalculateNormals();
 
 	isRemeshing = false;
@@ -644,6 +646,8 @@ static void ShowMenu() {
 			if (ImGui::BeginMenu("Export As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
 					if (ExportOBJ(terrain.mesh.Clone(), openfilename())) {
+						successMessage = "Sucessfully exported mesh!";
+						ImGui::BeginPopup("Success Messages");
 					}
 					else {
 						errorMessage = "One Export is already in progress!";
@@ -653,6 +657,19 @@ static void ShowMenu() {
 
 				if (ImGui::MenuItem("PNG Heightmap")) {
 					if (ExportHeightmapPNG(terrain.mesh.Clone(), openfilename())) {
+						successMessage = "Sucessfully exported heightmap!";
+						ImGui::BeginPopup("Success Messages");
+					}
+					else {
+						errorMessage = "One Export is already in progress!";
+						ImGui::BeginPopup("Error Messages");
+					}
+				}
+
+				if (ImGui::MenuItem("JPG Heightmap")) {
+					if (ExportHeightmapJPG(terrain.mesh.Clone(), openfilename())) {
+						successMessage = "Sucessfully exported heightmap!";
+						ImGui::BeginPopup("Success Messages");
 					}
 					else {
 						errorMessage = "One Export is already in progress!";
@@ -717,6 +734,12 @@ static void ShowMenu() {
 static void ShowErrorModal() {
 	if (ImGui::BeginPopupModal("Error Messages")) {
 		ImGui::TextColored(ImVec4(0.7f, 0.2f, 0.2f, 1.0f), errorMessage.c_str());
+	}
+}
+
+static void ShowSuccessModal() {
+	if (ImGui::BeginPopupModal("Success Messages")) {
+		ImGui::TextColored(ImVec4(0.2f, 0.7f, 0.2f, 1.0f), successMessage.c_str());
 	}
 }
 
@@ -840,6 +863,8 @@ public:
 		ShowLightingControls();
 		ShowNoiseSettings();
 		ShowMainScene();
+		ShowErrorModal();
+		ShowSuccessModal();
 
 		// Optional Windows
 

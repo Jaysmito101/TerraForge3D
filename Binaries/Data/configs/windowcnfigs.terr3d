@@ -67,8 +67,8 @@ Collapsed=0
 DockId=0x00000007,0
 
 [Window][General Controls]
-Pos=582,345
-Size=784,360
+Pos=582,552
+Size=784,153
 Collapsed=0
 DockId=0x0000000D,0
 
@@ -80,8 +80,8 @@ Collapsed=0
 DockId=0x3BC79352,2
 
 [Window][Camera Controls]
-Pos=582,345
-Size=784,360
+Pos=582,552
+Size=784,153
 Collapsed=0
 DockId=0x0000000D,1
 
@@ -98,8 +98,8 @@ Collapsed=0
 DockId=0x0000000A,0
 
 [Window][Noise Settings]
-Pos=582,345
-Size=784,360
+Pos=582,552
+Size=784,153
 Collapsed=0
 DockId=0x0000000D,2
 
@@ -141,7 +141,7 @@ DockId=0x0000000B,0
 
 [Window][Elevation Node Editor]
 Pos=582,23
-Size=784,320
+Size=784,527
 Collapsed=0
 DockId=0x00000005,0
 
@@ -167,8 +167,8 @@ DockSpace           ID=0x3BC79352 Window=0x4647B76E Pos=0,46 Size=1366,682 Split
           DockNode  ID=0x0000000A Parent=0x00000006 SizeRef=289,344 Selected=0x9EA6AB16
         DockNode    ID=0x00000007 Parent=0x00000003 SizeRef=250,344 Selected=0xAD8E88F2
   DockNode          ID=0x00000004 Parent=0x3BC79352 SizeRef=784,461 Split=Y Selected=0x995B0CF8
-    DockNode        ID=0x00000005 Parent=0x00000004 SizeRef=160,320 CentralNode=1 Selected=0x23A785A4
-    DockNode        ID=0x00000008 Parent=0x00000004 SizeRef=160,360 Split=X Selected=0x6C0FE6DB
+    DockNode        ID=0x00000005 Parent=0x00000004 SizeRef=160,527 CentralNode=1 Selected=0x23A785A4
+    DockNode        ID=0x00000008 Parent=0x00000004 SizeRef=160,153 Split=X Selected=0x6C0FE6DB
       DockNode      ID=0x0000000D Parent=0x00000008 SizeRef=394,360 Selected=0x6C0FE6DB
       DockNode      ID=0x0000000E Parent=0x00000008 SizeRef=388,360 Selected=0x83142C78
 

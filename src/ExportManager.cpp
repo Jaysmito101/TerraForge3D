@@ -12,11 +12,11 @@
 #include "stb/stb_image_write.h"
 
 std::atomic<bool> isExportingOBJ = false;
-Mesh meshToExport;
+Mesh* meshToExport;
 std::string meshExportFileName;
 
 std::atomic<bool> isExportinghMap = false;
-Mesh meshhMapToExport;
+Mesh* meshhMapToExport;
 std::string meshhMapExportFileName;
 
 
@@ -27,60 +27,89 @@ static void ExportOBJImpl() {
 	if (fileName.find(".obj") == std::string::npos)
 		fileName += ".obj";
 
-	if (meshToExport.vert && meshToExport.indices) {
+	if (meshToExport && meshToExport->IsValid()) {
 
 		outfile.open(fileName);
 
 
 		outfile << "# TerraGenV1.0 OBJ" << std::endl << std::endl;;
 
-		for (int i = 0; i < meshToExport.vertexCount; i++)
+		for (int i = 0; i < meshToExport->vertexCount; i++)
 		{
-			outfile << "v " << meshToExport.vert[i].position.x << " " << meshToExport.vert[i].position.y << " " << meshToExport.vert[i].position.z << " " << std::endl;
+			outfile << "v " << meshToExport->vert[i].position.x << " " << meshToExport->vert[i].position.y << " " << meshToExport->vert[i].position.z << " " << std::endl;
 		}
 
 		outfile << std::endl;
 		outfile << std::endl;
 
-		for (int i = 0; i < meshToExport.indexCount; i += 3)
+		for (int i = 0; i < meshToExport->indexCount; i += 3)
 		{
-			outfile << "f " << meshToExport.indices[i] + 1 << " " << meshToExport.indices[i + 1] + 1 << " " << meshToExport.indices[i + 2] + 1 << " " << std::endl;
+			outfile << "f " << meshToExport->indices[i] + 1 << " " << meshToExport->indices[i + 1] + 1 << " " << meshToExport->indices[i + 2] + 1 << " " << std::endl;
 		}
 
 		outfile.close();
 
-		delete meshToExport.indices;
-		delete meshToExport.vert;
+		delete meshToExport;
 		Log((std::string("Exported Mesh to ") + fileName));
 	}
 	isExportingOBJ = false;
 }
 
 static void ExportHeightmapPNGImpl() {
-	if (meshhMapToExport.vert && meshhMapToExport.indices)
+	if (meshhMapExportFileName.find(".png") == std::string::npos)
+		meshhMapExportFileName += ".png";
+
+	if (meshhMapToExport && meshhMapToExport->IsValid())
 	{
-		unsigned char* heightMap = new unsigned char[meshhMapToExport.res * meshhMapToExport.res * 3];
+		int res = meshhMapToExport->res;
+		unsigned char* heightMap = new unsigned char[res * res * 3];
 		float t = 0;
-		int res = meshhMapToExport.res;
 		for (int i = 0; i < res; i++) {
 			for (int j = 0; j < res; j++) {
 				int ind = i + j * res;
-				t = (meshhMapToExport.vert[ind].position.y * 0.5f + 0.5f);
+				t = Clamp01(meshhMapToExport->vert[ind].position.y * 0.5f + 0.5f);
 				heightMap[i * res * 3 + j * 3 + 0] = (unsigned char)(t * 255);
 				heightMap[i * res * 3 + j * 3 + 1] = (unsigned char)(t * 255);
 				heightMap[i * res * 3 + j * 3 + 2] = (unsigned char)(t * 255);
 			}
 		}
-		stbi_write_png(meshhMapExportFileName.c_str(), meshhMapToExport.res, meshhMapToExport.res, 3, heightMap, meshhMapToExport.res * 3);
+		stbi_write_png(meshhMapExportFileName.c_str(), res, res, 3, heightMap, res * 3);
 
 
-		delete meshhMapToExport.vert;
-		delete meshhMapToExport.indices;
+		delete meshhMapToExport;
 		delete heightMap;
 	}
 }
 
-bool ExportOBJ(Mesh mesh, std::string fileName)
+
+static void ExportHeightmapJPGImpl() {
+	if (meshhMapExportFileName.find(".jpg") == std::string::npos)
+		meshhMapExportFileName += ".jpg";
+
+	if (meshhMapToExport && meshhMapToExport->IsValid())
+	{
+		int res = meshhMapToExport->res;
+		unsigned char* heightMap = new unsigned char[res * res * 3];
+		float t = 0;
+		for (int i = 0; i < res; i++) {
+			for (int j = 0; j < res; j++) {
+				int ind = i + j * res;
+				t = Clamp01(meshhMapToExport->vert[ind].position.y * 0.5f + 0.5f);
+				heightMap[i * res * 3 + j * 3 + 0] = (unsigned char)(t * 255);
+				heightMap[i * res * 3 + j * 3 + 1] = (unsigned char)(t * 255);
+				heightMap[i * res * 3 + j * 3 + 2] = (unsigned char)(t * 255);
+			}
+		}
+		stbi_write_jpg(meshhMapExportFileName.c_str(), res, res, 3, heightMap, 100);
+
+
+		delete meshhMapToExport;
+		delete heightMap;
+	}
+}
+
+
+bool ExportOBJ(Mesh* mesh, std::string fileName)
 {
 	if (isExportingOBJ || fileName.size() < 4)
 		return false;
@@ -90,11 +119,10 @@ bool ExportOBJ(Mesh mesh, std::string fileName)
 	meshExportFileName = fileName;
 	std::thread t(ExportOBJImpl);
 	t.detach();
-	mesh.deleteOnDestruction = false;
 	return true;
 }
 
-bool ExportHeightmapPNG(Mesh mesh, std::string filename)
+bool ExportHeightmapPNG(Mesh* mesh, std::string filename)
 {
 	if (isExportinghMap || filename.size()<4)
 		return false;
@@ -104,6 +132,18 @@ bool ExportHeightmapPNG(Mesh mesh, std::string filename)
 	meshhMapExportFileName = filename;
 	std::thread t(ExportHeightmapPNGImpl);
 	t.detach();
-	mesh.deleteOnDestruction = false;
+	return true;
+}
+
+bool ExportHeightmapJPG(Mesh* mesh, std::string filename)
+{
+	if (isExportinghMap || filename.size() < 4)
+		return false;
+
+	isExportinghMap = false;
+	meshhMapToExport = mesh;
+	meshhMapExportFileName = filename;
+	std::thread t(ExportHeightmapJPGImpl);
+	t.detach();
 	return true;
 }

@@ -24,7 +24,7 @@ public:
 
 	void AddElevation(float elevation, int x, int y);
 
-	Mesh Clone();
+	Mesh* Clone();
 
 	bool IsValid();
 

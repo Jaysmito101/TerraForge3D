@@ -112,18 +112,17 @@ void Mesh::AddElevation(float elevation, int x, int y){
 	vert[i].position.y += elevation;
 }
 
-Mesh Mesh::Clone()
+Mesh* Mesh::Clone()
 {
-	Mesh cloneMesh;
-	cloneMesh.res = res;
-	cloneMesh.sc = sc;
-	cloneMesh.deleteOnDestruction = false;
-	cloneMesh.vertexCount = vertexCount;
-	cloneMesh.indexCount = indexCount;
-	cloneMesh.vert = new Vert[res * res];
-	memcpy(cloneMesh.vert, vert, sizeof(Vert) * vertexCount);
-	cloneMesh.indices = new int[(res - 1) * (res - 1) * 6];
-	memcpy(cloneMesh.indices, indices, sizeof(int) * indexCount);
+	Mesh* cloneMesh = new Mesh();
+	cloneMesh->res = res;
+	cloneMesh->sc = sc;
+	cloneMesh->vertexCount = vertexCount;
+	cloneMesh->indexCount = indexCount;
+	cloneMesh->vert = new Vert[res * res];
+	memcpy(cloneMesh->vert, vert, sizeof(Vert) * vertexCount);
+	cloneMesh->indices = new int[(res - 1) * (res - 1) * 6];
+	memcpy(cloneMesh->indices, indices, sizeof(int) * indexCount);
 	return cloneMesh;
 }
 

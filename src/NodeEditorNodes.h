@@ -29,7 +29,13 @@ enum NodeType
 	Div,
 	Sin,
 	Cos,
-	MeshCoord
+	MeshCoord,
+	Square,
+	Sqrt,
+	Abs,
+	Midval,
+	Mix,
+	Clamp
 };
 
 struct Link
@@ -110,6 +116,10 @@ public:
 		type = data["type"];
 		id = data["id"];
 	};
+
+	virtual bool AllowConnection(PinType t) {
+		return true;
+	}
 
 	int id = -1;
 	Link link;
@@ -1015,5 +1025,371 @@ public:
 	FloatPin outputPinX = FloatPin(this, PinType::Output);
 	FloatPin outputPinY = FloatPin(this, PinType::Output);
 	float value = 0.0f;
+
+};
+
+
+class SquareNode : public Node {
+public:
+	SquareNode(std::string name = "Square", int id = GenerateId())
+		: Node(name, id) {
+	}
+
+	virtual void Setup() override {
+		outputPin.node = this;
+		inputPin.node = this;
+	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPin, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Square;
+		data["inputPin"] = inputPin.Save();
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPin.Load(data["inputPin"]);
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
+	}
+
+	virtual bool Render() override {
+		ImNodes::BeginNode(id);
+
+		ImNodes::BeginNodeTitleBar();
+		ImGui::TextUnformatted((name).c_str());
+		ImNodes::EndNodeTitleBar();
+
+		if (!inputPin.isLinked)
+		{
+			ImNodes::BeginInputAttribute(inputPin.id);
+			ImGui::PushItemWidth(100);
+			ImGui::DragFloat((std::string("Value##squareNode") + std::to_string(inputPin.id)).c_str(), &value, 0.01f);
+			ImGui::PopItemWidth();
+			ImNodes::EndInputAttribute();
+		}
+		else {
+			ImNodes::BeginInputAttribute(inputPin.id);
+			ImGui::Dummy(ImVec2(100, 20));
+			ImNodes::EndInputAttribute();
+		}
+
+		ImNodes::BeginOutputAttribute(outputPin.id);
+		ImNodes::EndOutputAttribute();
+
+
+		ImNodes::EndNode();
+		return true;
+	}
+
+	virtual float EvaluatePin(float x, float y, int id) override {
+		if (inputPin.isLinked) {
+			return (inputPin.Evaluate(x, y)) * (inputPin.Evaluate(x, y));
+		}
+		return (value * value);
+	}
+
+	FloatPin inputPin = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float value = 0.0f;
+
+};
+
+
+class SqrtNode : public Node {
+public:
+	SqrtNode(std::string name = "Square Root", int id = GenerateId())
+		: Node(name, id) {
+	}
+
+	virtual void Setup() override {
+		outputPin.node = this;
+		inputPin.node = this;
+	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPin, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Sqrt;
+		data["inputPin"] = inputPin.Save();
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPin.Load(data["inputPin"]);
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
+	}
+
+	virtual bool Render() override {
+		ImNodes::BeginNode(id);
+
+		ImNodes::BeginNodeTitleBar();
+		ImGui::TextUnformatted((name).c_str());
+		ImNodes::EndNodeTitleBar();
+
+		if (!inputPin.isLinked)
+		{
+			ImNodes::BeginInputAttribute(inputPin.id);
+			ImGui::PushItemWidth(100);
+			ImGui::DragFloat((std::string("Value##sqrtNode") + std::to_string(inputPin.id)).c_str(), &value, 0.01f);
+			ImGui::PopItemWidth();
+			ImNodes::EndInputAttribute();
+		}
+		else {
+			ImNodes::BeginInputAttribute(inputPin.id);
+			ImGui::Dummy(ImVec2(100, 20));
+			ImNodes::EndInputAttribute();
+		}
+
+		ImNodes::BeginOutputAttribute(outputPin.id);
+		ImNodes::EndOutputAttribute();
+
+
+		ImNodes::EndNode();
+		return true;
+	}
+
+	virtual float EvaluatePin(float x, float y, int id) override {
+		if (inputPin.isLinked) {
+			return sqrt(inputPin.Evaluate(x, y));
+		}
+		return sqrt(value);
+	}
+
+	FloatPin inputPin = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float value = 0.0f;
+
+};
+
+
+
+class AbsNode : public Node {
+public:
+	AbsNode(std::string name = "Absolute Value", int id = GenerateId())
+		: Node(name, id) {
+	}
+
+	virtual void Setup() override {
+		outputPin.node = this;
+		inputPin.node = this;
+	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPin, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Abs;
+		data["inputPin"] = inputPin.Save();
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPin.Load(data["inputPin"]);
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		id = data["id"];
+		name = data["name"];
+	}
+
+	virtual bool Render() override {
+		ImNodes::BeginNode(id);
+
+		ImNodes::BeginNodeTitleBar();
+		ImGui::TextUnformatted((name).c_str());
+		ImNodes::EndNodeTitleBar();
+
+		if (!inputPin.isLinked)
+		{
+			ImNodes::BeginInputAttribute(inputPin.id);
+			ImGui::PushItemWidth(100);
+			ImGui::DragFloat((std::string("Value##sqrtNode") + std::to_string(inputPin.id)).c_str(), &value, 0.01f);
+			ImGui::PopItemWidth();
+			ImNodes::EndInputAttribute();
+		}
+		else {
+			ImNodes::BeginInputAttribute(inputPin.id);
+			ImGui::Dummy(ImVec2(100, 20));
+			ImNodes::EndInputAttribute();
+		}
+
+		ImNodes::BeginOutputAttribute(outputPin.id);
+		ImNodes::EndOutputAttribute();
+
+
+		ImNodes::EndNode();
+		return true;
+	}
+
+	virtual float EvaluatePin(float x, float y, int id) override {
+		if (inputPin.isLinked) {
+			return abs(inputPin.Evaluate(x, y));
+		}
+		return abs(value);
+	}
+
+	FloatPin inputPin = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float value = 0.0f;
+
+};
+
+
+class ClampNode : public Node {
+public:
+	ClampNode(std::string name = "Clamp", int id = GenerateId())
+		: Node(name, id) {
+	}
+
+	virtual void Setup() override {
+		outputPin.node = this;
+		inputPinV.node = this;
+		inputPinX.node = this;
+		inputPinY.node = this;
+	}
+
+
+	virtual std::vector<void*>  GetPins() {
+		return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &outputPin });
+	};
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["type"] = NodeType::Clamp;
+		data["inputPinZ"] = inputPinV.Save();
+		data["inputPinX"] = inputPinX.Save();
+		data["inputPinY"] = inputPinY.Save();
+		data["outputPin"] = outputPin.Save();
+		data["value"] = value;
+		data["min"] = min;
+		data["max"] = max;
+		data["id"] = id;
+		data["name"] = name;
+		return data;
+	}
+	void Load(nlohmann::json data) {
+		inputPinV.Load(data["inputPinV"]);
+		inputPinX.Load(data["inputPinX"]);
+		inputPinY.Load(data["inputPinY"]);
+		outputPin.Load(data["outputPin"]);
+		value = data["value"];
+		min = data["min"];
+		max = data["max"];
+		id = data["id"];
+		name = data["name"];
+	}
+
+	virtual bool Render() override {
+		ImNodes::BeginNode(id);
+
+		ImNodes::BeginNodeTitleBar();
+		ImGui::TextUnformatted((name).c_str());
+		ImNodes::EndNodeTitleBar();
+
+		ImNodes::BeginOutputAttribute(outputPin.id);
+		ImNodes::EndOutputAttribute();
+
+		if (!inputPinV.isLinked)
+		{
+			ImNodes::BeginInputAttribute(inputPinV.id);
+			ImGui::PushItemWidth(100);
+			ImGui::DragFloat((std::string("Value##clampNode") + std::to_string(inputPinV.id)).c_str(), &value, 0.01f);
+			ImGui::PopItemWidth();
+			ImNodes::EndInputAttribute();
+		}
+		else {
+			ImNodes::BeginInputAttribute(inputPinV.id);
+			ImGui::Dummy(ImVec2(100, 20));
+			ImNodes::EndInputAttribute();
+		}
+
+		if (!inputPinX.isLinked)
+		{
+			ImNodes::BeginInputAttribute(inputPinX.id);
+			ImGui::PushItemWidth(100);
+			ImGui::DragFloat((std::string("Value##clampNode") + std::to_string(inputPinX.id)).c_str(), &min, 0.01f);
+			ImGui::PopItemWidth();
+			ImNodes::EndInputAttribute();
+		}
+		else {
+			ImNodes::BeginInputAttribute(inputPinX.id);
+			ImGui::Dummy(ImVec2(100, 20));
+			ImNodes::EndInputAttribute();
+		}
+
+		if (!inputPinY.isLinked)
+		{
+			ImNodes::BeginInputAttribute(inputPinY.id);
+			ImGui::PushItemWidth(100);
+			ImGui::DragFloat((std::string("Value##clampNode") + std::to_string(inputPinY.id)).c_str(), &max, 0.01f);
+			ImGui::PopItemWidth();
+			ImNodes::EndInputAttribute();
+		}
+		else {
+			ImNodes::BeginInputAttribute(inputPinY.id);
+			ImGui::Dummy(ImVec2(100, 20));
+			ImNodes::EndInputAttribute();
+		}
+
+
+		ImNodes::EndNode();
+		return true;
+	}
+
+	virtual float EvaluatePin(float x, float y, int id) override {
+		float minV = min;
+		float maxV = max;
+		float valV = value;
+
+		if (inputPinV.isLinked) {
+			valV = (inputPinV.Evaluate(x, y));
+		}
+		if (inputPinX.isLinked) {
+			minV = (inputPinX.Evaluate(x, y));
+		}
+		if (inputPinY.isLinked) {
+			maxV = (inputPinY.Evaluate(x, y));
+		}
+		if (valV > maxV)
+			return max;
+		if (valV < minV)
+			return min;
+		return valV;
+
+	}
+
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float value = 0.5f;
+	float min = 0.0f;
+	float max = 1.0f;
 
 };
