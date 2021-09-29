@@ -7,6 +7,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
+#include <avir/avir.h>
+
 Texture2D::Texture2D(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height)
 {
@@ -67,7 +69,6 @@ void Texture2D::SetData(void* data, uint32_t size)
 {
 	if (!data)
 		return;
-	uint32_t bpp = 3;
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -78,3 +79,32 @@ void Texture2D::Bind(uint32_t slot) const
 	glBindTextureUnit(slot, m_RendererID);
 }
 
+void Texture2D::Resize(int width, int height, bool resetOpenGL) {
+	if (m_Width == width && m_Height == height)
+		return;
+	if (!m_Data)
+		return;
+	unsigned char* data = (unsigned char*)malloc(width * height * 3 * sizeof(unsigned char));
+	memset(data, 0, width * height * 3 * sizeof(unsigned char));
+	avir::CImageResizer<> ImageResizer(8);
+	ImageResizer.resizeImage(m_Data, m_Width, m_Height, 0, data, width, height, 3, 0);
+	if (data) {
+		if (m_Data)
+			delete m_Data;
+		m_Data = data;
+		m_Width = width;
+		m_Height = height;
+		if (resetOpenGL) {
+			glBindTexture(GL_TEXTURE_2D, m_RendererID);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+	}
+}
+
+unsigned char* Texture2D::GetData() {
+	if (m_Data)
+		return m_Data;
+	else
+		return nullptr;
+}

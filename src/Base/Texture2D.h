@@ -15,9 +15,12 @@
 		virtual uint32_t GetHeight() const  { return m_Height; }
 		virtual uint32_t GetRendererID() const  { return m_RendererID; }
 		
+		void Resize(int width, int height, bool resetOpenGL = true);
+
 		virtual void SetData(void* data, uint32_t size) ;
 
 		virtual void Bind(uint32_t slot = 0) const ;
+		unsigned char* GetData();
 
 		virtual bool IsLoaded() const { return m_IsLoaded; }
 		

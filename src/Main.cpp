@@ -245,7 +245,7 @@ static void ResetShader() {
 	if (shd)
 		delete shd;
 	if (!wireframeShader)
-		wireframeShader = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetWireframeGeometryShaderSource());
+		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
@@ -350,12 +350,7 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetLightCol(LightColor);
 	shader->SetLightPos(LightPosition);
 	glBindVertexArray(vao);
-	if (wireFrameMode) {
-		glDrawElements(GL_LINE_STRIP, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
-	}
-	else {
-		glDrawElements(GL_TRIANGLES, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
-	}
+	glDrawElements(GL_TRIANGLES, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
@@ -374,6 +369,11 @@ static void ShowTerrainControls()
 	ImGui::NewLine();
 	if (ImGui::Button("Update Mesh"))
 		RegenerateMesh();
+
+	if (ImGui::Button("Recalculate Normals")) {
+		while (isRemeshing);
+		terrain.mesh.RecalculateNormals();
+	}
 
 	if (ImGui::Button("Refresh Shaders")) {
 		ResetShader();
@@ -569,7 +569,7 @@ static void OpenSaveFile() {
 
 	// For Now it dows not do anything id any error has occured but in later versions this will be reported to user!
 
-	std::string file = ShowOpenFileDialog(".terr3d\0");
+	std::string file = ShowOpenFileDialog((wchar_t*)".terr3d\0");
 	if (file.size() == 0)
 		return;
 	if (file.find(".terr3d") == std::string::npos)

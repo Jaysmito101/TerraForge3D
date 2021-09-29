@@ -9,15 +9,16 @@
 #include <algorithm>
 #include <ViewportFramebuffer.h>
 #include <json.hpp>
+#include <text-editor/TextEditor.h>
+#include <Texture2D.h>
+#include <lua-5.4.3/src/lua.hpp>
+#include <lua-5.4.3/src/lualib.h>
+#include <lua-5.4.3/src/lauxlib.h>
 
 #define STR(x) std::to_string(x)
 
-static int GenerateId() {
-	static int id = 1;
-	int retVal = id;
-	id = id + 1;
-	return retVal;
-}
+
+int GenerateId();
 
 enum NodeType
 {
@@ -33,9 +34,20 @@ enum NodeType
 	Square,
 	Sqrt,
 	Abs,
-	Midval,
 	Mix,
-	Clamp
+	Clamp,
+	ScriptF,
+	TextureSampler2D
+};
+
+struct NodeData {
+	NodeData(){}
+
+	NodeData(int* res)
+		:resolution(res) {}
+
+
+	int *resolution;
 };
 
 struct Link
@@ -80,6 +92,7 @@ public:
 
 	int id = -1;
 	std::string name;
+	NodeData data;
 };
 
 enum PinType {
@@ -294,57 +307,21 @@ private:
 
 class FloatValueO : public Node {
 public:
-	FloatValueO(std::string name = "Float Value", int id = GenerateId())
-		: Node(name, id) {
-	}
+	FloatValueO(std::string name = "Float Value", int id = GenerateId());
 
-	virtual void Setup() override {
-		outputPin.node = this;
-	}
+	virtual void Setup() override;
 
 
-	virtual std::vector<void*>  GetPins() {
-		return std::vector<void*>({ &outputPin });
-	};
+	virtual std::vector<void*>  GetPins();
 
-	nlohmann::json Save() {
-		nlohmann::json data;
-		data["type"] = NodeType::FloatNodeO;
-		data["outputPin"] = outputPin.Save();
-		data["value"] = value;
-		data["id"] = id;
-		data["name"] = name;
-		return data;
-	}
-	void Load(nlohmann::json data) {
-		outputPin.Load(data["outputPin"]);
-		value = data["value"];
-		id = data["id"];
-		name = data["name"];
-	}
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
 
 
-	virtual bool Render() override {
-		ImNodes::BeginNode(id);
+	virtual bool Render() override;
 
-		ImNodes::BeginNodeTitleBar();
-		ImGui::TextUnformatted((name).c_str());
-		ImNodes::EndNodeTitleBar();
-
-		ImNodes::BeginOutputAttribute(outputPin.id);
-		ImGui::PushItemWidth(100);
-		ImGui::DragFloat((std::string("Value##floatValueNode") + std::to_string(outputPin.id)).c_str(), &value, 0.01f);
-		ImGui::PopItemWidth();
-		ImNodes::EndOutputAttribute();
-
-
-		ImNodes::EndNode();
-		return true;
-	}
-
-	virtual float EvaluatePin(float x, float y, int id) override {
-		return value;
-	}
+	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin outputPin = FloatPin(this, PinType::Output);
 	float value = 0.0f;
@@ -964,63 +941,19 @@ public:
 
 class MeshCoordNode : public Node {
 public:
-	MeshCoordNode(std::string name = "Mesh Coordinates", int id = GenerateId())
-		: Node(name, id) {
-	}
+	MeshCoordNode(std::string name = "Mesh Coordinates", int id = GenerateId());
 
-	virtual void Setup() override {
-		outputPinX.node = this;
-		outputPinY.node = this;
-	}
+	virtual void Setup() override;
 
-	nlohmann::json Save() {
-		nlohmann::json data;
-		data["type"] = NodeType::MeshCoord;
-		data["outputPinX"] = outputPinX.Save();
-		data["outputPinY"] = outputPinY.Save();
-		data["value"] = value;
-		data["id"] = id;
-		data["name"] = name;
-		return data;
-	}
-	void Load(nlohmann::json data) {
-		outputPinX.Load(data["outputPinX"]);
-		outputPinY.Load(data["outputPinY"]);
-		value = data["value"];
-		id = data["id"];
-		name = data["name"];
-		Setup();
-	}
+	nlohmann::json Save();
 
-	virtual std::vector<void*>  GetPins() {
-		return std::vector<void*>({ &outputPinX, &outputPinX });
-	};
+	void Load(nlohmann::json data);
 
-	virtual bool Render() override {
-		ImNodes::BeginNode(id);
+	virtual std::vector<void*>  GetPins();
 
-		ImNodes::BeginNodeTitleBar();
-		ImGui::TextUnformatted((name).c_str());
-		ImNodes::EndNodeTitleBar();
+	virtual bool Render() override;
 
-		ImNodes::BeginOutputAttribute(outputPinX.id);
-		ImGui::Text("X");
-		ImNodes::EndOutputAttribute();
-
-		ImNodes::BeginOutputAttribute(outputPinY.id);
-		ImGui::Text("Y");
-		ImNodes::EndOutputAttribute();
-
-		ImNodes::EndNode();
-		return true;
-	}
-
-	virtual float EvaluatePin(float x, float y, int id) override {
-		if (id == outputPinX.id)
-			return x;
-		if (id == outputPinY.id)
-			return y;
-	}
+	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin outputPinX = FloatPin(this, PinType::Output);
 	FloatPin outputPinY = FloatPin(this, PinType::Output);
@@ -1028,153 +961,44 @@ public:
 
 };
 
-
 class SquareNode : public Node {
 public:
-	SquareNode(std::string name = "Square", int id = GenerateId())
-		: Node(name, id) {
-	}
+	SquareNode(std::string name = "Square", int id = GenerateId());
 
-	virtual void Setup() override {
-		outputPin.node = this;
-		inputPin.node = this;
-	}
+	virtual void Setup() override;
 
 
-	virtual std::vector<void*>  GetPins() {
-		return std::vector<void*>({ &inputPin, &outputPin });
-	};
+	virtual std::vector<void*>  GetPins();
 
-	nlohmann::json Save() {
-		nlohmann::json data;
-		data["type"] = NodeType::Square;
-		data["inputPin"] = inputPin.Save();
-		data["outputPin"] = outputPin.Save();
-		data["value"] = value;
-		data["id"] = id;
-		data["name"] = name;
-		return data;
-	}
-	void Load(nlohmann::json data) {
-		inputPin.Load(data["inputPin"]);
-		outputPin.Load(data["outputPin"]);
-		value = data["value"];
-		id = data["id"];
-		name = data["name"];
-	}
+	nlohmann::json Save();
 
-	virtual bool Render() override {
-		ImNodes::BeginNode(id);
+	void Load(nlohmann::json data);
 
-		ImNodes::BeginNodeTitleBar();
-		ImGui::TextUnformatted((name).c_str());
-		ImNodes::EndNodeTitleBar();
+	virtual bool Render() override;
 
-		if (!inputPin.isLinked)
-		{
-			ImNodes::BeginInputAttribute(inputPin.id);
-			ImGui::PushItemWidth(100);
-			ImGui::DragFloat((std::string("Value##squareNode") + std::to_string(inputPin.id)).c_str(), &value, 0.01f);
-			ImGui::PopItemWidth();
-			ImNodes::EndInputAttribute();
-		}
-		else {
-			ImNodes::BeginInputAttribute(inputPin.id);
-			ImGui::Dummy(ImVec2(100, 20));
-			ImNodes::EndInputAttribute();
-		}
-
-		ImNodes::BeginOutputAttribute(outputPin.id);
-		ImNodes::EndOutputAttribute();
-
-
-		ImNodes::EndNode();
-		return true;
-	}
-
-	virtual float EvaluatePin(float x, float y, int id) override {
-		if (inputPin.isLinked) {
-			return (inputPin.Evaluate(x, y)) * (inputPin.Evaluate(x, y));
-		}
-		return (value * value);
-	}
+	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin inputPin = FloatPin(this, PinType::Input);
 	FloatPin outputPin = FloatPin(this, PinType::Output);
 	float value = 0.0f;
 
 };
-
 
 class SqrtNode : public Node {
 public:
-	SqrtNode(std::string name = "Square Root", int id = GenerateId())
-		: Node(name, id) {
-	}
+	SqrtNode(std::string name = "Square Root", int id = GenerateId());
 
-	virtual void Setup() override {
-		outputPin.node = this;
-		inputPin.node = this;
-	}
+	virtual void Setup() override;
 
 
-	virtual std::vector<void*>  GetPins() {
-		return std::vector<void*>({ &inputPin, &outputPin });
-	};
+	virtual std::vector<void*>  GetPins();
+	nlohmann::json Save();
 
-	nlohmann::json Save() {
-		nlohmann::json data;
-		data["type"] = NodeType::Sqrt;
-		data["inputPin"] = inputPin.Save();
-		data["outputPin"] = outputPin.Save();
-		data["value"] = value;
-		data["id"] = id;
-		data["name"] = name;
-		return data;
-	}
-	void Load(nlohmann::json data) {
-		inputPin.Load(data["inputPin"]);
-		outputPin.Load(data["outputPin"]);
-		value = data["value"];
-		id = data["id"];
-		name = data["name"];
-	}
+	void Load(nlohmann::json data);
 
-	virtual bool Render() override {
-		ImNodes::BeginNode(id);
+	virtual bool Render() override;
 
-		ImNodes::BeginNodeTitleBar();
-		ImGui::TextUnformatted((name).c_str());
-		ImNodes::EndNodeTitleBar();
-
-		if (!inputPin.isLinked)
-		{
-			ImNodes::BeginInputAttribute(inputPin.id);
-			ImGui::PushItemWidth(100);
-			ImGui::DragFloat((std::string("Value##sqrtNode") + std::to_string(inputPin.id)).c_str(), &value, 0.01f);
-			ImGui::PopItemWidth();
-			ImNodes::EndInputAttribute();
-		}
-		else {
-			ImNodes::BeginInputAttribute(inputPin.id);
-			ImGui::Dummy(ImVec2(100, 20));
-			ImNodes::EndInputAttribute();
-		}
-
-		ImNodes::BeginOutputAttribute(outputPin.id);
-		ImNodes::EndOutputAttribute();
-
-
-		ImNodes::EndNode();
-		return true;
-	}
-
-	virtual float EvaluatePin(float x, float y, int id) override {
-		if (inputPin.isLinked) {
-			return sqrt(inputPin.Evaluate(x, y));
-		}
-		return sqrt(value);
-	}
+	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin inputPin = FloatPin(this, PinType::Input);
 	FloatPin outputPin = FloatPin(this, PinType::Output);
@@ -1182,77 +1006,22 @@ public:
 
 };
 
-
-
 class AbsNode : public Node {
 public:
-	AbsNode(std::string name = "Absolute Value", int id = GenerateId())
-		: Node(name, id) {
-	}
+	AbsNode(std::string name = "Absolute Value", int id = GenerateId());
 
-	virtual void Setup() override {
-		outputPin.node = this;
-		inputPin.node = this;
-	}
+	virtual void Setup() override;
 
 
-	virtual std::vector<void*>  GetPins() {
-		return std::vector<void*>({ &inputPin, &outputPin });
-	};
+	virtual std::vector<void*>  GetPins();
 
-	nlohmann::json Save() {
-		nlohmann::json data;
-		data["type"] = NodeType::Abs;
-		data["inputPin"] = inputPin.Save();
-		data["outputPin"] = outputPin.Save();
-		data["value"] = value;
-		data["id"] = id;
-		data["name"] = name;
-		return data;
-	}
-	void Load(nlohmann::json data) {
-		inputPin.Load(data["inputPin"]);
-		outputPin.Load(data["outputPin"]);
-		value = data["value"];
-		id = data["id"];
-		name = data["name"];
-	}
+	nlohmann::json Save();
 
-	virtual bool Render() override {
-		ImNodes::BeginNode(id);
+	void Load(nlohmann::json data);
 
-		ImNodes::BeginNodeTitleBar();
-		ImGui::TextUnformatted((name).c_str());
-		ImNodes::EndNodeTitleBar();
+	virtual bool Render() override;
 
-		if (!inputPin.isLinked)
-		{
-			ImNodes::BeginInputAttribute(inputPin.id);
-			ImGui::PushItemWidth(100);
-			ImGui::DragFloat((std::string("Value##sqrtNode") + std::to_string(inputPin.id)).c_str(), &value, 0.01f);
-			ImGui::PopItemWidth();
-			ImNodes::EndInputAttribute();
-		}
-		else {
-			ImNodes::BeginInputAttribute(inputPin.id);
-			ImGui::Dummy(ImVec2(100, 20));
-			ImNodes::EndInputAttribute();
-		}
-
-		ImNodes::BeginOutputAttribute(outputPin.id);
-		ImNodes::EndOutputAttribute();
-
-
-		ImNodes::EndNode();
-		return true;
-	}
-
-	virtual float EvaluatePin(float x, float y, int id) override {
-		if (inputPin.isLinked) {
-			return abs(inputPin.Evaluate(x, y));
-		}
-		return abs(value);
-	}
+	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin inputPin = FloatPin(this, PinType::Input);
 	FloatPin outputPin = FloatPin(this, PinType::Output);
@@ -1263,126 +1032,19 @@ public:
 
 class ClampNode : public Node {
 public:
-	ClampNode(std::string name = "Clamp", int id = GenerateId())
-		: Node(name, id) {
-	}
+	ClampNode(std::string name = "Clamp", int id = GenerateId());
 
-	virtual void Setup() override {
-		outputPin.node = this;
-		inputPinV.node = this;
-		inputPinX.node = this;
-		inputPinY.node = this;
-	}
+	virtual void Setup() override;
 
+	virtual std::vector<void*>  GetPins();
 
-	virtual std::vector<void*>  GetPins() {
-		return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &outputPin });
-	};
+	nlohmann::json Save();
 
-	nlohmann::json Save() {
-		nlohmann::json data;
-		data["type"] = NodeType::Clamp;
-		data["inputPinZ"] = inputPinV.Save();
-		data["inputPinX"] = inputPinX.Save();
-		data["inputPinY"] = inputPinY.Save();
-		data["outputPin"] = outputPin.Save();
-		data["value"] = value;
-		data["min"] = min;
-		data["max"] = max;
-		data["id"] = id;
-		data["name"] = name;
-		return data;
-	}
-	void Load(nlohmann::json data) {
-		inputPinV.Load(data["inputPinV"]);
-		inputPinX.Load(data["inputPinX"]);
-		inputPinY.Load(data["inputPinY"]);
-		outputPin.Load(data["outputPin"]);
-		value = data["value"];
-		min = data["min"];
-		max = data["max"];
-		id = data["id"];
-		name = data["name"];
-	}
+	void Load(nlohmann::json data);
 
-	virtual bool Render() override {
-		ImNodes::BeginNode(id);
+	virtual bool Render() override;
 
-		ImNodes::BeginNodeTitleBar();
-		ImGui::TextUnformatted((name).c_str());
-		ImNodes::EndNodeTitleBar();
-
-		ImNodes::BeginOutputAttribute(outputPin.id);
-		ImNodes::EndOutputAttribute();
-
-		if (!inputPinV.isLinked)
-		{
-			ImNodes::BeginInputAttribute(inputPinV.id);
-			ImGui::PushItemWidth(100);
-			ImGui::DragFloat((std::string("Value##clampNode") + std::to_string(inputPinV.id)).c_str(), &value, 0.01f);
-			ImGui::PopItemWidth();
-			ImNodes::EndInputAttribute();
-		}
-		else {
-			ImNodes::BeginInputAttribute(inputPinV.id);
-			ImGui::Dummy(ImVec2(100, 20));
-			ImNodes::EndInputAttribute();
-		}
-
-		if (!inputPinX.isLinked)
-		{
-			ImNodes::BeginInputAttribute(inputPinX.id);
-			ImGui::PushItemWidth(100);
-			ImGui::DragFloat((std::string("Value##clampNode") + std::to_string(inputPinX.id)).c_str(), &min, 0.01f);
-			ImGui::PopItemWidth();
-			ImNodes::EndInputAttribute();
-		}
-		else {
-			ImNodes::BeginInputAttribute(inputPinX.id);
-			ImGui::Dummy(ImVec2(100, 20));
-			ImNodes::EndInputAttribute();
-		}
-
-		if (!inputPinY.isLinked)
-		{
-			ImNodes::BeginInputAttribute(inputPinY.id);
-			ImGui::PushItemWidth(100);
-			ImGui::DragFloat((std::string("Value##clampNode") + std::to_string(inputPinY.id)).c_str(), &max, 0.01f);
-			ImGui::PopItemWidth();
-			ImNodes::EndInputAttribute();
-		}
-		else {
-			ImNodes::BeginInputAttribute(inputPinY.id);
-			ImGui::Dummy(ImVec2(100, 20));
-			ImNodes::EndInputAttribute();
-		}
-
-
-		ImNodes::EndNode();
-		return true;
-	}
-
-	virtual float EvaluatePin(float x, float y, int id) override {
-		float minV = min;
-		float maxV = max;
-		float valV = value;
-
-		if (inputPinV.isLinked) {
-			valV = (inputPinV.Evaluate(x, y));
-		}
-		if (inputPinX.isLinked) {
-			minV = (inputPinX.Evaluate(x, y));
-		}
-		if (inputPinY.isLinked) {
-			maxV = (inputPinY.Evaluate(x, y));
-		}
-		if (valV > maxV)
-			return max;
-		if (valV < minV)
-			return min;
-		return valV;
-
-	}
+	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin inputPinV = FloatPin(this, PinType::Input);
 	FloatPin inputPinX = FloatPin(this, PinType::Input);
@@ -1391,5 +1053,99 @@ public:
 	float value = 0.5f;
 	float min = 0.0f;
 	float max = 1.0f;
+
+};
+
+class ScriptFloatNode : public Node {
+public:
+	ScriptFloatNode(std::string name = "Script", int id = GenerateId())
+		:Node(name, id) {};
+
+	~ScriptFloatNode();
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float a = 0;
+	float b = 0;
+	float c = 0;
+private:
+	lua_State* L;
+	TextEditor* editor;
+	std::vector<std::pair<int, std::string>> output;
+	bool isCompiled = false;
+	bool isDraggable = true;
+	bool showConsole = false;
+	bool showEditor = true;
+};
+
+
+class MixNode : public Node {
+public:
+	MixNode(std::string name = "Mix", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float a = 0.0f;
+	float b = 1.0f;
+	float factor = 0.5f;
+
+};
+
+
+class TextureSamplerNode : public Node {
+public:
+
+	TextureSamplerNode(std::string name = "Texture Sampler", int id = GenerateId())
+		: Node(name, id) {}
+
+	virtual void Setup() override;
+
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+private:
+	Texture2D* texture;
+	std::string textureFilePath;
+	FloatPin outputPinR = FloatPin(this, PinType::Output);
+	FloatPin outputPinG = FloatPin(this, PinType::Output);
+	FloatPin outputPinB = FloatPin(this, PinType::Output);
+	bool isLoaded = false;
 
 };

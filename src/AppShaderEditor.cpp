@@ -241,6 +241,17 @@ std::string GetGeometryShaderSource()
 {
 	return geomShaderFile.GetSource();
 }
+std::string GetDefaultFragmentShaderSource() 
+{
+	return defaultBaseFragmentShader;
+}
+
+std::string GetDefaultVertexShaderSource() 
+{
+	return defaultBaseVertexShader;
+}
+
+
 
 // This will be updated later
 std::string GetMeshNormalsGeometryShaderSource()

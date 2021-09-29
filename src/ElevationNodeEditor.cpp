@@ -18,6 +18,7 @@
 #include <Application.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
+#include <MathUtils.h>
 
 
 static Editor editorM;
@@ -89,10 +90,10 @@ static void UpdateHeightMap() {
 	for (int i = 0; i < currRes; i++) {
 		for (int j = 0; j < currRes; j++) {
 			heightMapData[i * currRes + j] = outputNode->Evaluate(i, j);
-			t = heightMapData[i * currRes + j] * 0.5f + 0.5f;
-			heightMap[i * currRes * 3 + j * 3 + 0] = (unsigned char)(t * 255);
-			heightMap[i * currRes * 3 + j * 3 + 1] = (unsigned char)(t * 255);
-			heightMap[i * currRes * 3 + j * 3 + 2] = (unsigned char)(t * 255);
+			unsigned char d = (unsigned char)((heightMapData[i * currRes + j]*0.5f + 0.5f) * 256);
+			heightMap[i * currRes * 3 + j * 3 + 0] = d;
+			heightMap[i * currRes * 3 + j * 3 + 1] = d;
+			heightMap[i * currRes * 3 + j * 3 + 2] = d;
 		}
 	}
 	if (*resolution != currRes)
@@ -237,6 +238,30 @@ static Node* MakeNode(nlohmann::json& nodedata) {
 		nd->Load(nodedata);
 		return nd;
 	}
+
+	if (nodedata["type"] == NodeType::Clamp) {
+		ClampNode* nd = new ClampNode();
+		nd->Load(nodedata);
+		return nd;
+	}
+
+	if (nodedata["type"] == NodeType::ScriptF) {
+		ScriptFloatNode* nd = new ScriptFloatNode();
+		nd->Load(nodedata);
+		return nd;
+	}
+
+	if (nodedata["type"] == NodeType::Mix) {
+		MixNode* nd = new MixNode();
+		nd->Load(nodedata);
+		return nd;
+	}
+
+	if (nodedata["type"] == NodeType::TextureSampler2D) {
+		TextureSamplerNode* nd = new TextureSamplerNode();
+		nd->Load(nodedata);
+		return nd;
+	}
 }
 
 static void FixPinPointers() {
@@ -312,8 +337,7 @@ static void ResetNodeEditor() {
 	editorM.pins.push_back(&(outputNode)->inputPin);
 }
 
-
-static void ShowValueNodeMaker(Pin* start_drop, char* searchString, int searchStringLength) {
+static void ShowNodesMaker(Pin* start_drop, char* searchString, int searchStringLength) {
 	if (searchStringLength == 0 || strcasestr("Mesh Coordinates", searchString)) {
 		if (ImGui::Button("Mesh Coordinates"))
 		{
@@ -338,9 +362,6 @@ static void ShowValueNodeMaker(Pin* start_drop, char* searchString, int searchSt
 			ImGui::CloseCurrentPopup();
 		}
 	}
-}
-
-static void ShowMathNodeMaker(Pin* start_drop, char* searchString, int searchStringLength) {
 
 	if (searchStringLength == 0 || strcasestr("Add", searchString)) {
 		if (ImGui::Button("Add"))
@@ -444,7 +465,6 @@ static void ShowMathNodeMaker(Pin* start_drop, char* searchString, int searchStr
 		if (ImGui::Button("Absolute Value"))
 		{
 			editorM.nodes.push_back(new AbsNode());
-			editorM.pins.push_back(&((AbsNode*)editorM.nodes.back())->outputPin);
 			std::vector<void*> pins = ((AbsNode*)editorM.nodes.back())->GetPins();
 			for (void* p : pins)
 				editorM.pins.push_back((Pin*)p);
@@ -461,7 +481,6 @@ static void ShowMathNodeMaker(Pin* start_drop, char* searchString, int searchStr
 		if (ImGui::Button("Clamp"))
 		{
 			editorM.nodes.push_back(new ClampNode());
-			editorM.pins.push_back(&((ClampNode*)editorM.nodes.back())->outputPin);
 			std::vector<void*> pins = ((ClampNode*)editorM.nodes.back())->GetPins();
 			for (void* p : pins)
 				editorM.pins.push_back((Pin*)p);
@@ -473,10 +492,56 @@ static void ShowMathNodeMaker(Pin* start_drop, char* searchString, int searchStr
 			ImGui::CloseCurrentPopup();
 		}
 	}
-}
 
+	if (searchStringLength == 0 || strcasestr("Mix", searchString)) {
+		if (ImGui::Button("Mix"))
+		{
+			editorM.nodes.push_back(new MixNode());
+			std::vector<void*> pins = ((MixNode*)editorM.nodes.back())->GetPins();
+			for (void* p : pins)
+				editorM.pins.push_back((Pin*)p);
+			((MixNode*)editorM.nodes.back())->Setup();
+			if (start_drop) {
+				MakeLink(start_drop, &((MixNode*)editorM.nodes.back())->inputPinV);
+			}
+			ImNodes::SetNodeScreenSpacePos(editorM.nodes.back()->id, ImGui::GetMousePos() - ImVec2(40, 40));
+			ImGui::CloseCurrentPopup();
+		}
+	}
 
-static void ShowMathFunctionNodeMaker(Pin* start_drop, char* searchString, int searchStringLength) {
+	if (searchStringLength == 0 || strcasestr("Texture Sampler", searchString)) {
+		if (ImGui::Button("Texture Sampler"))
+		{
+			editorM.nodes.push_back(new TextureSamplerNode());
+			std::vector<void*> pins = ((TextureSamplerNode*)editorM.nodes.back())->GetPins();
+			for (void* p : pins)
+				editorM.pins.push_back((Pin*)p);
+			((TextureSamplerNode*)editorM.nodes.back())->Setup();
+			((TextureSamplerNode*)editorM.nodes.back())->data = NodeData(resolution);
+			if (start_drop) {
+				// Nothing to do here as it takes no input!
+			}
+			ImNodes::SetNodeScreenSpacePos(editorM.nodes.back()->id, ImGui::GetMousePos() - ImVec2(40, 40));
+			ImGui::CloseCurrentPopup();
+		}
+	}
+
+	if (searchStringLength == 0 || strcasestr("Script", searchString)) {
+		if (ImGui::Button("Script"))
+		{
+			editorM.nodes.push_back(new ScriptFloatNode());
+			std::vector<void*> pins = ((ScriptFloatNode*)editorM.nodes.back())->GetPins();
+			for (void* p : pins)
+				editorM.pins.push_back((Pin*)p);
+			((ScriptFloatNode*)editorM.nodes.back())->Setup();
+			if (start_drop) {
+				MakeLink(start_drop, &((ScriptFloatNode*)editorM.nodes.back())->inputPinV);
+			}
+			ImNodes::SetNodeScreenSpacePos(editorM.nodes.back()->id, ImGui::GetMousePos() - ImVec2(40, 40));
+			ImGui::CloseCurrentPopup();
+		}
+	}
+
 	if (searchStringLength == 0 || strcasestr("Sin", searchString)) {
 		if (ImGui::Button("Sin"))
 		{
@@ -508,6 +573,28 @@ static void ShowMathFunctionNodeMaker(Pin* start_drop, char* searchString, int s
 	}
 }
 
+static void UpdateNodeDuplacation() {
+	for (Node* node : editorM.nodes) {
+		if (ImNodes::IsNodeSelected(node->id)) {
+			if (node->id == outputNode->id)
+				return;
+			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_D) == GLFW_PRESS 
+				&&
+				(
+					glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS
+					||
+					glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS
+				)) {
+				nlohmann::json data = node->Save();
+				Node* nd = MakeNode(data);
+				editorM.nodes.push_back(nd);
+				std::vector<void*> pins = nd->GetPins();
+				for (void* p : pins)
+					editorM.pins.push_back((Pin*)p);
+			}
+		}
+	}
+}
 
 nlohmann::json GetElevationNodeEditorSaveData() {
 	return editorM.Save(outputNode);
@@ -520,22 +607,7 @@ static void ShowNodeMaker(Pin* start_drop) {
 	ImGui::BeginChild("NodeMakerPopup", ImVec2(200, 200));
 	ImGui::Separator();
 	int searchStringLength = strlen(searchString);
-	//ImGui::Text("Values");
-	//ImGui::Separator();
-	ShowValueNodeMaker(start_drop, searchString, searchStringLength);
-
-	//ImGui::Separator();
-	//ImGui::Text("Math Nodes");
-	//ImGui::Separator();
-	ShowMathNodeMaker(start_drop, searchString, searchStringLength);
-
-
-	//ImGui::Separator();
-	//ImGui::Text("Math Functions");
-	//ImGui::Separator();
-	ShowMathFunctionNodeMaker(start_drop, searchString, searchStringLength);
-
-
+	ShowNodesMaker(start_drop, searchString, searchStringLength);
 	ImGui::EndChild();
 	ImGui::PopStyleColor();
 
@@ -665,6 +737,7 @@ static void ShowEditor(const char* editor_name, Editor& editor) {
 	}
 
 	UpdateNodeDeletion();
+	UpdateNodeDuplacation();
 
 	if (drop_make_node) {
 		int start_id;

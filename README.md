@@ -38,6 +38,7 @@
 * Customizable Geometry Shaders included in rendering pipeline
 * Skyboxes
 * Multithreded Mesh Generation
+* [Lua](https://www.lua.org/) scripting to add custom algotrithms
 
 # Expected Goals for Version 3
 
@@ -50,7 +51,6 @@
 
 # Things that may be added
 
-* [Wren](https://wren.io/) scripting to add custom algotrithms
 * Procedural grass and foliage
 * Fix more bugs!
 

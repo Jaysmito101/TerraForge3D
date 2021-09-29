@@ -69,7 +69,7 @@ std::string openfilename(HWND owner) {
 	return std::string("");
 }
 
-std::string ShowOpenFileDialog(const char* ext, HWND owner) {
+std::string ShowOpenFileDialog(LPWSTR ext, HWND owner) {
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
@@ -77,7 +77,7 @@ std::string ShowOpenFileDialog(const char* ext, HWND owner) {
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = (LPWSTR)ext;
+	ofn.lpstrFilter = ext;
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
