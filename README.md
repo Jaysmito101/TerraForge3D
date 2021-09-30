@@ -41,30 +41,23 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 * Skyboxes
 * Multithreded Mesh Generation
 * [Lua](https://www.lua.org/) scripting to add custom algotrithms
-
-# Expected Goals for Version 3
-
-* Add a lot more Nodes
 * Export to heightmaps(both PNG and also custom format)
-* Node based procedural texture editing
 * Custom Skyboxes
 * Completely usable 3D procedural modelling and texturing pipeline
-* Fix as many bugs I can find
 
-# Things that may be added
+
+# Future Goals
 
 * Procedural grass and foliage
 * Fix more bugs!
 
 # Screenshots
 
-![Screenshot 1](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Screenshot%20(6).png)
+![Screenshot 1](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%203/Screenshot%20(1).png)
 
-![Screenshot 2](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Screenshot%20(5).png)
+![Screenshot 2](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%203/Screenshot%20(2).png)
 
-![Screenshot 3](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Screenshot%20(4).png)
-
-![Screenshot 4](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Screenshot%20(7).png)
+![Screenshot 3](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%203/Screenshot%20(3).png)
 
 # Support
 
