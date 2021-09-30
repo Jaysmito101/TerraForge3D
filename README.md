@@ -22,6 +22,8 @@
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
+Join the Discord Server : https://discord.gg/AcgRafSfyB
+
 # What can this do?
 
 * Generte 3D Terrain Procedrally
@@ -78,3 +80,5 @@ Please considering tweeting about this!
 
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
+
+Join the Discord Server : https://discord.gg/AcgRafSfyB
