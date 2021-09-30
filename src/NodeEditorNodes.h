@@ -37,7 +37,14 @@ enum NodeType
 	Mix,
 	Clamp,
 	ScriptF,
-	TextureSampler2D
+	TextureSampler2D,
+	Random,
+	Perlin,
+	Cellular,
+	Generator,
+	Time,
+	Condition,
+	Duplicate
 };
 
 struct NodeData {
@@ -161,8 +168,8 @@ struct Editor
 			pos = ImNodes::GetNodeEditorSpacePos(n->id);
 			nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", n->id} }));
 		}
-		pos = ImNodes::GetNodeEditorSpacePos(outputNode->id);
-		nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", outputNode->id} }));
+
+		//nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", outputNode->id} }));
 		data["nodes"] = nodesSave;
 		data["nodePositions"] = nodesPositionSave;
 		data["outputNode"] = outputNode->Save().dump();
@@ -277,12 +284,9 @@ public:
 			ImNodes::EndInputAttribute();
 		}
 
-		if (true) {
-			ImNodes::BeginStaticAttribute(oiID);
 			ImGui::Dummy(ImVec2(100, 110));
 			ImGui::Image((ImTextureID)outputTex, ImVec2(100, -100));
-			ImNodes::EndStaticAttribute();
-		}
+		
 
 
 		ImNodes::EndNode();
@@ -1085,11 +1089,13 @@ public:
 private:
 	lua_State* L;
 	TextEditor* editor;
+	Texture2D* outputTex;
 	std::vector<std::pair<int, std::string>> output;
 	bool isCompiled = false;
 	bool isDraggable = true;
 	bool showConsole = false;
 	bool showEditor = true;
+	bool showTexture = false;
 };
 
 
@@ -1149,3 +1155,193 @@ private:
 	bool isLoaded = false;
 
 };
+
+
+
+
+class RandomNode : public Node {
+public:
+	RandomNode(std::string name = "Random", int id = GenerateId());
+
+	virtual void Setup() override;
+
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPin = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	int value = 0.0f;
+	int max = 10;
+	int min = 0;
+
+};
+
+
+
+class TimeNode : public Node {
+public:
+	TimeNode(std::string name = "Time", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+};
+
+
+
+class PerlinNode : public Node {
+public:
+	PerlinNode(std::string name = "Simplex Noise", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPinT = FloatPin(this, PinType::Input);
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float a = 1.0f;
+	float b = 0.0f;
+	float factor = 0.0f;
+	float strength = 1.0f;
+};
+
+
+
+class CellularNode : public Node {
+public:
+	CellularNode(std::string name = "Cellular Noise", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPinT = FloatPin(this, PinType::Input);
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float a = 1.0f;
+	float b = 0.0f;
+	float factor = 0.0f;
+	float strength = 1.0f;
+};
+
+class GeneratorNode : public Node {
+public:
+	GeneratorNode(std::string name = "Generator", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPinT = FloatPin(this, PinType::Input);
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	int gridSize = 4;
+	int gridSizeOld = 4;
+	bool *grid;
+	float smoothness = 1.0f;
+};
+
+class ConditionNode : public Node {
+public:
+	ConditionNode(std::string name = "Condition", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPinV = FloatPin(this, PinType::Input);
+	FloatPin inputPinX = FloatPin(this, PinType::Input);
+	FloatPin inputPinY = FloatPin(this, PinType::Input);
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+	float a = 0.0f;
+	float b = 1.0f;
+	float factor = 0.5f;
+	float condValue;
+};
+
+class DuplicateNode : public Node {
+public:
+
+	DuplicateNode(std::string name = "Duplicate", int id = GenerateId());
+
+	virtual void Setup() override;
+
+
+	virtual std::vector<void*>  GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin inputPin = FloatPin(this, PinType::Input);
+private:
+	FloatPin outputPinX = FloatPin(this, PinType::Output);
+	FloatPin outputPinY = FloatPin(this, PinType::Output);
+	FloatPin outputPinZ = FloatPin(this, PinType::Output);
+};
+

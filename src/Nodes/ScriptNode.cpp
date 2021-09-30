@@ -29,7 +29,7 @@ void ScriptFloatNode::Setup() {
 	inputPinY.node = this;
 	L = luaL_newstate();
 	luaL_openlibs(L);
-	
+	outputTex = new Texture2D(*data.resolution, *data.resolution);
 	editor = new TextEditor();
 	auto lang = TextEditor::LanguageDefinition::Lua();
 	editor->SetLanguageDefinition(lang);
@@ -84,6 +84,7 @@ nlohmann::json ScriptFloatNode::Save() {
 	data["isDraggable"] = isDraggable;
 	data["showEditor"] = showEditor;
 	data["showConsole"] = showConsole;
+	data["showTexture"] = showTexture;
 	return data;
 }
 
@@ -100,6 +101,7 @@ void ScriptFloatNode::Load(nlohmann::json data) {
 	isDraggable = data["isDraggable"];
 	showEditor = data["showEditor"];
 	showConsole = data["showConsole"];
+	showTexture = data["showTexture"];
 }
 
 bool ScriptFloatNode::Render() {
@@ -248,7 +250,18 @@ bool ScriptFloatNode::Render() {
 			showEditor = true;
 		}
 	}
+	ImGui::SameLine();
 
+	if (showTexture) {
+		if (ImGui::Button("Hide Texture")) {
+			showTexture = false;
+		}
+	}
+	else {
+		if (ImGui::Button("Show Texture")) {
+			showTexture = true;
+		}
+	}
 
 	ImGui::Checkbox("Node Draggable", &isDraggable);
 	if(ImGui::IsWindowHovered())
@@ -279,6 +292,11 @@ bool ScriptFloatNode::Render() {
 		}
 		ImGui::EndChild();
 	}
+
+	if (showEditor && outputTex) {
+		ImGui::Image((ImTextureID)outputTex->GetRendererID(), ImVec2(200, 200));
+	}
+
 
 	ImNodes::EndNode();
 	return true;

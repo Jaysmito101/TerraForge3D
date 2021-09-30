@@ -4,6 +4,7 @@
 #include <Base/EntryPoint.h>
 #include <ImGuiConsole.h>
 #include <AppStyles.h>
+#include <Texture2D.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
 #include <ElevationNodeEditor.h>
@@ -36,9 +37,10 @@
 #include <AppStructs.h>
 
 static Model terrain("Terrain");
+static Model sea("Sea");
 
 static Application* myApp;
-static Shader* shd, * meshNormalsShader, * wireframeShader;
+static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader;
 static Camera camera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
@@ -52,6 +54,7 @@ static glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 static glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 static glm::vec3 LightPosition = glm::vec3(0.0f);
 static float LightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+static float SeaColor[4] = { 0.4f, 0.4f, 1.0f, 1.0f };
 static float CameraPosition[3];
 static float CameraRotation[3];
 static Vec2 prevMousePos;
@@ -64,11 +67,13 @@ static bool flattenBase = false;
 static bool button1, button2, button3;
 static std::atomic<bool> noiseBased = false;
 static bool wireFrameMode = false;
+static bool showSea = false;
 static bool absolute = false;
 static bool square = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
+static Texture2D* diffuse, * normal;
 
 
 static uint32_t vao, vbo, ebo;
@@ -78,7 +83,10 @@ static int resolution = 256;
 static float mouseSpeed = 25;
 static float scrollSpeed = 0.5f;
 static float mouseScrollAmount = 0;
+static float seaLevel = 0.0f;
 static float scale = 1.0f;
+static float textureScale = 1.0f;
+static float textureScaleO = 1.0f;
 static int numberOfNoiseTypes = 3;
 static nlohmann::json appData;
 
@@ -182,14 +190,14 @@ static void ShowCameraControls() {
 }
 
 static void ShowLightingControls() {
-	ImGui::Begin("Light Controls");
+	ImGui::Begin("Sun Controls");
 
-	ImGui::Text("Light Position");
+	ImGui::Text("Sun Position");
 	ImGui::DragFloat3("##lightPosition", &LightPosition[0], 0.1f);
 	ImGui::Separator();
 	ImGui::Separator();
-	ImGui::Text("Light Color");
-	ImGui::ColorPicker4("##lightColor", LightColor);
+	ImGui::Text("Sun Light Color");
+	ImGui::ColorEdit3("##lightColor", LightColor);
 
 	ImGui::End();
 }
@@ -242,27 +250,31 @@ static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 }
 
 static void ResetShader() {
+	bool res = false;
 	if (shd)
 		delete shd;
 	if (!wireframeShader)
 		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
+	if (!waterShader)
+		waterShader = new Shader(ReadShaderSourceFile("Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile("Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile("Data\\shaders\\water\\geom.glsl", &res));
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
 static void FillMeshData() {
 
-	if (terrain.mesh.res != resolution || terrain.mesh.sc != scale) {
+	if (terrain.mesh.res != resolution || terrain.mesh.sc != scale || textureScale != textureScaleO) {
 
-		terrain.mesh.GeneratePlane(resolution, scale);
+		terrain.mesh.GeneratePlane(resolution, scale, textureScale);
 		s_Stats.triangles = terrain.mesh.indexCount / 3;
 		s_Stats.vertCount = terrain.mesh.vertexCount;
+		textureScaleO = textureScale;
 	}
 
 	for (int y = 0; y < resolution; y++)
 	{
 		for (int x = 0; x < resolution; x++)
 		{
-			if(noiseBased)
+			if (noiseBased)
 				terrain.mesh.SetElevation(noise(x, y), x, y);
 			else
 				terrain.mesh.SetElevation(GetElevation(x, y), x, y);
@@ -274,31 +286,12 @@ static void FillMeshData() {
 	isRemeshing = false;
 }
 
-static void UploadMeshToGPU() {
-	if (!terrain.mesh.IsValid())
-		return;
-
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * terrain.mesh.vertexCount, terrain.mesh.vert, GL_DYNAMIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * terrain.mesh.indexCount, terrain.mesh.indices, GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
-	glEnableVertexAttribArray(1);
-
-}
-
 static void RegenerateMesh() {
 
 	if (isRemeshing)
 		return;
 
-	UploadMeshToGPU();
+	terrain.UploadToGPU();
 
 	isRemeshing = true;
 
@@ -310,35 +303,28 @@ static void RegenerateMesh() {
 
 static void GenerateMesh()
 {
-	FillMeshData();
-
 	ResetShader();
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	FillMeshData();
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * terrain.mesh.vertexCount, terrain.mesh.vert, GL_DYNAMIC_DRAW);
+	terrain.SetupMeshOnGPU();
 
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * terrain.mesh.indexCount, terrain.mesh.indices, GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
-	glEnableVertexAttribArray(1);
-
+	sea.SetupMeshOnGPU();
+	sea.mesh.GeneratePlane(256, 120);
+	sea.mesh.RecalculateNormals();
+	sea.UploadToGPU();
 }
 
 static void DoTheRederThing(float deltaTime) {
+
 	static float time;
 	time += deltaTime;
 	camera.UpdateCamera(CameraPosition, CameraRotation);
 	Shader* shader;
 	if (skyboxEnabled)
 		RenderSkybox(camera.pv);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (wireFrameMode)
 		shader = wireframeShader;
 	else
@@ -349,9 +335,33 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetUniformMAt4("_Model", terrain.modelMatrix);
 	shader->SetLightCol(LightColor);
 	shader->SetLightPos(LightPosition);
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, terrain.mesh.indexCount, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	float tmp[3];
+	tmp[0] = ImGui::GetIO().MousePos.x;
+	tmp[1] = ImGui::GetIO().MousePos.y;
+	tmp[2] = ImGui::GetIO().MouseDown[0];
+	shader->SetUniform3f("_MousePos", tmp);
+	tmp[0] = 800;
+	tmp[1] = 600;
+	tmp[2] = 1;
+	shader->SetUniform3f("_Resolution", tmp);
+	if (diffuse) {
+		diffuse->Bind(5);
+		shader->SetUniformi("_Diffuse", 5);
+	}
+	terrain.Render();
+	if (showSea) {
+		glUseProgram(0);
+		waterShader->Bind();
+		waterShader->SetTime(&time);
+		sea.position.y = seaLevel;
+		sea.Update();
+		glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0));
+		waterShader->SetUniform3f("_SeaColor", SeaColor);
+		waterShader->SetMPV(tmp);
+		waterShader->SetLightCol(LightColor);
+		waterShader->SetLightPos(LightPosition);
+		sea.Render();
+	}
 }
 
 static void ShowTerrainControls()
@@ -378,10 +388,17 @@ static void ShowTerrainControls()
 	if (ImGui::Button("Refresh Shaders")) {
 		ResetShader();
 	}
-	ImGui::Separator();
 
 	if (ImGui::Button("Use Custom Shaders")) {
 		activeWindows.shaderEditorWindow = true;
+	}
+
+	if (ImGui::Button("Texture Settings")) {
+		activeWindows.texturEditorWindow = true;
+	}
+
+	if (ImGui::Button("Sea Settings")) {
+		activeWindows.seaEditor = true;
 	}
 
 	ImGui::Separator();
@@ -461,10 +478,11 @@ static void ShowNoiseSettings() {
 }
 
 static void MouseMoveCallback(float x, float y) {
+	float deltaX = x - prevMousePos.x;
+	float deltaY = y - prevMousePos.y;
+
 	if (button2) {
 
-		float deltaX = x - prevMousePos.x;
-		float deltaY = y - prevMousePos.y;
 
 		if (deltaX > 200) {
 			deltaX = 0;
@@ -477,6 +495,7 @@ static void MouseMoveCallback(float x, float y) {
 		CameraRotation[0] += deltaX * mouseSpeed;
 		CameraRotation[1] += deltaY * mouseSpeed;
 	}
+
 
 	prevMousePos.x = x;
 	prevMousePos.y = y;
@@ -507,6 +526,12 @@ static void ShowMainScene() {
 			button1 = io.MouseDown[0];
 			button2 = io.MouseDown[2];
 			button3 = io.MouseDown[1];
+
+			if (ImGui::GetIO().MouseDown[1]) {
+				CameraPosition[0] += -io.MouseDelta.x * 0.005f;
+				CameraPosition[1] += io.MouseDelta.y * 0.005f;
+			}
+
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
 		ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
@@ -549,11 +574,15 @@ static void SaveFile() {
 	tmp["noiseBased"] = noiseBased ? true : false;
 	tmp["wireFrameMode"] = wireFrameMode;
 	tmp["skyboxEnabled"] = skyboxEnabled;
+	tmp["showSea"] = showSea;
 	tmp["vSync"] = vSync;
 	tmp["mouseSpeed"] = mouseSpeed;
 	tmp["scrollSpeed"] = scrollSpeed;
 	tmp["mouseScrollAmount"] = mouseScrollAmount;
 	tmp["scale"] = scale;
+	tmp["textureScale"] = textureScale;
+	tmp["textureScaleO"] = textureScaleO;
+	tmp["seaLevel"] = seaLevel;
 
 	data["generals"] = tmp;
 
@@ -607,12 +636,15 @@ static void OpenSaveFile() {
 	noiseBased = tmp["noiseBased"];
 	skyboxEnabled = tmp["skyboxEnabled"];
 	vSync = tmp["vSync"];
+	showSea = tmp["showSea"];
 	wireFrameMode = tmp["wireFrameMode"];
 	mouseSpeed = tmp["mouseSpeed"];
 	scrollSpeed = tmp["scrollSpeed"];
 	mouseScrollAmount = tmp["mouseScrollAmount"];
 	scale = tmp["scale"];
-
+	textureScale = tmp["textureScale"];
+	textureScaleO = tmp["textureScaleO"];
+	seaLevel = tmp["seaLevel"];
 
 	// For Future
 	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size());
@@ -628,6 +660,8 @@ static void OpenSaveFile() {
 static void ShowWindowMenuItem(const char* title, bool* val) {
 	ImGui::Checkbox(title, val);
 }
+
+
 
 static void ShowMenu() {
 	if (ImGui::BeginMainMenuBar())
@@ -725,7 +759,33 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Elevation Node Editor", &activeWindows.elevationNodeEditorWindow);
 
+			ShowWindowMenuItem("Texture Settings", &activeWindows.texturEditorWindow);
+
+			ShowWindowMenuItem("Sea Settings", &activeWindows.seaEditor);
+
+			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
+
 			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Help")) {
+			if (ImGui::MenuItem("Contributers"))
+				activeWindows.contribWindow = true;
+
+			if (ImGui::MenuItem("Tutorial"))
+				ShellExecute(NULL, L"open", L"https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ", NULL, NULL, SW_SHOWNORMAL);
+
+			if (ImGui::MenuItem("Social Handle"))
+				ShellExecute(NULL, L"open", L"https://twitter.com/jaysmito101", NULL, NULL, SW_SHOWNORMAL);
+
+			if (ImGui::MenuItem("Discord Server"))
+				ShellExecute(NULL, L"open", L"https://discord.gg/AcgRafSfyB", NULL, NULL, SW_SHOWNORMAL);
+
+			if (ImGui::MenuItem("GitHub Page"))
+				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D", NULL, NULL, SW_SHOWNORMAL);
+
+			ImGui::EndMenu();
+
 		}
 		ImGui::EndMainMenuBar();
 	}
@@ -742,6 +802,57 @@ static void ShowSuccessModal() {
 		ImGui::TextColored(ImVec4(0.2f, 0.7f, 0.2f, 1.0f), successMessage.c_str());
 	}
 }
+
+static void ShowTextureSettings() {
+	ImGui::Begin("Texture Settings", &activeWindows.texturEditorWindow);
+	uint32_t id = diffuse ? diffuse->GetRendererID() : 0;
+	ImGui::Image((ImTextureID)(id), ImVec2(200, 200));
+	if (!diffuse) {
+		if (ImGui::Button("Load Texture")) {
+			std::string textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
+			if (textureFilePath.size() > 1) {
+				diffuse = new Texture2D(textureFilePath);
+			}
+		}
+	}
+	else {
+		if (ImGui::Button("Change Texture")) {
+			std::string textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
+			if (textureFilePath.size() > 1) {
+				delete diffuse;
+				diffuse = new Texture2D(textureFilePath);
+			}
+		}
+	}
+
+	ImGui::DragFloat("Texture Scale", &textureScale, 0.1f);
+
+
+	ImGui::End();
+}
+
+static void ShowSeaSettings() {
+	ImGui::Begin("Sea Settings", &activeWindows.seaEditor);
+
+	ImGui::Checkbox("Show Sea Level", &showSea);
+
+	ImGui::Text("Sea Color");
+	ImGui::ColorEdit3("##seaColor", SeaColor);
+
+	ImGui::DragFloat("Sea Level", &seaLevel, 0.1f);
+
+
+	ImGui::End();
+}
+
+static void ShowContributers() {
+	ImGui::Begin("Contributers", &activeWindows.contribWindow);
+	ImGui::Text("The contributers as of Version 3.0:");
+	ImGui::NewLine();
+	ImGui::Text("Jaysmito Mukherjee");
+	ImGui::End();
+}
+
 
 static void OnBeforeImGuiRender() {
 
@@ -820,7 +931,7 @@ public:
 
 	virtual void OnUpdate(float deltatime) override
 	{
-		if(!isRuinning)
+		if (!isRuinning)
 			return;
 
 		if (!isRemeshing) {
@@ -871,6 +982,14 @@ public:
 		if (activeWindows.statsWindow)
 			ShowStats();
 
+		if (activeWindows.texturEditorWindow)
+			ShowTextureSettings();
+
+		if (activeWindows.seaEditor)
+			ShowSeaSettings();
+
+		if (activeWindows.contribWindow)
+			ShowContributers();
 
 		if (activeWindows.styleEditor)
 			ShowStyleEditor(&activeWindows.styleEditor);

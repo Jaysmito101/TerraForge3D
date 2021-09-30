@@ -7,6 +7,7 @@ struct Vert
 {
 	glm::vec3 position;
 	glm::vec3 normal;
+	glm::vec2 texCoord;
 };
 
 class Mesh
@@ -18,7 +19,7 @@ public:
 
 	void RecalculateNormals();
 
-	void GeneratePlane(int resolution, float scale);
+	void GeneratePlane(int resolution, float scale, float textureScale = 1.0f);
 
 	void SetElevation(float elevation, int x, int y);
 

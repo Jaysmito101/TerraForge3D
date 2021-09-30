@@ -44,6 +44,9 @@ void TextureSamplerNode::Load(nlohmann::json data) {
 	outputPinB.Load(data["outputPinB"]);
 	Setup();
 	textureFilePath = data["textureFilePath"];
+	if (texture)
+		delete texture;
+	texture = new Texture2D(textureFilePath);
 	id = data["id"];
 	name = data["name"];
 }
@@ -80,10 +83,29 @@ bool TextureSamplerNode::Render()  {
 				if (texture)
 					delete texture;
 				texture = new Texture2D(textureFilePath);
+				isLoaded = true;
 				if(data.resolution)
 					texture->Resize(*data.resolution, *data.resolution);
 			}
 			else {
+				isLoaded = false;
+				textureFilePath = "";
+			}
+		}
+	}
+	else {
+		if (ImGui::Button("Change Texture")) {
+			textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
+			if (textureFilePath.size() > 1) {
+				if (texture)
+					delete texture;
+				texture = new Texture2D(textureFilePath);
+				isLoaded = true;
+				if (data.resolution)
+					texture->Resize(*data.resolution, *data.resolution);
+			}
+			else {
+				isLoaded = false;
 				textureFilePath = "";
 			}
 		}
@@ -93,9 +115,6 @@ bool TextureSamplerNode::Render()  {
 
 	if (texture) {
 		ImGui::Image((ImTextureID)texture->GetRendererID(), ImVec2(200, 200));
-	}
-	else {
-		ImGui::Image((ImTextureID)0, ImVec2(200, 200));
 	}
 
 	ImNodes::EndNode();

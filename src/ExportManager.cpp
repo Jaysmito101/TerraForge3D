@@ -42,9 +42,32 @@ static void ExportOBJImpl() {
 		outfile << std::endl;
 		outfile << std::endl;
 
+		for (int i = 0; i < meshToExport->vertexCount; i++)
+		{
+			outfile << "vt " << meshToExport->vert[i].texCoord.x << " " << meshToExport->vert[i].texCoord.y << std::endl;
+		}
+
+		outfile << std::endl;
+		outfile << std::endl;
+
+		for (int i = 0; i < meshToExport->vertexCount; i++)
+		{
+			outfile << "vn " << meshToExport->vert[i].normal.x << " " << meshToExport->vert[i].normal.y << " " << meshToExport->vert[i].normal.z << " " << std::endl;
+		}
+
+		outfile << std::endl;
+		outfile << std::endl;
+
+		int a = 0;
+		int b = 0;
+		int c = 0;
+
 		for (int i = 0; i < meshToExport->indexCount; i += 3)
 		{
-			outfile << "f " << meshToExport->indices[i] + 1 << " " << meshToExport->indices[i + 1] + 1 << " " << meshToExport->indices[i + 2] + 1 << " " << std::endl;
+			a = meshToExport->indices[i + 0] + 1;
+			b = meshToExport->indices[i + 1] + 1;
+			c = meshToExport->indices[i + 2] + 1;
+			outfile << "f " << a << "/" << a << "/" << a << " " << b << "/" << b << "/" << b << " " << c << "/" << c << "/" << c << " " << std::endl;
 		}
 
 		outfile.close();

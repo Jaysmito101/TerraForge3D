@@ -14,6 +14,9 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 {
 	m_InternalFormat = GL_RGB8;
 	m_DataFormat = GL_RGB;
+	if (m_Data)
+		delete m_Data;
+	m_Data = new unsigned char[width * height * 3];
 
 	glGenTextures(1, &m_RendererID);
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
@@ -76,7 +79,8 @@ void Texture2D::SetData(void* data, uint32_t size)
 
 void Texture2D::Bind(uint32_t slot) const
 {
-	glBindTextureUnit(slot, m_RendererID);
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 }
 
 void Texture2D::Resize(int width, int height, bool resetOpenGL) {

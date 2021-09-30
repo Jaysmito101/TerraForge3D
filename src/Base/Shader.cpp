@@ -145,6 +145,33 @@ void Shader::SetUniformf(std::string name, float value)
 	}
 }
 
+void Shader::SetUniform3f(std::string name, float* value)
+{
+	if (uniformLocations.find(name) == uniformLocations.end()) {
+		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+		uniformLocations.insert(std::make_pair(name, loc));
+		glUniform3fv(loc, 1, value);
+	}
+	else {
+		uint32_t loc = uniformLocations[name];
+		glUniform3fv(loc, 1, value);
+	}
+}
+
+void Shader::SetUniformi(std::string name, int value)
+{
+	if (uniformLocations.find(name) == uniformLocations.end()) {
+		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+		uniformLocations.insert(std::make_pair(name, loc));
+		glUniform1i(loc, value);
+	}
+	else {
+		uint32_t loc = uniformLocations[name];
+		glUniform1i(loc, value);
+	}
+}
+
+
 void Shader::SetUniformMAt4(std::string name, glm::mat4& value)
 {
 	if (uniformLocations.find(name) == uniformLocations.end()) {

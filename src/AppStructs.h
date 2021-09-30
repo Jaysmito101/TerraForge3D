@@ -93,8 +93,8 @@ struct ActiveWindows {
 	bool styleEditor = false;
 	bool statsWindow = false;
 	bool shaderEditorWindow = false;
-	//bool elevationNodeEditorWindow = false;
-
-	// For Debug Only
-	bool elevationNodeEditorWindow = true;
+	bool texturEditorWindow = false;
+	bool seaEditor = false;
+	bool elevationNodeEditorWindow = false;
+	bool contribWindow = false;
 };

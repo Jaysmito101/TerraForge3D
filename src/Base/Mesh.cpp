@@ -41,7 +41,7 @@ void Mesh::RecalculateNormals()
 	for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
 }
 
-void Mesh::GeneratePlane(int resolution, float scale)
+void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 {
 	res = resolution;
 	sc = scale;
@@ -63,6 +63,7 @@ void Mesh::GeneratePlane(int resolution, float scale)
 			vertices[i].position.x = (float)pointOnPlane.x;
 			vertices[i].position.y = (float)pointOnPlane.y;
 			vertices[i].position.z = (float)pointOnPlane.z;
+			vertices[i].texCoord = glm::vec2(percent.x, percent.y)*textureScale;
 			vertices[i].normal = glm::vec3(0.0f);
 			if (x != resolution - 1 && y != resolution - 1)
 			{

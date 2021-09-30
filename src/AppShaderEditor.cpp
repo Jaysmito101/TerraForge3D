@@ -14,6 +14,7 @@ static std::string defaultBaseVertexShader = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
+layout (location = 2) in vec2 aTexCoord;
 
 uniform mat4 _PV;
 uniform mat4 _Model;
@@ -21,8 +22,9 @@ uniform mat4 _Model;
 out DATA
 {
 
-    vec3  FragPos;
+    vec3 FragPos;
     vec3 Normal;
+	vec2 TexCoord;
 	mat4 PV;
 } data_out; 
 
@@ -31,6 +33,7 @@ void main()
     gl_Position =  vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	data_out.FragPos = aPos;
 	data_out.Normal = aNorm;
+	data_out.TexCoord = aTexCoord;
 	data_out.PV = _PV;
 }
 )";
@@ -43,11 +46,14 @@ layout(triangle_strip, max_vertices = 3) out;
 
 out vec3 FragPos;
 out vec3 Normal;
+out vec2 TexCoord;
 
 in DATA
 {
-    vec3  FragPos;
+
+    vec3 FragPos;
     vec3 Normal;
+	vec2 TexCoord;
 	mat4 PV;
 } data_in[]; 
 
@@ -55,16 +61,19 @@ void main()
 {	
 	gl_Position = data_in[0].PV * gl_in[0].gl_Position;
 	Normal = data_in[0].Normal;
+	TexCoord = data_in[0].TexCoord;
 	FragPos = data_in[0].FragPos;
 	EmitVertex();
 
 	gl_Position = data_in[0].PV * gl_in[1].gl_Position;
 	Normal = data_in[1].Normal;
+	TexCoord = data_in[0].TexCoord;
 	FragPos = data_in[1].FragPos;
 	EmitVertex();
 
 	gl_Position =  data_in[0].PV * gl_in[2].gl_Position;
 	Normal = data_in[2].Normal;
+	TexCoord = data_in[0].TexCoord;
 	FragPos = data_in[2].FragPos;
 	EmitVertex();
 
@@ -73,20 +82,24 @@ void main()
 )";
 
 static std::string defaultBaseFragmentShader = R"(
-
 #version 330 core
 out vec4 FragColor;
 
 uniform vec3 _LightPosition;
 uniform vec3 _LightColor;
 
+uniform sampler2D _Diffuse;
+//unifrom float _UseTexutres;
+
 in vec3 FragPos;
 in vec3 Normal;
+in vec2 TexCoord;
 
 void main()
 {	
 	//vec3 objectColor = vec3(0.34f, 0.49f, 0.27f);
 	vec3 objectColor = vec3(1, 1, 1);
+	objectColor = texture(_Diffuse, TexCoord).xyz;
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(_LightPosition - FragPos);
 	float diff = max(dot(norm, lightDir), 0.0f);
