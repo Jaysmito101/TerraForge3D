@@ -18,6 +18,9 @@
 
 
 # TerraGen3D
+
+[![Join the chat at https://gitter.im/TerraGen3D/community](https://badges.gitter.im/TerraGen3D/community.svg)](https://gitter.im/TerraGen3D/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
