@@ -12,7 +12,7 @@
   <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/Jaysmito101/TerraGen3D/total?label=Github%20Downloads&style=for-the-badge">
   <img alt="SourceForge" src="https://img.shields.io/sourceforge/dt/terragen3d?label=Source%20Forge%20Downloads&style=for-the-badge">
   <img alt="GitHub" src="https://img.shields.io/github/license/Jaysmito101/Terragen3D?style=for-the-badge">
-  
+    
 </p>
 <br/>
 
@@ -22,9 +22,13 @@
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
-Tutorials : https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ
+Give your valuable feedback : https://github.com/Jaysmito101/TerraGen3D/discussions/6
+
+Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
+
+ <a href="https://www.producthunt.com/posts/terragen3d?utm_source=badge-review&utm_medium=badge&utm_souce=badge-terragen3d#discussion-body" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/review.svg?post_id=314431&theme=dark" alt="TerraGen3D - 3D Procedural Node Based Terrain Generation Tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 # What can this do?
 
@@ -76,4 +80,11 @@ Please considering tweeting about this!
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
+
+Give your valuable feedback : https://github.com/Jaysmito101/TerraGen3D/discussions/6
+
+Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
+
 Join the Discord Server : https://discord.gg/AcgRafSfyB
+
+<a href="https://www.producthunt.com/posts/terragen3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terragen3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=314431&theme=dark" alt="TerraGen3D - 3D Procedural Node Based Terrain Generation Tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
