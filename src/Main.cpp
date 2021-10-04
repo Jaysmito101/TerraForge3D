@@ -87,6 +87,8 @@ static float seaLevel = 0.0f;
 static float scale = 1.0f;
 static float textureScale = 1.0f;
 static float textureScaleO = 1.0f;
+static float viewportMousePosX = 0;
+static float viewportMousePosY = 0;
 static int numberOfNoiseTypes = 3;
 static nlohmann::json appData;
 
@@ -336,8 +338,8 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetLightCol(LightColor);
 	shader->SetLightPos(LightPosition);
 	float tmp[3];
-	tmp[0] = ImGui::GetIO().MousePos.x;
-	tmp[1] = ImGui::GetIO().MousePos.y;
+	tmp[0] = viewportMousePosX;
+	tmp[1] = viewportMousePosY;
 	tmp[2] = ImGui::GetIO().MouseDown[0];
 	shader->SetUniform3f("_MousePos", tmp);
 	tmp[0] = 800;
@@ -526,11 +528,12 @@ static void ShowMainScene() {
 			button1 = io.MouseDown[0];
 			button2 = io.MouseDown[2];
 			button3 = io.MouseDown[1];
-
 			if (ImGui::GetIO().MouseDown[1]) {
 				CameraPosition[0] += -io.MouseDelta.x * 0.005f;
 				CameraPosition[1] += io.MouseDelta.y * 0.005f;
 			}
+			viewportMousePosX = ImGui::GetIO().MousePos.x - viewportOffset.x;
+			viewportMousePosY = ImGui::GetIO().MousePos.y - viewportOffset.y;
 
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
