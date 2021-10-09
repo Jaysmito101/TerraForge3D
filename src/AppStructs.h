@@ -67,8 +67,8 @@ struct NoiseLayer {
 	void Load(nlohmann::json data) {
 		if(noiseType)
 			delete noiseType;
-		memset(noiseType, 0, 1024);
 		noiseType = (char*)malloc(1024);
+		memset(noiseType, 0, 1024);
 		strcpy(noiseType, std::string(data["type"]).c_str());
 		std::string t = std::string(data["name"]);
 		memcpy_s(name, 256, t.c_str(), 256);
@@ -78,6 +78,23 @@ struct NoiseLayer {
 		offsetY = data["offsetY"];
 		enabled = data["enabled"];
 		active = data["active"];
+	}
+
+	NoiseLayer Clone(){
+		NoiseLayer clone;
+		if(clone.noiseType)
+			delete noiseType;
+		clone.noiseType = (char*)malloc(1024);
+		memset(clone.noiseType, 0, 1024);
+		strcpy(clone.noiseType, noiseType);
+		memcpy_s(clone.name, 256, name, 256);
+		clone.strength = strength;
+		clone.scale = scale;
+		clone.offsetX = offsetX;
+		clone.offsetY = offsetY;
+		clone.enabled = enabled;
+		clone.active = active;
+		return clone;
 	}
 
 	char* noiseType;
@@ -97,4 +114,5 @@ struct ActiveWindows {
 	bool seaEditor = false;
 	bool elevationNodeEditorWindow = false;
 	bool contribWindow = false;
+	bool textureStore = false;
 };

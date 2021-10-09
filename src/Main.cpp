@@ -9,6 +9,7 @@
 #include <AppShaderEditor.h>
 #include <ElevationNodeEditor.h>
 #include <ExportManager.h>
+#include <TextureStore.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
 #include <windows.h>
 #include <string>
@@ -451,8 +452,7 @@ static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button((std::string("Duplicate") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
-			Log(std::to_string(id).c_str());
-			noiseLayersTmp.push_back(noiseLayers[id]);
+			noiseLayersTmp.push_back(noiseLayers[id].Clone());
 		}
 	}
 }
@@ -764,6 +764,8 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Texture Settings", &activeWindows.texturEditorWindow);
 
+			ShowWindowMenuItem("Texture Store", &activeWindows.textureStore);
+
 			ShowWindowMenuItem("Sea Settings", &activeWindows.seaEditor);
 
 			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
@@ -928,7 +930,7 @@ class MyApp : public Application
 public:
 	virtual void OnPreload() override {
 		SetTitle("TerraGen3D - Jaysmito Mukherjee");
-		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowcnfigs.terr3d");
+		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
 		Sleep(1000);
 	}
 
@@ -966,6 +968,7 @@ public:
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;
 		ElevationNodeEditorTick();
 		SecondlyShaderEditorUpdate();
+		UpdateTextureStore();
 	}
 
 	virtual void OnImGuiRender() override
@@ -1003,6 +1006,9 @@ public:
 		if (activeWindows.elevationNodeEditorWindow)
 			ShowElevationNodeEditor(&activeWindows.elevationNodeEditorWindow);
 
+		if (activeWindows.textureStore)
+			ShowTextureStore(&activeWindows.textureStore);
+
 
 		OnImGuiRenderEnd();
 	}
@@ -1015,6 +1021,7 @@ public:
 		SetupCubemap();
 		SetupShaderManager();
 		SetupElevationManager(&resolution);
+		SetupTextureStore(GetExecutableDir());
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();

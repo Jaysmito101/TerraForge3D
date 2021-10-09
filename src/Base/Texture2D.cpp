@@ -14,8 +14,6 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 {
 	m_InternalFormat = GL_RGB8;
 	m_DataFormat = GL_RGB;
-	if (m_Data)
-		delete m_Data;
 	m_Data = new unsigned char[width * height * 3];
 
 	glGenTextures(1, &m_RendererID);

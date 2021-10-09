@@ -91,21 +91,21 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libssl_static.lib;libcrypto_static.lib;Crypt32.lib;ws2_32.lib;Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <Optimization>MaxSpeed</Optimization>
@@ -118,7 +118,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libssl_static.lib;libcrypto_static.lib;Crypt32.lib;ws2_32.lib;Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -235,6 +235,7 @@
     <ClCompile Include="src\Nodes\TimeNode.cpp" />
     <ClCompile Include="src\Nodes\ValueNodes.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
+    <ClCompile Include="src\TextureStore.cpp" />
     <ClCompile Include="src\Utils.cpp" />
     <ClCompile Include="src\ViewportFramebuffer.cpp" />
   </ItemGroup>
@@ -244,6 +245,90 @@
     <ClInclude Include="include\avir\avir_float4_sse.h" />
     <ClInclude Include="include\avir\avir_float8_avx.h" />
     <ClInclude Include="include\avir\lancir.h" />
+    <ClInclude Include="include\crypto\aes_platform.h" />
+    <ClInclude Include="include\crypto\aria.h" />
+    <ClInclude Include="include\crypto\asn1.h" />
+    <ClInclude Include="include\crypto\asn1err.h" />
+    <ClInclude Include="include\crypto\asn1_dsa.h" />
+    <ClInclude Include="include\crypto\async.h" />
+    <ClInclude Include="include\crypto\asyncerr.h" />
+    <ClInclude Include="include\crypto\bioerr.h" />
+    <ClInclude Include="include\crypto\bn.h" />
+    <ClInclude Include="include\crypto\bnerr.h" />
+    <ClInclude Include="include\crypto\bn_conf.h" />
+    <ClInclude Include="include\crypto\bn_dh.h" />
+    <ClInclude Include="include\crypto\bn_srp.h" />
+    <ClInclude Include="include\crypto\buffererr.h" />
+    <ClInclude Include="include\crypto\chacha.h" />
+    <ClInclude Include="include\crypto\cmll_platform.h" />
+    <ClInclude Include="include\crypto\cmperr.h" />
+    <ClInclude Include="include\crypto\cmserr.h" />
+    <ClInclude Include="include\crypto\comperr.h" />
+    <ClInclude Include="include\crypto\conferr.h" />
+    <ClInclude Include="include\crypto\crmferr.h" />
+    <ClInclude Include="include\crypto\cryptlib.h" />
+    <ClInclude Include="include\crypto\cryptoerr.h" />
+    <ClInclude Include="include\crypto\cterr.h" />
+    <ClInclude Include="include\crypto\ctype.h" />
+    <ClInclude Include="include\crypto\decoder.h" />
+    <ClInclude Include="include\crypto\decodererr.h" />
+    <ClInclude Include="include\crypto\des_platform.h" />
+    <ClInclude Include="include\crypto\dh.h" />
+    <ClInclude Include="include\crypto\dherr.h" />
+    <ClInclude Include="include\crypto\dsa.h" />
+    <ClInclude Include="include\crypto\dsaerr.h" />
+    <ClInclude Include="include\crypto\dso_conf.h" />
+    <ClInclude Include="include\crypto\ec.h" />
+    <ClInclude Include="include\crypto\ecerr.h" />
+    <ClInclude Include="include\crypto\ecx.h" />
+    <ClInclude Include="include\crypto\encoder.h" />
+    <ClInclude Include="include\crypto\encodererr.h" />
+    <ClInclude Include="include\crypto\engine.h" />
+    <ClInclude Include="include\crypto\engineerr.h" />
+    <ClInclude Include="include\crypto\err.h" />
+    <ClInclude Include="include\crypto\ess.h" />
+    <ClInclude Include="include\crypto\esserr.h" />
+    <ClInclude Include="include\crypto\evp.h" />
+    <ClInclude Include="include\crypto\evperr.h" />
+    <ClInclude Include="include\crypto\httperr.h" />
+    <ClInclude Include="include\crypto\lhash.h" />
+    <ClInclude Include="include\crypto\md32_common.h" />
+    <ClInclude Include="include\crypto\modes.h" />
+    <ClInclude Include="include\crypto\objects.h" />
+    <ClInclude Include="include\crypto\objectserr.h" />
+    <ClInclude Include="include\crypto\ocsperr.h" />
+    <ClInclude Include="include\crypto\pem.h" />
+    <ClInclude Include="include\crypto\pemerr.h" />
+    <ClInclude Include="include\crypto\pkcs12err.h" />
+    <ClInclude Include="include\crypto\pkcs7.h" />
+    <ClInclude Include="include\crypto\pkcs7err.h" />
+    <ClInclude Include="include\crypto\poly1305.h" />
+    <ClInclude Include="include\crypto\ppc_arch.h" />
+    <ClInclude Include="include\crypto\punycode.h" />
+    <ClInclude Include="include\crypto\rand.h" />
+    <ClInclude Include="include\crypto\randerr.h" />
+    <ClInclude Include="include\crypto\rand_pool.h" />
+    <ClInclude Include="include\crypto\rsa.h" />
+    <ClInclude Include="include\crypto\rsaerr.h" />
+    <ClInclude Include="include\crypto\security_bits.h" />
+    <ClInclude Include="include\crypto\sha.h" />
+    <ClInclude Include="include\crypto\siphash.h" />
+    <ClInclude Include="include\crypto\siv.h" />
+    <ClInclude Include="include\crypto\sm2.h" />
+    <ClInclude Include="include\crypto\sm2err.h" />
+    <ClInclude Include="include\crypto\sm4.h" />
+    <ClInclude Include="include\crypto\sparc_arch.h" />
+    <ClInclude Include="include\crypto\sparse_array.h" />
+    <ClInclude Include="include\crypto\store.h" />
+    <ClInclude Include="include\crypto\storeerr.h" />
+    <ClInclude Include="include\crypto\tserr.h" />
+    <ClInclude Include="include\crypto\types.h" />
+    <ClInclude Include="include\crypto\uierr.h" />
+    <ClInclude Include="include\crypto\x509.h" />
+    <ClInclude Include="include\crypto\x509err.h" />
+    <ClInclude Include="include\crypto\x509v3err.h" />
+    <ClInclude Include="include\crypto\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="include\crypto\__DECC_INCLUDE_PROLOGUE.H" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\glad\khrplatform.h" />
     <ClInclude Include="include\glm\common.hpp" />
@@ -496,6 +581,7 @@
     <ClInclude Include="include\glm\vec3.hpp" />
     <ClInclude Include="include\glm\vec4.hpp" />
     <ClInclude Include="include\glm\vector_relational.hpp" />
+    <ClInclude Include="include\httplib\httplib.h" />
     <ClInclude Include="include\imgui-node-editor-master\crude_json.h" />
     <ClInclude Include="include\imgui-node-editor-master\imgui_bezier_math.h" />
     <ClInclude Include="include\imgui-node-editor-master\imgui_canvas.h" />
@@ -541,6 +627,227 @@
     <ClInclude Include="include\lua-5.4.3\src\lvm.h" />
     <ClInclude Include="include\lua-5.4.3\src\lzio.h" />
     <ClInclude Include="include\mini-yaml\Yaml.hpp" />
+    <ClInclude Include="include\openssl\aes.h" />
+    <ClInclude Include="include\openssl\asn1.h" />
+    <ClInclude Include="include\openssl\asn1err.h" />
+    <ClInclude Include="include\openssl\asn1t.h" />
+    <ClInclude Include="include\openssl\asn1_mac.h" />
+    <ClInclude Include="include\openssl\async.h" />
+    <ClInclude Include="include\openssl\asyncerr.h" />
+    <ClInclude Include="include\openssl\bio.h" />
+    <ClInclude Include="include\openssl\bioerr.h" />
+    <ClInclude Include="include\openssl\blowfish.h" />
+    <ClInclude Include="include\openssl\bn.h" />
+    <ClInclude Include="include\openssl\bnerr.h" />
+    <ClInclude Include="include\openssl\buffer.h" />
+    <ClInclude Include="include\openssl\buffererr.h" />
+    <ClInclude Include="include\openssl\camellia.h" />
+    <ClInclude Include="include\openssl\cast.h" />
+    <ClInclude Include="include\openssl\cmac.h" />
+    <ClInclude Include="include\openssl\cmp.h" />
+    <ClInclude Include="include\openssl\cmperr.h" />
+    <ClInclude Include="include\openssl\cmp_util.h" />
+    <ClInclude Include="include\openssl\cms.h" />
+    <ClInclude Include="include\openssl\cmserr.h" />
+    <ClInclude Include="include\openssl\comp.h" />
+    <ClInclude Include="include\openssl\comperr.h" />
+    <ClInclude Include="include\openssl\conf.h" />
+    <ClInclude Include="include\openssl\conferr.h" />
+    <ClInclude Include="include\openssl\configuration.h" />
+    <ClInclude Include="include\openssl\conftypes.h" />
+    <ClInclude Include="include\openssl\conf_api.h" />
+    <ClInclude Include="include\openssl\core.h" />
+    <ClInclude Include="include\openssl\core_dispatch.h" />
+    <ClInclude Include="include\openssl\core_names.h" />
+    <ClInclude Include="include\openssl\core_object.h" />
+    <ClInclude Include="include\openssl\crmf.h" />
+    <ClInclude Include="include\openssl\crmferr.h" />
+    <ClInclude Include="include\openssl\crypto.h" />
+    <ClInclude Include="include\openssl\cryptoerr.h" />
+    <ClInclude Include="include\openssl\cryptoerr_legacy.h" />
+    <ClInclude Include="include\openssl\crypto\aes_platform.h" />
+    <ClInclude Include="include\openssl\crypto\aria.h" />
+    <ClInclude Include="include\openssl\crypto\asn1.h" />
+    <ClInclude Include="include\openssl\crypto\asn1err.h" />
+    <ClInclude Include="include\openssl\crypto\asn1_dsa.h" />
+    <ClInclude Include="include\openssl\crypto\async.h" />
+    <ClInclude Include="include\openssl\crypto\asyncerr.h" />
+    <ClInclude Include="include\openssl\crypto\bioerr.h" />
+    <ClInclude Include="include\openssl\crypto\bn.h" />
+    <ClInclude Include="include\openssl\crypto\bnerr.h" />
+    <ClInclude Include="include\openssl\crypto\bn_conf.h" />
+    <ClInclude Include="include\openssl\crypto\bn_dh.h" />
+    <ClInclude Include="include\openssl\crypto\bn_srp.h" />
+    <ClInclude Include="include\openssl\crypto\buffererr.h" />
+    <ClInclude Include="include\openssl\crypto\chacha.h" />
+    <ClInclude Include="include\openssl\crypto\cmll_platform.h" />
+    <ClInclude Include="include\openssl\crypto\cmperr.h" />
+    <ClInclude Include="include\openssl\crypto\cmserr.h" />
+    <ClInclude Include="include\openssl\crypto\comperr.h" />
+    <ClInclude Include="include\openssl\crypto\conferr.h" />
+    <ClInclude Include="include\openssl\crypto\crmferr.h" />
+    <ClInclude Include="include\openssl\crypto\cryptlib.h" />
+    <ClInclude Include="include\openssl\crypto\cryptoerr.h" />
+    <ClInclude Include="include\openssl\crypto\cterr.h" />
+    <ClInclude Include="include\openssl\crypto\ctype.h" />
+    <ClInclude Include="include\openssl\crypto\decoder.h" />
+    <ClInclude Include="include\openssl\crypto\decodererr.h" />
+    <ClInclude Include="include\openssl\crypto\des_platform.h" />
+    <ClInclude Include="include\openssl\crypto\dh.h" />
+    <ClInclude Include="include\openssl\crypto\dherr.h" />
+    <ClInclude Include="include\openssl\crypto\dsa.h" />
+    <ClInclude Include="include\openssl\crypto\dsaerr.h" />
+    <ClInclude Include="include\openssl\crypto\dso_conf.h" />
+    <ClInclude Include="include\openssl\crypto\ec.h" />
+    <ClInclude Include="include\openssl\crypto\ecerr.h" />
+    <ClInclude Include="include\openssl\crypto\ecx.h" />
+    <ClInclude Include="include\openssl\crypto\encoder.h" />
+    <ClInclude Include="include\openssl\crypto\encodererr.h" />
+    <ClInclude Include="include\openssl\crypto\engine.h" />
+    <ClInclude Include="include\openssl\crypto\engineerr.h" />
+    <ClInclude Include="include\openssl\crypto\err.h" />
+    <ClInclude Include="include\openssl\crypto\ess.h" />
+    <ClInclude Include="include\openssl\crypto\esserr.h" />
+    <ClInclude Include="include\openssl\crypto\evp.h" />
+    <ClInclude Include="include\openssl\crypto\evperr.h" />
+    <ClInclude Include="include\openssl\crypto\httperr.h" />
+    <ClInclude Include="include\openssl\crypto\lhash.h" />
+    <ClInclude Include="include\openssl\crypto\md32_common.h" />
+    <ClInclude Include="include\openssl\crypto\modes.h" />
+    <ClInclude Include="include\openssl\crypto\objects.h" />
+    <ClInclude Include="include\openssl\crypto\objectserr.h" />
+    <ClInclude Include="include\openssl\crypto\ocsperr.h" />
+    <ClInclude Include="include\openssl\crypto\pem.h" />
+    <ClInclude Include="include\openssl\crypto\pemerr.h" />
+    <ClInclude Include="include\openssl\crypto\pkcs12err.h" />
+    <ClInclude Include="include\openssl\crypto\pkcs7.h" />
+    <ClInclude Include="include\openssl\crypto\pkcs7err.h" />
+    <ClInclude Include="include\openssl\crypto\poly1305.h" />
+    <ClInclude Include="include\openssl\crypto\ppc_arch.h" />
+    <ClInclude Include="include\openssl\crypto\punycode.h" />
+    <ClInclude Include="include\openssl\crypto\rand.h" />
+    <ClInclude Include="include\openssl\crypto\randerr.h" />
+    <ClInclude Include="include\openssl\crypto\rand_pool.h" />
+    <ClInclude Include="include\openssl\crypto\rsa.h" />
+    <ClInclude Include="include\openssl\crypto\rsaerr.h" />
+    <ClInclude Include="include\openssl\crypto\security_bits.h" />
+    <ClInclude Include="include\openssl\crypto\sha.h" />
+    <ClInclude Include="include\openssl\crypto\siphash.h" />
+    <ClInclude Include="include\openssl\crypto\siv.h" />
+    <ClInclude Include="include\openssl\crypto\sm2.h" />
+    <ClInclude Include="include\openssl\crypto\sm2err.h" />
+    <ClInclude Include="include\openssl\crypto\sm4.h" />
+    <ClInclude Include="include\openssl\crypto\sparc_arch.h" />
+    <ClInclude Include="include\openssl\crypto\sparse_array.h" />
+    <ClInclude Include="include\openssl\crypto\store.h" />
+    <ClInclude Include="include\openssl\crypto\storeerr.h" />
+    <ClInclude Include="include\openssl\crypto\tserr.h" />
+    <ClInclude Include="include\openssl\crypto\types.h" />
+    <ClInclude Include="include\openssl\crypto\uierr.h" />
+    <ClInclude Include="include\openssl\crypto\x509.h" />
+    <ClInclude Include="include\openssl\crypto\x509err.h" />
+    <ClInclude Include="include\openssl\crypto\x509v3err.h" />
+    <ClInclude Include="include\openssl\crypto\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="include\openssl\crypto\__DECC_INCLUDE_PROLOGUE.H" />
+    <ClInclude Include="include\openssl\ct.h" />
+    <ClInclude Include="include\openssl\cterr.h" />
+    <ClInclude Include="include\openssl\decoder.h" />
+    <ClInclude Include="include\openssl\decodererr.h" />
+    <ClInclude Include="include\openssl\des.h" />
+    <ClInclude Include="include\openssl\dh.h" />
+    <ClInclude Include="include\openssl\dherr.h" />
+    <ClInclude Include="include\openssl\dsa.h" />
+    <ClInclude Include="include\openssl\dsaerr.h" />
+    <ClInclude Include="include\openssl\dtls1.h" />
+    <ClInclude Include="include\openssl\ebcdic.h" />
+    <ClInclude Include="include\openssl\ec.h" />
+    <ClInclude Include="include\openssl\ecdh.h" />
+    <ClInclude Include="include\openssl\ecdsa.h" />
+    <ClInclude Include="include\openssl\ecerr.h" />
+    <ClInclude Include="include\openssl\encoder.h" />
+    <ClInclude Include="include\openssl\encodererr.h" />
+    <ClInclude Include="include\openssl\engine.h" />
+    <ClInclude Include="include\openssl\engineerr.h" />
+    <ClInclude Include="include\openssl\err.h" />
+    <ClInclude Include="include\openssl\ess.h" />
+    <ClInclude Include="include\openssl\esserr.h" />
+    <ClInclude Include="include\openssl\evp.h" />
+    <ClInclude Include="include\openssl\evperr.h" />
+    <ClInclude Include="include\openssl\e_os2.h" />
+    <ClInclude Include="include\openssl\fipskey.h" />
+    <ClInclude Include="include\openssl\fips_names.h" />
+    <ClInclude Include="include\openssl\hmac.h" />
+    <ClInclude Include="include\openssl\http.h" />
+    <ClInclude Include="include\openssl\httperr.h" />
+    <ClInclude Include="include\openssl\idea.h" />
+    <ClInclude Include="include\openssl\kdf.h" />
+    <ClInclude Include="include\openssl\kdferr.h" />
+    <ClInclude Include="include\openssl\lhash.h" />
+    <ClInclude Include="include\openssl\macros.h" />
+    <ClInclude Include="include\openssl\md2.h" />
+    <ClInclude Include="include\openssl\md4.h" />
+    <ClInclude Include="include\openssl\md5.h" />
+    <ClInclude Include="include\openssl\mdc2.h" />
+    <ClInclude Include="include\openssl\modes.h" />
+    <ClInclude Include="include\openssl\objects.h" />
+    <ClInclude Include="include\openssl\objectserr.h" />
+    <ClInclude Include="include\openssl\obj_mac.h" />
+    <ClInclude Include="include\openssl\ocsp.h" />
+    <ClInclude Include="include\openssl\ocsperr.h" />
+    <ClInclude Include="include\openssl\opensslconf.h" />
+    <ClInclude Include="include\openssl\opensslv.h" />
+    <ClInclude Include="include\openssl\ossl_typ.h" />
+    <ClInclude Include="include\openssl\params.h" />
+    <ClInclude Include="include\openssl\param_build.h" />
+    <ClInclude Include="include\openssl\pem.h" />
+    <ClInclude Include="include\openssl\pem2.h" />
+    <ClInclude Include="include\openssl\pemerr.h" />
+    <ClInclude Include="include\openssl\pkcs12.h" />
+    <ClInclude Include="include\openssl\pkcs12err.h" />
+    <ClInclude Include="include\openssl\pkcs7.h" />
+    <ClInclude Include="include\openssl\pkcs7err.h" />
+    <ClInclude Include="include\openssl\proverr.h" />
+    <ClInclude Include="include\openssl\provider.h" />
+    <ClInclude Include="include\openssl\prov_ssl.h" />
+    <ClInclude Include="include\openssl\rand.h" />
+    <ClInclude Include="include\openssl\randerr.h" />
+    <ClInclude Include="include\openssl\rc2.h" />
+    <ClInclude Include="include\openssl\rc4.h" />
+    <ClInclude Include="include\openssl\rc5.h" />
+    <ClInclude Include="include\openssl\ripemd.h" />
+    <ClInclude Include="include\openssl\rsa.h" />
+    <ClInclude Include="include\openssl\rsaerr.h" />
+    <ClInclude Include="include\openssl\safestack.h" />
+    <ClInclude Include="include\openssl\seed.h" />
+    <ClInclude Include="include\openssl\self_test.h" />
+    <ClInclude Include="include\openssl\sha.h" />
+    <ClInclude Include="include\openssl\srp.h" />
+    <ClInclude Include="include\openssl\srtp.h" />
+    <ClInclude Include="include\openssl\ssl.h" />
+    <ClInclude Include="include\openssl\ssl2.h" />
+    <ClInclude Include="include\openssl\ssl3.h" />
+    <ClInclude Include="include\openssl\sslerr.h" />
+    <ClInclude Include="include\openssl\sslerr_legacy.h" />
+    <ClInclude Include="include\openssl\stack.h" />
+    <ClInclude Include="include\openssl\store.h" />
+    <ClInclude Include="include\openssl\storeerr.h" />
+    <ClInclude Include="include\openssl\symhacks.h" />
+    <ClInclude Include="include\openssl\tls1.h" />
+    <ClInclude Include="include\openssl\trace.h" />
+    <ClInclude Include="include\openssl\ts.h" />
+    <ClInclude Include="include\openssl\tserr.h" />
+    <ClInclude Include="include\openssl\txt_db.h" />
+    <ClInclude Include="include\openssl\types.h" />
+    <ClInclude Include="include\openssl\ui.h" />
+    <ClInclude Include="include\openssl\uierr.h" />
+    <ClInclude Include="include\openssl\whrlpool.h" />
+    <ClInclude Include="include\openssl\x509.h" />
+    <ClInclude Include="include\openssl\x509err.h" />
+    <ClInclude Include="include\openssl\x509v3.h" />
+    <ClInclude Include="include\openssl\x509v3err.h" />
+    <ClInclude Include="include\openssl\x509_vfy.h" />
+    <ClInclude Include="include\openssl\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="include\openssl\__DECC_INCLUDE_PROLOGUE.H" />
     <ClInclude Include="include\stb\stb_connected_components.h" />
     <ClInclude Include="include\stb\stb_c_lexer.h" />
     <ClInclude Include="include\stb\stb_divide.h" />
@@ -602,6 +909,7 @@
     <ClInclude Include="src\MathUtils.h" />
     <ClInclude Include="src\NodeEditorNodes.h" />
     <ClInclude Include="src\SimplexNoise.h" />
+    <ClInclude Include="src\TextureStore.h" />
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\ViewportFramebuffer.h" />
   </ItemGroup>
@@ -717,6 +1025,31 @@
     <None Include="include\imgui-node-editor-master\imgui_bezier_math.inl" />
     <None Include="include\imgui-node-editor-master\imgui_extra_math.inl" />
     <None Include="include\imgui-node-editor-master\imgui_node_editor_internal.inl" />
+    <None Include="include\openssl\asn1.h.in" />
+    <None Include="include\openssl\asn1t.h.in" />
+    <None Include="include\openssl\bio.h.in" />
+    <None Include="include\openssl\cmp.h.in" />
+    <None Include="include\openssl\cms.h.in" />
+    <None Include="include\openssl\conf.h.in" />
+    <None Include="include\openssl\configuration.h.in" />
+    <None Include="include\openssl\crmf.h.in" />
+    <None Include="include\openssl\crypto.h.in" />
+    <None Include="include\openssl\ct.h.in" />
+    <None Include="include\openssl\err.h.in" />
+    <None Include="include\openssl\ess.h.in" />
+    <None Include="include\openssl\fipskey.h.in" />
+    <None Include="include\openssl\lhash.h.in" />
+    <None Include="include\openssl\ocsp.h.in" />
+    <None Include="include\openssl\opensslv.h.in" />
+    <None Include="include\openssl\pkcs12.h.in" />
+    <None Include="include\openssl\pkcs7.h.in" />
+    <None Include="include\openssl\safestack.h.in" />
+    <None Include="include\openssl\srp.h.in" />
+    <None Include="include\openssl\ssl.h.in" />
+    <None Include="include\openssl\ui.h.in" />
+    <None Include="include\openssl\x509.h.in" />
+    <None Include="include\openssl\x509v3.h.in" />
+    <None Include="include\openssl\x509_vfy.h.in" />
     <None Include="include\wren\src\optional\wren_opt_meta.wren.inc" />
     <None Include="include\wren\src\optional\wren_opt_random.wren.inc" />
     <None Include="include\wren\src\vm\wren_core.wren.inc" />

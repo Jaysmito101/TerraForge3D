@@ -1,9 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include <httplib/httplib.h>
 
 #include <Utils.h>
 #include <fstream>
 #include <iostream>
+
 
 static std::string getExecutablePath() {
 	char rawPathName[MAX_PATH];
@@ -116,6 +119,20 @@ std::string GetExecutableDir()
 	return getExecutableDir();
 }
 
+std::string FetchURL(std::string baseURL, std::string path){
+	httplib::Client cli(baseURL);
+	auto res = cli.Get(path.c_str());
+	//if(res->status == 200)
+		return res->body;
+	return "";
+}
+
+void SaveToFile(std::string filename, std::string content){
+	std::ofstream outfile;
+	outfile.open(filename);
+	outfile << content;
+	outfile.close();
+}
 
 void Log(const char* log)
 {

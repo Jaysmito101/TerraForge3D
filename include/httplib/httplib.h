@@ -5,6 +5,8 @@
 //  MIT License
 //
 
+_CRT_SECURE_NO_WARNINGS
+
 #ifndef CPPHTTPLIB_HTTPLIB_H
 #define CPPHTTPLIB_HTTPLIB_H
 
@@ -183,6 +185,9 @@ using socket_t = int;
 #endif
 #endif //_WIN32
 
+#include <openssl/crypto/cryptlib.h>
+#include <openssl/crypto.h>
+
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -220,10 +225,6 @@ using socket_t = int;
 
 #include <iostream>
 #include <sstream>
-
-#if OPENSSL_VERSION_NUMBER < 0x1010100fL
-#error Sorry, OpenSSL versions prior to 1.1.1 are not supported
-#endif
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #include <openssl/crypto.h>

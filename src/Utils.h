@@ -15,6 +15,10 @@ std::string ReadShaderSourceFile(std::string path, bool* result);
 
 std::string GetExecutableDir();
 
+std::string FetchURL(std::string baseURL, std::string path);
+
+void SaveToFile(std::string filename, std::string content = "");
+
 void Log(const char* log);
 
 void Log(std::string log);
