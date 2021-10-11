@@ -9,7 +9,11 @@
 #include  <io.h>
 #include  <stdio.h>
 #include  <stdlib.h>
+#include <atlstr.h>
+#include <wininet.h>
+#pragma comment(lib,"Wininet.lib")
 
+char pingURL[128] = "http://www.google.com";
 
 static std::string getExecutablePath() {
 	char rawPathName[MAX_PATH];
@@ -25,7 +29,7 @@ static std::string getExecutableDir() {
 
 
 
-std::string ShowSaveFileDialog(std::string ext , HWND owner ) {
+std::string ShowSaveFileDialog(std::string ext, HWND owner) {
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
@@ -122,7 +126,7 @@ std::string GetExecutableDir()
 	return getExecutableDir();
 }
 
-std::string FetchURL(std::string baseURL, std::string path){
+std::string FetchURL(std::string baseURL, std::string path) {
 	httplib::Client cli(baseURL);
 	auto res = cli.Get(path.c_str());
 	//if(res->status == 200)
@@ -130,38 +134,54 @@ std::string FetchURL(std::string baseURL, std::string path){
 	return "";
 }
 
-bool FileExists(std::string path, bool writeAccess){
-	if( (_access( path.c_str(), 0 )) != -1 )
+bool FileExists(std::string path, bool writeAccess) {
+	if ((_access(path.c_str(), 0)) != -1)
 	{
-		if(!writeAccess)
+		if (!writeAccess)
 			return true;
-		if( (_access( path.c_str(), 2 )) != -1 )
+		if ((_access(path.c_str(), 2)) != -1)
 			return true;
 	}
 	return false;
 }
 
-void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size){
+bool IsNetWorkConnected()
+{
+	
+	bool bConnect = InternetCheckConnection(CA2CT(pingURL), FLAG_ICC_FORCE_CONNECTION, 0);
+
+
+	if (bConnect)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size) {
 	std::ofstream outfile;
 	httplib::Client cli(baseURL);
 	int done = 0;
 	outfile.open(path.c_str(), std::ios::binary | std::ios::out);
 	std::cout << "Starting download - " << baseURL << urlPath << std::endl;
 	auto res = cli.Get(urlPath.c_str(),
-		[&](const char *data, size_t data_length) {
+		[&](const char* data, size_t data_length) {
 			done = done + data_length;
 			if (size > 0) {
 				float percent = (float)done / (float)size;
 				std::cout << "Downloaded " << (int)(percent * 100) << "%      \r";
 			}
-			outfile.write(data, data_length);  
+			outfile.write(data, data_length);
 			return true;
 		});
 	std::cout << "Download Complete - " << path << std::endl;
 	outfile.close();
 }
 
-void SaveToFile(std::string filename, std::string content){
+void SaveToFile(std::string filename, std::string content) {
 	std::ofstream outfile;
 	outfile.open(filename);
 	outfile << content;
@@ -179,3 +199,65 @@ void Log(std::string log)
 	std::cout << log << std::endl;
 };
 
+
+// From https://stackoverflow.com/a/20256714/14911094
+void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue) {
+
+	HKEY hkey;
+
+	char szValueCurrent[1000];
+	DWORD dwType;
+	DWORD dwSize = sizeof(szValueCurrent);
+
+	
+
+	int iRC = RegGetValue(hkeyHive, CA2CT(pszVar), NULL, RRF_RT_ANY, &dwType, szValueCurrent, &dwSize);
+
+	bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
+
+	if (iRC != ERROR_SUCCESS && !bDidntExist)
+    	Log("RegGetValue( " + std::string(pszVar) + " ) Failed : " + strerror(iRC));
+
+	if (!bDidntExist) {
+		if (dwType != REG_SZ)
+			Log("RegGetValue( " + std::string(pszVar) + " ) found type unhandled " + std::to_string(dwType));
+
+		if (strcmp(szValueCurrent, pszValue) == 0) {
+			Log("RegSet( \"" + std::string(pszVar) + "\" \"" + std::string(pszValue) + "\" ): already correct");
+			return;
+		}
+	}
+	
+
+	DWORD dwDisposition;
+	iRC = RegCreateKeyEx(hkeyHive, CA2CT(pszVar), 0, 0, 0, KEY_ALL_ACCESS, NULL, &hkey, &dwDisposition);
+	if (iRC != ERROR_SUCCESS)
+		Log("RegSetValue( " + std::string(pszVar) + " ) Failed : " + strerror(iRC));
+
+	iRC = RegSetValueEx(hkey, L"", 0, REG_SZ, (BYTE*)pszValue, strlen(pszValue) + 1);
+	if (iRC != ERROR_SUCCESS)
+		Log("RegSetValue( " + std::string(pszVar) + " ) Failed: " + strerror(iRC));
+	
+	if (bDidntExist)
+		Log("RegSet( " + std::string(pszVar) +" ): set to \"" + std::string(pszValue) + "\"");
+	else
+		Log("RegSet( " + std::string(pszVar) +" ): changed \"" + std::string(szValueCurrent) + "\" to \"" + std::string(pszValue) + "\"");
+
+	RegCloseKey(hkey);
+}
+
+
+void AccocFileType() {
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.terr3d", "TerraGen3D.TerraGen3D.1");
+
+	// Not needed.
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.terr3d\\Content Type", "application/json");
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.terr3d\\PerceivedType", "json");
+
+	//Not needed, but may be be a way to have wordpad show up on the default list.
+	RegSet( HKEY_CURRENT_USER, "Software\\Classes\\.terr3d\\OpenWithProgIds\\TerraGen3D.TerraGen3D.1", "" );
+
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\TerraGen3D.TerraGen3D.1", "TerraGen3D");
+
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\TerraGen3D.TerraGen3D.1\\Shell\\Open\\Command", (getExecutablePath() + " %1").c_str());
+}

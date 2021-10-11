@@ -11,7 +11,7 @@ public:
 	virtual void OnUpdate(float) {};
 	virtual void OnOneSecondTick() {};
 	virtual void OnImGuiRender() {};
-	virtual void OnStart() {};
+	virtual void OnStart(std::string loadFile) {};
 	virtual void OnEnd() {};
 	virtual void OnPreload() {};
 
@@ -24,7 +24,7 @@ public:
 	void Render();
 	void ImGuiRenderBegin();
 	void ImGuiRenderEnd();
-	void Run();
+	void Run(std::string loadFile = "");
 
 	inline void Close() { isActive = false; }
 

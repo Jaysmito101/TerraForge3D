@@ -234,6 +234,7 @@
     <ClCompile Include="src\Nodes\TextureSamplerNode.cpp" />
     <ClCompile Include="src\Nodes\TimeNode.cpp" />
     <ClCompile Include="src\Nodes\ValueNodes.cpp" />
+    <ClCompile Include="src\OSLiscenses.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
     <ClCompile Include="src\TextureStore.cpp" />
     <ClCompile Include="src\Utils.cpp" />
@@ -908,6 +909,7 @@
     <ClInclude Include="src\LuaNativeFunctions.h" />
     <ClInclude Include="src\MathUtils.h" />
     <ClInclude Include="src\NodeEditorNodes.h" />
+    <ClInclude Include="src\OSLiscenses.h" />
     <ClInclude Include="src\SimplexNoise.h" />
     <ClInclude Include="src\TextureStore.h" />
     <ClInclude Include="src\Utils.h" />

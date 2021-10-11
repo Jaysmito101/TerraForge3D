@@ -28,6 +28,8 @@
 #include <json.hpp>
 #include <atomic>
 
+
+
 #include <Utils.h>
 
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -39,6 +41,7 @@
 
 static Model terrain("Terrain");
 static Model sea("Sea");
+static Model grid("Grid");
 
 static Application* myApp;
 static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader;
@@ -75,7 +78,7 @@ static bool reqTexRfrsh = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
-static Texture2D* diffuse, * normal;
+static Texture2D* diffuse, * normal, *gridTex;
 
 
 static uint32_t vao, vbo, ebo;
@@ -260,7 +263,7 @@ static void ResetShader() {
 	if (!wireframeShader)
 		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	if (!waterShader)
-		waterShader = new Shader(ReadShaderSourceFile("Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile("Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile("Data\\shaders\\water\\geom.glsl", &res));
+		waterShader = new Shader(ReadShaderSourceFile("Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + " Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + " Data\\shaders\\water\\geom.glsl", &res));
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
@@ -317,6 +320,11 @@ static void GenerateMesh()
 	sea.mesh.GeneratePlane(256, 120);
 	sea.mesh.RecalculateNormals();
 	sea.UploadToGPU();
+
+	grid.SetupMeshOnGPU();
+	grid.mesh.GeneratePlane(50, 120);
+	grid.mesh.RecalculateNormals();
+	grid.UploadToGPU();
 }
 
 static void DoTheRederThing(float deltaTime) {
@@ -351,6 +359,12 @@ static void DoTheRederThing(float deltaTime) {
 	diffuse->Bind(5);
 	shader->SetUniformi("_Diffuse", 5);
 	terrain.Render();
+
+	// For Future
+	//gridTex->Bind(5);
+	//grid.Render();
+
+	
 	if (showSea) {
 		glUseProgram(0);
 		waterShader->Bind();
@@ -370,7 +384,6 @@ static void ShowTerrainControls()
 {
 	static bool exp = false;
 	ImGui::Begin("Dashboard");
-
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
@@ -596,11 +609,11 @@ static void SaveFile() {
 	outfile.close();
 }
 
-static void OpenSaveFile() {
+static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3d\0")) {
 
 	// For Now it dows not do anything id any error has occured but in later versions this will be reported to user!
 
-	std::string file = ShowOpenFileDialog((wchar_t*)".terr3d\0");
+	
 	if (file.size() == 0)
 		return;
 	if (file.find(".terr3d") == std::string::npos)
@@ -724,6 +737,10 @@ static void ShowMenu() {
 		{
 			if (ImGui::MenuItem("Toggle System Console")) {
 				ToggleSystemConsole();
+			}
+
+			if (ImGui::MenuItem("Associate (.terr3d) File Type")) {
+				AccocFileType();
 			}
 
 			if (ImGui::BeginMenu("Themes")) {
@@ -930,6 +947,7 @@ public:
 	virtual void OnPreload() override {
 		SetTitle("TerraGen3D - Jaysmito Mukherjee");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
+		
 		Sleep(1000);
 	}
 
@@ -1019,7 +1037,7 @@ public:
 		OnImGuiRenderEnd();
 	}
 
-	virtual void OnStart() override
+	virtual void OnStart(std::string loadFile) override
 	{
 		srand((unsigned int)time(NULL));
 		SetUpIcon();
@@ -1029,6 +1047,7 @@ public:
 		SetupElevationManager(&resolution);
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
+		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid.png", false, true);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
@@ -1051,6 +1070,11 @@ public:
 		scale = 1;
 		noiseLayersTmp.push_back(NoiseLayer());
 		Log("Started Up App!");
+
+		if (loadFile.size() > 0) {
+			Log("Loading File from " + loadFile);
+			OpenSaveFile(loadFile);
+		}
 
 		// For Debug Only
 		autoUpdate = true;

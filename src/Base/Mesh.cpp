@@ -101,6 +101,8 @@ void Mesh::SetElevation(float elevation, int x, int y){
 	int i = x + y * res;
 	if (i > vertexCount)
 		return;
+	if (elevation > maxHeight)
+		maxHeight = elevation;
 	vert[i].position.y = elevation;
 }
 
@@ -118,6 +120,7 @@ Mesh* Mesh::Clone()
 	Mesh* cloneMesh = new Mesh();
 	cloneMesh->res = res;
 	cloneMesh->sc = sc;
+	cloneMesh->maxHeight = maxHeight;
 	cloneMesh->vertexCount = vertexCount;
 	cloneMesh->indexCount = indexCount;
 	cloneMesh->vert = new Vert[res * res];

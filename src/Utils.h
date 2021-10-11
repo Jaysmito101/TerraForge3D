@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Mesh.h>
 #include <Windows.h>
 #include <string>
 
@@ -19,6 +20,8 @@ std::string FetchURL(std::string baseURL, std::string path);
 
 bool FileExists(std::string path, bool writeAccess = false);
 
+bool IsNetWorkConnected();
+
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
 
 void SaveToFile(std::string filename, std::string content = "");
@@ -26,3 +29,7 @@ void SaveToFile(std::string filename, std::string content = "");
 void Log(const char* log);
 
 void Log(std::string log);
+
+void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue);
+
+void AccocFileType();

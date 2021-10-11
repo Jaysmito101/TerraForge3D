@@ -58,7 +58,16 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 # Future Goals
 
 * Procedural grass and foliage
+* Texture Editor
+* Export as FBX
+* Render Images from within Engine
+* Ray tracing(CPU based)
 * Fix more bugs!
+
+# Note
+
+* When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails
+* You can Show/Hide the console from Menu > Options > Toggle System Console.
 
 # Screenshots
 

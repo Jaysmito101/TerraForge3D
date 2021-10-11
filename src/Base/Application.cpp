@@ -113,16 +113,18 @@ bool Application::IsActive()
 }
 
 void Application::RenderImGui() {
+	glEnable(GL_BLEND);
 	ImGuiRenderBegin();
 	OnImGuiRender();
 	ImGuiRenderEnd();
+	glDisable(GL_BLEND);
 }
 
-void Application::Run() 
+void Application::Run(std::string loadFile)
 {
 	InitGlad();
 	InitImGui(windowConfigPath);
-	OnStart();
+	OnStart(loadFile);
 	float oneSecCounter = 0;
 	while (isActive) {
 		float currentTime = glfwGetTime();

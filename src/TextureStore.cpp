@@ -50,6 +50,9 @@ std::string currTex = "";
 std::string currTexID = "";
 bool* reqRefresh;
 Texture2D* phlogo;
+bool intProob = false;
+bool isConnected = true;
+int counterT = 0;
 
 void LoadThumbnails() {
 	isLoadingThumbs = true;
@@ -138,6 +141,7 @@ void ChacheFilesData() {
 }
 
 void SetupTextureStore(std::string executablePath, bool* reqrfrsh) {
+	//isConnected = IsNetWorkConnected();
 	reqRefresh = reqrfrsh;
 	execDir = executablePath;
 	phlogo = new Texture2D(execDir + "\\Data\\logos\\polyhavenlogo.png");
@@ -148,34 +152,61 @@ void SetupTextureStore(std::string executablePath, bool* reqrfrsh) {
 		download_database = nlohmann::json::parse(ReadShaderSourceFile(execDir + "\\Data\\configs\\downloaded_textures.terr3d", &tmpb));
 	}
 	catch (...) {}
-	std::string tmp = FetchURL("https://api.polyhaven.com", "/assets?t=textures");
-	SaveToFile(executablePath + "\\Data\\cache\\texture_database.terr3d", tmp);
-	texture_database = nlohmann::json::parse(tmp);
+	if (IsNetWorkConnected()) {
+		Log("Internet Connection is Live.\nFetching Latest data from servers.");
+		intProob = false;
+		std::string tmp = FetchURL("https://api.polyhaven.com", "/assets?t=textures");
+		SaveToFile(executablePath + "\\Data\\cache\\texture_database.terr3d", tmp);
+		texture_database = nlohmann::json::parse(tmp);
 
-	for (auto it = texture_database.begin(); it != texture_database.end(); ++it)
-	{
-		auto tm = std::find(download_database["downloaded"].begin(), download_database["downloaded"].end(), it.key());
-		if (tm != download_database["downloaded"].end()) {
-			it.value()["downloaded"] = true;
-			it.value()["downloaddata"] = download_database[std::string(tm.value())];
+		for (auto it = texture_database.begin(); it != texture_database.end(); ++it)
+		{
+			auto tm = std::find(download_database["downloaded"].begin(), download_database["downloaded"].end(), it.key());
+			if (tm != download_database["downloaded"].end()) {
+				it.value()["downloaded"] = true;
+				it.value()["downloaddata"] = download_database[std::string(tm.value())];
+			}
+			else {
+				it.value()["downloaded"] = false;
+			}
+		}
+		std::thread t1 = std::thread(ChacheFilesData);
+		t1.detach();
+
+		std::thread t2 = std::thread(ChacheThumbnails);
+		t2.detach();
+	}
+	else {
+		Log("Internet Connection not reachable!");
+		intProob = true;
+		if (FileExists(executablePath + "\\Data\\cache\\texture_database.terr3d", true) && FileExists(execDir + "\\Data\\cache\\texfiles.terr3d")) {
+			Log("Found Cached Data!\nLoading Texture Database From Cache!");
+			bool tmp = false;
+			texture_database = nlohmann::json::parse(ReadShaderSourceFile(executablePath + "\\Data\\cache\\texture_database.terr3d", &tmp));
+			nlohmann::json tp = nlohmann::json::parse(ReadShaderSourceFile(execDir + "\\Data\\cache\\texfiles.terr3d", &tmp));
+			Log("Found cached files data for " + std::to_string(tp.size()) + " items.");
 		}
 		else {
-			it.value()["downloaded"] = false;
+			Log("Could not Find Cached Data!\nTexture Store will not work till Internet Connection is Live!");
 		}
 	}
-	std::thread t1 = std::thread(ChacheFilesData);
-	t1.detach();
-
-	std::thread t2 = std::thread(ChacheThumbnails);
-	t2.detach();
 
 }
 
 void UpdateTextureStore() {
-
+	counterT++;
+	if (counterT > 5) {
+		counterT = 0;
+		isConnected = IsNetWorkConnected();
+	}
 }
 
 static void DownloadTexture(std::string id, int k) {
+	if (!IsNetWorkConnected()) {
+		Log("Cannot download texture wthout an internet Connection!");
+		return;
+		return;
+	}
 	nlohmann::json data = texture_files_database[id];
 	int size = data["Diffuse"][std::to_string(k) + "k"]["png"]["size"];
 	std::string url = data["Diffuse"][std::to_string(k) + "k"]["png"]["url"];
@@ -391,6 +422,23 @@ void ShowTextureStore(bool* pOpen) {
 
 	if (ImGui::Button("Update")) {
 		LoadThumbnails();
+	}
+
+
+	if (intProob) {
+		ImGui::SameLine();
+		if (ImGui::Button("Retry to Connect")) {
+			if (IsNetWorkConnected()) {
+				SetupTextureStore(execDir, reqRefresh);
+			}
+			else {
+				Log("Internet Connection Still not available!");
+			}
+		}
+	}
+
+	if (!isConnected) {
+		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Internet Connection Not Abailable! Texture Store will not work as expected!");
 	}
 
 	ImGui::Text("Work In Progress...");

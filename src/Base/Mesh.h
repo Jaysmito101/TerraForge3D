@@ -35,6 +35,7 @@ public:
 	int indexCount;
 	int res;
 	float sc;
+	float maxHeight = 0;
 	bool deleteOnDestruction = true;
 private:
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);

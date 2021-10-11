@@ -90,7 +90,8 @@ static void ExportHeightmapPNGImpl() {
 		for (int i = 0; i < res; i++) {
 			for (int j = 0; j < res; j++) {
 				int ind = i + j * res;
-				t = Clamp01(meshhMapToExport->vert[ind].position.y * 0.5f + 0.5f);
+				t = (meshhMapToExport->vert[ind].position.y / meshhMapToExport->maxHeight) * 0.5f + 0.5f;
+				t = t * 0.9f + 0.1f;
 				heightMap[i * res * 3 + j * 3 + 0] = (unsigned char)(t * 255);
 				heightMap[i * res * 3 + j * 3 + 1] = (unsigned char)(t * 255);
 				heightMap[i * res * 3 + j * 3 + 2] = (unsigned char)(t * 255);
@@ -117,7 +118,8 @@ static void ExportHeightmapJPGImpl() {
 		for (int i = 0; i < res; i++) {
 			for (int j = 0; j < res; j++) {
 				int ind = i + j * res;
-				t = Clamp01(meshhMapToExport->vert[ind].position.y * 0.5f + 0.5f);
+				t = (meshhMapToExport->vert[ind].position.y/meshhMapToExport->maxHeight) * 0.5f + 0.5f;
+				t = t * 0.9f + 0.1f;
 				heightMap[i * res * 3 + j * 3 + 0] = (unsigned char)(t * 255);
 				heightMap[i * res * 3 + j * 3 + 1] = (unsigned char)(t * 255);
 				heightMap[i * res * 3 + j * 3 + 2] = (unsigned char)(t * 255);
