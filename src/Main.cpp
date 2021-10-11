@@ -71,6 +71,7 @@ static bool wireFrameMode = false;
 static bool showSea = false;
 static bool absolute = false;
 static bool square = false;
+static bool reqTexRfrsh = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
@@ -347,10 +348,8 @@ static void DoTheRederThing(float deltaTime) {
 	tmp[1] = 600;
 	tmp[2] = 1;
 	shader->SetUniform3f("_Resolution", tmp);
-	if (diffuse) {
-		diffuse->Bind(5);
-		shader->SetUniformi("_Diffuse", 5);
-	}
+	diffuse->Bind(5);
+	shader->SetUniformi("_Diffuse", 5);
 	terrain.Render();
 	if (showSea) {
 		glUseProgram(0);
@@ -945,6 +944,13 @@ public:
 			noiseLayersTmp.clear();
 		}
 
+		if (reqTexRfrsh) {
+			if (diffuse)
+				delete diffuse;
+			diffuse = new Texture2D(GetTextureStoreSelectedTexture(), true);
+			reqTexRfrsh = false;
+		}
+
 		glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
 		glViewport(0, 0, 800, 600);
 		GetWindow()->Clear();
@@ -1021,7 +1027,8 @@ public:
 		SetupCubemap();
 		SetupShaderManager();
 		SetupElevationManager(&resolution);
-		SetupTextureStore(GetExecutableDir());
+		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
+		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();

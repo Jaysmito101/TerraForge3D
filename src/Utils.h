@@ -17,6 +17,10 @@ std::string GetExecutableDir();
 
 std::string FetchURL(std::string baseURL, std::string path);
 
+bool FileExists(std::string path, bool writeAccess = false);
+
+void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
+
 void SaveToFile(std::string filename, std::string content = "");
 
 void Log(const char* log);

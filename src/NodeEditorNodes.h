@@ -1147,7 +1147,7 @@ public:
 	virtual float EvaluatePin(float x, float y, int id) override;
 
 private:
-	Texture2D* texture;
+	Texture2D* texture = nullptr;
 	std::string textureFilePath;
 	FloatPin outputPinR = FloatPin(this, PinType::Output);
 	FloatPin outputPinG = FloatPin(this, PinType::Output);

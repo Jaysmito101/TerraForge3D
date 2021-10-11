@@ -6,6 +6,9 @@
 #include <Utils.h>
 #include <fstream>
 #include <iostream>
+#include  <io.h>
+#include  <stdio.h>
+#include  <stdlib.h>
 
 
 static std::string getExecutablePath() {
@@ -123,8 +126,39 @@ std::string FetchURL(std::string baseURL, std::string path){
 	httplib::Client cli(baseURL);
 	auto res = cli.Get(path.c_str());
 	//if(res->status == 200)
-		return res->body;
+	return res->body;
 	return "";
+}
+
+bool FileExists(std::string path, bool writeAccess){
+	if( (_access( path.c_str(), 0 )) != -1 )
+	{
+		if(!writeAccess)
+			return true;
+		if( (_access( path.c_str(), 2 )) != -1 )
+			return true;
+	}
+	return false;
+}
+
+void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size){
+	std::ofstream outfile;
+	httplib::Client cli(baseURL);
+	int done = 0;
+	outfile.open(path.c_str(), std::ios::binary | std::ios::out);
+	std::cout << "Starting download - " << baseURL << urlPath << std::endl;
+	auto res = cli.Get(urlPath.c_str(),
+		[&](const char *data, size_t data_length) {
+			done = done + data_length;
+			if (size > 0) {
+				float percent = (float)done / (float)size;
+				std::cout << "Downloaded " << (int)(percent * 100) << "%      \r";
+			}
+			outfile.write(data, data_length);  
+			return true;
+		});
+	std::cout << "Download Complete - " << path << std::endl;
+	outfile.close();
 }
 
 void SaveToFile(std::string filename, std::string content){
