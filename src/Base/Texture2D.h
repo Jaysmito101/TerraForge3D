@@ -13,7 +13,8 @@
 
 		virtual uint32_t GetWidth() const  { return m_Width;  }
 		virtual uint32_t GetHeight() const  { return m_Height; }
-		virtual uint32_t GetRendererID() const  { return m_RendererID; }
+		virtual uint32_t GetRendererID() const { return m_RendererID; }
+		virtual std::string GetPath() const  { return m_Path; }
 		
 		void Resize(int width, int height, bool resetOpenGL = true);
 

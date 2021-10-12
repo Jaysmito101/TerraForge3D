@@ -3,6 +3,9 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib/httplib.h>
 
+#include <openssl/md5.h>
+#include <openssl/sha.h>
+
 #include <Utils.h>
 #include <fstream>
 #include <iostream>
@@ -27,7 +30,28 @@ static std::string getExecutableDir() {
 	return directory;
 }
 
+const char HEX_MAP[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
+char replace(unsigned char c)
+{
+	return HEX_MAP[c & 0x0f];
+}
+
+std::string UChar2Hex(unsigned char c)
+{
+
+	{
+		std::string hex;
+		// First four bytes
+		char left = (c >> 4);
+		// Second four bytes
+		char right = (c & 0x0f);
+		hex += replace(left);
+		hex += replace(right);
+
+		return hex;
+	}
+}
 
 std::string ShowSaveFileDialog(std::string ext, HWND owner) {
 	OPENFILENAME ofn;
@@ -121,6 +145,11 @@ std::string ReadShaderSourceFile(std::string path, bool* result) {
 	return std::string("");
 }
 
+std::string GetExecutablePath()
+{
+	return getExecutablePath();
+}
+
 std::string GetExecutableDir()
 {
 	return getExecutableDir();
@@ -132,6 +161,15 @@ std::string FetchURL(std::string baseURL, std::string path) {
 	//if(res->status == 200)
 	return res->body;
 	return "";
+}
+
+char* UChar2Char(unsigned char* data, int length)
+{
+	char* odata = new char[length];
+	for (int i = 0; i < length; i++) {
+		odata[i] = (char)data[i];
+	}
+	return odata;
 }
 
 bool FileExists(std::string path, bool writeAccess) {
@@ -159,6 +197,38 @@ bool IsNetWorkConnected()
 	{
 		return false;
 	}
+}
+
+char* ReadBinaryFile(std::string path, int* fSize, uint32_t sizeToLoad)
+{
+	std::ifstream in(path, std::ifstream::ate | std::ifstream::binary);
+	int size = in.tellg();
+	in.close();
+	if(sizeToLoad > 0)
+		size = size < sizeToLoad ? size : sizeToLoad;
+	std::ifstream f1(path, std::fstream::binary);
+	char* buffer = new char[size];
+	f1.read(buffer, size);
+	f1.close();
+	*fSize = size;
+	return buffer;
+}
+
+char* ReadBinaryFile(std::string path, uint32_t sizeToLoad)
+{
+	int size;
+	return ReadBinaryFile(path, &size, sizeToLoad);
+}
+
+Hash MD5File(std::string path)
+{
+	int size = 1;
+	unsigned char* data = (unsigned char*)ReadBinaryFile(path, &size);
+	unsigned char hash[MD5_DIGEST_LENGTH];
+	MD5(data, size, hash);
+	Hash resultHash(hash, MD5_DIGEST_LENGTH);
+	delete[] data;
+	return resultHash;
 }
 
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size) {

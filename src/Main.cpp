@@ -76,10 +76,11 @@ static bool showSea = false;
 static bool absolute = false;
 static bool square = false;
 static bool reqTexRfrsh = false;
+static bool autoSave = true;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
-static Texture2D* diffuse, * normal, *gridTex;
+static Texture2D* diffuse, * normal, * gridTex;
 
 
 static uint32_t vao, vbo, ebo;
@@ -96,11 +97,13 @@ static float textureScaleO = 1.0f;
 static float viewportMousePosX = 0;
 static float viewportMousePosY = 0;
 static int numberOfNoiseTypes = 3;
+static int secondCounter = 0;
+
 static nlohmann::json appData;
 
 static std::string successMessage = "";
 static std::string errorMessage = "";
-
+static std::string savePath = "";
 
 static void ToggleSystemConsole() {
 	static bool state = false;
@@ -365,7 +368,7 @@ static void DoTheRederThing(float deltaTime) {
 	//gridTex->Bind(5);
 	//grid.Render();
 
-	
+
 	if (showSea) {
 		glUseProgram(0);
 		waterShader->Bind();
@@ -389,6 +392,7 @@ static void ShowTerrainControls()
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
 	ImGui::NewLine();
+	ImGui::Checkbox("Auto Save", &autoSave);
 	ImGui::Checkbox("Auto Update", &autoUpdate);
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
 	ImGui::Checkbox("Use Skybox", &skyboxEnabled);
@@ -556,15 +560,17 @@ static void ShowMainScene() {
 	ImGui::End();
 }
 
-static void SaveFile() {
-	std::string file = ShowSaveFileDialog();
+static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	if (file.size() == 0)
 		return;
 	if (file.find(".terr3d") == std::string::npos)
 		file += ".terr3d";
 
+	savePath = file;
+
 	nlohmann::json data;
 	data["type"] = "SAVEFILE";
+	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
 	data["version"] = "3.0";
 	data["name"] = "TerraGen3D v3.0";
 	data["EnodeEditor"] = GetElevationNodeEditorSaveData();
@@ -599,6 +605,22 @@ static void SaveFile() {
 	tmp["textureScale"] = textureScale;
 	tmp["textureScaleO"] = textureScaleO;
 	tmp["seaLevel"] = seaLevel;
+	tmp["autoSave"] = autoSave;
+
+	tmp["cameraPosX"] = CameraPosition[0];
+	tmp["cameraPosY"] = CameraPosition[2];
+	tmp["cameraPosZ"] = CameraPosition[1];
+
+	tmp["cameraRotX"] = CameraRotation[0];
+	tmp["cameraRotY"] = CameraRotation[1];
+	tmp["cameraRotZ"] = CameraRotation[2];
+
+	tmp["lightPosX"] = LightPosition[0];
+	tmp["lightPosY"] = LightPosition[2];
+	tmp["lightPosZ"] = LightPosition[1];
+
+	if (diffuse)
+		tmp["diffuseTexPath"] = diffuse->GetPath();
 
 	data["generals"] = tmp;
 
@@ -614,7 +636,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 
 	// For Now it dows not do anything id any error has occured but in later versions this will be reported to user!
 
-	
+
 	if (file.size() == 0)
 		return;
 	if (file.find(".terr3d") == std::string::npos)
@@ -625,7 +647,29 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 		return;
 	if (sdata.size() == 0)
 		return;
-	nlohmann::json data = nlohmann::json::parse(sdata);
+	nlohmann::json data;
+	try {
+		data = nlohmann::json::parse(sdata);
+	}
+	catch (...) {
+		Log("Failed to Parse file : " + file);
+	}
+	try {
+		if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
+			Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+			return;
+		}
+	}
+	catch (...) {
+		Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+		return;
+	}
+
+	if (data["type"] == "THEME") {
+		LoadThemeFromStr(data.dump());
+	}
+
+
 	if (data["type"] != "SAVEFILE")
 		return;
 
@@ -661,6 +705,29 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	textureScale = tmp["textureScale"];
 	textureScaleO = tmp["textureScaleO"];
 	seaLevel = tmp["seaLevel"];
+	autoSave = tmp["autoSave"];
+
+	CameraPosition[0] = tmp["cameraPosX"];
+	CameraPosition[2] = tmp["cameraPosY"];
+	CameraPosition[1] = tmp["cameraPosZ"];
+
+	CameraRotation[0] = tmp["cameraRotX"];
+	CameraRotation[1] = tmp["cameraRotY"];
+	CameraRotation[2] = tmp["cameraRotZ"];
+
+	LightPosition[0] = tmp["lightPosX"];
+	LightPosition[2] = tmp["lightPosY"];
+	LightPosition[1] = tmp["lightPosZ"];
+
+
+	if (diffuse)
+		delete diffuse;
+	try {
+		diffuse = new Texture2D(tmp["diffuseTexPath"]);
+	}
+	catch (...) {
+		Log("Cold not load texture from saved file.");
+	}
 
 	// For Future
 	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size());
@@ -927,11 +994,6 @@ static void OnImGuiRenderEnd() {
 	ImGui::End();
 }
 
-static void ResizeTexture(uint32_t tex, int w, int h) {
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-}
-
 static void SetUpIcon() {
 	HWND hwnd = glfwGetWin32Window(myApp->GetWindow()->GetNativeWindow());
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
@@ -953,6 +1015,7 @@ public:
 	virtual void OnPreload() override {
 		SetTitle("TerraGen3D - Jaysmito Mukherjee");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
+		system((std::string("mkdir \"") + GetExecutableDir() + "\\Data\\cache\\autosave\"").c_str());
 		SetupOSLiscences();
 		Sleep(1000);
 	}
@@ -975,6 +1038,44 @@ public:
 			reqTexRfrsh = false;
 		}
 
+		// CTRL Shortcuts
+		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL))) {
+
+			// Save Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
+				if (savePath.size() > 3) {
+					Log("Saved to " + savePath);
+					SaveFile(savePath);
+				}
+				else {
+					SaveFile();
+				}
+			}
+
+			// Close Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_W)) {
+				if (savePath.size() > 3) {
+					Log("CLosed file " + savePath);
+					savePath = "";
+				}
+				else {
+					Log("Shutting Down");
+					exit(0);
+				}
+			}
+
+			// CTRL + SHIFT Shortcuts
+			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT))) {// Save Shortcut
+
+				// Save As Shortcuts
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
+					savePath = "";
+					SaveFile();
+				}
+
+			}
+		}
+
 		glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
 		glViewport(0, 0, 800, 600);
 		GetWindow()->Clear();
@@ -993,6 +1094,14 @@ public:
 	{
 		if (!isRuinning)
 			return;
+		
+		secondCounter++;
+
+		if (secondCounter % 5 == 0) {
+			if (autoSave) {
+				SaveFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
+			}
+		}
 
 		GetWindow()->SetVSync(vSync);
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;

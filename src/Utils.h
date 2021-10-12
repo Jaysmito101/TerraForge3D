@@ -1,8 +1,43 @@
 #pragma once
 
+
+
 #include <Mesh.h>
 #include <Windows.h>
 #include <string>
+
+std::string UChar2Hex(unsigned char c);
+
+struct Hash {
+
+	Hash() {
+
+	}
+
+	Hash(unsigned char* d, int l) {
+		length = l;
+		data = new unsigned char[length];
+		memcpy_s(data, length, d, l);
+	}
+
+	~Hash() {
+		//delete[] data;
+	}
+
+	std::string ToString() {
+		std::string hash;
+		for (int i = 0; i < length; i++) 
+		{
+			
+			hash += UChar2Hex(data[i]);
+		}
+		return hash;
+	}
+
+	int length = 0;
+	unsigned char* data;
+};
+
 
 #define MAX(x, y) (x > y ? x : y)
 
@@ -14,13 +49,23 @@ std::string ShowOpenFileDialog(LPWSTR ext = (wchar_t*)L"*.glsl\0*.*\0", HWND own
 
 std::string ReadShaderSourceFile(std::string path, bool* result);
 
+std::string GetExecutablePath();
+
 std::string GetExecutableDir();
 
 std::string FetchURL(std::string baseURL, std::string path);
 
+char* UChar2Char(unsigned char* data, int length);
+
 bool FileExists(std::string path, bool writeAccess = false);
 
 bool IsNetWorkConnected();
+
+char* ReadBinaryFile(std::string path, int* size, uint32_t sizeToLoad = -1);
+
+char* ReadBinaryFile(std::string path, uint32_t sizeToLoad = -1);
+
+Hash MD5File(std::string path);
 
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
 
