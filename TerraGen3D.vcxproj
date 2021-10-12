@@ -221,6 +221,7 @@
     <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\ElevationNodeEditor.cpp" />
     <ClCompile Include="src\ExportManager.cpp" />
+    <ClCompile Include="src\FoliagePlacement.cpp" />
     <ClCompile Include="src\LuaNativeFunctions.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Nodes\CellularNoiseNode.cpp" />
@@ -1577,6 +1578,7 @@
     <ClInclude Include="src\ElevationNodeEditor.h" />
     <ClInclude Include="src\ExportManager.h" />
     <ClInclude Include="src\FastNoiseLite.h" />
+    <ClInclude Include="src\FoliagePlacement.h" />
     <ClInclude Include="src\ImGuiConsole.h" />
     <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\LuaNativeFunctions.h" />

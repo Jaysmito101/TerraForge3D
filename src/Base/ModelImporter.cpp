@@ -80,6 +80,7 @@ Model* LoadModel(std::string path)
     
     Model* model = new Model(std::string(paiMesh->mName.C_Str()));
     model->SetupMeshOnGPU();
+       
 
     model->mesh = LoadMesh(paiMesh);
     return model;

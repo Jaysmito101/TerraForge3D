@@ -61,7 +61,11 @@ void Model::UploadToGPU()
 
 void Model::Update()
 {
-	modelMatrix = glm::translate(glm::mat4(0.0f), position);
+	modelMatrix = glm::translate(glm::mat4(1.0f), position);
+	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
+	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
+	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
+	modelMatrix = glm::scale(modelMatrix, scale);
 }
 
 void Model::Render()

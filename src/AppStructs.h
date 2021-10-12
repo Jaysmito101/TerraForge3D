@@ -116,4 +116,5 @@ struct ActiveWindows {
 	bool contribWindow = false;
 	bool textureStore = false;
 	bool osLisc = false;
+	bool foliageManager = false;
 };

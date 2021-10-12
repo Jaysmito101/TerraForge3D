@@ -9,6 +9,7 @@
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
 #include <OSLiscenses.h>
+#include <FoliagePlacement.h>
 #include <ElevationNodeEditor.h>
 #include <ExportManager.h>
 #include <TextureStore.h>
@@ -78,6 +79,7 @@ static bool absolute = false;
 static bool square = false;
 static bool reqTexRfrsh = false;
 static bool autoSave = true;
+static bool showFoliage = true;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
@@ -362,8 +364,11 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetUniform3f("_Resolution", tmp);
 	diffuse->Bind(5);
 	shader->SetUniformi("_Diffuse", 5);
-	//terrain.Render();
-	tmpm->Render();
+	terrain.Render();
+
+	if(showFoliage)
+		RenderFoliage(shader, camera);
+
 	// For Future
 	//gridTex->Bind(5);
 	//grid->Render();
@@ -395,7 +400,8 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Auto Save", &autoSave);
 	ImGui::Checkbox("Auto Update", &autoUpdate);
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
-	ImGui::Checkbox("Use Skybox", &skyboxEnabled);
+	ImGui::Checkbox("Show Skybox", &skyboxEnabled);
+	ImGui::Checkbox("Show Foliage", &showFoliage);
 	ImGui::NewLine();
 	if (ImGui::Button("Update Mesh"))
 		RegenerateMesh();
@@ -844,6 +850,8 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Shader Editor", &activeWindows.shaderEditorWindow);
 
+			ShowWindowMenuItem("Foliage Manager", &activeWindows.foliageManager);
+
 			ShowWindowMenuItem("Elevation Node Editor", &activeWindows.elevationNodeEditorWindow);
 
 			ShowWindowMenuItem("Texture Settings", &activeWindows.texturEditorWindow);
@@ -1139,6 +1147,9 @@ public:
 		if (activeWindows.styleEditor)
 			ShowStyleEditor(&activeWindows.styleEditor);
 
+		if (activeWindows.foliageManager)
+			ShowFoliageManager(&activeWindows.foliageManager);
+
 		if (activeWindows.shaderEditorWindow)
 			ShowShaderEditor(&activeWindows.shaderEditorWindow);
 
@@ -1162,6 +1173,7 @@ public:
 		SetupCubemap();
 		SetupShaderManager();
 		SetupElevationManager(&resolution);
+		SetupFoliageManager();
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);
