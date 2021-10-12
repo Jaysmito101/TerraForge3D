@@ -98,7 +98,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Urlmon.lib;libssl_static.lib;libcrypto_static.lib;Crypt32.lib;ws2_32.lib;Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;Urlmon.lib;libssl_static.lib;libcrypto_static.lib;Crypt32.lib;ws2_32.lib;Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,7 +118,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Urlmon.lib;libssl_static.lib;libcrypto_static.lib;Crypt32.lib;ws2_32.lib;Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;Urlmon.lib;libssl_static.lib;libcrypto_static.lib;Crypt32.lib;ws2_32.lib;Pathcch.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -212,6 +212,8 @@
     <ClCompile Include="src\Base\FrameBuffer.cpp" />
     <ClCompile Include="src\Base\Mesh.cpp" />
     <ClCompile Include="src\Base\Model.cpp" />
+    <ClCompile Include="src\Base\ModelImporter.cpp" />
+    <ClCompile Include="src\Base\Renderer.cpp" />
     <ClCompile Include="src\Base\Shader.cpp" />
     <ClCompile Include="src\Base\SplashScreen.cpp" />
     <ClCompile Include="src\Base\Texture2D.cpp" />
@@ -898,6 +900,8 @@
     <ClInclude Include="src\Base\FrameBuffer.h" />
     <ClInclude Include="src\Base\Mesh.h" />
     <ClInclude Include="src\Base\Model.h" />
+    <ClInclude Include="src\Base\ModelImporter.h" />
+    <ClInclude Include="src\Base\Renderer.h" />
     <ClInclude Include="src\Base\Shader.h" />
     <ClInclude Include="src\Base\SplashScreen.h" />
     <ClInclude Include="src\Base\Texture2D.h" />

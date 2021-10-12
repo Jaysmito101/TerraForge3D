@@ -3,6 +3,7 @@
 #include <Model.h>
 #include <FrameBuffer.h>
 #include <Camera.h>
+#include <Texture2D.h>
 #include <Shader.h>
 
 #include <vector>
