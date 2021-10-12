@@ -1,5 +1,7 @@
 #include "ModelImporter.h"
 
+#include <string>
+
 #include <Utils.h>
 
 #include <assimp/Importer.hpp>      // C++ importer interface
@@ -7,8 +9,55 @@
 #include <assimp/postprocess.h>     // Post processing flags
 
 
-void LoadModel(std::string path)
-{
+Mesh* LoadMesh(aiMesh* paiMesh) {
+    Mesh mesh;
+
+    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+    Vert* verts = new Vert[paiMesh->mNumVertices];
+    mesh.vertexCount = paiMesh->mNumVertices;
+    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
+        const aiVector3D* pPos = &(paiMesh->mVertices[i]);
+        const aiVector3D* pNormal = &(paiMesh->mNormals[i]);
+        const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
+        Vert tmp;
+        tmp.position = glm::vec3(1.0f);
+        tmp.position.x = pPos->x;
+        tmp.position.y = pPos->y;
+        tmp.position.z = pPos->z;
+
+        tmp.texCoord = glm::vec2(1.0f);
+        if (pTexCoord) {
+            tmp.texCoord.x = pTexCoord->x;
+            tmp.texCoord.y = pTexCoord->y;
+        }
+
+        tmp.normal = glm::vec3(1.0f);
+        
+        /*
+        if (pNormal) {
+            tmp.normal.x = pNormal->x;
+            tmp.normal.y = pNormal->y;
+            tmp.normal.z = pNormal->z;
+        }
+        */
+
+        verts[i] = tmp;
+    }
+    mesh.vert = verts;
+    mesh.indexCount = paiMesh->mNumFaces * 3;
+    mesh.indices = new int[mesh.indexCount];
+    int co = 0;
+    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
+        const aiFace& Face = paiMesh->mFaces[i];
+        mesh.indices[co++] = Face.mIndices[0];
+        mesh.indices[co++] = Face.mIndices[1];
+        mesh.indices[co++] = Face.mIndices[2];
+    }
+    return mesh.Clone();
+}
+
+Model* LoadModel(std::string path)
+{   
 
     Assimp::Importer importer;
 
@@ -21,13 +70,17 @@ void LoadModel(std::string path)
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
 
-    // If the import failed, report it
-    if (nullptr != scene) {
+    if (nullptr == scene) {
         Log("Assimp Error : " + std::string(importer.GetErrorString()));
-        return;
+        return nullptr;
     }
 
-    // Now we can access the file's contents.
-//    DoTheSceneProcessing(scene);
+    
+    aiMesh* paiMesh = scene->mMeshes[0];
+    
+    Model* model = new Model(std::string(paiMesh->mName.C_Str()));
+    model->SetupMeshOnGPU();
 
+    model->mesh = LoadMesh(paiMesh);
+    return model;
 }

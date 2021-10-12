@@ -4,6 +4,7 @@
 #include <Base/EntryPoint.h>
 #include <ImGuiConsole.h>
 #include <AppStyles.h>
+#include <ModelImporter.h>
 #include <Texture2D.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
@@ -273,11 +274,11 @@ static void ResetShader() {
 
 static void FillMeshData() {
 
-	if (terrain.mesh.res != resolution || terrain.mesh.sc != scale || textureScale != textureScaleO) {
+	if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
 
-		terrain.mesh.GeneratePlane(resolution, scale, textureScale);
-		s_Stats.triangles = terrain.mesh.indexCount / 3;
-		s_Stats.vertCount = terrain.mesh.vertexCount;
+		terrain.mesh->GeneratePlane(resolution, scale, textureScale);
+		s_Stats.triangles = terrain.mesh->indexCount / 3;
+		s_Stats.vertCount = terrain.mesh->vertexCount;
 		textureScaleO = textureScale;
 	}
 
@@ -286,13 +287,13 @@ static void FillMeshData() {
 		for (int x = 0; x < resolution; x++)
 		{
 			if (noiseBased)
-				terrain.mesh.SetElevation(noise(x, y), x, y);
+				terrain.mesh->SetElevation(noise(x, y), x, y);
 			else
-				terrain.mesh.SetElevation(GetElevation(x, y), x, y);
+				terrain.mesh->SetElevation(GetElevation(x, y), x, y);
 		}
 	}
 
-	terrain.mesh.RecalculateNormals();
+	terrain.mesh->RecalculateNormals();
 
 	isRemeshing = false;
 }
@@ -319,15 +320,14 @@ static void GenerateMesh()
 	FillMeshData();
 
 	terrain.SetupMeshOnGPU();
-
 	sea.SetupMeshOnGPU();
-	sea.mesh.GeneratePlane(256, 120);
-	sea.mesh.RecalculateNormals();
+	sea.mesh->GeneratePlane(256, 120);
+	sea.mesh->RecalculateNormals();
 	sea.UploadToGPU();
 
 	grid.SetupMeshOnGPU();
-	grid.mesh.GeneratePlane(50, 120);
-	grid.mesh.RecalculateNormals();
+	grid.mesh->GeneratePlane(50, 120);
+	grid.mesh->RecalculateNormals();
 	grid.UploadToGPU();
 }
 
@@ -362,11 +362,11 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetUniform3f("_Resolution", tmp);
 	diffuse->Bind(5);
 	shader->SetUniformi("_Diffuse", 5);
-	terrain.Render();
-
+	//terrain.Render();
+	tmpm->Render();
 	// For Future
 	//gridTex->Bind(5);
-	//grid.Render();
+	//grid->Render();
 
 
 	if (showSea) {
@@ -402,7 +402,7 @@ static void ShowTerrainControls()
 
 	if (ImGui::Button("Recalculate Normals")) {
 		while (isRemeshing);
-		terrain.mesh.RecalculateNormals();
+		terrain.mesh->RecalculateNormals();
 	}
 
 	if (ImGui::Button("Refresh Shaders")) {
@@ -762,7 +762,7 @@ static void ShowMenu() {
 
 			if (ImGui::BeginMenu("Export As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
-					if (ExportOBJ(terrain.mesh.Clone(), openfilename())) {
+					if (ExportOBJ(terrain.mesh->Clone(), openfilename())) {
 						successMessage = "Sucessfully exported mesh!";
 						ImGui::BeginPopup("Success Messages");
 					}
@@ -773,7 +773,7 @@ static void ShowMenu() {
 				}
 
 				if (ImGui::MenuItem("PNG Heightmap")) {
-					if (ExportHeightmapPNG(terrain.mesh.Clone(), openfilename())) {
+					if (ExportHeightmapPNG(terrain.mesh->Clone(), openfilename())) {
 						successMessage = "Sucessfully exported heightmap!";
 						ImGui::BeginPopup("Success Messages");
 					}
@@ -784,7 +784,7 @@ static void ShowMenu() {
 				}
 
 				if (ImGui::MenuItem("JPG Heightmap")) {
-					if (ExportHeightmapJPG(terrain.mesh.Clone(), openfilename())) {
+					if (ExportHeightmapJPG(terrain.mesh->Clone(), openfilename())) {
 						successMessage = "Sucessfully exported heightmap!";
 						ImGui::BeginPopup("Success Messages");
 					}
@@ -1164,7 +1164,7 @@ public:
 		SetupElevationManager(&resolution);
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
-		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid.png", false, true);
+		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();

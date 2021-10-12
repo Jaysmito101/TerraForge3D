@@ -9,7 +9,8 @@
 
 Mesh::Mesh()
 {
-	
+	vert = nullptr;
+	indices = nullptr;
 }
 
 Mesh::~Mesh() {
@@ -123,9 +124,9 @@ Mesh* Mesh::Clone()
 	cloneMesh->maxHeight = maxHeight;
 	cloneMesh->vertexCount = vertexCount;
 	cloneMesh->indexCount = indexCount;
-	cloneMesh->vert = new Vert[res * res];
+	cloneMesh->vert = new Vert[vertexCount];
 	memcpy(cloneMesh->vert, vert, sizeof(Vert) * vertexCount);
-	cloneMesh->indices = new int[(res - 1) * (res - 1) * 6];
+	cloneMesh->indices = new int[indexCount];
 	memcpy(cloneMesh->indices, indices, sizeof(int) * indexCount);
 	return cloneMesh;
 }
