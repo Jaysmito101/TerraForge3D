@@ -7,6 +7,7 @@
 #include <Texture2D.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
+#include <OSLiscenses.h>
 #include <ElevationNodeEditor.h>
 #include <ExportManager.h>
 #include <TextureStore.h>
@@ -263,7 +264,7 @@ static void ResetShader() {
 	if (!wireframeShader)
 		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	if (!waterShader)
-		waterShader = new Shader(ReadShaderSourceFile("Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + " Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + " Data\\shaders\\water\\geom.glsl", &res));
+		waterShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &res));
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
@@ -786,6 +787,8 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
 
+			ShowWindowMenuItem("Open Source Liscenses", &activeWindows.osLisc);
+
 			ImGui::EndMenu();
 		}
 
@@ -804,6 +807,9 @@ static void ShowMenu() {
 
 			if (ImGui::MenuItem("GitHub Page"))
 				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D", NULL, NULL, SW_SHOWNORMAL);
+
+			if (ImGui::MenuItem("Open Source Liscenses"))
+				activeWindows.osLisc = !activeWindows.osLisc;
 
 			ImGui::EndMenu();
 
@@ -947,7 +953,7 @@ public:
 	virtual void OnPreload() override {
 		SetTitle("TerraGen3D - Jaysmito Mukherjee");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
-		
+		SetupOSLiscences();
 		Sleep(1000);
 	}
 
@@ -1033,6 +1039,8 @@ public:
 		if (activeWindows.textureStore)
 			ShowTextureStore(&activeWindows.textureStore);
 
+		if (activeWindows.osLisc)
+			ShowOSLiscences(&activeWindows.osLisc);
 
 		OnImGuiRenderEnd();
 	}

@@ -115,4 +115,5 @@ struct ActiveWindows {
 	bool elevationNodeEditorWindow = false;
 	bool contribWindow = false;
 	bool textureStore = false;
+	bool osLisc = false;
 };
