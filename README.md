@@ -36,11 +36,21 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 # What can this do?
 
 * Generte 3D Terrain Procedrally
+* An Highly abstracted API for OpenGL which can be reused by other projects
+* Foliage and custom model importer and renderer
+* Pack Projects into completely portable `.terr3dpack` files
+* A Texture Store Powered By <a href = "https://polyhaven.com/"> PolyHaven </a>
 * Export Terrain mesh as OBJ
+* Easy and Userfriendly UI
+* Autosave and backup projects
+* Caching system
+* Asset Management
 * You can write and test your own shaders
 * An Inbuilt IDE for shaders
 * Test under different lighting
-* A 3D viewer
+* A proper 3D viewer
+* Sea with waves amd custom color
+* Video Tutorials(<a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>)
 * A Node based as well as Layer based workflow
 * Save the project(custom `.terr3d` files)
 * Hieght map visualizer in node editor
@@ -57,7 +67,6 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 # Future Goals
 
-* Procedural grass and foliage
 * Texture Editor
 * Export as FBX
 * Render Images from within Engine
