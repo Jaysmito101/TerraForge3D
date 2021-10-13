@@ -1,4 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include "../resource.h"
 #include <Base.h>
 #include <Base/EntryPoint.h>
@@ -26,10 +27,14 @@
 #include <SimplexNoise.h>
 #include <FastNoiseLite.h>
 #include <thread>
+#include <experimental/filesystem>
 #include <CubeMap.h>
 #include <time.h>
 #include <mutex>
 #include <json.hpp>
+#include <zip/zip.h>
+#include <sys/stat.h>
+#include <dirent/dirent.h>
 #include <atomic>
 
 
@@ -662,10 +667,13 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["generals"] = tmp;
 
 	std::ofstream outfile;
+	
 	outfile.open(file);
-
 	outfile << data;
+	outfile.close();
 
+	outfile.open(GetProjectResourcePath() + "\\project.terr3d");
+	outfile << data;
 	outfile.close();
 }
 
@@ -680,10 +688,14 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 		file += ".terr3d";
 	bool flagRd = true;
 	std::string sdata = ReadShaderSourceFile(file, &flagRd);
-	if (!flagRd)
+	if (!flagRd) {
+		Log("Could not read file " + file);
 		return;
-	if (sdata.size() == 0)
+	}
+	if (sdata.size() == 0){
+		Log("Empty file.");
 		return;
+	}
 	nlohmann::json data;
 	try {
 		data = nlohmann::json::parse(sdata);
@@ -778,11 +790,102 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size())
 }
 
-static void ShowWindowMenuItem(const char* title, bool* val) {
-	ImGui::Checkbox(title, val);
+
+void zip_walk(struct zip_t* zip, const char* path, bool isFristLayer = true, std::string prevPath = "") {
+	DIR* dir;
+	struct dirent* entry;
+	char fullpath[MAX_PATH];
+	struct stat s;
+
+	memset(fullpath, 0, MAX_PATH);
+	dir = opendir(path);
+	assert(dir);
+
+	while ((entry = readdir(dir))) {
+		// skip "." and ".."
+		if (!strcmp(entry->d_name, ".\0") || !strcmp(entry->d_name, "..\0"))
+			continue;
+
+		snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
+		stat(fullpath, &s);
+		if (S_ISDIR(s.st_mode)) {
+			zip_walk(zip, fullpath, false, prevPath + entry->d_name+"\\");
+		}
+		else {
+			zip_entry_open(zip, (prevPath + entry->d_name).c_str());
+			zip_entry_fwrite(zip, fullpath);
+			zip_entry_close(zip);
+		}
+	}
+
+	closedir(dir);
 }
 
 
+static void PackProject(std::string path = ShowSaveFileDialog()) {
+	if (path.find(".terr3dpack") == std::string::npos)
+		path = path + ".terr3dpack";
+	if (savePath.size() > 0) {
+		SaveFile(savePath);
+	}
+	else {
+		if (!PathExist(GetExecutableDir() + "\\Data\\temp"))
+			MkDir(GetExecutableDir() + "\\Data\\temp");
+		std::string uid = GenerateId(64);
+		SaveFile(GetExecutableDir() + "\\Data\\temp\\" + uid);
+	}
+	zip_t* packed = zip_open(path.c_str(), 9, 'w');
+	zip_walk(packed, GetProjectResourcePath().c_str());
+	zip_close(packed);
+}
+
+static void LoadPackedProject(std::string path = ShowOpenFileDialog()) {
+	if (path.find(".terr3dpack") == std::string::npos)
+		path = path + ".terr3dpack";
+	std::string uid = GenerateId(64);
+	MkDir(GetExecutableDir() + "\\Data\\temp\\pcache_" + uid);
+	zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\temp\\pcache_" + uid).c_str(), [](const char* filename, void* arg) {return 1; }, (void*)0);
+
+	if (FileExists(GetExecutableDir() + "\\Data\\temp\\pcache_" + uid + "\\project.terr3d", true)) {
+		bool tmp = false;
+		std::string sdata = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\temp\\pcache_" + uid + "\\project.terr3d", &tmp);
+		if (sdata.size() <= 0) {
+			Log("Emppty Project File!");
+			return;
+		}
+		nlohmann::json data;
+		try {
+			data = nlohmann::json::parse(sdata);
+		}
+		catch (...) {
+			Log("Failed to Parse Project file!");
+			return;
+		}
+		try {
+			if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
+				Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+				return;
+			}
+		}
+		catch (...) {
+			Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+			return;
+		}
+		std::string projId = data["generals"]["projectID"];
+		zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId).c_str(), [](const char* filename, void* arg) {Log(std::string("Extracted ") + filename); return 1; }, (void*)0);
+		std::string oriDir = path.substr(0, path.rfind("\\"));
+		std::string oriName = path.substr(path.rfind("\\")+1);
+		CopyFileData((GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId + "\\project.terr3d").c_str(), oriDir + "\\" + oriName + ".terr3d");
+		OpenSaveFile(oriDir + "\\" + oriName + ".terr3d");
+	}
+	else {
+		Log("Not a valid terr3dpack file!");
+	}
+}
+
+static void ShowWindowMenuItem(const char* title, bool* val) {
+	ImGui::Checkbox(title, val);
+}
 
 static void ShowMenu() {
 	if (ImGui::BeginMainMenuBar())
@@ -832,6 +935,18 @@ static void ShowMenu() {
 					}
 				}
 				ImGui::EndMenu();
+			}
+
+			if (ImGui::MenuItem("Close")) {
+				savePath = "";
+			}
+
+			if (ImGui::MenuItem("Pack Project")) {
+				PackProject();
+			}
+
+			if (ImGui::MenuItem("Load Packed Project")) {
+				LoadPackedProject();
 			}
 
 			if (ImGui::MenuItem("Exit")) {

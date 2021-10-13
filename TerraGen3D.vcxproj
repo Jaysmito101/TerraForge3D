@@ -204,6 +204,7 @@
     <ClCompile Include="include\wren\src\vm\wren_utils.c" />
     <ClCompile Include="include\wren\src\vm\wren_value.c" />
     <ClCompile Include="include\wren\src\vm\wren_vm.c" />
+    <ClCompile Include="include\zip\zip.c" />
     <ClCompile Include="src\AppShaderEditor.cpp" />
     <ClCompile Include="src\AppStyles.cpp" />
     <ClCompile Include="src\Base\Application.cpp" />
@@ -1558,6 +1559,8 @@
     <ClInclude Include="include\wren\src\vm\wren_utils.h" />
     <ClInclude Include="include\wren\src\vm\wren_value.h" />
     <ClInclude Include="include\wren\src\vm\wren_vm.h" />
+    <ClInclude Include="include\zip\miniz.h" />
+    <ClInclude Include="include\zip\zip.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\AppShaderEditor.h" />
     <ClInclude Include="src\AppStructs.h" />

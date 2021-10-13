@@ -9,6 +9,9 @@
 #include <glad/glad.h>
 #include <Shader.h>
 #include <glm/glm.hpp>
+
+#include <Utils.h>
+
 static uint32_t textureID;
 static uint32_t vao;
 static std::string vertShader = R"(
@@ -124,12 +127,12 @@ void SetupCubemap()
 
     std::vector<std::string> faces =
     {
-            "Data\\skybox\\px.jpg",
-            "Data\\skybox\\nx.jpg",
-            "Data\\skybox\\py.jpg",
-            "Data\\skybox\\ny.jpg",
-            "Data\\skybox\\pz.jpg",
-            "Data\\skybox\\nz.jpg"
+            GetExecutableDir() + "\\Data\\skybox\\px.jpg",
+            GetExecutableDir() + "\\Data\\skybox\\nx.jpg",
+            GetExecutableDir() + "\\Data\\skybox\\py.jpg",
+            GetExecutableDir() + "\\Data\\skybox\\ny.jpg",
+            GetExecutableDir() + "\\Data\\skybox\\pz.jpg",
+            GetExecutableDir() + "\\Data\\skybox\\nz.jpg"
     };
     textureID = loadCubemap(faces);
 
