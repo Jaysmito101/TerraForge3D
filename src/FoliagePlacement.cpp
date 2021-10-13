@@ -35,12 +35,17 @@ void ShowFoliageManager(bool* pOpen)
 			ImGui::DragFloat3((std::string("Rotation##") + std::to_string(id++)).c_str(), glm::value_ptr(t.model->rotation), 0.1f);
 			ImGui::DragFloat3((std::string("Scale##") + std::to_string(id++)).c_str(), glm::value_ptr(t.model->scale), 0.1f);
 
+			if (ImGui::Button("Recalculate Normals")) {
+				t.model->mesh->RecalculateNormals();
+			}
 
 			uint32_t itexId = 0;
 			if (t.textureLoaded) {
 				itexId = t.texture->GetRendererID();
 			}
 
+			
+			
 			if (ImGui::ImageButton((ImTextureID)itexId, ImVec2(100, 100))) {
 				if (t.textureLoaded)
 					delete t.texture;

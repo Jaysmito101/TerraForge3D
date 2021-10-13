@@ -686,6 +686,10 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 		return;
 	if (file.find(".terr3d") == std::string::npos)
 		file += ".terr3d";
+
+	if (file.find("autosave.terr3d") == std::string::npos)
+		savePath = file;
+
 	bool flagRd = true;
 	std::string sdata = ReadShaderSourceFile(file, &flagRd);
 	if (!flagRd) {
@@ -949,6 +953,10 @@ static void ShowMenu() {
 				LoadPackedProject();
 			}
 
+			if (ImGui::MenuItem("Load Auto Saved Project")) {
+				OpenSaveFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
+			}
+
 			if (ImGui::MenuItem("Exit")) {
 				exit(0);
 			}
@@ -1029,6 +1037,9 @@ static void ShowMenu() {
 
 			if (ImGui::MenuItem("GitHub Page"))
 				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D", NULL, NULL, SW_SHOWNORMAL);
+
+			if(ImGui::MenuItem("Documentation"))
+				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D/wiki", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Open Source Liscenses"))
 				activeWindows.osLisc = !activeWindows.osLisc;
@@ -1195,6 +1206,21 @@ public:
 		// CTRL Shortcuts
 		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL))) {
 
+			// Open Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) {
+				OpenSaveFile();
+			}
+
+			// Exit Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) {
+				exit(0);
+			}
+
+			// Export Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_E)) {
+				ExportOBJ(terrain.mesh->Clone(), ShowSaveFileDialog(".obj"));
+			}
+
 			// Save Shortcut
 			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
 				if (savePath.size() > 3) {
@@ -1227,6 +1253,17 @@ public:
 					SaveFile();
 				}
 
+				// Node Editor Shortcut
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_N)) {
+					activeWindows.elevationNodeEditorWindow = true;
+					noiseBased = false;
+				}
+
+				// Noise Layer Shortcut
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L)) {
+					activeWindows.elevationNodeEditorWindow = false;
+					noiseBased = true;
+				}
 			}
 		}
 
@@ -1254,6 +1291,10 @@ public:
 		if (secondCounter % 5 == 0) {
 			if (autoSave) {
 				SaveFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
+
+				if (savePath.size() > 3) {
+					SaveFile(savePath);
+				}
 			}
 		}
 

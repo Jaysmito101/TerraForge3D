@@ -311,6 +311,9 @@ static int numTextoShow = 50;
 static bool tmpbo = false;
 static void ShowTextureThumbs(char* searchStr, int sstrl) {
 	int co = 0;
+			ImGuiDragDropFlags src_flags = 0;
+			src_flags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
+			src_flags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
 	std::string texThumbChildID = "TexThumbChildID##1";
 	if (textureThumbnails.size() != texture_database.size() || isLoadingThumbs)
 		return;
