@@ -3,6 +3,8 @@
 #include "Base/ModelImporter.h"
 #include <Shader.h>
 
+#include <ProjectData.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui/imgui.h>
@@ -44,7 +46,13 @@ void ShowFoliageManager(bool* pOpen)
 					delete t.texture;
 				std::string path = ShowOpenFileDialog();
 				if (path.size() > 3) {
-					t.texture = new Texture2D(path);
+					if (!PathExist(GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetProjectId() + "\\textures"))
+						MkDir(GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetProjectId() + "\\textures");
+					std::string uid = GenerateId(64);
+					CopyFileData(path, GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetProjectId() + "\\textures\\" + uid);
+					RegisterProjectAsset(uid, GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetProjectId() + "\\textures\\" + uid);
+					SaveProjectDatabase();
+					t.texture = new Texture2D(GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetProjectId() + "\\textures\\" + uid);
 					t.textureLoaded = true;
 				}
 			}
@@ -58,12 +66,22 @@ void ShowFoliageManager(bool* pOpen)
 	if (ImGui::Button("Add Item")) {
 		FoliageItem t;
 		std::string tmp = ShowOpenFileDialog();
-		t.modelDir = tmp.substr(0, tmp.rfind("\\"));
-		t.name = tmp.substr(tmp.rfind("\\") + 1);
-		t.model = LoadModel(tmp);
-		t.model->SetupMeshOnGPU();
-		t.model->UploadToGPU();
-		fi.push_back(t);
+		if (tmp.size() > 3) {
+			if (!PathExist(GetProjectResourcePath() + "\\models"))
+				MkDir(GetProjectResourcePath() + "\\models");
+			std::string uid = GenerateId(64);
+			std::string extension = tmp.substr(tmp.rfind("."));
+			CopyFileData(tmp, GetProjectResourcePath() + "\\models\\" + uid + extension);
+			RegisterProjectAsset(uid, "models\\" + uid + extension);
+			SaveProjectDatabase();
+			t.modelDir = tmp.substr(0, tmp.rfind("\\"));
+			t.name = tmp.substr(tmp.rfind("\\") + 1);
+			Log("Loaded mdoel(" + t.name + ") with ID : " + uid);
+			t.model = LoadModel(GetProjectResourcePath() + "\\models\\" + uid + extension);
+			t.model->SetupMeshOnGPU();
+			t.model->UploadToGPU();
+			fi.push_back(t);
+		}
 	}
 
 	ImGui::Separator();

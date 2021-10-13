@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include  <io.h>
+#include <sys/stat.h>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include <atlstr.h>
@@ -155,6 +156,16 @@ std::string GetExecutableDir()
 	return getExecutableDir();
 }
 
+std::string GenerateId(uint32_t length)
+{
+	std::string id;
+	srand(time(NULL));
+	for (int i = 0; i < length; i++) {
+		id += std::to_string(rand() % 9);
+	}
+	return id;
+}
+
 std::string FetchURL(std::string baseURL, std::string path) {
 	httplib::Client cli(baseURL);
 	auto res = cli.Get(path.c_str());
@@ -181,6 +192,12 @@ bool FileExists(std::string path, bool writeAccess) {
 			return true;
 	}
 	return false;
+}
+
+bool PathExist(const std::string& s)
+{
+	struct stat buffer;
+	return (stat(s.c_str(), &buffer) == 0);
 }
 
 bool IsNetWorkConnected()
@@ -330,4 +347,14 @@ void AccocFileType() {
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\TerraGen3D.TerraGen3D.1", "TerraGen3D");
 
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\TerraGen3D.TerraGen3D.1\\Shell\\Open\\Command", (getExecutablePath() + " %1").c_str());
+}
+
+void MkDir(std::string path)
+{
+	system((std::string("mkdir \"") + path + "\"").c_str());
+}
+
+void CopyFileData(std::string source, std::string destination)
+{
+	CopyFileW(CString(source.c_str()), CString(destination.c_str()), false);
 }

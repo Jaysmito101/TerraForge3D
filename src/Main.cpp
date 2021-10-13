@@ -8,6 +8,7 @@
 #include <Texture2D.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
+#include <ProjectData.h>
 #include <OSLiscenses.h>
 #include <FoliagePlacement.h>
 #include <ElevationNodeEditor.h>
@@ -572,7 +573,8 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	if (file.find(".terr3d") == std::string::npos)
 		file += ".terr3d";
 
-	savePath = file;
+	if(file.find("autosave.terr3d") == std::string::npos)
+		savePath = file;
 
 	nlohmann::json data;
 	data["type"] = "SAVEFILE";
@@ -613,6 +615,11 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["seaLevel"] = seaLevel;
 	tmp["autoSave"] = autoSave;
 
+	tmp["projectID"] = GetProjectId();
+	tmp["projectDatabase"] = GetProjectDatabase();
+
+	SaveProjectDatabase();
+
 	tmp["cameraPosX"] = CameraPosition[0];
 	tmp["cameraPosY"] = CameraPosition[2];
 	tmp["cameraPosZ"] = CameraPosition[1];
@@ -625,8 +632,32 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["lightPosY"] = LightPosition[2];
 	tmp["lightPosZ"] = LightPosition[1];
 
-	if (diffuse)
-		tmp["diffuseTexPath"] = diffuse->GetPath();
+	if (diffuse) {
+		bool isOk = true;
+		static std::string uid ;
+		static std::string oPath = "";
+		try {
+			std::string path = GetProjectAsset(uid);
+			if (path.size() > 0 && diffuse->GetPath() == oPath) {
+				isOk = true;
+			}
+			else
+				isOk = false;
+		}
+		catch (...) {
+			isOk = false;
+		}
+		if (!isOk) {
+			uid = GenerateId(32);
+			oPath = diffuse->GetPath();
+			if (!PathExist(GetProjectResourcePath() + "\\textures"))
+				MkDir(GetProjectResourcePath() + "\\textures");
+			CopyFileData(diffuse->GetPath(), GetProjectResourcePath() + "\\textures\\" + uid);
+			RegisterProjectAsset(uid, "textures\\" + uid);
+			Log("Saved Texture with ID : " + uid);
+		}
+		tmp["diffuseTexId"] = uid;
+	}
 
 	data["generals"] = tmp;
 
@@ -713,6 +744,13 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	seaLevel = tmp["seaLevel"];
 	autoSave = tmp["autoSave"];
 
+	SetProjectId(tmp["projectID"]);
+	try {
+		SetProjectDatabase(tmp["projectDatabase"]);
+	}
+	catch (...) {}
+	Log("Loaded Project ID : " + GetProjectId());
+
 	CameraPosition[0] = tmp["cameraPosX"];
 	CameraPosition[2] = tmp["cameraPosY"];
 	CameraPosition[1] = tmp["cameraPosZ"];
@@ -729,21 +767,15 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	if (diffuse)
 		delete diffuse;
 	try {
-		diffuse = new Texture2D(tmp["diffuseTexPath"]);
+		diffuse = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(tmp["diffuseTexId"]));
 	}
 	catch (...) {
 		Log("Cold not load texture from saved file.");
+		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 	}
 
 	// For Future
-	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size());
-
-	std::ofstream outfile;
-	outfile.open(file);
-
-	outfile << data;
-
-	outfile.close();
+	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size())
 }
 
 static void ShowWindowMenuItem(const char* title, bool* val) {
@@ -920,7 +952,7 @@ static void ShowTextureSettings() {
 	else {
 		if (ImGui::Button("Change Texture")) {
 			std::string textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
-			if (textureFilePath.size() > 1) {
+			if (textureFilePath.size() > 3) {
 				delete diffuse;
 				diffuse = new Texture2D(textureFilePath);
 			}
@@ -954,7 +986,6 @@ static void ShowContributers() {
 	ImGui::Text("Jaysmito Mukherjee");
 	ImGui::End();
 }
-
 
 static void OnBeforeImGuiRender() {
 
@@ -1204,6 +1235,8 @@ public:
 			Log("Loading File from " + loadFile);
 			OpenSaveFile(loadFile);
 		}
+
+		SetProjectId(GenerateId(32));
 
 		// For Debug Only
 		autoUpdate = true;

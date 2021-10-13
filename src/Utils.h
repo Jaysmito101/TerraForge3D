@@ -53,11 +53,15 @@ std::string GetExecutablePath();
 
 std::string GetExecutableDir();
 
+std::string GenerateId(uint32_t length);
+
 std::string FetchURL(std::string baseURL, std::string path);
 
 char* UChar2Char(unsigned char* data, int length);
 
 bool FileExists(std::string path, bool writeAccess = false);
+
+bool PathExist(const std::string& s);
 
 bool IsNetWorkConnected();
 
@@ -78,3 +82,7 @@ void Log(std::string log);
 void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue);
 
 void AccocFileType();
+
+void MkDir(std::string path);
+
+void CopyFileData(std::string source, std::string destination);

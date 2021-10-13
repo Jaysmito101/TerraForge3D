@@ -187,6 +187,12 @@ ViewportId=0x929E0302
 Size=506,503
 Collapsed=0
 
+[Window][Foliage Manager]
+ViewportPos=666,80
+ViewportId=0x213F919C
+Size=285,370
+Collapsed=0
+
 [Table][0xD0F0C6E3,2]
 Column 0  Weight=1.0000
 Column 1  Weight=1.0000
