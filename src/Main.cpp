@@ -1122,7 +1122,7 @@ static void ShowSeaSettings() {
 
 static void ShowContributers() {
 	ImGui::Begin("Major Contributers", &activeWindows.contribWindow);
-	ImGui::Text("The major contributers as of Version 3.0:");
+	ImGui::Text("The major contributers as of Version 4.0:");
 	ImGui::NewLine();
 	ImGui::Text("Jaysmito Mukherjee");
 	ImGui::End();
