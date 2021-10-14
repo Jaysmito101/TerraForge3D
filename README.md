@@ -21,6 +21,8 @@
 # TerraGen3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
+![Showcase2](./Screenshots/ShowCase2.gif)
+
 ![Showcase1](./Screenshots/ShowCase1.gif)
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
@@ -35,6 +37,7 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 # What can this do?
 
+* Tribute to all who starred or contributed to the project
 * Generte 3D Terrain Procedrally
 * An Highly abstracted API for OpenGL which can be reused by other projects
 * Foliage and custom model importer and renderer
@@ -77,6 +80,7 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 * When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails
 * You can Show/Hide the console from Menu > Options > Toggle System Console.
+* Whenever you feel that something is wrong or the app is slow check the console for updates
 
 # Screenshots
 
