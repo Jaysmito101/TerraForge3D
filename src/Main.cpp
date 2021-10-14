@@ -971,6 +971,20 @@ static void ShowMenu() {
 				AccocFileType();
 			}
 
+			if (ImGui::MenuItem("Copy Version Hash")) {
+				char* output = new char[MD5File(GetExecutablePath()).ToString().size() + 1];
+				strcpy(output, MD5File(GetExecutablePath()).ToString().c_str());
+				const size_t len = strlen(output) + 1;
+				HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+				memcpy(GlobalLock(hMem), output, len);
+				GlobalUnlock(hMem);
+				OpenClipboard(0);
+				EmptyClipboard();
+				SetClipboardData(CF_TEXT, hMem);
+				CloseClipboard();
+				delete[] output;
+			}
+
 			if (ImGui::BeginMenu("Themes")) {
 				if (ImGui::MenuItem("Default")) {
 					LoadDefaultStyle();

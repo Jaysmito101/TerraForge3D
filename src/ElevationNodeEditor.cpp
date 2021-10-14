@@ -173,6 +173,10 @@ static void UpdateLinkCreation(Editor& editor) {
 			link.id = ++editor.current_id;
 			FloatPin* st = (FloatPin*)editor.FindPin(link.start_attr);
 			FloatPin* en = (FloatPin*)editor.FindPin(link.end_attr);
+
+			if (!en || !st)
+				return;
+
 			bool flag = true;
 			{
 				if (st->isLinked || en->isLinked) {
