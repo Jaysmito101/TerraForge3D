@@ -535,9 +535,8 @@ public:
 		ImGui::TextUnformatted((name).c_str());
 		ImNodes::EndNodeTitleBar();
 
-		ImNodes::BeginStaticAttribute(oID);
 		ImGui::Checkbox((std::string("Use Mesh XY##") + STR(oID)).c_str(), &useXY);
-		ImNodes::EndStaticAttribute();
+
 
 		ImNodes::BeginOutputAttribute(outputPin.id);
 		ImGui::Text("Output");
@@ -1284,6 +1283,8 @@ public:
 
 	virtual float EvaluatePin(float x, float y, int id) override;
 
+	FloatPin inputPinTiles = FloatPin(this, PinType::Input);
+	FloatPin inputPinPlacer = FloatPin(this, PinType::Input);
 	FloatPin inputPinT = FloatPin(this, PinType::Input);
 	FloatPin inputPinV = FloatPin(this, PinType::Input);
 	FloatPin inputPinX = FloatPin(this, PinType::Input);
@@ -1291,7 +1292,7 @@ public:
 	FloatPin outputPin = FloatPin(this, PinType::Output);
 	int gridSize = 4;
 	int gridSizeOld = 4;
-	bool *grid;
+	float *grid = nullptr;
 	float smoothness = 1.0f;
 };
 
