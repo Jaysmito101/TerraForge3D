@@ -242,6 +242,7 @@
     <ClCompile Include="src\OSLiscenses.cpp" />
     <ClCompile Include="src\ProjectData.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />
+    <ClCompile Include="src\SupportersTribute.cpp" />
     <ClCompile Include="src\TextureStore.cpp" />
     <ClCompile Include="src\Utils.cpp" />
     <ClCompile Include="src\ViewportFramebuffer.cpp" />
@@ -1591,6 +1592,7 @@
     <ClInclude Include="src\OSLiscenses.h" />
     <ClInclude Include="src\ProjectData.h" />
     <ClInclude Include="src\SimplexNoise.h" />
+    <ClInclude Include="src\SupportersTribute.h" />
     <ClInclude Include="src\TextureStore.h" />
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\ViewportFramebuffer.h" />

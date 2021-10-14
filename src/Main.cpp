@@ -12,6 +12,7 @@
 #include <ProjectData.h>
 #include <OSLiscenses.h>
 #include <FoliagePlacement.h>
+#include <SupportersTribute.h>
 #include <ElevationNodeEditor.h>
 #include <ExportManager.h>
 #include <TextureStore.h>
@@ -1015,13 +1016,15 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
 
+			ShowWindowMenuItem("Supporters", &activeWindows.supportersTribute);
+
 			ShowWindowMenuItem("Open Source Liscenses", &activeWindows.osLisc);
 
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Help")) {
-			if (ImGui::MenuItem("Contributers"))
+			if (ImGui::MenuItem("Major Contributers"))
 				activeWindows.contribWindow = true;
 
 			if (ImGui::MenuItem("Tutorial"))
@@ -1104,8 +1107,8 @@ static void ShowSeaSettings() {
 }
 
 static void ShowContributers() {
-	ImGui::Begin("Contributers", &activeWindows.contribWindow);
-	ImGui::Text("The contributers as of Version 3.0:");
+	ImGui::Begin("Major Contributers", &activeWindows.contribWindow);
+	ImGui::Text("The major contributers as of Version 3.0:");
 	ImGui::NewLine();
 	ImGui::Text("Jaysmito Mukherjee");
 	ImGui::End();
@@ -1347,6 +1350,9 @@ public:
 		if (activeWindows.osLisc)
 			ShowOSLiscences(&activeWindows.osLisc);
 
+		if (activeWindows.supportersTribute)
+			ShowSupportersTribute(&activeWindows.supportersTribute);
+
 		OnImGuiRenderEnd();
 	}
 
@@ -1359,6 +1365,7 @@ public:
 		SetupShaderManager();
 		SetupElevationManager(&resolution);
 		SetupFoliageManager();
+		SetupSupportersTribute();
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);
