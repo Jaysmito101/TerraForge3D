@@ -20,7 +20,7 @@ std::vector<void*> GeneratorNode::GetPins() {
 
 nlohmann::json GeneratorNode::Save() {
 	nlohmann::json data;
-	data["type"] = NodeType::Cellular;
+	data["type"] = NodeType::Generator;
 	data["inputPinTiles"] = inputPinTiles.Save();
 	data["inputPinPlacer"] = inputPinPlacer.Save();
 	data["inputPinT"] = inputPinT.Save();
@@ -29,6 +29,14 @@ nlohmann::json GeneratorNode::Save() {
 	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();
 	data["gridSize"] = gridSize;
+
+	nlohmann::json gridData;
+	for (int i = 0; i < gridSize * gridSize; i++) {
+		gridData.push_back(grid[i]);
+	}
+	data["gridData"] = gridData;
+
+
 	data["id"] = id;
 	data["name"] = name;
 	return data;
@@ -40,9 +48,17 @@ void GeneratorNode::Load(nlohmann::json data) {
 	inputPinT.Load(data["inputPinT"]);
 	inputPinTiles.Load(data["inputPinTiles"]);
 	inputPinPlacer.Load(data["inputPinPlacer"]);
+	gridSize = data["gridSize"];
+	if (grid)
+		delete[] grid;
+	grid = new float[gridSize * gridSize];
+	int i = 0;
+	for (float v : data["gridData"]) {
+		grid[i++] = v;
+	}
+
 	id = data["id"];
 	name = data["name"];
-	gridSize = data["gridSize"];
 }
 
 
@@ -66,6 +82,8 @@ bool GeneratorNode::Render() {
 	ImGui::DragFloat((std::string("Smoothness##RandomNode") + std::to_string(inputPinV.id)).c_str(), &smoothness, 0.01f);
 	ImGui::PopItemWidth();
 
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));
+
 	if (ImGui::Button("Generate")) {
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
@@ -74,6 +92,8 @@ bool GeneratorNode::Render() {
 		}
 		std::cout << ("Generated Generator Data.\n");
 	}
+
+	ImGui::PopStyleVar();
 
 	ImGui::NewLine();
 

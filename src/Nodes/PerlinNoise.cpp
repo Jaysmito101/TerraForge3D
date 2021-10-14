@@ -19,7 +19,7 @@ void PerlinNode::Setup() {
 
 
 std::vector<void*>  PerlinNode::GetPins() {
-	return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &outputPin });
+	return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &inputPinT, &outputPin });
 };
 
 nlohmann::json PerlinNode::Save() {

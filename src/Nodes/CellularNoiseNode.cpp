@@ -17,7 +17,7 @@ void CellularNode::Setup() {
 
 
 std::vector<void*>  CellularNode::GetPins() {
-	return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &outputPin });
+	return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &inputPinT, &outputPin });
 };
 
 nlohmann::json CellularNode::Save() {

@@ -1078,6 +1078,8 @@ public:
 
 	virtual bool Render() override;
 
+	float EvaluateScript(float x, float y);
+
 	virtual float EvaluatePin(float x, float y, int id) override;
 
 	FloatPin inputPinV = FloatPin(this, PinType::Input);
@@ -1097,6 +1099,7 @@ private:
 	bool showConsole = false;
 	bool showEditor = true;
 	bool showTexture = false;
+	float* acData;
 };
 
 

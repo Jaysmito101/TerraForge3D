@@ -1,5 +1,6 @@
 #include <NodeEditorNodes.h>
 #include <LuaNativeFunctions.h>
+#include <MathUtils.h>
 
 static std::string floatNodeDefaultScript = R"(
 function Evaluate(x, y, a, b, c)
@@ -40,7 +41,7 @@ std::vector<void*> ScriptFloatNode::GetPins() {
 	return std::vector<void*>({ &inputPinX, &inputPinY, &inputPinV, &outputPin });
 }
 
-float ScriptFloatNode::EvaluatePin(float x, float y, int id) {
+float ScriptFloatNode::EvaluateScript(float x, float y) {
 	if (isCompiled) {
 			lua_getglobal(L, "Evaluate");
 			lua_pushnumber(L, x);
@@ -65,6 +66,13 @@ float ScriptFloatNode::EvaluatePin(float x, float y, int id) {
 				}
 				lua_pop(L, lua_gettop(L));
 			}
+	}
+	return 0.0f;
+}
+
+float ScriptFloatNode::EvaluatePin(float x, float y, int id) {
+	if (acData) {
+		return acData[(int)x * *data.resolution + (int)y];
 	}
 	return 0.0f;
 }
@@ -192,6 +200,29 @@ bool ScriptFloatNode::Render() {
 				output.push_back(std::make_pair(1, "Function call to Evaluate failed!"));
 			}
 		}
+		if (ImGui::Button("Generate")) {
+			if (outputTex)
+				delete outputTex;
+			outputTex = new Texture2D(*data.resolution, *data.resolution);
+			if (acData)
+				delete[] acData;
+			acData = new float[*data.resolution * *data.resolution];
+			char* Idata = new char[*data.resolution* *data.resolution*3];
+			int co = 0;
+			int co2 = 0;
+			for (int i = 0; i < *data.resolution; i++) {
+				for (int j = 0; j < *data.resolution; j++) {
+					float vv = EvaluateScript(i, j);
+					float vt =  Clamp01(vv * 0.5f + 0.5f) * 256;
+					acData[co2++] = vv;
+					Idata[co++] = vt;
+					Idata[co++] = vt;
+					Idata[co++] = vt;
+				}
+			}
+ 			outputTex->SetData(Idata, sizeof(char)* *data.resolution* *data.resolution);
+			delete[] Idata;
+		}
 	}
 	else {
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -293,7 +324,7 @@ bool ScriptFloatNode::Render() {
 		ImGui::EndChild();
 	}
 
-	if (showEditor && outputTex) {
+	if (showTexture && outputTex) {
 		ImGui::Image((ImTextureID)outputTex->GetRendererID(), ImVec2(200, 200));
 	}
 
@@ -306,6 +337,8 @@ bool ScriptFloatNode::Render() {
 ScriptFloatNode::~ScriptFloatNode(){
 	lua_close(L);
 	delete editor;
+	if (acData)
+		delete acData;
 }
 
 // -------SCRIPT-FLOAT--NODE-END----------------------------------------------------------------------------

@@ -807,20 +807,6 @@ static void UpdateNodeDuplacation() {
 		if (ImNodes::IsNodeSelected(node->id)) {
 			if (node->id == outputNode->id)
 				return;
-			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_D) == GLFW_PRESS
-				&&
-				(
-					glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS
-					||
-					glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS
-					)) {
-				nlohmann::json data = node->Save();
-				Node* nd = MakeNode(data);
-				editorM.nodes.push_back(nd);
-				std::vector<void*> pins = nd->GetPins();
-				for (void* p : pins)
-					editorM.pins.push_back((Pin*)p);
-			}
 		}
 	}
 }
@@ -870,7 +856,7 @@ static void UpdateNodeDeletion() {
 		if (ImNodes::IsNodeSelected(node->id)) {
 			if (node->id == outputNode->id)
 				return;
-			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_DELETE)) {
+			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_DELETE) && (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL))) {
 				//editorM.nodes.erase(std::remove(editorM.nodes.begin(), editorM.nodes.end(), 8), editorM.nodes.end());
 				DeletePins(node->GetPins());
 				std::vector<Node*>::iterator position = std::find(editorM.nodes.begin(), editorM.nodes.end(), node);
