@@ -26,7 +26,7 @@ nlohmann::json PerlinNode::Save() {
 	nlohmann::json data;
 	data["type"] = NodeType::Perlin;
 	data["inputPinT"] = inputPinT.Save();
-	data["inputPinZ"] = inputPinV.Save();
+	data["inputPinV"] = inputPinV.Save();
 	data["inputPinX"] = inputPinX.Save();
 	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();

@@ -1,5 +1,6 @@
 #include <NodeEditorNodes.h>
 #include <Utils.h>
+#include <ProjectData.h>
 
 
 float TextureSamplerNode::EvaluatePin(float x, float y, int id)  {
@@ -44,9 +45,15 @@ void TextureSamplerNode::Load(nlohmann::json data) {
 	outputPinB.Load(data["outputPinB"]);
 	Setup();
 	textureFilePath = data["textureFilePath"];
-	if (texture)
-		delete texture;
-	texture = new Texture2D(textureFilePath);
+	if (textureFilePath.size() > 0) {
+		if (texture)
+			delete texture;
+		Log("Loaded texture with ID : " + textureFilePath);
+		texture = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(textureFilePath));
+	}
+	else {
+		texture = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
+	}
 	id = data["id"];
 	name = data["name"];
 }
@@ -82,7 +89,14 @@ bool TextureSamplerNode::Render()  {
 			if (textureFilePath.size() > 1) {
 				if (texture)
 					delete texture;
-				texture = new Texture2D(textureFilePath);
+				std::string uid = GenerateId(64);
+				if (!PathExist(GetProjectResourcePath() + "\\textures"))
+					MkDir(GetProjectResourcePath() + "\\textures");
+				CopyFileData(textureFilePath, GetProjectResourcePath() + "\\textures\\" + uid);
+				RegisterProjectAsset(uid, "textures\\" + uid);
+				Log("Loaded texture with ID : " + uid);
+				textureFilePath = uid;
+				texture = new Texture2D(GetProjectResourcePath() + "\\textures\\" + uid);
 				isLoaded = true;
 				if(data.resolution)
 					texture->Resize(*data.resolution, *data.resolution);
@@ -99,7 +113,14 @@ bool TextureSamplerNode::Render()  {
 			if (textureFilePath.size() > 1) {
 				if (texture)
 					delete texture;
-				texture = new Texture2D(textureFilePath);
+				std::string uid = GenerateId(64);
+				if (!PathExist(GetProjectResourcePath() + "\\textures"))
+					MkDir(GetProjectResourcePath() + "\\textures");
+				CopyFileData(textureFilePath, GetProjectResourcePath() + "\\textures\\" + uid);
+				RegisterProjectAsset(uid, "textures\\" + uid);
+				Log("Loaded texture with ID : " + uid);
+				textureFilePath = uid;
+				texture = new Texture2D(GetProjectResourcePath() + "\\textures\\" + uid);
 				isLoaded = true;
 				if (data.resolution)
 					texture->Resize(*data.resolution, *data.resolution);

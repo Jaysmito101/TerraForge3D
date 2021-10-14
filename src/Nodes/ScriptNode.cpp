@@ -72,7 +72,7 @@ float ScriptFloatNode::EvaluatePin(float x, float y, int id) {
 nlohmann::json ScriptFloatNode::Save() {
 	nlohmann::json data;
 	data["type"] = NodeType::ScriptF;
-	data["inputPinZ"] = inputPinV.Save();
+	data["inputPinV"] = inputPinV.Save();
 	data["inputPinX"] = inputPinX.Save();
 	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();

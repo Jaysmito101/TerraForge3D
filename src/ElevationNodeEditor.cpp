@@ -147,7 +147,6 @@ static void UpdateHeightMap() {
 		return;
 }
 
-
 void SetupElevationManager(int* res) {
 	resolution = res;
 	currRes = *resolution;
@@ -383,19 +382,19 @@ static void FixPinPointers() {
 }
 
 static void LoadEditorData(Editor& editor, nlohmann::json data) {
-	ImNodes::LoadEditorStateFromIniString(editor.context, data["context"].dump().c_str(), data["context"].dump().size());
 	for (Node* n : editor.nodes) {
 		if (n->id == outputNode->id)
 			continue;
 		delete n;
 	}
-	editor.nodes = std::vector<Node*>();
+	editor.nodes.clear();
+	editor.pins.clear();
+	ImNodes::EditorContextSet(editor.context);
+	ImNodes::LoadEditorStateFromIniString(editor.context, std::string(data["context"]).c_str(), std::string(data["context"]).size());
+	SetBaseId(data["lID"]);
 	for (nlohmann::json node : data["nodes"]) {
 		editor.nodes.push_back(MakeNode(node));
 	}
-
-
-	editor.pins = std::vector<Pin*>();
 	for (Node* n : editor.nodes) {
 		std::vector<void*> np = n->GetPins();
 		for (void* pn : np) {
@@ -403,9 +402,7 @@ static void LoadEditorData(Editor& editor, nlohmann::json data) {
 		}
 	}
 	editor.pins.push_back(&(outputNode)->inputPin);
-
-
-	editor.links = std::vector<Link>();
+	editor.links.clear();
 	for (nlohmann::json link : data["links"]) {
 		editor.links.push_back(Link());
 		editor.links.back().Load(link);
@@ -416,18 +413,21 @@ static void LoadEditorData(Editor& editor, nlohmann::json data) {
 		}
 	}
 	FixPinPointers();
-
-	ImNodes::EditorContextSet(editor.context);
+	/*
 	for (nlohmann::json nodePos : data["nodePositions"]) {
 		ImNodes::SetNodeEditorSpacePos(nodePos["id"], ImVec2(nodePos["x"], nodePos["y"]));
 	}
+	*/
 }
 
 void SetElevationNodeEditorSaveData(nlohmann::json data) {
 	try {
 		LoadEditorData(editorM, data);
+		autoUpdate = data["updateNode"];
 	}
-	catch (...) {}
+	catch (...) {
+		std::cout << ("Failed to Load Node Editor Data.\n");
+	}
 }
 
 static void ResetNodeEditor() {
@@ -826,7 +826,9 @@ static void UpdateNodeDuplacation() {
 }
 
 nlohmann::json GetElevationNodeEditorSaveData() {
-	return editorM.Save(outputNode);
+	nlohmann::json data = editorM.Save(outputNode);
+	data["updateNode"] = autoUpdate;
+	return data;
 }
 
 static void ShowNodeMaker(Pin* start_drop) {
@@ -864,7 +866,6 @@ static void DeletePins(std::vector<void*> pins) {
 }
 
 static void UpdateNodeDeletion() {
-
 	for (Node* node : editorM.nodes) {
 		if (ImNodes::IsNodeSelected(node->id)) {
 			if (node->id == outputNode->id)
@@ -878,7 +879,6 @@ static void UpdateNodeDeletion() {
 			}
 		}
 	}
-
 }
 
 static void ShowEditor(const char* editor_name, Editor& editor) {
@@ -905,10 +905,6 @@ static void ShowEditor(const char* editor_name, Editor& editor) {
 				showHMap = false;
 			}
 		}
-	}
-
-	if (ImGui::GetIO().KeysDown[ImGuiKey_A]) {
-		showNodeMaker = true;
 	}
 
 	ImNodes::EditorContextSet(editorM.context);

@@ -22,7 +22,7 @@ std::vector<void*>  ConditionNode::GetPins() {
 nlohmann::json ConditionNode::Save() {
 	nlohmann::json data;
 	data["type"] = NodeType::Condition;
-	data["inputPinZ"] = inputPinV.Save();
+	data["inputPinV"] = inputPinV.Save();
 	data["inputPinX"] = inputPinX.Save();
 	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();

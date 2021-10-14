@@ -84,7 +84,7 @@ static bool showSea = false;
 static bool absolute = false;
 static bool square = false;
 static bool reqTexRfrsh = false;
-static bool autoSave = true;
+static bool autoSave = false;
 static bool showFoliage = true;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
@@ -669,11 +669,11 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	std::ofstream outfile;
 	
 	outfile.open(file);
-	outfile << data;
+	outfile << data.dump(4, ' ', false);
 	outfile.close();
 
 	outfile.open(GetProjectResourcePath() + "\\project.terr3d");
-	outfile << data;
+	outfile << data.dump(4, ' ', false);
 	outfile.close();
 }
 
@@ -794,7 +794,6 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size())
 }
 
-
 void zip_walk(struct zip_t* zip, const char* path, bool isFristLayer = true, std::string prevPath = "") {
 	DIR* dir;
 	struct dirent* entry;
@@ -824,7 +823,6 @@ void zip_walk(struct zip_t* zip, const char* path, bool isFristLayer = true, std
 
 	closedir(dir);
 }
-
 
 static void PackProject(std::string path = ShowSaveFileDialog()) {
 	if (path.find(".terr3dpack") == std::string::npos)

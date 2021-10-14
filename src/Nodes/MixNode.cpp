@@ -22,7 +22,7 @@ std::vector<void*>  MixNode::GetPins() {
 nlohmann::json MixNode::Save() {
 	nlohmann::json data;
 	data["type"] = NodeType::Mix;
-	data["inputPinZ"] = inputPinV.Save();
+	data["inputPinV"] = inputPinV.Save();
 	data["inputPinX"] = inputPinX.Save();
 	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();

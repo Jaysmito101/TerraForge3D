@@ -20,6 +20,8 @@
 
 int GenerateId();
 
+void SetBaseId(int baseID);
+
 enum NodeType
 {
 	FloatNodeI = 0,
@@ -178,7 +180,7 @@ struct Editor
 			linksSave.push_back(l.Save());
 		}
 		data["links"] = linksSave;
-
+		data["lID"] = GenerateId();
 
 
 		return data;

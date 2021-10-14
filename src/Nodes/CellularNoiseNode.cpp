@@ -24,7 +24,7 @@ nlohmann::json CellularNode::Save() {
 	nlohmann::json data;
 	data["type"] = NodeType::Cellular;
 	data["inputPinT"] = inputPinT.Save();
-	data["inputPinZ"] = inputPinV.Save();
+	data["inputPinV"] = inputPinV.Save();
 	data["inputPinX"] = inputPinX.Save();
 	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();
