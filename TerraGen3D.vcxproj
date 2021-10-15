@@ -225,6 +225,7 @@
     <ClCompile Include="src\FoliagePlacement.cpp" />
     <ClCompile Include="src\LuaNativeFunctions.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Nodes\BinaryTreeMazeNode.cpp" />
     <ClCompile Include="src\Nodes\CellularNoiseNode.cpp" />
     <ClCompile Include="src\Nodes\ClampNode.cpp" />
     <ClCompile Include="src\Nodes\ConditionNode.cpp" />

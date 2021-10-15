@@ -115,6 +115,7 @@ static std::string successMessage = "";
 static std::string errorMessage = "";
 static std::string savePath = "";
 
+
 static void ToggleSystemConsole() {
 	static bool state = false;
 	state = !state;
@@ -559,8 +560,8 @@ static void ShowMainScene() {
 			button2 = io.MouseDown[2];
 			button3 = io.MouseDown[1];
 			if (ImGui::GetIO().MouseDown[1]) {
-				CameraPosition[0] += -io.MouseDelta.x * 0.005f;
-				CameraPosition[1] += io.MouseDelta.y * 0.005f;
+				CameraPosition[0] += -io.MouseDelta.x * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(CameraPosition[0], CameraPosition[1], CameraPosition[2]));
+				CameraPosition[1] += io.MouseDelta.y * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(CameraPosition[0], CameraPosition[1], CameraPosition[2]));
 			}
 			viewportMousePosX = ImGui::GetIO().MousePos.x - viewportOffset.x;
 			viewportMousePosY = ImGui::GetIO().MousePos.y - viewportOffset.y;
@@ -1332,6 +1333,7 @@ public:
 		ShowErrorModal();
 		ShowSuccessModal();
 
+
 		// Optional Windows
 
 		if (activeWindows.statsWindow)
@@ -1380,6 +1382,8 @@ public:
 		SetupElevationManager(&resolution);
 		SetupFoliageManager();
 		SetupSupportersTribute();
+
+
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);

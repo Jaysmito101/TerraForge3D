@@ -370,6 +370,12 @@ static Node* MakeNode(nlohmann::json& nodedata) {
 		nd->data = NodeData(resolution);
 		return nd;
 	}
+	if (nodedata["type"] == NodeType::BinTreeMaze) {
+		BinaryTreeMazeNode* nd = new BinaryTreeMazeNode();
+		nd->Load(nodedata);
+		nd->data = NodeData(resolution);
+		return nd;
+	}
 }
 
 static void FixPinPointers() {
@@ -741,6 +747,23 @@ static void ShowNodesMaker(Pin* start_drop, char* searchString, int searchString
 		}
 	}
 
+	if (searchStringLength == 0 || strcasestr("Binary Tree Maze", searchString)) {
+		if (ImGui::Button("Binary Tree Maze"))
+		{
+			editorM.nodes.push_back(new BinaryTreeMazeNode());
+			std::vector<void*> pins = ((BinaryTreeMazeNode*)editorM.nodes.back())->GetPins();
+			for (void* p : pins)
+				editorM.pins.push_back((Pin*)p);
+			((BinaryTreeMazeNode*)editorM.nodes.back())->Setup();
+			((BinaryTreeMazeNode*)editorM.nodes.back())->data = NodeData(resolution);
+			if (start_drop) {
+				// Nothing to do in here!
+			}
+			ImNodes::SetNodeScreenSpacePos(editorM.nodes.back()->id, ImGui::GetMousePos() - ImVec2(40, 40));
+			ImGui::CloseCurrentPopup();
+		}
+	}
+
 	if (searchStringLength == 0 || strcasestr("Time", searchString)) {
 		if (ImGui::Button("Time"))
 		{
@@ -860,7 +883,7 @@ static void UpdateNodeDeletion() {
 		if (ImNodes::IsNodeSelected(node->id)) {
 			if (node->id == outputNode->id)
 				return;
-			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_DELETE) && (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL))) {
+			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_DELETE)) {
 				//editorM.nodes.erase(std::remove(editorM.nodes.begin(), editorM.nodes.end(), 8), editorM.nodes.end());
 				DeletePins(node->GetPins());
 				std::vector<Node*>::iterator position = std::find(editorM.nodes.begin(), editorM.nodes.end(), node);

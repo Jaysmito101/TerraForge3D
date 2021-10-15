@@ -85,6 +85,8 @@ bool GeneratorNode::Render() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));
 
 	if (ImGui::Button("Generate")) {
+		if (inputPinPlacer.isLinked && inputPinPlacer.node->name.find("Maze") != std::string::npos)
+			inputPinPlacer.node->data.resolution = &gridSizeOld;
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
 				grid[i * gridSize + j] = inputPinPlacer.Evaluate(i, j);
@@ -135,7 +137,7 @@ bool GeneratorNode::Render() {
 			float color = (grid[i * gridSize + j] - minH) / maxH;
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(color, color, color, 1));
 			if (ImGui::Button((std::string("  ##i") + std::to_string(i) + "_j" + std::to_string(j)).c_str())) {
-				grid[i * gridSize + j] = grid[i * gridSize + j] == 0 ? 1 : 0;
+				grid[i * gridSize + j] = grid[i * gridSize + j] < 1 ? 1 : 0;
 			}
 			ImGui::PushItemWidth(100);
 			if (ImGui::BeginPopupContextItem()) {

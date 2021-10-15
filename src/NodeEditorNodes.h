@@ -46,7 +46,8 @@ enum NodeType
 	Generator,
 	Time,
 	Condition,
-	Duplicate
+	Duplicate,
+	BinTreeMaze
 };
 
 struct NodeData {
@@ -1332,13 +1333,11 @@ public:
 
 	virtual void Setup() override;
 
-
 	virtual std::vector<void*>  GetPins();
 
 	nlohmann::json Save();
 
 	void Load(nlohmann::json data);
-
 
 	virtual bool Render() override;
 
@@ -1351,3 +1350,24 @@ private:
 	FloatPin outputPinZ = FloatPin(this, PinType::Output);
 };
 
+class BinaryTreeMazeNode : public Node {
+public:
+	BinaryTreeMazeNode(std::string name = "Binary Tree Maze", int id = GenerateId());
+
+	virtual void Setup() override;
+
+	virtual std::vector<void*> GetPins();
+
+	nlohmann::json Save();
+
+	void Load(nlohmann::json data);
+
+	virtual bool Render() override;
+
+	virtual float EvaluatePin(float x, float y, int id) override;
+
+	FloatPin outputPin = FloatPin(this, PinType::Output);
+
+	int seed = 0;
+	bool* grid = nullptr;
+};
