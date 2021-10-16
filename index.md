@@ -9,9 +9,15 @@
   <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/Jaysmito101/TerraGen3D?style=for-the-badge">
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/Jaysmito101/TerraGen3D?style=for-the-badge">
     <br>
+    <br>
+    <br>
   <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/Jaysmito101/TerraGen3D/total?label=Github%20Downloads&style=for-the-badge">
   <img alt="SourceForge" src="https://img.shields.io/sourceforge/dt/terragen3d?label=Source%20Forge%20Downloads&style=for-the-badge">
   <img alt="GitHub" src="https://img.shields.io/github/license/Jaysmito101/Terragen3D?style=for-the-badge">
+    <br>
+    <br>
+    <br>
+    
     <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2021?style=for-the-badge">
     
     
