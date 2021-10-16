@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="./resources/ReadmeHeader.png" border="0"></
+    <img src="https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/resources/ReadmeHeader.png" border="0"></
 </p>
 
 <br/>
@@ -23,9 +23,9 @@
 # TerraGen3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
-![Showcase2](./Screenshots/ShowCase2.gif)
+<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase2.gif" width="1000">
 
-![Showcase1](./Screenshots/ShowCase1.gif)
+<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase1.gif" width="1000">
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
