@@ -1,9 +1,11 @@
 .vs
-Release
-Debug
+bin
+vendor/premake/**.**
+scripts/__pycache__
 
+*.sln
+*.vcxproj
 *.user
 *.filters
 *.aps
 *.ini
-*.dll
