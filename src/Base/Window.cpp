@@ -63,6 +63,37 @@ void Window::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Window::SetFullScreen(bool fullscreen)
+{
+	if (isFullscreen == fullscreen)
+		return;
+
+	static int x, y;
+	static int sx, sy;
+
+	isFullscreen = fullscreen;
+
+	if (fullscreen)
+	{
+		
+		// backup window position and window size
+		glfwGetWindowPos(m_Window, &x, &y);
+		glfwGetWindowSize(m_Window, &sx, &sy);
+
+		// get resolution of monitor
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+		// switch to full screen
+		glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
+	}
+	else
+	{
+		// restore last window size and position
+		glfwSetWindowMonitor(m_Window, nullptr, x, y, sx, sy, 0);
+	}
+
+}
+
 void Window::Update()
 {
 	if (!isActive)

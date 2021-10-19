@@ -6,6 +6,7 @@
 #include <ImGuiConsole.h>
 #include <AppStyles.h>
 #include <ModelImporter.h>
+#include <ExplorerControls.h>
 #include <Texture2D.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
@@ -86,6 +87,7 @@ static bool absolute = false;
 static bool square = false;
 static bool reqTexRfrsh = false;
 static bool autoSave = false;
+static bool isExploreMode = false;
 static bool showFoliage = true;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
@@ -374,7 +376,7 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetUniformi("_Diffuse", 5);
 	terrain.Render();
 
-	if(showFoliage)
+	if (showFoliage)
 		RenderFoliage(shader, camera);
 
 	// For Future
@@ -410,6 +412,7 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
 	ImGui::Checkbox("Show Skybox", &skyboxEnabled);
 	ImGui::Checkbox("Show Foliage", &showFoliage);
+	ImGui::Checkbox("Explorer Mode", &isExploreMode);
 	ImGui::NewLine();
 	if (ImGui::Button("Update Mesh"))
 		RegenerateMesh();
@@ -580,7 +583,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	if (file.find(".terr3d") == std::string::npos)
 		file += ".terr3d";
 
-	if(file.find("autosave.terr3d") == std::string::npos)
+	if (file.find("autosave.terr3d") == std::string::npos)
 		savePath = file;
 
 	nlohmann::json data;
@@ -641,7 +644,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 
 	if (diffuse) {
 		bool isOk = true;
-		static std::string uid ;
+		static std::string uid;
 		static std::string oPath = "";
 		try {
 			std::string path = GetProjectAsset(uid);
@@ -669,7 +672,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["generals"] = tmp;
 
 	std::ofstream outfile;
-	
+
 	outfile.open(file);
 	outfile << data.dump(4, ' ', false);
 	outfile.close();
@@ -698,7 +701,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 		Log("Could not read file " + file);
 		return;
 	}
-	if (sdata.size() == 0){
+	if (sdata.size() == 0) {
 		Log("Empty file.");
 		return;
 	}
@@ -814,7 +817,7 @@ void zip_walk(struct zip_t* zip, const char* path, bool isFristLayer = true, std
 		snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
 		stat(fullpath, &s);
 		if (S_ISDIR(s.st_mode)) {
-			zip_walk(zip, fullpath, false, prevPath + entry->d_name+"\\");
+			zip_walk(zip, fullpath, false, prevPath + entry->d_name + "\\");
 		}
 		else {
 			zip_entry_open(zip, (prevPath + entry->d_name).c_str());
@@ -878,7 +881,7 @@ static void LoadPackedProject(std::string path = ShowOpenFileDialog()) {
 		std::string projId = data["generals"]["projectID"];
 		zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId).c_str(), [](const char* filename, void* arg) {Log(std::string("Extracted ") + filename); return 1; }, (void*)0);
 		std::string oriDir = path.substr(0, path.rfind("\\"));
-		std::string oriName = path.substr(path.rfind("\\")+1);
+		std::string oriName = path.substr(path.rfind("\\") + 1);
 		CopyFileData((GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId + "\\project.terr3d").c_str(), oriDir + "\\" + oriName + ".terr3d");
 		OpenSaveFile(oriDir + "\\" + oriName + ".terr3d");
 	}
@@ -1054,7 +1057,7 @@ static void ShowMenu() {
 			if (ImGui::MenuItem("GitHub Page"))
 				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D", NULL, NULL, SW_SHOWNORMAL);
 
-			if(ImGui::MenuItem("Documentation"))
+			if (ImGui::MenuItem("Documentation"))
 				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D/wiki", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Open Source Liscenses"))
@@ -1211,87 +1214,126 @@ public:
 				noiseLayers.push_back(n);
 			noiseLayersTmp.clear();
 		}
-
-		if (reqTexRfrsh) {
-			if (diffuse)
-				delete diffuse;
-			diffuse = new Texture2D(GetTextureStoreSelectedTexture(), true);
-			reqTexRfrsh = false;
-		}
-
-		// CTRL Shortcuts
-		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL))) {
-
-			// Open Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) {
-				OpenSaveFile();
+		if (!isExploreMode) {
+			if (reqTexRfrsh) {
+				if (diffuse)
+					delete diffuse;
+				diffuse = new Texture2D(GetTextureStoreSelectedTexture(), true);
+				reqTexRfrsh = false;
 			}
 
-			// Exit Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) {
-				exit(0);
-			}
+			// CTRL Shortcuts
+			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL))) {
 
-			// Export Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_E)) {
-				ExportOBJ(terrain.mesh->Clone(), ShowSaveFileDialog(".obj"));
-			}
-
-			// Save Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
-				if (savePath.size() > 3) {
-					Log("Saved to " + savePath);
-					SaveFile(savePath);
+				// Open Shortcut
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) {
+					OpenSaveFile();
 				}
-				else {
-					SaveFile();
-				}
-			}
 
-			// Close Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_W)) {
-				if (savePath.size() > 3) {
-					Log("CLosed file " + savePath);
-					savePath = "";
-				}
-				else {
-					Log("Shutting Down");
+				// Exit Shortcut
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) {
 					exit(0);
 				}
-			}
 
-			// CTRL + SHIFT Shortcuts
-			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT))) {// Save Shortcut
+				// Export Shortcut
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_E)) {
+					ExportOBJ(terrain.mesh->Clone(), ShowSaveFileDialog(".obj"));
+				}
 
-				// Save As Shortcuts
+				// Save Shortcut
 				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
-					savePath = "";
-					SaveFile();
+					if (savePath.size() > 3) {
+						Log("Saved to " + savePath);
+						SaveFile(savePath);
+					}
+					else {
+						SaveFile();
+					}
 				}
 
-				// Node Editor Shortcut
-				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_N)) {
-					activeWindows.elevationNodeEditorWindow = true;
-					noiseBased = false;
+				// Close Shortcut
+				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_W)) {
+					if (savePath.size() > 3) {
+						Log("CLosed file " + savePath);
+						savePath = "";
+					}
+					else {
+						Log("Shutting Down");
+						exit(0);
+					}
 				}
 
-				// Noise Layer Shortcut
-				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L)) {
-					activeWindows.elevationNodeEditorWindow = false;
-					noiseBased = true;
+				// CTRL + SHIFT Shortcuts
+				if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT))) {// Save Shortcut
+
+					// Save As Shortcuts
+					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
+						savePath = "";
+						SaveFile();
+					}
+
+					// Node Editor Shortcut
+					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_N)) {
+						activeWindows.elevationNodeEditorWindow = true;
+						noiseBased = false;
+					}
+
+					// Noise Layer Shortcut
+					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L)) {
+						activeWindows.elevationNodeEditorWindow = false;
+						noiseBased = true;
+					}
+
+					// Explorer Mode Shortcut
+					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_X)) {
+						Log("Toggle Explorer Mode");
+						isExploreMode = true;
+					}
+
 				}
 			}
-		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
-		glViewport(0, 0, 800, 600);
-		GetWindow()->Clear();
-		s_Stats.deltaTime = deltatime;
-		DoTheRederThing(deltatime);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		RenderImGui();
-		if (autoUpdate)
-			RegenerateMesh();
+			glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
+			glViewport(0, 0, 800, 600);
+			GetWindow()->Clear();
+			s_Stats.deltaTime = deltatime;
+
+			DoTheRederThing(deltatime);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			RenderImGui();
+			if (autoUpdate)
+				RegenerateMesh();
+
+		}
+		else {
+			static bool expH = false;
+			if (!expH) {
+				GetWindow()->SetFullScreen(true);
+				glfwSetInputMode(GetWindow()->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+				ExPSaveCamera(CameraPosition, CameraRotation);
+			}
+
+
+			expH = isExploreMode;
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			int w, h;
+			glfwGetWindowSize(GetWindow()->GetNativeWindow(), &w, &h);
+			glViewport(0, 0, w, h);
+			GetWindow()->Clear();
+			s_Stats.deltaTime = deltatime;
+			UpdateExplorerControls(CameraPosition, CameraRotation);
+			DoTheRederThing(deltatime);
+
+
+			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_ESCAPE))) {
+				isExploreMode = false;
+				expH = false;
+				glfwSetInputMode(GetWindow()->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				GetWindow()->SetFullScreen(false);
+				ExPRestoreCamera(CameraPosition, CameraRotation);
+			}
+
+		}
 
 		if (ReqRefresh())
 			ResetShader();
@@ -1301,7 +1343,7 @@ public:
 	{
 		if (!isRuinning)
 			return;
-		
+
 		secondCounter++;
 
 		if (secondCounter % 5 == 0) {
@@ -1382,7 +1424,7 @@ public:
 		SetupElevationManager(&resolution);
 		SetupFoliageManager();
 		SetupSupportersTribute();
-
+		SetupExplorerControls();
 
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");

@@ -35,12 +35,13 @@ public:
 	void Update();
 	void Close();
 	void Clear();
+	void SetFullScreen(bool fullscreen);
 
 	inline bool IsVSyncEnabled() { return vSyncState; }
 	inline GLFWwindow* GetNativeWindow() { return m_Window; }
 
 private:
-	bool isActive, vSyncState;
+	bool isActive, vSyncState, isFullscreen = false;
 	GLFWwindow* m_Window;
 	EventFn m_CloseEventCallback, m_ResizeEventCallback, m_MouseEventCallback;
 	ClearColor m_ClearColor;
