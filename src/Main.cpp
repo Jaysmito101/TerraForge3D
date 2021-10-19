@@ -1420,7 +1420,7 @@ public:
 		SetUpIcon();
 		SetupViewportFrameBuffer();
 		SetupCubemap();
-		SetupShaderManager();
+		SetupShaderManager(GetExecutableDir());
 		SetupElevationManager(&resolution);
 		SetupFoliageManager();
 		SetupSupportersTribute();

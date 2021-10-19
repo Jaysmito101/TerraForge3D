@@ -5,7 +5,7 @@
 void ShowShaderEditor(bool* pOpen);
 
 void SecondlyShaderEditorUpdate();
-void SetupShaderManager();
+void SetupShaderManager(std::string execDir);
 bool ReqRefresh();
 std::string GetDefaultVertexShaderSource();
 std::string GetVertexShaderSource();

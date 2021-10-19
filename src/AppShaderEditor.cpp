@@ -10,104 +10,11 @@
 #include <Windows.h>
 #include <Utils.h>
 
-static std::string defaultBaseVertexShader = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNorm;
-layout (location = 2) in vec2 aTexCoord;
+static std::string defaultBaseVertexShader = "";
 
-uniform mat4 _PV;
-uniform mat4 _Model;
+static std::string defaultBaseGeometryShader = "";
 
-out DATA
-{
-
-    vec3 FragPos;
-    vec3 Normal;
-	vec2 TexCoord;
-	mat4 PV;
-} data_out; 
-
-void main()
-{
-    gl_Position =  vec4(aPos.x, aPos.y, aPos.z, 1.0);
-	data_out.FragPos = aPos;
-	data_out.Normal = aNorm;
-	data_out.TexCoord = aTexCoord;
-	data_out.PV = _PV;
-}
-)";
-
-static std::string defaultBaseGeometryShader = R"(
-#version 330 core
-
-layout(triangles) in;
-layout(triangle_strip, max_vertices = 3) out;
-
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 TexCoord;
-
-in DATA
-{
-
-    vec3 FragPos;
-    vec3 Normal;
-	vec2 TexCoord;
-	mat4 PV;
-} data_in[]; 
-
-void main()
-{	
-	gl_Position = data_in[0].PV * gl_in[0].gl_Position;
-	Normal = data_in[0].Normal;
-	TexCoord = data_in[0].TexCoord;
-	FragPos = data_in[0].FragPos;
-	EmitVertex();
-
-	gl_Position = data_in[0].PV * gl_in[1].gl_Position;
-	Normal = data_in[1].Normal;
-	TexCoord = data_in[0].TexCoord;
-	FragPos = data_in[1].FragPos;
-	EmitVertex();
-
-	gl_Position =  data_in[0].PV * gl_in[2].gl_Position;
-	Normal = data_in[2].Normal;
-	TexCoord = data_in[0].TexCoord;
-	FragPos = data_in[2].FragPos;
-	EmitVertex();
-
-	EndPrimitive();
-} 
-)";
-
-static std::string defaultBaseFragmentShader = R"(
-#version 330 core
-out vec4 FragColor;
-
-uniform vec3 _LightPosition;
-uniform vec3 _LightColor;
-
-uniform sampler2D _Diffuse;
-//unifrom float _UseTexutres;
-
-in vec3 FragPos;
-in vec3 Normal;
-in vec2 TexCoord;
-
-void main()
-{	
-	//vec3 objectColor = vec3(0.34f, 0.49f, 0.27f);
-	vec3 objectColor = vec3(1, 1, 1);
-	objectColor = texture(_Diffuse, TexCoord).xyz;
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(_LightPosition - FragPos);
-	float diff = max(dot(norm, lightDir), 0.0f);
-	vec3 diffuse = diff * _LightColor;
-	vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;
-	FragColor = vec4(result, 1.0);
-} 
-)";
+static std::string defaultBaseFragmentShader = "";
 
 
 enum ShaderType {
@@ -229,7 +136,39 @@ static std::string ShowOpenFileDialogSh(HWND owner = NULL) {
 }
 
 
-void SetupShaderManager() {
+void SetupShaderManager(std::string execDir) {
+	bool tmp = false;
+
+	defaultBaseVertexShader = ReadShaderSourceFile(execDir + "\\Data\\shaders\\default\\vert.glsl", &tmp);
+	if (tmp) {
+		std::cout << "Loaded Default Vertex Shader from " << execDir + "\\Data\\shaders\\default\\vert.glsl" << std::endl;
+		vertShaderFile.SetSource(defaultBaseVertexShader);
+	}
+	else {
+		std::cout << "Failed to load Default Vertex Shader from " << execDir + "\\Data\\shaders\\default\\vert.glsl" << std::endl;
+	}
+	tmp = false;
+
+	defaultBaseGeometryShader = ReadShaderSourceFile(execDir + "\\Data\\shaders\\default\\geom.glsl", &tmp);
+	if (tmp) {
+		std::cout << "Loaded Default Geometry Shader from " << execDir + "\\Data\\shaders\\default\\geom.glsl" << std::endl;
+		geomShaderFile.SetSource(defaultBaseGeometryShader);
+	}
+	else {
+		std::cout << "Failed to load Default Geometry Shader from " << execDir + "\\Data\\shaders\\default\\geom.glsl" << std::endl;
+	}
+	tmp = false;
+
+	defaultBaseFragmentShader = ReadShaderSourceFile(execDir + "\\Data\\shaders\\default\\frag.glsl", &tmp);
+	if (tmp) {
+		std::cout << "Loaded Default Fragment Shader from " << execDir + "\\Data\\shaders\\default\\frag.glsl" << std::endl;
+		fragShaderFile.SetSource(defaultBaseFragmentShader);
+	}
+	else {
+		std::cout << "Failed to load Default Fragment Shader from " << execDir + "\\Data\\shaders\\default\\frag.glsl" << std::endl;
+	}
+	tmp = false;
+
 	auto lang = TextEditor::LanguageDefinition::GLSL();
 	Veditor.SetLanguageDefinition(lang);
 	Veditor.SetText(vertShaderFile.GetSource());
