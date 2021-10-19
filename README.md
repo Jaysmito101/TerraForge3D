@@ -42,6 +42,7 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 * Tribute to all who **Starred** or **Contributed** to the project
 * Added Maze Generator using Binary Tree Algorithm
 * Generte 3D Terrain Procedrally
+* First Person Terrain Explorer
 * An Highly abstracted API for OpenGL which can be reused by other projects
 * Foliage and custom model importer and renderer
 * Pack Projects into completely portable `.terr3dpack` files
