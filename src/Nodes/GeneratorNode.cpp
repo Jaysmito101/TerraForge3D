@@ -21,12 +21,7 @@ std::vector<void*> GeneratorNode::GetPins() {
 nlohmann::json GeneratorNode::Save() {
 	nlohmann::json data;
 	data["type"] = NodeType::Generator;
-	data["inputPinTiles"] = inputPinTiles.Save();
 	data["inputPinPlacer"] = inputPinPlacer.Save();
-	data["inputPinT"] = inputPinT.Save();
-	data["inputPinV"] = inputPinV.Save();
-	data["inputPinX"] = inputPinX.Save();
-	data["inputPinY"] = inputPinY.Save();
 	data["outputPin"] = outputPin.Save();
 	data["gridSize"] = gridSize;
 
@@ -42,11 +37,7 @@ nlohmann::json GeneratorNode::Save() {
 	return data;
 }
 void GeneratorNode::Load(nlohmann::json data) {
-	inputPinX.Load(data["inputPinX"]);
-	inputPinY.Load(data["inputPinY"]);
-	inputPinV.Load(data["inputPinV"]);
-	inputPinT.Load(data["inputPinT"]);
-	inputPinTiles.Load(data["inputPinTiles"]);
+	outputPin.Load(data["outputPin"]);
 	inputPinPlacer.Load(data["inputPinPlacer"]);
 	gridSize = data["gridSize"];
 	if (grid)
@@ -78,8 +69,8 @@ bool GeneratorNode::Render() {
 	ImNodes::EndInputAttribute();
 
 	ImGui::PushItemWidth(100);
-	ImGui::DragInt((std::string("Grid Size##RandomNode") + std::to_string(inputPinT.id)).c_str(), &gridSize, 1);
-	ImGui::DragFloat((std::string("Smoothness##RandomNode") + std::to_string(inputPinV.id)).c_str(), &smoothness, 0.01f);
+	ImGui::DragInt((std::string("Grid Size##RandomNode") + std::to_string(id)).c_str(), &gridSize, 1);
+	ImGui::DragFloat((std::string("Smoothness##RandomNode") + std::to_string(id)).c_str(), &smoothness, 0.01f);
 	ImGui::PopItemWidth();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));

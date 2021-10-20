@@ -34,7 +34,7 @@ void MeshCoordNode::Load(nlohmann::json data) {
 }
 
 std::vector<void*> MeshCoordNode::GetPins() {
-	return std::vector<void*>({ &outputPinX, &outputPinX });
+	return std::vector<void*>({ &outputPinX, &outputPinY });
 };
 
 bool MeshCoordNode::Render() {

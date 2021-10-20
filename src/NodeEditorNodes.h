@@ -62,7 +62,7 @@ struct NodeData {
 
 struct Link
 {
-	int id;
+	int id = GenerateId();
 	int start_attr, end_attr;
 	void* other;
 
@@ -172,10 +172,10 @@ struct Editor
 			nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", n->id} }));
 		}
 
-		//nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", outputNode->id} }));
+		nodesPositionSave.push_back(nlohmann::json({ {"x", pos.x}, {"y", pos.y}, {"id", outputNode->id} }));
 		data["nodes"] = nodesSave;
 		data["nodePositions"] = nodesPositionSave;
-		data["outputNode"] = outputNode->Save().dump();
+		data["outputNode"] = outputNode->Save();
 		std::vector<nlohmann::json> linksSave;
 		for (Link& l : links) {
 			linksSave.push_back(l.Save());

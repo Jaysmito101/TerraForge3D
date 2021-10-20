@@ -7,6 +7,7 @@
 #include <AppStyles.h>
 #include <ModelImporter.h>
 #include <ExplorerControls.h>
+#include <VersionInfo.h>
 #include <Texture2D.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
@@ -588,8 +589,8 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 
 	nlohmann::json data;
 	data["type"] = "SAVEFILE";
+	data["serializerVersion"] = TERR3D_SERIALIZER_VERSION;
 	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
-	data["version"] = "3.0";
 	data["name"] = "TerraGen3D v3.0";
 	data["EnodeEditor"] = GetElevationNodeEditorSaveData();
 	data["styleData"] = GetStyleData();
@@ -712,16 +713,39 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	catch (...) {
 		Log("Failed to Parse file : " + file);
 	}
+
+	bool isSelfMade = true;
+	
 	try {
 		if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
-			Log("The file you are tryng to open was made with a different version of TerraGen3D!");
-			return;
+			Log("The file you are tryng to open was made with a different version of TerraGen3D!\nTrying to check Serializer compatibility.");
+			isSelfMade = false;
 		}
 	}
 	catch (...) {
-		Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+		isSelfMade = false;
+		Log("Failed to verify File version!");
 		return;
 	}
+
+	if (!isSelfMade) {
+		try {
+			int sVersion = data["serializerVersion"];
+			if (sVersion < TERR3D_MIN_SERIALIZER_VERSION) {
+				Log("This file (" + file + ") cannot be opened as it was serialized using serializer V" + std::to_string(sVersion) + " but the minimum serializer version required is V" + std::to_string(TERR3D_MIN_SERIALIZER_VERSION));
+				return;
+			}
+			if (sVersion > TERR3D_MAX_SERIALIZER_VERSION) {
+				Log("This file (" + file + ") cannot be opened as it was serialized using serializer V" + std::to_string(sVersion) + " but the maximum serializer version supported is V" + std::to_string(TERR3D_MAX_SERIALIZER_VERSION));
+				return;
+			}
+		}
+		catch (...) {
+			Log("Failed to verify Serializer!");
+			return;
+		}
+	}
+
 
 	if (data["type"] == "THEME") {
 		LoadThemeFromStr(data.dump());

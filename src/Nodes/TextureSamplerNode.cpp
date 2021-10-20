@@ -49,11 +49,13 @@ void TextureSamplerNode::Load(nlohmann::json data) {
 		if (texture)
 			delete texture;
 		Log("Loaded texture with ID : " + textureFilePath);
-		texture = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(textureFilePath));
+		texture = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(textureFilePath), true, false);
 	}
 	else {
 		texture = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 	}
+	if (this->data.resolution)
+		texture->Resize(*this->data.resolution, *this->data.resolution);
 	id = data["id"];
 	name = data["name"];
 }
@@ -83,59 +85,34 @@ bool TextureSamplerNode::Render()  {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
 
-	if (!isLoaded) {
-		if (ImGui::Button("Load Texture")) {
-			textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
-			if (textureFilePath.size() > 1) {
-				if (texture)
-					delete texture;
-				std::string uid = GenerateId(64);
-				if (!PathExist(GetProjectResourcePath() + "\\textures"))
-					MkDir(GetProjectResourcePath() + "\\textures");
-				CopyFileData(textureFilePath, GetProjectResourcePath() + "\\textures\\" + uid);
-				RegisterProjectAsset(uid, "textures\\" + uid);
-				Log("Loaded texture with ID : " + uid);
-				textureFilePath = uid;
-				texture = new Texture2D(GetProjectResourcePath() + "\\textures\\" + uid);
-				isLoaded = true;
-				if(data.resolution)
-					texture->Resize(*data.resolution, *data.resolution);
-			}
-			else {
-				isLoaded = false;
-				textureFilePath = "";
-			}
-		}
-	}
-	else {
-		if (ImGui::Button("Change Texture")) {
-			textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
-			if (textureFilePath.size() > 1) {
-				if (texture)
-					delete texture;
-				std::string uid = GenerateId(64);
-				if (!PathExist(GetProjectResourcePath() + "\\textures"))
-					MkDir(GetProjectResourcePath() + "\\textures");
-				CopyFileData(textureFilePath, GetProjectResourcePath() + "\\textures\\" + uid);
-				RegisterProjectAsset(uid, "textures\\" + uid);
-				Log("Loaded texture with ID : " + uid);
-				textureFilePath = uid;
-				texture = new Texture2D(GetProjectResourcePath() + "\\textures\\" + uid);
-				isLoaded = true;
-				if (data.resolution)
-					texture->Resize(*data.resolution, *data.resolution);
-			}
-			else {
-				isLoaded = false;
-				textureFilePath = "";
-			}
-		}
-	}
-
 	ImGui::PopStyleVar();
 
-	if (texture) {
-		ImGui::Image((ImTextureID)texture->GetRendererID(), ImVec2(200, 200));
+
+	uint32_t tId = 0;
+	if (texture)
+		tId = texture->GetRendererID();
+
+	if (ImGui::ImageButton((ImTextureID)tId, ImVec2(200, 200))) {
+		textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
+		if (textureFilePath.size() > 1) {
+			if (texture)
+				delete texture;
+			std::string uid = GenerateId(64);
+			if (!PathExist(GetProjectResourcePath() + "\\textures"))
+				MkDir(GetProjectResourcePath() + "\\textures");
+			CopyFileData(textureFilePath, GetProjectResourcePath() + "\\textures\\" + uid);
+			RegisterProjectAsset(uid, "textures\\" + uid);
+			Log("Loaded texture with ID : " + uid);
+			textureFilePath = uid;
+			texture = new Texture2D(GetProjectResourcePath() + "\\textures\\" + uid);
+			isLoaded = true;
+			if (data.resolution)
+				texture->Resize(*data.resolution, *data.resolution);
+		}
+		else {
+			isLoaded = false;
+			textureFilePath = "";
+		}
 	}
 
 	ImNodes::EndNode();

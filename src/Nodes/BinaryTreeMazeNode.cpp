@@ -59,7 +59,7 @@ float BinaryTreeMazeNode::EvaluatePin(float x, float y, int id) {
 }
 
 bool BinaryTreeMazeNode::Render() {
-
+	ImGui::PushItemWidth(100);
 	ImNodes::BeginNode(id);
 
 	ImNodes::BeginNodeTitleBar();
@@ -69,10 +69,9 @@ bool BinaryTreeMazeNode::Render() {
 	ImNodes::BeginOutputAttribute(outputPin.id);
 	ImNodes::EndOutputAttribute();
 
-	ImGui::Dummy(ImVec2(60, 20));
 	ImGui::DragInt((std::string("##sizeBinMazeNode") + std::to_string(id)).c_str(), &seed, 1);
 
 	ImNodes::EndNode();
-
+	ImGui::PopItemWidth();
 	return false;
 }

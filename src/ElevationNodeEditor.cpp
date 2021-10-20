@@ -170,7 +170,6 @@ static void UpdateLinkCreation(Editor& editor) {
 		Link link;
 		if (ImNodes::IsLinkCreated(&link.start_attr, &link.end_attr))
 		{
-			link.id = ++editor.current_id;
 			FloatPin* st = (FloatPin*)editor.FindPin(link.start_attr);
 			FloatPin* en = (FloatPin*)editor.FindPin(link.end_attr);
 
@@ -183,16 +182,16 @@ static void UpdateLinkCreation(Editor& editor) {
 					return;
 				}
 				st->isLinked = true;
-				link.other = en;
 				st->link = link;
+				st->link.other = en;
 			}
 			{
 				if (en->isLinked) {
 					return;
 				}
 				en->isLinked = true;
-				link.other = st;
 				en->link = link;
+				en->link.other = st;
 			}
 			if (flag)
 				editor.links.push_back(link);
@@ -413,6 +412,9 @@ static void LoadEditorData(Editor& editor, nlohmann::json data) {
 	}
 	editor.pins.push_back(&(outputNode)->inputPin);
 	editor.links.clear();
+
+	outputNode->Load(data["outputNode"]);
+	
 	for (nlohmann::json link : data["links"]) {
 		editor.links.push_back(Link());
 		editor.links.back().Load(link);
@@ -422,12 +424,31 @@ static void LoadEditorData(Editor& editor, nlohmann::json data) {
 			outputNode->inputPin.link.other = editor.FindPin(outputNode->inputPin.link.start_attr);
 		}
 	}
+	
 	FixPinPointers();
 	/*
 	for (nlohmann::json nodePos : data["nodePositions"]) {
 		ImNodes::SetNodeEditorSpacePos(nodePos["id"], ImVec2(nodePos["x"], nodePos["y"]));
 	}
 	*/
+}
+
+void ResetNode(Node* node) {
+
+	std::vector<void*> nPins = node->GetPins();
+
+	for (void* p : nPins) {
+		Pin* np = (Pin*)p;
+		if (np->isLinked) {
+			((Pin*)np->link.other)->isLinked = false;
+		}
+		np->isLinked = false;
+		std::vector<Link>::iterator position = std::find(editorM.links.begin(), editorM.links.end(), np->link);
+		if (position != editorM.links.end())
+			editorM.links.erase(position);
+
+	}
+
 }
 
 void SetElevationNodeEditorSaveData(nlohmann::json data) {
@@ -838,6 +859,15 @@ static void UpdateNodeDuplacation() {
 	}
 }
 
+static void UpdateNodeResetation() {
+	for (Node* node : editorM.nodes) {
+		if (ImNodes::IsNodeSelected(node->id)) {
+			if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_R))
+				ResetNode(node);
+		}
+	}
+}
+
 nlohmann::json GetElevationNodeEditorSaveData() {
 	nlohmann::json data = editorM.Save(outputNode);
 	data["updateNode"] = autoUpdate;
@@ -862,9 +892,10 @@ static void DeletePins(std::vector<void*> pins) {
 	for (void* pp : pins) {
 		Pin* p = (Pin*)pp;
 		if (p) {
-			if (p->link.other) {
+			if (p->isLinked && p->link.other) {
 				((Pin*)p->link.other)->isLinked = false;
-
+			}
+			{
 				std::vector<Link>::iterator positionL = std::find(editorM.links.begin(), editorM.links.end(), p->link);
 				if (positionL != editorM.links.end()) // == myVector.end() means the element was not found
 					editorM.links.erase(positionL);
@@ -964,11 +995,13 @@ static void ShowEditor(const char* editor_name, Editor& editor) {
 					return link.id == link_id;
 				});
 			assert(iter != editor.links.end());
-			FloatPin* st = (FloatPin*)editor.FindPin(iter->start_attr);
+			Pin* st = (FloatPin*)editor.FindPin(iter->start_attr);
+			if(st)
 			{
 				st->isLinked = false;
 			}
-			FloatPin* en = (FloatPin*)editor.FindPin(iter->end_attr);
+			Pin* en = (FloatPin*)editor.FindPin(iter->end_attr);
+			if(en)
 			{
 				en->isLinked = false;
 			}
@@ -979,6 +1012,7 @@ static void ShowEditor(const char* editor_name, Editor& editor) {
 	{
 		UpdateNodeDeletion();
 		UpdateNodeDuplacation();
+		UpdateNodeResetation();
 
 
 		int start_id;
