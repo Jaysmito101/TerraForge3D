@@ -40,7 +40,8 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 # What can this do?
 
 * Tribute to all who **Starred** or **Contributed** to the project
-* Added Maze Generator using Binary Tree Algorithm
+* Procedural Texturing
+* Maze Generator using Binary Tree Algorithm
 * Generte 3D Terrain Procedrally
 * First Person Terrain Explorer
 * An Highly abstracted API for OpenGL which can be reused by other projects
