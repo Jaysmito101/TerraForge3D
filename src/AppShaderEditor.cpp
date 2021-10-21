@@ -317,7 +317,7 @@ void ShowShaderEditor(bool* pOpen)
 {
 	static bool showCreateShaderPopup = false;
 
-	ImGui::Begin("Shader Editor Window (Beta)", pOpen);
+	ImGui::Begin("Shader Editor Window", pOpen);
 
 	if (ImGui::Button("Create Shader")) {
 		CreateShader(current);

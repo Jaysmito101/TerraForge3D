@@ -9,6 +9,7 @@
 #include <ExplorerControls.h>
 #include <VersionInfo.h>
 #include <Texture2D.h>
+#include <TextureSettings.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
 #include <ProjectData.h>
@@ -227,8 +228,6 @@ static void ShowLightingControls() {
 	ImGui::End();
 }
 
-
-
 static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
 	if (!noiseLayer.enabled)
 		return 0.0f;
@@ -373,8 +372,7 @@ static void DoTheRederThing(float deltaTime) {
 	tmp[1] = 600;
 	tmp[2] = 1;
 	shader->SetUniform3f("_Resolution", tmp);
-	diffuse->Bind(5);
-	shader->SetUniformi("_Diffuse", 5);
+	UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 	terrain.Render();
 
 	if (showFoliage)
@@ -1106,34 +1104,6 @@ static void ShowSuccessModal() {
 	}
 }
 
-static void ShowTextureSettings() {
-	ImGui::Begin("Texture Settings", &activeWindows.texturEditorWindow);
-	uint32_t id = diffuse ? diffuse->GetRendererID() : 0;
-	ImGui::Image((ImTextureID)(id), ImVec2(200, 200));
-	if (!diffuse) {
-		if (ImGui::Button("Load Texture")) {
-			std::string textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
-			if (textureFilePath.size() > 1) {
-				diffuse = new Texture2D(textureFilePath);
-			}
-		}
-	}
-	else {
-		if (ImGui::Button("Change Texture")) {
-			std::string textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
-			if (textureFilePath.size() > 3) {
-				delete diffuse;
-				diffuse = new Texture2D(textureFilePath);
-			}
-		}
-	}
-
-	ImGui::DragFloat("Texture Scale", &textureScale, 0.1f);
-
-
-	ImGui::End();
-}
-
 static void ShowSeaSettings() {
 	ImGui::Begin("Sea Settings", &activeWindows.seaEditor);
 
@@ -1242,7 +1212,7 @@ public:
 			if (reqTexRfrsh) {
 				if (diffuse)
 					delete diffuse;
-				diffuse = new Texture2D(GetTextureStoreSelectedTexture(), true);
+				diffuse = GetCurrentDiffuseTexture();
 				reqTexRfrsh = false;
 			}
 
@@ -1385,6 +1355,7 @@ public:
 		ElevationNodeEditorTick();
 		SecondlyShaderEditorUpdate();
 		UpdateTextureStore();
+		TextureSettingsTick();
 	}
 
 	virtual void OnImGuiRender() override
@@ -1406,7 +1377,7 @@ public:
 			ShowStats();
 
 		if (activeWindows.texturEditorWindow)
-			ShowTextureSettings();
+			ShowTextureSettings(&activeWindows.texturEditorWindow);
 
 		if (activeWindows.seaEditor)
 			ShowSeaSettings();
@@ -1449,7 +1420,7 @@ public:
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
-
+		SetupTextureSettings(&reqTexRfrsh, &textureScale);
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);

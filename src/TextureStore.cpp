@@ -52,6 +52,7 @@ bool* reqRefresh;
 Texture2D* phlogo;
 bool intProob = false;
 bool isConnected = true;
+bool isThumbsLoaded = false;
 int counterT = 0;
 
 void LoadThumbnails() {
@@ -71,7 +72,7 @@ void LoadThumbnails() {
 		std::cout << "Loaded " << co << " thumbnails.          \r";
 	}
 	Log("\nLoaded thumbnails");
-
+	isThumbsLoaded = true;
 }
 
 void ChacheThumbnails() {
@@ -81,7 +82,9 @@ void ChacheThumbnails() {
 	int uco = 0;
 	std::vector<std::string> batch;
 	int batchsize = data.size() / NUM_DOWNLOADER_THREADS;
-
+	if (!PathExist(execDir + "\\Data\\cache\\texture_thumbnails")) {
+		MkDir(execDir + "\\Data\\cache\\texture_thumbnails");
+	}
 	for (auto it = data.begin(); it != data.end();)
 	{
 		// Preparing Batch
@@ -201,6 +204,12 @@ void UpdateTextureStore() {
 	}
 }
 
+void LoadTextureThumbs()
+{
+	if(!isThumbsLoaded)
+		LoadThumbnails();
+}
+
 static void DownloadTexture(std::string id, int k) {
 	if (!IsNetWorkConnected()) {
 		Log("Cannot download texture wthout an internet Connection!");
@@ -233,7 +242,7 @@ static void DownloadTexture(std::string id, int k) {
 	}
 }
 
-static void DeleteTexture(std::string id, int k) {
+void DeleteTexture(std::string id, int k) {
 	try {
 		if (std::experimental::filesystem::remove(((execDir)+"\\Data\\textures\\" + id + "\\" + std::to_string(k) + "\\diffuse.png")))
 			std::cout << "File " << ((execDir)+"\\Data\\textures\\" + id + "\\" + std::to_string(k) + "\\diffuse.png") << " deleted.\n";
@@ -291,12 +300,15 @@ static void ShowPopUpSettings(nlohmann::json data) {
 			ImGui::Text("Resolution : ");
 			ImGui::SameLine();
 			ImGui::Text(std::string(data["downloaddata"]["k"]).c_str());
+
+			/*
 			if (ImGui::Button("Use")) {
 				currTexID = data["key"];
 				currTex = data["downloaddata"]["dpath"];
 				*reqRefresh = true;
 				ImGui::CloseCurrentPopup();
 			}
+			*/
 
 			if (ImGui::Button("Delete")) {
 				DeleteTexture(data["key"], data["downloaddata"]["ko"]);
@@ -474,4 +486,19 @@ void ShowTextureStore(bool* pOpen) {
 
 std::string GetTextureStoreSelectedTexture() {
 	return currTex;
+}
+
+bool IsTextureThumnsLoaded()
+{
+	return isThumbsLoaded;
+}
+
+std::vector<Texture2D*>* GetTextures()
+{
+	return &textureThumbnails;
+}
+
+nlohmann::json* GetTextureDatabase()
+{
+	return &texture_database;
 }
