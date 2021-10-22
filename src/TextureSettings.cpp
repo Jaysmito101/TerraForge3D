@@ -17,8 +17,8 @@ Texture2D* diffuse;
 struct TextureLayer {
 	Texture2D* texture;
 	std::string name = "Texture Layer";
-	float heightMax = 1;
-	float heightMin = -1;
+	float heightMax = -10;
+	float heightMin = -10;
 	float textureScale = 1;
 };
 

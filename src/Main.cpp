@@ -90,6 +90,7 @@ static bool square = false;
 static bool reqTexRfrsh = false;
 static bool autoSave = false;
 static bool isExploreMode = false;
+static bool isIExploreMode = false;
 static bool showFoliage = true;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
@@ -118,6 +119,8 @@ static nlohmann::json appData;
 static std::string successMessage = "";
 static std::string errorMessage = "";
 static std::string savePath = "";
+
+static float nLOffsetX, nLOffsetY;
 
 
 static void ToggleSystemConsole() {
@@ -232,16 +235,19 @@ static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
 	if (!noiseLayer.enabled)
 		return 0.0f;
 	float baseNoise = 0;
+	float offsetX = noiseLayer.offsetX + nLOffsetX;
+	float offsetY = noiseLayer.offsetY + nLOffsetY;
+
 	try {
 		if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
-			baseNoise = SimplexNoise::noise((x / resolution) * noiseLayer.scale + noiseLayer.offsetX, (y / resolution) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+			baseNoise = SimplexNoise::noise((x / resolution) * noiseLayer.scale + offsetX, (y / resolution) * noiseLayer.scale + offsetY) * noiseLayer.strength;
 		}
 		else if (strcmp(noiseLayer.noiseType, "Random") == 0) {
 			return (rand()) * noiseLayer.strength * 0.0001f;
 		}
 		else if (strcmp(noiseLayer.noiseType, "Cellular") == 0) {
 			m_NoiseGen.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-			baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + noiseLayer.offsetX, (y / 1) * noiseLayer.scale + noiseLayer.offsetY) * noiseLayer.strength;
+			baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + offsetX, (y / 1) * noiseLayer.scale + offsetY) * noiseLayer.strength;
 		}
 	}
 	catch (...) {
@@ -411,6 +417,7 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
 	ImGui::Checkbox("Show Skybox", &skyboxEnabled);
 	ImGui::Checkbox("Show Foliage", &showFoliage);
+	ImGui::Checkbox("Infinite Explorer Mode", &isIExploreMode);
 	ImGui::Checkbox("Explorer Mode", &isExploreMode);
 	ImGui::NewLine();
 	if (ImGui::Button("Update Mesh"))
@@ -494,6 +501,8 @@ static void ShowNoiseSettings() {
 	ImGui::Begin("Noise Settings");
 
 	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
+	ImGui::DragFloat("Global X Offset", &nLOffsetX, 0.01f);
+	ImGui::DragFloat("Global Y Offset", &nLOffsetY, 0.01f);
 	ImGui::Checkbox("Flatten Base", &flattenBase);
 	ImGui::Checkbox("Absoulute Value", &absolute);
 	ImGui::Checkbox("Square Value", &square);
@@ -608,6 +617,8 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	nlohmann::json tmp;
 	tmp["autoUpdate"] = autoUpdate;
 	tmp["square"] = square;
+	tmp["nLOffsetX"] = nLOffsetX;
+	tmp["nLOffsetY"] = nLOffsetY;
 	tmp["absolute"] = absolute;
 	tmp["flattenBase"] = flattenBase;
 	tmp["noiseBased"] = noiseBased ? true : false;
@@ -713,7 +724,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	}
 
 	bool isSelfMade = true;
-	
+
 	try {
 		if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
 			Log("The file you are tryng to open was made with a different version of TerraGen3D!\nTrying to check Serializer compatibility.");
@@ -767,9 +778,12 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 		noiseLayersTmp.push_back(NoiseLayer());
 		noiseLayersTmp.back().Load(noiseLayersSaveData[i]);
 	}
-
 	nlohmann::json tmp = data["generals"];
 	autoUpdate = tmp["autoUpdate"];
+
+	nLOffsetY = tmp["nLOffsetY"];
+	nLOffsetX = tmp["nLOffsetX"];
+
 	square = tmp["square"];
 	absolute = tmp["absolute"];
 	flattenBase = tmp["flattenBase"];
@@ -1315,7 +1329,7 @@ public:
 			glViewport(0, 0, w, h);
 			GetWindow()->Clear();
 			s_Stats.deltaTime = deltatime;
-			UpdateExplorerControls(CameraPosition, CameraRotation);
+			UpdateExplorerControls(CameraPosition, CameraRotation, isIExploreMode, &nLOffsetX, &nLOffsetY);
 			DoTheRederThing(deltatime);
 
 
@@ -1327,7 +1341,23 @@ public:
 				ExPRestoreCamera(CameraPosition, CameraRotation);
 			}
 
+
+			if (autoUpdate)
+				RegenerateMesh();
+
 		}
+		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_I))
+			nLOffsetY -= 0.01f;
+
+		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_K))
+			nLOffsetY += 0.01f;
+
+		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L))
+			nLOffsetX -= 0.01f;
+
+		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_J))
+			nLOffsetX += 0.01f;
+
 
 		if (ReqRefresh())
 			ResetShader();
