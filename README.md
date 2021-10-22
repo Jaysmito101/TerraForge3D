@@ -25,7 +25,7 @@
 
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase2.gif" width="1000">
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase1.gif" width="1000">
+<a href="https://youtu.be/EhkgesSzT8U"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase4.gif" width="1000"></a>
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
@@ -41,6 +41,7 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 * Tribute to all who **Starred** or **Contributed** to the project
 * Procedural Texturing
+* Infinite First Person Terrain Explorer
 * Maze Generator using Binary Tree Algorithm
 * Generte 3D Terrain Procedrally
 * First Person Terrain Explorer
