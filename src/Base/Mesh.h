@@ -23,7 +23,11 @@ public:
 
 	void SetElevation(float elevation, int x, int y);
 
+	float GetElevation(int x, int y);
+
 	void AddElevation(float elevation, int x, int y);
+
+	glm::vec3 Mesh::GetNormals(int x, int y);
 
 	Mesh* Clone();
 

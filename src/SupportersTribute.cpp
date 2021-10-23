@@ -80,7 +80,7 @@ void SetupSupportersTribute()
 
 		if (FileExists(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache")) {
 			Log("Found Contributors Cached Data!");
-			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", &tmp);
+			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", &tmp);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
 			LoadcontributorsData(contributorsData);
 		}
@@ -92,7 +92,8 @@ void SetupSupportersTribute()
 
 void ShowSupportersTribute(bool* pOpen)
 {
-	ImGui::Begin("Supporters", pOpen);
+	ImGui::Begin("Supporters", pOpen, ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowSize(ImVec2(250, 250));
 
 	ImGui::Separator();
 	ImGui::Text("Contributors");

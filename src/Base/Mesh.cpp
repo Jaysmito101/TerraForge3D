@@ -107,6 +107,25 @@ void Mesh::SetElevation(float elevation, int x, int y){
 	vert[i].position.y = elevation;
 }
 
+float Mesh::GetElevation(int x, int y) {
+	if (!vert)
+		return 0;
+	int i = x + y * res;
+	if (i > vertexCount)
+		return 0;
+	
+	return vert[i].position.y;
+}
+
+glm::vec3 Mesh::GetNormals(int x, int y) {
+	if (!vert)
+		return glm::vec3(0);
+	int i = x + y * res;
+	if (i > vertexCount)
+		return glm::vec3(0);
+	return vert[i].normal;
+}
+
 void Mesh::AddElevation(float elevation, int x, int y){
 	if(!vert)
 		return;

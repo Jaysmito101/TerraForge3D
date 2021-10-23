@@ -15,10 +15,11 @@ void ShowFiltersMamager(bool* pOpen){
     if(*autoUpdate){
         ImGui::Text("Cannot use filters while auto update is on!");
     }else{
-        bool state = ImGui::CollapsingHeader((std::string("##noiseLayerName") + std::to_string(id)).c_str());
+        bool state = ImGui::CollapsingHeader("##SnowBallErrosionFilterSettings");
 	    ImGui::SameLine();
 	    ImGui::Text("Snowball Erosion");
 	    if (state) {
+            RenderSnowballErosionFilterPropUI();
             if(ImGui::Button("Apply")){
                 ApplySnowballErosion(mainModel);
             }

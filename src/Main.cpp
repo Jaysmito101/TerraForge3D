@@ -14,6 +14,7 @@
 #include <AppShaderEditor.h>
 #include <ProjectData.h>
 #include <OSLiscenses.h>
+#include <FiltersManager.h>
 #include <FoliagePlacement.h>
 #include <SupportersTribute.h>
 #include <ElevationNodeEditor.h>
@@ -443,7 +444,9 @@ static void ShowTerrainControls()
 	if (ImGui::Button("Sea Settings")) {
 		activeWindows.seaEditor = true;
 	}
-
+	if (ImGui::Button("Filter Settings")) {
+		activeWindows.filtersManager = true;
+	}
 	ImGui::Separator();
 
 	if (ImGui::Button("Change Mode##4584")) {
@@ -1068,6 +1071,8 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Sea Settings", &activeWindows.seaEditor);
 
+			ShowWindowMenuItem("Filters Manager", &activeWindows.filtersManager);
+
 			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
 
 			ShowWindowMenuItem("Supporters", &activeWindows.supportersTribute);
@@ -1134,7 +1139,7 @@ static void ShowSeaSettings() {
 
 static void ShowContributers() {
 	ImGui::Begin("Major Contributers", &activeWindows.contribWindow);
-	ImGui::Text("The major contributers as of Version 4.0:");
+	ImGui::Text("The major contributers as of Version 5.0:");
 	ImGui::NewLine();
 	ImGui::Text("Jaysmito Mukherjee");
 	ImGui::End();
@@ -1430,6 +1435,9 @@ public:
 		if (activeWindows.textureStore)
 			ShowTextureStore(&activeWindows.textureStore);
 
+		if (activeWindows.filtersManager)
+			ShowFiltersMamager(&activeWindows.filtersManager);
+
 		if (activeWindows.osLisc)
 			ShowOSLiscences(&activeWindows.osLisc);
 
@@ -1483,7 +1491,7 @@ public:
 		}
 
 		SetProjectId(GenerateId(32));
-
+		SetupFiltersManager(&autoUpdate, &terrain);
 		// For Debug Only
 		autoUpdate = true;
 	}
