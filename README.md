@@ -87,6 +87,23 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 ![Screenshot 3](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%203/Screenshot%20(3).png)
 
+# Contributing
+
+Since this project has become very large I would really love some help.
+Here are some things that you might contribute:
+
+* A Documentation (written or video guide)
+* Add comments to the source code
+* Add the small values here and there to serialization which I may have missed
+* Add Some more maze algorithms (like Kruskal's algorithm).(See BinaryTreeMazeNode for reference)
+* Report any bug you can find.
+* In case you write a general purpose script node in lua you may contribute it if you dont mind.
+* You can post the screenshots of your creations to https://github.com/Jaysmito101/TerraGen3D/issues/10
+
+# What of SHOWCASE?
+
+After every 10 - 15 posts in https://github.com/Jaysmito101/TerraGen3D/issues/10 I would make a montage of all of them to show the capabilities of TerraGen3D!
+
 # Support
 
 I am just a Highschool student so I may not have the best quality of code but still i am trying my best to write good code!
