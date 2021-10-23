@@ -1,13 +1,19 @@
 #include <FiltersManager.h>
-#include <Filters/SnowballErosionFilters.h>
+#include <Filters/Filter.h>
 #include <imgui.h>
+
+// Temporary
+#include <Filters/ErosionFilter.h>
 
 static bool* autoUpdate;
 static Model* mainModel;
 
+std::vector<Filter*> filters;
+
 void SetupFiltersManager(bool* aU, Model* model){
     autoUpdate = aU;
     mainModel = model;
+    filters.push_back(new ErosionFilter(model));
 }
 
 void ShowFiltersMamager(bool* pOpen){
@@ -15,15 +21,19 @@ void ShowFiltersMamager(bool* pOpen){
     if(*autoUpdate){
         ImGui::Text("Cannot use filters while auto update is on!");
     }else{
-        bool state = ImGui::CollapsingHeader("##SnowBallErrosionFilterSettings");
-	    ImGui::SameLine();
-	    ImGui::Text("Snowball Erosion");
-	    if (state) {
-            RenderSnowballErosionFilterPropUI();
-            if(ImGui::Button("Apply")){
-                ApplySnowballErosion(mainModel);
+        int cop = 0;
+        for (Filter* filter : filters) {
+            cop++;
+            bool state = ImGui::CollapsingHeader(("##" + filter->name + "-filterID" + std::to_string(cop)).c_str());
+            ImGui::SameLine();
+            ImGui::Text(filter->name.c_str());
+            if (state) {
+                filter->Render();
+                if (ImGui::Button("Apply")) {
+                    filter->Apply();
+                }
             }
-	    }
+        }
     }
     ImGui::End();
 }
