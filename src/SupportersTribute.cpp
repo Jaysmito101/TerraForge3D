@@ -9,12 +9,13 @@ std::vector<GitHubData> stargazers;
 std::vector<GitHubData> contributors;
 
 void LoadstargazersData(nlohmann::json& data) {
+	bool isNetWorkConnected = IsNetWorkConnected();
 	for (nlohmann::json item : data) {
 		GitHubData st;
 		st.name = item["login"];
 		if (!PathExist(GetExecutableDir() + "\\Data\\cache\\github_avatars"))
 			MkDir(GetExecutableDir() + "\\Data\\cache\\github_avatars");
-		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]))) {
+		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected) {
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
@@ -26,12 +27,13 @@ void LoadstargazersData(nlohmann::json& data) {
 }
 
 void LoadcontributorsData(nlohmann::json& data) {
+	bool isNetWorkConnected = IsNetWorkConnected();
 	for (nlohmann::json item : data) {
 		GitHubData st;
 		st.name = item["login"];
 		if (!PathExist(GetExecutableDir() + "\\Data\\cache\\github_avatars"))
 			MkDir(GetExecutableDir() + "\\Data\\cache\\github_avatars");
-		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]))) {
+		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected) {
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
@@ -50,14 +52,14 @@ void SetupSupportersTribute()
 		
 		{
 			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraGen3D/stargazers");
-			SaveToFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache");
+			SaveToFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", stargazersRawData);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
 		}
 
 		{
 			std::string contributorsRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraGen3D/contributors");
-			SaveToFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache");
+			SaveToFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", contributorsRawData);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
 			LoadcontributorsData(contributorsData);
 		}
