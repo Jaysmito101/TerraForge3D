@@ -28,7 +28,7 @@ void ErosionFilter::Apply()
 	TinyErode::Simulation simulation(model->mesh->res, model->mesh->res);
 	std::vector<float> water(simulation.GetWidth()*simulation.GetHeight());
 	auto getHeight = [this](int x, int y) -> float {
-		return model->mesh->GetElevation(x, y);
+		return (model->mesh->GetElevation(x, y)/model->mesh->maxHeight)*200;
 	};
 	auto addHeight = [this](int x, int y, float deltaHeight) {
 		//std::cout << deltaHeight << "\n";

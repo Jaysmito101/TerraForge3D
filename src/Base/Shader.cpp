@@ -2,41 +2,7 @@
 #include <Shader.h>
 #include <windows.h>
 #include <glm/gtc/type_ptr.hpp>
-
-
-static void Log(const char* log) {
-	std::cout << log << std::endl;
-};
-
-static void Log(std::string log) {
-	std::cout << log << std::endl;
-};
-
-static int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name) {
-	GLuint shader = glCreateShader(shaderType);
-	const GLchar* source = (const GLchar*)shaderSrc.c_str();
-	glShaderSource(shader, 1, &source, 0);
-	glCompileShader(shader);
-	GLint isCompiled = 0;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
-	if (isCompiled == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-		char* errorLog = (char*)malloc(maxLength);
-		memset(errorLog, 0, maxLength);
-		glGetShaderInfoLog(shader, maxLength, &maxLength, errorLog);
-		Log(std::string("Error in Compiling ") + name + " Shader : ");
-		Log(errorLog);
-		glDeleteShader(shader);
-	}
-	return shader;
-}
-
-static int CreateProgram() {
-	GLuint program = glCreateProgram();
-	return program;
-}
+#include <ShaderUtils.h>
 
 Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geometrySource)
 {
@@ -61,10 +27,14 @@ Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geome
 		glDeleteShader(vertShader);
 		glDeleteShader(fragShader);
 		Log(errorLog);
+		return;
 	}
 	glDetachShader(m_Shader, vertShader);
 	glDetachShader(m_Shader, fragShader);
 	glDetachShader(m_Shader, geomShader);
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
+	glDeleteShader(geomShader);
 }
 
 
@@ -89,9 +59,12 @@ Shader::Shader(std::string vertexSrc, std::string fragmentSrc)
 		glDeleteShader(vertShader);
 		glDeleteShader(fragShader);
 		Log(errorLog);
+		return;
 	}
 	glDetachShader(m_Shader, vertShader);
 	glDetachShader(m_Shader, fragShader);
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
 }
 
 

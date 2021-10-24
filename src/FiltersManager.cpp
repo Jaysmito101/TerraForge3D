@@ -4,6 +4,7 @@
 
 // Temporary
 #include <Filters/ErosionFilter.h>
+#include <Filters/GPUErosionFilter.h>
 
 static bool* autoUpdate;
 static Model* mainModel;
@@ -14,6 +15,9 @@ void SetupFiltersManager(bool* aU, Model* model){
     autoUpdate = aU;
     mainModel = model;
     filters.push_back(new ErosionFilter(model));
+    filters.back()->OnAttach();
+    filters.push_back(new GPUErosionFilter(model));
+    filters.back()->OnAttach();
 }
 
 void ShowFiltersMamager(bool* pOpen){
@@ -23,6 +27,7 @@ void ShowFiltersMamager(bool* pOpen){
     }else{
         int cop = 0;
         for (Filter* filter : filters) {
+            ImGui::Separator();
             cop++;
             bool state = ImGui::CollapsingHeader(("##" + filter->name + "-filterID" + std::to_string(cop)).c_str());
             ImGui::SameLine();
@@ -33,6 +38,7 @@ void ShowFiltersMamager(bool* pOpen){
                     filter->Apply();
                 }
             }
+            ImGui::Separator();
         }
     }
     ImGui::End();

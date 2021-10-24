@@ -427,6 +427,7 @@ static void ShowTerrainControls()
 	if (ImGui::Button("Recalculate Normals")) {
 		while (isRemeshing);
 		terrain.mesh->RecalculateNormals();
+		terrain.UploadToGPU();
 	}
 
 	if (ImGui::Button("Refresh Shaders")) {
