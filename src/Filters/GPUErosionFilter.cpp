@@ -11,35 +11,39 @@
 
 #define MAX(x, y) x>y?x:y
 
-std::string shadersrc = R"(
+std::string src = R"(
+#version 430 core
 
-#version 430
-layout(local_size_x = 1, local_size_y = 1) in;
-uniform image2D img_output;
-void main(){
-// base pixel colour for image
-  vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
-  // get index in global work group i.e x,y position
-  ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-  
-  //
-  // interesting stuff happens here later
-  //
-  
-  // output to a specific pixel in the image
-  imageStore(img_output, pixel_coords, pixel);
+layout(local_size_x=10) in;
+
+layout(std430, binding = 0) buffer data
+{
+  float coordinate_array[1000];
+};
+
+
+
+void main(void)
+{
+ uint x = gl_GlobalInvocationID.x;
+ coordinate_array[x] = x * 1.0f; 
+
 }
 
 )";
 
-static Texture2D* tex;
+ComputeShader* shd;
+ShaderStorageBuffer* ssbo;
+
+
+static unsigned int tex;
 void GPUErosionFilter::Render()
 {
 	ImGui::DragInt("Num Iterations##GPUErosionFilter", &iterations, 1, 0);
 	ImGui::DragFloat("Actual Dimensions##GPUErosionFilter", &dimension, 1, 0);
 	ImGui::DragFloat("Strength##GPUErosionFilter", &tfac, 1000);
 
-	ImGui::Image((ImTextureID)tex->GetRendererID(), ImVec2(200, 200));
+	ImGui::Image((ImTextureID)tex, ImVec2(200, 200));
 
 }
 
@@ -56,7 +60,24 @@ void GPUErosionFilter::Apply()
 {
 	model->mesh->RecalculateNormals();
 
+	shd = new ComputeShader(src);
+	ssbo = new ShaderStorageBuffer();
+	ssbo->SetData(NULL, sizeof(float) * 1000);
+	ssbo->Bind(0);
 
+	shd->Bind();
+	shd->Dispatch(100, 1, 1);
+	shd->SetMemoryBarrier();
+	std::vector<float> storage(1000);
+
+	glGetNamedBufferSubData(ssbo->rendererId, 0, 1000 * sizeof(float), storage.data());
+
+	for (float t : storage) {
+		std::cout << t << "\n";
+	}
+
+	delete shd;
+	delete ssbo;
 
 	model->mesh->RecalculateNormals();
 	model->UploadToGPU();
@@ -64,6 +85,6 @@ void GPUErosionFilter::Apply()
 
 void GPUErosionFilter::OnAttach()
 {
-	cCh = new ComputeShader(shadersrc);;
-	tex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
+	
+
 }

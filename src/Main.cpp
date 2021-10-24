@@ -607,6 +607,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["styleData"] = GetStyleData();
 	data["appData"] = appData;
 	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
+	data["texLayers"] = SaveTextureLayerData();
 
 	nlohmann::json noiseLayersSave;
 	noiseLayersSave["type"] = "NOISE LAYERS";
@@ -770,7 +771,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 
 	SetElevationNodeEditorSaveData(data["EnodeEditor"]);
 	LoadThemeFromStr(data["styleData"]);
-	data["imguiData"] = ImGui::SaveIniSettingsToMemory();
+	//data["imguiData"] = ImGui::SaveIniSettingsToMemory();
 	appData = data["appData"];
 
 	// This should be replaced with something better
@@ -811,6 +812,9 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	}
 	catch (...) {}
 	Log("Loaded Project ID : " + GetProjectId());
+
+	LoadTextureLayerData(data["texLayers"]);
+
 
 	CameraPosition[0] = tmp["cameraPosX"];
 	CameraPosition[2] = tmp["cameraPosY"];

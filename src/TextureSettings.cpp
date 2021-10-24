@@ -5,6 +5,7 @@
 #include <TextureStore.h>
 #include <json.hpp>
 
+#include <ProjectData.h>
 
 bool* reqrfrsh;
 float* textureScale;
@@ -20,6 +21,39 @@ struct TextureLayer {
 	float heightMax = -10;
 	float heightMin = -10;
 	float textureScale = 1;
+
+	nlohmann::json Save() {
+		nlohmann::json data;
+		data["name"] = name;
+		data["hMx"] = heightMax;
+		data["hMn"] = heightMin;
+		data["texSc"] = textureScale;
+		std::string filePath = texture->GetPath();
+		std::string hash = MD5File(filePath).ToString();
+		if (GetProjectAsset(hash).size() == 0) {
+			if (!PathExist(GetProjectResourcePath() + "\\textures\\"))
+				MkDir(GetProjectResourcePath() + "\\textures\\");
+			Log("Saving Texture To : " + GetProjectResourcePath() + "textures\\" + hash);
+			CopyFileData(filePath, GetProjectResourcePath() + "\\textures\\" + hash);
+			RegisterProjectAsset(hash, "textures\\" + hash);
+		}
+		else{
+			Log("Texture Already Cached!");
+		}
+		data["texture"] = hash;
+		return data;
+	}
+
+	void Load(nlohmann::json data) {
+		name = data["name"];
+		heightMax = data["hMx"];
+		heightMin = data["hMn"];
+		textureScale = data["texSc"];
+		if (texture)
+			delete texture;
+		Log("Laoding : " + GetProjectResourcePath() + "\\" + GetProjectAsset(data["texture"]));
+		texture = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(data["texture"]), false);
+	}
 };
 
 
@@ -57,13 +91,13 @@ void SetupTextureSettings(bool* reqRefresh, float* textScale)
 	textureScale = textScale;
 	if (diffuse)
 		delete diffuse;
-	diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
+	diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png", false);
 }
 
 static void LoadUpTexture(std::string path) {
 	if (path.size() <= 3)
 		return;
-	textureLayers[cTexID].texture = new Texture2D(path);
+	textureLayers[cTexID].texture = new Texture2D(path, false);
 	cTexID++;
 	ImGui::CloseCurrentPopup();
 }
@@ -209,4 +243,18 @@ uint32_t UpdateDiffuseTexturesUBO(uint32_t shaderID, std::string diffuseUBOName)
 Texture2D* GetCurrentDiffuseTexture()
 { 
 	return diffuse;
+}
+
+nlohmann::json SaveTextureLayerData() {
+	nlohmann::json data;
+	for (TextureLayer& tl : textureLayers)
+		data.push_back(tl.Save());
+	return data;
+}
+
+void LoadTextureLayerData(nlohmann::json data) {
+	int i = 0;
+	for (nlohmann::json tl : data) {
+		textureLayers[i++].Load(tl);
+	}
 }

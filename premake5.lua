@@ -49,6 +49,7 @@ project "TerraGen3D"
 		"Urlmon.lib",
 		"libssl_static.lib",
 		"libcrypto_static",
+		"OpenCL.lib",
 		"Crypt32",
 		"ws2_32",
 		"Pathcch",

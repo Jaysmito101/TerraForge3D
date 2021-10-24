@@ -18,7 +18,7 @@ std::string GetProjectId()
 
 std::string GetProjectDatabase()
 {
-    return projectDatase.dump(); 
+    return projectDatase.dump(4); 
 }
 
 void RegisterProjectAsset(std::string uid, std::string path)
@@ -28,7 +28,12 @@ void RegisterProjectAsset(std::string uid, std::string path)
 
 std::string GetProjectAsset(std::string id)
 {
-    return projectDatase[id];
+    try {
+        return projectDatase[id];
+    }
+    catch (...) {
+        return "";
+    }
 }
 
 void SetProjectDatabase(std::string db)
