@@ -20,7 +20,7 @@ Mesh* LoadMesh(aiMesh* paiMesh) {
         const aiVector3D* pNormal = &(paiMesh->mNormals[i]);
         const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
         Vert tmp;
-        tmp.position = glm::vec3(1.0f);
+        tmp.position = glm::vec4(0.0f);
         tmp.position.x = pPos->x;
         tmp.position.y = pPos->y;
         tmp.position.z = pPos->z;
@@ -31,7 +31,7 @@ Mesh* LoadMesh(aiMesh* paiMesh) {
             tmp.texCoord.y = pTexCoord->y;
         }
 
-        tmp.normal = glm::vec3(1.0f);
+        tmp.normal = glm::vec4(1.0f);
         
         /*
         if (pNormal) {

@@ -30,13 +30,13 @@ void Mesh::RecalculateNormals()
 		const int ib = indices[i + 1];
 		const int ic = indices[i + 2];
 
-		const glm::vec3 e1 = vert[ia].position - vert[ib].position;
-		const glm::vec3 e2 = vert[ic].position - vert[ib].position;
+		const glm::vec3 e1 = glm::vec3(vert[ia].position) - glm::vec3(vert[ib].position);
+		const glm::vec3 e2 = glm::vec3(vert[ic].position) - glm::vec3(vert[ib].position);
 		const glm::vec3 no = cross(e1, e2);
 
-		vert[ia].normal += no;
-		vert[ib].normal += no;
-		vert[ic].normal += no;
+		vert[ia].normal += glm::vec4(no, 0.0);
+		vert[ib].normal += glm::vec4(no, 0.0);
+		vert[ic].normal += glm::vec4(no, 0.0);
 	}
 
 	for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
@@ -51,7 +51,7 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 	int triIndex = 0;
 
 	for (int y = 0; y < resolution; y++)
-	{
+	{ 
 		for (int x = 0; x < resolution; x++)
 		{
 			int i = x + y * resolution;
@@ -59,13 +59,13 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 			glm::vec3 pointOnPlane = (percent.x - .5f) * 2 * right + (percent.y - .5f) * 2 * front;
 			pointOnPlane *= scale;
 			vertices[i] = Vert();
-			vertices[i].position = glm::vec3(0.0f);
+			vertices[i].position = glm::vec4(0.0f);
 
 			vertices[i].position.x = (float)pointOnPlane.x;
 			vertices[i].position.y = (float)pointOnPlane.y;
 			vertices[i].position.z = (float)pointOnPlane.z;
 			vertices[i].texCoord = glm::vec2(percent.x, percent.y)*textureScale;
-			vertices[i].normal = glm::vec3(0.0f);
+			vertices[i].normal = glm::vec4(0.0f);
 			if (x != resolution - 1 && y != resolution - 1)
 			{
 				inds[triIndex] = i;
@@ -123,7 +123,7 @@ glm::vec3 Mesh::GetNormals(int x, int y) {
 	int i = x + y * res;
 	if (i > vertexCount)
 		return glm::vec3(0);
-	return vert[i].normal;
+	return glm::vec3(vert[i].normal.x, vert[i].normal.y, vert[i].normal.z);
 }
 
 void Mesh::AddElevation(float elevation, int x, int y){

@@ -43,7 +43,7 @@ void ErosionFilter::Apply()
 	};
 
 	auto carryCapacity = [](int x, int y) -> float {
-		return 0.01;
+		return 0.1;
 	};
 
 	auto deposition = [](int x, int y) -> float {

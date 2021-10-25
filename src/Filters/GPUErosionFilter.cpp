@@ -8,42 +8,26 @@
 #include <Utils.h>
 
 #include <string>
-
+#include <regex>
 #define MAX(x, y) x>y?x:y
-
-std::string src = R"(
-#version 430 core
-
-layout(local_size_x=10) in;
-
-layout(std430, binding = 0) buffer data
-{
-  float coordinate_array[1000];
-};
-
-
-
-void main(void)
-{
- uint x = gl_GlobalInvocationID.x;
- coordinate_array[x] = x * 1.0f; 
-
-}
-
-)";
 
 ComputeShader* shd;
 ShaderStorageBuffer* ssbo;
 
+struct ResultRecord
+{
+	float a[10];
+	float b[10];
+	float c[10];
+	float weight;
+};
 
-static unsigned int tex;
+GLuint tex, buf;
 void GPUErosionFilter::Render()
 {
 	ImGui::DragInt("Num Iterations##GPUErosionFilter", &iterations, 1, 0);
 	ImGui::DragFloat("Actual Dimensions##GPUErosionFilter", &dimension, 1, 0);
 	ImGui::DragFloat("Strength##GPUErosionFilter", &tfac, 1000);
-
-	ImGui::Image((ImTextureID)tex, ImVec2(200, 200));
 
 }
 
@@ -60,24 +44,41 @@ void GPUErosionFilter::Apply()
 {
 	model->mesh->RecalculateNormals();
 
-	shd = new ComputeShader(src);
+	bool tmp = false;
+	std::string shaderSrc = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\compute\\erosion.glsl", &tmp);
+	shaderSrc = std::regex_replace(shaderSrc, std::regex("LAYOUT_SIZE_X"), std::to_string(1));
+	shaderSrc = std::regex_replace(shaderSrc, std::regex("LAYOUT_SIZE_Y"), std::to_string(1));
+	shaderSrc = std::regex_replace(shaderSrc, std::regex("LAYOUT_SIZE_Z"), std::to_string(1));
+	shaderSrc = std::regex_replace(shaderSrc, std::regex("MESH_RESOLUTION"), std::to_string(model->mesh->res));
+	
+	shd = new ComputeShader(shaderSrc);
 	ssbo = new ShaderStorageBuffer();
-	ssbo->SetData(NULL, sizeof(float) * 1000);
-	ssbo->Bind(0);
+	ssbo->Bind(0);	
 
-	shd->Bind();
-	shd->Dispatch(100, 1, 1);
-	shd->SetMemoryBarrier();
-	std::vector<float> storage(1000);
-
-	glGetNamedBufferSubData(ssbo->rendererId, 0, 1000 * sizeof(float), storage.data());
-
-	for (float t : storage) {
-		std::cout << t << "\n";
+	float* verts = new float[model->mesh->vertexCount];
+	for (int i = 0; i < model->mesh->vertexCount; i++) { 
+		verts[i] = model->mesh->vert[i].position.y;
 	}
 
+	ssbo->SetData(verts, sizeof(float) * model->mesh->vertexCount);
+
+	shd->Bind();
+	shd->Dispatch(model->mesh->res, model->mesh->res, 1);
+	shd->SetMemoryBarrier();
+	delete verts;
+	verts = new float[model->mesh->vertexCount];
+
+	ssbo->GetData(verts, sizeof(float) * model->mesh->vertexCount);
+	for (int i = 0; i < model->mesh->vertexCount; i++) {
+		model->mesh->vert[i].position.y = verts[i];
+	}
+
+
+
+
+
 	delete shd;
-	delete ssbo;
+	delete ssbo; 
 
 	model->mesh->RecalculateNormals();
 	model->UploadToGPU();
@@ -85,6 +86,6 @@ void GPUErosionFilter::Apply()
 
 void GPUErosionFilter::OnAttach()
 {
-	
 
+	
 }
