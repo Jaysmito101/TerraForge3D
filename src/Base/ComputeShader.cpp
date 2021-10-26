@@ -48,6 +48,8 @@ void ComputeShader::Bind()
 
 void ComputeShader::SetUniformf(std::string name, float value)
 {
+	uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+	glUniform1f(loc, value);
 }
 
 void ComputeShader::SetUniform3f(std::string name, float* value)

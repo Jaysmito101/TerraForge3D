@@ -14,8 +14,18 @@ public:
 	virtual void Apply() override;
 	virtual void OnAttach() override;
 
-	float dimension = 1000.0f;
-	float tfac = 1000.0f;
-	int iterations = 1024;
+	int numErosionIterations = 50000;
+	int erosionBrushRadius = 3;
+	int maxLifetime = 30;
+	float sedimentCapacityFactor = 3;
+	float minSedimentCapacity = 0.01f;
+	float depositSpeed = 0.3f;
+	float errodeSpeed = 0.3f;
+	float evaporationSpeed = 0.01f;
+	float gravity = 4;
+	float startSpeed = 1;
+	float startWater = 1;
+	// (0 TO 1)
+	float inertia = 0.3f;
 };
 
