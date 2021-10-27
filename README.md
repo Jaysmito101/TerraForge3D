@@ -84,14 +84,6 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 * You can Show/Hide the console from Menu > Options > Toggle System Console.
 * Whenever you feel that something is wrong or the app is slow check the console for updates
 
-# Screenshots
-
-![Screenshot 1](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%203/Screenshot%20(1).png)
-
-![Screenshot 2](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Screenshot.png)
-
-![Screenshot 3](https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/Screenshots/Version%203/Screenshot%20(3).png)
-
 # Contributing
 
 Since this project has become very large I would really love some help.
