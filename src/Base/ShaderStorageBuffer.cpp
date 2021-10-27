@@ -15,8 +15,13 @@ ShaderStorageBuffer::~ShaderStorageBuffer()
 
 void ShaderStorageBuffer::Bind(int index)
 {
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererId);
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererId);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, rendererId);
+}
+
+void ShaderStorageBuffer::Bind()
+{
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererId);
 }
 
 void ShaderStorageBuffer::Unbind()

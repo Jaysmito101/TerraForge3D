@@ -14,6 +14,7 @@ public:
 	virtual void Apply() override;
 	virtual void OnAttach() override;
 
+	int mapSize;
 	int numErosionIterations = 50000;
 	int erosionBrushRadius = 3;
 	int maxLifetime = 30;

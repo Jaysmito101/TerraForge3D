@@ -44,6 +44,8 @@ void Mesh::RecalculateNormals()
 
 void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 {
+	maxHeight = -100;
+	minHeight = 100;
 	res = resolution;
 	sc = scale;
 	Vert* vertices = new Vert[resolution * resolution];
@@ -104,6 +106,8 @@ void Mesh::SetElevation(float elevation, int x, int y){
 		return;
 	if (elevation > maxHeight)
 		maxHeight = elevation;
+	if (elevation < minHeight)
+		minHeight = elevation;
 	vert[i].position.y = elevation;
 }
 
