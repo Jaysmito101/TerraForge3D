@@ -23,6 +23,8 @@
 # TerraGen3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
+<a href="https://youtu.be/wnNclej40zQ"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase5.gif" width="1000"></a>
+
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase2.gif" width="1000">
 
 <a href="https://youtu.be/EhkgesSzT8U"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase4.gif" width="1000"></a>
@@ -41,6 +43,9 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 * Tribute to all who **Starred** or **Contributed** to the project
 * Procedural Texturing
+* Realistic Hydraulic Erosion Simulation (CPU & GPU modes)
+* OpenCL Support
+* Compute Shaders
 * Infinite First Person Terrain Explorer
 * Maze Generator using Binary Tree Algorithm
 * Generte 3D Terrain Procedrally
