@@ -1,15 +1,20 @@
 #include "ErosionFilter.h"
 #include <imgui.h>
 #include <iostream>
-#include <tinyerode/TinyErode.h>
 
 #define MAX(x, y) x>y?x:y
+#define MIN(x, y) x<y?x:y
 
 void ErosionFilter::Render()
 {
-	ImGui::DragInt("Num Iterations##erosionFilter", &iterations, 1, 0);
-	ImGui::DragFloat("Actual Dimensions##erosionFilter", &dimension, 1, 0);
-	ImGui::DragFloat("Strength##erosionFilter", &tfac, 1000);
+	ImGui::DragInt("Num Iterations##erosionFilter", &iterations, 1, 1);
+	ImGui::DragInt("Num Particles##erosionFilter", &numParticles, 1, 1);
+	ImGui::DragFloat("Radius##erosionFilter", &radius, 0.1f, 1);
+	ImGui::DragFloat("Deposition Rate##erosionFilter", &depositionRate, 0.1f, 0);
+	ImGui::DragFloat("Erosion Rate##erosionFilter", &erosionRate, 0.1f, 0);
+	ImGui::DragFloat("Iteration Scale##erosionFilter", &iterationScale, 0.1f, 0);
+	ImGui::DragFloat("Friction##erosionFilter", &friction, 0.1f, 0);
+	ImGui::DragFloat("Speed##erosionFilter", &speed, 0.1f, 0);
 
 }
 
@@ -22,59 +27,53 @@ void ErosionFilter::Load(nlohmann::json data)
 {
 }
 
+void ErosionFilter::trace(int x, int y) {
+	int ox = (((double)rand() / (RAND_MAX)) * 2 - 1) * radius;
+	int oy = (((double)rand() / (RAND_MAX)) * 2 - 1) * radius;
+	float sediment = 0;
+	int xp = x;
+	int yp = y;
+	float vx = 0;
+	float vy = 0;
+
+	for (int i = 0; i < iterations; i++) {
+		if (y  <= 10)
+			y = 10;
+
+		glm::vec3 normal = model->mesh->GetNormals(x+ox, y+oy);
+		if (normal.y == 1)
+			break;
+
+		float deposit = sediment * depositionRate * normal.y;
+		float erosion = erosionRate * (1 - normal.y) * MIN(1, i * iterationScale);
+
+		float elevation = model->mesh->GetElevation(xp, yp);
+		model->mesh->SetElevation(elevation + deposit - erosion, xp, yp);
+
+		sediment += erosion - deposit;
+
+		vx = friction * vx + normal.x * speed;
+		vy = friction * vy + normal.z * speed;
+		xp = x;
+		yp = y;
+		x += vx;
+		y += vy;
+	}
+}
+
 void ErosionFilter::Apply()
 {
+	srand(time(NULL));
 	model->mesh->RecalculateNormals();
-	TinyErode::Simulation simulation(model->mesh->res, model->mesh->res);
-	std::vector<float> water(simulation.GetWidth()*simulation.GetHeight());
-	auto getHeight = [this](int x, int y) -> float {
-		return (model->mesh->GetElevation(x, y)/model->mesh->maxHeight)*200;
-	};
-	auto addHeight = [this](int x, int y, float deltaHeight) {
-		//std::cout << deltaHeight << "\n";
-		model->mesh->AddElevation(deltaHeight*tfac, x, y);
-	};
-	auto getWater = [&](int x, int y) -> float {
-		return water[(y * model->mesh->res) + x];
-	};
-
-	auto addWater = [&](int x, int y, float deltaWater) -> float {
-		return water[(y * model->mesh->res) + x] = MAX(0.0f, water[(y * model->mesh->res) + x] + deltaWater);
-	};
-
-	auto carryCapacity = [](int x, int y) -> float {
-		return 0.1;
-	};
-
-	auto deposition = [](int x, int y) -> float {
-		return 0.1;
-	};
-
-	auto erosion = [](int x, int y) -> float {
-		return 0.1;
-	};
-	auto evaporation = [](int x, int y) -> float {
-		return 0.1;
-	};
-	simulation.SetMetersPerX(dimension / model->mesh->res);
-	simulation.SetMetersPerY(dimension / model->mesh->res);
-	for (int i = 0; i < iterations; i++) {
-		// Determines where the water will flow.
-		simulation.ComputeFlowAndTilt(getHeight, getWater);
-		// Moves the water around the terrain based on the previous computed values.
-		simulation.TransportWater(addWater);
-		// Where the magic happens. Soil is picked up from the terrain and height
-		// values are subtracted based on how much was picked up. Then the sediment
-		// moves along with the water and is later deposited.
-		simulation.TransportSediment(carryCapacity, deposition, erosion, addHeight);
-		// Due to heat, water is gradually evaported. This will also cause soil
-		// deposition since there is less water to carry soil.
-		simulation.Evaporate(addWater, evaporation);
-		std::cout << "Finished " << (i + 1) << " iterations.\r";
+	int res = model->mesh->res;
+	res = res - 20;
+	for (int i = 0; i < numParticles; i++) {
+		int x = (int)(((double)rand() / (RAND_MAX)) * res + 10);
+		int y = (int)(((double)rand() / (RAND_MAX)) * res + 10);
+		trace(x, y);
+		std::cout << "Processed " << i + 1 << " iterations.\r";
 	}
-	// Drops all suspended sediment back into the terrain.
-	simulation.TerminateRainfall(addHeight);
-	std::cout << "Finished Erosion Processing!\n";
+	std::cout << "\n";
 	model->mesh->RecalculateNormals();
 	model->UploadToGPU();
 }

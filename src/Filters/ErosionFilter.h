@@ -13,7 +13,14 @@ public:
 	virtual void Load(nlohmann::json data) override;
 	virtual void Apply() override;
 
-	float dimension = 1000.0f;
-	float tfac = 1000.0f;
-	int iterations = 1024;
+	void trace(int x, int y);
+
+	float iterationScale = 0.1f;
+	float erosionRate = 0.01f;
+	float friction = 0.1f;
+	float speed = 0.1f;
+	float depositionRate = 0.001f;
+	int iterations = 24;
+	int numParticles = 5000;
+	float radius = 3;
 };
