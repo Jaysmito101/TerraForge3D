@@ -1,4 +1,3 @@
-
 #version 430 core
 
 layout(local_size_x = LAYOUT_SIZE_X, local_size_y = LAYOUT_SIZE_Y, local_size_z = LAYOUT_SIZE_Z) in;

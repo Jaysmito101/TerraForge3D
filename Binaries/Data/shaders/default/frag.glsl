@@ -7,12 +7,14 @@ uniform vec3 _LightPosition;
 uniform vec3 _LightColor;
 
 in float height;
+in float Distance;
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
 
 uniform sampler2D  _DiffuseTextures[NUM_TEXTURE_LAYERS];
 uniform vec3  _DiffuseTexturesHeights[NUM_TEXTURE_LAYERS];
+uniform vec3  _DiffuseTexturesData[NUM_TEXTURE_LAYERS];
 
 
 vec2 hash( vec2 p ) // replace this by something better
@@ -39,15 +41,15 @@ float noise( in vec2 p )
 
 
 float getTextureInfluence(int i, vec2 coord) {
-float h = height + noise(coord*5)*2;
+float h = height + noise(coord*_DiffuseTexturesData[i].x)*_DiffuseTexturesData[i].y;
   float midVal = (_DiffuseTexturesHeights[i].x + _DiffuseTexturesHeights[i].y)/2;
   float p = 0;
-  if(height < midVal)
+  if(h < midVal)
     p = _DiffuseTexturesHeights[i].x - height;
-  if(height >= midVal)
+  if(h >= midVal)
     p =height -  _DiffuseTexturesHeights[i].y;
   
-  return pow(2.713, -1.0*p);
+  return pow(2.713, -_DiffuseTexturesData[i].z*p);
 }
 
 vec4 GetTextureColorBasedOnHeight(vec2 coord){
@@ -77,5 +79,8 @@ void main()
 	float diff = max(dot(norm, lightDir), 0.0f);
 	vec3 diffuse = diff * _LightColor;
 	vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;
-	FragColor = vec4(result, 1.0);
+//	FragColor = vec4(result, 1.0);
+	float factor = pow(2.7139, -1*Distance);
+	FragColor = mix(vec4(result, 0.6f), vec4(1.0), 0.1);
+    FragColor = vec4(result, 0.6f);
 } 

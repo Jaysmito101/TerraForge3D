@@ -119,4 +119,5 @@ struct ActiveWindows {
 	bool filtersManager = false;
 	bool foliageManager = false;
 	bool supportersTribute = false;
+	bool skySettings = false;
 };

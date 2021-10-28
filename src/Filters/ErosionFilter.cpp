@@ -142,6 +142,8 @@ void ErosionFilter::Apply()
 	currentErosionRadius = erosionRadius;
 	currentMapSize = mapSize;
 
+    std::cout << std::endl << "Starting processing erosion." << std::endl;
+
 
     for (int iteration = 0; iteration < numIterations; iteration++) {
         // Create water droplet at random point on map
@@ -228,7 +230,7 @@ void ErosionFilter::Apply()
             water *= (1 - evaporateSpeed);
         }
 
-        std::cout << "Processed " + iteration + 1 << " particles.\r";
+        std::cout << "Processed " + std::to_string(iteration) << " particles.\r";
     }
     std::cout << "Finished Terrain Erosion Simulation\n";
 
@@ -256,3 +258,4 @@ void ErosionFilter::Apply()
 	model->mesh->RecalculateNormals();
 	model->UploadToGPU();
 }
+ 

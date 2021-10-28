@@ -170,7 +170,10 @@ std::string FetchURL(std::string baseURL, std::string path) {
 	httplib::Client cli(baseURL);
 	auto res = cli.Get(path.c_str());
 	//if(res->status == 200)
-	return res->body;
+	try {
+		return res->body;
+	}
+	catch (...) {}
 	return "";
 }
 

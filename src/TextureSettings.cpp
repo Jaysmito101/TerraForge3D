@@ -22,12 +22,19 @@ struct TextureLayer {
 	float heightMin = -10;
 	float textureScale = 1;
 
+	float randomnessScale = 1;
+	float randomnessStrength = 0;
+	float steepness = 1;
+
 	nlohmann::json Save() {
 		nlohmann::json data;
 		data["name"] = name;
 		data["hMx"] = heightMax;
 		data["hMn"] = heightMin;
 		data["texSc"] = textureScale;
+		data["rSc"] = randomnessScale;
+		data["rSt"] = randomnessStrength;
+		data["step"] = steepness;
 		std::string filePath = texture->GetPath();
 		std::string hash = MD5File(filePath).ToString();
 		if (GetProjectAsset(hash).size() == 0) {
@@ -49,10 +56,34 @@ struct TextureLayer {
 		heightMax = data["hMx"];
 		heightMin = data["hMn"];
 		textureScale = data["texSc"];
+
+		// Temporary
+		try {
+		 	randomnessScale = data["rSc"];
+			randomnessStrength = data["rSt"];
+			steepness = data["step"];
+		}
+		catch (...) {}
+
 		if (texture)
 			delete texture;
 		Log("Laoding : " + GetProjectResourcePath() + "\\" + GetProjectAsset(data["texture"]));
 		texture = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(data["texture"]), false);
+	}
+
+	void Render(int id) {
+		if (ImGui::ImageButton((ImTextureID)texture->GetRendererID(), ImVec2(30, 30))) {
+			cTexID = id;
+			ImGui::OpenPopup("Open Image");
+		}
+		ImGui::SameLine();
+		ImGui::InputText(("##TLayerName" + std::to_string(id)).c_str(), name.data(), 256);
+		ImGui::DragFloat(("Min##TLayerHeightMin" + std::to_string(id)).c_str(), &heightMin, 0.01f);
+		ImGui::DragFloat(("Max##TLayerHeightMax" + std::to_string(id)).c_str(), &heightMax, 0.01f);
+		ImGui::DragFloat(("Steepness##TLayerTScale" + std::to_string(id)).c_str(), &steepness, 0.01f);
+		ImGui::DragFloat(("Texture Scale##TLayerTScale" + std::to_string(id)).c_str(), &textureScale, 0.001f);
+		ImGui::DragFloat(("Randomness Scale##TLayerTScale" + std::to_string(id)).c_str(), &randomnessScale, 0.01f);
+		ImGui::DragFloat(("Randomness Strength##TLayerTScale" + std::to_string(id)).c_str(), &randomnessStrength, 0.01f);
 	}
 };
 
@@ -196,15 +227,7 @@ void ShowTextureSettings(bool* pOpen)
 	int i = 0;
 	for (auto& it = textureLayers.begin(); it != textureLayers.end();it++) {
 		ImGui::Separator();
-		if (ImGui::ImageButton((ImTextureID)it->texture->GetRendererID(), ImVec2(30, 30))) {
-			cTexID = i;
-			ImGui::OpenPopup("Open Image");
-		}
-		ImGui::SameLine();
-		ImGui::InputText(("##TLayerName" + std::to_string(i)).c_str(), it->name.data(), 256);
-		ImGui::DragFloat(("Min##TLayerHeightMin" + std::to_string(i)).c_str(), &it->heightMin, 0.01f);
-		ImGui::DragFloat(("Max##TLayerHeightMax" + std::to_string(i)).c_str(), &it->heightMax, 0.01f);
-		ImGui::DragFloat(("Scale##TLayerTScale" + std::to_string(i)).c_str(), &it->textureScale, 0.01f);
+		it->Render(i);
 		/*
 		if (ImGui::Button("Delete")) {
 			textureLayers.erase(it);
@@ -222,7 +245,7 @@ void ShowTextureSettings(bool* pOpen)
 		}
 	}
 	*/
-
+	 
 	ImGui::DragFloat("Texture Scale", textureScale, 0.1f);
 
 
@@ -236,6 +259,8 @@ uint32_t UpdateDiffuseTexturesUBO(uint32_t shaderID, std::string diffuseUBOName)
 		glUniform1i(uUniform, i);
 		uUniform = glGetUniformLocation(shaderID, (diffuseUBOName + "Heights[" + std::to_string(i) + "]").c_str());
 		glUniform3f(uUniform, textureLayers[i].heightMin, textureLayers[i].heightMax, textureLayers[i].textureScale);
+		uUniform = glGetUniformLocation(shaderID, (diffuseUBOName + "Data[" + std::to_string(i) + "]").c_str());
+		glUniform3f(uUniform, textureLayers[i].randomnessScale, textureLayers[i].randomnessStrength, textureLayers[i].steepness);		
 	}
 	return diffuseUBO;
 }

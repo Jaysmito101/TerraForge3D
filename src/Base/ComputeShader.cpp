@@ -66,6 +66,12 @@ void ComputeShader::SetUniformMat4(std::string name, glm::mat4& value)
 {
 }
 
+void ComputeShader::SetVec3(std::string name, float a, float b, float c)
+{
+	uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+	glUniform3f(loc, a, b, c);
+}
+
 void ComputeShader::Unbind()
 {
 	glUseProgram(0);

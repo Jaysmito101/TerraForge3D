@@ -16,6 +16,7 @@
 #include <OSLiscenses.h>
 #include <FiltersManager.h>
 #include <FoliagePlacement.h>
+#include <SkySettings.h>
 #include <SupportersTribute.h>
 #include <ElevationNodeEditor.h>
 #include <ExportManager.h>
@@ -83,7 +84,7 @@ static bool vSync = true;
 static bool autoUpdate = false;
 static bool flattenBase = false;
 static bool button1, button2, button3;
-static std::atomic<bool> noiseBased = false;
+static std::atomic<bool> noiseBased = true;
 static bool wireFrameMode = false;
 static bool showSea = false;
 static bool absolute = false;
@@ -372,13 +373,14 @@ static void DoTheRederThing(float deltaTime) {
 	shader->SetLightPos(LightPosition);
 	float tmp[3];
 	tmp[0] = viewportMousePosX;
-	tmp[1] = viewportMousePosY;
+	tmp[1] = viewportMousePosY; 
 	tmp[2] = ImGui::GetIO().MouseDown[0];
 	shader->SetUniform3f("_MousePos", tmp);
 	tmp[0] = 800;
 	tmp[1] = 600;
 	tmp[2] = 1;
 	shader->SetUniform3f("_Resolution", tmp);
+	shader->SetUniform3f("_CameraPos", CameraPosition);
 	UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 	terrain.Render();
 
@@ -403,6 +405,8 @@ static void DoTheRederThing(float deltaTime) {
 		waterShader->SetLightPos(LightPosition);
 		sea.Render();
 	}
+
+	RenderSky();
 }
 
 static void ShowTerrainControls()
@@ -1076,6 +1080,8 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Sea Settings", &activeWindows.seaEditor);
 
+			ShowWindowMenuItem("Sky Settings", &activeWindows.skySettings);
+
 			ShowWindowMenuItem("Filters Manager", &activeWindows.filtersManager);
 
 			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
@@ -1449,6 +1455,9 @@ public:
 		if (activeWindows.supportersTribute)
 			ShowSupportersTribute(&activeWindows.supportersTribute);
 
+		if (activeWindows.skySettings)
+			ShowSkySettings(&activeWindows.skySettings);
+
 		OnImGuiRenderEnd();
 	}
 
@@ -1489,7 +1498,7 @@ public:
 		scale = 1;
 		noiseLayersTmp.push_back(NoiseLayer());
 		Log("Started Up App!");
-
+		 
 		if (loadFile.size() > 0) {
 			Log("Loading File from " + loadFile);
 			OpenSaveFile(loadFile);
@@ -1497,8 +1506,10 @@ public:
 
 		SetProjectId(GenerateId(32));
 		SetupFiltersManager(&autoUpdate, &terrain);
+		SetupSky();
+
 		// For Debug Only
-		autoUpdate = true;
+		autoUpdate = true; 
 	}
 
 	void OnEnd()

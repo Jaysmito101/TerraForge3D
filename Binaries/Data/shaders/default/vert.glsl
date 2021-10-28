@@ -10,6 +10,7 @@ out DATA
 	float height;
     vec3 FragPos;
     vec3 Normal;
+    float distance;
 	vec2 TexCoord;
 } data_out; 
 
@@ -20,4 +21,6 @@ void main()
 	data_out.FragPos = vec3(aPos.x, aPos.y, aPos.z);
 	data_out.Normal = vec3(aNorm.x, aNorm.y, aNorm.z);
 	data_out.TexCoord = aTexCoord;
+//	data_out.distance = sqrt(_CameraPos, gl_Position.xyz);
+	data_out.distance = 0;
 }

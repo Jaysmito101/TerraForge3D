@@ -25,8 +25,8 @@ uniform mat4 _PV;
 
 void main()
 {
-    TexCoords = aPos*100;
-    gl_Position = _PV * vec4(aPos*100, 1.0);
+    TexCoords = aPos*1000;
+    gl_Position = _PV * vec4(aPos*1000, 1.0);
 }  
 )";
 static std::string fragShader = R"(
