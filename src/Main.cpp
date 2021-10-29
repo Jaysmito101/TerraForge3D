@@ -14,6 +14,7 @@
 #include <AppShaderEditor.h>
 #include <ProjectData.h>
 #include <OSLiscenses.h>
+#include <FrameBuffer.h>
 #include <FiltersManager.h>
 #include <FoliagePlacement.h>
 #include <SkySettings.h>
@@ -57,6 +58,9 @@
 static Model terrain("Terrain");
 static Model sea("Sea");
 static Model grid("Grid");
+
+
+static FrameBuffer* reflectionfbo;
 
 static Application* myApp;
 static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader;
@@ -114,6 +118,9 @@ static float textureScaleO = 1.0f;
 static float viewportMousePosX = 0;
 static float viewportMousePosY = 0;
 static int numberOfNoiseTypes = 3;
+static float seaAlpha = 0.5f;
+static float seaDistortionScale = 1.0f;
+static float seaDistortionStength = 0.0f;
 static int secondCounter = 0;
 
 static nlohmann::json appData;
@@ -351,14 +358,15 @@ static void GenerateMesh()
 	grid.UploadToGPU();
 }
 
-static void DoTheRederThing(float deltaTime) {
+static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 
 	static float time;
 	time += deltaTime;
 	camera.UpdateCamera(CameraPosition, CameraRotation);
 	Shader* shader;
 	if (skyboxEnabled)
-		RenderSkybox(camera.pv);
+		RenderSkybox(camera.view, camera.pers);
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (wireFrameMode)
@@ -368,7 +376,7 @@ static void DoTheRederThing(float deltaTime) {
 	shader->Bind();
 	shader->SetTime(&time);
 	shader->SetMPV(camera.pv);
-	shader->SetUniformMAt4("_Model", terrain.modelMatrix);
+	shader->SetUniformMat4("_Model", terrain.modelMatrix);
 	shader->SetLightCol(LightColor);
 	shader->SetLightPos(LightPosition);
 	float tmp[3];
@@ -392,10 +400,15 @@ static void DoTheRederThing(float deltaTime) {
 	//grid->Render();
 
 
-	if (showSea) {
-		glUseProgram(0);
+	if (showSea && renderWater) {
 		waterShader->Bind();
 		waterShader->SetTime(&time);
+		waterShader->SetUniformf("_SeaAlpha", seaAlpha);
+		waterShader->SetUniformf("_SeaDistScale", seaDistortionScale);
+		waterShader->SetUniformf("_SeaDistStrength", seaDistortionStength);
+		glActiveTexture(7);
+		glBindTexture(GL_TEXTURE_2D, reflectionfbo->GetColorTexture());
+		waterShader->SetUniformi("reflectionTexture", 7);
 		sea.position.y = seaLevel;
 		sea.Update();
 		glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0));
@@ -588,6 +601,7 @@ static void ShowMainScene() {
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
 		ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		//ImGui::Image((ImTextureID)GetViewportFramebufferDepthTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
 	ImGui::End();
@@ -642,8 +656,10 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["textureScale"] = textureScale;
 	tmp["textureScaleO"] = textureScaleO;
 	tmp["seaLevel"] = seaLevel;
+	tmp["seaAlpha"] = seaAlpha;
 	tmp["autoSave"] = autoSave;
-
+	tmp["seaDistortionStength"] = seaDistortionStength;
+	tmp["seaDistortionScale"] = seaDistortionScale;
 	tmp["projectID"] = GetProjectId();
 	tmp["projectDatabase"] = GetProjectDatabase();
 
@@ -808,7 +824,10 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	textureScale = tmp["textureScale"];
 	textureScaleO = tmp["textureScaleO"];
 	seaLevel = tmp["seaLevel"];
+	seaAlpha = tmp["seaAlpha"];
 	autoSave = tmp["autoSave"];
+	seaDistortionScale = tmp["seaDistortionScale"];
+	seaDistortionStength = tmp["seaDistortionStength"];
 
 	SetProjectId(tmp["projectID"]);
 	try {
@@ -838,6 +857,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	try {
 		diffuse = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(tmp["diffuseTexId"]));
 	}
+
 	catch (...) {
 		Log("Cold not load texture from saved file.");
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
@@ -1141,8 +1161,11 @@ static void ShowSeaSettings() {
 
 	ImGui::Text("Sea Color");
 	ImGui::ColorEdit3("##seaColor", SeaColor);
+	ImGui::DragFloat("Alpha", &seaAlpha, 0.1f);
+	ImGui::DragFloat("Distortion Strength", &seaDistortionStength, 0.1f);
+	ImGui::DragFloat("Distortion Scale", &seaDistortionScale, 0.1f);
 
-	ImGui::DragFloat("Sea Level", &seaLevel, 0.1f);
+	ImGui::DragFloat("Level", &seaLevel, 0.1f);
 
 
 	ImGui::End();
@@ -1238,6 +1261,8 @@ public:
 				noiseLayers.push_back(n);
 			noiseLayersTmp.clear();
 		}
+
+
 		if (!isExploreMode) {
 			if (reqTexRfrsh) {
 				if (diffuse)
@@ -1317,12 +1342,18 @@ public:
 				}
 			}
 
-			glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
+
+			reflectionfbo->Begin();
 			glViewport(0, 0, 800, 600);
 			GetWindow()->Clear();
 			s_Stats.deltaTime = deltatime;
-
 			DoTheRederThing(deltatime);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
+			glViewport(0, 0, 800, 600);
+			GetWindow()->Clear();
+			DoTheRederThing(deltatime, true);
+
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			RenderImGui();
 			if (autoUpdate)
@@ -1339,6 +1370,16 @@ public:
 
 
 			expH = isExploreMode;
+			
+
+
+			reflectionfbo->Begin();
+			glViewport(0, 0, 800, 600);
+			GetWindow()->Clear();
+			s_Stats.deltaTime = deltatime;
+			DoTheRederThing(deltatime);
+			reflectionfbo->End();
+
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			int w, h;
 			glfwGetWindowSize(GetWindow()->GetNativeWindow(), &w, &h);
@@ -1488,7 +1529,7 @@ public:
 			io.MouseWheel = (float)y;
 			});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		GenerateMesh();
+		GenerateMesh(); 
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
 		CameraPosition[1] = 0.2f;
@@ -1508,6 +1549,8 @@ public:
 		SetupFiltersManager(&autoUpdate, &terrain);
 		SetupSky();
 
+		reflectionfbo = new FrameBuffer();
+
 		// For Debug Only
 		autoUpdate = true; 
 	}
@@ -1517,6 +1560,7 @@ public:
 		ShutdownElevationNodeEditor();
 		delete shd;
 		delete wireframeShader;
+		delete reflectionfbo;
 	}
 };
 

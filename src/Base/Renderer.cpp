@@ -5,11 +5,11 @@ namespace Renderer {
 
 	void RenderModel(Model* model, Camera* camera, FrameBuffer* framebuffer, Shader* shader, Texture2D* diffuse, glm::vec3 lightPosition, float* lightColor, float time)
 	{
-		framebuffer->Begin();
+		framebuffer->Begin(); 
 		shader->Bind();
 		shader->SetTime(&time);
 		shader->SetMPV(camera->pv);
-		shader->SetUniformMAt4("_Model", model->modelMatrix);
+		shader->SetUniformMat4("_Model", model->modelMatrix);
 		shader->SetLightCol(lightColor);
 		shader->SetLightPos(lightPosition);
 		float tmp[3];
@@ -34,7 +34,7 @@ namespace Renderer {
 			shader->Bind();
 			shader->SetTime(&time);
 			shader->SetMPV(camera->pv);
-			shader->SetUniformMAt4("_Model", models[i]->modelMatrix);
+			shader->SetUniformMat4("_Model", models[i]->modelMatrix);
 			shader->SetLightCol(lightColor);
 			shader->SetLightPos(lightPosition);
 			float tmp[3];

@@ -4,6 +4,7 @@ layout (location = 1) in vec3 aNorm;
 layout (location = 2) in vec2 aTexCoord;
 
 uniform mat4 _Model;
+uniform mat4 _PV;
 
 out DATA
 {
@@ -13,6 +14,8 @@ out DATA
     float distance;
 	vec2 TexCoord;
 } data_out; 
+
+
 
 void main()
 {

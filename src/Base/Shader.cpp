@@ -2,19 +2,19 @@
 #include <Shader.h>
 #include <windows.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <ShaderUtils.h>
+#include <ShaderUtils.h>   
 
 Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geometrySource)
 {
 	GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER, "Vertex");
 	GLuint geomShader = CompileShader(geometrySource, GL_GEOMETRY_SHADER, "Geometry");
 	GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER, "Fragment");
-	m_Shader = CreateProgram();
+	m_Shader = CreateProgram(); 
 	glAttachShader(m_Shader, vertShader);
 	glAttachShader(m_Shader, geomShader);
 	glAttachShader(m_Shader, fragShader);
 	glLinkProgram(m_Shader);
-	GLint isLinked = 0;
+	GLint isLinked = 0; 
 	glGetProgramiv(m_Shader, GL_LINK_STATUS, (int*)&isLinked);
 	if (isLinked == GL_FALSE)
 	{
@@ -145,17 +145,9 @@ void Shader::SetUniformi(std::string name, int value)
 }
 
 
-void Shader::SetUniformMAt4(std::string name, glm::mat4& value)
-{
-	if (uniformLocations.find(name) == uniformLocations.end()) {
-		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
-		uniformLocations.insert(std::make_pair(name, loc));
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
-	}
-	else {
-		uint32_t loc = uniformLocations[name];
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
-	}
+void Shader::SetUniformMat4(std::string name, glm::mat4 value){
+	uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
+	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void Shader::Unbind()

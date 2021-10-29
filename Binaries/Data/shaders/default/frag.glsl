@@ -82,5 +82,5 @@ void main()
 //	FragColor = vec4(result, 1.0);
 	float factor = pow(2.7139, -1*Distance);
 	FragColor = mix(vec4(result, 0.6f), vec4(1.0), 0.1);
-    FragColor = vec4(result, 0.6f);
+    FragColor = vec4(result, 1.0f);
 } 

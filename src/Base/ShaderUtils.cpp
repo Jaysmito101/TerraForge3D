@@ -14,7 +14,7 @@ int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name) {
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
 	if (isCompiled == GL_FALSE)
 	{
-		GLint maxLength = 0;
+  		GLint maxLength = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
 		char* errorLog = (char*)malloc(maxLength);
 		memset(errorLog, 0, maxLength);

@@ -37,7 +37,6 @@ void FrameBuffer::Begin()
 
 uint32_t FrameBuffer::End()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return colorTexture;
 }
 

@@ -14,34 +14,11 @@
 
 static uint32_t textureID;
 static uint32_t vao;
-static std::string vertShader = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-
-out vec3 TexCoords;
+bool tmpb = false;
+static std::string vertShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\vert.glsl", &tmpb);
+static std::string fragShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\frag.glsl", &tmpb);
 
 
-uniform mat4 _PV;
-
-void main()
-{
-    TexCoords = aPos*1000;
-    gl_Position = _PV * vec4(aPos*1000, 1.0);
-}  
-)";
-static std::string fragShader = R"(
-#version 330 core
-out vec4 FragColor;
-
-in vec3 TexCoords;
-
-uniform samplerCube skybox;
-
-void main()
-{    
-    FragColor = texture(skybox, TexCoords);
-}
-)";
 static Shader* skyboxShader;
 float skyboxVertices[] = {
     // positions          
@@ -148,14 +125,18 @@ void SetupCubemap()
 }
 
 
-void RenderSkybox(glm::mat4 view) {
+void RenderSkybox(glm::mat4 view, glm::mat4 proj) {
+    glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glBindVertexArray(vao);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     skyboxShader->Bind();
-    skyboxShader->SetMPV(view);
+    view = glm::mat4(glm::mat3(view));
+    skyboxShader->SetUniformMat4("_P", proj);
+    skyboxShader->SetUniformMat4("_V", view);
     glUniform1i(glGetUniformLocation(skyboxShader->m_Shader, "skybox"), 0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
 }

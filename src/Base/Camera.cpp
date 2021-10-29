@@ -11,7 +11,7 @@
 Camera::Camera() {
 	fov = 45;
 	near = 0.01f;
-	far = 100000.0f;
+	far = 200.0f;
 	aspect = 16.0f / 9.0f;
 	pitch = yaw = roll = 0;
 	view = glm::mat4(1.0f);

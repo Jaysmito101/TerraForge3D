@@ -20,9 +20,12 @@ in DATA
 	vec2 TexCoord;
 } data_in[]; 
 
+const vec4 clipPlane = vec4(0, -1, 0, 5);
+
 void main()
 {	
 	gl_Position = _PV * gl_in[0].gl_Position;
+	//gl_ClipDistance[0] = dot(gl_Position, clipPlane);
 	Normal = data_in[0].Normal;
 	height = data_in[0].height;
 	Distance = data_in[0].distance;
@@ -31,6 +34,7 @@ void main()
 	EmitVertex();
 
 	gl_Position = _PV * gl_in[1].gl_Position;
+	//gl_ClipDistance[0] = dot(gl_Position, clipPlane);
 	height = data_in[1].height;
 	Distance = data_in[1].distance;
 	Normal = data_in[1].Normal;
@@ -39,6 +43,7 @@ void main()
 	EmitVertex();
 
 	gl_Position =  _PV * gl_in[2].gl_Position;
+	//gl_ClipDistance[0] = dot(gl_Position, clipPlane);
 	height = data_in[2].height;
 	Distance = data_in[2].distance;
 	Normal = data_in[2].Normal;
