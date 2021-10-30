@@ -23,6 +23,8 @@
 # TerraGen3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
+![Show-Case6.gif](https://i.postimg.cc/zDCmwc1G/Show-Case6.gif)
+
 <a href="https://youtu.be/wnNclej40zQ"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase5.gif" width="1000"></a>
 
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase2.gif" width="1000">
