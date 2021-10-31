@@ -370,7 +370,6 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 	if (skyboxEnabled)
 		RenderSky(camera.view, camera.pers);
 	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (wireFrameMode)
