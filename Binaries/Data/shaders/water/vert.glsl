@@ -8,11 +8,11 @@ uniform mat4 _Model;
 
 out DATA
 {
-
     vec3  FragPos;
     vec3 Normal;
 	vec2 TexCoords;
 	mat4 PV;
+	float height;
 } data_out; 
 
 void main()
@@ -21,5 +21,6 @@ void main()
 	data_out.FragPos = vec3(aPos.x, aPos.y, aPos.z);
 	data_out.Normal = vec3(aNorm.x, aNorm.y, aNorm.z);
 	data_out.PV = _PV;
+	data_out.height = aPos.y;
 	data_out.TexCoords = aTexCoord;
 }

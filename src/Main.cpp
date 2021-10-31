@@ -101,11 +101,11 @@ static bool showFoliage = true;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
-static Texture2D* diffuse, * normal, * gridTex;
+static Texture2D* diffuse, * normal, * gridTex, *waterDudvMap, *waterNormal;
 
 
 static uint32_t vao, vbo, ebo;
-
+ 
 static float noiseStrength = 1.0f;
 static int resolution = 256;
 static float mouseSpeed = 25;
@@ -120,7 +120,9 @@ static float viewportMousePosY = 0;
 static int numberOfNoiseTypes = 3;
 static float seaAlpha = 0.5f;
 static float seaDistortionScale = 1.0f;
-static float seaDistortionStength = 0.0f;
+static float seaDistortionStength = 0.02f;
+static float seaReflectivity = 0.7;
+static float seaWaveSpeed = 0.01f;
 static int secondCounter = 0;
 
 static nlohmann::json appData;
@@ -128,6 +130,8 @@ static nlohmann::json appData;
 static std::string successMessage = "";
 static std::string errorMessage = "";
 static std::string savePath = "";
+static std::string DuDvMapID = "";
+static std::string waterNormalMap = "";
 
 static float nLOffsetX, nLOffsetY;
 
@@ -389,6 +393,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 	tmp[2] = 1;
 	shader->SetUniform3f("_Resolution", tmp);
 	shader->SetUniform3f("_CameraPos", CameraPosition);
+	shader->SetUniformf("_SeaLevel", seaLevel);
 	UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 	terrain.Render();
 
@@ -402,16 +407,25 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 
 	if (showSea && renderWater) {
 		waterShader->Bind();
-		waterShader->SetTime(&time);
+		waterShader->SetTime(&time); 
 		waterShader->SetUniformf("_SeaAlpha", seaAlpha);
 		waterShader->SetUniformf("_SeaDistScale", seaDistortionScale);
 		waterShader->SetUniformf("_SeaDistStrength", seaDistortionStength);
-		glActiveTexture(7);
+		waterShader->SetUniformf("_SeaReflectivity", seaReflectivity);
+		waterShader->SetUniformf("_SeaLevel", seaLevel);
+		waterShader->SetUniformf("_SeaWaveSpeed", seaWaveSpeed);
+		glActiveTexture(7); 
 		glBindTexture(GL_TEXTURE_2D, reflectionfbo->GetColorTexture());
-		waterShader->SetUniformi("reflectionTexture", 7);
+		waterShader->SetUniformi("_ReflectionTexture", 7);
+		if(waterDudvMap)
+			waterDudvMap->Bind(8);
+		waterShader->SetUniformi("_DuDvMap", 8);
+		if (waterNormal)
+			waterNormal->Bind(9);
+		waterShader->SetUniformi("_NormalMap", 9);
 		sea.position.y = seaLevel;
 		sea.Update();
-		glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0));
+		glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0)); 
 		waterShader->SetUniform3f("_SeaColor", SeaColor);
 		waterShader->SetMPV(tmp);
 		waterShader->SetLightCol(LightColor);
@@ -660,8 +674,12 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["autoSave"] = autoSave;
 	tmp["seaDistortionStength"] = seaDistortionStength;
 	tmp["seaDistortionScale"] = seaDistortionScale;
+	tmp["seaReflectivity"] = seaReflectivity;
 	tmp["projectID"] = GetProjectId();
+	tmp["seaWaveSpeed"] = seaWaveSpeed;
 	tmp["projectDatabase"] = GetProjectDatabase();
+	tmp["dudvmapID"] = DuDvMapID;
+	tmp["waterNormalMap"] = waterNormalMap;
 
 	SaveProjectDatabase();
 
@@ -804,31 +822,37 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 		noiseLayersTmp.back().Load(noiseLayersSaveData[i]);
 	}
 	nlohmann::json tmp = data["generals"];
-	autoUpdate = tmp["autoUpdate"];
+	try {
+		autoUpdate = tmp["autoUpdate"];
 
-	nLOffsetY = tmp["nLOffsetY"];
-	nLOffsetX = tmp["nLOffsetX"];
+		nLOffsetY = tmp["nLOffsetY"];
+		nLOffsetX = tmp["nLOffsetX"];
 
-	square = tmp["square"];
-	absolute = tmp["absolute"];
-	flattenBase = tmp["flattenBase"];
-	noiseBased = tmp["noiseBased"];
-	skyboxEnabled = tmp["skyboxEnabled"];
-	vSync = tmp["vSync"];
-	showSea = tmp["showSea"];
-	wireFrameMode = tmp["wireFrameMode"];
-	mouseSpeed = tmp["mouseSpeed"];
-	scrollSpeed = tmp["scrollSpeed"];
-	mouseScrollAmount = tmp["mouseScrollAmount"];
-	scale = tmp["scale"];
-	textureScale = tmp["textureScale"];
-	textureScaleO = tmp["textureScaleO"];
-	seaLevel = tmp["seaLevel"];
-	seaAlpha = tmp["seaAlpha"];
-	autoSave = tmp["autoSave"];
-	seaDistortionScale = tmp["seaDistortionScale"];
-	seaDistortionStength = tmp["seaDistortionStength"];
-
+		square = tmp["square"];
+		absolute = tmp["absolute"];
+		flattenBase = tmp["flattenBase"];
+		noiseBased = tmp["noiseBased"];
+		skyboxEnabled = tmp["skyboxEnabled"];
+		vSync = tmp["vSync"];
+		showSea = tmp["showSea"];
+		wireFrameMode = tmp["wireFrameMode"];
+		mouseSpeed = tmp["mouseSpeed"];
+		scrollSpeed = tmp["scrollSpeed"];
+		mouseScrollAmount = tmp["mouseScrollAmount"];
+		scale = tmp["scale"];
+		textureScale = tmp["textureScale"];
+		textureScaleO = tmp["textureScaleO"];
+		seaLevel = tmp["seaLevel"];
+		seaAlpha = tmp["seaAlpha"];
+		autoSave = tmp["autoSave"];
+		seaReflectivity = tmp["seaReflectivity"];
+		seaDistortionScale = tmp["seaDistortionScale"];
+		seaWaveSpeed = tmp["seaWaveSpeed"];
+		seaDistortionStength = tmp["seaDistortionStength"];
+		DuDvMapID = tmp["dudvmapID"];
+		waterNormalMap = tmp["waterNormalMap"];
+	}
+	catch (...) {}
 	SetProjectId(tmp["projectID"]);
 	try {
 		SetProjectDatabase(tmp["projectDatabase"]);
@@ -851,6 +875,23 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 	LightPosition[2] = tmp["lightPosY"];
 	LightPosition[1] = tmp["lightPosZ"];
 
+	if (DuDvMapID != "DEFAULT") {
+		delete waterDudvMap;
+		waterDudvMap = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(DuDvMapID));
+	}
+	else {
+		delete waterDudvMap;
+		waterDudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
+	}
+
+	if (waterNormalMap != "DEFAULT") {
+		delete waterNormal;
+		waterNormal = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(waterNormalMap));
+	}
+	else {
+		delete waterNormal;
+		waterNormal = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_normal.png");
+	}
 
 	if (diffuse)
 		delete diffuse;
@@ -1139,7 +1180,7 @@ static void ShowMenu() {
 
 		}
 		ImGui::EndMainMenuBar();
-	}
+	} 
 }
 
 static void ShowErrorModal() {
@@ -1161,10 +1202,55 @@ static void ShowSeaSettings() {
 
 	ImGui::Text("Sea Color");
 	ImGui::ColorEdit3("##seaColor", SeaColor);
-	ImGui::DragFloat("Alpha", &seaAlpha, 0.1f);
-	ImGui::DragFloat("Distortion Strength", &seaDistortionStength, 0.1f);
-	ImGui::DragFloat("Distortion Scale", &seaDistortionScale, 0.1f);
+	ImGui::DragFloat("Alpha", &seaAlpha, 0.001f, 0, 1);
+	ImGui::DragFloat("Reflectivity", &seaReflectivity, 0.001f, 0, 1);
 
+	ImGui::Text("DuDv Map");
+	ImGui::SameLine();
+	if (ImGui::ImageButton((ImTextureID)waterDudvMap->GetRendererID(), ImVec2(50, 50))){
+		std::string fileName = ShowOpenFileDialog(L".png\0");
+		if (fileName.size() > 3) {
+			delete waterDudvMap;
+
+			std::string hash = MD5File(fileName).ToString();
+			if (GetProjectAsset(hash).size() != 0) {
+				DuDvMapID = hash;
+
+			}
+			else {
+				CopyFileData(fileName, GetProjectResourcePath() + "\\textures\\" + hash);
+				RegisterProjectAsset(hash, "textures\\" + hash);
+				DuDvMapID = hash;
+				waterDudvMap = new Texture2D(fileName);
+			}
+		}
+	}
+
+
+	ImGui::Text("Normal Map");
+	ImGui::SameLine();
+	if (ImGui::ImageButton((ImTextureID)waterNormal->GetRendererID(), ImVec2(50, 50))) {
+		std::string fileName = ShowOpenFileDialog(L".png\0");
+		if (fileName.size() > 3) {
+			delete waterNormal;
+
+			std::string hash = MD5File(fileName).ToString();
+			if (GetProjectAsset(hash).size() != 0) {
+				waterNormalMap = hash;
+
+			}
+			else {
+				CopyFileData(fileName, GetProjectResourcePath() + "\\textures\\" + hash);
+				RegisterProjectAsset(hash, "textures\\" + hash);
+				waterNormalMap = hash;
+				waterNormal = new Texture2D(fileName);
+			}
+		}
+	}
+
+	ImGui::DragFloat("Distortion Strength", &seaDistortionStength, 0.001f);
+	ImGui::DragFloat("Distortion Scale", &seaDistortionScale, 0.1f);
+	ImGui::DragFloat("Wave Speed", &seaWaveSpeed, 0.01f);
 	ImGui::DragFloat("Level", &seaLevel, 0.1f);
 
 
@@ -1549,6 +1635,13 @@ public:
 		SetupFiltersManager(&autoUpdate, &terrain);
 		SetupSky();
 
+
+		waterDudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
+		DuDvMapID = "DEFAULT";
+		Log("Loaded Water DUDV Map from " + GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
+		waterNormal = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_normal.png");
+		waterNormalMap = "DEFAULT";
+		Log("Loaded Water DUDV Map from " + GetExecutableDir() + "\\Data\\textures\\water_normal.png");
 		reflectionfbo = new FrameBuffer();
 
 		// For Debug Only
@@ -1561,6 +1654,8 @@ public:
 		delete shd;
 		delete wireframeShader;
 		delete reflectionfbo;
+		delete diffuse;
+		delete waterDudvMap;
 	}
 };
 

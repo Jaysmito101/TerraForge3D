@@ -205,12 +205,12 @@ bool PathExist(const std::string& s)
 
 bool IsNetWorkConnected()
 {
-	
+	 
 	bool bConnect = InternetCheckConnection(CA2CT(pingURL), FLAG_ICC_FORCE_CONNECTION, 0);
 
 
 	if (bConnect)
-	{
+	{ 
 		return true;
 	}
 	else
@@ -227,6 +227,8 @@ char* ReadBinaryFile(std::string path, int* fSize, uint32_t sizeToLoad)
 	if(sizeToLoad > 0)
 		size = size < sizeToLoad ? size : sizeToLoad;
 	std::ifstream f1(path, std::fstream::binary);
+	if (size < 1)
+		size = 1024;
 	char* buffer = new char[size];
 	f1.read(buffer, size);
 	f1.close();
@@ -250,7 +252,7 @@ Hash MD5File(std::string path)
 	delete[] data;
 	return resultHash;
 }
-
+ 
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size) {
 	std::ofstream outfile;
 	httplib::Client cli(baseURL);

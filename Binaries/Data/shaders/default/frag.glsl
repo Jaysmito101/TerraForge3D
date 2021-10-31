@@ -15,6 +15,7 @@ in vec2 TexCoord;
 uniform sampler2D  _DiffuseTextures[NUM_TEXTURE_LAYERS];
 uniform vec3  _DiffuseTexturesHeights[NUM_TEXTURE_LAYERS];
 uniform vec3  _DiffuseTexturesData[NUM_TEXTURE_LAYERS];
+uniform float _SeaLevel;
 
 
 vec2 hash( vec2 p ) // replace this by something better
@@ -72,6 +73,7 @@ vec4 GetTextureColorBasedOnHeight(vec2 coord){
 
 void main()
 {	
+
 	vec3 objectColor = vec3(1, 1, 1);
 	objectColor = GetTextureColorBasedOnHeight(TexCoord).xyz;
 	vec3 norm = normalize(Normal);
