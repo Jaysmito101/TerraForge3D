@@ -47,6 +47,8 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 * Tribute to all who **Starred** or **Contributed** to the project
 * Procedural Texturing
 * Realistic Hydraulic Erosion Simulation (CPU & GPU modes)
+* Use custom HDRI Skyboxes
+* Water with reflections, ripples, waves.
 * OpenCL Support
 * Compute Shaders
 * Infinite First Person Terrain Explorer
