@@ -47,6 +47,8 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 * Tribute to all who **Starred** or **Contributed** to the project
 * Procedural Texturing
 * Realistic Hydraulic Erosion Simulation (CPU & GPU modes)
+* Use custom HDRI Skyboxes
+* Water with reflections, ripples, waves.
 * OpenCL Support
 * Compute Shaders
 * Infinite First Person Terrain Explorer
@@ -126,6 +128,6 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
 
-<a href="https://www.producthunt.com/posts/terragen3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terragen3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=314431&theme=dark" alt="TerraGen3D - 3D Procedural Node Based Terrain Generation Tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+<a href="https://www.producthunt.com/posts/terragen3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terragen3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=314431&theme=dark" alt="TerraGen3D - 3D Procedural Node Based Terrain Generation Tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a> 
 
 <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.TerraGen3D&left_color=gray&right_color=green&style=for-the-badge">
