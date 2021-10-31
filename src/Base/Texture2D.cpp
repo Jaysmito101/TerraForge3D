@@ -72,15 +72,12 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 
 Texture2D::~Texture2D()
 {
-	if (m_Data)
-		stbi_image_free(m_Data);
+	if (m_Data) 
 		glDeleteTextures(1, &m_RendererID);
 }
 
 void Texture2D::SetData(void* data, uint32_t size, bool alpha)
 {
-	if (!data)
-		return;
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 
 	if(alpha)

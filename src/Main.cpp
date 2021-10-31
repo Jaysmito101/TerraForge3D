@@ -35,7 +35,6 @@
 #include <FastNoiseLite.h>
 #include <thread>
 #include <experimental/filesystem>
-#include <CubeMap.h>
 #include <time.h>
 #include <mutex>
 #include <json.hpp>
@@ -369,7 +368,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 	camera.UpdateCamera(CameraPosition, CameraRotation);
 	Shader* shader;
 	if (skyboxEnabled)
-		RenderSkybox(camera.view, camera.pers);
+		RenderSky(camera.view, camera.pers);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -433,7 +432,6 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 		sea.Render();
 	}
 
-	RenderSky();
 }
 
 static void ShowTerrainControls()
@@ -1593,7 +1591,6 @@ public:
 		srand((unsigned int)time(NULL));
 		SetUpIcon();
 		SetupViewportFrameBuffer();
-		SetupCubemap();
 		SetupShaderManager(GetExecutableDir());
 		SetupElevationManager(&resolution);
 		SetupFoliageManager();

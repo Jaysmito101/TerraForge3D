@@ -208,9 +208,8 @@ bool IsNetWorkConnected()
 	 
 	bool bConnect = InternetCheckConnection(CA2CT(pingURL), FLAG_ICC_FORCE_CONNECTION, 0);
 
-
 	if (bConnect)
-	{ 
+	{
 		return true;
 	}
 	else
