@@ -2,6 +2,8 @@
 #include <Utils.h>
 #include <imgui/imgui.h>
 #include <Texture2D.h>
+#include <ShaderStorageBuffer.h>
+#include <ComputeShader.h>
 #include <TextureStore.h>
 #include <json.hpp>
 
@@ -92,7 +94,6 @@ std::vector<TextureLayer> textureLayers;
 
 std::vector<Texture2D*>* textureThumbs;
 nlohmann::json* texture_database;
-
 
 
 static void AddNewLayer() {

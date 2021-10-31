@@ -2,8 +2,11 @@
 
 #include "CubeMap.h"
 
+
 #include <imgui.h>
 #include "Utils.h"
+
+#include <hdritocubemap/HdriToCubemap.hpp>
 
 TextureCubemap* cubemap;
 
@@ -21,10 +24,45 @@ static void ChangeCubemapTile(int face) {
 	}
 }
 
+static void LoadHDRI(std::string path) {
+		// load hdr or ldr image
+	int cubemapResolution = 1024;
+	bool linearFilter = true;
+	HdriToCubemap<unsigned char> hdriToCube_ldr(path, cubemapResolution, linearFilter);
+
+	cubemap->facesData[TEXTURE_CUBEMAP_PX] = hdriToCube_ldr.getLeft();
+	cubemap->facesSizes[TEXTURE_CUBEMAP_PX] = IVec2(hdriToCube_ldr.getCubemapResolution());
+
+	cubemap->facesData[TEXTURE_CUBEMAP_NX] = hdriToCube_ldr.getRight();
+	cubemap->facesSizes[TEXTURE_CUBEMAP_NX] = IVec2(hdriToCube_ldr.getCubemapResolution());
+
+	cubemap->facesData[TEXTURE_CUBEMAP_PY] = hdriToCube_ldr.getDown();
+	cubemap->facesSizes[TEXTURE_CUBEMAP_PY] = IVec2(hdriToCube_ldr.getCubemapResolution());
+
+	cubemap->facesData[TEXTURE_CUBEMAP_NY] = hdriToCube_ldr.getUp();
+	cubemap->facesSizes[TEXTURE_CUBEMAP_NY] = IVec2(hdriToCube_ldr.getCubemapResolution());
+
+	cubemap->facesData[TEXTURE_CUBEMAP_PZ] = hdriToCube_ldr.getBack();
+	cubemap->facesSizes[TEXTURE_CUBEMAP_PZ] = IVec2(hdriToCube_ldr.getCubemapResolution());
+
+	cubemap->facesData[TEXTURE_CUBEMAP_NZ] = hdriToCube_ldr.getFront();
+	cubemap->facesSizes[TEXTURE_CUBEMAP_NZ] = IVec2(hdriToCube_ldr.getCubemapResolution());
+
+	cubemap->UploadDataToGPU();
+}
+
 void ShowSkySettings(bool* pOpen)
 {
 	ImGui::Begin("Sky Settings", pOpen);
-	
+	if (ImGui::Button("Load HDRI")) {
+		std::string path = ShowOpenFileDialog(L".png\0");
+		if (path.size() > 2) {
+			LoadHDRI(path);
+		}
+	}
+
+	ImGui::Separator();
+	ImGui::Text("Cubemap Faces");
 	ImGui::Text("PX");
 	ImGui::SameLine();
 	if (ImGui::ImageButton((ImTextureID)cubemap->textures[TEXTURE_CUBEMAP_PX]->GetRendererID(), ImVec2(50, 50))) {

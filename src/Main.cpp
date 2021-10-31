@@ -370,6 +370,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 	if (skyboxEnabled)
 		RenderSky(camera.view, camera.pers);
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (wireFrameMode)
@@ -393,6 +394,8 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false) {
 	shader->SetUniform3f("_Resolution", tmp);
 	shader->SetUniform3f("_CameraPos", CameraPosition);
 	shader->SetUniformf("_SeaLevel", seaLevel);
+	shader->SetUniformf("_CameraNear", camera.near);
+	shader->SetUniformf("_CameraFar", camera.far);
 	UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 	terrain.Render();
 
@@ -613,7 +616,7 @@ static void ShowMainScene() {
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
 		ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		//ImGui::Image((ImTextureID)GetViewportFramebufferDepthTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		//ImGui::Image((ImTextureID)reflectionfbo->GetDepthTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
 	ImGui::End();
