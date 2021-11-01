@@ -169,11 +169,16 @@ std::string GenerateId(uint32_t length)
 std::string FetchURL(std::string baseURL, std::string path) {
 	httplib::Client cli(baseURL);
 	auto res = cli.Get(path.c_str());
-	//if(res->status == 200)
-	try {
-		return res->body;
+	cli.set_read_timeout(10);
+	if (res.error() == httplib::Error::Success) {
+		try {
+			return res->body;
+		}
+		catch (...) {}
 	}
-	catch (...) {}
+	else {
+		Log("Error in fetching " + baseURL+ path + " ERROR  : " + httplib::to_string(res.error()));
+	}
 	return "";
 }
 

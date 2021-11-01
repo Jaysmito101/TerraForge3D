@@ -114,6 +114,7 @@ void ChacheThumbnails() {
 }
 
 void ChacheFilesData() {
+	return;
 	if (FileExists(execDir + "\\Data\\cache\\texfiles.terr3d")) {
 		bool tmp = false;
 		nlohmann::json tp = nlohmann::json::parse(ReadShaderSourceFile(execDir + "\\Data\\cache\\texfiles.terr3d", &tmp));
@@ -216,7 +217,16 @@ static void DownloadTexture(std::string id, int k) {
 		return;
 		return;
 	}
-	nlohmann::json data = texture_files_database[id];
+	//nlohmann::json data = texture_files_database[id];
+
+	std::string fileData = FetchURL("https://api.polyhaven.com", "/files/" + id);
+	if (fileData.size() == 0) {
+		// TEMP
+		MessageBox(NULL, L"Failed to download data.", L"Error", 0);
+
+		return;
+	}
+	nlohmann::json data = nlohmann::json::parse(fileData);
 	int size = data["Diffuse"][std::to_string(k) + "k"]["png"]["size"];
 	std::string url = data["Diffuse"][std::to_string(k) + "k"]["png"]["url"];
 	system((std::string("mkdir \"") + (execDir)+"\\Data\\textures\\" + id + "\\" + std::to_string(k) +"\"").c_str());
