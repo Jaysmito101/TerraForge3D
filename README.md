@@ -41,8 +41,6 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
 
- <a href="https://www.producthunt.com/posts/terragen3d?utm_source=badge-review&utm_medium=badge&utm_souce=badge-terragen3d#discussion-body" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/review.svg?post_id=314431&theme=dark" alt="TerraGen3D - 3D Procedural Node Based Terrain Generation Tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
 # What can this do?
 
 * Tribute to all who **Starred** or **Contributed** to the project
