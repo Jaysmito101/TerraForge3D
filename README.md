@@ -21,7 +21,7 @@
 
 <hr/>
 
-# TerraGen3D
+# TerraForge3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
 
@@ -35,7 +35,7 @@
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
-Give your valuable feedback : https://github.com/Jaysmito101/TerraGen3D/discussions/6
+Give your valuable feedback : https://github.com/Jaysmito101/TerraForge3D/discussions/6
 
 Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
 
