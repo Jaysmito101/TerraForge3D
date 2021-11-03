@@ -30,6 +30,12 @@ namespace SplashScreen {
     {
         int wmId, wmEvent;
 
+        if (!isRunning) {
+            DeleteObject(hBitmap);
+            PostQuitMessage(0);
+            return 0;
+        }
+
         switch (message)
         {
         case WM_CREATE:
@@ -143,12 +149,11 @@ namespace SplashScreen {
 
         splashWindow = hwnd;
         // Step 3: The Message Loop
-        GetMessage(&Msg, NULL, 0, 0);
-        TranslateMessage(&Msg);
-        DispatchMessage(&Msg);
-        GetMessage(&Msg, NULL, 0, 0);
-        TranslateMessage(&Msg);
-        DispatchMessage(&Msg);
+        while (GetMessage(&Msg, NULL, 0, 0) && isRunning) {
+            TranslateMessage(&Msg);
+            DispatchMessage(&Msg);
+        }
+        
         return 0;
     }
 
@@ -163,6 +168,7 @@ namespace SplashScreen {
     }
     void Destory() {
         isRunning = false;
+        DestroyWindow(splashWindow);
         CloseWindow(splashWindow);
         CloseHandle(splashWindowThread);
     }

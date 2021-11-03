@@ -6,7 +6,7 @@
 #include <ComputeShader.h>
 #include <TextureStore.h>
 #include <json.hpp>
-
+#include <TextureBake.h>
 #include <ProjectData.h>
 
 bool* reqrfrsh;
@@ -16,6 +16,8 @@ int cTexID = 0;
 uint32_t diffuseUBOLocCache = -1;
 uint32_t diffuseUBO;
 Texture2D* diffuse;
+Model* model;
+Texture2D* tmp;
 
 struct TextureLayer {
 	Texture2D* texture;
@@ -110,8 +112,9 @@ void TextureSettingsTick() {
 	}
 }
 
-void SetupTextureSettings(bool* reqRefresh, float* textScale)
+void SetupTextureSettings(bool* reqRefresh, float* textScale, Model* mod)
 {
+	model = mod;
 	for(int i=0;i<NUM_TEXTURE_LAYERS;i++)
 		AddNewLayer();
 	

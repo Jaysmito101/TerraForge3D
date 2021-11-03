@@ -94,6 +94,14 @@ void Window::SetFullScreen(bool fullscreen)
 
 }
 
+void Window::SetVisible(bool visibility)
+{
+	if (visibility)
+		glfwShowWindow(m_Window);
+	else
+		glfwHideWindow(m_Window);
+}
+
 void Window::Update()
 {
 	if (!isActive)

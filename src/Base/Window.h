@@ -36,6 +36,7 @@ public:
 	void Close();
 	void Clear();
 	void SetFullScreen(bool fullscreen);
+	void SetVisible(bool visibility);
 
 	inline bool IsVSyncEnabled() { return vSyncState; }
 	inline GLFWwindow* GetNativeWindow() { return m_Window; }

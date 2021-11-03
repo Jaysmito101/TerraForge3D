@@ -7,9 +7,11 @@
 
 #define NUM_TEXTURE_LAYERS 8
 
+class Model;
+
 class Texture2D;
 
-void SetupTextureSettings(bool* reqRefresh, float* textureScale);
+void SetupTextureSettings(bool* reqRefresh, float* textureScale, Model* model);
 
 void ShowTextureSettings(bool* pOpen);
 

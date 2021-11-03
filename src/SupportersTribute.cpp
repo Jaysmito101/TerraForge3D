@@ -51,14 +51,14 @@ void SetupSupportersTribute()
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
 		
 		{
-			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraGen3D/stargazers");
+			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers");
 			SaveToFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", stargazersRawData);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
 		}
 
 		{
-			std::string contributorsRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraGen3D/contributors");
+			std::string contributorsRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/contributors");
 			SaveToFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", contributorsRawData);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
 			LoadcontributorsData(contributorsData);

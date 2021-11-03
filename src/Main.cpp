@@ -1017,7 +1017,7 @@ static void ShowMenu() {
 			}
 
 
-			if (ImGui::BeginMenu("Export As")) {
+			if (ImGui::BeginMenu("Export Mesh As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
 					if (ExportOBJ(terrain.mesh->Clone(), openfilename())) {
 						successMessage = "Sucessfully exported mesh!";
@@ -1029,7 +1029,32 @@ static void ShowMenu() {
 					}
 				}
 
-				if (ImGui::MenuItem("PNG Heightmap")) {
+				if (ImGui::MenuItem("GLTF")) {
+					ExportModelAssimp(&terrain, "gltf", ShowSaveFileDialog(".gltf\0"));
+				}
+
+				if (ImGui::MenuItem("GLB")) {
+					ExportModelAssimp(&terrain, "glb", ShowSaveFileDialog(".glb\0"));
+				}
+
+				if (ImGui::MenuItem("STL")) {
+					ExportModelAssimp(&terrain, "stl", ShowSaveFileDialog(".stl\0"));
+				}
+
+				if (ImGui::MenuItem("PLY")) {
+					ExportModelAssimp(&terrain, "ply", ShowSaveFileDialog(".ply\0"));
+				}
+
+				if (ImGui::MenuItem("Collada")) {
+					ExportModelAssimp(&terrain, "collada", ShowSaveFileDialog(".collada\0"));
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Export Heightmap As")) {
+
+				if (ImGui::MenuItem("PNG")) {
 					if (ExportHeightmapPNG(terrain.mesh->Clone(), openfilename())) {
 						successMessage = "Sucessfully exported heightmap!";
 						ImGui::BeginPopup("Success Messages");
@@ -1040,7 +1065,7 @@ static void ShowMenu() {
 					}
 				}
 
-				if (ImGui::MenuItem("JPG Heightmap")) {
+				if (ImGui::MenuItem("JPG")) {
 					if (ExportHeightmapJPG(terrain.mesh->Clone(), openfilename())) {
 						successMessage = "Sucessfully exported heightmap!";
 						ImGui::BeginPopup("Success Messages");
@@ -1598,7 +1623,6 @@ public:
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
-		SetupTextureSettings(&reqTexRfrsh, &textureScale);
 		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);
@@ -1632,6 +1656,7 @@ public:
 
 		SetProjectId(GenerateId(32));
 		SetupFiltersManager(&autoUpdate, &terrain);
+		SetupTextureSettings(&reqTexRfrsh, &textureScale, &terrain);
 		SetupSky();
 
 
@@ -1642,6 +1667,8 @@ public:
 		waterNormalMap = "DEFAULT";
 		Log("Loaded Water DUDV Map from " + GetExecutableDir() + "\\Data\\textures\\water_normal.png");
 		reflectionfbo = new FrameBuffer();
+
+		LoadTextureThumbs();
 
 		// For Debug Only
 		autoUpdate = true; 

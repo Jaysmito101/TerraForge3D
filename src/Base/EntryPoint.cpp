@@ -37,13 +37,14 @@ static std::string ParseArgs(PWSTR pCmdLine) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
 	Application* app = CreateApplication();
+	app->OnPreload();
+	app->Init();
 	{
 		SplashScreen::Init(hInstance);
-		app->OnPreload();
+		AllocateConsole();
+		app->OnStart(ParseArgs(pCmdLine));
 		SplashScreen::Destory();
 	}
-	AllocateConsole();
-	app->Init();
-	app->Run(ParseArgs(pCmdLine));
+	app->Run();
 	delete app;
 }

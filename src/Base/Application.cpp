@@ -75,8 +75,11 @@ void Application::SetTitle(std::string title)
 void Application::Init() {
 	m_Window = new Window(m_WindowTitle);
 	m_Window->SetVSync(true);
+	m_Window->SetVisible(false);
 	isActive = true;
 	s_App = this;
+	InitGlad();
+	InitImGui(windowConfigPath);
 }
 
 void Application::Render()
@@ -122,9 +125,7 @@ void Application::RenderImGui() {
 
 void Application::Run(std::string loadFile)
 {
-	InitGlad();
-	InitImGui(windowConfigPath);
-	OnStart(loadFile);
+	m_Window->SetVisible(true);
 	float oneSecCounter = 0;
 	while (isActive) {
 		float currentTime = glfwGetTime();
