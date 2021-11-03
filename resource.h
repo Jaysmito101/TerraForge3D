@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by TerraGen3D.rc
+// Used by TerraForge3D.rc
 //
 #define IDI_ICON1                       101
 #define IDB_BITMAP1                     102

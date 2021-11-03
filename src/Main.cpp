@@ -634,7 +634,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["type"] = "SAVEFILE";
 	data["serializerVersion"] = TERR3D_SERIALIZER_VERSION;
 	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
-	data["name"] = "TerraGen3D v3.0";
+	data["name"] = "TerraForge3D v3.0";
 	data["EnodeEditor"] = GetElevationNodeEditorSaveData();
 	data["styleData"] = GetStyleData();
 	data["appData"] = appData;
@@ -770,7 +770,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3
 
 	try {
 		if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
-			Log("The file you are tryng to open was made with a different version of TerraGen3D!\nTrying to check Serializer compatibility.");
+			Log("The file you are tryng to open was made with a different version of TerraForge3D!\nTrying to check Serializer compatibility.");
 			isSelfMade = false;
 		}
 	}
@@ -979,12 +979,12 @@ static void LoadPackedProject(std::string path = ShowOpenFileDialog()) {
 		}
 		try {
 			if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
-				Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+				Log("The file you are tryng to open was made with a different version of TerraForge3D!");
 				return;
 			}
 		}
 		catch (...) {
-			Log("The file you are tryng to open was made with a different version of TerraGen3D!");
+			Log("The file you are tryng to open was made with a different version of TerraForge3D!");
 			return;
 		}
 		std::string projId = data["generals"]["projectID"];
@@ -1168,10 +1168,10 @@ static void ShowMenu() {
 				ShellExecute(NULL, L"open", L"https://discord.gg/AcgRafSfyB", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("GitHub Page"))
-				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraForge3D", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Documentation"))
-				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraGen3D/wiki", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraForge3D/wiki", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Open Source Liscenses"))
 				activeWindows.osLisc = !activeWindows.osLisc;
@@ -1330,7 +1330,7 @@ class MyApp : public Application
 {
 public:
 	virtual void OnPreload() override {
-		SetTitle("TerraGen3D - Jaysmito Mukherjee");
+		SetTitle("TerraForge3D - Jaysmito Mukherjee");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
 		system((std::string("mkdir \"") + GetExecutableDir() + "\\Data\\cache\\autosave\"").c_str());
 		SetupOSLiscences();

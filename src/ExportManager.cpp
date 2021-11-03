@@ -32,7 +32,7 @@ static void ExportOBJImpl() {
 		outfile.open(fileName);
 
 
-		outfile << "# TerraGenV1.0 OBJ" << std::endl << std::endl;;
+		outfile << "# TerraForge3D OBJ" << std::endl << std::endl;;
 
 		for (int i = 0; i < meshToExport->vertexCount; i++)
 		{

@@ -52,7 +52,7 @@ namespace SplashScreen {
 
             SelectObject(hdcMem, oldBitmap);
             DeleteDC(hdcMem);
-
+/*
             TextOutA(
                 hdc,
                 10,
@@ -60,7 +60,7 @@ namespace SplashScreen {
                 splashMessage,
                 splashMessageLength
             );
-
+*/
             EndPaint(hwnd, &ps);
             break;
         case WM_DESTROY:
@@ -121,10 +121,10 @@ namespace SplashScreen {
             (LPCWSTR)classname.c_str(),
             L"The title of my window",
             ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU),
-            GetSystemMetrics(SM_CXSCREEN) / 2 - 150,
-            GetSystemMetrics(SM_CYSCREEN) / 2 - 150,
-            300,
-            300,
+            GetSystemMetrics(SM_CXSCREEN) / 2 - 300,
+            GetSystemMetrics(SM_CYSCREEN) / 2 - 225,
+            600,
+            450,
             NULL, NULL, hInstance, NULL);
 
 

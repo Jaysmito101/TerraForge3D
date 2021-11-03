@@ -1,4 +1,4 @@
-workspace "TerraGen3D"
+workspace "TerraForge3D"
 	architecture "x86"
 
 	configurations{
@@ -9,7 +9,7 @@ workspace "TerraGen3D"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 
-project "TerraGen3D"
+project "TerraForge3D"
 	location "."
 	kind "WindowedApp"
 	cppdialect "C++17"
