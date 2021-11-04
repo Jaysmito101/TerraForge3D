@@ -6,7 +6,6 @@
 #include <ComputeShader.h>
 #include <TextureStore.h>
 #include <json.hpp>
-#include <TextureBake.h>
 #include <ProjectData.h>
 
 bool* reqrfrsh;
@@ -17,7 +16,8 @@ uint32_t diffuseUBOLocCache = -1;
 uint32_t diffuseUBO;
 Texture2D* diffuse;
 Model* model;
-Texture2D* tmp;
+
+int tmp;
 
 struct TextureLayer {
 	Texture2D* texture;
@@ -225,6 +225,7 @@ void ShowTextureSettings(bool* pOpen)
 {
 	ImGui::Begin("Texture Settings", pOpen);
 	ShowOpenTextureModal();
+
 	uint32_t id = diffuse ? diffuse->GetRendererID() : 0;
 	//ImGui::Image((ImTextureID)(id), ImVec2(200, 200));
 

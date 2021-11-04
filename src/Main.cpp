@@ -14,6 +14,7 @@
 #include <AppShaderEditor.h>
 #include <ProjectData.h>
 #include <OSLiscenses.h>
+#include <ExportTexture.h>
 #include <FrameBuffer.h>
 #include <FiltersManager.h>
 #include <FoliagePlacement.h>
@@ -59,10 +60,10 @@ static Model sea("Sea");
 static Model grid("Grid");
 
 
-static FrameBuffer* reflectionfbo;
+static FrameBuffer* reflectionfbo, * textureFBO;
 
 static Application* myApp;
-static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader;
+static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader;
 static Camera camera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
@@ -97,14 +98,15 @@ static bool autoSave = false;
 static bool isExploreMode = false;
 static bool isIExploreMode = false;
 static bool showFoliage = true;
+static bool isTextureBake = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
 
-static Texture2D* diffuse, * normal, * gridTex, *waterDudvMap, *waterNormal;
+static Texture2D* diffuse, * normal, * gridTex, * waterDudvMap, * waterNormal;
 
 
 static uint32_t vao, vbo, ebo;
- 
+
 static float noiseStrength = 1.0f;
 static int resolution = 256;
 static float mouseSpeed = 25;
@@ -295,10 +297,13 @@ static void ResetShader() {
 	bool res = false;
 	if (shd)
 		delete shd;
+	if (textureBakeShader)
+		delete textureBakeShader;
 	if (!wireframeShader)
 		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	if (!waterShader)
 		waterShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &res));
+	textureBakeShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\geom.glsl", &res));
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
 }
 
@@ -361,78 +366,114 @@ static void GenerateMesh()
 	grid.UploadToGPU();
 }
 
-static void DoTheRederThing(float deltaTime, bool renderWater = false) {
+static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bakeTexture = false) {
 
 	static float time;
 	time += deltaTime;
 	camera.UpdateCamera(CameraPosition, CameraRotation);
 	Shader* shader;
-	if (skyboxEnabled)
-		RenderSky(camera.view, camera.pers);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	if (wireFrameMode)
-		shader = wireframeShader;
-	else
-		shader = shd;
-	shader->Bind();
-	shader->SetTime(&time);
-	shader->SetMPV(camera.pv);
-	shader->SetUniformMat4("_Model", terrain.modelMatrix);
-	shader->SetLightCol(LightColor);
-	shader->SetLightPos(LightPosition);
-	float tmp[3];
-	tmp[0] = viewportMousePosX;
-	tmp[1] = viewportMousePosY; 
-	tmp[2] = ImGui::GetIO().MouseDown[0];
-	shader->SetUniform3f("_MousePos", tmp);
-	tmp[0] = 800;
-	tmp[1] = 600;
-	tmp[2] = 1;
-	shader->SetUniform3f("_Resolution", tmp);
-	shader->SetUniform3f("_CameraPos", CameraPosition);
-	shader->SetUniformf("_SeaLevel", seaLevel);
-	shader->SetUniformf("_CameraNear", camera.near);
-	shader->SetUniformf("_CameraFar", camera.far);
-	UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
-	terrain.Render();
-
-	if (showFoliage)
-		RenderFoliage(shader, camera);
-
-	// For Future
-	//gridTex->Bind(5);
-	//grid->Render();
-
-
-	if (showSea && renderWater) {
-		waterShader->Bind();
-		waterShader->SetTime(&time); 
-		waterShader->SetUniformf("_SeaAlpha", seaAlpha);
-		waterShader->SetUniformf("_SeaDistScale", seaDistortionScale);
-		waterShader->SetUniformf("_SeaDistStrength", seaDistortionStength);
-		waterShader->SetUniformf("_SeaReflectivity", seaReflectivity);
-		waterShader->SetUniformf("_SeaLevel", seaLevel);
-		waterShader->SetUniformf("_SeaWaveSpeed", seaWaveSpeed);
-		glActiveTexture(7); 
-		glBindTexture(GL_TEXTURE_2D, reflectionfbo->GetColorTexture());
-		waterShader->SetUniformi("_ReflectionTexture", 7);
-		if(waterDudvMap)
-			waterDudvMap->Bind(8);
-		waterShader->SetUniformi("_DuDvMap", 8);
-		if (waterNormal)
-			waterNormal->Bind(9);
-		waterShader->SetUniformi("_NormalMap", 9);
-		sea.position.y = seaLevel;
-		sea.Update();
-		glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0)); 
-		waterShader->SetUniform3f("_SeaColor", SeaColor);
-		waterShader->SetMPV(tmp);
-		waterShader->SetLightCol(LightColor);
-		waterShader->SetLightPos(LightPosition);
-		sea.Render();
+	// Texture Bake
+	if (isTextureBake)
+	{
+		Camera cam;
+		float CameraP[3] = { 0.0f, 0.0f, CameraPosition[2] };
+		float CameraR[3] = { 5185.0f, 0.0f, 0.0f };
+		cam.far = 1000;
+		cam.aspect = 1;
+		cam.UpdateCamera(CameraP, CameraR);
+		shader = textureBakeShader;
+		shader->Bind();
+		shader->SetTime(&time);
+		shader->SetMPV(cam.pv);
+		shader->SetUniformMat4("_Model", terrain.modelMatrix);
+		shader->SetLightCol(LightColor);
+		shader->SetLightPos(LightPosition);
+		float tmp[3];
+		tmp[0] = 1024;
+		tmp[1] = 1024;
+		tmp[2] = 1;
+		shader->SetUniform3f("_Resolution", tmp);
+		shader->SetUniform3f("_CameraPos", CameraPosition);
+		shader->SetUniformf("_SeaLevel", seaLevel);
+		shader->SetUniformf("_CameraNear", camera.near);
+		shader->SetUniformf("_CameraFar", camera.far);
+		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
+		terrain.Render();
 	}
+	else {
+		if (skyboxEnabled)
+			RenderSky(camera.view, camera.pers);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (wireFrameMode)
+			shader = wireframeShader;
+		else
+			shader = shd;
+		shader->Bind();
+		shader->SetTime(&time);
+		shader->SetMPV(camera.pv);
+		shader->SetUniformMat4("_Model", terrain.modelMatrix);
+		shader->SetLightCol(LightColor);
+		shader->SetLightPos(LightPosition);
+		float tmp[3];
+		tmp[0] = viewportMousePosX;
+		tmp[1] = viewportMousePosY;
+		tmp[2] = ImGui::GetIO().MouseDown[0];
+		shader->SetUniform3f("_MousePos", tmp);
+		tmp[0] = 800;
+		tmp[1] = 600;
+		tmp[2] = 1;
+		shader->SetUniform3f("_Resolution", tmp);
+		shader->SetUniform3f("_CameraPos", CameraPosition);
+		shader->SetUniformf("_SeaLevel", seaLevel);
+		shader->SetUniformf("_CameraNear", camera.near);
+		shader->SetUniformf("_CameraFar", camera.far);
+		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
+		terrain.Render();
+
+
+		if (showFoliage)
+			RenderFoliage(shader, camera);
+
+
+
+
+		// For Future
+		//gridTex->Bind(5);
+		//grid->Render();
+
+
+		if (showSea && renderWater) {
+			waterShader->Bind();
+			waterShader->SetTime(&time);
+			waterShader->SetUniformf("_SeaAlpha", seaAlpha);
+			waterShader->SetUniformf("_SeaDistScale", seaDistortionScale);
+			waterShader->SetUniformf("_SeaDistStrength", seaDistortionStength);
+			waterShader->SetUniformf("_SeaReflectivity", seaReflectivity);
+			waterShader->SetUniformf("_SeaLevel", seaLevel);
+			waterShader->SetUniformf("_SeaWaveSpeed", seaWaveSpeed);
+			glActiveTexture(7);
+			glBindTexture(GL_TEXTURE_2D, reflectionfbo->GetColorTexture());
+			waterShader->SetUniformi("_ReflectionTexture", 7);
+			if (waterDudvMap)
+				waterDudvMap->Bind(8);
+			waterShader->SetUniformi("_DuDvMap", 8);
+			if (waterNormal)
+				waterNormal->Bind(9);
+			waterShader->SetUniformi("_NormalMap", 9);
+			sea.position.y = seaLevel;
+			sea.Update();
+			glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0));
+			waterShader->SetUniform3f("_SeaColor", SeaColor);
+			waterShader->SetMPV(tmp);
+			waterShader->SetLightCol(LightColor);
+			waterShader->SetLightPos(LightPosition);
+			sea.Render();
+		}
+	}
+
+
 
 }
 
@@ -451,6 +492,7 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Show Foliage", &showFoliage);
 	ImGui::Checkbox("Infinite Explorer Mode", &isIExploreMode);
 	ImGui::Checkbox("Explorer Mode", &isExploreMode);
+	ImGui::Checkbox("Texture Bake Mode", &isTextureBake);
 	ImGui::NewLine();
 	if (ImGui::Button("Update Mesh"))
 		RegenerateMesh();
@@ -478,6 +520,13 @@ static void ShowTerrainControls()
 	}
 	if (ImGui::Button("Filter Settings")) {
 		activeWindows.filtersManager = true;
+	}
+
+	if (ImGui::Button("Export Frame")) {
+		if(isTextureBake)
+			ExportTexture(textureFBO->GetRendererID() , ShowSaveFileDialog(".png"), 1024, 1024);
+		else
+			ExportTexture(GetViewportFramebufferId(), ShowSaveFileDialog(".png"), 800, 600);
 	}
 	ImGui::Separator();
 
@@ -614,7 +663,10 @@ static void ShowMainScene() {
 
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
-		ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		if (isTextureBake)
+			ImGui::Image((ImTextureID)textureFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		else
+			ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		//ImGui::Image((ImTextureID)reflectionfbo->GetDepthTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
@@ -1205,7 +1257,7 @@ static void ShowMenu() {
 
 		}
 		ImGui::EndMainMenuBar();
-	} 
+	}
 }
 
 static void ShowErrorModal() {
@@ -1232,7 +1284,7 @@ static void ShowSeaSettings() {
 
 	ImGui::Text("DuDv Map");
 	ImGui::SameLine();
-	if (ImGui::ImageButton((ImTextureID)waterDudvMap->GetRendererID(), ImVec2(50, 50))){
+	if (ImGui::ImageButton((ImTextureID)waterDudvMap->GetRendererID(), ImVec2(50, 50))) {
 		std::string fileName = ShowOpenFileDialog(L".png\0");
 		if (fileName.size() > 3) {
 			delete waterDudvMap;
@@ -1373,7 +1425,6 @@ public:
 			noiseLayersTmp.clear();
 		}
 
-
 		if (!isExploreMode) {
 			if (reqTexRfrsh) {
 				if (diffuse)
@@ -1453,20 +1504,28 @@ public:
 				}
 			}
 
+			if (isTextureBake) {
+				textureFBO->Begin();
+				glViewport(0, 0, 1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
+				GetWindow()->Clear();
+				DoTheRederThing(deltatime, false, true);
+			}
+			else {
+				reflectionfbo->Begin();
+				glViewport(0, 0, 800, 600);
+				GetWindow()->Clear();
+				s_Stats.deltaTime = deltatime;
+				DoTheRederThing(deltatime);
 
-			reflectionfbo->Begin();
-			glViewport(0, 0, 800, 600);
-			GetWindow()->Clear();
-			s_Stats.deltaTime = deltatime;
-			DoTheRederThing(deltatime);
+				glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
+				glViewport(0, 0, 800, 600);
+				GetWindow()->Clear();
+				DoTheRederThing(deltatime, true);
+			}
 
-			glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
-			glViewport(0, 0, 800, 600);
-			GetWindow()->Clear();
-			DoTheRederThing(deltatime, true);
-
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			RenderImGui();
+
 			if (autoUpdate)
 				RegenerateMesh();
 
@@ -1481,7 +1540,7 @@ public:
 
 
 			expH = isExploreMode;
-			
+
 
 
 			reflectionfbo->Begin();
@@ -1498,7 +1557,7 @@ public:
 			GetWindow()->Clear();
 			s_Stats.deltaTime = deltatime;
 			UpdateExplorerControls(CameraPosition, CameraRotation, isIExploreMode, &nLOffsetX, &nLOffsetY);
-			DoTheRederThing(deltatime);
+			DoTheRederThing(deltatime, true);
 
 
 			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_ESCAPE))) {
@@ -1514,6 +1573,8 @@ public:
 				RegenerateMesh();
 
 		}
+
+
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_I))
 			nLOffsetY -= 0.01f;
 
@@ -1638,7 +1699,7 @@ public:
 			io.MouseWheel = (float)y;
 			});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		GenerateMesh(); 
+		GenerateMesh();
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
 		CameraPosition[1] = 0.2f;
@@ -1648,7 +1709,7 @@ public:
 		scale = 1;
 		noiseLayersTmp.push_back(NoiseLayer());
 		Log("Started Up App!");
-		 
+
 		if (loadFile.size() > 0) {
 			Log("Loading File from " + loadFile);
 			OpenSaveFile(loadFile);
@@ -1667,11 +1728,11 @@ public:
 		waterNormalMap = "DEFAULT";
 		Log("Loaded Water DUDV Map from " + GetExecutableDir() + "\\Data\\textures\\water_normal.png");
 		reflectionfbo = new FrameBuffer();
-
+		textureFBO = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
 		LoadTextureThumbs();
 
 		// For Debug Only
-		autoUpdate = true; 
+		autoUpdate = true;
 	}
 
 	void OnEnd()

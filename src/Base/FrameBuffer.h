@@ -6,7 +6,7 @@ class FrameBuffer {
 
 public:
 
-	FrameBuffer();
+	FrameBuffer(int width = 800, int height = 600);
 	~FrameBuffer();
 
 	void Begin();
@@ -18,4 +18,5 @@ public:
 
 private:
 	uint32_t colorTexture, depthTexture, fbo;
+	int width, height;
 };
