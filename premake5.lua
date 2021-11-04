@@ -81,7 +81,7 @@ project "TerraForge3D"
 
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
-		buildoptions "/MTd"
+		buildoptions "/MT"
 		optimize "on"	
 
 		links{

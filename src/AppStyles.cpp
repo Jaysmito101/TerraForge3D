@@ -31,7 +31,7 @@ std::string RequestSaveFileName(HWND owner = NULL) {
     ofn.lpstrFile = fileName;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-    ofn.lpstrDefExt = (LPWSTR)"";
+    ofn.lpstrDefExt = (LPWSTR)""; 
 
     std::string fileNameStr;
 
