@@ -84,6 +84,7 @@ project "TerraForge3D"
 
 	postbuildcommands  {
 		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
+		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y",
 		"xcopy \"$(SolutionDir)Binaries\\assimp-vc140-mt.dll\" \"$(TargetDir)\" /r /y"
 	}
 
