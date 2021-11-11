@@ -100,17 +100,7 @@ project "TerraForge3D"
 		buildoptions "/MTd"
 		symbols "on"
 
-		links{
-			"msvcrtd.lib"
-		}
-
-
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
 		buildoptions "/MT"
 		optimize "on"	
-
-		links{
-			"msvcrt.lib"
-		}
-
