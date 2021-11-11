@@ -1,0 +1,6 @@
+[submodule "TerraForge3D/vendor/glfw"]
+	path = TerraForge3D/vendor/glfw
+	url = https://github.com/Jaysmito101/glfw.git
+[submodule "TerraForge3D/vendor/imgui"]
+	path = TerraForge3D/vendor/imgui
+	url = https://github.com/Jaysmito101/imgui.git
