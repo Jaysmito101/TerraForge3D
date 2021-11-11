@@ -1,6 +1,16 @@
 [submodule "TerraForge3D/vendor/glfw"]
 	path = TerraForge3D/vendor/glfw
 	url = https://github.com/Jaysmito101/glfw.git
+	branch = master
 [submodule "TerraForge3D/vendor/imgui"]
 	path = TerraForge3D/vendor/imgui
 	url = https://github.com/Jaysmito101/imgui.git
+	branch = docking
+[submodule "TerraForge3D/vendor/zip"]
+	path = TerraForge3D/vendor/zip
+	url = https://github.com/Jaysmito101/zip.git
+	branch = master
+[submodule "TerraForge3D/vendor/imnodes"]
+	path = TerraForge3D/vendor/imnodes
+	url = https://github.com/Jaysmito101/imnodes.git
+	branch = master

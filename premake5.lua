@@ -1,5 +1,6 @@
 workspace "TerraForge3D"
 	architecture "x86"
+	startproject "TerraForge3D"
 
 	configurations{
 		"Debug",
@@ -8,9 +9,26 @@ workspace "TerraForge3D"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["GLFW"] = "TerraForge3D/vendor/glfw/include"
+IncludeDir["Glad"] = "TerraForge3D/vendor/Glad/include"
+IncludeDir["glm"] = "TerraForge3D/vendor/glm"
+IncludeDir["ImGui"] = "TerraForge3D/vendor/imgui"
+IncludeDir["ImNodes"] = "TerraForge3D/vendor/imnodes"
+IncludeDir["Zip"] = "TerraForge3D/vendor/zip"
+IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
+IncludeDir["Lua"] = "TerraForge3D/vendor/lua"
+
+include "TerraForge3D/vendor/GLFW"
+include "TerraForge3D/vendor/Glad"
+include "TerraForge3D/vendor/imgui"
+include "TerraForge3D/vendor/imnodes"
+include "TerraForge3D/vendor/zip"
+include "TerraForge3D/vendor/text-editor"
+include "TerraForge3D/vendor/lua"
 
 project "TerraForge3D"
-	location "."
+	location "TerraForge3D"
 	kind "WindowedApp"
 	cppdialect "C++17"
 	language "C++"
@@ -20,22 +38,26 @@ project "TerraForge3D"
 	objdir ("bin/intermediates/" .. outputdir .."/%{prj.name}")
 
 	files {
-		"**.h",
-		"**.c",
-		"**.cpp",
-		"**.rc",
-		"**.hpp",
-		"**.inl"
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/src/**.hpp",
+		"%{prj.name}/src/**.inl",
+		"%{prj.name}/src/**.rc",
+		"%{prj.name}/vendor/glm/**.hpp",
+		"%{prj.name}/vendor/glm/**.inl"
 	}
 
 	includedirs {
-		"./include",
-		"./include/assimp/include",
-		"./src",
-		"./include/imgui/backends",
-		"./include/imgui",
-		"./",
-		"./src/Base"
+		"./TerraForge3D/vendor/assimp/include",
+		"./TerraForge3D/src",
+		"./TerraForge3D/src/Base",
+		"./TerraForge3D/vendor",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.Zip}/src",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.Lua}"
 	}
 
 	libdirs {
@@ -43,22 +65,26 @@ project "TerraForge3D"
 	}
 
 	links {
-		"glfw3.lib",
-		"glfw3_mt.lib",
 		"assimp.lib",
 		"Urlmon.lib",
 		"libssl_static.lib",
 		"libcrypto_static",
-		"OpenCL.lib",
 		"Crypt32",
 		"ws2_32",
 		"Pathcch",
-		"opengl32"
+		"opengl32",
+		"GLFW",
+		"Glad",
+		"Zip",
+		"ImGui",
+		"ImNodes",
+		"ImColorTextEdit",
+		"Lua"
 	}
 
 	postbuildcommands  {
-		"xcopy \"$(ProjectDir)Binaries\\Data\" \"$(TargetDir)Data\" /e /y /i /r",
-		"{COPY} \"$(ProjectDir)Binaries\\assimp-vc140-mt.dll\" \"$(TargetDir)\""
+		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
+		"xcopy \"$(SolutionDir)Binaries\\assimp-vc140-mt.dll\" \"$(TargetDir)\" /r /y"
 	}
 
 	filter "system:windows"
@@ -85,6 +111,6 @@ project "TerraForge3D"
 		optimize "on"	
 
 		links{
-			"msvcrtd.lib"
+			"msvcrt.lib"
 		}
 
