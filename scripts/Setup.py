@@ -14,7 +14,7 @@ os.chdir('./../') # Change from devtools/scripts directory to root
 premakeInstalled = PremakeRequirements.Validate()
 
 print("\nUpdating submodules...")
-subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
+subprocess.call(["git", "submodule", "update", "--remote", "--recursive", "--merge"])
 
 if (premakeInstalled):
     if platform.system() == "Windows":
