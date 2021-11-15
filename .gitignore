@@ -15,6 +15,7 @@ TerraForge3D/vendor/lua/bin-int
 **.filters
 **.aps
 **.ini
+**.lib
 
 TerraForge3D/**.exe
 TerraForge3D/**.obj
