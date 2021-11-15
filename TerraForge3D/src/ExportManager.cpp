@@ -12,9 +12,9 @@
 
 #include <stb/stb_image.h>
 #include "stb/stb_image_write.h"
-
-#include <assimp/Exporter.hpp>
+#undef __cplusplus // Temporary
 #include <assimp/scene.h>
+#include <assimp/Exporter.hpp>
 
 std::atomic<bool> isExportingOBJ = false;
 Mesh* meshToExport;
@@ -179,13 +179,18 @@ bool ExportHeightmapJPG(Mesh* mesh, std::string filename)
 }
 
 
-void ExportModelAssimp(Model* model, std::string format, std::string path) {
+void ExportModelAssimp(Model* model, std::string format, std::string path, std::string extension) {
 
 	if(path.size() < 3)
 		return;
 
-	if (path.find("." + format) == std::string::npos)
-		path += "." + format;
+	if (extension == "")
+	{
+		extension = format;
+	}
+
+	if (path.find("." + extension) == std::string::npos)
+		path += "." + extension;
 
 	Assimp::Exporter exporter;
 	aiScene* scene = new aiScene();

@@ -2,7 +2,9 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2019, assimp team
+
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -41,9 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @file ProgressHandler.hpp
  *  @brief Abstract base class 'ProgressHandler'.
  */
-#ifndef INCLUDED_AI_PROGRESSHANDLER_H
-#define INCLUDED_AI_PROGRESSHANDLER_H
+#pragma once
+#ifndef AI_PROGRESSHANDLER_H_INC
+#define AI_PROGRESSHANDLER_H_INC
+
 #include "types.h"
+
 namespace Assimp    {
 
 // ------------------------------------------------------------------------------------
@@ -57,11 +62,13 @@ class ASSIMP_API ProgressHandler
 #endif
 {
 protected:
-    /** @brief  Default constructor */
-    ProgressHandler () {
+    /// @brief  Default constructor
+    ProgressHandler () AI_NO_EXCEPT {
+        // empty
     }
+
 public:
-    /** @brief  Virtual destructor  */
+    /// @brief  Virtual destructor.
     virtual ~ProgressHandler () {
     }
 
@@ -115,8 +122,24 @@ public:
         Update( f * 0.5f + 0.5f );
     }
 
+
+    // -------------------------------------------------------------------
+    /** @brief Progress callback for export steps.
+     *  @param numberOfSteps The number of total processing
+     *   steps
+     *  @param currentStep The index of the current post-processing
+     *   step that will run, or equal to numberOfSteps if all of
+     *   them has finished. This number is always strictly monotone
+     *   increasing, although not necessarily linearly.
+     *   */
+    virtual void UpdateFileWrite(int currentStep /*= 0*/, int numberOfSteps /*= 0*/) {
+        float f = numberOfSteps ? currentStep / (float)numberOfSteps : 1.0f;
+        Update(f * 0.5f);
+    }
 }; // !class ProgressHandler
+
 // ------------------------------------------------------------------------------------
+
 } // Namespace Assimp
 
-#endif
+#endif // AI_PROGRESSHANDLER_H_INC

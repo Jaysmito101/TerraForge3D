@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2019, assimp team
 
 All rights reserved.
 
@@ -42,14 +42,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @file matrix4x4.inl
  *  @brief Inline implementation of the 4x4 matrix operators
  */
-#ifndef AI_MATRIX4x4_INL_INC
-#define AI_MATRIX4x4_INL_INC
+#pragma once
+#ifndef AI_MATRIX4X4_INL_INC
+#define AI_MATRIX4X4_INL_INC
 
 #ifdef __cplusplus
 
 #include "matrix4x4.h"
 #include "matrix3x3.h"
 #include "quaternion.h"
+#include "MathFunctions.h"
 
 #include <algorithm>
 #include <limits>
@@ -57,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ----------------------------------------------------------------------------------------
 template <typename TReal>
-aiMatrix4x4t<TReal> ::aiMatrix4x4t () :
+aiMatrix4x4t<TReal>::aiMatrix4x4t() AI_NO_EXCEPT :
     a1(1.0f), a2(), a3(), a4(),
     b1(), b2(1.0f), b3(), b4(),
     c1(), c2(), c3(1.0f), c4(),
@@ -68,7 +70,7 @@ aiMatrix4x4t<TReal> ::aiMatrix4x4t () :
 
 // ----------------------------------------------------------------------------------------
 template <typename TReal>
-aiMatrix4x4t<TReal> ::aiMatrix4x4t (TReal _a1, TReal _a2, TReal _a3, TReal _a4,
+aiMatrix4x4t<TReal>::aiMatrix4x4t (TReal _a1, TReal _a2, TReal _a3, TReal _a4,
               TReal _b1, TReal _b2, TReal _b3, TReal _b4,
               TReal _c1, TReal _c2, TReal _c3, TReal _c4,
               TReal _d1, TReal _d2, TReal _d3, TReal _d4) :
@@ -152,6 +154,54 @@ inline aiMatrix4x4t<TReal>& aiMatrix4x4t<TReal>::operator *= (const aiMatrix4x4t
         m.a3 * d1 + m.b3 * d2 + m.c3 * d3 + m.d3 * d4,
         m.a4 * d1 + m.b4 * d2 + m.c4 * d3 + m.d4 * d4);
     return *this;
+}
+
+// ----------------------------------------------------------------------------------------
+template <typename TReal>
+inline aiMatrix4x4t<TReal> aiMatrix4x4t<TReal>::operator* (const TReal& aFloat) const
+{
+    aiMatrix4x4t<TReal> temp(
+        a1 * aFloat,
+        a2 * aFloat,
+        a3 * aFloat,
+        a4 * aFloat,
+        b1 * aFloat,
+        b2 * aFloat,
+        b3 * aFloat,
+        b4 * aFloat,
+        c1 * aFloat,
+        c2 * aFloat,
+        c3 * aFloat,
+        c4 * aFloat,
+        d1 * aFloat,
+        d2 * aFloat,
+        d3 * aFloat,
+        d4 * aFloat);
+    return temp;
+}
+
+// ----------------------------------------------------------------------------------------
+template <typename TReal>
+inline aiMatrix4x4t<TReal> aiMatrix4x4t<TReal>::operator+ (const aiMatrix4x4t<TReal>& m) const
+{
+    aiMatrix4x4t<TReal> temp(
+        m.a1 + a1,
+        m.a2 + a2,
+        m.a3 + a3,
+        m.a4 + a4,
+        m.b1 + b1,
+        m.b2 + b2,
+        m.b3 + b3,
+        m.b4 + b4,
+        m.c1 + c1,
+        m.c2 + c2,
+        m.c3 + c3,
+        m.c4 + c4,
+        m.d1 + d1,
+        m.d2 + d2,
+        m.d3 + d3,
+        m.d4 + d4);
+    return temp;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -242,9 +292,19 @@ inline TReal* aiMatrix4x4t<TReal>::operator[](unsigned int p_iIndex) {
     if (p_iIndex > 3) {
         return NULL;
     }
-
-    // XXX this is UB. Has been for years. The fact that it works now does not make it better.
-    return &this->a1 + p_iIndex * 4;
+    switch ( p_iIndex ) {
+        case 0:
+            return &a1;
+        case 1:
+            return &b1;
+        case 2:
+            return &c1;
+        case 3:
+            return &d1;
+        default:
+            break;
+    }
+    return &a1;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -254,8 +314,19 @@ inline const TReal* aiMatrix4x4t<TReal>::operator[](unsigned int p_iIndex) const
         return NULL;
     }
 
-    // XXX same
-    return &this->a1 + p_iIndex * 4;
+    switch ( p_iIndex ) {
+        case 0:
+            return &a1;
+        case 1:
+            return &b1;
+        case 2:
+            return &c1;
+        case 3:
+            return &d1;
+        default:
+            break;
+    }
+    return &a1;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -298,57 +369,132 @@ inline bool aiMatrix4x4t<TReal>::Equal(const aiMatrix4x4t<TReal>& m, TReal epsil
 }
 
 // ----------------------------------------------------------------------------------------
+
+#define ASSIMP_MATRIX4_4_DECOMPOSE_PART		\
+	const aiMatrix4x4t<TReal>& _this = *this;/* Create alias for conveniance. */ \
+	\
+	/* extract translation */ \
+	pPosition.x = _this[0][3]; \
+	pPosition.y = _this[1][3]; \
+	pPosition.z = _this[2][3]; \
+	\
+	/* extract the columns of the matrix. */ \
+	aiVector3t<TReal> vCols[3] = { \
+		aiVector3t<TReal>(_this[0][0],_this[1][0],_this[2][0]), \
+		aiVector3t<TReal>(_this[0][1],_this[1][1],_this[2][1]), \
+		aiVector3t<TReal>(_this[0][2],_this[1][2],_this[2][2]) \
+	}; \
+	\
+	/* extract the scaling factors */ \
+	pScaling.x = vCols[0].Length(); \
+	pScaling.y = vCols[1].Length(); \
+	pScaling.z = vCols[2].Length(); \
+	\
+	/* and the sign of the scaling */ \
+	if (Determinant() < 0) pScaling = -pScaling; \
+	\
+	/* and remove all scaling from the matrix */ \
+	if(pScaling.x) vCols[0] /= pScaling.x; \
+	if(pScaling.y) vCols[1] /= pScaling.y; \
+	if(pScaling.z) vCols[2] /= pScaling.z; \
+	\
+	do {} while(false)
+
+
+
+
 template <typename TReal>
-inline void aiMatrix4x4t<TReal>::Decompose (aiVector3t<TReal>& scaling, aiQuaterniont<TReal>& rotation,
-    aiVector3t<TReal>& position) const
+inline void aiMatrix4x4t<TReal>::Decompose (aiVector3t<TReal>& pScaling, aiQuaterniont<TReal>& pRotation,
+    aiVector3t<TReal>& pPosition) const
 {
-    const aiMatrix4x4t<TReal>& _this = *this;
-
-    // extract translation
-    position.x = _this[0][3];
-    position.y = _this[1][3];
-    position.z = _this[2][3];
-
-    // extract the rows of the matrix
-    aiVector3t<TReal> vRows[3] = {
-        aiVector3t<TReal>(_this[0][0],_this[1][0],_this[2][0]),
-        aiVector3t<TReal>(_this[0][1],_this[1][1],_this[2][1]),
-        aiVector3t<TReal>(_this[0][2],_this[1][2],_this[2][2])
-    };
-
-    // extract the scaling factors
-    scaling.x = vRows[0].Length();
-    scaling.y = vRows[1].Length();
-    scaling.z = vRows[2].Length();
-
-    // and the sign of the scaling
-    if (Determinant() < 0) {
-        scaling.x = -scaling.x;
-        scaling.y = -scaling.y;
-        scaling.z = -scaling.z;
-    }
-
-    // and remove all scaling from the matrix
-    if(scaling.x)
-    {
-        vRows[0] /= scaling.x;
-    }
-    if(scaling.y)
-    {
-        vRows[1] /= scaling.y;
-    }
-    if(scaling.z)
-    {
-        vRows[2] /= scaling.z;
-    }
+	ASSIMP_MATRIX4_4_DECOMPOSE_PART;
 
     // build a 3x3 rotation matrix
-    aiMatrix3x3t<TReal> m(vRows[0].x,vRows[1].x,vRows[2].x,
-        vRows[0].y,vRows[1].y,vRows[2].y,
-        vRows[0].z,vRows[1].z,vRows[2].z);
+    aiMatrix3x3t<TReal> m(vCols[0].x,vCols[1].x,vCols[2].x,
+        vCols[0].y,vCols[1].y,vCols[2].y,
+        vCols[0].z,vCols[1].z,vCols[2].z);
 
     // and generate the rotation quaternion from it
-    rotation = aiQuaterniont<TReal>(m);
+    pRotation = aiQuaterniont<TReal>(m);
+}
+
+template <typename TReal>
+inline
+void aiMatrix4x4t<TReal>::Decompose(aiVector3t<TReal>& pScaling, aiVector3t<TReal>& pRotation, aiVector3t<TReal>& pPosition) const {
+	ASSIMP_MATRIX4_4_DECOMPOSE_PART;
+
+    /*
+    assuming a right-handed coordinate system
+    and post-multiplication of column vectors,
+    the rotation matrix for an euler XYZ rotation is M = Rz * Ry * Rx.
+    combining gives:
+    
+        |  CE  BDE-AF  ADE+BF  0  |
+    M = |  CF  BDF+AE  ADF-BE  0  |
+        |  -D    CB      AC    0  |
+        |   0     0       0    1  |
+
+    where
+	A = cos(angle_x), B = sin(angle_x);
+	C = cos(angle_y), D = sin(angle_y);
+	E = cos(angle_z), F = sin(angle_z);
+	*/
+
+	// Use a small epsilon to solve floating-point inaccuracies
+    const TReal epsilon = Assimp::Math::getEpsilon<TReal>();
+
+	pRotation.y  = std::asin(-vCols[0].z);// D. Angle around oY.
+
+	TReal C = std::cos(pRotation.y);
+
+	if(std::fabs(C) > epsilon)
+	{
+		// Finding angle around oX.
+		TReal tan_x = vCols[2].z / C;// A
+		TReal tan_y = vCols[1].z / C;// B
+
+		pRotation.x = std::atan2(tan_y, tan_x);
+		// Finding angle around oZ.
+		tan_x = vCols[0].x / C;// E
+		tan_y = vCols[0].y / C;// F
+		pRotation.z = std::atan2(tan_y, tan_x);
+	}
+	else
+	{// oY is fixed.
+		pRotation.x = 0;// Set angle around oX to 0. => A == 1, B == 0, C == 0, D == 1.
+
+		// And finding angle around oZ.
+		TReal tan_x =  vCols[1].y;// BDF+AE => E
+		TReal tan_y = -vCols[1].x;// BDE-AF => F
+
+		pRotation.z = std::atan2(tan_y, tan_x);
+	}
+}
+
+#undef ASSIMP_MATRIX4_4_DECOMPOSE_PART
+
+template <typename TReal>
+inline void aiMatrix4x4t<TReal>::Decompose(aiVector3t<TReal>& pScaling, aiVector3t<TReal>& pRotationAxis, TReal& pRotationAngle,
+											aiVector3t<TReal>& pPosition) const
+{
+aiQuaterniont<TReal> pRotation;
+
+	Decompose(pScaling, pRotation, pPosition);
+	pRotation.Normalize();
+
+	TReal angle_cos = pRotation.w;
+	TReal angle_sin = std::sqrt(1.0f - angle_cos * angle_cos);
+
+	pRotationAngle = std::acos(angle_cos) * 2;
+
+	// Use a small epsilon to solve floating-point inaccuracies
+    const TReal epsilon = 10e-3f;
+
+	if(std::fabs(angle_sin) < epsilon) angle_sin = 1;
+
+	pRotationAxis.x = pRotation.x / angle_sin;
+	pRotationAxis.y = pRotation.y / angle_sin;
+	pRotationAxis.z = pRotation.z / angle_sin;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -380,27 +526,25 @@ inline aiMatrix4x4t<TReal>& aiMatrix4x4t<TReal>::FromEulerAnglesXYZ(TReal x, TRe
 {
     aiMatrix4x4t<TReal>& _this = *this;
 
-    TReal cr = std::cos( x );
-    TReal sr = std::sin( x );
-    TReal cp = std::cos( y );
-    TReal sp = std::sin( y );
-    TReal cy = std::cos( z );
-    TReal sy = std::sin( z );
+    TReal cx = std::cos(x);
+    TReal sx = std::sin(x);
+    TReal cy = std::cos(y);
+    TReal sy = std::sin(y);
+    TReal cz = std::cos(z);
+    TReal sz = std::sin(z);
 
-    _this.a1 = cp*cy ;
-    _this.a2 = cp*sy;
-    _this.a3 = -sp ;
+    // mz*my*mx
+    _this.a1 = cz * cy;
+    _this.a2 = cz * sy * sx - sz * cx;
+    _this.a3 = sz * sx + cz * sy * cx;
 
-    TReal srsp = sr*sp;
-    TReal crsp = cr*sp;
+    _this.b1 = sz * cy;
+    _this.b2 = cz * cx + sz * sy * sx;
+    _this.b3 = sz * sy * cx - cz * sx;
 
-    _this.b1 = srsp*cy-cr*sy ;
-    _this.b2 = srsp*sy+cr*cy ;
-    _this.b3 = sr*cp ;
-
-    _this.c1 =  crsp*cy+sr*sy ;
-    _this.c2 =  crsp*sy-sr*cy ;
-    _this.c3 = cr*cp ;
+    _this.c1 = -sy;
+    _this.c2 = cy * sx;
+    _this.c3 = cy * cx;
 
     return *this;
 }
@@ -522,7 +666,7 @@ inline aiMatrix4x4t<TReal>& aiMatrix4x4t<TReal>::Scaling( const aiVector3t<TReal
  * "from" into another vector called "to".
  * Input : from[3], to[3] which both must be *normalized* non-zero vectors
  * Output: mtx[3][3] -- a 3x3 matrix in colum-major form
- * Authors: Tomas M�ller, John Hughes
+ * Authors: Tomas Möller, John Hughes
  *          "Efficiently Building a Matrix to Rotate One Vector to Another"
  *          Journal of Graphics Tools, 4(4):1-4, 1999
  */
@@ -538,4 +682,4 @@ inline aiMatrix4x4t<TReal>& aiMatrix4x4t<TReal>::FromToMatrix(const aiVector3t<T
 }
 
 #endif // __cplusplus
-#endif // AI_MATRIX4x4_INL_INC
+#endif // AI_MATRIX4X4_INL_INC

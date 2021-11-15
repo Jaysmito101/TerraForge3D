@@ -25,7 +25,7 @@
 #if defined(_MSC_VER) ||  defined(__BORLANDC__) ||	defined (__BCPLUSPLUS__)
 #	pragma pack(push,1)
 #	define PACK_STRUCT
-#elif defined( __GNUC__ )
+#elif defined( __GNUC__ ) || defined(__clang__)
 #	if !defined(HOST_MINGW)
 #		define PACK_STRUCT	__attribute__((__packed__))
 #	else
@@ -36,11 +36,8 @@
 #endif
 
 #if defined(_MSC_VER)
-
 // C4103: Packing was changed after the inclusion of the header, probably missing #pragma pop
 #	pragma warning (disable : 4103) 
 #endif
 
 #define AI_PUSHPACK_IS_DEFINED
-
-

@@ -1081,12 +1081,20 @@ static void ShowMenu() {
 					}
 				}
 
-				if (ImGui::MenuItem("GLTF")) {
-					ExportModelAssimp(&terrain, "gltf", ShowSaveFileDialog(".gltf\0"));
+				if (ImGui::MenuItem("FBX")) {
+					ExportModelAssimp(&terrain, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
 				}
 
-				if (ImGui::MenuItem("GLB")) {
-					ExportModelAssimp(&terrain, "glb", ShowSaveFileDialog(".glb\0"));
+				if (ImGui::MenuItem("GLTF v2")) {
+					ExportModelAssimp(&terrain, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
+				}
+
+				if (ImGui::MenuItem("GLB v2")) {
+					ExportModelAssimp(&terrain, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
+				}
+
+				if (ImGui::MenuItem("JSON")) {
+					ExportModelAssimp(&terrain, "json", ShowSaveFileDialog(".json\0"));
 				}
 
 				if (ImGui::MenuItem("STL")) {
@@ -1098,7 +1106,7 @@ static void ShowMenu() {
 				}
 
 				if (ImGui::MenuItem("Collada")) {
-					ExportModelAssimp(&terrain, "collada", ShowSaveFileDialog(".collada\0"));
+					ExportModelAssimp(&terrain, "collada", ShowSaveFileDialog(".dae\0"), "dae");
 				}
 
 				ImGui::EndMenu();

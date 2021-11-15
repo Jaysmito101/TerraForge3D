@@ -65,7 +65,6 @@ project "TerraForge3D"
 	}
 
 	links {
-		"assimp.lib",
 		"Urlmon.lib",
 		"libssl_static.lib",
 		"libcrypto_static",
@@ -84,8 +83,7 @@ project "TerraForge3D"
 
 	postbuildcommands  {
 		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
-		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y",
-		"xcopy \"$(SolutionDir)Binaries\\assimp-vc140-mt.dll\" \"$(TargetDir)\" /r /y"
+		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
 	}
 
 	filter "system:windows"
@@ -101,7 +99,21 @@ project "TerraForge3D"
 		buildoptions "/MTd"
 		symbols "on"
 
+		links
+		{
+			"IrrXMLd.lib",
+			"zlibstaticd.lib",
+			"assimp-vc142-mtd.lib"
+		}
+
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
 		buildoptions "/MT"
 		optimize "on"	
+
+		links
+		{
+			"IrrXML.lib",
+			"zlibstatic.lib",
+			"assimp-vc142-mt.lib"
+		}
