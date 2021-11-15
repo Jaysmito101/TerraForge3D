@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="https://raw.githubusercontent.com/Jaysmito101/TerraGen3D/master/resources/ReadmeHeader.png" border="0"></
+    <img src="https://media.githubusercontent.com/media/Jaysmito101/TerraForge3D/master/resources/ReadmeHeader.png" border="0"></
 </p>
 
 <br/>
@@ -31,7 +31,6 @@
 
 <a href="https://youtu.be/EhkgesSzT8U"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase4.gif" width="1000"></a>
 
-<a href="https://www.youtube.com/watch?v=CBJaM4ImdqY"><img src="https://i.ibb.co/0m8Mk2w/Show-Case6.gif" width="1000"></a>
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
