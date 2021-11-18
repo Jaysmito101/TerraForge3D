@@ -26,6 +26,7 @@ include "TerraForge3D/vendor/imnodes"
 include "TerraForge3D/vendor/zip"
 include "TerraForge3D/vendor/text-editor"
 include "TerraForge3D/vendor/lua"
+include "TerraForge3D/vendor/assimp"
 
 project "TerraForge3D"
 	location "TerraForge3D"
@@ -78,7 +79,8 @@ project "TerraForge3D"
 		"ImGui",
 		"ImNodes",
 		"ImColorTextEdit",
-		"Lua"
+		"Lua",
+		"Assimp"
 	}
 
 	postbuildcommands  {
@@ -99,21 +101,7 @@ project "TerraForge3D"
 		buildoptions "/MTd"
 		symbols "on"
 
-		links
-		{
-			"IrrXMLd.lib",
-			"zlibstaticd.lib",
-			"assimp-vc142-mtd.lib"
-		}
-
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
 		buildoptions "/MT"
 		optimize "on"	
-
-		links
-		{
-			"IrrXML.lib",
-			"zlibstatic.lib",
-			"assimp-vc142-mt.lib"
-		}

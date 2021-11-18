@@ -8,6 +8,8 @@ TerraForge3D/vendor/text-editor/bin
 TerraForge3D/vendor/text-editor/bin-int
 TerraForge3D/vendor/lua/bin
 TerraForge3D/vendor/lua/bin-int
+TerraForge3D/vendor/assimp/bin
+TerraForge3D/vendor/assimp/bin-int
 
 **.sln
 **.vcxproj
@@ -15,7 +17,6 @@ TerraForge3D/vendor/lua/bin-int
 **.filters
 **.aps
 **.ini
-**.lib
 
 TerraForge3D/**.exe
 TerraForge3D/**.obj
