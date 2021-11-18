@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="https://media.githubusercontent.com/media/Jaysmito101/TerraForge3D/master/resources/ReadmeHeader.png" border="0"></
+    <img src="https://raw.githubusercontent.com/Jaysmito101/TerraForge3D/master/resources/ReadmeHeader.png" border="0"></
 </p>
 
 <br/>
