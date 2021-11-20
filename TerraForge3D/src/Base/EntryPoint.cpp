@@ -1,19 +1,18 @@
 #pragma once
 #include <EntryPoint.h>
-#include <windows.h>
 #include <SplashScreen.h>
-
-
-
 #include <iostream>
 #include <string>
+
+#ifdef TERR3D_WIN32
+
+#include <windows.h>
 
 static void AllocateConsole() {
 	AllocConsole();
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 	freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 }
-
 static std::string ParseArgs(PWSTR pCmdLine) {
 	LPWSTR* szArgList;
 	int argCount;
@@ -48,3 +47,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	app->Run();
 	delete app;
 }
+
+#else
+
+int main(int argc, char** argv) 
+{
+	Application* app = CreateApplication();
+	app->OnPreload();
+	app->Init();
+	{
+		std::string args = "";
+		if (argc == 2)
+			argc = std::string(argv[1]);
+		app->OnStart(args);
+	}
+	app->Run();
+	delete app;
+}
+
+#endif

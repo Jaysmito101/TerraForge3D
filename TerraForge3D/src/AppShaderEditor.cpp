@@ -7,7 +7,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <Windows.h>
 #include <Utils.h>
 
 static std::string defaultBaseVertexShader = "";
@@ -83,56 +82,6 @@ bool ReqRefresh() {
 	bool t = reqRfrsh;
 	reqRfrsh = false;
 	return t;
-}
-
-static std::string ShowSaveFileDialogSh(HWND owner = NULL) {
-	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
-	ZeroMemory(fileName, MAX_PATH);
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.glsl\0";
-	ofn.lpstrFile = fileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
-
-	std::string fileNameStr;
-
-	if (GetSaveFileName(&ofn)) {
-		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
-	}
-	return std::string("");
-}
-
-static std::string ShowOpenFileDialogSh(HWND owner = NULL) {
-	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
-	ZeroMemory(fileName, MAX_PATH);
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.glsl\0*.*\0";
-	ofn.lpstrFile = fileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
-
-	std::string fileNameStr;
-
-	if (GetOpenFileName(&ofn)) {
-		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
-	}
-	return std::string("");
 }
 
 
@@ -217,7 +166,7 @@ std::string GetWireframeGeometryShaderSource()
 }
 
 static void CreateShader(ShaderType type) {
-	std::string fileName = ShowSaveFileDialogSh();
+	std::string fileName = ShowSaveFileDialog(".glsl");
 	std::ofstream outfile;
 	if (fileName.find(".glsl") == std::string::npos)
 		fileName += ".glsl";
@@ -243,7 +192,7 @@ static void CreateShader(ShaderType type) {
 }
 
 static void OpenShader(ShaderType type) {
-	std::string fileName = ShowOpenFileDialogSh();
+	std::string fileName = ShowOpenFileDialog(".glsl");
 
 	bool res = true;
 

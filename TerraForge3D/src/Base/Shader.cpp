@@ -1,6 +1,5 @@
 #include <Base.h>
 #include <Shader.h>
-#include <windows.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <ShaderUtils.h>   
 

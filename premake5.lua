@@ -93,6 +93,7 @@ project "TerraForge3D"
 		systemversion "latest"
 
 		defines {
+			"TERR3D_WIN32",
 			"_CRT_SECURE_NO_WARNINGS"
 		}
 

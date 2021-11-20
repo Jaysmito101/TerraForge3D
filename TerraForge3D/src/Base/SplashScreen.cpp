@@ -1,5 +1,6 @@
-#include <SplashScreen.h>
+#ifdef TERR3D_WIN32
 
+#include <SplashScreen.h>
 #include <resource.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -174,3 +175,5 @@ namespace SplashScreen {
     }
 
 }
+
+#endif

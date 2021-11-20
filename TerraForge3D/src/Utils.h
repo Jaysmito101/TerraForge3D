@@ -3,8 +3,9 @@
 
 
 #include <Mesh.h>
-#include <Windows.h>
 #include <string>
+
+
 
 std::string UChar2Hex(unsigned char c);
 
@@ -41,11 +42,11 @@ struct Hash {
 
 #define MAX(x, y) (x > y ? x : y)
 
-std::string ShowSaveFileDialog(std::string ext = ".terr3d", HWND owner = NULL);
+std::string ShowSaveFileDialog(std::string ext = ".terr3d");
 
-std::string openfilename(HWND owner = NULL);
+std::string openfilename();
 
-std::string ShowOpenFileDialog(LPWSTR ext = (wchar_t*)L"*.glsl\0*.*\0", HWND owner = NULL);
+std::string ShowOpenFileDialog(std::string ext = "*.glsl");
 
 std::string ReadShaderSourceFile(std::string path, bool* result);
 
@@ -79,7 +80,10 @@ void Log(const char* log);
 
 void Log(std::string log);
 
+#ifdef TERR3D_WIN32
+#include <windows.h>
 void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue);
+#endif
 
 void AccocFileType();
 

@@ -24,7 +24,9 @@
 #include <ExportManager.h>
 #include <TextureStore.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
+#ifdef TERR3D_WIN32
 #include <windows.h>
+#endif
 #include <string>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -140,7 +142,11 @@ static float nLOffsetX, nLOffsetY;
 static void ToggleSystemConsole() {
 	static bool state = false;
 	state = !state;
+#ifdef TERR3D_WIN32
 	ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);
+#else 
+	std::cout << "Toogle Console Not Supported on Linux!" < std::endl;
+#endif
 }
 
 
@@ -787,7 +793,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	outfile.close();
 }
 
-static void OpenSaveFile(std::string file = ShowOpenFileDialog((wchar_t*)".terr3d\0")) {
+static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 
 	// For Now it dows not do anything id any error has occured but in later versions this will be reported to user!
 
@@ -1055,6 +1061,18 @@ static void ShowWindowMenuItem(const char* title, bool* val) {
 	ImGui::Checkbox(title, val);
 }
 
+void OpenURL(std::string url)
+{
+#ifdef  TERR3D_WIN32
+	std::string op = std::string("start ").append(url);
+	system(op.c_str());
+#else
+	std::string op = std::string("xdg-open ").append(url);
+	system(op.c_str());
+#endif //  TERR3D_WIN32
+
+}
+
 static void ShowMenu() {
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -1173,6 +1191,7 @@ static void ShowMenu() {
 				char* output = new char[MD5File(GetExecutablePath()).ToString().size() + 1];
 				strcpy(output, MD5File(GetExecutablePath()).ToString().c_str());
 				const size_t len = strlen(output) + 1;
+#ifdef TERR3D_WIN32
 				HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
 				memcpy(GlobalLock(hMem), output, len);
 				GlobalUnlock(hMem);
@@ -1181,6 +1200,9 @@ static void ShowMenu() {
 				SetClipboardData(CF_TEXT, hMem);
 				CloseClipboard();
 				delete[] output;
+#else
+				std::cout << "Version Hash : " << output << std::endl;
+#endif
 			}
 
 			if (ImGui::BeginMenu("Themes")) {
@@ -1244,19 +1266,19 @@ static void ShowMenu() {
 				activeWindows.contribWindow = true;
 
 			if (ImGui::MenuItem("Tutorial"))
-				ShellExecute(NULL, L"open", L"https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ", NULL, NULL, SW_SHOWNORMAL);
+				OpenURL("https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ");
 
 			if (ImGui::MenuItem("Social Handle"))
-				ShellExecute(NULL, L"open", L"https://twitter.com/jaysmito101", NULL, NULL, SW_SHOWNORMAL);
+				OpenURL("https://twitter.com/jaysmito101");
 
 			if (ImGui::MenuItem("Discord Server"))
-				ShellExecute(NULL, L"open", L"https://discord.gg/AcgRafSfyB", NULL, NULL, SW_SHOWNORMAL);
+				OpenURL("https://discord.gg/AcgRafSfyB");
 
 			if (ImGui::MenuItem("GitHub Page"))
-				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraForge3D", NULL, NULL, SW_SHOWNORMAL);
+				OpenURL("https://github.com/Jaysmito101/TerraForge3D");
 
 			if (ImGui::MenuItem("Documentation"))
-				ShellExecute(NULL, L"open", L"https://github.com/Jaysmito101/TerraForge3D/wiki", NULL, NULL, SW_SHOWNORMAL);
+				OpenURL("https://github.com/Jaysmito101/TerraForge3D/wiki");
 
 			if (ImGui::MenuItem("Open Source Liscenses"))
 				activeWindows.osLisc = !activeWindows.osLisc;
@@ -1293,7 +1315,7 @@ static void ShowSeaSettings() {
 	ImGui::Text("DuDv Map");
 	ImGui::SameLine();
 	if (ImGui::ImageButton((ImTextureID)waterDudvMap->GetRendererID(), ImVec2(50, 50))) {
-		std::string fileName = ShowOpenFileDialog(L".png\0");
+		std::string fileName = ShowOpenFileDialog(".png");
 		if (fileName.size() > 3) {
 			delete waterDudvMap;
 
@@ -1315,7 +1337,7 @@ static void ShowSeaSettings() {
 	ImGui::Text("Normal Map");
 	ImGui::SameLine();
 	if (ImGui::ImageButton((ImTextureID)waterNormal->GetRendererID(), ImVec2(50, 50))) {
-		std::string fileName = ShowOpenFileDialog(L".png\0");
+		std::string fileName = ShowOpenFileDialog(".png");
 		if (fileName.size() > 3) {
 			delete waterNormal;
 
@@ -1397,6 +1419,7 @@ static void OnImGuiRenderEnd() {
 }
 
 static void SetUpIcon() {
+#ifdef TERR3D_WIN32
 	HWND hwnd = glfwGetWin32Window(myApp->GetWindow()->GetNativeWindow());
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
 	if (hIcon) {
@@ -1408,6 +1431,7 @@ static void SetUpIcon() {
 		SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	}
+#endif
 }
 
 

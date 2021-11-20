@@ -93,7 +93,7 @@ bool TextureSamplerNode::Render()  {
 		tId = texture->GetRendererID();
 
 	if (ImGui::ImageButton((ImTextureID)tId, ImVec2(200, 200))) {
-		textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
+		textureFilePath = ShowOpenFileDialog(".png");
 		if (textureFilePath.size() > 1) {
 			if (texture)
 				delete texture;

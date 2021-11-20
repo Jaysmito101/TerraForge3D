@@ -144,7 +144,7 @@ void ShowOpenTextureModal() {
 			ImGui::CloseCurrentPopup();
 
 		if (ImGui::Button("Open From File")) {
-			std::string textureFilePath = ShowOpenFileDialog((wchar_t*)L".png\0");
+			std::string textureFilePath = ShowOpenFileDialog(".png");
 			if (textureFilePath.size() > 1) {
 				LoadUpTexture(textureFilePath);
 			}

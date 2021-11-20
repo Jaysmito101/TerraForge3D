@@ -17,7 +17,7 @@ void SetupSky()
 }
 
 static void ChangeCubemapTile(int face) {
-	std::string path = ShowOpenFileDialog(L".png\0");
+	std::string path = ShowOpenFileDialog(".png");
 	if (path.size() > 2) {
 		cubemap->LoadFace(path, face);
 		cubemap->UploadDataToGPU();
@@ -55,7 +55,7 @@ void ShowSkySettings(bool* pOpen)
 {
 	ImGui::Begin("Sky Settings", pOpen);
 	if (ImGui::Button("Load HDRI")) {
-		std::string path = ShowOpenFileDialog(L".png\0");
+		std::string path = ShowOpenFileDialog(".png");
 		if (path.size() > 2) {
 			LoadHDRI(path);
 		}

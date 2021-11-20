@@ -199,7 +199,7 @@ void SetupTextureStore(std::string executablePath, bool* reqrfrsh) {
 
 void UpdateTextureStore() {
 	counterT++;
-	if (counterT > 5) {
+	if (counterT > 10) {
 		counterT = 0;
 		isConnected = IsNetWorkConnected();
 	}

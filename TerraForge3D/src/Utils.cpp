@@ -2,10 +2,8 @@
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib/httplib.h>
-
 #include <openssl/md5.h>
 #include <openssl/sha.h>
-
 #include <Utils.h>
 #include <fstream>
 #include <iostream>
@@ -13,15 +11,24 @@
 #include <sys/stat.h>
 #include  <stdio.h>
 #include  <stdlib.h>
-#include <atlstr.h>
-#include <wininet.h>
-#pragma comment(lib,"Wininet.lib")
 
-char pingURL[128] = "http://www.google.com";
+#ifndef TERR3D_WIN32
+#include <libgen.h>         // dirname
+#include <unistd.h>         // readlink
+#include <linux/limits.h>   // PATH_MAX
+#define MAX_PATH PATH_MAX
+#else
+#include <atlstr.h>
+#endif
+
 
 static std::string getExecutablePath() {
 	char rawPathName[MAX_PATH];
+#ifdef TERR3D_WIN32
 	GetModuleFileNameA(NULL, rawPathName, MAX_PATH);
+#else
+	readlink("/proc/self/exe", rawPathName, PATH_MAX);
+#endif
 	return std::string(rawPathName);
 }
 
@@ -54,15 +61,32 @@ std::string UChar2Hex(unsigned char c)
 	}
 }
 
-std::string ShowSaveFileDialog(std::string ext, HWND owner) {
+#ifdef TERR3D_WIN32
+
+std::wstring s2ws(const std::string& s)
+{
+	int len;
+	int slength = (int)s.length() + 1;
+	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+	wchar_t* buf = new wchar_t[len];
+	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	std::wstring r(buf);
+	delete[] buf;
+	return r;
+}
+
+#endif
+
+std::string ShowSaveFileDialog(std::string ext) {
+#ifdef TERR3D_WIN32
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
 	ZeroMemory(&ofn, sizeof(ofn));
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.terr3d\0";
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = s2ws(ext).c_str();
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -77,42 +101,29 @@ std::string ShowSaveFileDialog(std::string ext, HWND owner) {
 		return str;
 	}
 	return std::string("");
+#else
+	char filename[PATH_MAX];
+	FILE* f = popen("zenity --file-selection --save", "r");
+	fgets(filename, PATH_MAX, f);
+	pclose(f);
+	return std::steing(fileName);
+#endif
 }
 
-std::string openfilename(HWND owner) {
+std::string openfilename() {
+	return ShowOpenFileDialog(".obj");
+}
+
+std::string ShowOpenFileDialog(std::string ext) {
+#ifdef TERR3D_WIN32
 	OPENFILENAME ofn;
 	WCHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
 	ZeroMemory(&ofn, sizeof(ofn));
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = L"*.obj\0";
-	ofn.lpstrFile = fileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
-
-	std::string fileNameStr;
-
-	if (GetSaveFileName(&ofn)) {
-		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
-	}
-	return std::string("");
-}
-
-std::string ShowOpenFileDialog(LPWSTR ext, HWND owner) {
-	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
-	ZeroMemory(fileName, MAX_PATH);
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = owner;
-	ofn.lpstrFilter = ext;
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = s2ws(ext).c_str();
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -127,6 +138,13 @@ std::string ShowOpenFileDialog(LPWSTR ext, HWND owner) {
 		return str;
 	}
 	return std::string("");
+#else
+	char filename[PATH_MAX];
+	FILE* f = popen("zenity --file-selection", "r");
+	fgets(filename, PATH_MAX, f);
+	pclose(f);
+	return std::steing(fileName);
+#endif
 }
 
 std::string ReadShaderSourceFile(std::string path, bool* result) {
@@ -208,19 +226,20 @@ bool PathExist(const std::string& s)
 	return (stat(s.c_str(), &buffer) == 0);
 }
 
+
+#ifdef TERR3D_WIN32
+#include <wininet.h>
+#pragma comment(lib, "Wininet.lib")
+#endif
+
 bool IsNetWorkConnected()
 {
-	 
-	bool bConnect = InternetCheckConnection(CA2CT(pingURL), FLAG_ICC_FORCE_CONNECTION, 0);
-
-	if (bConnect)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+#ifdef TERR3D_WIN32
+	bool bConnect = InternetCheckConnectionW(L"http://www.google.com", FLAG_ICC_FORCE_CONNECTION, 0);
+	return bConnect;
+#else
+	return true; // I dont know how this works on linux
+#endif
 }
 
 char* ReadBinaryFile(std::string path, int* fSize, uint32_t sizeToLoad)
@@ -295,6 +314,7 @@ void Log(std::string log)
 	std::cout << log << std::endl;
 };
 
+#ifdef TERR3D_WIN32
 
 // From https://stackoverflow.com/a/20256714/14911094
 void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue) {
@@ -342,8 +362,13 @@ void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue) {
 	RegCloseKey(hkey);
 }
 
+#endif
 
 void AccocFileType() {
+
+#ifdef  TERR3D_WIN32
+
+
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.terr3d", "TerraGen3D.TerraGen3D.1");
 
 	// Not needed.
@@ -356,6 +381,7 @@ void AccocFileType() {
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\TerraGen3D.TerraGen3D.1", "TerraGen3D");
 
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\TerraGen3D.TerraGen3D.1\\Shell\\Open\\Command", (getExecutablePath() + " %1").c_str());
+#endif //  TERR3D_WIN32
 }
 
 void MkDir(std::string path)
@@ -363,7 +389,31 @@ void MkDir(std::string path)
 	system((std::string("mkdir \"") + path + "\"").c_str());
 }
 
+#ifndef TERR3D_WIN32
+int get_file_size(char* source)
+{
+	FILE* fichier = fopen(source, "rb");
+	fseek(fichier, 0, SEEK_END);
+	int size = ftell(fichier);
+	fseek(fichier, 0, SEEK_SET);
+	fclose(fichier);
+	return size;
+}
+#endif
+
 void CopyFileData(std::string source, std::string destination)
 {
+#ifdef TERR3D_WIN32
 	CopyFileW(CString(source.c_str()), CString(destination.c_str()), false);
+#else
+	int srcsize = get_file_size(source.c_str());
+	char* data = (char*)malloc(srcsize);
+	int fsource = open(source.c_str(), O_RDONLY | O_BINARY);
+	int fdest = open(destination.c_str(), O_WRONLY | O_CREAT | O_BINARY, 0777);
+	read(fsource, data, srcsize);
+	write(fdest, data, srcsize);
+	close(fsource);
+	close(fdest);
+	free(data);
+#endif
 }
