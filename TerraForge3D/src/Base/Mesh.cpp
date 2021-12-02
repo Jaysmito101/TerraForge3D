@@ -42,6 +42,11 @@ void Mesh::RecalculateNormals()
 	for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
 }
 
+void Mesh::GenerateIcoSphere(int resolution, float radius, float textureScale)
+{
+	// TODO : Later
+}
+
 void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 {
 	maxHeight = -100;

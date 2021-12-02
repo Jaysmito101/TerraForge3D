@@ -72,6 +72,8 @@ static ActiveWindows activeWindows;
 static std::vector<NoiseLayer> noiseLayers;
 static std::vector<NoiseLayer> noiseLayersTmp;
 static const char* noiseTypes[] = { "Simplex Perlin", "Random", "Cellular" };
+static const char* baseShapes[] = { "Plane", "Icosphere"};
+static char* currentBaseShape = (char*)noiseTypes[0];
 static FastNoiseLite m_NoiseGen;
 
 static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -136,7 +138,7 @@ static std::string savePath = "";
 static std::string DuDvMapID = "";
 static std::string waterNormalMap = "";
 
-static float nLOffsetX, nLOffsetY;
+static float nLOffsetX, nLOffsetY, nLOffsetZ;
 
 
 static void ToggleSystemConsole() {
@@ -251,23 +253,24 @@ static void ShowLightingControls() {
 	ImGui::End();
 }
 
-static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
+static float EvaluateNoiseLayer(float x, float y, float z, NoiseLayer& noiseLayer) {
 	if (!noiseLayer.enabled)
 		return 0.0f;
 	float baseNoise = 0;
 	float offsetX = noiseLayer.offsetX + nLOffsetX;
 	float offsetY = noiseLayer.offsetY + nLOffsetY;
+	float offsetZ = noiseLayer.offsetZ + nLOffsetZ;
 
 	try {
 		if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
-			baseNoise = SimplexNoise::noise((x / resolution) * noiseLayer.scale + offsetX, (y / resolution) * noiseLayer.scale + offsetY) * noiseLayer.strength;
+			baseNoise = SimplexNoise::noise((x / resolution) * noiseLayer.scale + offsetX, (y / resolution) * noiseLayer.scale + offsetY, (z / resolution) * noiseLayer.scale + offsetZ) * noiseLayer.strength;
 		}
 		else if (strcmp(noiseLayer.noiseType, "Random") == 0) {
 			return (rand()) * noiseLayer.strength * 0.0001f;
 		}
 		else if (strcmp(noiseLayer.noiseType, "Cellular") == 0) {
 			m_NoiseGen.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-			baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + offsetX, (y / 1) * noiseLayer.scale + offsetY) * noiseLayer.strength;
+			baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + offsetX, (y / 1) * noiseLayer.scale + offsetY, (z / resolution) * noiseLayer.scale + offsetZ) * noiseLayer.strength;
 		}
 	}
 	catch (...) {
@@ -276,10 +279,10 @@ static float EvaluateNoiseLayer(float x, float y, NoiseLayer& noiseLayer) {
 	return baseNoise;
 }
 
-static float noise(float x, float y) {
+static float noise(float x, float y, float z = 0) {
 	float noise = 0;
 	for (NoiseLayer& nl : noiseLayers) {
-		noise += EvaluateNoiseLayer(x, y, nl);
+		noise += EvaluateNoiseLayer(x, y, z, nl);
 	}
 	if (flattenBase) {
 		noise = MAX(0, noise);
@@ -488,6 +491,20 @@ static void ShowTerrainControls()
 	static bool exp = false;
 	ImGui::Begin("Dashboard");
 
+	if (ImGui::BeginCombo("Base Shape", currentBaseShape)) 
+	{
+	    for (int n = 0; n < IM_ARRAYSIZE(baseShapes); n++)
+	    {
+	        bool is_selected = (currentBaseShape == baseShapes[n]); // You can store your selection however you want, outside or inside your objects
+	        if (ImGui::Selectable(baseShapes[n], is_selected))
+	            currentBaseShape = (char*)baseShapes[n];
+	        if (is_selected)
+	            ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+	    }
+	    ImGui::EndCombo();
+	}
+
+
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
 	ImGui::NewLine();
@@ -577,6 +594,7 @@ static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
 		ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.001f);
 		ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
 		ImGui::DragFloat((std::string("Offset Y##") + std::to_string(id)).c_str(), &(noiseLayer.offsetY), 0.01f);
+		ImGui::DragFloat((std::string("Offset Z##") + std::to_string(id)).c_str(), &(noiseLayer.offsetZ), 0.01f);
 		if (ImGui::Button((std::string("Remove") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
 			noiseLayers.erase(noiseLayers.begin() + id);
 		}
@@ -593,6 +611,7 @@ static void ShowNoiseSettings() {
 	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
 	ImGui::DragFloat("Global X Offset", &nLOffsetX, 0.01f);
 	ImGui::DragFloat("Global Y Offset", &nLOffsetY, 0.01f);
+	ImGui::DragFloat("Global Y Offset", &nLOffsetZ, 0.01f);
 	ImGui::Checkbox("Flatten Base", &flattenBase);
 	ImGui::Checkbox("Absoulute Value", &absolute);
 	ImGui::Checkbox("Square Value", &square);
@@ -714,6 +733,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["square"] = square;
 	tmp["nLOffsetX"] = nLOffsetX;
 	tmp["nLOffsetY"] = nLOffsetY;
+	tmp["nLOffsetZ"] = nLOffsetZ;
 	tmp["absolute"] = absolute;
 	tmp["flattenBase"] = flattenBase;
 	tmp["noiseBased"] = noiseBased ? true : false;
@@ -885,6 +905,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 
 		nLOffsetY = tmp["nLOffsetY"];
 		nLOffsetX = tmp["nLOffsetX"];
+		nLOffsetZ = tmp["nLOffsetZ"];
 
 		square = tmp["square"];
 		absolute = tmp["absolute"];

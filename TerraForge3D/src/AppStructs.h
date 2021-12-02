@@ -49,6 +49,7 @@ struct NoiseLayer {
 		scale = 1;
 		offsetX = 0;
 		offsetY = 0;
+		offsetZ = 0;
 	}
 
 	nlohmann::json Save() {
@@ -59,6 +60,7 @@ struct NoiseLayer {
 		data["scale"] = scale;
 		data["offsetX"] = offsetX;
 		data["offsetY"] = offsetY;
+		data["offsetZ"] = offsetZ;
 		data["enabled"] = enabled;
 		data["active"] = active;
 		return data;
@@ -76,6 +78,7 @@ struct NoiseLayer {
 		scale = data["scale"];
 		offsetX = data["offsetX"];
 		offsetY = data["offsetY"];
+		offsetZ = data["offsetZ"];
 		enabled = data["enabled"];
 		active = data["active"];
 	}
@@ -92,6 +95,7 @@ struct NoiseLayer {
 		clone.scale = scale;
 		clone.offsetX = offsetX;
 		clone.offsetY = offsetY;
+		clone.offsetZ = offsetZ;
 		clone.enabled = enabled;
 		clone.active = active;
 		return clone;
@@ -100,7 +104,7 @@ struct NoiseLayer {
 	char* noiseType;
 	char name[256];
 	float strength;
-	float offsetX, offsetY;
+	float offsetX, offsetY, offsetZ;
 	float scale;
 	bool enabled;
 	bool active;

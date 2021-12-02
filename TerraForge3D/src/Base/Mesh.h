@@ -21,6 +21,8 @@ public:
 
 	void GeneratePlane(int resolution, float scale, float textureScale = 1.0f);
 
+	void GenerateIcoSphere(int resolution, float radius, float textureScale = 1.0f);
+
 	void SetElevation(float elevation, int x, int y);
 
 	float GetElevation(int x, int y);
