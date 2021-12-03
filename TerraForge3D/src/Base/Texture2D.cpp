@@ -1,6 +1,6 @@
 
 #include "Texture2D.h"
-
+#include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
@@ -67,6 +67,9 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 			m_Data = data;
 		else
 			stbi_image_free(data);
+	}
+	else {
+		std::cout << "Failed to load texture : " << path << std::endl;
 	}
 }
 

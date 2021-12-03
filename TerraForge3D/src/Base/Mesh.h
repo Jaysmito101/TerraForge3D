@@ -2,6 +2,10 @@
 
 #include <glm/glm.hpp>
 
+enum MeshType {
+	Plane = 0,
+	Icosphere
+};
 
 struct Vert 
 {
@@ -45,6 +49,7 @@ public:
 	float minHeight = 100;
 	bool deleteOnDestruction = true;
 private:
+	MeshType currType;
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 };

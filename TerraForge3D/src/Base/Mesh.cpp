@@ -24,31 +24,75 @@ Mesh::~Mesh() {
 
 void Mesh::RecalculateNormals()
 {
-	for (int i = 0; i < indexCount; i += 3)
+	if (currType == MeshType::Icosphere) 
 	{
-		const int ia = indices[i];
-		const int ib = indices[i + 1];
-		const int ic = indices[i + 2];
-
-		const glm::vec3 e1 = glm::vec3(vert[ia].position) - glm::vec3(vert[ib].position);
-		const glm::vec3 e2 = glm::vec3(vert[ic].position) - glm::vec3(vert[ib].position);
-		const glm::vec3 no = cross(e1, e2);
-
-		vert[ia].normal += glm::vec4(no, 0.0);
-		vert[ib].normal += glm::vec4(no, 0.0);
-		vert[ic].normal += glm::vec4(no, 0.0);
+		for (int i = 0; i < vertexCount; i++) {
+			vert[i].normal = glm::normalize(vert[i].position);
+		}
 	}
+	else {
+		for (int i = 0; i < indexCount; i += 3)
+		{
+			const int ia = indices[i];
+			const int ib = indices[i + 1];
+			const int ic = indices[i + 2];
 
-	for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
+			const glm::vec3 e1 = glm::vec3(vert[ia].position) - glm::vec3(vert[ib].position);
+			const glm::vec3 e2 = glm::vec3(vert[ic].position) - glm::vec3(vert[ib].position);
+			const glm::vec3 no = cross(e1, e2);
+
+			vert[ia].normal += glm::vec4(no, 0.0);
+			vert[ib].normal += glm::vec4(no, 0.0);
+			vert[ic].normal += glm::vec4(no, 0.0);
+		}
+
+		for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
+	}
 }
 
 void Mesh::GenerateIcoSphere(int resolution, float radius, float textureScale)
 {
-	// TODO : Later
+	currType = MeshType::Icosphere;
+	glm::vec3 vertis[] = {
+		glm::vec3(0, -1, 0),
+		glm::vec3(0, 0, 1),
+		glm::vec3(1, 0, 0),
+		glm::vec3(0, 0, -1),
+		glm::vec3(-1, 0, 0),
+		glm::vec3(0, 1, 0)
+	};
+
+	int triangles[] = {
+		   0, 1, 2,
+		   0, 2, 3,
+		   0, 3, 4,
+		   0, 4, 1,
+
+		   5, 2, 1,
+		   5, 3, 2,
+		   5, 4, 3,
+		   5, 1, 4
+	};
+
+	for (int i = 0; i < sizeof(vertis)/sizeof(glm::vec3); i++) {
+		vertis[i] *= radius;
+	}
+
+	vertexCount = sizeof(vertis)/sizeof(int);
+	vert = new Vert[sizeof(vertis) / sizeof(int)];
+	memset(vert, 0, sizeof(Vert) * vertexCount);
+ 	for (int i = 0; i < vertexCount; i++) {
+		vert[i] = Vert();
+		vert[i].position = glm::vec4(vertis[i], 1);
+	}
+	indexCount = sizeof(triangles)/sizeof(int);
+	indices = new int[indexCount];
+	memcpy(indices, triangles, sizeof(int) * indexCount);
 }
 
 void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 {
+	currType = MeshType::Plane;
 	maxHeight = -100;
 	minHeight = 100;
 	res = resolution;

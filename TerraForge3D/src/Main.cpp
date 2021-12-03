@@ -318,26 +318,40 @@ static void ResetShader() {
 
 static void FillMeshData() {
 
-	if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
+	if (strcmp(currentBaseShape, "Plane") == 0) {
 
-		terrain.mesh->GeneratePlane(resolution, scale, textureScale);
+		if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
+
+			terrain.mesh->GeneratePlane(resolution, scale, textureScale);
+			s_Stats.triangles = terrain.mesh->indexCount / 3;
+			s_Stats.vertCount = terrain.mesh->vertexCount;
+			textureScaleO = textureScale;
+		}
+
+		for (int y = 0; y < resolution; y++)
+		{
+			for (int x = 0; x < resolution; x++)
+			{
+				if (noiseBased)
+					terrain.mesh->SetElevation(noise(x, y), x, y);
+				else
+					terrain.mesh->SetElevation(GetElevation(x, y), x, y);
+			}
+		}
+
+	}
+	else if (strcmp(currentBaseShape, "Icosphere") == 0) {
+		terrain.mesh->GenerateIcoSphere(resolution, scale, textureScale);
 		s_Stats.triangles = terrain.mesh->indexCount / 3;
 		s_Stats.vertCount = terrain.mesh->vertexCount;
 		textureScaleO = textureScale;
 	}
-
-	for (int y = 0; y < resolution; y++)
-	{
-		for (int x = 0; x < resolution; x++)
-		{
-			if (noiseBased)
-				terrain.mesh->SetElevation(noise(x, y), x, y);
-			else
-				terrain.mesh->SetElevation(GetElevation(x, y), x, y);
-		}
+	else {
+		Log("Unknown base shape " + std::string(currentBaseShape));
+		currentBaseShape = (char*)baseShapes[0];
+		Log("Switching back to " + std::string(currentBaseShape));
 	}
-
-	terrain.mesh->RecalculateNormals();
+		terrain.mesh->RecalculateNormals();
 
 	isRemeshing = false;
 }
