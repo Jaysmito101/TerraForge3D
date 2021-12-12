@@ -20,13 +20,10 @@
 #include <FoliagePlacement.h>
 #include <SkySettings.h>
 #include <SupportersTribute.h>
-#include <ElevationNodeEditor.h>
+#include <MeshNodeEditor.h>
 #include <ExportManager.h>
 #include <TextureStore.h>
 #include <glm/ext/quaternion_trigonometric.hpp>
-#ifdef TERR3D_WIN32
-#include <windows.h>
-#endif
 #include <string>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -39,6 +36,7 @@
 #include <thread>
 #include <experimental/filesystem>
 #include <time.h>
+#include <string.h>
 #include <mutex>
 #include <json.hpp>
 #include <zip.h>
@@ -46,6 +44,9 @@
 #include <dirent/dirent.h>
 #include <atomic>
 
+#ifdef TERR3D_WIN32
+#include <windows.h>
+#endif
 
 
 #include <Utils.h>
@@ -335,7 +336,7 @@ static void FillMeshData() {
 				if (noiseBased)
 					terrain.mesh->SetElevation(noise(x, y), x, y);
 				else
-					terrain.mesh->SetElevation(GetElevation(x, y), x, y);
+					terrain.mesh->SetElevation(EvaluateMeshNodeEditor({(float)x, (float)y, 0.0f}).value, x, y);
 			}
 		}
 
@@ -726,7 +727,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["serializerVersion"] = TERR3D_SERIALIZER_VERSION;
 	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
 	data["name"] = "TerraForge3D v3.0";
-	data["EnodeEditor"] = GetElevationNodeEditorSaveData();
+	data["EnodeEditor"] = GetMeshNodeEditorSaveData();
 	data["styleData"] = GetStyleData();
 	data["appData"] = appData;
 	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
@@ -899,7 +900,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 	if (data["type"] != "SAVEFILE")
 		return;
 
-	SetElevationNodeEditorSaveData(data["EnodeEditor"]);
+	SetMeshNodeEditorSaveData(data["EnodeEditor"]);
 	LoadThemeFromStr(data["styleData"]);
 	//data["imguiData"] = ImGui::SaveIniSettingsToMemory();
 	appData = data["appData"];
@@ -1678,7 +1679,7 @@ public:
 
 		GetWindow()->SetVSync(vSync);
 		s_Stats.frameRate = 1 / s_Stats.deltaTime;
-		ElevationNodeEditorTick();
+		MeshNodeEditorTick();
 		SecondlyShaderEditorUpdate();
 		UpdateTextureStore();
 		TextureSettingsTick();
@@ -1721,7 +1722,7 @@ public:
 			ShowShaderEditor(&activeWindows.shaderEditorWindow);
 
 		if (activeWindows.elevationNodeEditorWindow)
-			ShowElevationNodeEditor(&activeWindows.elevationNodeEditorWindow);
+			ShowMeshNodeEditor(&activeWindows.elevationNodeEditorWindow);
 
 		if (activeWindows.textureStore)
 			ShowTextureStore(&activeWindows.textureStore);
@@ -1747,7 +1748,7 @@ public:
 		SetUpIcon();
 		SetupViewportFrameBuffer();
 		SetupShaderManager(GetExecutableDir());
-		SetupElevationManager(&resolution);
+		SetupMeshNodeEditor(&resolution);
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
@@ -1804,7 +1805,7 @@ public:
 
 	void OnEnd()
 	{
-		ShutdownElevationNodeEditor();
+		ShutdownMeshNodeEditor();
 		delete shd;
 		delete wireframeShader;
 		delete reflectionfbo;

@@ -15,6 +15,7 @@ IncludeDir["Glad"] = "TerraForge3D/vendor/Glad/include"
 IncludeDir["glm"] = "TerraForge3D/vendor/glm"
 IncludeDir["ImGui"] = "TerraForge3D/vendor/imgui"
 IncludeDir["ImNodes"] = "TerraForge3D/vendor/imnodes"
+IncludeDir["ImGuiNodeEditor"] = "TerraForge3D/vendor/imgui-node-editor"
 IncludeDir["Zip"] = "TerraForge3D/vendor/zip"
 IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
 IncludeDir["Lua"] = "TerraForge3D/vendor/lua"
@@ -23,6 +24,7 @@ include "TerraForge3D/vendor/GLFW"
 include "TerraForge3D/vendor/Glad"
 include "TerraForge3D/vendor/imgui"
 include "TerraForge3D/vendor/imnodes"
+include "TerraForge3D/vendor/imgui-node-editor"
 include "TerraForge3D/vendor/zip"
 include "TerraForge3D/vendor/text-editor"
 include "TerraForge3D/vendor/lua"
@@ -58,7 +60,8 @@ project "TerraForge3D"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.Zip}/src",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.Lua}"
+		"%{IncludeDir.Lua}",
+		"%{IncludeDir.ImGuiNodeEditor}"
 	}
 
 	libdirs {
@@ -67,8 +70,6 @@ project "TerraForge3D"
 
 	links {
 		"Urlmon.lib",
-		"libssl_static.lib",
-		"libcrypto_static",
 		"Crypt32",
 		"ws2_32",
 		"Pathcch",
@@ -78,6 +79,7 @@ project "TerraForge3D"
 		"Zip",
 		"ImGui",
 		"ImNodes",
+		"ImGuiNodeEditor",
 		"ImColorTextEdit",
 		"Lua",
 		"Assimp"
@@ -102,7 +104,19 @@ project "TerraForge3D"
 		buildoptions "/MTd"
 		symbols "on"
 
+		links
+		{
+			"libcrypto32MTd.lib",
+			"libssl32MTd.lib"
+		}
+
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
 		buildoptions "/MT"
 		optimize "on"	
+
+		links
+		{
+			"libcrypto32MT.lib",
+			"libssl32MT.lib"
+		}
