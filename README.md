@@ -18,11 +18,13 @@
 </p>
 <br/>
 
+⚠️ In the latest master branch the node editor is being re written from scratch so for a version with a fully working node editor check out thr releases or https://github.com/Jaysmito101/TerraForge3D/tree/f8d630ab7bad4ed2822375c996fca008849a6ee5
 
 <hr/>
 
 # TerraForge3D
 3D Procedural Terrain Generation Tool in OpenGL/C++
+
 
 
 <a href="https://youtu.be/wnNclej40zQ"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase5.gif" width="1000"></a>
