@@ -30,18 +30,21 @@ struct NodeInputParam
 	float z;
 };
 
-struct NodeEditorConfig 
-{
-	std::string saveFile;
-
-	NodeEditorConfig(std::string saveFile = "NodeEditor.terr3d");
-};
 
 int GenerateUID();
 void SeUIDSeed(int seed);
 
 class NodeEditorNode;
 class NodeEditorPin;
+
+struct NodeEditorConfig 
+{
+	std::string saveFile;
+	std::function<void(void)> updateFunc;
+	std::function<void(void)> makeNodeFunc;
+
+	NodeEditorConfig(std::string saveFile = "NodeEditor.terr3d");
+};
 
 class NodeEditorLink 
 {
@@ -123,8 +126,6 @@ public:
 	std::unordered_map<uintptr_t,  NodeEditorLink*> links;
 	std::unordered_map<uintptr_t,  NodeEditorNode*> nodes;
 	std::unordered_map<uintptr_t, NodeEditorPin*> pins;
-	std::function<void(void)> updateFunc;
-	std::function<NodeEditorNode*(NodeEditorPin*)> makeNodeFunc;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

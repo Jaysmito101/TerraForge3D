@@ -244,31 +244,12 @@ void NodeEditor::Render()
         }
 
         ImGuiNodeEditor::PinId nPid;
-        if (makeNodeFunc && ImGuiNodeEditor::QueryNewNode(&nPid))
+        if (config.makeNodeFunc && ImGuiNodeEditor::QueryNewNode(&nPid))
         {
             if (ImGuiNodeEditor::AcceptNewItem())
             {
                 NodeEditorPin* iPin = pins[nPid.Get()];
-                NodeEditorNode* node = makeNodeFunc(iPin);
-                if (node)
-                {
-                    AddNode(node);
-                    if (node->inputPins.size() > 0)
-                    {
-                        NodeEditorLink* link = new NodeEditorLink();
-                        link->from = iPin;
-                        link->to = node->inputPins[0];
-                        bool lnkFrm = link->from->ValidateLink(link);
-                        bool lnkTo = link->to->ValidateLink(link);
-                        if (lnkFrm && lnkTo)
-                        {
-                            link->from->Link(link);
-                            link->to->Link(link);
-                            links[link->_id.Get()] = link;
-                            ImGuiNodeEditor::Link(link->id, link->from->id, link->to->id);
-                        }
-                    }                    
-                }
+                config.makeNodeFunc();
             }
         }
     }
@@ -303,8 +284,8 @@ void NodeEditor::Render()
     }
     ImGuiNodeEditor::EndDelete();
 
-    if (updateFunc)
-        updateFunc();
+    if (config.updateFunc)
+        config.updateFunc();
     ImGuiNodeEditor::End();
     ImGuiNodeEditor::SetCurrentEditor(nullptr);
 }
