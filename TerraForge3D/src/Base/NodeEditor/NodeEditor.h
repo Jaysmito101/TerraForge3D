@@ -96,6 +96,7 @@ public:
 	std::vector<NodeEditorPin*> outputPins;
 	std::vector<NodeEditorPin*> inputPins;
 	void* userData;
+	std::string name;
 	ImColor headerColor = ImColor(59, 29, 209);
 
 	virtual NodeOutput Evaluate(NodeInputParam input) = 0;
@@ -126,6 +127,7 @@ public:
 	std::unordered_map<uintptr_t,  NodeEditorLink*> links;
 	std::unordered_map<uintptr_t,  NodeEditorNode*> nodes;
 	std::unordered_map<uintptr_t, NodeEditorPin*> pins;
+	NodeEditorNode* outputNode = nullptr;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

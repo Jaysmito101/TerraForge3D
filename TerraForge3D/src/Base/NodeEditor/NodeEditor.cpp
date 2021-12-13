@@ -292,7 +292,10 @@ void NodeEditor::Render()
 
 void NodeEditor::AddNode(NodeEditorNode* node)
 {
+    if (node->name == "Output" && outputNode)
+        return;
     nodes[node->_id.Get()] = node;
+    outputNode = node;
     for (auto& it : node->GetPins()) 
     {
         pins[it->_id.Get()] = it;
@@ -310,6 +313,8 @@ NodeEditor::NodeEditor(NodeEditorConfig aconfig)
 
 void NodeEditor::DeleteNode(NodeEditorNode* node)
 {
+    if (node->name == "Output")
+        return;
     if (nodes.find(node->_id.Get()) != nodes.end()) 
     {
         node->OnDelete();

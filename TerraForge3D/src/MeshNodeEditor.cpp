@@ -7,6 +7,7 @@
 
 // Nodes
 #include "Nodes/DummyNode.h"
+#include "Nodes/OutputNode.h"
 
 #include <iostream>
 
@@ -53,7 +54,13 @@ static void ShowNodeMaker()
 
 MeshNodeEditorResult EvaluateMeshNodeEditor(MeshNodeEditorParam param)
 {
-    return MeshNodeEditorResult();
+    NodeInputParam iParam;
+    iParam.x = param.x;
+    iParam.y = param.y;
+    iParam.z = param.z;
+    MeshNodeEditorResult res;
+    res.value = editor->outputNode->Evaluate(iParam).value;
+    return res;
 }
 
 nlohmann::json GetMeshNodeEditorSaveData()
@@ -74,6 +81,8 @@ void SetupMeshNodeEditor(int* res)
         ImGui::OpenPopup("NodeMakerDropped");
     };
     editor = new NodeEditor(config);
+    editor->AddNode(new OutputNode());
+    
 }
 
 void MeshNodeEditorTick()
