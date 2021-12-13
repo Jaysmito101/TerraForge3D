@@ -47,7 +47,7 @@ void LoadcontributorsData(nlohmann::json& data) {
 
 void SetupSupportersTribute()
 {
-	if (IsNetWorkConnected()) {
+	if (IsNetWorkConnected() && !FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache")) {
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
 		
 		{
@@ -66,7 +66,7 @@ void SetupSupportersTribute()
 	}
 	else {
 		bool tmp = false;
-		Log("Failed to connect to Internet!\nTrying to load cached data.");
+		Log("Trying to load cached data.");
 
 		if (FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache")) {
 			Log("Found Stargazers Cached Data!");

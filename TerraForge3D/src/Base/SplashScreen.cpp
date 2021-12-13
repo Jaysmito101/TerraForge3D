@@ -124,7 +124,7 @@ namespace SplashScreen {
 
         // Step 2: Creating the Window
         hwnd = CreateWindowEx(
-            WS_EX_TOPMOST,
+            0,
             (LPCWSTR)classname.c_str(),
             L"The title of my window",
             ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU),

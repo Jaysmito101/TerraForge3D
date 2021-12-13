@@ -1752,7 +1752,7 @@ public:
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
-		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
+		//SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;

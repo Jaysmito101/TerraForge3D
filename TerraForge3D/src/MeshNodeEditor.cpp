@@ -2,6 +2,10 @@
 #include "imgui.h"
 #include "Base/ImGuiShapes.h"
 #include "Base/NodeEditor/NodeEditor.h"
+#include "Utils.h"
+
+// Nodes
+#include "Nodes/DummyNode.h"
 
 static int* resolution;
 static NodeEditor* editor;
@@ -23,7 +27,7 @@ void SetMeshNodeEditorSaveData(nlohmann::json data)
 void SetupMeshNodeEditor(int* res)
 {
     resolution = res;
-    editor = new NodeEditor();
+    editor = new NodeEditor(NodeEditorConfig(GetExecutableDir() + "\\Data\\configs\\meshnodeeditorconfigs.terr3d"));
 }
 
 void MeshNodeEditorTick()
@@ -39,7 +43,10 @@ void ShutdownMeshNodeEditor()
 void ShowMeshNodeEditor(bool* pOpen)
 {
     ImGui::Begin("Mesh Node Editor", pOpen);
-
+    if (ImGui::Button("Add Node")) 
+    {
+        editor->AddNode(new DummyNode());
+    }
 
     ImGui::Text("WARNING : Work In Progress!");
     
