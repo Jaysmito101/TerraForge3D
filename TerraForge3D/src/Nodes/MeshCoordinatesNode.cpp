@@ -31,17 +31,17 @@ void MeshCoordinatesNode::OnRender()
 {
     DrawHeader("Mesh Coordinates");
     
-    ImGui::Dummy(ImVec2(20, 10));
+    ImGui::Dummy(ImVec2(40, 10));
     ImGui::SameLine();
     ImGui::Text("X");
     outputPins[0]->Render();
 
-    ImGui::Dummy(ImVec2(20, 10));
+    ImGui::Dummy(ImVec2(40, 10));
     ImGui::SameLine();
     ImGui::Text("Y");
     outputPins[1]->Render();
 
-    ImGui::Dummy(ImVec2(20, 10));
+    ImGui::Dummy(ImVec2(40, 10));
     ImGui::SameLine();
     ImGui::Text("Z");
     outputPins[2]->Render();
@@ -49,7 +49,7 @@ void MeshCoordinatesNode::OnRender()
 
 MeshCoordinatesNode::MeshCoordinatesNode()
 {
-    headerColor = ImColor(10, 150, 150);
+    headerColor = ImColor(VALUE_NODE_COLOR);
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));

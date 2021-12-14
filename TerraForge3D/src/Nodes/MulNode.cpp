@@ -1,4 +1,4 @@
-#include "AddNode.h"
+#include "MulNode.h"
 #include "Base/ImGuiShapes.h"
 #include "MeshNodeEditor.h"
 #include <iostream>
@@ -6,38 +6,38 @@
 #include <mutex>
 
 
-NodeOutput AddNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
+NodeOutput MulNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
-    float sum = 0;
+    float prod = 1.0f;
     if (inputPins[0]->IsLinked())
-        sum += inputPins[0]->other->Evaluate(input).value;
+        prod *= inputPins[0]->other->Evaluate(input).value;
     else
-        sum += value1;
+        prod *= value1;
     if (inputPins[1]->IsLinked())
-        sum += inputPins[1]->other->Evaluate(input).value;
+        prod *= inputPins[1]->other->Evaluate(input).value;
     else
-        sum += value2;
-    return NodeOutput({ sum });
+        prod *= value2;
+    return NodeOutput({ prod });
 }
 
-void AddNode::Load(nlohmann::json data)
+void MulNode::Load(nlohmann::json data)
 {
     value1 = data["value1"];
     value2 = data["value2"];
 }
 
-nlohmann::json AddNode::Save()
+nlohmann::json MulNode::Save()
 {
     nlohmann::json data;
-    data["type"] = MeshNodeEditor::MeshNodeType::Add;
+    data["type"] = MeshNodeEditor::MeshNodeType::Mul;
     data["value1"] = value1;
     data["value2"] = value2;
     return data;
 }
 
-void AddNode::OnRender()
+void MulNode::OnRender()
 {
-    DrawHeader("Add");
+    DrawHeader("Multiply");
 
     inputPins[0]->Render();
     if (inputPins[0]->IsLinked())
@@ -65,12 +65,13 @@ void AddNode::OnRender()
     }    
 }
 
-AddNode::AddNode()
+MulNode::MulNode()
 {
+    headerColor = ImColor(MATH_NODE_COLOR);
     inputPins.push_back(new NodeEditorPin());
     inputPins.push_back(new NodeEditorPin());
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
-    headerColor = ImColor(MATH_NODE_COLOR);
-    value1 = (0.0f);
-    value2 = (0.0f);
+
+    value1 = (1.0f);
+    value2 = (1.0f);
 }

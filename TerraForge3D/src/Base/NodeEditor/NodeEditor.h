@@ -135,6 +135,7 @@ public:
 	std::unordered_map<uintptr_t,  NodeEditorNode*> nodes;
 	std::unordered_map<uintptr_t, NodeEditorPin*> pins;
 	NodeEditorNode* outputNode = nullptr;
+	std::mutex mutex;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

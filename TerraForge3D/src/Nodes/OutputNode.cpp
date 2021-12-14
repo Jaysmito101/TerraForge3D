@@ -42,7 +42,7 @@ OutputNode::OutputNode()
 {
     name = "Output";
     value = 0;
-    headerColor = ImColor(150, 0, 0);
+    headerColor = ImColor(OUTPUT_NODE_COLOR);
     inputPins.push_back(new NodeEditorPin());
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
 }

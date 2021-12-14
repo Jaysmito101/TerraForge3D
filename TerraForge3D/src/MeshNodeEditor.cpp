@@ -10,6 +10,13 @@
 // Nodes
 #include "Nodes/DummyNode.h"
 #include "Nodes/AddNode.h"
+#include "Nodes/SubNode.h"
+#include "Nodes/MulNode.h"
+#include "Nodes/DivNode.h"
+#include "Nodes/AbsNode.h"
+#include "Nodes/SinNode.h"
+#include "Nodes/CosNode.h"
+#include "Nodes/TanNode.h"
 #include "Nodes/MeshCoordinatesNode.h"
 #include "Nodes/OutputNode.h"
 
@@ -53,6 +60,13 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(DummyNode, "Dummy");
     NODE_MAKER_SHOW(MeshCoordinatesNode, "Mesh Coordinates");
     NODE_MAKER_SHOW(AddNode, "Add");
+    NODE_MAKER_SHOW(SubNode, "Subtract");
+    NODE_MAKER_SHOW(MulNode, "Multiply");
+    NODE_MAKER_SHOW(DivNode, "Divide");
+    NODE_MAKER_SHOW(AbsNode, "Absolute Value");
+    NODE_MAKER_SHOW(SinNode, "Sin");
+    NODE_MAKER_SHOW(CosNode, "Cos");
+    NODE_MAKER_SHOW(TanNode, "Tan");
    
 }
 
@@ -93,6 +107,13 @@ void SetupMeshNodeEditor(int* res)
         case MeshNodeEditor::MeshNodeType::Output:               node = new OutputNode(); break;
         case MeshNodeEditor::MeshNodeType::MeshCoordinates:      node = new MeshCoordinatesNode(); break;
         case MeshNodeEditor::MeshNodeType::Add:                  node = new AddNode(); break;
+        case MeshNodeEditor::MeshNodeType::Sub:                  node = new SubNode(); break;
+        case MeshNodeEditor::MeshNodeType::Mul:                  node = new MulNode(); break;
+        case MeshNodeEditor::MeshNodeType::Div:                  node = new DivNode(); break;
+        case MeshNodeEditor::MeshNodeType::Sin:                  node = new SinNode(); break;
+        case MeshNodeEditor::MeshNodeType::Cos:                  node = new CosNode(); break;
+        case MeshNodeEditor::MeshNodeType::Tan:                  node = new TanNode(); break;
+        case MeshNodeEditor::MeshNodeType::Abs:                  node = new AbsNode(); break;
         default:                                   node = nullptr; Log("Unknown Node Type!"); break;
         }
         return node;
@@ -114,7 +135,7 @@ void ShutdownMeshNodeEditor()
 
 void ShowMeshNodeEditor(bool* pOpen)
 {
-    /*
+    
     ImGui::Begin("Mesh Node Editor Debugger");
     if (ImGui::Button("Save"))
         saveVal = GetMeshNodeEditorSaveData().dump(4);
@@ -127,7 +148,7 @@ void ShowMeshNodeEditor(bool* pOpen)
     ImGui::Text(saveVal.c_str());
     ImGui::EndChild();
     ImGui::End();
-    */
+    
 
     ImGui::Begin("Mesh Node Editor", pOpen);
     if (ImGui::Button("Add Node")) 

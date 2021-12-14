@@ -1,4 +1,4 @@
-#include "AddNode.h"
+#include "DivNode.h"
 #include "Base/ImGuiShapes.h"
 #include "MeshNodeEditor.h"
 #include <iostream>
@@ -6,38 +6,42 @@
 #include <mutex>
 
 
-NodeOutput AddNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
+NodeOutput DivNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
-    float sum = 0;
+    float quo = 0;
     if (inputPins[0]->IsLinked())
-        sum += inputPins[0]->other->Evaluate(input).value;
+        quo = inputPins[0]->other->Evaluate(input).value;
     else
-        sum += value1;
+        quo = value1;
+    float tmp = 1;
     if (inputPins[1]->IsLinked())
-        sum += inputPins[1]->other->Evaluate(input).value;
+        tmp = inputPins[1]->other->Evaluate(input).value;
     else
-        sum += value2;
-    return NodeOutput({ sum });
+        tmp = value2;
+    if (tmp == 0)
+        tmp = 1;
+    quo = quo / tmp;
+    return NodeOutput({ quo });
 }
 
-void AddNode::Load(nlohmann::json data)
+void DivNode::Load(nlohmann::json data)
 {
     value1 = data["value1"];
     value2 = data["value2"];
 }
 
-nlohmann::json AddNode::Save()
+nlohmann::json DivNode::Save()
 {
     nlohmann::json data;
-    data["type"] = MeshNodeEditor::MeshNodeType::Add;
+    data["type"] = MeshNodeEditor::MeshNodeType::Div;
     data["value1"] = value1;
     data["value2"] = value2;
     return data;
 }
 
-void AddNode::OnRender()
+void DivNode::OnRender()
 {
-    DrawHeader("Add");
+    DrawHeader("Divide");
 
     inputPins[0]->Render();
     if (inputPins[0]->IsLinked())
@@ -65,12 +69,14 @@ void AddNode::OnRender()
     }    
 }
 
-AddNode::AddNode()
+DivNode::DivNode()
 {
+    headerColor = ImColor(MATH_NODE_COLOR);
+
     inputPins.push_back(new NodeEditorPin());
     inputPins.push_back(new NodeEditorPin());
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
-    headerColor = ImColor(MATH_NODE_COLOR);
-    value1 = (0.0f);
-    value2 = (0.0f);
+
+    value1 = (1.0f);
+    value2 = (1.0f);
 }

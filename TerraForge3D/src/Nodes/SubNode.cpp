@@ -1,4 +1,4 @@
-#include "AddNode.h"
+#include "SubNode.h"
 #include "Base/ImGuiShapes.h"
 #include "MeshNodeEditor.h"
 #include <iostream>
@@ -6,38 +6,38 @@
 #include <mutex>
 
 
-NodeOutput AddNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
+NodeOutput SubNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
-    float sum = 0;
+    float diff = 0;
     if (inputPins[0]->IsLinked())
-        sum += inputPins[0]->other->Evaluate(input).value;
+        diff += inputPins[0]->other->Evaluate(input).value;
     else
-        sum += value1;
+        diff += value1;
     if (inputPins[1]->IsLinked())
-        sum += inputPins[1]->other->Evaluate(input).value;
+        diff -= inputPins[1]->other->Evaluate(input).value;
     else
-        sum += value2;
-    return NodeOutput({ sum });
+        diff -= value2;
+    return NodeOutput({ diff });
 }
 
-void AddNode::Load(nlohmann::json data)
+void SubNode::Load(nlohmann::json data)
 {
     value1 = data["value1"];
     value2 = data["value2"];
 }
 
-nlohmann::json AddNode::Save()
+nlohmann::json SubNode::Save()
 {
     nlohmann::json data;
-    data["type"] = MeshNodeEditor::MeshNodeType::Add;
+    data["type"] = MeshNodeEditor::MeshNodeType::Sub;
     data["value1"] = value1;
     data["value2"] = value2;
     return data;
 }
 
-void AddNode::OnRender()
+void SubNode::OnRender()
 {
-    DrawHeader("Add");
+    DrawHeader("Subtract");
 
     inputPins[0]->Render();
     if (inputPins[0]->IsLinked())
@@ -65,7 +65,7 @@ void AddNode::OnRender()
     }    
 }
 
-AddNode::AddNode()
+SubNode::SubNode()
 {
     inputPins.push_back(new NodeEditorPin());
     inputPins.push_back(new NodeEditorPin());

@@ -1,6 +1,8 @@
 #include "NodeEditor.h"
 #include "Base/ImGuiShapes.h"
 #include "Base/UIFontManager.h"
+#include "glfw/glfw3.h"
+#include "Application.h"
 
 static int uidSeed = 1;
 
@@ -380,6 +382,26 @@ void NodeEditor::Render()
     }
     ImGuiNodeEditor::EndDelete();
 
+    ImGuiNodeEditor::NodeId sNode;
+    ImGuiNodeEditor::GetSelectedNodes(&sNode, 1);
+
+    if (ImGui::IsWindowFocused()) {
+        GLFWwindow* wind = Application::Get()->GetWindow()->GetNativeWindow();
+        if (glfwGetKey(wind, GLFW_KEY_RIGHT_SHIFT) || glfwGetKey(wind, GLFW_KEY_LEFT_SHIFT))
+        {
+            if (glfwGetKey(wind, GLFW_KEY_D) && sNode)
+            {
+                if (!(sNode.Get() == outputNode->_id.Get())) {
+                    NodeEditorNode* node = (config.insNodeFunc(nodes[sNode.Get()]->Save()));
+                    ImVec2 prePos = ImGuiNodeEditor::GetNodePosition(sNode);
+                    ImGuiNodeEditor::SetNodePosition(node->_id, ImVec2(prePos.x + 10, prePos.y + 10));
+                    ImGuiNodeEditor::DeselectNode(sNode);
+                    AddNode(node);
+                }
+            }
+        }
+    }
+
     if (config.updateFunc)
         config.updateFunc();
     ImGuiNodeEditor::End();
@@ -414,8 +436,11 @@ NodeEditor::NodeEditor(NodeEditorConfig aconfig)
 
 void NodeEditor::DeleteNode(NodeEditorNode* node)
 {
+    mutex.lock();
     if (nodes.find(node->_id.Get()) != nodes.end()) 
     {
+        using namespace std::chrono_literals; // This Line is temporary 
+        std::this_thread::sleep_for(500ms); // This Line is temporary 
         node->OnDelete();
         std::vector<NodeEditorPin*> mPins = node->GetPins();
         for (NodeEditorPin* pin : mPins) {
@@ -430,6 +455,7 @@ void NodeEditor::DeleteNode(NodeEditorNode* node)
         nodes.erase(nodes.find(node->_id.Get()));
         delete node;
     }
+    mutex.unlock();
 }
 
 NodeEditor::~NodeEditor()

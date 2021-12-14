@@ -3,6 +3,15 @@
 #include <json.hpp>
 #include "Base/NodeEditor/NodeEditor.h"
 
+// Default Node Colors
+
+#define DUMMY_NODE_COLOR          20, 31, 128
+#define MATH_NODE_COLOR           11, 99, 20
+#define VALUE_NODE_COLOR          11, 99, 90
+#define OUTPUT_NODE_COLOR         79, 9, 32
+#define NOISE_NODE_COLOR          115, 90, 17
+
+
 namespace MeshNodeEditor {
 
 	enum MeshNodePinType {

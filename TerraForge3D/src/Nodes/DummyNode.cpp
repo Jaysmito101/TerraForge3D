@@ -56,6 +56,7 @@ void DummyNode::OnRender()
 
 DummyNode::DummyNode()
 {
+    headerColor = ImColor(DUMMY_NODE_COLOR);
     inputPins.push_back(new NodeEditorPin());
     outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
 }
