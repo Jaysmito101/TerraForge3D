@@ -16,6 +16,24 @@ struct MeshNodeEditorResult {
 	float value;
 };
 
+namespace MeshNodeEditor {
+
+	enum MeshNodePinType {
+		Float = 0,
+		Boolean,
+		Vec2,
+		Vec3,
+		MeshNodePinTypeCount
+	};
+
+	enum MeshNodeType {
+		Dummy = 0,
+		Output,
+		MeshNodeTypeCount
+	};
+
+}
+
 
 // Evaluate the nodes to get the value
 MeshNodeEditorResult EvaluateMeshNodeEditor(MeshNodeEditorParam param);

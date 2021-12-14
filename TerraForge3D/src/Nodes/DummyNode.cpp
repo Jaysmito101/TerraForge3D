@@ -1,6 +1,6 @@
 #include "DummyNode.h"
 #include "Base/ImGuiShapes.h"
-
+#include "MeshNodeEditor.h"
 #include <iostream>
 
 NodeOutput DummyNode::Evaluate(NodeInputParam input)
@@ -25,7 +25,9 @@ void DummyNode::Load(nlohmann::json data)
 
 nlohmann::json DummyNode::Save()
 {
-    return nlohmann::json();
+    nlohmann::json data;
+    data["type"] = MeshNodeEditor::MeshNodeType::Dummy;
+    return data;
 }
 
 void DummyNode::OnRender()

@@ -42,6 +42,7 @@ struct NodeEditorConfig
 	std::string saveFile;
 	std::function<void(void)> updateFunc;
 	std::function<void(void)> makeNodeFunc;
+	std::function<NodeEditorNode*(nlohmann::json)> insNodeFunc;
 
 	NodeEditorConfig(std::string saveFile = "NodeEditor.terr3d");
 };
@@ -53,11 +54,11 @@ public:
 	ImGuiNodeEditor::LinkId _id;
 	NodeEditorPin* from;
 	NodeEditorPin* to;
-	NodeEditorPin* other;
 	ImVec4 color = ImVec4(1, 1, 1, 1);
 	float thickness = 1.0f;
 
 	nlohmann::json Save();
+	void Load(nlohmann::json data);
 
 	NodeEditorLink(int id = GenerateUID());
 };
@@ -71,8 +72,8 @@ public:
 	NodeEditorPin* other;
 	NodeEditorNode* parent;
 	NodeEditorPinType type;
-	ImColor color = ImColor(94, 95, 191);
-	void* userData;
+	ImU32 color = ImColor(94, 95, 191);
+	char userData[128];
 
 	virtual nlohmann::json Save();
 	virtual void Load(nlohmann::json data);
@@ -95,9 +96,9 @@ public:
 	ImGuiNodeEditor::NodeId _id;
 	std::vector<NodeEditorPin*> outputPins;
 	std::vector<NodeEditorPin*> inputPins;
-	void* userData;
+	char userData[128];
 	std::string name;
-	ImColor headerColor = ImColor(59, 29, 209);
+	ImU32 headerColor = ImColor(59, 29, 209);
 
 	virtual NodeOutput Evaluate(NodeInputParam input) = 0;
 
@@ -105,6 +106,8 @@ public:
 	virtual bool OnLink(NodeEditorPin* pin, NodeEditorLink* link);
 	virtual void OnDelete();
 
+	nlohmann::json SaveInternal();
+	void LoadInternal(nlohmann::json data);
 	virtual void Load(nlohmann::json data) = 0;
 	virtual nlohmann::json Save() = 0;
 	virtual void OnRender() = 0;
@@ -134,6 +137,9 @@ public:
 	void Render();
 	void AddNode(NodeEditorNode* node);
 	void DeleteNode(NodeEditorNode* node);
+	void DeleteLink(NodeEditorLink* link);
+	void Reset();
+	void SetOutputNode(NodeEditorNode* node);
 
 	NodeEditor(NodeEditorConfig config = NodeEditorConfig());
 	~NodeEditor();

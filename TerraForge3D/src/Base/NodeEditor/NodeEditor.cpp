@@ -38,13 +38,32 @@ NodeEditorLink::NodeEditorLink(int id)
     _id = id;
 }
 
+void NodeEditorLink::Load(nlohmann::json data)
+{
+    color.x = data["color"]["r"];
+    color.y = data["color"]["g"];
+    color.z = data["color"]["b"];
+    color.w = data["color"]["a"];
+    thickness = data["thickness"];
+    id = data["id"];
+    _id = id;
+}
+
 nlohmann::json NodeEditorPin::Save()
 {
-    return nlohmann::json();
+    nlohmann::json data;
+    data["id"] = id;
+    data["type"] = type;
+    data["color"] = color;
+    return data;
 }
 
 void NodeEditorPin::Load(nlohmann::json data)
 {
+    id = data["id"];
+    _id = id;
+    type = data["type"];
+    color = data["color"];
 }
 
 void NodeEditorPin::Begin()
@@ -61,6 +80,8 @@ void NodeEditorPin::End()
 bool NodeEditorPin::ValidateLink(NodeEditorLink* lnk)
 {
     if (link)
+        return false;
+    if (lnk->from->parent->id == lnk->to->parent->id)
         return false;
     if (lnk->from->type == lnk->to->type)
         return false;
@@ -166,6 +187,42 @@ void NodeEditorNode::DrawHeader(std::string text)
     ImGui::NewLine();
 }
 
+void NodeEditorNode::LoadInternal(nlohmann::json data)
+{
+    name = data["name"];
+    headerColor = data["headerColor"];
+    id = data["id"];
+    _id = id;
+    for (nlohmann::json pns : data["inputPins"])
+        inputPins[pns["index"]]->Load(pns);
+    for (nlohmann::json pns : data["outputPins"])
+        outputPins[pns["index"]]->Load(pns);
+    Load(data);
+}
+
+nlohmann::json NodeEditorNode::SaveInternal()
+{
+    nlohmann::json data = Save();
+    data["name"] = name;
+    data["headerColor"] = headerColor;
+    data["id"] = id;
+    nlohmann::json tmp, tmp2;
+    for (int i = 0; i < inputPins.size(); i++) {
+        tmp2 = inputPins[i]->Save();
+        tmp2["index"] = i;
+        tmp.push_back(tmp2);
+    }
+    data["inputPins"] = tmp;
+    tmp.clear();
+    for (int i = 0; i < outputPins.size(); i++) {
+        tmp2 = outputPins[i]->Save();
+        tmp2["index"] = i;
+        tmp.push_back(tmp2);
+    }
+    data["outputPins"] = tmp;
+    return data;
+}
+
 void NodeEditorNode::Setup()
 {
     for (NodeEditorPin* pin : inputPins)
@@ -181,7 +238,8 @@ nlohmann::json NodeEditor::Save()
    data["serializer"] = "Node Serializer v2.0";
    nlohmann::json tmp;
    for (auto& it : nodes) {
-       tmp.push_back(it.second->Save());
+       if(it.second->name != "Output")
+           tmp.push_back(it.second->SaveInternal());
    }
    data["nodes"] = tmp;
    tmp = nlohmann::json();
@@ -189,12 +247,36 @@ nlohmann::json NodeEditor::Save()
        tmp.push_back(it.second->Save());
    }
    data["links"] = tmp;
+   data["uidSeed"] = GenerateUID();
    return data;
 }
 
 void NodeEditor::Load(nlohmann::json data)
 {
-    // TODO
+    if (!config.insNodeFunc)
+        throw std::runtime_error("Node Instantiate Function Not Found!");
+    Reset();
+    SeUIDSeed(data["uidSeed"]);
+    for (nlohmann::json ndata : data["nodes"])
+    {
+        NodeEditorNode* nd = (config.insNodeFunc(ndata));
+        nd->LoadInternal(ndata);
+        AddNode(nd);
+    }
+
+    for (nlohmann::json ldata : data["links"])
+    {
+        NodeEditorLink* lnk = new NodeEditorLink();
+        lnk->Load(ldata);
+        ImGuiNodeEditor::PinId fromId, toId;
+        fromId = (int)ldata["from"];
+        toId = (int)ldata["to"];
+        lnk->from = pins[fromId.Get()];
+        lnk->to = pins[toId.Get()];
+        lnk->from->Link(lnk);
+        lnk->to->Link(lnk);
+        links[lnk->_id.Get()] = lnk;
+    }
 }
 
 void NodeEditor::Render()
@@ -207,6 +289,7 @@ void NodeEditor::Render()
     {
         it.second->Render();
     }
+    outputNode->Render();
 
     for (auto& it : links)
     {
@@ -235,11 +318,14 @@ void NodeEditor::Render()
                 }
             }
             else if(iPid) {
-                NodeEditorLink* link = links[iPid.Get()];
-                link->from->link = nullptr;
-                link->to->link = nullptr;
-                links.erase(links.find(iPid.Get()));
-                delete link;
+                NodeEditorPin* pin = pins[iPid.Get()];
+                if(pin->IsLinked())
+                    DeleteLink(pin->link);
+            }
+            else if (oPid) {
+                NodeEditorPin* pin = pins[oPid.Get()];
+                if (pin->IsLinked())
+                    DeleteLink(pin->link);
             }
         }
 
@@ -248,8 +334,9 @@ void NodeEditor::Render()
         {
             if (ImGuiNodeEditor::AcceptNewItem())
             {
-                NodeEditorPin* iPin = pins[nPid.Get()];
-                config.makeNodeFunc();
+                NodeEditorPin* pin = pins[nPid.Get()];
+                if (pin->IsLinked())
+                    DeleteLink(pin->link);
             }
         }
     }
@@ -274,10 +361,7 @@ void NodeEditor::Render()
                 if (lId && ImGuiNodeEditor::AcceptDeletedItem())
                 {
                     NodeEditorLink* link = links[lId.Get()];
-                    link->from->link = nullptr;
-                    link->to->link = nullptr;
-                    links.erase(links.find(lId.Get()));
-                    delete link;
+                    DeleteLink(link);
                 }
             }
         }
@@ -290,12 +374,17 @@ void NodeEditor::Render()
     ImGuiNodeEditor::SetCurrentEditor(nullptr);
 }
 
+void NodeEditor::DeleteLink(NodeEditorLink* link)
+{
+    link->from->link = nullptr;
+    link->to->link = nullptr;
+    links.erase(links.find(link->_id.Get()));
+    delete link;
+}
+
 void NodeEditor::AddNode(NodeEditorNode* node)
 {
-    if (node->name == "Output" && outputNode)
-        return;
     nodes[node->_id.Get()] = node;
-    outputNode = node;
     for (auto& it : node->GetPins()) 
     {
         pins[it->_id.Get()] = it;
@@ -313,8 +402,6 @@ NodeEditor::NodeEditor(NodeEditorConfig aconfig)
 
 void NodeEditor::DeleteNode(NodeEditorNode* node)
 {
-    if (node->name == "Output")
-        return;
     if (nodes.find(node->_id.Get()) != nodes.end()) 
     {
         node->OnDelete();
@@ -337,6 +424,32 @@ NodeEditor::~NodeEditor()
 {
     ImGuiNodeEditor::DestroyEditor(context);
 }
+
+void NodeEditor::Reset()
+{
+    // Clear Up Node Editor
+    int size = 0;
+    std::unordered_map<uintptr_t, NodeEditorNode*> nodesc = nodes;
+    for (auto& it : nodesc)
+        DeleteNode(it.second);
+    NodeEditorNode* node = outputNode;
+    for (auto& it : node->GetPins())
+    {
+        pins[it->_id.Get()] = it;
+    }
+    node->Setup();
+}
+
+void NodeEditor::SetOutputNode(NodeEditorNode* node)
+{
+    outputNode = node;
+    for (auto& it : node->GetPins())
+    {
+        pins[it->_id.Get()] = it;
+    }
+    node->Setup();
+}
+
 
 NodeEditorConfig::NodeEditorConfig(std::string saveFile)
     :saveFile(saveFile)

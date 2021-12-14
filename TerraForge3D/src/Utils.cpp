@@ -11,6 +11,8 @@
 #include <sys/stat.h>
 #include  <stdio.h>
 #include  <stdlib.h>
+#include "glfw/glfw3.h"
+#include "Application.h"
 
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
@@ -416,4 +418,9 @@ void CopyFileData(std::string source, std::string destination)
 	close(fdest);
 	free(data);
 #endif
+}
+
+bool IsKeyDown(int key)
+{
+	return glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), key);
 }
