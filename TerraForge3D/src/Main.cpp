@@ -12,6 +12,7 @@
 #include <TextureSettings.h>
 #include <ViewportFramebuffer.h>
 #include <AppShaderEditor.h>
+#include <UIFontManager.h>
 #include <ProjectData.h>
 #include <OSLiscenses.h>
 #include <ExportTexture.h>
@@ -328,6 +329,8 @@ static void FillMeshData() {
 			s_Stats.vertCount = terrain.mesh->vertexCount;
 			textureScaleO = textureScale;
 		}
+
+		
 
 		for (int y = 0; y < resolution; y++)
 		{
@@ -1787,6 +1790,11 @@ public:
 		SetupFiltersManager(&autoUpdate, &terrain);
 		SetupTextureSettings(&reqTexRfrsh, &textureScale, &terrain);
 		SetupSky();
+
+		// Load Fonts
+
+		LoadUIFont("Open-Sans-Regular", 18, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Regular.ttf");
+		LoadUIFont("Ostrich-Sans", 13, GetExecutableDir() + "\\Data\\fonts\\OstrichSans-Heavy.ttf");
 
 
 		waterDudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");

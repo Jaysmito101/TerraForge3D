@@ -1,5 +1,6 @@
 #include "NodeEditor.h"
 #include "Base/ImGuiShapes.h"
+#include "Base/UIFontManager.h"
 
 static int uidSeed = 1;
 
@@ -133,6 +134,15 @@ void NodeEditorPin::Unlink()
     link = nullptr;
 }
 
+NodeOutput NodeEditorPin::Evaluate(NodeInputParam input)
+{
+    mutex.lock();
+    NodeOutput o = parent->Evaluate(input, this);
+    mutex.unlock();
+    return o;
+
+}
+
 std::vector<NodeEditorPin*> NodeEditorNode::GetPins()
 {
     std::vector<NodeEditorPin*> pins;
@@ -183,12 +193,15 @@ void NodeEditorNode::DrawHeader(std::string text)
     
     ImGui::DrawFilledRect(ImVec2(start.x, 40), headerColor, 13);
     ImGui::SetCursorPos(ImVec2(pos.x + ImGuiNodeEditor::GetStyle().NodePadding.x, pos.y + ImGuiNodeEditor::GetStyle().NodePadding.x));
+    ImGui::PushFont(GetUIFont("Ostrich-Sans"));
     ImGui::Text(text.c_str());
+    ImGui::PopFont();
     ImGui::NewLine();
 }
 
 void NodeEditorNode::LoadInternal(nlohmann::json data)
 {
+    Load(data);
     name = data["name"];
     headerColor = data["headerColor"];
     id = data["id"];
@@ -197,7 +210,6 @@ void NodeEditorNode::LoadInternal(nlohmann::json data)
         inputPins[pns["index"]]->Load(pns);
     for (nlohmann::json pns : data["outputPins"])
         outputPins[pns["index"]]->Load(pns);
-    Load(data);
 }
 
 nlohmann::json NodeEditorNode::SaveInternal()

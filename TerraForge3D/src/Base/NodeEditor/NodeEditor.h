@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <iterator>
 #include <functional>
+#include <mutex>
 
 namespace ImGuiNodeEditor = ax::NodeEditor;
 
@@ -72,6 +73,7 @@ public:
 	NodeEditorPin* other;
 	NodeEditorNode* parent;
 	NodeEditorPinType type;
+	std::mutex mutex;
 	ImU32 color = ImColor(94, 95, 191);
 	char userData[128];
 
@@ -84,6 +86,8 @@ public:
 	bool IsLinked();
 	void Unlink();
 	void Render();
+	NodeOutput Evaluate(NodeInputParam input);
+
 
 	NodeEditorPin(NodeEditorPinType type = NodeEditorPinType::Input, int id = GenerateUID());
 	~NodeEditorPin();
@@ -99,9 +103,9 @@ public:
 	char userData[128];
 	std::string name;
 	ImU32 headerColor = ImColor(59, 29, 209);
+	std::mutex m;
 
-	virtual NodeOutput Evaluate(NodeInputParam input) = 0;
-
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin) = 0;
 	virtual std::vector<NodeEditorPin*> GetPins();
 	virtual bool OnLink(NodeEditorPin* pin, NodeEditorLink* link);
 	virtual void OnDelete();

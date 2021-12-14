@@ -193,6 +193,12 @@ ViewportId=0x213F919C
 Size=285,370
 Collapsed=0
 
+[Window][Mesh Node Editor]
+Pos=582,23
+Size=784,434
+Collapsed=0
+DockId=0x0000000F,0
+
 [Table][0xD0F0C6E3,2]
 Column 0  Weight=1.0000
 Column 1  Weight=1.0000
@@ -210,7 +216,7 @@ DockSpace           ID=0x3BC79352 Window=0x4647B76E Pos=0,46 Size=1366,682 Split
         DockNode    ID=0x00000007 Parent=0x00000003 SizeRef=250,344 Selected=0xAD8E88F2
   DockNode          ID=0x00000004 Parent=0x3BC79352 SizeRef=784,461 Split=Y Selected=0x995B0CF8
     DockNode        ID=0x00000005 Parent=0x00000004 SizeRef=160,434 Split=X Selected=0xF498C204
-      DockNode      ID=0x0000000F Parent=0x00000005 SizeRef=370,525 CentralNode=1 Selected=0x929E0302
+      DockNode      ID=0x0000000F Parent=0x00000005 SizeRef=370,525 CentralNode=1 Selected=0xE88D3F1B
       DockNode      ID=0x00000010 Parent=0x00000005 SizeRef=412,525 Selected=0xD47684FE
     DockNode        ID=0x00000008 Parent=0x00000004 SizeRef=160,246 Split=X Selected=0x6C0FE6DB
       DockNode      ID=0x0000000D Parent=0x00000008 SizeRef=394,360 Selected=0x6C0FE6DB

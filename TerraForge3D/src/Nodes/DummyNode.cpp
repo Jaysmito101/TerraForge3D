@@ -3,7 +3,7 @@
 #include "MeshNodeEditor.h"
 #include <iostream>
 
-NodeOutput DummyNode::Evaluate(NodeInputParam input)
+NodeOutput DummyNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
     return NodeOutput();
 }

@@ -1,20 +1,7 @@
 #pragma once
 
 #include <json.hpp>
-
-/*
-* A struct to hold parameters to the mesh node editor.
-* 
-*/
-struct MeshNodeEditorParam{
-	float x;
-	float y;
-	float z;
-};
-
-struct MeshNodeEditorResult {
-	float value;
-};
+#include "Base/NodeEditor/NodeEditor.h"
 
 namespace MeshNodeEditor {
 
@@ -29,6 +16,15 @@ namespace MeshNodeEditor {
 	enum MeshNodeType {
 		Dummy = 0,
 		Output,
+		MeshCoordinates,
+		Add,
+		Sub,
+		Mul,
+		Div,
+		Sin,
+		Cos,
+		Tan,
+		Abs,
 		MeshNodeTypeCount
 	};
 
@@ -36,7 +32,7 @@ namespace MeshNodeEditor {
 
 
 // Evaluate the nodes to get the value
-MeshNodeEditorResult EvaluateMeshNodeEditor(MeshNodeEditorParam param);
+NodeOutput EvaluateMeshNodeEditor(NodeInputParam param);
 
 // Serialize Node data
 nlohmann::json GetMeshNodeEditorSaveData();

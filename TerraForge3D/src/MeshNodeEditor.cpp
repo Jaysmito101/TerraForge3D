@@ -9,12 +9,15 @@
 
 // Nodes
 #include "Nodes/DummyNode.h"
+#include "Nodes/AddNode.h"
+#include "Nodes/MeshCoordinatesNode.h"
 #include "Nodes/OutputNode.h"
 
 #include <iostream>
+#include <mutex>
 
-#define NODE_MAKER_COND(x) length == 0 || stristr4(data, x) 
-#define NODE_MAKER_SHOW(x) if(ImGui::Button(#x)){editor->AddNode(new x()); ImGui::CloseCurrentPopup();}
+#define NODE_MAKER_COND(x) length == 0 || stristr4(x, data) 
+#define NODE_MAKER_SHOW(x, y) if (NODE_MAKER_COND(y)) {if (ImGui::Button(y)) { editor->AddNode(new x()); ImGui::CloseCurrentPopup(); } }
 
 static char* stristr4(const char* str, const char* pattern) {
     size_t i;
@@ -38,6 +41,7 @@ static char* stristr4(const char* str, const char* pattern) {
 static int* resolution;
 static NodeEditor* editor;
 static std::string saveVal;
+static std::mutex m;
 
 static void ShowNodeMaker() 
 {
@@ -46,24 +50,20 @@ static void ShowNodeMaker()
     ImGui::InputTextWithHint("##SearchMeshNodes", "Search ...", data, sizeof(data));
     int length = strlen(data);
 
-    if (NODE_MAKER_COND("Dummy")) {
-        NODE_MAKER_SHOW(DummyNode);
-    }
-    else if (NODE_MAKER_COND("Add")) {
-        ImGui::CloseCurrentPopup();
-    }
+    NODE_MAKER_SHOW(DummyNode, "Dummy");
+    NODE_MAKER_SHOW(MeshCoordinatesNode, "Mesh Coordinates");
+    NODE_MAKER_SHOW(AddNode, "Add");
+   
 }
 
-MeshNodeEditorResult EvaluateMeshNodeEditor(MeshNodeEditorParam param)
+NodeOutput EvaluateMeshNodeEditor(NodeInputParam param)
 {
-    NodeInputParam iParam;
-    iParam.x = param.x;
-    iParam.y = param.y;
-    iParam.z = param.z;
-    MeshNodeEditorResult res;
-    if(editor->outputNode)
-        res.value = editor->outputNode->Evaluate(iParam).value;
-    return res;
+    m.lock();
+    NodeOutput o;
+    if(editor && editor->outputNode)
+        o = editor->outputNode->Evaluate(param, nullptr);
+    m.unlock();
+    return o;
 }
 
 nlohmann::json GetMeshNodeEditorSaveData()
@@ -89,8 +89,10 @@ void SetupMeshNodeEditor(int* res)
         MeshNodeEditor::MeshNodeType type = (MeshNodeEditor::MeshNodeType)data["type"];
         switch (type)
         {
-        case MeshNodeEditor::Dummy:                node = new DummyNode(); break;
-        case MeshNodeEditor::Output:               node = new OutputNode(); break;
+        case MeshNodeEditor::MeshNodeType::Dummy:                node = new DummyNode(); break;
+        case MeshNodeEditor::MeshNodeType::Output:               node = new OutputNode(); break;
+        case MeshNodeEditor::MeshNodeType::MeshCoordinates:      node = new MeshCoordinatesNode(); break;
+        case MeshNodeEditor::MeshNodeType::Add:                  node = new AddNode(); break;
         default:                                   node = nullptr; Log("Unknown Node Type!"); break;
         }
         return node;
@@ -112,6 +114,7 @@ void ShutdownMeshNodeEditor()
 
 void ShowMeshNodeEditor(bool* pOpen)
 {
+    /*
     ImGui::Begin("Mesh Node Editor Debugger");
     if (ImGui::Button("Save"))
         saveVal = GetMeshNodeEditorSaveData().dump(4);
@@ -124,6 +127,7 @@ void ShowMeshNodeEditor(bool* pOpen)
     ImGui::Text(saveVal.c_str());
     ImGui::EndChild();
     ImGui::End();
+    */
 
     ImGui::Begin("Mesh Node Editor", pOpen);
     if (ImGui::Button("Add Node")) 
@@ -141,7 +145,7 @@ void ShowMeshNodeEditor(bool* pOpen)
     
     if(ImGui::BeginPopup("NodeMakerDropped"))
     {
-        ImGui::BeginChild("MNDMP", ImVec2(150, 200));
+        ImGui::BeginChild("MNDMP", ImVec2(200, 250));
         ShowNodeMaker();
         ImGui::EndChild();
         if (ImGui::Button("Close"))

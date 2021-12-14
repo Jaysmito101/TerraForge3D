@@ -6,7 +6,7 @@ class DummyNode : public NodeEditorNode {
 public:
 
 
-	virtual NodeOutput Evaluate(NodeInputParam input);
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin);
 	virtual bool OnLink(NodeEditorPin* pin, NodeEditorLink* link);
 	virtual void OnDelete();
 
