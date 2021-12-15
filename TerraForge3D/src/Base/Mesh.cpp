@@ -97,6 +97,7 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 	minHeight = 100;
 	res = resolution;
 	sc = scale;
+	texSc = textureScale;
 	Vert* vertices = new Vert[resolution * resolution];
 	int* inds = new int[(resolution-1) * (resolution-1) * 6];
 	int triIndex = 0;
@@ -186,6 +187,17 @@ void Mesh::AddElevation(float elevation, int x, int y){
 	if (i > vertexCount)
 		return;
 	vert[i].position.y += elevation;
+}
+
+glm::vec2 Mesh::GetTexCoord(float x, float y, float z)
+{
+	if (currType == MeshType::Plane)
+	{
+		return (glm::vec2(x, y) / ((float)res - 1)) * texSc;
+	}
+	else {
+		return glm::vec2(1.0f);
+	}
 }
 
 Mesh* Mesh::Clone()

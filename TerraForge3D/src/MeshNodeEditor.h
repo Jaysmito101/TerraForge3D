@@ -9,7 +9,10 @@
 #define MATH_NODE_COLOR           11, 99, 20
 #define VALUE_NODE_COLOR          11, 99, 90
 #define OUTPUT_NODE_COLOR         79, 9, 32
+#define OP_NODE_COLOR             39, 0, 87
+#define IMAGE_NODE_COLOR          143, 95, 0
 #define NOISE_NODE_COLOR          115, 90, 17
+
 
 
 namespace MeshNodeEditor {
@@ -34,6 +37,14 @@ namespace MeshNodeEditor {
 		Cos,
 		Tan,
 		Abs,
+		Blend,
+		Curve,
+		NoiseOpenSimplex2,
+		NoiseOpenSimplex2S,
+		NoiseCellular,
+		NoisePerlin,
+		NoiseValueCubic,
+		NoiseValue,
 		MeshNodeTypeCount
 	};
 

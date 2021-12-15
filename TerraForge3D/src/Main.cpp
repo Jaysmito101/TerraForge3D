@@ -338,8 +338,13 @@ static void FillMeshData() {
 			{
 				if (noiseBased)
 					terrain.mesh->SetElevation(noise(x, y), x, y);
-				else
-					terrain.mesh->SetElevation(EvaluateMeshNodeEditor({(float)x, (float)y, 0.0f}).value, x, y);
+				else {
+					float pos[3] = { (float)x, (float)y, 0.0f };
+					float texCoord[2] = { (float)x / (resolution - 1), (float)y / (resolution - 1) };
+					float minPos[3] = {0, 0, 0};
+					float maxPos[3] = {256, 256, 0};
+					terrain.mesh->SetElevation(EvaluateMeshNodeEditor(NodeInputParam(pos, texCoord, minPos, maxPos)).value, x, y);
+				}
 			}
 		}
 
@@ -1794,7 +1799,7 @@ public:
 		// Load Fonts
 
 		LoadUIFont("Open-Sans-Regular", 18, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Regular.ttf");
-		LoadUIFont("Ostrich-Sans", 13, GetExecutableDir() + "\\Data\\fonts\\OstrichSans-Heavy.ttf");
+		LoadUIFont("OpenSans-Bold", 25, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Bold.ttf");
 
 
 		waterDudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");

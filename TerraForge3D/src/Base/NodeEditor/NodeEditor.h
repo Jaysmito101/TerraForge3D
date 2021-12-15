@@ -10,6 +10,9 @@
 #include <functional>
 #include <mutex>
 
+#define MAKE_IMGUI_ID(x) ("##" + std::to_string(x)).c_str()
+#define MAKE_IMGUI_LABEL(x, y) (y + std::string("##") + std::to_string(x)).c_str()
+
 namespace ImGuiNodeEditor = ax::NodeEditor;
 
 enum NodeEditorPinType
@@ -29,6 +32,19 @@ struct NodeInputParam
 	float x;
 	float y;
 	float z;
+
+	float texX;
+	float texY;
+
+	float minX;
+	float minY;
+	float minZ;
+
+	float maxX;
+	float maxY;
+	float maxZ;
+
+	NodeInputParam(float* pos, float* texCoord, float* minPos, float* maxPos);
 };
 
 
@@ -148,4 +164,7 @@ public:
 
 	NodeEditor(NodeEditorConfig config = NodeEditorConfig());
 	~NodeEditor();
+
+private:
+	ImGuiNodeEditor::NodeId lastNodeId;
 };

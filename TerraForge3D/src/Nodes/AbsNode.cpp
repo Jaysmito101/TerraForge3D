@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <mutex>
-
+#include "Base/ImGuiCurveEditor.h"
 
 NodeOutput AbsNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {

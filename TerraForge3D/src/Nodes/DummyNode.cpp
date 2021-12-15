@@ -51,7 +51,6 @@ void DummyNode::OnRender()
     tmp = outputPins[0]->IsLinked();
     ImGui::Text("Out Pin : "); ImGui::SameLine(); ImGui::Checkbox(("##" + std::to_string(inputPins[0]->id)).c_str(), &tmp);
     ImGui::Text(("ID : " + std::to_string(outputPins[0]->id)).c_str());
-
 }
 
 DummyNode::DummyNode()

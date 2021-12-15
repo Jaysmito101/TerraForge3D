@@ -193,9 +193,9 @@ void NodeEditorNode::DrawHeader(std::string text)
     ImGui::SetCursorPos(ImVec2(pos.x - ImGuiNodeEditor::GetStyle().NodePadding.x, pos.y - ImGuiNodeEditor::GetStyle().NodePadding.y));
     ImVec2 start = ImGuiNodeEditor::GetNodeSize(_id);
     
-    ImGui::DrawFilledRect(ImVec2(start.x, 40), headerColor, 13);
+    ImGui::DrawFilledRect(ImVec2(start.x, 60), headerColor, 13);
     ImGui::SetCursorPos(ImVec2(pos.x + ImGuiNodeEditor::GetStyle().NodePadding.x, pos.y + ImGuiNodeEditor::GetStyle().NodePadding.x));
-    ImGui::PushFont(GetUIFont("Ostrich-Sans"));
+    ImGui::PushFont(GetUIFont("OpenSans-Bold"));
     ImGui::Text(text.c_str());
     ImGui::PopFont();
     ImGui::NewLine();
@@ -351,6 +351,8 @@ void NodeEditor::Render()
                 NodeEditorPin* pin = pins[nPid.Get()];
                 if (pin->IsLinked())
                     DeleteLink(pin->link);
+                else
+                    config.makeNodeFunc();
             }
         }
     }
@@ -363,8 +365,10 @@ void NodeEditor::Render()
         {
             if (nId && ImGuiNodeEditor::AcceptDeletedItem())
             {
-                NodeEditorNode* node = nodes[nId.Get()];
-                DeleteNode(node);
+                if (!(outputNode && nId == outputNode->_id)) {
+                    NodeEditorNode* node = nodes[nId.Get()];
+                    DeleteNode(node);
+                }
             }
         }
         else
@@ -424,6 +428,8 @@ void NodeEditor::AddNode(NodeEditorNode* node)
         pins[it->_id.Get()] = it;
     }
     node->Setup();
+    
+    lastNodeId = node->_id;
 }
 
 NodeEditor::NodeEditor(NodeEditorConfig aconfig)
@@ -492,4 +498,22 @@ void NodeEditor::SetOutputNode(NodeEditorNode* node)
 NodeEditorConfig::NodeEditorConfig(std::string saveFile)
     :saveFile(saveFile)
 {
+}
+
+NodeInputParam::NodeInputParam(float* pos, float* texCoord, float* minPos, float* maxPos)
+{
+    x = pos[0];
+    y = pos[1];
+    z = pos[2];
+
+    texX = texCoord[0];
+    texY = texCoord[1];
+
+    minX = minPos[0];
+    minY = minPos[1];
+    minZ = minPos[2];
+
+    maxX = maxPos[0];
+    maxY = maxPos[1];
+    maxZ = maxPos[2];
 }

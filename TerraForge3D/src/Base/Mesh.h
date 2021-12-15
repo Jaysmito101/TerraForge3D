@@ -33,7 +33,9 @@ public:
 
 	void AddElevation(float elevation, int x, int y);
 
-	glm::vec3 Mesh::GetNormals(int x, int y);
+	glm::vec2 GetTexCoord(float x, float y, float z);
+
+	glm::vec3 GetNormals(int x, int y);
 
 	Mesh* Clone();
 
@@ -45,6 +47,7 @@ public:
 	int indexCount;
 	int res;
 	float sc;
+	float texSc;
 	float maxHeight = -100;
 	float minHeight = 100;
 	bool deleteOnDestruction = true;

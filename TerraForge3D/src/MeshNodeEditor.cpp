@@ -17,6 +17,14 @@
 #include "Nodes/SinNode.h"
 #include "Nodes/CosNode.h"
 #include "Nodes/TanNode.h"
+#include "Nodes/BlendNode.h"
+#include "Nodes/CurveNode.h"
+#include "Nodes/NoisePerlinNode.h"
+#include "Nodes/NoiseCellularNode.h"
+#include "Nodes/NoiseValueNode.h"
+#include "Nodes/NoiseValueCubicNode.h"
+#include "Nodes/NoiseOpenSimplex2Node.h"
+#include "Nodes/NoiseOpenSimplex2SNode.h"
 #include "Nodes/MeshCoordinatesNode.h"
 #include "Nodes/OutputNode.h"
 
@@ -52,8 +60,7 @@ static std::mutex m;
 
 static void ShowNodeMaker() 
 {
-    char data[1000];
-    memset(data, 0, 1000);
+    static char data[1000];
     ImGui::InputTextWithHint("##SearchMeshNodes", "Search ...", data, sizeof(data));
     int length = strlen(data);
 
@@ -67,6 +74,15 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(SinNode, "Sin");
     NODE_MAKER_SHOW(CosNode, "Cos");
     NODE_MAKER_SHOW(TanNode, "Tan");
+    NODE_MAKER_SHOW(AbsNode, "Absolute Value");
+    NODE_MAKER_SHOW(BlendNode, "Blend");
+    NODE_MAKER_SHOW(CurveNode, "Curve Editor");
+    NODE_MAKER_SHOW(NoisePerlinNode, "Perlin Noise");
+    NODE_MAKER_SHOW(NoiseCellularNode, "Cellular Noise");
+    NODE_MAKER_SHOW(NoiseValueNode, "Value Noise");
+    NODE_MAKER_SHOW(NoiseOpenSimplex2Node, "Open Simplex 2 Noise");
+    NODE_MAKER_SHOW(NoiseOpenSimplex2SNode, "Open Simplex 2S Noise");
+    NODE_MAKER_SHOW(NoiseValueCubicNode, "Value Cubic Noise");
    
 }
 
@@ -96,7 +112,9 @@ void SetupMeshNodeEditor(int* res)
     NodeEditorConfig config;
     config.saveFile = GetExecutableDir() + "\\Data\\configs\\meshnodeeditorconfigs.terr3d";
     config.makeNodeFunc = [&]() {
+        ImGuiNodeEditor::Suspend();
         ImGui::OpenPopup("NodeMakerDropped");
+        ImGuiNodeEditor::Resume();
     };
     config.insNodeFunc = [&](nlohmann::json data) -> NodeEditorNode* {
         NodeEditorNode* node;
@@ -114,6 +132,14 @@ void SetupMeshNodeEditor(int* res)
         case MeshNodeEditor::MeshNodeType::Cos:                  node = new CosNode(); break;
         case MeshNodeEditor::MeshNodeType::Tan:                  node = new TanNode(); break;
         case MeshNodeEditor::MeshNodeType::Abs:                  node = new AbsNode(); break;
+        case MeshNodeEditor::MeshNodeType::Blend:                node = new BlendNode(); break;
+        case MeshNodeEditor::MeshNodeType::Curve:                node = new CurveNode(); break;
+        case MeshNodeEditor::MeshNodeType::NoisePerlin:          node = new NoisePerlinNode(); break;
+        case MeshNodeEditor::MeshNodeType::NoiseCellular:        node = new NoiseCellularNode(); break;
+        case MeshNodeEditor::MeshNodeType::NoiseOpenSimplex2:    node = new NoiseOpenSimplex2Node(); break;
+        case MeshNodeEditor::MeshNodeType::NoiseOpenSimplex2S:   node = new NoiseOpenSimplex2SNode(); break;
+        case MeshNodeEditor::MeshNodeType::NoiseValue:           node = new NoiseValueNode(); break;
+        case MeshNodeEditor::MeshNodeType::NoiseValueCubic:      node = new NoiseValueCubicNode(); break;
         default:                                   node = nullptr; Log("Unknown Node Type!"); break;
         }
         return node;
