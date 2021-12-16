@@ -55,6 +55,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
+#include "NoiseLayers/LayeredNoiseManager.h"
 
 
 #include <AppStructs.h>
@@ -71,8 +72,7 @@ static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * tex
 static Camera camera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
-static std::vector<NoiseLayer> noiseLayers;
-static std::vector<NoiseLayer> noiseLayersTmp;
+static LayeredNoiseManager* noiseGen;
 static const char* noiseTypes[] = { "Simplex Perlin", "Random", "Cellular" };
 static const char* baseShapes[] = { "Plane", "Icosphere"};
 static char* currentBaseShape = (char*)noiseTypes[0];
@@ -255,49 +255,6 @@ static void ShowLightingControls() {
 	ImGui::End();
 }
 
-static float EvaluateNoiseLayer(float x, float y, float z, NoiseLayer& noiseLayer) {
-	if (!noiseLayer.enabled)
-		return 0.0f;
-	float baseNoise = 0;
-	float offsetX = noiseLayer.offsetX + nLOffsetX;
-	float offsetY = noiseLayer.offsetY + nLOffsetY;
-	float offsetZ = noiseLayer.offsetZ + nLOffsetZ;
-
-	try {
-		if (strcmp(noiseLayer.noiseType, "Simplex Perlin") == 0) {
-			baseNoise = SimplexNoise::noise((x / resolution) * noiseLayer.scale + offsetX, (y / resolution) * noiseLayer.scale + offsetY, (z / resolution) * noiseLayer.scale + offsetZ) * noiseLayer.strength;
-		}
-		else if (strcmp(noiseLayer.noiseType, "Random") == 0) {
-			return (rand()) * noiseLayer.strength * 0.0001f;
-		}
-		else if (strcmp(noiseLayer.noiseType, "Cellular") == 0) {
-			m_NoiseGen.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-			baseNoise = m_NoiseGen.GetNoise((x / 1) * noiseLayer.scale + offsetX, (y / 1) * noiseLayer.scale + offsetY, (z / resolution) * noiseLayer.scale + offsetZ) * noiseLayer.strength;
-		}
-	}
-	catch (...) {
-		baseNoise = 0.0f;
-	}
-	return baseNoise;
-}
-
-static float noise(float x, float y, float z = 0) {
-	float noise = 0;
-	for (NoiseLayer& nl : noiseLayers) {
-		noise += EvaluateNoiseLayer(x, y, z, nl);
-	}
-	if (flattenBase) {
-		noise = MAX(0, noise);
-	}
-	if (absolute) {
-		noise = abs(noise);
-	}
-	if (square) {
-		noise *= noise;
-	}
-	return noise * noiseStrength;
-}
-
 static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
 	glDeleteBuffers(1, &a);
 	glDeleteBuffers(1, &b);
@@ -337,7 +294,7 @@ static void FillMeshData() {
 			for (int x = 0; x < resolution; x++)
 			{
 				if (noiseBased)
-					terrain.mesh->SetElevation(noise(x, y), x, y);
+					terrain.mesh->SetElevation(noiseGen->Evaluate(x, y, 0), x, y);
 				else {
 					float pos[3] = { (float)x, (float)y, 0.0f };
 					float texCoord[2] = { (float)x / (resolution - 1), (float)y / (resolution - 1) };
@@ -591,65 +548,11 @@ static void ShowTerrainControls()
 	ImGui::End();
 }
 
-static void ShowNoiseLayer(NoiseLayer& noiseLayer, int id) {
-	bool state = ImGui::CollapsingHeader((std::string("##noiseLayerName") + std::to_string(id)).c_str());
-	ImGui::SameLine();
-	ImGui::Text(noiseLayer.name);
-	if (state) {
-		ImGui::InputText((std::string("##") + std::to_string(id)).c_str(), (noiseLayer.name), 256);
-		ImGui::Checkbox((std::string("Enabled##") + std::to_string(id)).c_str(), &(noiseLayer.enabled));
-		ImGui::Text("Noise Type");
-		if (ImGui::BeginCombo((std::string("##noiseType") + std::to_string(id)).c_str(), noiseLayer.noiseType))
-		{
-			for (int i = 0; i < numberOfNoiseTypes; i++)
-			{
-				bool is_selected = (noiseLayer.noiseType == noiseTypes[i]);
-				if (ImGui::Selectable(noiseTypes[i], is_selected)) {
-					memset(noiseLayer.noiseType, 0, 1024);
-					strcpy(noiseLayer.noiseType, noiseTypes[i]);
-					if (is_selected)
-						ImGui::SetItemDefaultFocus();
-				}
-			}
-			ImGui::EndCombo();
-		}
-		ImGui::DragFloat((std::string("Scale##") + std::to_string(id)).c_str(), &(noiseLayer.scale), 0.01f, -200.0f, 200.0f);
-		ImGui::DragFloat((std::string("Strength##") + std::to_string(id)).c_str(), &(noiseLayer.strength), 0.001f);
-		ImGui::DragFloat((std::string("Offset X##") + std::to_string(id)).c_str(), &(noiseLayer.offsetX), 0.01f);
-		ImGui::DragFloat((std::string("Offset Y##") + std::to_string(id)).c_str(), &(noiseLayer.offsetY), 0.01f);
-		ImGui::DragFloat((std::string("Offset Z##") + std::to_string(id)).c_str(), &(noiseLayer.offsetZ), 0.01f);
-		if (ImGui::Button((std::string("Remove") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
-			noiseLayers.erase(noiseLayers.begin() + id);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button((std::string("Duplicate") + std::string("##noiseLayerName") + std::to_string(id)).c_str())) {
-			noiseLayersTmp.push_back(noiseLayers[id].Clone());
-		}
-	}
-}
-
 static void ShowNoiseSettings() {
 	ImGui::Begin("Noise Settings");
 
-	ImGui::DragFloat("Noise Strength", &noiseStrength, 0.005f);
-	ImGui::DragFloat("Global X Offset", &nLOffsetX, 0.01f);
-	ImGui::DragFloat("Global Y Offset", &nLOffsetY, 0.01f);
-	ImGui::DragFloat("Global Y Offset", &nLOffsetZ, 0.01f);
-	ImGui::Checkbox("Flatten Base", &flattenBase);
-	ImGui::Checkbox("Absoulute Value", &absolute);
-	ImGui::Checkbox("Square Value", &square);
+	noiseGen->Render();
 
-	ImGui::Separator();
-
-	ImGui::Text("Noise Layers");
-	ImGui::Separator();
-	for (unsigned int i = 0; i < noiseLayers.size(); i++) {
-		ShowNoiseLayer(noiseLayers[i], i);
-		ImGui::Separator();
-	}
-	if (ImGui::Button("Add Noise Layer")) {
-		noiseLayersTmp.push_back(NoiseLayer());
-	}
 	ImGui::End();
 }
 
@@ -741,16 +644,8 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
 	data["texLayers"] = SaveTextureLayerData();
 
-	nlohmann::json noiseLayersSave;
-	noiseLayersSave["type"] = "NOISE LAYERS";
-	std::vector<nlohmann::json> noiseLayersSaveData;
-	for (int i = 0; i < noiseLayers.size(); i++) {
-		nlohmann::json t = noiseLayers[i].Save();
-		t["id"] = i;
-		noiseLayersSaveData.push_back(t);
-	}
-	noiseLayersSave["data"] = noiseLayersSaveData;
-	data["noiseLayers"] = noiseLayersSave;
+	
+	data["noiseLayers"] = noiseGen->Save();
 	nlohmann::json tmp;
 	tmp["autoUpdate"] = autoUpdate;
 	tmp["square"] = square;
@@ -915,13 +810,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 
 	// This should be replaced with something better
 	while (isRemeshing);
-	noiseLayers.clear();
-
-	std::vector<nlohmann::json> noiseLayersSaveData = data["noiseLayers"]["data"];
-	for (int i = 0; i < noiseLayersSaveData.size(); i++) {
-		noiseLayersTmp.push_back(NoiseLayer());
-		noiseLayersTmp.back().Load(noiseLayersSaveData[i]);
-	}
+	noiseGen->Load(data["noiseLayers"]);
 	nlohmann::json tmp = data["generals"];
 	try {
 		autoUpdate = tmp["autoUpdate"];
@@ -1496,9 +1385,7 @@ public:
 			return;
 
 		if (!isRemeshing) {
-			for (NoiseLayer n : noiseLayersTmp)
-				noiseLayers.push_back(n);
-			noiseLayersTmp.clear();
+			
 		}
 
 		if (!isExploreMode) {
@@ -1762,7 +1649,7 @@ public:
 		SetupExplorerControls();
 		//SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
-		gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid->png", false, true);
+		//gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid.png", false, true);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
 		m_NoiseGen = FastNoiseLite::FastNoiseLite();
@@ -1776,6 +1663,7 @@ public:
 			});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
 		GenerateMesh();
+		noiseGen = new LayeredNoiseManager();
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
 		CameraPosition[1] = 0.2f;
@@ -1783,7 +1671,6 @@ public:
 		CameraRotation[1] = 2530.0f;
 		autoUpdate = false;
 		scale = 1;
-		noiseLayersTmp.push_back(NoiseLayer());
 		Log("Started Up App!");
 
 		if (loadFile.size() > 0) {
@@ -1818,7 +1705,8 @@ public:
 
 	void OnEnd()
 	{
-		ShutdownMeshNodeEditor();
+		//ShutdownMeshNodeEditor();
+		delete noiseGen;
 		delete shd;
 		delete wireframeShader;
 		delete reflectionfbo;
