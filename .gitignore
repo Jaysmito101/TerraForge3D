@@ -1,0 +1,12 @@
+.vs
+bin
+vendor/premake/**.**
+scripts/__pycache__
+TerraForge3D
+
+**.sln
+**.vcxproj
+**.user
+**.filters
+**.aps
+**.ini
