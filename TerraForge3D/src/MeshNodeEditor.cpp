@@ -26,6 +26,13 @@
 #include "Nodes/NoiseOpenSimplex2Node.h"
 #include "Nodes/NoiseOpenSimplex2SNode.h"
 #include "Nodes/MeshCoordinatesNode.h"
+#include "Nodes/MinMeshCoordinatesNode.h"
+#include "Nodes/MaxMeshCoordinatesNode.h"
+#include "Nodes/TextureCoordinatesNode.h"
+#include "Nodes/TimeBasedSeedNode.h"
+#include "Nodes/RandomNumberNode.h"
+#include "Nodes/DuplicateNode.h"
+#include "Nodes/MathFunctionNode.h"
 #include "Nodes/OutputNode.h"
 
 #include <iostream>
@@ -66,6 +73,10 @@ static void ShowNodeMaker()
 
     NODE_MAKER_SHOW(DummyNode, "Dummy");
     NODE_MAKER_SHOW(MeshCoordinatesNode, "Mesh Coordinates");
+    NODE_MAKER_SHOW(MaxMeshCoordinatesNode, "Maximum Mesh Coordinates");
+    NODE_MAKER_SHOW(TextureCoordinatesNode, "Texture Coordinates");
+    NODE_MAKER_SHOW(MinMeshCoordinatesNode, "Minimum Mesh Coordinates");
+    NODE_MAKER_SHOW(TimeBasedSeedNode, "Time Based Seed");
     NODE_MAKER_SHOW(AddNode, "Add");
     NODE_MAKER_SHOW(SubNode, "Subtract");
     NODE_MAKER_SHOW(MulNode, "Multiply");
@@ -77,12 +88,15 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(AbsNode, "Absolute Value");
     NODE_MAKER_SHOW(BlendNode, "Blend");
     NODE_MAKER_SHOW(CurveNode, "Curve Editor");
+    NODE_MAKER_SHOW(RandomNumberNode, "Random Number");
     NODE_MAKER_SHOW(NoisePerlinNode, "Perlin Noise");
     NODE_MAKER_SHOW(NoiseCellularNode, "Cellular Noise");
     NODE_MAKER_SHOW(NoiseValueNode, "Value Noise");
     NODE_MAKER_SHOW(NoiseOpenSimplex2Node, "Open Simplex 2 Noise");
     NODE_MAKER_SHOW(NoiseOpenSimplex2SNode, "Open Simplex 2S Noise");
     NODE_MAKER_SHOW(NoiseValueCubicNode, "Value Cubic Noise");
+    NODE_MAKER_SHOW(DuplicateNode, "Duplicate");
+    NODE_MAKER_SHOW(MathFunctionNode, "Custom Math Funcion");
    
 }
 
@@ -124,6 +138,11 @@ void SetupMeshNodeEditor(int* res)
         case MeshNodeEditor::MeshNodeType::Dummy:                node = new DummyNode(); break;
         case MeshNodeEditor::MeshNodeType::Output:               node = new OutputNode(); break;
         case MeshNodeEditor::MeshNodeType::MeshCoordinates:      node = new MeshCoordinatesNode(); break;
+        case MeshNodeEditor::MeshNodeType::MaxMeshCoordinates:   node = new MaxMeshCoordinatesNode(); break;
+        case MeshNodeEditor::MeshNodeType::MinMeshCoordinates:   node = new MinMeshCoordinatesNode(); break;
+        case MeshNodeEditor::MeshNodeType::TextureCoordinates:   node = new TextureCoordinatesNode(); break;
+        case MeshNodeEditor::MeshNodeType::TimeBasedSeed:        node = new TimeBasedSeedNode(); break;
+        case MeshNodeEditor::MeshNodeType::Duplicate:            node = new DuplicateNode(); break;
         case MeshNodeEditor::MeshNodeType::Add:                  node = new AddNode(); break;
         case MeshNodeEditor::MeshNodeType::Sub:                  node = new SubNode(); break;
         case MeshNodeEditor::MeshNodeType::Mul:                  node = new MulNode(); break;
@@ -134,12 +153,14 @@ void SetupMeshNodeEditor(int* res)
         case MeshNodeEditor::MeshNodeType::Abs:                  node = new AbsNode(); break;
         case MeshNodeEditor::MeshNodeType::Blend:                node = new BlendNode(); break;
         case MeshNodeEditor::MeshNodeType::Curve:                node = new CurveNode(); break;
+        case MeshNodeEditor::MeshNodeType::RandomNumber:         node = new RandomNumberNode(); break;
         case MeshNodeEditor::MeshNodeType::NoisePerlin:          node = new NoisePerlinNode(); break;
         case MeshNodeEditor::MeshNodeType::NoiseCellular:        node = new NoiseCellularNode(); break;
         case MeshNodeEditor::MeshNodeType::NoiseOpenSimplex2:    node = new NoiseOpenSimplex2Node(); break;
         case MeshNodeEditor::MeshNodeType::NoiseOpenSimplex2S:   node = new NoiseOpenSimplex2SNode(); break;
         case MeshNodeEditor::MeshNodeType::NoiseValue:           node = new NoiseValueNode(); break;
         case MeshNodeEditor::MeshNodeType::NoiseValueCubic:      node = new NoiseValueCubicNode(); break;
+        case MeshNodeEditor::MeshNodeType::MathFunction:         node = new MathFunctionNode(); break;
         default:                                   node = nullptr; Log("Unknown Node Type!"); break;
         }
         return node;

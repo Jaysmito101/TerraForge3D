@@ -29,6 +29,12 @@ namespace MeshNodeEditor {
 		Dummy = 0,
 		Output,
 		MeshCoordinates,
+		MinMeshCoordinates,
+		MaxMeshCoordinates,
+		TextureCoordinates,
+		TimeBasedSeed,
+		RandomNumber,
+		Duplicate,
 		Add,
 		Sub,
 		Mul,
@@ -45,6 +51,7 @@ namespace MeshNodeEditor {
 		NoisePerlin,
 		NoiseValueCubic,
 		NoiseValue,
+		MathFunction,
 		MeshNodeTypeCount
 	};
 

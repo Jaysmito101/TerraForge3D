@@ -19,6 +19,7 @@ IncludeDir["ImGuiNodeEditor"] = "TerraForge3D/vendor/imgui-node-editor"
 IncludeDir["Zip"] = "TerraForge3D/vendor/zip"
 IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
 IncludeDir["Lua"] = "TerraForge3D/vendor/lua"
+IncludeDir["MuParser"] = "TerraForge3D/vendor/muparser/include"
 
 include "TerraForge3D/vendor/GLFW"
 include "TerraForge3D/vendor/Glad"
@@ -29,6 +30,7 @@ include "TerraForge3D/vendor/zip"
 include "TerraForge3D/vendor/text-editor"
 include "TerraForge3D/vendor/lua"
 include "TerraForge3D/vendor/assimp"
+include "TerraForge3D/vendor/muparser"
 
 project "TerraForge3D"
 	location "TerraForge3D"
@@ -61,6 +63,7 @@ project "TerraForge3D"
 		"%{IncludeDir.Zip}/src",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.Lua}",
+		"%{IncludeDir.MuParser}",
 		"%{IncludeDir.ImGuiNodeEditor}"
 	}
 
@@ -82,6 +85,7 @@ project "TerraForge3D"
 		"ImGuiNodeEditor",
 		"ImColorTextEdit",
 		"Lua",
+		"MuParser",
 		"Assimp"
 	}
 

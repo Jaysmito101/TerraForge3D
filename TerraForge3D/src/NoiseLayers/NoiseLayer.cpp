@@ -164,7 +164,7 @@ void NoiseLayer::Load(nlohmann::json data)
 
 float NoiseLayer::Evaluate(NoiseLayerInput input)
 {
-	return enabled ? noiseGen->GetNoise(input.x, input.y, input.z) : 0.0f;
+	return enabled ? noiseGen->GetNoise(input.x, input.y, input.z) * strength : 0.0f;
 }
 
 void NoiseLayer::Render(int index)

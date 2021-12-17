@@ -11,6 +11,7 @@ class LayeredNoiseManager
 public:
 	LayeredNoiseManager();
 
+	void UpdateLayers();
 	void Render();
 	void Load(nlohmann::json data);
 	nlohmann::json Save();
@@ -20,7 +21,8 @@ public:
 	float strength;
 	bool absv; // Temporary
 	bool sq;  // Temporary
-	std::vector<NoiseLayer*> noiseLayers;
+	std::vector<NoiseLayer*> noiseLayers, toAdd;
+	std::vector<int> toDelete;
 
 	std::mutex mutex;
 };

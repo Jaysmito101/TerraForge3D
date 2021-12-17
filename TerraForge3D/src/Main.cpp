@@ -329,6 +329,8 @@ static void RegenerateMesh() {
 
 	terrain.UploadToGPU();
 
+	noiseGen->UpdateLayers();
+
 	isRemeshing = true;
 
 	std::thread worker(FillMeshData);
@@ -1383,10 +1385,6 @@ public:
 	{
 		if (!isRuinning)
 			return;
-
-		if (!isRemeshing) {
-			
-		}
 
 		if (!isExploreMode) {
 			if (reqTexRfrsh) {
