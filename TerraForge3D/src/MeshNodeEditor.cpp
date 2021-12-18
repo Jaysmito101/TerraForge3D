@@ -33,7 +33,10 @@
 #include "Nodes/RandomNumberNode.h"
 #include "Nodes/DuplicateNode.h"
 #include "Nodes/MathFunctionNode.h"
+#include "Nodes/ModuleNode.h"
 #include "Nodes/OutputNode.h"
+
+#include "Modules/ModuleManager.h"
 
 #include <iostream>
 #include <mutex>
@@ -60,7 +63,7 @@ static char* stristr4(const char* str, const char* pattern) {
     return NULL;
 }
 
-static int* resolution;
+static ModuleManager* modMan;
 static NodeEditor* editor;
 static std::string saveVal;
 static std::mutex m;
@@ -97,6 +100,16 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(NoiseValueCubicNode, "Value Cubic Noise");
     NODE_MAKER_SHOW(DuplicateNode, "Duplicate");
     NODE_MAKER_SHOW(MathFunctionNode, "Custom Math Funcion");
+
+    for (NodeModule* mod : modMan->noModules)
+    {
+        if (NODE_MAKER_COND(mod->name.data())) { 
+            if (ImGui::Button(mod->name.data())) {
+                editor->AddNode(new ModuleNode(mod->id, mod));
+                ImGui::CloseCurrentPopup(); 
+            }
+        }
+    }
    
 }
 
@@ -120,9 +133,9 @@ void SetMeshNodeEditorSaveData(nlohmann::json data)
     editor->Load(data);
 }
 
-void SetupMeshNodeEditor(int* res)
+void SetupMeshNodeEditor(ModuleManager* m)
 {
-    resolution = res;
+    modMan = m;
     NodeEditorConfig config;
     config.saveFile = GetExecutableDir() + "\\Data\\configs\\meshnodeeditorconfigs.terr3d";
     config.makeNodeFunc = [&]() {
@@ -161,6 +174,7 @@ void SetupMeshNodeEditor(int* res)
         case MeshNodeEditor::MeshNodeType::NoiseValue:           node = new NoiseValueNode(); break;
         case MeshNodeEditor::MeshNodeType::NoiseValueCubic:      node = new NoiseValueCubicNode(); break;
         case MeshNodeEditor::MeshNodeType::MathFunction:         node = new MathFunctionNode(); break;
+        case MeshNodeEditor::MeshNodeType::Module:               node = new ModuleNode(data["mid"], modMan->FindNodeModule(data["mid"])); break;
         default:                                   node = nullptr; Log("Unknown Node Type!"); break;
         }
         return node;

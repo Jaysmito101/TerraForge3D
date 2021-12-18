@@ -88,7 +88,8 @@ std::string ShowSaveFileDialog(std::string ext) {
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = s2ws(ext).c_str();
+	//ofn.lpstrFilter = s2ws(ext).c_str();
+	ofn.lpstrFilter = L"*.*\0";
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -125,7 +126,8 @@ std::string ShowOpenFileDialog(std::string ext) {
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = s2ws(ext).c_str();
+	//ofn.lpstrFilter = s2ws(ext).c_str();
+	ofn.lpstrFilter = L"*.*\0";
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;

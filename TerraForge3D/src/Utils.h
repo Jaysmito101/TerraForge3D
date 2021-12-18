@@ -42,6 +42,12 @@ struct Hash {
 
 #define MAX(x, y) (x > y ? x : y)
 
+
+#ifdef TERR3D_WIN32
+std::wstring s2ws(const std::string& s);
+#endif
+
+
 std::string ShowSaveFileDialog(std::string ext = ".terr3d");
 
 std::string openfilename();

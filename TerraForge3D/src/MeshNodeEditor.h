@@ -3,6 +3,8 @@
 #include <json.hpp>
 #include "Base/NodeEditor/NodeEditor.h"
 
+#include "Modules/ModuleManager.h"
+
 // Default Node Colors
 
 #define DUMMY_NODE_COLOR          20, 31, 128
@@ -52,6 +54,7 @@ namespace MeshNodeEditor {
 		NoiseValueCubic,
 		NoiseValue,
 		MathFunction,
+		Module,
 		MeshNodeTypeCount
 	};
 
@@ -68,7 +71,7 @@ nlohmann::json GetMeshNodeEditorSaveData();
 void SetMeshNodeEditorSaveData(nlohmann::json data);
 
 // Setup the data for mesh node editor
-void SetupMeshNodeEditor(int* resolution);
+void SetupMeshNodeEditor(ModuleManager* manager);
 
 void MeshNodeEditorTick();
 void ShutdownMeshNodeEditor();

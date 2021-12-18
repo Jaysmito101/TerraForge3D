@@ -11,6 +11,7 @@
 #include <Texture2D.h>
 #include <TextureSettings.h>
 #include <ViewportFramebuffer.h>
+#include <Modules/ModuleManager.h>
 #include <AppShaderEditor.h>
 #include <UIFontManager.h>
 #include <ProjectData.h>
@@ -76,7 +77,7 @@ static LayeredNoiseManager* noiseGen;
 static const char* noiseTypes[] = { "Simplex Perlin", "Random", "Cellular" };
 static const char* baseShapes[] = { "Plane", "Icosphere"};
 static char* currentBaseShape = (char*)noiseTypes[0];
-static FastNoiseLite m_NoiseGen;
+static ModuleManager* moduleManager;
 
 static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 static glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -294,7 +295,18 @@ static void FillMeshData() {
 			for (int x = 0; x < resolution; x++)
 			{
 				if (noiseBased)
-					terrain.mesh->SetElevation(noiseGen->Evaluate(x, y, 0), x, y);
+				{
+					float elev = noiseGen->Evaluate(x, y, 0);
+					for (NoiseLayerModule* mod : moduleManager->nlModules)
+					{
+						if (mod->active)
+						{
+							elev += mod->Evaluate(x, y, 0);
+						}
+					}
+
+					terrain.mesh->SetElevation(elev, x, y);
+				}
 				else {
 					float pos[3] = { (float)x, (float)y, 0.0f };
 					float texCoord[2] = { (float)x / (resolution - 1), (float)y / (resolution - 1) };
@@ -547,6 +559,24 @@ static void ShowTerrainControls()
 	}
 
 	ImGui::Separator();
+
+	ImGui::NewLine();
+
+	if(moduleManager->uiModules.size() > 0)
+		ImGui::Text("UI Modules");
+	int i = 0;
+	for (UIModule* mod : moduleManager->uiModules)
+		ImGui::Checkbox(MAKE_IMGUI_LABEL(i++, mod->windowName), &mod->active);
+
+	ImGui::Separator();
+
+	ImGui::NewLine();
+
+	if (moduleManager->nlModules.size() > 0)
+		ImGui::Text("Noise Layer Modules");
+	i = 0;
+	for (NoiseLayerModule* mod : moduleManager->nlModules)
+		ImGui::Checkbox(MAKE_IMGUI_LABEL(i++, mod->name), &mod->active);
 	ImGui::End();
 }
 
@@ -1021,6 +1051,9 @@ static void ShowMenu() {
 				SaveFile();
 			}
 
+			if (ImGui::MenuItem("Install Module")) {
+				moduleManager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
+			}
 
 			if (ImGui::BeginMenu("Export Mesh As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
@@ -1068,7 +1101,7 @@ static void ShowMenu() {
 			if (ImGui::BeginMenu("Export Heightmap As")) {
 
 				if (ImGui::MenuItem("PNG")) {
-					if (ExportHeightmapPNG(terrain.mesh->Clone(), openfilename())) {
+					if (ExportHeightmapPNG(terrain.mesh->Clone(), ShowSaveFileDialog(".png"))) {
 						successMessage = "Sucessfully exported heightmap!";
 						ImGui::BeginPopup("Success Messages");
 					}
@@ -1079,7 +1112,7 @@ static void ShowMenu() {
 				}
 
 				if (ImGui::MenuItem("JPG")) {
-					if (ExportHeightmapJPG(terrain.mesh->Clone(), openfilename())) {
+					if (ExportHeightmapJPG(terrain.mesh->Clone(), ShowSaveFileDialog(".jpg"))) {
 						successMessage = "Sucessfully exported heightmap!";
 						ImGui::BeginPopup("Success Messages");
 					}
@@ -1632,6 +1665,26 @@ public:
 		if (activeWindows.skySettings)
 			ShowSkySettings(&activeWindows.skySettings);
 
+		for (UIModule* mod : moduleManager->uiModules)
+		{
+			if (mod->active)
+			{
+				ImGui::Begin(mod->windowName.c_str());
+				mod->Render();
+				ImGui::End();
+			}
+		}
+
+		for (NoiseLayerModule* mod : moduleManager->nlModules)
+		{
+			if (mod->active)
+			{
+				ImGui::Begin(mod->name.c_str());
+				mod->Render();
+				ImGui::End();
+			}
+		}
+
 		OnImGuiRenderEnd();
 	}
 
@@ -1641,7 +1694,6 @@ public:
 		SetUpIcon();
 		SetupViewportFrameBuffer();
 		SetupShaderManager(GetExecutableDir());
-		SetupMeshNodeEditor(&resolution);
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
@@ -1650,7 +1702,6 @@ public:
 		//gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid.png", false, true);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
-		m_NoiseGen = FastNoiseLite::FastNoiseLite();
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
 		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow* window, int w, int h) {
 			glfwSwapBuffers(window);
@@ -1662,6 +1713,8 @@ public:
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
 		GenerateMesh();
 		noiseGen = new LayeredNoiseManager();
+		moduleManager = new ModuleManager();
+		SetupMeshNodeEditor(moduleManager);
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
 		CameraPosition[1] = 0.2f;
@@ -1704,6 +1757,7 @@ public:
 	void OnEnd()
 	{
 		//ShutdownMeshNodeEditor();
+		//delete moduleManager;
 		delete noiseGen;
 		delete shd;
 		delete wireframeShader;

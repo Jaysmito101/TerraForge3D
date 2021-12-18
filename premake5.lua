@@ -32,6 +32,9 @@ include "TerraForge3D/vendor/lua"
 include "TerraForge3D/vendor/assimp"
 include "TerraForge3D/vendor/muparser"
 
+include "Tools/ModuleMaker"
+include "Tools/ModuleSDK"
+
 project "TerraForge3D"
 	location "TerraForge3D"
 	kind "WindowedApp"
