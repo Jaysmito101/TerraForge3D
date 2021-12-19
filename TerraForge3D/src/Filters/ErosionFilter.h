@@ -32,7 +32,7 @@ public:
     int** erosionBrushIndices;
     float** erosionBrushWeights;
 
-    int currentSeed;
+    int currentSeed = 42;
     int currentErosionRadius;
     int currentMapSize;
 

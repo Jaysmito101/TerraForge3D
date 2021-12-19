@@ -7,6 +7,13 @@
 
 #include "Terr3DModule.h"
 
+void OnModuleLoad()
+{
+}
+
+void OnModuleUnload()
+{
+}
 
 std::string GetName()
 {

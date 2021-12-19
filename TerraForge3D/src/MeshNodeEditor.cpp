@@ -35,6 +35,10 @@
 #include "Nodes/MathFunctionNode.h"
 #include "Nodes/ModuleNode.h"
 #include "Nodes/OutputNode.h"
+#include "Nodes/PixelateNode.h"
+#include "Nodes/VisualizerNode.h"
+#include "Nodes/TextureNode.h"
+#include "Nodes/HillNode.h"
 
 #include "Modules/ModuleManager.h"
 
@@ -80,6 +84,9 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(TextureCoordinatesNode, "Texture Coordinates");
     NODE_MAKER_SHOW(MinMeshCoordinatesNode, "Minimum Mesh Coordinates");
     NODE_MAKER_SHOW(TimeBasedSeedNode, "Time Based Seed");
+    NODE_MAKER_SHOW(PixelateNode, "Pixelate");
+    NODE_MAKER_SHOW(TextureNode, "Texture");
+    NODE_MAKER_SHOW(HillNode, "Hill");
     NODE_MAKER_SHOW(AddNode, "Add");
     NODE_MAKER_SHOW(SubNode, "Subtract");
     NODE_MAKER_SHOW(MulNode, "Multiply");
@@ -100,6 +107,7 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(NoiseValueCubicNode, "Value Cubic Noise");
     NODE_MAKER_SHOW(DuplicateNode, "Duplicate");
     NODE_MAKER_SHOW(MathFunctionNode, "Custom Math Funcion");
+    NODE_MAKER_SHOW(VisualizerNode, "Visualizer");
 
     for (NodeModule* mod : modMan->noModules)
     {
@@ -174,6 +182,10 @@ void SetupMeshNodeEditor(ModuleManager* m)
         case MeshNodeEditor::MeshNodeType::NoiseValue:           node = new NoiseValueNode(); break;
         case MeshNodeEditor::MeshNodeType::NoiseValueCubic:      node = new NoiseValueCubicNode(); break;
         case MeshNodeEditor::MeshNodeType::MathFunction:         node = new MathFunctionNode(); break;
+        case MeshNodeEditor::MeshNodeType::Texture:              node = new TextureNode(); break;
+        case MeshNodeEditor::MeshNodeType::Pixelate:             node = new PixelateNode(); break;
+        case MeshNodeEditor::MeshNodeType::Visualizer:           node = new VisualizerNode(); break;
+        case MeshNodeEditor::MeshNodeType::Hill:                 node = new HillNode(); break;
         case MeshNodeEditor::MeshNodeType::Module:               node = new ModuleNode(data["mid"], modMan->FindNodeModule(data["mid"])); break;
         default:                                   node = nullptr; Log("Unknown Node Type!"); break;
         }
@@ -196,7 +208,7 @@ void ShutdownMeshNodeEditor()
 
 void ShowMeshNodeEditor(bool* pOpen)
 {
-    
+    /*
     ImGui::Begin("Mesh Node Editor Debugger");
     if (ImGui::Button("Save"))
         saveVal = GetMeshNodeEditorSaveData().dump(4);
@@ -209,7 +221,7 @@ void ShowMeshNodeEditor(bool* pOpen)
     ImGui::Text(saveVal.c_str());
     ImGui::EndChild();
     ImGui::End();
-    
+    */
 
     ImGui::Begin("Mesh Node Editor", pOpen);
     if (ImGui::Button("Add Node")) 

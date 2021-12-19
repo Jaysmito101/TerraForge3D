@@ -55,6 +55,11 @@ namespace MeshNodeEditor {
 		NoiseValue,
 		MathFunction,
 		Module,
+		Pixelate,
+		Texture,
+		RectangleMask,
+		Visualizer,
+		Hill,
 		MeshNodeTypeCount
 	};
 

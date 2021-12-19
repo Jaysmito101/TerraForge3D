@@ -12,6 +12,8 @@ void RegisterProjectAsset(std::string uid, std::string path);
 
 std::string GetProjectAsset(std::string id);
 
+bool ProjectAssetExists(std::string id);
+
 void SetProjectDatabase(std::string db);
 
 void SaveProjectDatabase();

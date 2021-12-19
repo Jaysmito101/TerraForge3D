@@ -500,6 +500,10 @@ NodeEditorConfig::NodeEditorConfig(std::string saveFile)
 {
 }
 
+NodeInputParam::NodeInputParam()
+{
+}
+
 NodeInputParam::NodeInputParam(float* pos, float* texCoord, float* minPos, float* maxPos)
 {
     x = pos[0];

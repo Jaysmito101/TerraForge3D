@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Application.h>
-
+#include "implot.h"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -28,6 +28,7 @@ static void InitGlad() {
 static void InitImGui(std::string& configPath) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	ImNodes::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.IniFilename = configPath.c_str();
@@ -51,6 +52,7 @@ static void ImGuiShutdown() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImNodes::DestroyContext();
+	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 }
 

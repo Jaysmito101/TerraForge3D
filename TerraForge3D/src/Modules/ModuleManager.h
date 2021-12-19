@@ -15,6 +15,7 @@ public:
 	ModuleManager();
 	~ModuleManager();
 
+	void Render();
 	void InstallModule(std::string path);
 	void UinstallModule(std::string id);
 	void* GetDLLHandle(std::string id);
@@ -25,4 +26,5 @@ public:
 	std::vector<UIModule*> uiModules;
 	std::vector<NoiseLayerModule*> nlModules;
 	std::vector<NodeModule*> noModules;
+	nlohmann::json modData;
 };

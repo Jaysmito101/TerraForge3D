@@ -99,6 +99,8 @@ void CopyFileData(std::string source, std::string destination);
 
 bool IsKeyDown(int key);
 
+void ShowMessageBox(std::string message, std::string title = "Info");
+
 
 // KEY DEFINES
 /* The unknown key */

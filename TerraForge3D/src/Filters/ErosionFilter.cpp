@@ -22,7 +22,7 @@ void ErosionFilter::Render()
 
     ImGui::DragInt("Max Droplet Lifetime##erosionFilter", &maxDropletLifetime, 1, 1);
     ImGui::DragInt("Num Particles##erosionFilter", &numIterations, 1, 1);
-    ImGui::DragInt("Erosoion Radius##erosionFilter", &currentErosionRadius, 1, 1);
+    ImGui::DragInt("Erosoion Radius##erosionFilter", &erosionRadius, 1, 1);
 
 
     ImGui::DragFloat("Sediment Capacity Factor##erosionFilter", &sedimentCapacityFactor, 0.1f, 0);

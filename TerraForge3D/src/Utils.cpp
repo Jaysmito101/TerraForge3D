@@ -390,7 +390,8 @@ void AccocFileType() {
 
 void MkDir(std::string path)
 {
-	system((std::string("mkdir \"") + path + "\"").c_str());
+	if (!PathExist(path))
+		system((std::string("mkdir \"") + path + "\"").c_str());
 }
 
 #ifndef TERR3D_WIN32
@@ -425,4 +426,13 @@ void CopyFileData(std::string source, std::string destination)
 bool IsKeyDown(int key)
 {
 	return glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), key);
+}
+
+void ShowMessageBox(std::string message, std::string title)
+{
+#ifdef TERR3D_WIN32
+	MessageBox(NULL, s2ws(message).c_str(), s2ws(title).c_str(), 0);
+#else
+	system(("zenity --info --text=" + message + " --title="+title + "").c_str());
+#endif
 }

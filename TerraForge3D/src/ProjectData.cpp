@@ -28,12 +28,14 @@ void RegisterProjectAsset(std::string uid, std::string path)
 
 std::string GetProjectAsset(std::string id)
 {
-    try {
+    if(projectDatase.find(id) != projectDatase.end())
         return projectDatase[id];
-    }
-    catch (...) {
-        return "";
-    }
+    return "";
+}
+
+bool ProjectAssetExists(std::string id)
+{
+    return (projectDatase.find(id) != projectDatase.end());
 }
 
 void SetProjectDatabase(std::string db)

@@ -835,7 +835,6 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 	if (data["type"] != "SAVEFILE")
 		return;
 
-	SetMeshNodeEditorSaveData(data["EnodeEditor"]);
 	LoadThemeFromStr(data["styleData"]);
 	//data["imguiData"] = ImGui::SaveIniSettingsToMemory();
 	appData = data["appData"];
@@ -884,6 +883,7 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 	Log("Loaded Project ID : " + GetProjectId());
 
 	LoadTextureLayerData(data["texLayers"]);
+	SetMeshNodeEditorSaveData(data["EnodeEditor"]);
 
 
 	CameraPosition[0] = tmp["cameraPosX"];
@@ -1220,7 +1220,7 @@ static void ShowMenu() {
 
 			ShowWindowMenuItem("Filters Manager", &activeWindows.filtersManager);
 
-			ShowWindowMenuItem("Contributers", &activeWindows.contribWindow);
+			ShowWindowMenuItem("Module Manager", &activeWindows.modulesManager);
 
 			ShowWindowMenuItem("Supporters", &activeWindows.supportersTribute);
 
@@ -1332,11 +1332,9 @@ static void ShowSeaSettings() {
 	ImGui::End();
 }
 
-static void ShowContributers() {
-	ImGui::Begin("Major Contributers", &activeWindows.contribWindow);
-	ImGui::Text("The major contributers as of Version 5.0:");
-	ImGui::NewLine();
-	ImGui::Text("Jaysmito Mukherjee");
+static void ShowModuleManager() {
+	ImGui::Begin("Module Manager", &activeWindows.modulesManager);
+	moduleManager->Render();
 	ImGui::End();
 }
 
@@ -1635,8 +1633,8 @@ public:
 		if (activeWindows.seaEditor)
 			ShowSeaSettings();
 
-		if (activeWindows.contribWindow)
-			ShowContributers();
+		if (activeWindows.modulesManager)
+			ShowModuleManager();
 
 		if (activeWindows.styleEditor)
 			ShowStyleEditor(&activeWindows.styleEditor);
@@ -1669,7 +1667,7 @@ public:
 		{
 			if (mod->active)
 			{
-				ImGui::Begin(mod->windowName.c_str());
+				ImGui::Begin(mod->windowName.c_str(), &mod->active);
 				mod->Render();
 				ImGui::End();
 			}
@@ -1722,7 +1720,6 @@ public:
 		CameraRotation[1] = 2530.0f;
 		autoUpdate = false;
 		scale = 1;
-		Log("Started Up App!");
 
 		if (loadFile.size() > 0) {
 			Log("Loading File from " + loadFile);
@@ -1752,10 +1749,13 @@ public:
 
 		// For Debug Only
 		autoUpdate = true;
+
+		Log("Started Up App!");
 	}
 
 	void OnEnd()
 	{
+		while (isRemeshing);
 		//ShutdownMeshNodeEditor();
 		//delete moduleManager;
 		delete noiseGen;

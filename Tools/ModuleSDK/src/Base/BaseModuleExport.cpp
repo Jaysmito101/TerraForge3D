@@ -26,3 +26,13 @@ bool VerifyUpdate(char* path)
 {
 	return OnModuleUpdate(std::string(path));
 }
+
+void LoadModule()
+{
+	OnModuleLoad();
+}
+
+void UnloadModule()
+{
+	OnModuleUnload();
+}

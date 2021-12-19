@@ -303,6 +303,8 @@ static bool VerifyNodeDLL(std::string path) {
 	data = data && VerifyDLLFunc(dll, "GetModuleName");
 	data = data && VerifyDLLFunc(dll, "GetModuleVersion");
 	data = data && VerifyDLLFunc(dll, "VerifyUpdate");
+	data = data && VerifyDLLFunc(dll, "LoadModule");
+	data = data && VerifyDLLFunc(dll, "UnloadModule");
 	data = data && VerifyDLLFunc(dll, "LoadNode");
 	data = data && VerifyDLLFunc(dll, "RenderNode");
 	data = data && VerifyDLLFunc(dll, "EvaluateNode");
@@ -321,6 +323,8 @@ static bool VerifyNoiseLayerDLL(std::string path) {
 	data = data && VerifyDLLFunc(dll, "GetModuleName");
 	data = data && VerifyDLLFunc(dll, "GetModuleVersion");
 	data = data && VerifyDLLFunc(dll, "VerifyUpdate");
+	data = data && VerifyDLLFunc(dll, "LoadModule");
+	data = data && VerifyDLLFunc(dll, "UnloadModule");
 	data = data && VerifyDLLFunc(dll, "LoadNoiseLayer");
 	data = data && VerifyDLLFunc(dll, "RenderNoiseLayer");
 	data = data && VerifyDLLFunc(dll, "EvaluateNoiseLayer");
@@ -339,6 +343,8 @@ static bool VerifyUIDLL(std::string path) {
 	data = data && VerifyDLLFunc(dll, "GetModuleName");
 	data = data && VerifyDLLFunc(dll, "GetModuleVersion");
 	data = data && VerifyDLLFunc(dll, "VerifyUpdate");
+	data = data && VerifyDLLFunc(dll, "LoadModule");
+	data = data && VerifyDLLFunc(dll, "UnloadModule");
 	data = data && VerifyDLLFunc(dll, "GetWindowName");
 	data = data && VerifyDLLFunc(dll, "Render");
 	CloseDLL(dll);

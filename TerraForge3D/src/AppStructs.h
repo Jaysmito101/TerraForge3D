@@ -51,4 +51,5 @@ struct ActiveWindows {
 	bool foliageManager = false;
 	bool supportersTribute = false;
 	bool skySettings = false;
+	bool modulesManager = false;
 };

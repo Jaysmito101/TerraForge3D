@@ -15,6 +15,7 @@ IncludeDir["Glad"] = "TerraForge3D/vendor/Glad/include"
 IncludeDir["glm"] = "TerraForge3D/vendor/glm"
 IncludeDir["ImGui"] = "TerraForge3D/vendor/imgui"
 IncludeDir["ImNodes"] = "TerraForge3D/vendor/imnodes"
+IncludeDir["ImPlot"] = "TerraForge3D/vendor/implot"
 IncludeDir["ImGuiNodeEditor"] = "TerraForge3D/vendor/imgui-node-editor"
 IncludeDir["Zip"] = "TerraForge3D/vendor/zip"
 IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
@@ -25,6 +26,7 @@ include "TerraForge3D/vendor/GLFW"
 include "TerraForge3D/vendor/Glad"
 include "TerraForge3D/vendor/imgui"
 include "TerraForge3D/vendor/imnodes"
+include "TerraForge3D/vendor/implot"
 include "TerraForge3D/vendor/imgui-node-editor"
 include "TerraForge3D/vendor/zip"
 include "TerraForge3D/vendor/text-editor"
@@ -34,6 +36,7 @@ include "TerraForge3D/vendor/muparser"
 
 include "Tools/ModuleMaker"
 include "Tools/ModuleSDK"
+include "Tools/PyModuleSDK"
 
 project "TerraForge3D"
 	location "TerraForge3D"
@@ -65,6 +68,7 @@ project "TerraForge3D"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.Zip}/src",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImPlot}",
 		"%{IncludeDir.Lua}",
 		"%{IncludeDir.MuParser}",
 		"%{IncludeDir.ImGuiNodeEditor}"
@@ -85,6 +89,7 @@ project "TerraForge3D"
 		"Zip",
 		"ImGui",
 		"ImNodes",
+		"ImPlot",
 		"ImGuiNodeEditor",
 		"ImColorTextEdit",
 		"Lua",
