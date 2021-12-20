@@ -99,12 +99,27 @@ void CopyFileData(std::string source, std::string destination);
 
 bool IsKeyDown(int key);
 
+bool IsMouseButtonDown(int button);
+
 void ShowMessageBox(std::string message, std::string title = "Info");
 
 
 // KEY DEFINES
 /* The unknown key */
 #define TERR3D_KEY_UNKNOWN            -1
+
+#define TERR3D_MOUSE_BUTTON_1         0
+#define TERR3D_MOUSE_BUTTON_2         1
+#define TERR3D_MOUSE_BUTTON_3         2
+#define TERR3D_MOUSE_BUTTON_4         3
+#define TERR3D_MOUSE_BUTTON_5         4
+#define TERR3D_MOUSE_BUTTON_6         5
+#define TERR3D_MOUSE_BUTTON_7         6
+#define TERR3D_MOUSE_BUTTON_8         7
+#define TERR3D_MOUSE_BUTTON_LAST      TERR3D_MOUSE_BUTTON_8
+#define TERR3D_MOUSE_BUTTON_LEFT      TERR3D_MOUSE_BUTTON_1
+#define TERR3D_MOUSE_BUTTON_RIGHT     TERR3D_MOUSE_BUTTON_2
+#define TERR3D_MOUSE_BUTTON_MIDDLE    TERR3D_MOUSE_BUTTON_3
 
 /* Printable keys */
 #define TERR3D_KEY_SPACE              32

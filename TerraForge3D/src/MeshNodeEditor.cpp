@@ -228,11 +228,38 @@ void ShowMeshNodeEditor(bool* pOpen)
     {
         ImGui::OpenPopup("NodeMakerDropped");
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Reset"))
+    {
+        editor->Reset();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Export"))
+    {
+        std::string file = ShowSaveFileDialog("*.terr3d");
+        if (file.size() > 3)
+        {
+            if (file.find(".terr3d") == std::string::npos)
+                file += ".terr3d";
+            SaveToFile(file, editor->Save().dump(4));
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Import"))
+    {
+        std::string file = ShowOpenFileDialog("*.terr3d");
+        if (file.size() > 3)
+        {
+            bool tmp = false;
+            editor->Reset();
+            editor->Load(nlohmann::json::parse(ReadShaderSourceFile(file, &tmp)));
+        }
+    }
 
-    ImGui::Text("WARNING : Work In Progress!");
-    
+
     editor->Render();
-    if (ImGui::IsWindowFocused() && (IsKeyDown(TERR3D_KEY_RIGHT_SHIFT) || IsKeyDown(TERR3D_KEY_LEFT_SHIFT)) && IsKeyDown(TERR3D_KEY_A))
+
+    if (ImGui::IsWindowFocused() && (((IsKeyDown(TERR3D_KEY_RIGHT_SHIFT) || IsKeyDown(TERR3D_KEY_LEFT_SHIFT)) && IsKeyDown(TERR3D_KEY_A)) || IsMouseButtonDown(TERR3D_MOUSE_BUTTON_MIDDLE)))
     {
         ImGui::OpenPopup("NodeMakerDropped");
     }

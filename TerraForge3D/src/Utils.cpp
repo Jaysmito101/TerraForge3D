@@ -425,7 +425,12 @@ void CopyFileData(std::string source, std::string destination)
 
 bool IsKeyDown(int key)
 {
-	return glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), key);
+	return glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), key) == GLFW_PRESS;
+}
+
+bool IsMouseButtonDown(int button)
+{
+	return glfwGetMouseButton(Application::Get()->GetWindow()->GetNativeWindow(), button);
 }
 
 void ShowMessageBox(std::string message, std::string title)
