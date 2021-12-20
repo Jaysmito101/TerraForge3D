@@ -25,7 +25,7 @@ void TimeBasedSeedNode::OnRender()
 {
     DrawHeader("Time Based Seed");
     
-    ImGui::Dummy(ImVec2(150, 10));
+    ImGui::Dummy(ImVec2(200, 10));
     ImGui::SameLine();
     ImGui::Text("Time");
     outputPins[0]->Render();
@@ -34,7 +34,7 @@ void TimeBasedSeedNode::OnRender()
 
     ImGui::Text("Current Seed : ");
     ImGui::SameLine();
-    ImGui::PushItemWidth(100);
+    ImGui::PushItemWidth(200);
     ImGui::InputInt(MAKE_IMGUI_ID(id), &val, 1);
     ImGui::PopItemWidth();
 

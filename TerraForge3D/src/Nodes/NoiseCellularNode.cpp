@@ -229,7 +229,7 @@ void NoiseCellularNode::OnRender()
 	ImGui::Text("Current Fractal Type : ");
 	ImGui::SameLine();
 	ImGui::Text(fractalTypes[fractalType]);
-	if (ImGui::Button("Change Fractal Type"))
+	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Fractal Type")))
 	{
 		fractalType++;
 		if (fractalType == 4)
@@ -240,7 +240,7 @@ void NoiseCellularNode::OnRender()
 	ImGui::Text("Current Distance Function : ");
 	ImGui::SameLine();
 	ImGui::Text(distFuncs[distanceFunc]);
-	if (ImGui::Button("Change Distance Function"))
+	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Distance Function")))
 	{
 		distanceFunc++;
 		if (distanceFunc == 4)

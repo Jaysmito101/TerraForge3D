@@ -669,7 +669,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	data["type"] = "SAVEFILE";
 	data["serializerVersion"] = TERR3D_SERIALIZER_VERSION;
 	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
-	data["name"] = "TerraForge3D v3.0";
+	data["name"] = "TerraForge3D v2.0.0";
 	data["EnodeEditor"] = GetMeshNodeEditorSaveData();
 	data["styleData"] = GetStyleData();
 	data["appData"] = appData;
@@ -1568,16 +1568,16 @@ public:
 
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_I))
-			nLOffsetY -= 0.01f;
+			noiseGen->offset[0] -= 0.01f;
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_K))
-			nLOffsetY += 0.01f;
+			noiseGen->offset[0] += 0.01f;
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L))
-			nLOffsetX -= 0.01f;
+			noiseGen->offset[1] -= 0.01f;
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_J))
-			nLOffsetX += 0.01f;
+			noiseGen->offset[1] += 0.01f;
 
 
 		if (ReqRefresh())
@@ -1695,7 +1695,7 @@ public:
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
-		//SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
+		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
 		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
 		//gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid.png", false, true);
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;

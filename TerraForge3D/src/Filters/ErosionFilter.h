@@ -23,7 +23,7 @@ public:
      float evaporateSpeed = .01f;
      float gravity = 4;
      int maxDropletLifetime = 30;
-     int numIterations = 10000;
+     int numIterations = 100000;
 
      float initialWaterVolume = 1;
      float initialSpeed = 1;

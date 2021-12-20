@@ -206,7 +206,7 @@ void NoiseValueNode::OnRender()
 	ImGui::Text("Current Fractal Type : ");
 	ImGui::SameLine();
 	ImGui::Text(fractalTypes[fractalType]);
-	if (ImGui::Button("Change Fractal Type"))
+	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Fractal Type")))
 	{
 		fractalType++;
 		if (fractalType == 4)

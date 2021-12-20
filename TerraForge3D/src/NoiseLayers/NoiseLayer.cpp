@@ -138,12 +138,19 @@ nlohmann::json NoiseLayer::Save()
 void NoiseLayer::Load(nlohmann::json data)
 {
 	frequency = data["frequency"];
+	noiseGen->SetFrequency(frequency);
 	seed = data["seed"];
+	noiseGen->SetSeed(seed);
 	lacunarity = data["lacunarity"];
+	noiseGen->SetFractalLacunarity(lacunarity);
 	weightedStrength = data["weightedStrength"];
+	noiseGen->SetFractalWeightedStrength(weightedStrength);
 	octaves = data["octaves"];
+	noiseGen->SetFractalOctaves(octaves);
 	pingPongStrength = data["pingPongStrength"];
+	noiseGen->SetFractalPingPongStrength(pingPongStrength);
 	gain = data["gain"];
+	noiseGen->SetFractalGain(gain);
 	strength = data["strength"];
 	fractalType = data["fractalType"];
 	distanceFunc = data["distanceFunc"];
@@ -164,7 +171,7 @@ void NoiseLayer::Load(nlohmann::json data)
 
 float NoiseLayer::Evaluate(NoiseLayerInput input)
 {
-	return enabled ? noiseGen->GetNoise(input.x, input.y, input.z) * strength : 0.0f;
+	return enabled ? noiseGen->GetNoise(input.x + offset[0], input.y + offset[1], input.z + offset[2]) * strength : 0.0f;
 }
 
 void NoiseLayer::Render(int index)

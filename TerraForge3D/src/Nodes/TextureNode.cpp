@@ -148,18 +148,18 @@ void TextureNode::OnRender()
     if (ImGui::ImageButton((ImTextureID)texture->GetRendererID(), ImVec2(200, 200)))
         ChangeTexture();
 
-    if (ImGui::Button("Change Texture"))
+    if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Texture")))
         ChangeTexture();
 
 }
 
 void TextureNode::ChangeTexture()
 {
-    isDefault = false;
-    delete texture;
     std::string path = ShowOpenFileDialog(".png");
     if (path.size() < 3)
         return;
+    isDefault = false;
+    delete texture;
     texture = new Texture2D(path, true, false);
     texture->Resize(256, 256);
     Log("Loaded Texture : " + texture->GetPath());

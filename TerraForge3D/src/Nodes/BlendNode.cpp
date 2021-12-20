@@ -16,13 +16,13 @@ NodeOutput BlendNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
     else
         v1 = value1;
     if (inputPins[1]->IsLinked())
-        v2 *= inputPins[1]->other->Evaluate(input).value;
+        v2 = inputPins[1]->other->Evaluate(input).value;
     else
-        v2 *= value2;
+        v2 = value2;
     if (inputPins[2]->IsLinked())
-        f *= inputPins[2]->other->Evaluate(input).value;
+        f = inputPins[2]->other->Evaluate(input).value;
     else
-        f *= factor;
+        f = factor;
     return NodeOutput({ f * v1 + (1 - f) * v2 });
 }
  

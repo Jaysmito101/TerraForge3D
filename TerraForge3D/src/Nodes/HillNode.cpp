@@ -8,6 +8,8 @@
 
 #define SQUARE(x) (x) * (x)
 #define MIN(x, y) x > y ? x : y
+
+
 NodeOutput HillNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
     float xC, yC, hC;
@@ -45,7 +47,7 @@ void HillNode::Load(nlohmann::json data)
 nlohmann::json HillNode::Save()
 {
     nlohmann::json data;
-    data["type"] = MeshNodeEditor::MeshNodeType::Abs;
+    data["type"] = MeshNodeEditor::MeshNodeType::Hill;
     data["posX"] = pos[0];
     data["posY"] = pos[1];
     data["posZ"] = pos[2];
