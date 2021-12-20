@@ -17,9 +17,6 @@
     <a href="https://patreon.com/jaysmito101"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djaysmito101%26type%3Dpledges&style=for-the-badge" alt="Support me on Patreon" /></a>
 </p>
 <br/>
-
-⚠️ In the latest master branch the node editor is being re written from scratch so for a version with a fully working node editor check out thr releases or https://github.com/Jaysmito101/TerraForge3D/tree/f8d630ab7bad4ed2822375c996fca008849a6ee5
-
 <hr/>
 
 # TerraForge3D
@@ -27,9 +24,7 @@
 
 
 
-<a href="https://youtu.be/wnNclej40zQ"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase5.gif" width="1000"></a>
-
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase2.gif" width="1000">
+<a href="https://youtu.be/eU9a92sYqwA"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Showcase.gif" width="1000"></a>
 
 <a href="https://youtu.be/EhkgesSzT8U"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase4.gif" width="1000"></a>
 
