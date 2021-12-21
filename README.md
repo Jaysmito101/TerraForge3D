@@ -35,7 +35,7 @@ Give your valuable feedback : https://github.com/Jaysmito101/TerraForge3D/discus
 
 Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
 
-Join the Discord Server : https://discord.gg/AcgRafSfyB
+## Join the Discord Server for any help or posting your showcases and get featured in the website : https://discord.gg/AcgRafSfyB
 
 # What can this do?
 
