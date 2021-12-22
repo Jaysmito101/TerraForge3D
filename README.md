@@ -128,4 +128,8 @@ Join the Discord Server : https://discord.gg/AcgRafSfyB
 
 <a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
+# Supporters & Sponsers
+
+* <a href="https://gitbook.com/">GitBook</a>
+
 <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.TerraGen3D&left_color=gray&right_color=green&style=for-the-badge">
