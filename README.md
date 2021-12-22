@@ -40,9 +40,15 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 ## Join the Discord Server for any help or posting your showcases and get featured in the website : https://discord.gg/AcgRafSfyB
 
-# What can this do?
+# Features
 
 * Tribute to all who **Starred** or **Contributed** to the project
+* Support fo installable native modules like blender addons
+* Procedurally generated fully customizable skies
+* 30+ different nodes
+* Export to 4+ 3D formats
+* Runs on any hardware ( no need for any powerful graphics card or processor)
+* Very easy to learn
 * Procedural Texturing
 * Realistic Hydraulic Erosion Simulation (CPU & GPU modes)
 * Use custom HDRI Skyboxes
