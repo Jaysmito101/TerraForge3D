@@ -23,7 +23,7 @@
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (373).png" width="1000">
+<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Screenshot (375).png" width="1000">
 
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (364).png" width="1000">
 
