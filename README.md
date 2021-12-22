@@ -126,6 +126,6 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
 
-<a href="https://www.producthunt.com/posts/terragen3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terragen3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=314431&theme=dark" alt="TerraGen3D - 3D Procedural Node Based Terrain Generation Tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a> 
+<a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.TerraGen3D&left_color=gray&right_color=green&style=for-the-badge">
