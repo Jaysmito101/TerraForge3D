@@ -43,7 +43,7 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 # Features
 
 * Tribute to all who **Starred** or **Contributed** to the project
-* Support fo installable native modules like blender addons
+* Support fo installable native modules(dll) like blender addons
 * Procedurally generated fully customizable skies
 * 30+ different nodes
 * Export to 4+ 3D formats
@@ -53,7 +53,6 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 * Realistic Hydraulic Erosion Simulation (CPU & GPU modes)
 * Use custom HDRI Skyboxes
 * Water with reflections, ripples, waves.
-* OpenCL Support
 * Compute Shaders
 * Infinite First Person Terrain Explorer
 * Maze Generator using Binary Tree Algorithm
@@ -82,7 +81,7 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 * Customizable Geometry Shaders included in rendering pipeline
 * Skyboxes
 * Multithreded Mesh Generation
-* [Lua](https://www.lua.org/) scripting to add custom algotrithms
+* Custom 3D Mathematical functions for height
 * Export to heightmaps(both PNG and also custom format)
 * Custom Skyboxes
 * Completely usable 3D procedural modelling and texturing pipeline
