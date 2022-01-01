@@ -13,7 +13,7 @@
   <img alt="SourceForge" src="https://img.shields.io/sourceforge/dt/terragen3d?label=Source%20Forge%20Downloads&style=for-the-badge">
   <img alt="GitHub" src="https://img.shields.io/github/license/Jaysmito101/Terragen3D?style=for-the-badge">
     <br>
-    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2021?style=for-the-badge">
+    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2022?style=for-the-badge">
     <a href="https://patreon.com/jaysmito101"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djaysmito101%26type%3Dpledges&style=for-the-badge" alt="Support me on Patreon" /></a>
 </p>
 <br/>
