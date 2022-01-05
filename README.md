@@ -131,6 +131,8 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
 
+Docs : https://terraforge3d.gitbook.io/docs
+
 <a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 # Supporters & Sponsers
