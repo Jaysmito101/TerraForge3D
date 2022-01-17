@@ -114,7 +114,7 @@ void SetupCubemap()
 }
 
 
-void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural) {
+void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural, float cirrus, float cumulus, float time, float* fsun, float upf){
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glBindVertexArray(vao);
@@ -127,6 +127,11 @@ void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedura
     view = glm::mat4(glm::mat3(view));
     shd->SetUniformMat4("_P", proj);
     shd->SetUniformMat4("_V", view);
+    shd->SetUniformf("time", time);
+    shd->SetUniformf("cirrus", cirrus);
+    shd->SetUniformf("upf", upf);
+    shd->SetUniformf("cumulus", cumulus);
+    shd->SetUniform3f("fsun", fsun);
     glUniform1i(glGetUniformLocation(shd->m_Shader, "skybox"), 0);
     if(useBox)
         glDrawArrays(GL_TRIANGLES, 0, 36);

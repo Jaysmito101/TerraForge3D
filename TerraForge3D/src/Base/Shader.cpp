@@ -122,11 +122,11 @@ void Shader::SetUniform3f(std::string name, float* value)
 	if (uniformLocations.find(name) == uniformLocations.end()) {
 		uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
 		uniformLocations.insert(std::make_pair(name, loc));
-		glUniform3fv(loc, 1, value);
+		glUniform3f(loc, value[0], value[1], value[2]);
 	}
 	else {
 		uint32_t loc = uniformLocations[name];
-		glUniform3fv(loc, 1, value);
+		glUniform3f(loc, value[0], value[1], value[2]);
 	}
 }
 
