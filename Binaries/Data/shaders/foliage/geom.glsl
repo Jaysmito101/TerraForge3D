@@ -14,7 +14,6 @@ out vec2 TexCoord;
 in DATA
 {
 	float height;
-    vec3 FragPos;
     vec3 Normal;
     float distance;
 	vec2 TexCoord;

@@ -29,13 +29,6 @@ class PremakeConfiguration:
 
     @classmethod
     def InstallPremake(cls):
-        permissionGranted = False
-        while not permissionGranted:
-            reply = str(input("Premake not found. Would you like to download Premake {0:s}? [Y/N]: ".format(cls.premakeVersion))).lower().strip()[:1]
-            if reply == 'n':
-                return False
-            permissionGranted = (reply == 'y')
-
         premakePath = f"{cls.premakeDirectory}/premake-{cls.premakeVersion}-windows.zip"
         print("Downloading {0:s} to {1:s}".format(cls.premakeZipUrls, premakePath))
         Utils.DownloadFile(cls.premakeZipUrls, premakePath)

@@ -40,6 +40,7 @@
 #include <time.h>
 #include <string.h>
 #include <mutex>
+#include <memory>
 #include <json.hpp>
 #include <zip.h>
 #include <sys/stat.h>
@@ -69,7 +70,7 @@ static Model grid("Grid");
 static FrameBuffer* reflectionfbo, * textureFBO;
 
 static Application* myApp;
-static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader;
+static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader, * foliageShader;
 static Camera camera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
@@ -268,12 +269,15 @@ static void ResetShader() {
 		delete shd;
 	if (textureBakeShader)
 		delete textureBakeShader;
+	if(foliageShader)
+		delete foliageShader;
 	if (!wireframeShader)
 		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	if (!waterShader)
 		waterShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &res));
 	textureBakeShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\geom.glsl", &res));
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
+	foliageShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\geom.glsl", &res));
 }
 
 static void FillMeshData() {
@@ -437,8 +441,29 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 
 
 		if (showFoliage)
+		{
+			shader = foliageShader;
+			shader->Bind();
+		shader->SetTime(&time);
+		shader->SetMPV(camera.pv);
+		shader->SetUniformMat4("_Model", terrain.modelMatrix);
+		shader->SetLightCol(LightColor);
+		shader->SetLightPos(LightPosition);
+		float tmp[3];
+		tmp[0] = viewportMousePosX;
+		tmp[1] = viewportMousePosY;
+		tmp[2] = ImGui::GetIO().MouseDown[0];
+		shader->SetUniform3f("_MousePos", tmp);
+		tmp[0] = 800;
+		tmp[1] = 600;
+		tmp[2] = 1;
+		shader->SetUniform3f("_Resolution", tmp);
+		shader->SetUniform3f("_CameraPos", CameraPosition);
+		shader->SetUniformf("_SeaLevel", seaLevel);
+		shader->SetUniformf("_CameraNear", camera.near);
+		shader->SetUniformf("_CameraFar", camera.far);
 			RenderFoliage(shader, camera);
-
+		}
 
 
 
@@ -1759,6 +1784,7 @@ public:
 		//ShutdownMeshNodeEditor();
 		//delete moduleManager;
 		delete noiseGen;
+		delete foliageShader;
 		delete shd;
 		delete wireframeShader;
 		delete reflectionfbo;

@@ -33,13 +33,13 @@ Mesh* LoadMesh(aiMesh* paiMesh) {
 
         tmp.normal = glm::vec4(1.0f);
         
-        /*
+        
         if (pNormal) {
             tmp.normal.x = pNormal->x;
             tmp.normal.y = pNormal->y;
             tmp.normal.z = pNormal->z;
         }
-        */
+        
 
         verts[i] = tmp;
     }
