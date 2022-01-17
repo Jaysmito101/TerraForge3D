@@ -66,6 +66,7 @@ static Model terrain("Terrain");
 static Model sea("Sea");
 static Model grid("Grid");
 
+static Model* customModel,* customModelCopy;
 
 static FrameBuffer* reflectionfbo, * textureFBO;
 
@@ -91,6 +92,7 @@ static float CameraRotation[3];
 static Vec2 prevMousePos;
 static char b1[4096], b2[4096];
 
+static bool isUsingBase = true;
 static bool skyboxEnabled = false;
 static bool vSync = true;
 static bool autoUpdate = false;
@@ -141,6 +143,7 @@ static std::string errorMessage = "";
 static std::string savePath = "";
 static std::string DuDvMapID = "";
 static std::string waterNormalMap = "";
+static std::string currentBaseModelName = "";
 
 static float nLOffsetX, nLOffsetY, nLOffsetZ;
 
@@ -282,7 +285,7 @@ static void ResetShader() {
 
 static void FillMeshData() {
 
-	if (strcmp(currentBaseShape, "Plane") == 0) {
+	if (isUsingBase) {
 
 		if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
 
@@ -291,7 +294,6 @@ static void FillMeshData() {
 			s_Stats.vertCount = terrain.mesh->vertexCount;
 			textureScaleO = textureScale;
 		}
-
 		
 
 		for (int y = 0; y < resolution; y++)
@@ -308,7 +310,6 @@ static void FillMeshData() {
 							elev += mod->Evaluate(x, y, 0);
 						}
 					}
-
 					terrain.mesh->SetElevation(elev, x, y);
 				}
 				else {
@@ -320,20 +321,43 @@ static void FillMeshData() {
 				}
 			}
 		}
+		terrain.mesh->RecalculateNormals();	
+	}
+	else{
+		//customModelCopy->mesh->RecalculateNormals();
+		for(int i=0;i<customModel->mesh->vertexCount;i++)
+		{
+			Vert tmp = customModelCopy->mesh->vert[i];
+			float x = tmp.position.x;
+			float y = tmp.position.y;
+			float z = tmp.position.z;
+			float elev = 0.0f;
+			if (noiseBased)
+			{
+				elev = noiseGen->Evaluate(x, y, z);
+				for (NoiseLayerModule* mod : moduleManager->nlModules)
+				{
+					if (mod->active)
+					{
+						elev += mod->Evaluate(x, y, z);
+					}
+				}
+			}
+			else {
+				float pos[3] = { x, y, z };
+				float texCoord[2] = { tmp.texCoord.x, tmp.texCoord.y };
+				float minPos[3] = {0, 0, 0};
+				float maxPos[3] = {-1, -1, -1};
+				elev =  EvaluateMeshNodeEditor(NodeInputParam(pos, texCoord, minPos, maxPos)).value;
+				
+			}
+			tmp.position += elev * tmp.normal;
+			customModel->mesh->vert[i] = tmp;			
+		}
+		customModel->mesh->RecalculateNormals();
+		
+	}	
 
-	}
-	else if (strcmp(currentBaseShape, "Icosphere") == 0) {
-		terrain.mesh->GenerateIcoSphere(resolution, scale, textureScale);
-		s_Stats.triangles = terrain.mesh->indexCount / 3;
-		s_Stats.vertCount = terrain.mesh->vertexCount;
-		textureScaleO = textureScale;
-	}
-	else {
-		Log("Unknown base shape " + std::string(currentBaseShape));
-		currentBaseShape = (char*)baseShapes[0];
-		Log("Switching back to " + std::string(currentBaseShape));
-	}
-		terrain.mesh->RecalculateNormals();
 
 	isRemeshing = false;
 }
@@ -343,7 +367,10 @@ static void RegenerateMesh() {
 	if (isRemeshing)
 		return;
 
-	terrain.UploadToGPU();
+	if(isUsingBase)
+		terrain.UploadToGPU();
+	else
+		customModel->UploadToGPU();
 
 	noiseGen->UpdateLayers();
 
@@ -437,7 +464,10 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformf("_CameraNear", camera.near);
 		shader->SetUniformf("_CameraFar", camera.far);
 		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
-		terrain.Render();
+		if(isUsingBase)
+			terrain.Render();
+		else
+			customModel->Render();
 
 
 		if (showFoliage)
@@ -505,24 +535,51 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 
 }
 
+static void ChangeCustomModel()
+{
+	if(!isUsingBase)
+	{
+		while(isRemeshing);
+		delete customModel;
+		delete customModelCopy;
+	}
+	currentBaseModelName = ShowOpenFileDialog("*.obj");
+	if(currentBaseModelName.size() > 3)
+	{
+		isUsingBase = false;	
+		customModel = LoadModel(currentBaseModelName);
+		customModelCopy = LoadModel(currentBaseModelName); // Will Be Replaced with something efficient
+	}
+}
+
 static void ShowTerrainControls()
 {
 	static bool exp = false;
 	ImGui::Begin("Dashboard");
-
-	if (ImGui::BeginCombo("Base Shape", currentBaseShape)) 
+	
+	if(!isUsingBase)
 	{
-	    for (int n = 0; n < IM_ARRAYSIZE(baseShapes); n++)
-	    {
-	        bool is_selected = (currentBaseShape == baseShapes[n]); // You can store your selection however you want, outside or inside your objects
-	        if (ImGui::Selectable(baseShapes[n], is_selected))
-	            currentBaseShape = (char*)baseShapes[n];
-	        if (is_selected)
-	            ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-	    }
-	    ImGui::EndCombo();
+		ImGui::Text(("Current Base Model : " + currentBaseModelName).c_str());
+		if(ImGui::Button("Change Current Base"))
+		{
+			ChangeCustomModel();
+		}
+		if(ImGui::Button("Switch to Plane"))
+		{
+			while(isRemeshing);
+			delete customModel;
+			delete customModelCopy;
+			isUsingBase = true;
+		}
 	}
-
+	else
+	{
+		ImGui::Text("Current Base Model : Default Plane");
+		if(ImGui::Button("Change Current Base"))
+		{
+			ChangeCustomModel();
+		}	
+	}
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
@@ -1734,9 +1791,9 @@ public:
 			io.MouseWheel = (float)y;
 			});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		GenerateMesh();
 		noiseGen = new LayeredNoiseManager();
 		moduleManager = new ModuleManager();
+		GenerateMesh();
 		SetupMeshNodeEditor(moduleManager);
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
