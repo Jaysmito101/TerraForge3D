@@ -8,7 +8,7 @@ uniform vec3 _LightColor;
 
 in float height;
 in float Distance;
-in flat vec4 FragPos;
+in vec4 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
 
@@ -39,12 +39,13 @@ void main()
 {	
 
 	vec3 objectColor = vec3(0, 1, 1);
+
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(_LightPosition - FragPos.xyz);
 	float diff = max(dot(norm, lightDir), 0.0f);
 	vec3 diffuse = diff * _LightColor;
 	vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;
-	float factor = pow(2.7139, -1*Distance);
-	FragColor = mix(vec4(result, 0.6f), vec4(1.0), 0.1);
+
+
 	FragColor = vec4(result, 1.0f);
 } 

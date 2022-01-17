@@ -10,6 +10,9 @@
 #include <Shader.h>
 #include <glm/glm.hpp>
 
+#include "Model.h"
+#include "ModelImporter.h"
+
 #include <Utils.h>
 
 static uint32_t textureID;
@@ -17,9 +20,10 @@ static uint32_t vao;
 bool tmpb = false;
 static std::string vertShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\vert.glsl", &tmpb);
 static std::string fragShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\frag.glsl", &tmpb);
+static std::string fragProShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\procedural_clouds.glsl", &tmpb);
 
 
-static Shader* skyboxShader;
+static Shader* skyboxShader, *skyproShader;
 float skyboxVertices[] = {
     // positions          
     -1.0f,  1.0f, -1.0f,
@@ -66,7 +70,7 @@ float skyboxVertices[] = {
 };
 
 static TextureCubemap cubemap;
-
+static Model* skySphere;
 
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
@@ -92,6 +96,7 @@ void SetupCubemap()
     cubemap.UploadDataToGPU();
 
     skyboxShader = new Shader(vertShader, fragShader);
+    skyproShader = new Shader(vertShader, fragProShader);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -102,20 +107,33 @@ void SetupCubemap()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    skySphere = LoadModel(GetExecutableDir() + "\\Data\\models\\icosphere.obj");
+    skySphere->SetupMeshOnGPU();
+    skySphere->UploadToGPU();
 }
 
 
-void RenderSkybox(glm::mat4 view, glm::mat4 proj) {
+void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural) {
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glBindVertexArray(vao);
-    skyboxShader->Bind();
+    
+    Shader* shd = skyboxShader;
+    if(useProcedural)
+        shd = skyproShader;
+    shd->Bind();
     cubemap.Bind(0);
     view = glm::mat4(glm::mat3(view));
-    skyboxShader->SetUniformMat4("_P", proj);
-    skyboxShader->SetUniformMat4("_V", view);
-    glUniform1i(glGetUniformLocation(skyboxShader->m_Shader, "skybox"), 0);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    shd->SetUniformMat4("_P", proj);
+    shd->SetUniformMat4("_V", view);
+    glUniform1i(glGetUniformLocation(shd->m_Shader, "skybox"), 0);
+    if(useBox)
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    else{
+        skySphere->Update();
+        skySphere->Render();
+    }
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
 }

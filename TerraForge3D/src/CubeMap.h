@@ -5,6 +5,6 @@
 
 void SetupCubemap();
 
-void RenderSkybox(glm::mat4 view, glm::mat4 proj);
+void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox = false, bool useProcedural = true);
 
 TextureCubemap* GetSkyboxCubemapTexture();

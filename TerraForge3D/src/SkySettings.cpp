@@ -24,6 +24,9 @@ static void ChangeCubemapTile(int face) {
 	}
 }
 
+static bool useBox = false;
+static bool useProcedural = true;
+
 static void LoadHDRI(std::string path) {
 		// load hdr or ldr image
 	int cubemapResolution = 1024;
@@ -54,6 +57,9 @@ static void LoadHDRI(std::string path) {
 void ShowSkySettings(bool* pOpen)
 {
 	ImGui::Begin("Sky Settings", pOpen);
+
+	if(!useProcedural ){
+
 	if (ImGui::Button("Load HDRI")) {
 		std::string path = ShowOpenFileDialog(".png");
 		if (path.size() > 2) {
@@ -99,12 +105,26 @@ void ShowSkySettings(bool* pOpen)
 		ChangeCubemapTile(TEXTURE_CUBEMAP_NZ);
 	}
 	ImGui::Separator();
+
+	}
+
+	if(!useProcedural)
+		useProcedural = ImGui::Button("Use Procedural Sky");
+	else
+		useProcedural = !ImGui::Button("Use Cubemap Sky");
+	
+	if(!useBox)
+		useBox = ImGui::Button("Use Sky Box");
+	else
+		useBox = !ImGui::Button("Use Sky Sphere");
+	
+
 	ImGui::End();
 
 }
 
 void RenderSky(glm::mat4 view, glm::mat4 pers)
 {
-	RenderSkybox(view, pers);
+	RenderSkybox(view, pers, useBox, useProcedural);
 }
 

@@ -8,7 +8,7 @@ uniform vec3 _LightColor;
 
 in float height;
 in float Distance;
-in flat vec4 FragPos;
+in vec4 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
 
