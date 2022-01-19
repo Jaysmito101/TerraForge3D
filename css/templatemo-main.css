@@ -310,19 +310,19 @@ nav a:hover::before {
   background-image: url(../img/first_bg.gif);
 }
 .slides .slide:nth-child(2) {
-  background-image: url(../img/second_bg.gif);
+  background-image: url(../img/first_bg.gif);
 }
 .slides .slide:nth-child(3) {
-  background-image: url(../img/third_bg.gif);
+  background-image: url(../img/first_bg.gif);
 }
 .slides .slide:nth-child(4) {
-  background-image: url(../img/fourth_bg.gif);
+  background-image: url(../img/first_bg.gif);
  }
 .slides .slide:nth-child(5) {
-  background-image: url(../img/fifth_bg.gif);
+  background-image: url(../img/first_bg.gif);
 }
 .slides .slide:nth-child(6) {
-  background-image: url(../img/third_bg.gif);
+  background-image: url(../img/first_bg.gif);
 }
 .slides .slide img {
   width: 100%;
