@@ -2,6 +2,7 @@
 layout (location = 0) in vec4 aPos;
 layout (location = 1) in vec4 aNorm;
 layout (location = 2) in vec2 aTexCoord;
+layout (location = 3) in vec4 aExtras1;
 
 uniform mat4 _PV;
 uniform mat4 _Model;

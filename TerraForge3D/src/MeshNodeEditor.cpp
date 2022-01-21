@@ -39,6 +39,7 @@
 #include "Nodes/VisualizerNode.h"
 #include "Nodes/TextureNode.h"
 #include "Nodes/HillNode.h"
+#include "Nodes/MinValNode.h"
 
 #include "Modules/ModuleManager.h"
 
@@ -107,6 +108,7 @@ static void ShowNodeMaker()
     NODE_MAKER_SHOW(NoiseValueCubicNode, "Value Cubic Noise");
     NODE_MAKER_SHOW(DuplicateNode, "Duplicate");
     NODE_MAKER_SHOW(MathFunctionNode, "Custom Math Funcion");
+    NODE_MAKER_SHOW(MinValNode, "MinVal");
     NODE_MAKER_SHOW(VisualizerNode, "Visualizer");
 
     for (NodeModule* mod : modMan->noModules)
@@ -186,8 +188,9 @@ void SetupMeshNodeEditor(ModuleManager* m)
         case MeshNodeEditor::MeshNodeType::Pixelate:             node = new PixelateNode(); break;
         case MeshNodeEditor::MeshNodeType::Visualizer:           node = new VisualizerNode(); break;
         case MeshNodeEditor::MeshNodeType::Hill:                 node = new HillNode(); break;
+        case MeshNodeEditor::MeshNodeType::MinVal:               node = new MinValNode(); break;
         case MeshNodeEditor::MeshNodeType::Module:               node = new ModuleNode(data["mid"], modMan->FindNodeModule(data["mid"])); break;
-        default:                                   node = nullptr; Log("Unknown Node Type!"); break;
+        default:                                                 node = nullptr; Log("Unknown Node Type!"); break;
         }
         return node;
     };

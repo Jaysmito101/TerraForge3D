@@ -324,7 +324,6 @@ static void FillMeshData() {
 		terrain.mesh->RecalculateNormals();	
 	}
 	else{
-		//customModelCopy->mesh->RecalculateNormals();
 		for(int i=0;i<customModel->mesh->vertexCount;i++)
 		{
 			Vert tmp = customModelCopy->mesh->vert[i];
@@ -351,8 +350,10 @@ static void FillMeshData() {
 				elev =  EvaluateMeshNodeEditor(NodeInputParam(pos, texCoord, minPos, maxPos)).value;
 				
 			}
+			tmp.position *= scale;
 			tmp.position += elev * tmp.normal;
-			customModel->mesh->vert[i] = tmp;			
+			customModel->mesh->vert[i].extras1.x = elev;
+			customModel->mesh->vert[i].position = tmp.position;			
 		}
 		customModel->mesh->RecalculateNormals();
 		
@@ -1139,7 +1140,7 @@ static void ShowMenu() {
 
 			if (ImGui::BeginMenu("Export Mesh As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
-					if (ExportOBJ(terrain.mesh->Clone(), openfilename())) {
+					if (ExportOBJ(terrain.mesh->Clone(), ShowSaveFileDialog(".obj\0"))) {
 						successMessage = "Sucessfully exported mesh!";
 						ImGui::BeginPopup("Success Messages");
 					}

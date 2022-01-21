@@ -67,7 +67,9 @@ Model* LoadModel(std::string path)
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
+	aiProcess_GenSmoothNormals |
         aiProcess_JoinIdenticalVertices |
+	aiProcess_GenUVCoords |
         aiProcess_SortByPType);
 
     if (nullptr == scene) {

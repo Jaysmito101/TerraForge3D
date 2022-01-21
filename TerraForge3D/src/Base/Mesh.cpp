@@ -24,13 +24,7 @@ Mesh::~Mesh() {
 
 void Mesh::RecalculateNormals()
 {
-	if (currType == MeshType::Icosphere) 
-	{
-		for (int i = 0; i < vertexCount; i++) {
-			vert[i].normal = glm::normalize(vert[i].position);
-		}
-	}
-	else {
+
 		for (int i = 0; i < indexCount; i += 3)
 		{
 			const int ia = indices[i];
@@ -46,8 +40,9 @@ void Mesh::RecalculateNormals()
 			vert[ic].normal += glm::vec4(no, 0.0);
 		}
 
-		for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
-	}
+		for (int i = 0; i < vertexCount; i++)
+			vert[i].normal = glm::vec4(glm::normalize(glm::vec3(vert[i].normal)), 0.0f);
+
 }
 
 void Mesh::GenerateIcoSphere(int resolution, float radius, float textureScale)
@@ -129,6 +124,7 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 				inds[triIndex + 5] = i + resolution + 1;
 				triIndex += 6;
 			}
+			vertices[i].extras1 = glm::vec4(0.0f);			
 		}
 	}
 	
@@ -159,6 +155,7 @@ void Mesh::SetElevation(float elevation, int x, int y){
 	if (elevation < minHeight)
 		minHeight = elevation;
 	vert[i].position.y = elevation;
+	vert[i].extras1.x = elevation;
 }
 
 float Mesh::GetElevation(int x, int y) {

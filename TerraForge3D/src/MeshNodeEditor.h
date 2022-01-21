@@ -37,6 +37,7 @@ namespace MeshNodeEditor {
 		TimeBasedSeed,
 		RandomNumber,
 		Duplicate,
+		MinVal,
 		Add,
 		Sub,
 		Mul,
