@@ -65,6 +65,7 @@
 static Model terrain("Terrain");
 static Model sea("Sea");
 static Model grid("Grid");
+static Model screenQuad("Screen Quad");
 
 static Model* customModel,* customModelCopy;
 
@@ -72,7 +73,9 @@ static FrameBuffer* reflectionfbo, * textureFBO;
 
 static Application* myApp;
 static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader, * foliageShader;
+static std::shared_ptr<Shader> postProcessingShader;
 static Camera camera;
+static Camera postCamera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
 static LayeredNoiseManager* noiseGen;
@@ -111,6 +114,7 @@ static bool showFoliage = true;
 static bool isTextureBake = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
+static bool isPostProcess = true;
 
 static Texture2D* diffuse, * normal, * gridTex, * waterDudvMap, * waterNormal;
 
@@ -146,6 +150,8 @@ static std::string waterNormalMap = "";
 static std::string currentBaseModelName = "";
 
 static float nLOffsetX, nLOffsetY, nLOffsetZ;
+
+std::shared_ptr<FrameBuffer> postProcessFBO;
 
 
 static void ToggleSystemConsole() {
@@ -399,6 +405,11 @@ static void GenerateMesh()
 	grid.mesh->GeneratePlane(50, 120);
 	grid.mesh->RecalculateNormals();
 	grid.UploadToGPU();
+
+	screenQuad.SetupMeshOnGPU();
+	screenQuad.mesh->GenerateScreenQuad();
+	screenQuad.mesh->RecalculateNormals();
+	screenQuad.UploadToGPU();
 }
 
 static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bakeTexture = false) {
@@ -533,7 +544,29 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	}
 
 
+	 
+}
 
+void PostProcess(float deltatime)
+{
+	float pos[3] = { 0, 0, 1.8 };
+	float rot[3] = {0, 0, 0};
+	postCamera.aspect = 1;
+	postCamera.UpdateCamera(pos, rot);
+
+	postProcessingShader->Bind(); 
+	 
+	postProcessingShader->SetMPV(postCamera.pv);
+
+	glActiveTexture(GL_TEXTURE5);	
+	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferColorTextureId());
+	postProcessingShader->SetUniformi("_ColorTexture", 5);
+
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferDepthTextureId());
+	postProcessingShader->SetUniformi("_DepthTexture", 6);
+
+	screenQuad.Render();
 }
 
 static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
@@ -585,6 +618,7 @@ static void ShowTerrainControls()
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
 	ImGui::NewLine();
+	ImGui::Checkbox("Post Processing", &isPostProcess);
 	ImGui::Checkbox("Auto Save", &autoSave);
 	ImGui::Checkbox("Auto Update", &autoUpdate);
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
@@ -731,9 +765,10 @@ static void ShowMainScene() {
 		ImVec2 wsize = ImGui::GetWindowSize();
 		if (isTextureBake)
 			ImGui::Image((ImTextureID)textureFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		else if (isPostProcess)
+			ImGui::Image((ImTextureID)postProcessFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		else
 			ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		//ImGui::Image((ImTextureID)reflectionfbo->GetDepthTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
 	ImGui::End();
@@ -1628,6 +1663,13 @@ public:
 				glViewport(0, 0, 800, 600);
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime, true);
+
+				if (isPostProcess)
+				{
+					postProcessFBO->Begin();
+					GetWindow()->Clear();
+					PostProcess(deltatime);
+				}
 			}
 
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1666,6 +1708,11 @@ public:
 			UpdateExplorerControls(CameraPosition, CameraRotation, isIExploreMode, &nLOffsetX, &nLOffsetY);
 			DoTheRederThing(deltatime, true);
 
+			if (isPostProcess)
+			{
+				postProcessFBO->Begin();
+				PostProcess(deltatime);
+			}
 
 			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_ESCAPE))) {
 				isExploreMode = false;
@@ -1861,6 +1908,11 @@ public:
 		reflectionfbo = new FrameBuffer();
 		textureFBO = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
 		LoadTextureThumbs();
+
+		bool tpp = false;
+
+		postProcessFBO = std::make_shared<FrameBuffer>(800, 600);
+		postProcessingShader = std::make_shared<Shader>(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\vert.glsl", &tpp), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\frag.glsl", &tpp));
 
 		// For Debug Only
 		autoUpdate = true;

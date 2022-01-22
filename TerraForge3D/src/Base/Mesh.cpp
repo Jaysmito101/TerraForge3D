@@ -144,6 +144,45 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 	delete inds;
 }
 
+void Mesh::GenerateScreenQuad(float dist) 
+{
+	if (vert) 
+		delete[] vert;
+	if (indices)
+		delete[] indices;
+	Vert v;
+	vert = new Vert[4];
+
+	v.position = glm::vec4(-1, -1, dist, 0);
+	v.texCoord = glm::vec2(0, 0);
+	vert[0] = v;
+
+	v.position = glm::vec4(-1, 1, dist, 0);
+	v.texCoord = glm::vec2(0, 1);
+	vert[1] = v;
+
+	v.position = glm::vec4(1, 1, dist, 0);
+	v.texCoord = glm::vec2(1, 1);
+	vert[2] = v;
+
+	v.position = glm::vec4(1, -1, dist, 0);
+	v.texCoord = glm::vec2(1, 0);
+	vert[3] = v;
+
+	vertexCount = 4;
+
+	indexCount = 6;
+
+	indices = new int[6];
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+}
+
 void Mesh::SetElevation(float elevation, int x, int y){
 	if(!vert)
 		return;

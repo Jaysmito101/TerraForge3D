@@ -34,8 +34,8 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::Begin()
 {
-	glViewport(0, 0, width, height);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glViewport(0, 0, width, height);
 }
 
 uint32_t FrameBuffer::End()
