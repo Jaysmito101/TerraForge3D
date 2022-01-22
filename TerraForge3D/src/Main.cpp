@@ -536,7 +536,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 
 }
 
-static void ChangeCustomModel()
+static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 {
 	if(!isUsingBase)
 	{
@@ -544,7 +544,7 @@ static void ChangeCustomModel()
 		delete customModel;
 		delete customModelCopy;
 	}
-	currentBaseModelName = ShowOpenFileDialog("*.obj");
+	currentBaseModelName = mdstr;
 	if(currentBaseModelName.size() > 3)
 	{
 		isUsingBase = false;	
@@ -833,6 +833,22 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 		tmp["diffuseTexId"] = uid;
 	}
 
+	tmp["isUsingBase"] = isUsingBase;
+
+	if(!isUsingBase)
+	{
+		std::string baseHash = MD5File(currentBaseModelName).ToString();
+		std::string projectAsset = GetProjectAsset(baseHash); 
+		if(projectAsset == "")
+		{
+			if (!PathExist(GetProjectResourcePath() + "\\models"))
+				MkDir(GetProjectResourcePath() + "\\models");
+			CopyFileData(currentBaseModelName, GetProjectResourcePath() + "\\models\\" + baseHash + currentBaseModelName.substr(currentBaseModelName.find_last_of(".")));
+			RegisterProjectAsset(baseHash, "models\\" + baseHash + currentBaseModelName.substr(currentBaseModelName.find_last_of(".")));
+		}
+		tmp["baseid"] = baseHash;
+	}
+
 	data["generals"] = tmp;
 
 	std::ofstream outfile;
@@ -956,6 +972,8 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 		seaDistortionStength = tmp["seaDistortionStength"];
 		DuDvMapID = tmp["dudvmapID"];
 		waterNormalMap = tmp["waterNormalMap"];
+		tmp["isUsingBase"] = isUsingBase;
+
 	}
 	catch (...) {}
 	SetProjectId(tmp["projectID"]);
@@ -980,6 +998,31 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 	LightPosition[0] = tmp["lightPosX"];
 	LightPosition[2] = tmp["lightPosY"];
 	LightPosition[1] = tmp["lightPosZ"];
+
+
+
+	isUsingBase = tmp["isUsingBase"];
+
+	try{
+		std::string baseHash = GetProjectAsset(tmp["baseid"]);
+		std::string projectAsset = GetProjectAsset(baseHash); 
+		if(projectAsset == "")
+		{
+			Log("Failed to load base model from save file!");
+		}
+		else
+		{
+			ChangeCustomModel(GetProjectResourcePath() + "\\" + projectAsset);
+		}
+		isUsingBase = false;
+		Log("Loaded Base Model!");
+	}catch(...)
+	{
+		delete customModel;
+		delete customModelCopy;
+		isUsingBase = true;
+		Log("Switching to Base Plane!");
+	}
 
 	if (DuDvMapID != "DEFAULT") {
 		delete waterDudvMap;
@@ -1083,16 +1126,6 @@ static void LoadPackedProject(std::string path = ShowOpenFileDialog()) {
 			Log("Failed to Parse Project file!");
 			return;
 		}
-		try {
-			if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
-				Log("The file you are tryng to open was made with a different version of TerraForge3D!");
-				return;
-			}
-		}
-		catch (...) {
-			Log("The file you are tryng to open was made with a different version of TerraForge3D!");
-			return;
-		}
 		std::string projId = data["generals"]["projectID"];
 		zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId).c_str(), [](const char* filename, void* arg) {Log(std::string("Extracted ") + filename); return 1; }, (void*)0);
 		std::string oriDir = path.substr(0, path.rfind("\\"));
@@ -1138,44 +1171,43 @@ static void ShowMenu() {
 				moduleManager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
 			}
 
+			Model* modelToExport;
+			if(isUsingBase)
+				modelToExport = &terrain;
+			else
+				modelToExport = customModel;
+
 			if (ImGui::BeginMenu("Export Mesh As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
-					if (ExportOBJ(terrain.mesh->Clone(), ShowSaveFileDialog(".obj\0"))) {
-						successMessage = "Sucessfully exported mesh!";
-						ImGui::BeginPopup("Success Messages");
-					}
-					else {
-						errorMessage = "One Export is already in progress!";
-						ImGui::BeginPopup("Error Messages");
-					}
+					ExportModelAssimp(modelToExport, "obj", ShowSaveFileDialog(".obj\0"), "obj");
 				}
 
 				if (ImGui::MenuItem("FBX")) {
-					ExportModelAssimp(&terrain, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
+					ExportModelAssimp(modelToExport, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
 				}
 
 				if (ImGui::MenuItem("GLTF v2")) {
-					ExportModelAssimp(&terrain, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
+					ExportModelAssimp(modelToExport, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
 				}
 
 				if (ImGui::MenuItem("GLB v2")) {
-					ExportModelAssimp(&terrain, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
+					ExportModelAssimp(modelToExport, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
 				}
 
 				if (ImGui::MenuItem("JSON")) {
-					ExportModelAssimp(&terrain, "json", ShowSaveFileDialog(".json\0"));
+					ExportModelAssimp(modelToExport, "json", ShowSaveFileDialog(".json\0"));
 				}
 
 				if (ImGui::MenuItem("STL")) {
-					ExportModelAssimp(&terrain, "stl", ShowSaveFileDialog(".stl\0"));
+					ExportModelAssimp(modelToExport, "stl", ShowSaveFileDialog(".stl\0"));
 				}
 
 				if (ImGui::MenuItem("PLY")) {
-					ExportModelAssimp(&terrain, "ply", ShowSaveFileDialog(".ply\0"));
+					ExportModelAssimp(modelToExport, "ply", ShowSaveFileDialog(".ply\0"));
 				}
 
 				if (ImGui::MenuItem("Collada")) {
-					ExportModelAssimp(&terrain, "collada", ShowSaveFileDialog(".dae\0"), "dae");
+					ExportModelAssimp(modelToExport, "collada", ShowSaveFileDialog(".dae\0"), "dae");
 				}
 
 				ImGui::EndMenu();
