@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 
 FrameBuffer::FrameBuffer(int w, int h)
-{
+{  
 	width = w;
 	height = h;
 	glGenFramebuffers(1, &fbo);
@@ -23,26 +23,26 @@ FrameBuffer::FrameBuffer(int w, int h)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
+}        
+ 
 FrameBuffer::~FrameBuffer()
-{
+{ 
 	glDeleteTextures(1, &colorTexture);
 	glDeleteTextures(1, &depthTexture);
 	glDeleteFramebuffers(1, &fbo);
-}
+} 
 
 void FrameBuffer::Begin()
-{
+{ 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);  
 }
 
 uint32_t FrameBuffer::End()
 {
 	return colorTexture;
 }
-
+ 
 uint32_t FrameBuffer::GetColorTexture()
 {
 	return colorTexture;
@@ -57,3 +57,4 @@ uint32_t FrameBuffer::GetRendererID()
 {
 	return fbo;
 }
+   

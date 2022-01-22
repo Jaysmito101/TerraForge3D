@@ -33,6 +33,7 @@
 #include <glm/ext/matrix_relational.hpp>
 #include <glm/ext/vector_relational.hpp>
 #include <glm/ext/scalar_relational.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SimplexNoise.h>
 #include <FastNoiseLite.h>
 #include <thread>
@@ -152,6 +153,9 @@ static std::string currentBaseModelName = "";
 static float nLOffsetX, nLOffsetY, nLOffsetZ;
 
 std::shared_ptr<FrameBuffer> postProcessFBO;
+
+static float cloudsBoxMin[3] = { 0, 0, 0 };
+static float cloudsBoxMax[3] = {1, 1, 1};
 
 
 static void ToggleSystemConsole() {
@@ -554,7 +558,15 @@ void PostProcess(float deltatime)
 	postCamera.aspect = 1;
 	postCamera.UpdateCamera(pos, rot);
 
+	float viewDir[3] = { glm::value_ptr(camera.pv)[2], glm::value_ptr(camera.pv)[6], glm::value_ptr(camera.pv)[10] };
+
 	postProcessingShader->Bind(); 
+
+	postProcessingShader->SetUniform3f("_CameraPosition", CameraPosition);
+	postProcessingShader->SetUniform3f("_ViewDir", viewDir);
+
+	postProcessingShader->SetUniform3f("cloudsBoxBoundsMin", cloudsBoxMin);
+	postProcessingShader->SetUniform3f("cloudsBoxBoundsMax", cloudsBoxMax);
 	 
 	postProcessingShader->SetMPV(postCamera.pv);
 
@@ -563,12 +575,12 @@ void PostProcess(float deltatime)
 	postProcessingShader->SetUniformi("_ColorTexture", 5);
 
 	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferDepthTextureId());
+	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferDepthTextureId()); 
 	postProcessingShader->SetUniformi("_DepthTexture", 6);
 
 	screenQuad.Render();
-}
-
+} 
+ 
 static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 {
 	if(!isUsingBase)
@@ -615,8 +627,16 @@ static void ShowTerrainControls()
 		}	
 	}
 
+
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
+	ImGui::NewLine();
+
+	// TMP
+	ImGui::DragFloat3("Clouds Box Max", cloudsBoxMax, 0.1f);
+	ImGui::DragFloat3("Clouds Box Min", cloudsBoxMin, 0.1f);
+	// TMP
+
 	ImGui::NewLine();
 	ImGui::Checkbox("Post Processing", &isPostProcess);
 	ImGui::Checkbox("Auto Save", &autoSave);
