@@ -844,6 +844,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["projectID"] = GetProjectId();
 	tmp["seaWaveSpeed"] = seaWaveSpeed;
 	tmp["projectDatabase"] = GetProjectDatabase();
+	tmp["projectDatabaseJs"] = nlohmann::json::parse(GetProjectDatabase());
 	tmp["dudvmapID"] = DuDvMapID;
 	tmp["waterNormalMap"] = waterNormalMap;
 
@@ -1056,21 +1057,20 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 
 
 
-	isUsingBase = tmp["isUsingBase"];
-
 	try{
-		std::string baseHash = GetProjectAsset(tmp["baseid"]);
+		std::string baseHash = tmp["baseid"];
 		std::string projectAsset = GetProjectAsset(baseHash); 
 		if(projectAsset == "")
 		{
 			Log("Failed to load base model from save file!");
+			Log("Loaded Base Model!");
+			isUsingBase = true;
 		}
 		else
 		{
 			ChangeCustomModel(GetProjectResourcePath() + "\\" + projectAsset);
+			isUsingBase = false;
 		}
-		isUsingBase = false;
-		Log("Loaded Base Model!");
 	}catch(...)
 	{
 		delete customModel;

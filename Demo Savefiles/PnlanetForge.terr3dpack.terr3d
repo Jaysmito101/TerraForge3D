@@ -8,10 +8,10 @@
                     "g": 1.0,
                     "r": 1.0
                 },
-                "from": 54,
-                "id": 175,
+                "from": 40,
+                "id": 183,
                 "thickness": 1.0,
-                "to": 71,
+                "to": 74,
                 "type": "Link"
             },
             {
@@ -34,23 +34,10 @@
                     "g": 1.0,
                     "r": 1.0
                 },
-                "from": 40,
-                "id": 183,
+                "from": 54,
+                "id": 175,
                 "thickness": 1.0,
-                "to": 74,
-                "type": "Link"
-            },
-            {
-                "color": {
-                    "a": 1.0,
-                    "b": 1.0,
-                    "g": 1.0,
-                    "r": 1.0
-                },
-                "from": 100,
-                "id": 101,
-                "thickness": 1.0,
-                "to": 88,
+                "to": 71,
                 "type": "Link"
             },
             {
@@ -73,6 +60,19 @@
                     "g": 1.0,
                     "r": 1.0
                 },
+                "from": 100,
+                "id": 101,
+                "thickness": 1.0,
+                "to": 88,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
                 "from": 84,
                 "id": 90,
                 "thickness": 1.0,
@@ -86,10 +86,10 @@
                     "g": 1.0,
                     "r": 1.0
                 },
-                "from": 43,
-                "id": 174,
+                "from": 89,
+                "id": 102,
                 "thickness": 1.0,
-                "to": 68,
+                "to": 93,
                 "type": "Link"
             },
             {
@@ -99,10 +99,10 @@
                     "g": 1.0,
                     "r": 1.0
                 },
-                "from": 89,
-                "id": 102,
+                "from": 43,
+                "id": 174,
                 "thickness": 1.0,
-                "to": 93,
+                "to": 68,
                 "type": "Link"
             },
             {
@@ -139,7 +139,20 @@
                     "r": 1.0
                 },
                 "from": 41,
-                "id": 182,
+                "id": 717,
+                "thickness": 1.0,
+                "to": 714,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 716,
+                "id": 718,
                 "thickness": 1.0,
                 "to": 2,
                 "type": "Link"
@@ -148,17 +161,17 @@
         "nodes": [
             {
                 "headerColor": 4279526155,
-                "id": 86,
+                "id": 38,
                 "inputPins": [
                     {
                         "color": 4290731870,
-                        "id": 87,
+                        "id": 39,
                         "index": 0,
                         "type": 1
                     },
                     {
                         "color": 4290731870,
-                        "id": 88,
+                        "id": 40,
                         "index": 1,
                         "type": 1
                     }
@@ -167,13 +180,13 @@
                 "outputPins": [
                     {
                         "color": 4290731870,
-                        "id": 89,
+                        "id": 41,
                         "index": 0,
                         "type": 0
                     }
                 ],
-                "posX": -466.0,
-                "posY": -285.0,
+                "posX": -446.0,
+                "posY": -669.0,
                 "type": 12,
                 "value1": 1.0,
                 "value2": 1.0
@@ -222,17 +235,17 @@
             },
             {
                 "headerColor": 4279526155,
-                "id": 38,
+                "id": 86,
                 "inputPins": [
                     {
                         "color": 4290731870,
-                        "id": 39,
+                        "id": 87,
                         "index": 0,
                         "type": 1
                     },
                     {
                         "color": 4290731870,
-                        "id": 40,
+                        "id": 88,
                         "index": 1,
                         "type": 1
                     }
@@ -241,16 +254,58 @@
                 "outputPins": [
                     {
                         "color": 4290731870,
-                        "id": 41,
+                        "id": 89,
                         "index": 0,
                         "type": 0
                     }
                 ],
-                "posX": -446.0,
-                "posY": -669.0,
+                "posX": -450.0,
+                "posY": -317.0,
                 "type": 12,
                 "value1": 1.0,
                 "value2": 1.0
+            },
+            {
+                "headerColor": 4283891751,
+                "id": 42,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 43,
+                        "index": 0,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 44,
+                        "index": 0,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 45,
+                        "index": 1,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 46,
+                        "index": 2,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 47,
+                        "index": 3,
+                        "type": 0
+                    }
+                ],
+                "posX": -1538.0,
+                "posY": -381.0,
+                "type": 8
             },
             {
                 "fractalType": 1,
@@ -332,48 +387,6 @@
                 "strength": 7.010000228881836,
                 "type": 23,
                 "weightedStrength": 0.0
-            },
-            {
-                "headerColor": 4283891751,
-                "id": 42,
-                "inputPins": [
-                    {
-                        "color": 4290731870,
-                        "id": 43,
-                        "index": 0,
-                        "type": 1
-                    }
-                ],
-                "name": "",
-                "outputPins": [
-                    {
-                        "color": 4290731870,
-                        "id": 44,
-                        "index": 0,
-                        "type": 0
-                    },
-                    {
-                        "color": 4290731870,
-                        "id": 45,
-                        "index": 1,
-                        "type": 0
-                    },
-                    {
-                        "color": 4290731870,
-                        "id": 46,
-                        "index": 2,
-                        "type": 0
-                    },
-                    {
-                        "color": 4290731870,
-                        "id": 47,
-                        "index": 3,
-                        "type": 0
-                    }
-                ],
-                "posX": -1538.0,
-                "posY": -381.0,
-                "type": 8
             },
             {
                 "headerColor": 4283891751,
@@ -552,11 +565,43 @@
                 "posX": -1024.0,
                 "posY": -813.0,
                 "type": 31
+            },
+            {
+                "headerColor": 4279526155,
+                "id": 713,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 714,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 715,
+                        "index": 1,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 716,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": -18.0,
+                "posY": -549.0,
+                "type": 12,
+                "value1": 1.0,
+                "value2": 1.649999976158142
             }
         ],
         "serializer": "Node Serializer v2.0",
         "type": "NodeEditorData",
-        "uidSeed": 450
+        "uidSeed": 719
     },
     "appData": null,
     "generals": {
@@ -565,12 +610,12 @@
         "autoUpdate": true,
         "baseid": "A27A257CB225AC2CAB524910E901B1A6",
         "cameraPosX": 4.808925151824951,
-        "cameraPosY": 41.599998474121094,
+        "cameraPosY": 94.0999984741211,
         "cameraPosZ": 2.718867540359497,
-        "cameraRotX": 50400.0,
-        "cameraRotY": 805.0,
+        "cameraRotX": 87010.0,
+        "cameraRotY": 450.0,
         "cameraRotZ": 0.0,
-        "diffuseTexId": "38676360277478138345657070345317",
+        "diffuseTexId": "61230807382076601730650572145267",
         "dudvmapID": "DEFAULT",
         "flattenBase": false,
         "isUsingBase": false,
@@ -583,9 +628,23 @@
         "nLOffsetY": 0.0,
         "nLOffsetZ": 0.0,
         "noiseBased": false,
-        "projectDatabase": "{\n    \"06230634733313333181116730020140\": \"textures\\\\06230634733313333181116730020140\",\n    \"38676360277478138345657070345317\": \"textures\\\\38676360277478138345657070345317\",\n    \"75DB99B125FE4E9AFBE58696320BEA73\": \"textures\\\\75DB99B125FE4E9AFBE58696320BEA73\",\n    \"77643160173384037225464124755834\": \"textures\\\\77643160173384037225464124755834\",\n    \"79515FE2B90CC186D205AF54BD34FEDE\": \"textures\\\\79515FE2B90CC186D205AF54BD34FEDE\",\n    \"8DA6790915B3073C8499C34AD4BE9BAD\": \"textures\\\\8DA6790915B3073C8499C34AD4BE9BAD\",\n    \"A27A257CB225AC2CAB524910E901B1A6\": \"models\\\\A27A257CB225AC2CAB524910E901B1A6.obj\",\n    \"C8E58B31D224FD27C5D8674FFB1C14E2\": \"textures\\\\C8E58B31D224FD27C5D8674FFB1C14E2\",\n    \"CD250F2B5FB5A6B603CD68D52DADAB86\": \"textures\\\\CD250F2B5FB5A6B603CD68D52DADAB86\",\n    \"F9EFE1785A5CCCCB971F344EFE0430E0\": \"textures\\\\F9EFE1785A5CCCCB971F344EFE0430E0\"\n}",
+        "projectDatabase": "{\n    \"06230634733313333181116730020140\": \"textures\\\\06230634733313333181116730020140\",\n    \"38676360277478138345657070345317\": \"textures\\\\38676360277478138345657070345317\",\n    \"43204348308372733840588137642175\": \"textures\\\\43204348308372733840588137642175\",\n    \"56453011667168273176533287062046\": \"textures\\\\56453011667168273176533287062046\",\n    \"75DB99B125FE4E9AFBE58696320BEA73\": \"textures\\\\75DB99B125FE4E9AFBE58696320BEA73\",\n    \"77643160173384037225464124755834\": \"textures\\\\77643160173384037225464124755834\",\n    \"79515FE2B90CC186D205AF54BD34FEDE\": \"textures\\\\79515FE2B90CC186D205AF54BD34FEDE\",\n    \"8DA6790915B3073C8499C34AD4BE9BAD\": \"textures\\\\8DA6790915B3073C8499C34AD4BE9BAD\",\n    \"A27A257CB225AC2CAB524910E901B1A6\": \"models\\\\A27A257CB225AC2CAB524910E901B1A6.obj\",\n    \"C8E58B31D224FD27C5D8674FFB1C14E2\": \"textures\\\\C8E58B31D224FD27C5D8674FFB1C14E2\",\n    \"CD250F2B5FB5A6B603CD68D52DADAB86\": \"textures\\\\CD250F2B5FB5A6B603CD68D52DADAB86\",\n    \"F9EFE1785A5CCCCB971F344EFE0430E0\": \"textures\\\\F9EFE1785A5CCCCB971F344EFE0430E0\"\n}",
+        "projectDatabaseJs": {
+            "06230634733313333181116730020140": "textures\\06230634733313333181116730020140",
+            "38676360277478138345657070345317": "textures\\38676360277478138345657070345317",
+            "43204348308372733840588137642175": "textures\\43204348308372733840588137642175",
+            "56453011667168273176533287062046": "textures\\56453011667168273176533287062046",
+            "75DB99B125FE4E9AFBE58696320BEA73": "textures\\75DB99B125FE4E9AFBE58696320BEA73",
+            "77643160173384037225464124755834": "textures\\77643160173384037225464124755834",
+            "79515FE2B90CC186D205AF54BD34FEDE": "textures\\79515FE2B90CC186D205AF54BD34FEDE",
+            "8DA6790915B3073C8499C34AD4BE9BAD": "textures\\8DA6790915B3073C8499C34AD4BE9BAD",
+            "A27A257CB225AC2CAB524910E901B1A6": "models\\A27A257CB225AC2CAB524910E901B1A6.obj",
+            "C8E58B31D224FD27C5D8674FFB1C14E2": "textures\\C8E58B31D224FD27C5D8674FFB1C14E2",
+            "CD250F2B5FB5A6B603CD68D52DADAB86": "textures\\CD250F2B5FB5A6B603CD68D52DADAB86",
+            "F9EFE1785A5CCCCB971F344EFE0430E0": "textures\\F9EFE1785A5CCCCB971F344EFE0430E0"
+        },
         "projectID": "30366560145161815546147274531223",
-        "scale": 16.600000381469727,
+        "scale": 45.0,
         "scrollSpeed": 0.5,
         "seaAlpha": 0.5,
         "seaDistortionScale": 1.0,
@@ -602,7 +661,7 @@
         "waterNormalMap": "DEFAULT",
         "wireFrameMode": false
     },
-    "imguiData": "[Window][Debug##Default]\nViewportPos=224,247\nViewportId=0x9F5F46A1\nSize=400,400\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=243,232\nViewportId=0xE927CF2F\nSize=866,497\nCollapsed=0\n\n[Window][Application Statistics]\nPos=60,60\nSize=32,35\nCollapsed=0\n\n[Window][Example: Log]\nPos=60,60\nSize=500,400\nCollapsed=0\n\n[Window][Example: Console]\nViewportPos=577,158\nViewportId=0xA4D966FE\nSize=584,457\nCollapsed=0\nDockId=0x3BC79352,1\n\n[Window][Dear ImGui Style Editor]\nViewportPos=94,117\nViewportId=0x6D551092\nSize=353,722\nCollapsed=0\n\n[Window][Hello, world!]\nViewportPos=18,296\nViewportId=0xEBE6C6E6\nSize=866,497\nCollapsed=0\n\n[Window][Example: Property editor]\nViewportPos=65,165\nViewportId=0x593C5C9B\nSize=430,450\nCollapsed=0\n\n[Window][Hello]\nPos=60,60\nSize=65,48\nCollapsed=0\n\n[Window][About Dear ImGui]\nPos=60,60\nSize=570,109\nCollapsed=0\n\n[Window][Hellow rod]\nPos=60,60\nSize=58,48\nCollapsed=0\n\n[Window][Statistics]\nPos=295,461\nSize=285,244\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][General Controls]\nPos=0,317\nSize=319,163\nCollapsed=0\nDockId=0x00000009,3\n\n[Window][System Console]\nViewportPos=577,159\nViewportId=0xA4D966FE\nSize=584,457\nCollapsed=0\nDockId=0x3BC79352,2\n\n[Window][Camera Controls]\nPos=0,317\nSize=319,163\nCollapsed=0\nDockId=0x00000009,2\n\n[Window][Terrain Controls]\nPos=0,33\nSize=319,224\nCollapsed=0\nDockId=0x0000000B,0\n\n[Window][Light Controls]\nPos=291,462\nSize=289,243\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][Noise Settings]\nPos=321,28\nSize=319,452\nCollapsed=0\nDockId=0x00000015,1\n\n[Window][Viewport]\nPos=0,28\nSize=319,287\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][Teffgsf]\nPos=60,60\nSize=129,75\nCollapsed=0\n\n[Window][DockSpace Demo]\nPos=0,0\nSize=640,480\nCollapsed=0\n\n[Window][Theme Editor]\nViewportPos=663,106\nViewportId=0x1974BBCA\nSize=622,459\nCollapsed=0\n\n[Window][Shader Editor Window (Beta)]\nPos=978,235\nSize=388,470\nCollapsed=0\nDockId=0x00000008,0\n\n[Window][Create Shader##shaderEditor]\nViewportPos=417,138\nViewportId=0xAA02EECC\nPos=408,0\nSize=194,538\nCollapsed=0\nDockId=0x0000000B,0\n\n[Window][Elevation Node Editor]\nPos=582,23\nSize=784,434\nCollapsed=0\nDockId=0x00000015,0\n\n[Window][Dashboard]\nPos=0,317\nSize=319,163\nCollapsed=0\nDockId=0x00000009,0\n\n[Window][Sun Controls]\nPos=0,317\nSize=319,163\nCollapsed=0\nDockId=0x00000009,1\n\n[Window][Texture Settings]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,2\n\n[Window][Sea Settings]\nPos=954,28\nSize=412,677\nCollapsed=0\nDockId=0x00000013,0\n\n[Window][Contributers]\nViewportPos=512,286\nViewportId=0x67743C4C\nSize=275,108\nCollapsed=0\n\n[Window][Texture Store]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,2\n\n[Window][Open Source LICENSES]\nViewportPos=393,165\nViewportId=0x929E0302\nSize=506,503\nCollapsed=0\n\n[Window][Foliage Manager]\nPos=1081,28\nSize=285,677\nCollapsed=0\nDockId=0x00000012,0\n\n[Window][Mesh Node Editor]\nPos=321,28\nSize=319,452\nCollapsed=0\nDockId=0x00000015,0\n\n[Window][Mesh Node Editor Debugger]\nPos=0,28\nSize=580,578\nCollapsed=0\nDockId=0x00000002,1\n\n[Window][Shader Editor Window]\nPos=978,28\nSize=388,677\nCollapsed=0\nDockId=0x0000000E,0\n\n[Window][Sky Settings]\nPos=954,371\nSize=412,334\nCollapsed=0\nDockId=0x00000014,0\n\n[Window][Filters Manager]\nPos=1076,28\nSize=290,677\nCollapsed=0\nDockId=0x00000016,0\n\n[Window][Supporters]\nPos=582,28\nSize=250,250\nCollapsed=0\nDockId=0x00000015,2\n\n[Table][0xD0F0C6E3,2]\nColumn 0  Weight=1.0000\nColumn 1  Weight=1.0000\n\n[Docking][Data]\nDockSpace             ID=0x3BC79352 Window=0x4647B76E Pos=266,122 Size=640,452 Split=X\n  DockNode            ID=0x00000001 Parent=0x3BC79352 SizeRef=580,461 Split=Y Selected=0xE3CB8543\n    DockNode          ID=0x0000000B Parent=0x00000001 SizeRef=231,231 Selected=0xE3CB8543\n    DockNode          ID=0x0000000C Parent=0x00000001 SizeRef=231,228 Split=Y Selected=0xDE657D5B\n      DockNode        ID=0x00000002 Parent=0x0000000C SizeRef=509,431 Selected=0x995B0CF8\n      DockNode        ID=0x00000003 Parent=0x0000000C SizeRef=509,244 Split=X Selected=0xDE657D5B\n        DockNode      ID=0x00000006 Parent=0x00000003 SizeRef=257,344 Split=X Selected=0xDE657D5B\n          DockNode    ID=0x00000009 Parent=0x00000006 SizeRef=289,344 Selected=0xDE657D5B\n          DockNode    ID=0x0000000A Parent=0x00000006 SizeRef=289,344 Selected=0x9EA6AB16\n        DockNode      ID=0x00000007 Parent=0x00000003 SizeRef=250,344 Selected=0xAD8E88F2\n  DockNode            ID=0x00000004 Parent=0x3BC79352 SizeRef=784,461 Split=Y Selected=0x995B0CF8\n    DockNode          ID=0x00000005 Parent=0x00000004 SizeRef=160,398 Split=X Selected=0xF498C204\n      DockNode        ID=0x0000000F Parent=0x00000005 SizeRef=370,525 Split=X Selected=0xE88D3F1B\n        DockNode      ID=0x0000000D Parent=0x0000000F SizeRef=394,677 Split=X Selected=0xE88D3F1B\n          DockNode    ID=0x00000011 Parent=0x0000000D SizeRef=497,677 Split=X Selected=0xE88D3F1B\n            DockNode  ID=0x00000015 Parent=0x00000011 SizeRef=492,677 CentralNode=1 Selected=0xE88D3F1B\n            DockNode  ID=0x00000016 Parent=0x00000011 SizeRef=290,677 Selected=0xE5CE34ED\n          DockNode    ID=0x00000012 Parent=0x0000000D SizeRef=285,677 Selected=0x213F919C\n        DockNode      ID=0x0000000E Parent=0x0000000F SizeRef=388,677 Selected=0xFFE85315\n      DockNode        ID=0x00000010 Parent=0x00000005 SizeRef=412,525 Split=Y Selected=0xD47684FE\n        DockNode      ID=0x00000013 Parent=0x00000010 SizeRef=412,341 Selected=0xD47684FE\n        DockNode      ID=0x00000014 Parent=0x00000010 SizeRef=412,334 Selected=0xB2796EE4\n    DockNode          ID=0x00000008 Parent=0x00000004 SizeRef=160,277 Selected=0x6C0FE6DB\n\n",
+    "imguiData": "[Window][Debug##Default]\nViewportPos=224,247\nViewportId=0x9F5F46A1\nSize=400,400\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=243,232\nViewportId=0xE927CF2F\nSize=866,497\nCollapsed=0\n\n[Window][Application Statistics]\nPos=60,60\nSize=32,35\nCollapsed=0\n\n[Window][Example: Log]\nPos=60,60\nSize=500,400\nCollapsed=0\n\n[Window][Example: Console]\nViewportPos=577,158\nViewportId=0xA4D966FE\nSize=584,457\nCollapsed=0\nDockId=0x3BC79352,1\n\n[Window][Dear ImGui Style Editor]\nViewportPos=94,117\nViewportId=0x6D551092\nSize=353,722\nCollapsed=0\n\n[Window][Hello, world!]\nViewportPos=18,296\nViewportId=0xEBE6C6E6\nSize=866,497\nCollapsed=0\n\n[Window][Example: Property editor]\nViewportPos=65,165\nViewportId=0x593C5C9B\nSize=430,450\nCollapsed=0\n\n[Window][Hello]\nPos=60,60\nSize=65,48\nCollapsed=0\n\n[Window][About Dear ImGui]\nPos=60,60\nSize=570,109\nCollapsed=0\n\n[Window][Hellow rod]\nPos=60,60\nSize=58,48\nCollapsed=0\n\n[Window][Statistics]\nPos=295,461\nSize=285,244\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][General Controls]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,3\n\n[Window][System Console]\nViewportPos=577,159\nViewportId=0xA4D966FE\nSize=584,457\nCollapsed=0\nDockId=0x3BC79352,2\n\n[Window][Camera Controls]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,2\n\n[Window][Terrain Controls]\nPos=0,33\nSize=319,224\nCollapsed=0\nDockId=0x0000000B,0\n\n[Window][Light Controls]\nPos=291,462\nSize=289,243\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][Noise Settings]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,1\n\n[Window][Viewport]\nPos=0,28\nSize=580,431\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][Teffgsf]\nPos=60,60\nSize=129,75\nCollapsed=0\n\n[Window][DockSpace Demo]\nPos=0,0\nSize=1366,705\nCollapsed=0\n\n[Window][Theme Editor]\nViewportPos=663,106\nViewportId=0x1974BBCA\nSize=622,459\nCollapsed=0\n\n[Window][Shader Editor Window (Beta)]\nPos=978,235\nSize=388,470\nCollapsed=0\nDockId=0x00000008,0\n\n[Window][Create Shader##shaderEditor]\nViewportPos=417,138\nViewportId=0xAA02EECC\nPos=408,0\nSize=194,538\nCollapsed=0\nDockId=0x0000000B,0\n\n[Window][Elevation Node Editor]\nPos=582,23\nSize=784,434\nCollapsed=0\nDockId=0x00000015,0\n\n[Window][Dashboard]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,0\n\n[Window][Sun Controls]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,1\n\n[Window][Texture Settings]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,2\n\n[Window][Sea Settings]\nPos=954,28\nSize=412,677\nCollapsed=0\nDockId=0x00000013,0\n\n[Window][Contributers]\nViewportPos=512,286\nViewportId=0x67743C4C\nSize=275,108\nCollapsed=0\n\n[Window][Texture Store]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,2\n\n[Window][Open Source LICENSES]\nViewportPos=393,165\nViewportId=0x929E0302\nSize=506,503\nCollapsed=0\n\n[Window][Foliage Manager]\nPos=1081,28\nSize=285,677\nCollapsed=0\nDockId=0x00000012,0\n\n[Window][Mesh Node Editor]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,0\n\n[Window][Mesh Node Editor Debugger]\nPos=0,28\nSize=580,578\nCollapsed=0\nDockId=0x00000002,1\n\n[Window][Shader Editor Window]\nPos=978,28\nSize=388,677\nCollapsed=0\nDockId=0x0000000E,0\n\n[Window][Sky Settings]\nPos=954,371\nSize=412,334\nCollapsed=0\nDockId=0x00000014,0\n\n[Window][Filters Manager]\nPos=1076,28\nSize=290,677\nCollapsed=0\nDockId=0x00000016,0\n\n[Window][Supporters]\nPos=582,28\nSize=250,250\nCollapsed=0\nDockId=0x00000015,2\n\n[Table][0xD0F0C6E3,2]\nColumn 0  Weight=1.0000\nColumn 1  Weight=1.0000\n\n[Docking][Data]\nDockSpace             ID=0x3BC79352 Window=0x4647B76E Pos=0,51 Size=1366,677 Split=X\n  DockNode            ID=0x00000001 Parent=0x3BC79352 SizeRef=580,461 Split=Y Selected=0xE3CB8543\n    DockNode          ID=0x0000000B Parent=0x00000001 SizeRef=231,231 Selected=0xE3CB8543\n    DockNode          ID=0x0000000C Parent=0x00000001 SizeRef=231,228 Split=Y Selected=0xDE657D5B\n      DockNode        ID=0x00000002 Parent=0x0000000C SizeRef=509,431 Selected=0x995B0CF8\n      DockNode        ID=0x00000003 Parent=0x0000000C SizeRef=509,244 Split=X Selected=0xDE657D5B\n        DockNode      ID=0x00000006 Parent=0x00000003 SizeRef=257,344 Split=X Selected=0xDE657D5B\n          DockNode    ID=0x00000009 Parent=0x00000006 SizeRef=289,344 Selected=0xDE657D5B\n          DockNode    ID=0x0000000A Parent=0x00000006 SizeRef=289,344 Selected=0x9EA6AB16\n        DockNode      ID=0x00000007 Parent=0x00000003 SizeRef=250,344 Selected=0xAD8E88F2\n  DockNode            ID=0x00000004 Parent=0x3BC79352 SizeRef=784,461 Split=Y Selected=0x995B0CF8\n    DockNode          ID=0x00000005 Parent=0x00000004 SizeRef=160,398 Split=X Selected=0xF498C204\n      DockNode        ID=0x0000000F Parent=0x00000005 SizeRef=370,525 Split=X Selected=0xE88D3F1B\n        DockNode      ID=0x0000000D Parent=0x0000000F SizeRef=394,677 Split=X Selected=0xE88D3F1B\n          DockNode    ID=0x00000011 Parent=0x0000000D SizeRef=497,677 Split=X Selected=0xE88D3F1B\n            DockNode  ID=0x00000015 Parent=0x00000011 SizeRef=492,677 CentralNode=1 Selected=0xE88D3F1B\n            DockNode  ID=0x00000016 Parent=0x00000011 SizeRef=290,677 Selected=0xE5CE34ED\n          DockNode    ID=0x00000012 Parent=0x0000000D SizeRef=285,677 Selected=0x213F919C\n        DockNode      ID=0x0000000E Parent=0x0000000F SizeRef=388,677 Selected=0xFFE85315\n      DockNode        ID=0x00000010 Parent=0x00000005 SizeRef=412,525 Split=Y Selected=0xD47684FE\n        DockNode      ID=0x00000013 Parent=0x00000010 SizeRef=412,341 Selected=0xD47684FE\n        DockNode      ID=0x00000014 Parent=0x00000010 SizeRef=412,334 Selected=0xB2796EE4\n    DockNode          ID=0x00000008 Parent=0x00000004 SizeRef=160,277 Selected=0x6C0FE6DB\n\n",
     "name": "TerraForge3D v2.0.0",
     "noiseLayers": {
         "absv": false,
@@ -719,5 +778,5 @@
         }
     ],
     "type": "SAVEFILE",
-    "versionHash": "3E8336A4EE7DAC423E294F47C59399AC"
+    "versionHash": "C02C5A0F1160892A19718A9C2CF1B2AB"
 }
