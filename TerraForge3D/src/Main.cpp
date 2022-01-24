@@ -115,7 +115,7 @@ static bool showFoliage = true;
 static bool isTextureBake = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
-static bool isPostProcess = true;
+static bool isPostProcess = false;
 
 static Texture2D* diffuse, * normal, * gridTex, * waterDudvMap, * waterNormal;
 

@@ -4,6 +4,7 @@
 
 // Temporary
 #include <Filters/ErosionFilter.h>
+#include <Filters/DrawFilter.h>
 #include <Filters/GPUErosionFilter.h>
 
 static bool* autoUpdate;
@@ -16,7 +17,7 @@ void SetupFiltersManager(bool* aU, Model* model){
     mainModel = model;
     filters.push_back(new ErosionFilter(model));
     filters.back()->OnAttach();
-    filters.push_back(new GPUErosionFilter(model));
+    filters.push_back(new DrawFilter(model));
     filters.back()->OnAttach();
 }
 
@@ -24,6 +25,8 @@ void ShowFiltersMamager(bool* pOpen){
     ImGui::Begin("Filters Manager", pOpen);
     if(*autoUpdate){
         ImGui::Text("Cannot use filters while auto update is on!");
+        ImGui::NewLine();
+        ImGui::Checkbox("Auto Update", autoUpdate);
     }else{
         int cop = 0;
         for (Filter* filter : filters) {
