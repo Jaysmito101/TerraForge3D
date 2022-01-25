@@ -28,7 +28,7 @@
 
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (380).png" width="1000">
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.1/Screenshot (448).png" width="1000">
+<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase6.gif" width="1000">
 
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (364).png" width="1000">
 
