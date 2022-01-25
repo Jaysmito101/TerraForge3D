@@ -22,3 +22,6 @@ TerraForge3D/**.exe
 TerraForge3D/**.obj
 TerraForge3D/**.lib
 TerraForge3D/**.pdb
+
+# You must get it from you own (GPU/CPU) vendor
+libs/OpenCL.lib

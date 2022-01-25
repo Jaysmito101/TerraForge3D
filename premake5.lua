@@ -84,6 +84,7 @@ project "TerraForge3D"
 		"ws2_32",
 		"Pathcch",
 		"opengl32",
+		"OpenCL",
 		"GLFW",
 		"Glad",
 		"Zip",

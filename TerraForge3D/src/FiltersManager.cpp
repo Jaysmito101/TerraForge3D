@@ -5,6 +5,7 @@
 // Temporary
 #include <Filters/ErosionFilter.h>
 #include <Filters/DrawFilter.h>
+#include <Filters/AdvancedErosionFilter.h>
 #include <Filters/GPUErosionFilter.h>
 
 static bool* autoUpdate;
@@ -16,6 +17,8 @@ void SetupFiltersManager(bool* aU, Model* model){
     autoUpdate = aU;
     mainModel = model;
     filters.push_back(new ErosionFilter(model));
+    filters.back()->OnAttach();
+    filters.push_back(new AdvancedErosionFilter(model));
     filters.back()->OnAttach();
     filters.push_back(new DrawFilter(model));
     filters.back()->OnAttach();

@@ -598,17 +598,89 @@ static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 	}
 }
 
+static void ShowChooseBaseModelPopup()
+{
+	// TEMP
+	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\plane.png", false, false);
+	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\sphere.png", false, false);
+	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cube.png", false, false);
+	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cone.png", false, false);
+	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cylinder.png", false, false);
+	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\torus.png", false, false);
+	// TEMP
+
+	if (ImGui::BeginPopup("Choose Base Model"))
+	{
+		if (ImGui::Button("Open From File")) 
+		{
+			ChangeCustomModel();
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (ImGui::Button("Close"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::BeginChild("Choose Base Model##Child", ImVec2(650, 450));
+
+		if (ImGui::ImageButton((ImTextureID)plane->GetRendererID(), ImVec2(200, 200)) )
+		{
+			while (isRemeshing);
+			delete customModel;
+			delete customModelCopy;
+			isUsingBase = true;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)sphere->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\sphere.obj");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)cube->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cube.obj");
+			ImGui::CloseCurrentPopup();
+		}
+
+
+		if (ImGui::ImageButton((ImTextureID)torus->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\torus.obj");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)cone->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cone.obj");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)cyllinder->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cylinder.obj");
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndChild();
+
+		ImGui::EndPopup();
+	}
+}
+
 static void ShowTerrainControls()
 {
 	static bool exp = false;
 	ImGui::Begin("Dashboard");
+
+	ShowChooseBaseModelPopup();
 	
 	if(!isUsingBase)
 	{
 		ImGui::Text(("Current Base Model : " + currentBaseModelName).c_str());
 		if(ImGui::Button("Change Current Base"))
 		{
-			ChangeCustomModel();
+			ImGui::OpenPopup("Choose Base Model");
 		}
 		if(ImGui::Button("Switch to Plane"))
 		{
@@ -621,10 +693,10 @@ static void ShowTerrainControls()
 	else
 	{
 		ImGui::Text("Current Base Model : Default Plane");
-		if(ImGui::Button("Change Current Base"))
+		if (ImGui::Button("Change Current Base"))
 		{
-			ChangeCustomModel();
-		}	
+			ImGui::OpenPopup("Choose Base Model");
+		}
 	}
 
 
@@ -758,6 +830,7 @@ static void MouseScrollCallback(float amount) {
 	CameraPosition[1] = pPos.y;
 	CameraPosition[2] = pPos.z;
 }
+
 
 static void ShowMainScene() {
 	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -1501,6 +1574,7 @@ static void ShowSeaSettings() {
 
 	ImGui::End();
 }
+
 
 static void ShowModuleManager() {
 	ImGui::Begin("Module Manager", &activeWindows.modulesManager);
