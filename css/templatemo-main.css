@@ -307,22 +307,22 @@ nav a:hover::before {
 }
 
 .slides .slide:nth-child(1) {
-  background-image: url(../img/first_bg-567.png);
+  background-image: url(../img/first_bg3.png);
 }
 .slides .slide:nth-child(2) {
-  background-image: url(../img/first_bg-571.png);
+  background-image: url(../img/first_bg2.png);
 }
 .slides .slide:nth-child(3) {
-  background-image: url(../img/first_bg-521.png);
+  background-image: url(../img/first_bg1.png);
 }
 .slides .slide:nth-child(4) {
-  background-image: url(../img/first_bg-573.png);
+  background-image: url(../img/first_bg2.png);
  }
 .slides .slide:nth-child(5) {
-  background-image: url(../img/first_bg-528.png);
+  background-image: url(../img/first_bg1.png);
 }
 .slides .slide:nth-child(6) {
-  background-image: url(../img/first_bg-563.png);
+  background-image: url(../img/first_bg3.png);
 }
 .slides .slide img {
   width: 100%;
