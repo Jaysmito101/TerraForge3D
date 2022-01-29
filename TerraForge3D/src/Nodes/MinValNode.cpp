@@ -24,6 +24,7 @@ void MinValNode::Load(nlohmann::json data)
 {
     inputf = data["inputf"];
     outputf = data["outputf"];
+    outputr = data["outputr"];
     thresholdf = data["thresholdf"];
 }
 
@@ -33,6 +34,7 @@ nlohmann::json MinValNode::Save()
     data["type"] = MeshNodeEditor::MeshNodeType::MinVal;
     data["inputf"] = inputf;
     data["outputf"] = outputf;
+    data["outputr"] = outputr;
     data["thresholdf"] = thresholdf;
     return data;
 }
