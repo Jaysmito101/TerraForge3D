@@ -224,8 +224,6 @@ void NoiseLayer::Render(int index)
 	if (ImGui::DragInt(MAKE_IMGUI_LABEL("Seed"), &seed))
 		noiseGen->SetSeed(seed);
 	
-	if (ImGui::DragInt(MAKE_IMGUI_LABEL("Octaves"), &octaves, 0.05f))
-		noiseGen->SetSeed(octaves);
 
 	if (ImGui::DragFloat(MAKE_IMGUI_LABEL("Frequency"), &frequency, 0.001f))
 		noiseGen->SetFrequency(frequency);
@@ -234,6 +232,9 @@ void NoiseLayer::Render(int index)
 
 	if (fractalType != 0)
 	{
+		if (ImGui::DragInt(MAKE_IMGUI_LABEL("Octaves"), &octaves, 0.05f))
+			noiseGen->SetFractalOctaves(octaves);
+		
 		if (ImGui::DragFloat(MAKE_IMGUI_LABEL("Lacunarity"), &lacunarity, 0.1f))
 			noiseGen->SetFractalLacunarity(lacunarity);
 
