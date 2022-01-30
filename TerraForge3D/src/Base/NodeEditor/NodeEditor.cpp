@@ -444,21 +444,25 @@ void NodeEditor::DeleteLink(NodeEditorLink* link)
     links.erase(links.find(link->_id.Get()));
     delete link;
 }
-
+int nodeCounter = 1;
 void NodeEditor::AddNode(NodeEditorNode* node)
 {
+    
     nodes[node->_id.Get()] = node;
     for (auto& it : node->GetPins()) 
     {
         pins[it->_id.Get()] = it;
     }
     node->Setup();
-    if (nodes.size() > 2)
+    if (nodes.size() > INFINITY) //Set 2 to INFINTIY here to prevent a program crash, any number here will cause a crash after that many nodes have been made, and one gets deleted and another is added
     {
         NodeEditorNode* lastNode = nodes[lastNodeId.Get()];
         node->nodePosition = lastNode->nodePosition;
         node->reqNodePosLoad = true;
     }
+    std::cout << "Added a New Node" << std::endl;
+    std::cout << "Added Node #" << nodeCounter << std::endl;
+    nodeCounter++;
     lastNodeId = node->_id;
 }
 
@@ -492,6 +496,7 @@ void NodeEditor::DeleteNode(NodeEditorNode* node)
         delete node;
     }
     mutex.unlock();
+    nodeCounter--;
 }
 
 NodeEditor::~NodeEditor()
