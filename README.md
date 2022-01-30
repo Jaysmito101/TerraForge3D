@@ -100,14 +100,14 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 # Contributing
 
 Since this project has become very large I would really love some help.
+For a guide on how to get started developing TerraForge3D https://terraforge3d.gitbook.io/docs/developers-guide
 Here are some things that you might contribute:
 
 * A Documentation (written or video guide)
 * Add comments to the source code
 * Add the small values here and there to serialization which I may have missed
-* Add Some more maze algorithms (like Kruskal's algorithm).(See BinaryTreeMazeNode for reference)
 * Report any bug you can find.
-* In case you write a general purpose script node in lua you may contribute it if you dont mind.
+* Add a new node
 * You can post the screenshots of your creations to https://github.com/Jaysmito101/TerraGen3D/issues/10
 
 # What of SHOWCASE?
@@ -116,7 +116,6 @@ After every 10 - 15 posts in https://github.com/Jaysmito101/TerraGen3D/issues/10
 
 # Support
 
-I am just a Highschool student so I may not have the best quality of code but still i am trying my best to write good code!
 
 Any support would be highly appretiated!
 
