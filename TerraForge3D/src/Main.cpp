@@ -42,6 +42,7 @@
 #include <string.h>
 #include <mutex>
 #include <memory>
+#include <chrono>
 #include <json.hpp>
 #include <zip.h>
 #include <sys/stat.h>
@@ -213,6 +214,8 @@ static void ShowStats()
 		strcat_s(b1, "Vertices  : ");
 		strcat_s(b1, b2);
 		ImGui::Text(b1);
+
+		ImGui::Text(("Mesh Generation Time : " + std::to_string(s_Stats.meshGenerationTime)).c_str());
 	}
 
 	ImGui::End();
@@ -294,8 +297,9 @@ static void ResetShader() {
 }
 
 static void FillMeshData() {
-
+	auto timeBegin = std::chrono::high_resolution_clock::now();
 	if (isUsingBase) {
+		s_Stats.vertCount = terrain.mesh->vertexCount;
 
 		if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
 
@@ -334,6 +338,7 @@ static void FillMeshData() {
 		terrain.mesh->RecalculateNormals();	
 	}
 	else{
+		s_Stats.vertCount = customModel->mesh->vertexCount;
 		for(int i=0;i<customModel->mesh->vertexCount;i++)
 		{
 			Vert tmp = customModelCopy->mesh->vert[i];
@@ -368,8 +373,9 @@ static void FillMeshData() {
 		customModel->mesh->RecalculateNormals();
 		
 	}	
-
-
+	auto timeEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::milli> timeElapsed = timeEnd - timeBegin;
+	s_Stats.meshGenerationTime = timeElapsed.count();
 	isRemeshing = false;
 }
 
