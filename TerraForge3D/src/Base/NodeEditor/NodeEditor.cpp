@@ -181,6 +181,7 @@ NodeEditorNode::NodeEditorNode(int id)
     :id(id)
 {
     _id = id;
+    nodePosition = ImVec2(0, 0);
 }
 
 NodeEditorNode::~NodeEditorNode()
@@ -212,7 +213,14 @@ void NodeEditorNode::LoadInternal(nlohmann::json data)
         inputPins[pns["index"]]->Load(pns);
     for (nlohmann::json pns : data["outputPins"])
         outputPins[pns["index"]]->Load(pns);
+    try{ // For Backward Ckompitabilaty
+        nodePosition = ImVec2(data["posX"], data["posY"]);
+    }catch(...){
+        std::cout << "Failed to load node position!\n";
+    }
+    reqNodePosLoad = true;
 }
+
 
 nlohmann::json NodeEditorNode::SaveInternal()
 {
@@ -233,6 +241,9 @@ nlohmann::json NodeEditorNode::SaveInternal()
         tmp2["index"] = i;
         tmp.push_back(tmp2);
     }
+
+    data["posX"] = nodePosition.x;
+    data["posY"] = nodePosition.y;
     data["outputPins"] = tmp;
     return data;
 }
@@ -406,6 +417,20 @@ void NodeEditor::Render()
         }
     }
 
+
+    for(auto& it : nodes)
+    {
+        if(it.second->reqNodePosLoad)
+        {
+            ImGuiNodeEditor::SetNodePosition(it.second->_id, it.second->nodePosition);
+            it.second->reqNodePosLoad = false;
+        }
+        else
+        {
+            it.second->nodePosition = ImGuiNodeEditor::GetNodePosition(it.second->_id);
+        }
+    }
+
     if (config.updateFunc)
         config.updateFunc();
     ImGuiNodeEditor::End();
@@ -428,7 +453,12 @@ void NodeEditor::AddNode(NodeEditorNode* node)
         pins[it->_id.Get()] = it;
     }
     node->Setup();
-    
+    if (nodes.size() > 2)
+    {
+        NodeEditorNode* lastNode = nodes[lastNodeId.Get()];
+        node->nodePosition = lastNode->nodePosition;
+        node->reqNodePosLoad = true;
+    }
     lastNodeId = node->_id;
 }
 

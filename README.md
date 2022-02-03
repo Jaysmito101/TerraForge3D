@@ -13,9 +13,12 @@
   <img alt="SourceForge" src="https://img.shields.io/sourceforge/dt/terragen3d?label=Source%20Forge%20Downloads&style=for-the-badge">
   <img alt="GitHub" src="https://img.shields.io/github/license/Jaysmito101/Terragen3D?style=for-the-badge">
     <br>
-    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2021?style=for-the-badge">
+    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2022?style=for-the-badge">
     <a href="https://patreon.com/jaysmito101"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djaysmito101%26type%3Dpledges&style=for-the-badge" alt="Support me on Patreon" /></a>
+    <br/>
+  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/Jaysmito101/TerraForge3D/MSBuild?label=Windows%20Build&style=for-the-badge">
 </p>
+
 <br/>
 <hr/>
 
@@ -23,7 +26,9 @@
 3D Procedural Terrain Generation Tool in OpenGL/C++
 
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Screenshot (375).png" width="1000">
+<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (380).png" width="1000">
+
+<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase6.gif" width="1000">
 
 <img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (364).png" width="1000">
 
@@ -95,14 +100,14 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 # Contributing
 
 Since this project has become very large I would really love some help.
+For a guide on how to get started developing TerraForge3D https://terraforge3d.gitbook.io/docs/developers-guide
 Here are some things that you might contribute:
 
 * A Documentation (written or video guide)
 * Add comments to the source code
 * Add the small values here and there to serialization which I may have missed
-* Add Some more maze algorithms (like Kruskal's algorithm).(See BinaryTreeMazeNode for reference)
 * Report any bug you can find.
-* In case you write a general purpose script node in lua you may contribute it if you dont mind.
+* Add a new node
 * You can post the screenshots of your creations to https://github.com/Jaysmito101/TerraGen3D/issues/10
 
 # What of SHOWCASE?
@@ -111,7 +116,6 @@ After every 10 - 15 posts in https://github.com/Jaysmito101/TerraGen3D/issues/10
 
 # Support
 
-I am just a Highschool student so I may not have the best quality of code but still i am trying my best to write good code!
 
 Any support would be highly appretiated!
 
@@ -130,6 +134,8 @@ Give your valuable feedback : https://github.com/Jaysmito101/TerraGen3D/discussi
 Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
+
+Docs : https://terraforge3d.gitbook.io/docs
 
 <a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 

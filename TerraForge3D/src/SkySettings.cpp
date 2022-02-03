@@ -24,6 +24,14 @@ static void ChangeCubemapTile(int face) {
 	}
 }
 
+static bool useBox = false;
+static bool useProcedural = true;
+static float cltime = 0.0f;
+static float upf = 0.35f;
+static float cirrus = 0.4f;
+static float cumulus = 0.8f;
+static float fsun[3] = {0, 0.2, 0.1};
+
 static void LoadHDRI(std::string path) {
 		// load hdr or ldr image
 	int cubemapResolution = 1024;
@@ -54,6 +62,9 @@ static void LoadHDRI(std::string path) {
 void ShowSkySettings(bool* pOpen)
 {
 	ImGui::Begin("Sky Settings", pOpen);
+
+	if(!useProcedural ){
+
 	if (ImGui::Button("Load HDRI")) {
 		std::string path = ShowOpenFileDialog(".png");
 		if (path.size() > 2) {
@@ -99,12 +110,35 @@ void ShowSkySettings(bool* pOpen)
 		ChangeCubemapTile(TEXTURE_CUBEMAP_NZ);
 	}
 	ImGui::Separator();
+
+	}
+	else{
+
+	ImGui::DragFloat("Clouds Time", &cltime, 0.01f);
+	ImGui::DragFloat("Clouds UPF", &upf, 0.01f);
+	ImGui::DragFloat("Cirrus Clouds", &cirrus, 0.005f, -1, 1);
+	ImGui::DragFloat("Cumulus Clouds", &cumulus, 0.005f, -1, 1);
+	ImGui::DragFloat3("Sun Position", fsun, 0.01f);
+
+	}
+
+	if(!useProcedural)
+		useProcedural = ImGui::Button("Use Procedural Sky");
+	else
+		useProcedural = !ImGui::Button("Use Cubemap Sky");
+	
+	if(!useBox)
+		useBox = ImGui::Button("Use Sky Box");
+	else
+		useBox = !ImGui::Button("Use Sky Sphere");
+	
+
 	ImGui::End();
 
 }
 
 void RenderSky(glm::mat4 view, glm::mat4 pers)
 {
-	RenderSkybox(view, pers);
+	RenderSkybox(view, pers, useBox, useProcedural, cirrus, cumulus, cltime, fsun, upf);
 }
 

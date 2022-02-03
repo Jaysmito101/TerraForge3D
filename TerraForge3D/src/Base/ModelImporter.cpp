@@ -33,13 +33,13 @@ Mesh* LoadMesh(aiMesh* paiMesh) {
 
         tmp.normal = glm::vec4(1.0f);
         
-        /*
+        
         if (pNormal) {
             tmp.normal.x = pNormal->x;
             tmp.normal.y = pNormal->y;
             tmp.normal.z = pNormal->z;
         }
-        */
+        
 
         verts[i] = tmp;
     }
@@ -67,7 +67,9 @@ Model* LoadModel(std::string path)
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
+	aiProcess_GenSmoothNormals |
         aiProcess_JoinIdenticalVertices |
+	aiProcess_GenUVCoords |
         aiProcess_SortByPType);
 
     if (nullptr == scene) {

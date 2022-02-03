@@ -1,0 +1,782 @@
+{
+    "EnodeEditor": {
+        "links": [
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 40,
+                "id": 183,
+                "thickness": 1.0,
+                "to": 74,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 47,
+                "id": 55,
+                "thickness": 1.0,
+                "to": 50,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 54,
+                "id": 175,
+                "thickness": 1.0,
+                "to": 71,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 73,
+                "id": 85,
+                "thickness": 1.0,
+                "to": 80,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 100,
+                "id": 101,
+                "thickness": 1.0,
+                "to": 88,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 84,
+                "id": 90,
+                "thickness": 1.0,
+                "to": 87,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 89,
+                "id": 102,
+                "thickness": 1.0,
+                "to": 93,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 43,
+                "id": 174,
+                "thickness": 1.0,
+                "to": 68,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 177,
+                "id": 179,
+                "thickness": 1.0,
+                "to": 44,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 178,
+                "id": 180,
+                "thickness": 1.0,
+                "to": 39,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 41,
+                "id": 717,
+                "thickness": 1.0,
+                "to": 714,
+                "type": "Link"
+            },
+            {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "from": 716,
+                "id": 718,
+                "thickness": 1.0,
+                "to": 2,
+                "type": "Link"
+            }
+        ],
+        "nodes": [
+            {
+                "headerColor": 4279526155,
+                "id": 38,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 39,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 40,
+                        "index": 1,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 41,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": -446.0,
+                "posY": -669.0,
+                "type": 12,
+                "value1": 1.0,
+                "value2": 1.0
+            },
+            {
+                "headerColor": 4283891751,
+                "id": 70,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 71,
+                        "index": 0,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 72,
+                        "index": 0,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 73,
+                        "index": 1,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 74,
+                        "index": 2,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 75,
+                        "index": 3,
+                        "type": 0
+                    }
+                ],
+                "posX": -1026.0,
+                "posY": 355.0,
+                "type": 8
+            },
+            {
+                "headerColor": 4279526155,
+                "id": 86,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 87,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 88,
+                        "index": 1,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 89,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": -450.0,
+                "posY": -317.0,
+                "type": 12,
+                "value1": 1.0,
+                "value2": 1.0
+            },
+            {
+                "headerColor": 4283891751,
+                "id": 42,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 43,
+                        "index": 0,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 44,
+                        "index": 0,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 45,
+                        "index": 1,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 46,
+                        "index": 2,
+                        "type": 0
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 47,
+                        "index": 3,
+                        "type": 0
+                    }
+                ],
+                "posX": -1538.0,
+                "posY": -381.0,
+                "type": 8
+            },
+            {
+                "fractalType": 1,
+                "frequency": 1.4429999589920044,
+                "gain": 0.800000011920929,
+                "headerColor": 4279327347,
+                "id": 58,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 59,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 60,
+                        "index": 1,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 61,
+                        "index": 2,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 62,
+                        "index": 3,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 63,
+                        "index": 4,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 64,
+                        "index": 5,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 65,
+                        "index": 6,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 66,
+                        "index": 7,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 67,
+                        "index": 8,
+                        "type": 1
+                    }
+                ],
+                "lacunarity": 1.7699999809265137,
+                "name": "",
+                "octaves": 7,
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 68,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "pingPongStrength": 1.7000000476837158,
+                "posX": -2050.0,
+                "posY": -189.0,
+                "seed": 537,
+                "strength": 7.010000228881836,
+                "type": 23,
+                "weightedStrength": 0.0
+            },
+            {
+                "headerColor": 4283891751,
+                "id": 49,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 50,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 51,
+                        "index": 1,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 52,
+                        "index": 2,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 53,
+                        "index": 3,
+                        "type": 1
+                    }
+                ],
+                "inputf": 0.0,
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 54,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "outputf": 0.0,
+                "posX": -1255.0,
+                "posY": 531.0,
+                "thresholdf": 0.23999999463558197,
+                "type": 9
+            },
+            {
+                "headerColor": 4283891751,
+                "id": 79,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 80,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 81,
+                        "index": 1,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 82,
+                        "index": 2,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 83,
+                        "index": 3,
+                        "type": 1
+                    }
+                ],
+                "inputf": 0.0,
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 84,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "outputf": 1.0,
+                "posX": -551.0,
+                "posY": -13.0,
+                "thresholdf": 0.36000001430511475,
+                "type": 9
+            },
+            {
+                "headerColor": 4279526155,
+                "id": 91,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 92,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 93,
+                        "index": 1,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 94,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": 30.0,
+                "posY": -309.0,
+                "type": 10,
+                "value1": 0.0,
+                "value2": 0.0
+            },
+            {
+                "headerColor": 4279526155,
+                "id": 97,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 98,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 99,
+                        "index": 1,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 100,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": -850.0,
+                "posY": -93.0,
+                "type": 10,
+                "value1": -3.890000104904175,
+                "value2": 0.0
+            },
+            {
+                "headerColor": 4283891751,
+                "id": 176,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 177,
+                        "index": 0,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 178,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": -1024.0,
+                "posY": -813.0,
+                "type": 31
+            },
+            {
+                "headerColor": 4279526155,
+                "id": 713,
+                "inputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 714,
+                        "index": 0,
+                        "type": 1
+                    },
+                    {
+                        "color": 4290731870,
+                        "id": 715,
+                        "index": 1,
+                        "type": 1
+                    }
+                ],
+                "name": "",
+                "outputPins": [
+                    {
+                        "color": 4290731870,
+                        "id": 716,
+                        "index": 0,
+                        "type": 0
+                    }
+                ],
+                "posX": -18.0,
+                "posY": -549.0,
+                "type": 12,
+                "value1": 1.0,
+                "value2": 1.649999976158142
+            }
+        ],
+        "serializer": "Node Serializer v2.0",
+        "type": "NodeEditorData",
+        "uidSeed": 719
+    },
+    "appData": null,
+    "generals": {
+        "absolute": false,
+        "autoSave": false,
+        "autoUpdate": true,
+        "baseid": "A27A257CB225AC2CAB524910E901B1A6",
+        "cameraPosX": 4.808925151824951,
+        "cameraPosY": 94.0999984741211,
+        "cameraPosZ": 2.718867540359497,
+        "cameraRotX": 87010.0,
+        "cameraRotY": 450.0,
+        "cameraRotZ": 0.0,
+        "diffuseTexId": "61230807382076601730650572145267",
+        "dudvmapID": "DEFAULT",
+        "flattenBase": false,
+        "isUsingBase": false,
+        "lightPosX": 0.0,
+        "lightPosY": -1.2000000476837158,
+        "lightPosZ": -24.799999237060547,
+        "mouseScrollAmount": 0.0,
+        "mouseSpeed": 25.0,
+        "nLOffsetX": 0.0,
+        "nLOffsetY": 0.0,
+        "nLOffsetZ": 0.0,
+        "noiseBased": false,
+        "projectDatabase": "{\n    \"06230634733313333181116730020140\": \"textures\\\\06230634733313333181116730020140\",\n    \"38676360277478138345657070345317\": \"textures\\\\38676360277478138345657070345317\",\n    \"43204348308372733840588137642175\": \"textures\\\\43204348308372733840588137642175\",\n    \"56453011667168273176533287062046\": \"textures\\\\56453011667168273176533287062046\",\n    \"75DB99B125FE4E9AFBE58696320BEA73\": \"textures\\\\75DB99B125FE4E9AFBE58696320BEA73\",\n    \"77643160173384037225464124755834\": \"textures\\\\77643160173384037225464124755834\",\n    \"79515FE2B90CC186D205AF54BD34FEDE\": \"textures\\\\79515FE2B90CC186D205AF54BD34FEDE\",\n    \"8DA6790915B3073C8499C34AD4BE9BAD\": \"textures\\\\8DA6790915B3073C8499C34AD4BE9BAD\",\n    \"A27A257CB225AC2CAB524910E901B1A6\": \"models\\\\A27A257CB225AC2CAB524910E901B1A6.obj\",\n    \"C8E58B31D224FD27C5D8674FFB1C14E2\": \"textures\\\\C8E58B31D224FD27C5D8674FFB1C14E2\",\n    \"CD250F2B5FB5A6B603CD68D52DADAB86\": \"textures\\\\CD250F2B5FB5A6B603CD68D52DADAB86\",\n    \"F9EFE1785A5CCCCB971F344EFE0430E0\": \"textures\\\\F9EFE1785A5CCCCB971F344EFE0430E0\"\n}",
+        "projectDatabaseJs": {
+            "06230634733313333181116730020140": "textures\\06230634733313333181116730020140",
+            "38676360277478138345657070345317": "textures\\38676360277478138345657070345317",
+            "43204348308372733840588137642175": "textures\\43204348308372733840588137642175",
+            "56453011667168273176533287062046": "textures\\56453011667168273176533287062046",
+            "75DB99B125FE4E9AFBE58696320BEA73": "textures\\75DB99B125FE4E9AFBE58696320BEA73",
+            "77643160173384037225464124755834": "textures\\77643160173384037225464124755834",
+            "79515FE2B90CC186D205AF54BD34FEDE": "textures\\79515FE2B90CC186D205AF54BD34FEDE",
+            "8DA6790915B3073C8499C34AD4BE9BAD": "textures\\8DA6790915B3073C8499C34AD4BE9BAD",
+            "A27A257CB225AC2CAB524910E901B1A6": "models\\A27A257CB225AC2CAB524910E901B1A6.obj",
+            "C8E58B31D224FD27C5D8674FFB1C14E2": "textures\\C8E58B31D224FD27C5D8674FFB1C14E2",
+            "CD250F2B5FB5A6B603CD68D52DADAB86": "textures\\CD250F2B5FB5A6B603CD68D52DADAB86",
+            "F9EFE1785A5CCCCB971F344EFE0430E0": "textures\\F9EFE1785A5CCCCB971F344EFE0430E0"
+        },
+        "projectID": "30366560145161815546147274531223",
+        "scale": 45.0,
+        "scrollSpeed": 0.5,
+        "seaAlpha": 0.5,
+        "seaDistortionScale": 1.0,
+        "seaDistortionStength": 0.019999999552965164,
+        "seaLevel": 0.0,
+        "seaReflectivity": 0.699999988079071,
+        "seaWaveSpeed": 0.009999999776482582,
+        "showSea": false,
+        "skyboxEnabled": false,
+        "square": false,
+        "textureScale": 1.0,
+        "textureScaleO": 1.0,
+        "vSync": true,
+        "waterNormalMap": "DEFAULT",
+        "wireFrameMode": false
+    },
+    "imguiData": "[Window][Debug##Default]\nViewportPos=224,247\nViewportId=0x9F5F46A1\nSize=400,400\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=243,232\nViewportId=0xE927CF2F\nSize=866,497\nCollapsed=0\n\n[Window][Application Statistics]\nPos=60,60\nSize=32,35\nCollapsed=0\n\n[Window][Example: Log]\nPos=60,60\nSize=500,400\nCollapsed=0\n\n[Window][Example: Console]\nViewportPos=577,158\nViewportId=0xA4D966FE\nSize=584,457\nCollapsed=0\nDockId=0x3BC79352,1\n\n[Window][Dear ImGui Style Editor]\nViewportPos=94,117\nViewportId=0x6D551092\nSize=353,722\nCollapsed=0\n\n[Window][Hello, world!]\nViewportPos=18,296\nViewportId=0xEBE6C6E6\nSize=866,497\nCollapsed=0\n\n[Window][Example: Property editor]\nViewportPos=65,165\nViewportId=0x593C5C9B\nSize=430,450\nCollapsed=0\n\n[Window][Hello]\nPos=60,60\nSize=65,48\nCollapsed=0\n\n[Window][About Dear ImGui]\nPos=60,60\nSize=570,109\nCollapsed=0\n\n[Window][Hellow rod]\nPos=60,60\nSize=58,48\nCollapsed=0\n\n[Window][Statistics]\nPos=295,461\nSize=285,244\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][General Controls]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,3\n\n[Window][System Console]\nViewportPos=577,159\nViewportId=0xA4D966FE\nSize=584,457\nCollapsed=0\nDockId=0x3BC79352,2\n\n[Window][Camera Controls]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,2\n\n[Window][Terrain Controls]\nPos=0,33\nSize=319,224\nCollapsed=0\nDockId=0x0000000B,0\n\n[Window][Light Controls]\nPos=291,462\nSize=289,243\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][Noise Settings]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,1\n\n[Window][Viewport]\nPos=0,28\nSize=580,431\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][Teffgsf]\nPos=60,60\nSize=129,75\nCollapsed=0\n\n[Window][DockSpace Demo]\nPos=0,0\nSize=1366,705\nCollapsed=0\n\n[Window][Theme Editor]\nViewportPos=663,106\nViewportId=0x1974BBCA\nSize=622,459\nCollapsed=0\n\n[Window][Shader Editor Window (Beta)]\nPos=978,235\nSize=388,470\nCollapsed=0\nDockId=0x00000008,0\n\n[Window][Create Shader##shaderEditor]\nViewportPos=417,138\nViewportId=0xAA02EECC\nPos=408,0\nSize=194,538\nCollapsed=0\nDockId=0x0000000B,0\n\n[Window][Elevation Node Editor]\nPos=582,23\nSize=784,434\nCollapsed=0\nDockId=0x00000015,0\n\n[Window][Dashboard]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,0\n\n[Window][Sun Controls]\nPos=0,461\nSize=580,244\nCollapsed=0\nDockId=0x00000009,1\n\n[Window][Texture Settings]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,2\n\n[Window][Sea Settings]\nPos=954,28\nSize=412,677\nCollapsed=0\nDockId=0x00000013,0\n\n[Window][Contributers]\nViewportPos=512,286\nViewportId=0x67743C4C\nSize=275,108\nCollapsed=0\n\n[Window][Texture Store]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,2\n\n[Window][Open Source LICENSES]\nViewportPos=393,165\nViewportId=0x929E0302\nSize=506,503\nCollapsed=0\n\n[Window][Foliage Manager]\nPos=1081,28\nSize=285,677\nCollapsed=0\nDockId=0x00000012,0\n\n[Window][Mesh Node Editor]\nPos=582,28\nSize=784,677\nCollapsed=0\nDockId=0x00000015,0\n\n[Window][Mesh Node Editor Debugger]\nPos=0,28\nSize=580,578\nCollapsed=0\nDockId=0x00000002,1\n\n[Window][Shader Editor Window]\nPos=978,28\nSize=388,677\nCollapsed=0\nDockId=0x0000000E,0\n\n[Window][Sky Settings]\nPos=954,371\nSize=412,334\nCollapsed=0\nDockId=0x00000014,0\n\n[Window][Filters Manager]\nPos=1076,28\nSize=290,677\nCollapsed=0\nDockId=0x00000016,0\n\n[Window][Supporters]\nPos=582,28\nSize=250,250\nCollapsed=0\nDockId=0x00000015,2\n\n[Table][0xD0F0C6E3,2]\nColumn 0  Weight=1.0000\nColumn 1  Weight=1.0000\n\n[Docking][Data]\nDockSpace             ID=0x3BC79352 Window=0x4647B76E Pos=0,51 Size=1366,677 Split=X\n  DockNode            ID=0x00000001 Parent=0x3BC79352 SizeRef=580,461 Split=Y Selected=0xE3CB8543\n    DockNode          ID=0x0000000B Parent=0x00000001 SizeRef=231,231 Selected=0xE3CB8543\n    DockNode          ID=0x0000000C Parent=0x00000001 SizeRef=231,228 Split=Y Selected=0xDE657D5B\n      DockNode        ID=0x00000002 Parent=0x0000000C SizeRef=509,431 Selected=0x995B0CF8\n      DockNode        ID=0x00000003 Parent=0x0000000C SizeRef=509,244 Split=X Selected=0xDE657D5B\n        DockNode      ID=0x00000006 Parent=0x00000003 SizeRef=257,344 Split=X Selected=0xDE657D5B\n          DockNode    ID=0x00000009 Parent=0x00000006 SizeRef=289,344 Selected=0xDE657D5B\n          DockNode    ID=0x0000000A Parent=0x00000006 SizeRef=289,344 Selected=0x9EA6AB16\n        DockNode      ID=0x00000007 Parent=0x00000003 SizeRef=250,344 Selected=0xAD8E88F2\n  DockNode            ID=0x00000004 Parent=0x3BC79352 SizeRef=784,461 Split=Y Selected=0x995B0CF8\n    DockNode          ID=0x00000005 Parent=0x00000004 SizeRef=160,398 Split=X Selected=0xF498C204\n      DockNode        ID=0x0000000F Parent=0x00000005 SizeRef=370,525 Split=X Selected=0xE88D3F1B\n        DockNode      ID=0x0000000D Parent=0x0000000F SizeRef=394,677 Split=X Selected=0xE88D3F1B\n          DockNode    ID=0x00000011 Parent=0x0000000D SizeRef=497,677 Split=X Selected=0xE88D3F1B\n            DockNode  ID=0x00000015 Parent=0x00000011 SizeRef=492,677 CentralNode=1 Selected=0xE88D3F1B\n            DockNode  ID=0x00000016 Parent=0x00000011 SizeRef=290,677 Selected=0xE5CE34ED\n          DockNode    ID=0x00000012 Parent=0x0000000D SizeRef=285,677 Selected=0x213F919C\n        DockNode      ID=0x0000000E Parent=0x0000000F SizeRef=388,677 Selected=0xFFE85315\n      DockNode        ID=0x00000010 Parent=0x00000005 SizeRef=412,525 Split=Y Selected=0xD47684FE\n        DockNode      ID=0x00000013 Parent=0x00000010 SizeRef=412,341 Selected=0xD47684FE\n        DockNode      ID=0x00000014 Parent=0x00000010 SizeRef=412,334 Selected=0xB2796EE4\n    DockNode          ID=0x00000008 Parent=0x00000004 SizeRef=160,277 Selected=0x6C0FE6DB\n\n",
+    "name": "TerraForge3D v2.0.0",
+    "noiseLayers": {
+        "absv": false,
+        "noiseLayers": [
+            {
+                "cellularJitter": 1.0,
+                "distanceFunc": 0,
+                "enabled": false,
+                "fractalType": 0,
+                "frequency": 0.009999999776482582,
+                "gain": 0.5,
+                "index": 0,
+                "lacunarity": 2.0,
+                "name": "Noise Layer",
+                "noiseType": 0,
+                "octaves": 3,
+                "offsetX": 0.0,
+                "offsetY": 0.0,
+                "offsetZ": 0.0,
+                "pingPongStrength": 2.0,
+                "seed": 42,
+                "strength": 1.0,
+                "weightedStrength": 0.0
+            }
+        ],
+        "offsetX": 0.0,
+        "offsetY": 0.0,
+        "offsetZ": 0.0,
+        "sq": false,
+        "strength": 8.800000190734863
+    },
+    "serializerVersion": 4,
+    "styleData": "{\"colors\":{\"0\":{\"w\":1.0,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.8299999833106995},\"1\":{\"w\":1.0,\"x\":0.23999999463558197,\"y\":0.23000000417232513,\"z\":0.28999999165534973},\"10\":{\"w\":1.0,\"x\":0.10000000149011612,\"y\":0.09000000357627869,\"z\":0.11999999731779099},\"11\":{\"w\":1.0,\"x\":0.07000000029802322,\"y\":0.07000000029802322,\"z\":0.09000000357627869},\"12\":{\"w\":0.75,\"x\":1.0,\"y\":0.9800000190734863,\"z\":0.949999988079071},\"13\":{\"w\":1.0,\"x\":0.10000000149011612,\"y\":0.09000000357627869,\"z\":0.11999999731779099},\"14\":{\"w\":1.0,\"x\":0.10000000149011612,\"y\":0.09000000357627869,\"z\":0.11999999731779099},\"15\":{\"w\":0.3100000023841858,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.8299999833106995},\"16\":{\"w\":1.0,\"x\":0.5600000023841858,\"y\":0.5600000023841858,\"z\":0.5799999833106995},\"17\":{\"w\":1.0,\"x\":0.05999999865889549,\"y\":0.05000000074505806,\"z\":0.07000000029802322},\"18\":{\"w\":0.3100000023841858,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.8299999833106995},\"19\":{\"w\":0.3100000023841858,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.8299999833106995},\"2\":{\"w\":1.0,\"x\":0.05999999865889549,\"y\":0.05000000074505806,\"z\":0.07000000029802322},\"20\":{\"w\":1.0,\"x\":0.05999999865889549,\"y\":0.05000000074505806,\"z\":0.07000000029802322},\"21\":{\"w\":1.0,\"x\":0.10000000149011612,\"y\":0.09000000357627869,\"z\":0.11999999731779099},\"22\":{\"w\":1.0,\"x\":0.23999999463558197,\"y\":0.23000000417232513,\"z\":0.28999999165534973},\"23\":{\"w\":1.0,\"x\":0.5600000023841858,\"y\":0.5600000023841858,\"z\":0.5799999833106995},\"24\":{\"w\":0.2199999988079071,\"x\":0.6100000143051147,\"y\":0.6100000143051147,\"z\":0.6200000047683716},\"25\":{\"w\":0.5099999904632568,\"x\":0.6100000143051147,\"y\":0.6200000047683716,\"z\":0.6200000047683716},\"26\":{\"w\":0.8299999833106995,\"x\":0.6100000143051147,\"y\":0.6200000047683716,\"z\":0.6200000047683716},\"27\":{\"w\":0.5,\"x\":0.4300000071525574,\"y\":0.4300000071525574,\"z\":0.5},\"28\":{\"w\":0.7799999713897705,\"x\":0.10000000149011612,\"y\":0.4000000059604645,\"z\":0.75},\"29\":{\"w\":1.0,\"x\":0.10000000149011612,\"y\":0.4000000059604645,\"z\":0.75},\"3\":{\"w\":0.0,\"x\":0.0,\"y\":0.0,\"z\":0.0},\"30\":{\"w\":0.0,\"x\":0.0,\"y\":0.0,\"z\":0.0},\"31\":{\"w\":1.0,\"x\":0.5600000023841858,\"y\":0.5600000023841858,\"z\":0.5799999833106995},\"32\":{\"w\":1.0,\"x\":0.05999999865889549,\"y\":0.05000000074505806,\"z\":0.07000000029802322},\"33\":{\"w\":0.8600000143051147,\"x\":0.1459999978542328,\"y\":0.11299999803304672,\"z\":0.1459999978542328},\"34\":{\"w\":0.800000011920929,\"x\":0.36399999260902405,\"y\":0.20499999821186066,\"z\":0.3659999966621399},\"35\":{\"w\":0.9700000286102295,\"x\":0.20000000298023224,\"y\":0.12156862765550613,\"z\":0.1921568661928177},\"36\":{\"w\":0.9700000286102295,\"x\":0.16862745583057404,\"y\":0.06666667014360428,\"z\":0.16862745583057404},\"37\":{\"w\":0.5699999928474426,\"x\":0.20200000703334808,\"y\":0.11599999666213989,\"z\":0.19599999487400055},\"38\":{\"w\":0.699999988079071,\"x\":0.25999999046325684,\"y\":0.5899999737739563,\"z\":0.9800000190734863},\"39\":{\"w\":1.0,\"x\":0.20000000298023224,\"y\":0.20000000298023224,\"z\":0.20000000298023224},\"4\":{\"w\":1.0,\"x\":0.07000000029802322,\"y\":0.07000000029802322,\"z\":0.09000000357627869},\"40\":{\"w\":0.6299999952316284,\"x\":0.4000000059604645,\"y\":0.38999998569488525,\"z\":0.3799999952316284},\"41\":{\"w\":1.0,\"x\":0.25,\"y\":1.0,\"z\":0.0},\"42\":{\"w\":0.6299999952316284,\"x\":0.4000000059604645,\"y\":0.38999998569488525,\"z\":0.3799999952316284},\"43\":{\"w\":1.0,\"x\":0.25,\"y\":1.0,\"z\":0.0},\"44\":{\"w\":1.0,\"x\":0.1899999976158142,\"y\":0.1899999976158142,\"z\":0.20000000298023224},\"45\":{\"w\":1.0,\"x\":0.3100000023841858,\"y\":0.3100000023841858,\"z\":0.3499999940395355},\"46\":{\"w\":1.0,\"x\":0.23000000417232513,\"y\":0.23000000417232513,\"z\":0.25},\"47\":{\"w\":0.0,\"x\":0.0,\"y\":0.0,\"z\":0.0},\"48\":{\"w\":0.05999999865889549,\"x\":1.0,\"y\":1.0,\"z\":1.0},\"49\":{\"w\":0.4300000071525574,\"x\":0.25,\"y\":1.0,\"z\":0.0},\"5\":{\"w\":0.8799999952316284,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.8299999833106995},\"50\":{\"w\":0.8999999761581421,\"x\":1.0,\"y\":1.0,\"z\":0.0},\"51\":{\"w\":1.0,\"x\":0.25999999046325684,\"y\":0.5899999737739563,\"z\":0.9800000190734863},\"52\":{\"w\":0.699999988079071,\"x\":1.0,\"y\":1.0,\"z\":1.0},\"53\":{\"w\":0.20000000298023224,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.800000011920929},\"54\":{\"w\":0.3499999940395355,\"x\":0.800000011920929,\"y\":0.800000011920929,\"z\":0.800000011920929},\"6\":{\"w\":0.0,\"x\":0.9200000166893005,\"y\":0.9100000262260437,\"z\":0.8799999952316284},\"7\":{\"w\":1.0,\"x\":0.10000000149011612,\"y\":0.09000000357627869,\"z\":0.11999999731779099},\"8\":{\"w\":1.0,\"x\":0.23999999463558197,\"y\":0.23000000417232513,\"z\":0.28999999165534973},\"9\":{\"w\":1.0,\"x\":0.5600000023841858,\"y\":0.5600000023841858,\"z\":0.5799999833106995}},\"styles\":{\"ChildBorderSize\":0.0,\"FrameBorderSize\":0.0,\"FramePadding\":{\"x\":5.0,\"y\":5.0},\"FrameRounding\":4.0,\"GrabMinSize\":5.0,\"GrabRounding\":3.0,\"IndentSpacing\":25.0,\"ItemSpacing\":{\"x\":12.0,\"y\":12.0},\"ScrollbarRounding\":9.0,\"ScrollbarSize\":15.0,\"TabBorderSize\":0.0,\"WindowBorderSize\":0.0,\"WindowPadding\":{\"x\":8.0,\"y\":6.0},\"WindowRounding\":5.0},\"themeName\":\"Custom Theme\",\"type\":\"THEME\"}",
+    "texLayers": [
+        {
+            "hMn": -12.65999984741211,
+            "hMx": 0.6499999761581421,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 13.510000228881836,
+            "texSc": 2.068000078201294,
+            "texture": "8DA6790915B3073C8499C34AD4BE9BAD"
+        },
+        {
+            "hMn": -0.8199999928474426,
+            "hMx": 2.0199999809265137,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 3.380000114440918,
+            "texSc": 10.055000305175781,
+            "texture": "79515FE2B90CC186D205AF54BD34FEDE"
+        },
+        {
+            "hMn": 0.9399999976158142,
+            "hMx": 19.479999542236328,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 6.460000038146973,
+            "texSc": 10.0,
+            "texture": "C8E58B31D224FD27C5D8674FFB1C14E2"
+        },
+        {
+            "hMn": -10.0,
+            "hMx": -10.0,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 1.0,
+            "texSc": 1.0,
+            "texture": "75DB99B125FE4E9AFBE58696320BEA73"
+        },
+        {
+            "hMn": -10.0,
+            "hMx": -10.0,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 1.0,
+            "texSc": 1.0,
+            "texture": "75DB99B125FE4E9AFBE58696320BEA73"
+        },
+        {
+            "hMn": -10.0,
+            "hMx": -10.0,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 1.0,
+            "texSc": 1.0,
+            "texture": "75DB99B125FE4E9AFBE58696320BEA73"
+        },
+        {
+            "hMn": -10.0,
+            "hMx": -10.0,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 1.0,
+            "texSc": 1.0,
+            "texture": "75DB99B125FE4E9AFBE58696320BEA73"
+        },
+        {
+            "hMn": -10.0,
+            "hMx": -10.0,
+            "name": "Texture Layer",
+            "rSc": 1.0,
+            "rSt": 0.0,
+            "step": 1.0,
+            "texSc": 1.0,
+            "texture": "75DB99B125FE4E9AFBE58696320BEA73"
+        }
+    ],
+    "type": "SAVEFILE",
+    "versionHash": "C02C5A0F1160892A19718A9C2CF1B2AB"
+}

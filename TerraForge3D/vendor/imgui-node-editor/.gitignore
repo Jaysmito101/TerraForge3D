@@ -1,11 +1,2 @@
-.vs
-.vscode
-.build*
-.DS_Store
 bin
-[Bb]uild
-*.VC.db
-*.VC.opendb
-*.user
-*.ini
-*.json
+bin-int

@@ -103,6 +103,7 @@ void RenderFoliage(Shader* shader, Camera& camera)
 		glm::mat4 tmp = t.model->modelMatrix * camera.pv;
 		shader->Bind();
 		shader->SetMPV(tmp);
+		shader->SetUniformMat4("_Model", t.model->modelMatrix);
 		if (t.textureLoaded) {
 			t.texture->Bind(5);
 		}

@@ -34,6 +34,7 @@ struct Stats
 	float frameRate = 1;
 	int triangles = 0;
 	int vertCount = 0;
+	double meshGenerationTime;
 };
 
 

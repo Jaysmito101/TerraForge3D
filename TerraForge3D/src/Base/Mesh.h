@@ -12,6 +12,7 @@ struct Vert
 	glm::vec4 position;
 	glm::vec4 normal;
 	glm::vec2 texCoord;
+	glm::vec4 extras1;
 };
 
 class Mesh
@@ -24,6 +25,8 @@ public:
 	void RecalculateNormals();
 
 	void GeneratePlane(int resolution, float scale, float textureScale = 1.0f);
+
+	void GenerateScreenQuad(float dist = 0);
 
 	void GenerateIcoSphere(int resolution, float radius, float textureScale = 1.0f);
 

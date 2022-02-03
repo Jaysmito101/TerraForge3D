@@ -24,13 +24,7 @@ Mesh::~Mesh() {
 
 void Mesh::RecalculateNormals()
 {
-	if (currType == MeshType::Icosphere) 
-	{
-		for (int i = 0; i < vertexCount; i++) {
-			vert[i].normal = glm::normalize(vert[i].position);
-		}
-	}
-	else {
+
 		for (int i = 0; i < indexCount; i += 3)
 		{
 			const int ia = indices[i];
@@ -46,8 +40,9 @@ void Mesh::RecalculateNormals()
 			vert[ic].normal += glm::vec4(no, 0.0);
 		}
 
-		for (int i = 0; i < vertexCount; i++) vert[i].normal = glm::normalize(vert[i].normal);
-	}
+		for (int i = 0; i < vertexCount; i++)
+			vert[i].normal = glm::vec4(glm::normalize(glm::vec3(vert[i].normal)), 0.0f);
+
 }
 
 void Mesh::GenerateIcoSphere(int resolution, float radius, float textureScale)
@@ -129,6 +124,7 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 				inds[triIndex + 5] = i + resolution + 1;
 				triIndex += 6;
 			}
+			vertices[i].extras1 = glm::vec4(0.0f);			
 		}
 	}
 	
@@ -148,6 +144,45 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 	delete inds;
 }
 
+void Mesh::GenerateScreenQuad(float dist) 
+{
+	if (vert) 
+		delete[] vert;
+	if (indices)
+		delete[] indices;
+	Vert v;
+	vert = new Vert[4];
+
+	v.position = glm::vec4(-1, -1, dist, 0);
+	v.texCoord = glm::vec2(0, 0);
+	vert[0] = v;
+
+	v.position = glm::vec4(-1, 1, dist, 0);
+	v.texCoord = glm::vec2(0, 1);
+	vert[1] = v;
+
+	v.position = glm::vec4(1, 1, dist, 0);
+	v.texCoord = glm::vec2(1, 1);
+	vert[2] = v;
+
+	v.position = glm::vec4(1, -1, dist, 0);
+	v.texCoord = glm::vec2(1, 0);
+	vert[3] = v;
+
+	vertexCount = 4;
+
+	indexCount = 6;
+
+	indices = new int[6];
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+}
+
 void Mesh::SetElevation(float elevation, int x, int y){
 	if(!vert)
 		return;
@@ -159,6 +194,7 @@ void Mesh::SetElevation(float elevation, int x, int y){
 	if (elevation < minHeight)
 		minHeight = elevation;
 	vert[i].position.y = elevation;
+	vert[i].extras1.x = elevation;
 }
 
 float Mesh::GetElevation(int x, int y) {

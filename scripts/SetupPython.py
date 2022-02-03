@@ -31,13 +31,6 @@ class PythonConfiguration:
 
     @classmethod
     def __InstallPackage(cls, packageName):
-        permissionGranted = False
-        while not permissionGranted:
-            reply = str(input("Would you like to install Python package '{0:s}'? [Y/N]: ".format(packageName))).lower().strip()[:1]
-            if reply == 'n':
-                return False
-            permissionGranted = (reply == 'y')
-        
         print(f"Installing {packageName} module...")
         subprocess.check_call(['python', '-m', 'pip', 'install', packageName])
 

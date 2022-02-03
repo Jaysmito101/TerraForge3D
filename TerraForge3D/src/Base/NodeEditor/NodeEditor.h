@@ -113,6 +113,8 @@ public:
 class NodeEditorNode
 {
 public:
+	ImVec2 nodePosition;
+	bool reqNodePosLoad;
 	int id;
 	ImGuiNodeEditor::NodeId _id;
 	std::vector<NodeEditorPin*> outputPins;

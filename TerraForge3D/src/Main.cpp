@@ -33,6 +33,7 @@
 #include <glm/ext/matrix_relational.hpp>
 #include <glm/ext/vector_relational.hpp>
 #include <glm/ext/scalar_relational.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SimplexNoise.h>
 #include <FastNoiseLite.h>
 #include <thread>
@@ -40,6 +41,8 @@
 #include <time.h>
 #include <string.h>
 #include <mutex>
+#include <memory>
+#include <chrono>
 #include <json.hpp>
 #include <zip.h>
 #include <sys/stat.h>
@@ -64,13 +67,17 @@
 static Model terrain("Terrain");
 static Model sea("Sea");
 static Model grid("Grid");
+static Model screenQuad("Screen Quad");
 
+static Model* customModel,* customModelCopy;
 
 static FrameBuffer* reflectionfbo, * textureFBO;
 
 static Application* myApp;
-static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader;
+static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader, * foliageShader;
+static std::shared_ptr<Shader> postProcessingShader;
 static Camera camera;
+static Camera postCamera;
 static Stats s_Stats;
 static ActiveWindows activeWindows;
 static LayeredNoiseManager* noiseGen;
@@ -90,6 +97,7 @@ static float CameraRotation[3];
 static Vec2 prevMousePos;
 static char b1[4096], b2[4096];
 
+static bool isUsingBase = true;
 static bool skyboxEnabled = false;
 static bool vSync = true;
 static bool autoUpdate = false;
@@ -108,6 +116,7 @@ static bool showFoliage = true;
 static bool isTextureBake = false;
 static std::atomic<bool> isRemeshing = false;
 static std::atomic<bool> isRuinning = true;
+static bool isPostProcess = false;
 
 static Texture2D* diffuse, * normal, * gridTex, * waterDudvMap, * waterNormal;
 
@@ -140,8 +149,14 @@ static std::string errorMessage = "";
 static std::string savePath = "";
 static std::string DuDvMapID = "";
 static std::string waterNormalMap = "";
+static std::string currentBaseModelName = "";
 
 static float nLOffsetX, nLOffsetY, nLOffsetZ;
+
+std::shared_ptr<FrameBuffer> postProcessFBO;
+
+static float cloudsBoxMin[3] = { 0, 0, 0 };
+static float cloudsBoxMax[3] = {1, 1, 1};
 
 
 static void ToggleSystemConsole() {
@@ -199,6 +214,8 @@ static void ShowStats()
 		strcat_s(b1, "Vertices  : ");
 		strcat_s(b1, b2);
 		ImGui::Text(b1);
+
+		ImGui::Text(("Mesh Generation Time : " + std::to_string(s_Stats.meshGenerationTime)).c_str());
 	}
 
 	ImGui::End();
@@ -268,17 +285,21 @@ static void ResetShader() {
 		delete shd;
 	if (textureBakeShader)
 		delete textureBakeShader;
+	if(foliageShader)
+		delete foliageShader;
 	if (!wireframeShader)
 		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
 	if (!waterShader)
 		waterShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &res));
 	textureBakeShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\geom.glsl", &res));
 	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
+	foliageShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\geom.glsl", &res));
 }
 
 static void FillMeshData() {
-
-	if (strcmp(currentBaseShape, "Plane") == 0) {
+	auto timeBegin = std::chrono::high_resolution_clock::now();
+	if (isUsingBase) {
+		s_Stats.vertCount = terrain.mesh->vertexCount;
 
 		if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
 
@@ -287,7 +308,6 @@ static void FillMeshData() {
 			s_Stats.vertCount = terrain.mesh->vertexCount;
 			textureScaleO = textureScale;
 		}
-
 		
 
 		for (int y = 0; y < resolution; y++)
@@ -304,7 +324,6 @@ static void FillMeshData() {
 							elev += mod->Evaluate(x, y, 0);
 						}
 					}
-
 					terrain.mesh->SetElevation(elev, x, y);
 				}
 				else {
@@ -316,21 +335,47 @@ static void FillMeshData() {
 				}
 			}
 		}
-
+		terrain.mesh->RecalculateNormals();	
 	}
-	else if (strcmp(currentBaseShape, "Icosphere") == 0) {
-		terrain.mesh->GenerateIcoSphere(resolution, scale, textureScale);
-		s_Stats.triangles = terrain.mesh->indexCount / 3;
-		s_Stats.vertCount = terrain.mesh->vertexCount;
-		textureScaleO = textureScale;
-	}
-	else {
-		Log("Unknown base shape " + std::string(currentBaseShape));
-		currentBaseShape = (char*)baseShapes[0];
-		Log("Switching back to " + std::string(currentBaseShape));
-	}
-		terrain.mesh->RecalculateNormals();
-
+	else{
+		s_Stats.vertCount = customModel->mesh->vertexCount;
+		for(int i=0;i<customModel->mesh->vertexCount;i++)
+		{
+			Vert tmp = customModelCopy->mesh->vert[i];
+			float x = tmp.position.x;
+			float y = tmp.position.y;
+			float z = tmp.position.z;
+			float elev = 0.0f;
+			if (noiseBased)
+			{
+				elev = noiseGen->Evaluate(x, y, z);
+				for (NoiseLayerModule* mod : moduleManager->nlModules)
+				{
+					if (mod->active)
+					{
+						elev += mod->Evaluate(x, y, z);
+					}
+				}
+			}
+			else {
+				float pos[3] = { x, y, z };
+				float texCoord[2] = { tmp.texCoord.x, tmp.texCoord.y };
+				float minPos[3] = {0, 0, 0};
+				float maxPos[3] = {-1, -1, -1};
+				elev =  EvaluateMeshNodeEditor(NodeInputParam(pos, texCoord, minPos, maxPos)).value;
+				
+			}
+			tmp.position *= scale;
+			tmp.position += elev * tmp.normal;
+			customModel->mesh->vert[i].extras1.x = elev;
+			customModel->mesh->vert[i].position = tmp.position;			
+		}
+		customModel->mesh->RecalculateNormals();
+		
+	}	
+	auto timeEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::milli> timeElapsed = timeEnd - timeBegin;
+	s_Stats.meshGenerationTime = timeElapsed.count();
 	isRemeshing = false;
 }
 
@@ -339,7 +384,10 @@ static void RegenerateMesh() {
 	if (isRemeshing)
 		return;
 
-	terrain.UploadToGPU();
+	if(isUsingBase)
+		terrain.UploadToGPU();
+	else
+		customModel->UploadToGPU();
 
 	noiseGen->UpdateLayers();
 
@@ -367,6 +415,11 @@ static void GenerateMesh()
 	grid.mesh->GeneratePlane(50, 120);
 	grid.mesh->RecalculateNormals();
 	grid.UploadToGPU();
+
+	screenQuad.SetupMeshOnGPU();
+	screenQuad.mesh->GenerateScreenQuad();
+	screenQuad.mesh->RecalculateNormals();
+	screenQuad.UploadToGPU();
 }
 
 static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bakeTexture = false) {
@@ -433,12 +486,36 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformf("_CameraNear", camera.near);
 		shader->SetUniformf("_CameraFar", camera.far);
 		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
-		terrain.Render();
+		if(isUsingBase)
+			terrain.Render();
+		else
+			customModel->Render();
 
 
 		if (showFoliage)
+		{
+			shader = foliageShader;
+			shader->Bind();
+		shader->SetTime(&time);
+		shader->SetMPV(camera.pv);
+		shader->SetUniformMat4("_Model", terrain.modelMatrix);
+		shader->SetLightCol(LightColor);
+		shader->SetLightPos(LightPosition);
+		float tmp[3];
+		tmp[0] = viewportMousePosX;
+		tmp[1] = viewportMousePosY;
+		tmp[2] = ImGui::GetIO().MouseDown[0];
+		shader->SetUniform3f("_MousePos", tmp);
+		tmp[0] = 800;
+		tmp[1] = 600;
+		tmp[2] = 1;
+		shader->SetUniform3f("_Resolution", tmp);
+		shader->SetUniform3f("_CameraPos", CameraPosition);
+		shader->SetUniformf("_SeaLevel", seaLevel);
+		shader->SetUniformf("_CameraNear", camera.near);
+		shader->SetUniformf("_CameraFar", camera.far);
 			RenderFoliage(shader, camera);
-
+		}
 
 
 
@@ -477,7 +554,124 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	}
 
 
+	 
+}
 
+void PostProcess(float deltatime)
+{
+	float pos[3] = { 0, 0, 1.8 };
+	float rot[3] = {0, 0, 0};
+	postCamera.aspect = 1;
+	postCamera.UpdateCamera(pos, rot);
+
+	float viewDir[3] = { glm::value_ptr(camera.pv)[2], glm::value_ptr(camera.pv)[6], glm::value_ptr(camera.pv)[10] };
+
+	postProcessingShader->Bind(); 
+
+	postProcessingShader->SetUniform3f("_CameraPosition", CameraPosition);
+	postProcessingShader->SetUniform3f("_ViewDir", viewDir);
+
+	postProcessingShader->SetUniform3f("cloudsBoxBoundsMin", cloudsBoxMin);
+	postProcessingShader->SetUniform3f("cloudsBoxBoundsMax", cloudsBoxMax);
+	 
+	postProcessingShader->SetMPV(postCamera.pv);
+
+	glActiveTexture(GL_TEXTURE5);	
+	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferColorTextureId());
+	postProcessingShader->SetUniformi("_ColorTexture", 5);
+
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferDepthTextureId()); 
+	postProcessingShader->SetUniformi("_DepthTexture", 6);
+
+	screenQuad.Render();
+} 
+ 
+static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
+{
+	if(!isUsingBase)
+	{
+		while(isRemeshing);
+		delete customModel;
+		delete customModelCopy;
+	}
+	currentBaseModelName = mdstr;
+	if(currentBaseModelName.size() > 3)
+	{
+		isUsingBase = false;	
+		customModel = LoadModel(currentBaseModelName);
+		customModelCopy = LoadModel(currentBaseModelName); // Will Be Replaced with something efficient
+	}
+}
+
+static void ShowChooseBaseModelPopup()
+{
+	// TEMP
+	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\plane.png", false, false);
+	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\sphere.png", false, false);
+	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cube.png", false, false);
+	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cone.png", false, false);
+	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cylinder.png", false, false);
+	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\torus.png", false, false);
+	// TEMP
+
+	if (ImGui::BeginPopup("Choose Base Model"))
+	{
+		if (ImGui::Button("Open From File")) 
+		{
+			ChangeCustomModel();
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (ImGui::Button("Close"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::BeginChild("Choose Base Model##Child", ImVec2(650, 450));
+
+		if (ImGui::ImageButton((ImTextureID)plane->GetRendererID(), ImVec2(200, 200)) )
+		{
+			while (isRemeshing);
+			delete customModel;
+			delete customModelCopy;
+			isUsingBase = true;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)sphere->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\sphere.obj");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)cube->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cube.obj");
+			ImGui::CloseCurrentPopup();
+		}
+
+
+		if (ImGui::ImageButton((ImTextureID)torus->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\torus.obj");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)cone->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cone.obj");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton((ImTextureID)cyllinder->GetRendererID(), ImVec2(200, 200)))
+		{
+			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cylinder.obj");
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndChild();
+
+		ImGui::EndPopup();
+	}
 }
 
 static void ShowTerrainControls()
@@ -485,23 +679,44 @@ static void ShowTerrainControls()
 	static bool exp = false;
 	ImGui::Begin("Dashboard");
 
-	if (ImGui::BeginCombo("Base Shape", currentBaseShape)) 
+	ShowChooseBaseModelPopup();
+	
+	if(!isUsingBase)
 	{
-	    for (int n = 0; n < IM_ARRAYSIZE(baseShapes); n++)
-	    {
-	        bool is_selected = (currentBaseShape == baseShapes[n]); // You can store your selection however you want, outside or inside your objects
-	        if (ImGui::Selectable(baseShapes[n], is_selected))
-	            currentBaseShape = (char*)baseShapes[n];
-	        if (is_selected)
-	            ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-	    }
-	    ImGui::EndCombo();
+		ImGui::Text(("Current Base Model : " + currentBaseModelName).c_str());
+		if(ImGui::Button("Change Current Base"))
+		{
+			ImGui::OpenPopup("Choose Base Model");
+		}
+		if(ImGui::Button("Switch to Plane"))
+		{
+			while(isRemeshing);
+			delete customModel;
+			delete customModelCopy;
+			isUsingBase = true;
+		}
+	}
+	else
+	{
+		ImGui::Text("Current Base Model : Default Plane");
+		if (ImGui::Button("Change Current Base"))
+		{
+			ImGui::OpenPopup("Choose Base Model");
+		}
 	}
 
 
 	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
 	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
 	ImGui::NewLine();
+
+	// TMP
+	ImGui::DragFloat3("Clouds Box Max", cloudsBoxMax, 0.1f);
+	ImGui::DragFloat3("Clouds Box Min", cloudsBoxMin, 0.1f);
+	// TMP
+
+	ImGui::NewLine();
+	ImGui::Checkbox("Post Processing", &isPostProcess);
 	ImGui::Checkbox("Auto Save", &autoSave);
 	ImGui::Checkbox("Auto Update", &autoUpdate);
 	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
@@ -622,6 +837,7 @@ static void MouseScrollCallback(float amount) {
 	CameraPosition[2] = pPos.z;
 }
 
+
 static void ShowMainScene() {
 	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
@@ -648,9 +864,10 @@ static void ShowMainScene() {
 		ImVec2 wsize = ImGui::GetWindowSize();
 		if (isTextureBake)
 			ImGui::Image((ImTextureID)textureFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		else if (isPostProcess)
+			ImGui::Image((ImTextureID)postProcessFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		else
 			ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		//ImGui::Image((ImTextureID)reflectionfbo->GetDepthTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
 	ImGui::End();
@@ -706,6 +923,7 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 	tmp["projectID"] = GetProjectId();
 	tmp["seaWaveSpeed"] = seaWaveSpeed;
 	tmp["projectDatabase"] = GetProjectDatabase();
+	tmp["projectDatabaseJs"] = nlohmann::json::parse(GetProjectDatabase());
 	tmp["dudvmapID"] = DuDvMapID;
 	tmp["waterNormalMap"] = waterNormalMap;
 
@@ -748,6 +966,22 @@ static void SaveFile(std::string file = ShowSaveFileDialog()) {
 			Log("Saved Texture with ID : " + uid);
 		}
 		tmp["diffuseTexId"] = uid;
+	}
+
+	tmp["isUsingBase"] = isUsingBase;
+
+	if(!isUsingBase)
+	{
+		std::string baseHash = MD5File(currentBaseModelName).ToString();
+		std::string projectAsset = GetProjectAsset(baseHash); 
+		if(projectAsset == "")
+		{
+			if (!PathExist(GetProjectResourcePath() + "\\models"))
+				MkDir(GetProjectResourcePath() + "\\models");
+			CopyFileData(currentBaseModelName, GetProjectResourcePath() + "\\models\\" + baseHash + currentBaseModelName.substr(currentBaseModelName.find_last_of(".")));
+			RegisterProjectAsset(baseHash, "models\\" + baseHash + currentBaseModelName.substr(currentBaseModelName.find_last_of(".")));
+		}
+		tmp["baseid"] = baseHash;
 	}
 
 	data["generals"] = tmp;
@@ -873,6 +1107,8 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 		seaDistortionStength = tmp["seaDistortionStength"];
 		DuDvMapID = tmp["dudvmapID"];
 		waterNormalMap = tmp["waterNormalMap"];
+		tmp["isUsingBase"] = isUsingBase;
+
 	}
 	catch (...) {}
 	SetProjectId(tmp["projectID"]);
@@ -897,6 +1133,30 @@ static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 	LightPosition[0] = tmp["lightPosX"];
 	LightPosition[2] = tmp["lightPosY"];
 	LightPosition[1] = tmp["lightPosZ"];
+
+
+
+	try{
+		std::string baseHash = tmp["baseid"];
+		std::string projectAsset = GetProjectAsset(baseHash); 
+		if(projectAsset == "")
+		{
+			Log("Failed to load base model from save file!");
+			Log("Loaded Base Model!");
+			isUsingBase = true;
+		}
+		else
+		{
+			ChangeCustomModel(GetProjectResourcePath() + "\\" + projectAsset);
+			isUsingBase = false;
+		}
+	}catch(...)
+	{
+		delete customModel;
+		delete customModelCopy;
+		isUsingBase = true;
+		Log("Switching to Base Plane!");
+	}
 
 	if (DuDvMapID != "DEFAULT") {
 		delete waterDudvMap;
@@ -1000,16 +1260,6 @@ static void LoadPackedProject(std::string path = ShowOpenFileDialog()) {
 			Log("Failed to Parse Project file!");
 			return;
 		}
-		try {
-			if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
-				Log("The file you are tryng to open was made with a different version of TerraForge3D!");
-				return;
-			}
-		}
-		catch (...) {
-			Log("The file you are tryng to open was made with a different version of TerraForge3D!");
-			return;
-		}
 		std::string projId = data["generals"]["projectID"];
 		zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId).c_str(), [](const char* filename, void* arg) {Log(std::string("Extracted ") + filename); return 1; }, (void*)0);
 		std::string oriDir = path.substr(0, path.rfind("\\"));
@@ -1055,44 +1305,43 @@ static void ShowMenu() {
 				moduleManager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
 			}
 
+			Model* modelToExport;
+			if(isUsingBase)
+				modelToExport = &terrain;
+			else
+				modelToExport = customModel;
+
 			if (ImGui::BeginMenu("Export Mesh As")) {
 				if (ImGui::MenuItem("Wavefont OBJ")) {
-					if (ExportOBJ(terrain.mesh->Clone(), openfilename())) {
-						successMessage = "Sucessfully exported mesh!";
-						ImGui::BeginPopup("Success Messages");
-					}
-					else {
-						errorMessage = "One Export is already in progress!";
-						ImGui::BeginPopup("Error Messages");
-					}
+					ExportModelAssimp(modelToExport, "obj", ShowSaveFileDialog(".obj\0"), "obj");
 				}
 
 				if (ImGui::MenuItem("FBX")) {
-					ExportModelAssimp(&terrain, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
+					ExportModelAssimp(modelToExport, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
 				}
 
 				if (ImGui::MenuItem("GLTF v2")) {
-					ExportModelAssimp(&terrain, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
+					ExportModelAssimp(modelToExport, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
 				}
 
 				if (ImGui::MenuItem("GLB v2")) {
-					ExportModelAssimp(&terrain, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
+					ExportModelAssimp(modelToExport, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
 				}
 
 				if (ImGui::MenuItem("JSON")) {
-					ExportModelAssimp(&terrain, "json", ShowSaveFileDialog(".json\0"));
+					ExportModelAssimp(modelToExport, "json", ShowSaveFileDialog(".json\0"));
 				}
 
 				if (ImGui::MenuItem("STL")) {
-					ExportModelAssimp(&terrain, "stl", ShowSaveFileDialog(".stl\0"));
+					ExportModelAssimp(modelToExport, "stl", ShowSaveFileDialog(".stl\0"));
 				}
 
 				if (ImGui::MenuItem("PLY")) {
-					ExportModelAssimp(&terrain, "ply", ShowSaveFileDialog(".ply\0"));
+					ExportModelAssimp(modelToExport, "ply", ShowSaveFileDialog(".ply\0"));
 				}
 
 				if (ImGui::MenuItem("Collada")) {
-					ExportModelAssimp(&terrain, "collada", ShowSaveFileDialog(".dae\0"), "dae");
+					ExportModelAssimp(modelToExport, "collada", ShowSaveFileDialog(".dae\0"), "dae");
 				}
 
 				ImGui::EndMenu();
@@ -1332,6 +1581,7 @@ static void ShowSeaSettings() {
 	ImGui::End();
 }
 
+
 static void ShowModuleManager() {
 	ImGui::Begin("Module Manager", &activeWindows.modulesManager);
 	moduleManager->Render();
@@ -1513,6 +1763,13 @@ public:
 				glViewport(0, 0, 800, 600);
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime, true);
+
+				if (isPostProcess)
+				{
+					postProcessFBO->Begin();
+					GetWindow()->Clear();
+					PostProcess(deltatime);
+				}
 			}
 
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1551,6 +1808,11 @@ public:
 			UpdateExplorerControls(CameraPosition, CameraRotation, isIExploreMode, &nLOffsetX, &nLOffsetY);
 			DoTheRederThing(deltatime, true);
 
+			if (isPostProcess)
+			{
+				postProcessFBO->Begin();
+				PostProcess(deltatime);
+			}
 
 			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_ESCAPE))) {
 				isExploreMode = false;
@@ -1709,9 +1971,9 @@ public:
 			io.MouseWheel = (float)y;
 			});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		GenerateMesh();
 		noiseGen = new LayeredNoiseManager();
 		moduleManager = new ModuleManager();
+		GenerateMesh();
 		SetupMeshNodeEditor(moduleManager);
 		glEnable(GL_DEPTH_TEST);
 		LightPosition[1] = -0.3f;
@@ -1747,6 +2009,11 @@ public:
 		textureFBO = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
 		LoadTextureThumbs();
 
+		bool tpp = false;
+
+		postProcessFBO = std::make_shared<FrameBuffer>(800, 600);
+		postProcessingShader = std::make_shared<Shader>(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\vert.glsl", &tpp), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\frag.glsl", &tpp));
+
 		// For Debug Only
 		autoUpdate = true;
 
@@ -1759,6 +2026,7 @@ public:
 		//ShutdownMeshNodeEditor();
 		//delete moduleManager;
 		delete noiseGen;
+		delete foliageShader;
 		delete shd;
 		delete wireframeShader;
 		delete reflectionfbo;

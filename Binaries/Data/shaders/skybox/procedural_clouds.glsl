@@ -5,6 +5,7 @@ out vec4 FragColor;
 uniform float time = 0.0;
 uniform float cirrus = 0.4;
 uniform float cumulus = 0.8;
+uniform float upf = 0.35;
 
 const float Br = 0.0025;
 const float Bm = 0.0003;
@@ -42,7 +43,7 @@ float fbm(vec3 p) {
 }
 
 void main() {
-  vec3 pos = vec3(TexCoords.x, TexCoords.y + 0.3, TexCoords.z);
+  vec3 pos = vec3(TexCoords.x, TexCoords.y+upf, TexCoords.z);
 
   // Atmosphere Scattering
   float mu = dot(normalize(pos), normalize(fsun));

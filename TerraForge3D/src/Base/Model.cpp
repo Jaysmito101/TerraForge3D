@@ -28,12 +28,14 @@ void Model::SetupMeshOnGPU() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh.indexCount, mesh.indices, GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, texCoord));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, texCoord));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, extras1));
+	glEnableVertexAttribArray(3);
 }
 
 void Model::UploadToGPU()
@@ -51,12 +53,14 @@ void Model::UploadToGPU()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh->indexCount, mesh->indices, GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, texCoord));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, texCoord));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, extras1));
+	glEnableVertexAttribArray(3);
 }
 
 void Model::Update()
