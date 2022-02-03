@@ -453,7 +453,7 @@ void NodeEditor::AddNode(NodeEditorNode* node)
         pins[it->_id.Get()] = it;
     }
     node->Setup();
-    if (nodes.size() > 2)
+    if (nodes.size() > 2 && nodes.find(lastNodeId.Get()) != nodes.end() && !node->reqNodePosLoad)
     {
         NodeEditorNode* lastNode = nodes[lastNodeId.Get()];
         node->nodePosition = lastNode->nodePosition;
