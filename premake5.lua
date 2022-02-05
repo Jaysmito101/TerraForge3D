@@ -109,6 +109,7 @@ project "TerraForge3D"
 
 		defines {
 			"TERR3D_WIN32",
+			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS"
 		}
 

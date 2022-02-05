@@ -1,23 +1,14 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include "../resource.h"
-#include <Base.h>
-#include <Base/EntryPoint.h>
-#include <ImGuiConsole.h>
+
+#include <Utils.h>
 #include <AppStyles.h>
-#include <ModelImporter.h>
 #include <ExplorerControls.h>
-#include <VersionInfo.h>
-#include <Texture2D.h>
+#include <Data/VersionInfo.h>
 #include <TextureSettings.h>
 #include <ViewportFramebuffer.h>
 #include <Modules/ModuleManager.h>
 #include <AppShaderEditor.h>
-#include <UIFontManager.h>
-#include <ProjectData.h>
 #include <OSLiscenses.h>
-#include <ExportTexture.h>
-#include <FrameBuffer.h>
 #include <FiltersManager.h>
 #include <FoliagePlacement.h>
 #include <SkySettings.h>
@@ -25,198 +16,64 @@
 #include <MeshNodeEditor.h>
 #include <ExportManager.h>
 #include <TextureStore.h>
-#include <glm/ext/quaternion_trigonometric.hpp>
-#include <string>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/ext/matrix_relational.hpp>
-#include <glm/ext/vector_relational.hpp>
-#include <glm/ext/scalar_relational.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <SimplexNoise.h>
+
+// TerraForge3D Base
+
+
+#define GLFW_EXPOSE_NATIVE_WIN32 // For Windows
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+
+#include "Base/Base.h"
+#include "Base/EntryPoint.h"
+
+// TerraForge3D Application
+#include "Data/ProjectData.h"
+#include "Data/ApplicationState.h"
+#include "Generators/MeshGeneratorManager.h"
+
+#undef cNear
+#undef cFar
+
 #include <FastNoiseLite.h>
-#include <thread>
-#include <experimental/filesystem>
-#include <time.h>
-#include <string.h>
-#include <mutex>
-#include <memory>
-#include <chrono>
+
+
 #include <json.hpp>
 #include <zip.h>
 #include <sys/stat.h>
 #include <dirent/dirent.h>
-#include <atomic>
-
-#ifdef TERR3D_WIN32
-#include <windows.h>
-#endif
 
 
-#include <Utils.h>
 
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
+
 
 #include "NoiseLayers/LayeredNoiseManager.h"
 
+static ApplicationState* appState;
+static Application* mainApp;
 
-#include <AppStructs.h>
 
-static Model terrain("Terrain");
-static Model sea("Sea");
-static Model grid("Grid");
-static Model screenQuad("Screen Quad");
-
-static Model* customModel,* customModelCopy;
-
-static FrameBuffer* reflectionfbo, * textureFBO;
-
-static Application* myApp;
-static Shader* shd, * meshNormalsShader, * wireframeShader, * waterShader, * textureBakeShader, * foliageShader;
-static std::shared_ptr<Shader> postProcessingShader;
-static Camera camera;
-static Camera postCamera;
-static Stats s_Stats;
-static ActiveWindows activeWindows;
 static LayeredNoiseManager* noiseGen;
-static const char* noiseTypes[] = { "Simplex Perlin", "Random", "Cellular" };
-static const char* baseShapes[] = { "Plane", "Icosphere"};
-static char* currentBaseShape = (char*)noiseTypes[0];
-static ModuleManager* moduleManager;
 
-static glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-static glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
-static glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
-static glm::vec3 LightPosition = glm::vec3(0.0f);
-static float LightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static float SeaColor[4] = { 0.4f, 0.4f, 1.0f, 1.0f };
-static float CameraPosition[3];
-static float CameraRotation[3];
-static Vec2 prevMousePos;
-static char b1[4096], b2[4096];
-
-static bool isUsingBase = true;
-static bool skyboxEnabled = false;
-static bool vSync = true;
-static bool autoUpdate = false;
-static bool flattenBase = false;
-static bool button1, button2, button3;
-static std::atomic<bool> noiseBased = true;
-static bool wireFrameMode = false;
-static bool showSea = false;
-static bool absolute = false;
-static bool square = false;
-static bool reqTexRfrsh = false;
-static bool autoSave = false;
-static bool isExploreMode = false;
-static bool isIExploreMode = false;
-static bool showFoliage = true;
-static bool isTextureBake = false;
-static std::atomic<bool> isRemeshing = false;
-static std::atomic<bool> isRuinning = true;
-static bool isPostProcess = false;
-
-static Texture2D* diffuse, * normal, * gridTex, * waterDudvMap, * waterNormal;
-
-
-static uint32_t vao, vbo, ebo;
-
-static float noiseStrength = 1.0f;
-static int resolution = 256;
-static float mouseSpeed = 25;
-static float scrollSpeed = 0.5f;
-static float mouseScrollAmount = 0;
-static float seaLevel = 0.0f;
-static float scale = 1.0f;
-static float textureScale = 1.0f;
-static float textureScaleO = 1.0f;
-static float viewportMousePosX = 0;
-static float viewportMousePosY = 0;
-static int numberOfNoiseTypes = 3;
-static float seaAlpha = 0.5f;
-static float seaDistortionScale = 1.0f;
-static float seaDistortionStength = 0.02f;
-static float seaReflectivity = 0.7;
-static float seaWaveSpeed = 0.01f;
-static int secondCounter = 0;
-
-static nlohmann::json appData;
-
-static std::string successMessage = "";
-static std::string errorMessage = "";
-static std::string savePath = "";
-static std::string DuDvMapID = "";
-static std::string waterNormalMap = "";
-static std::string currentBaseModelName = "";
-
-static float nLOffsetX, nLOffsetY, nLOffsetZ;
-
-std::shared_ptr<FrameBuffer> postProcessFBO;
-
-static float cloudsBoxMin[3] = { 0, 0, 0 };
-static float cloudsBoxMax[3] = {1, 1, 1};
-
-
-static void ToggleSystemConsole() {
-	static bool state = false;
-	state = !state;
-#ifdef TERR3D_WIN32
-	ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);
-#else 
-	std::cout << "Toogle Console Not Supported on Linux!" < std::endl;
-#endif
-}
 
 
 
 void OnAppClose(int x, int y)
 {
 	Log("Close App");
-	myApp->Close();
+	appState->mainApp->Close();
 }
 
 
 static void ShowStats()
 {
-	ImGui::Begin("Statistics", &activeWindows.statsWindow);
+	ImGui::Begin("Statistics", &appState->windows.statsWindow);
 
-	// Frame Rate
-	{
-		if (s_Stats.deltaTime == 0)
-			s_Stats.deltaTime = 1;
-		memset(b1, 0, 100);
-		memset(b2, 0, 100);
-		_itoa_s((int)s_Stats.frameRate, b2, 10);
-		strcat_s(b1, "FPS         : ");
-		strcat_s(b1, b2);
-		ImGui::Text(b1);
-
-		memset(b1, 0, 100);
-		memset(b2, 0, 100);
-		_gcvt_s(b2, s_Stats.deltaTime * 1000, 6);
-		strcat_s(b1, "Frame Time  : ");
-		strcat_s(b1, b2);
-		strcat_s(b1, "ms");
-		ImGui::Text(b1);
-
-		memset(b1, 0, 100);
-		memset(b2, 0, 100);
-		_itoa_s(s_Stats.triangles, b2, 10);
-		strcat_s(b1, "Triangles  : ");
-		strcat_s(b1, b2);
-		ImGui::Text(b1);
-
-		memset(b1, 0, 100);
-		memset(b2, 0, 100);
-		_itoa_s(s_Stats.vertCount, b2, 10);
-		strcat_s(b1, "Vertices  : ");
-		strcat_s(b1, b2);
-		ImGui::Text(b1);
-
-		ImGui::Text(("Mesh Generation Time : " + std::to_string(s_Stats.meshGenerationTime)).c_str());
-	}
+	ImGui::Text(("Vertex Count    :" + std::to_string(appState->stats.vertexCount)).c_str());
+	ImGui::Text(("Triangles Count :" + std::to_string(appState->stats.triangles)).c_str());
+	ImGui::Text(("Framerate       :" + std::to_string(appState->stats.frameRate)).c_str());
+	
 
 	ImGui::End();
 }
@@ -226,11 +83,11 @@ static void ShowGeneralControls()
 	ImGui::Begin("General Controls");
 
 	{
-		ImGui::Checkbox("VSync ", &vSync);
+		ImGui::Checkbox("VSync ", &appState->states.vSync);
 	}
 
-	ImGui::DragFloat("Mouse Speed", &mouseSpeed);
-	ImGui::DragFloat("Zoom Speed", &scrollSpeed);
+	ImGui::DragFloat("Mouse Speed", &appState->globals.mouseSpeed);
+	ImGui::DragFloat("Zoom Speed", &appState->globals.scrollSpeed);
 
 	if (ImGui::Button("Exit")) {
 		exit(0);
@@ -239,282 +96,138 @@ static void ShowGeneralControls()
 	ImGui::End();
 }
 
-static void ShowCameraControls() {
-	ImGui::Begin("Camera Controls");
-
-	ImGui::Text("Camera Position");
-	ImGui::DragFloat3("##cameraPosition", CameraPosition, 0.1f);
-	ImGui::Separator();
-	ImGui::Separator();
-	ImGui::Text("Camera Rotation");
-	ImGui::DragFloat3("##cameraRotation", CameraRotation, 10);
-	ImGui::Separator();
-	ImGui::Separator();
-	ImGui::Text("Projection Settings");
-	ImGui::Separator();
-	ImGui::DragFloat("FOV", &(camera.fov), 0.01f);
-	ImGui::DragFloat("Aspect Ratio", &(camera.aspect), 0.01f);
-	ImGui::DragFloat("Near Clipping", &(camera.near), 0.01f);
-	ImGui::DragFloat("Far Clipping", &(camera.far), 0.01f);
-
-	ImGui::End();
-}
-
-static void ShowLightingControls() {
-	ImGui::Begin("Sun Controls");
-
-	ImGui::Text("Sun Position");
-	ImGui::DragFloat3("##lightPosition", &LightPosition[0], 0.1f);
-	ImGui::Separator();
-	ImGui::Separator();
-	ImGui::Text("Sun Light Color");
-	ImGui::ColorEdit3("##lightColor", LightColor);
-
-	ImGui::End();
-}
-
-static void DeleteBuffers(GLuint a, GLuint b, GLuint c) {
-	glDeleteBuffers(1, &a);
-	glDeleteBuffers(1, &b);
-	glDeleteBuffers(1, &c);
-}
-
 static void ResetShader() {
 	bool res = false;
-	if (shd)
-		delete shd;
-	if (textureBakeShader)
-		delete textureBakeShader;
-	if(foliageShader)
-		delete foliageShader;
-	if (!wireframeShader)
-		wireframeShader = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
-	if (!waterShader)
-		waterShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &res));
-	textureBakeShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\geom.glsl", &res));
-	shd = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
-	foliageShader = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\geom.glsl", &res));
+	if (appState->shaders.terrain)
+		delete appState->shaders.terrain;
+	if (appState->shaders.textureBake)
+		delete appState->shaders.textureBake;
+	if(appState->shaders.foliage)
+		delete appState->shaders.foliage;
+
+	if (!appState->shaders.wireframe)
+		appState->shaders.wireframe = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
+	
+	appState->shaders.textureBake = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\geom.glsl", &res));
+	appState->shaders.terrain = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
+	appState->shaders.foliage = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\geom.glsl", &res));
 }
 
-static void FillMeshData() {
-	auto timeBegin = std::chrono::high_resolution_clock::now();
-	if (isUsingBase) {
-		s_Stats.vertCount = terrain.mesh->vertexCount;
-
-		if (terrain.mesh->res != resolution || terrain.mesh->sc != scale || textureScale != textureScaleO) {
-
-			terrain.mesh->GeneratePlane(resolution, scale, textureScale);
-			s_Stats.triangles = terrain.mesh->indexCount / 3;
-			s_Stats.vertCount = terrain.mesh->vertexCount;
-			textureScaleO = textureScale;
-		}
-		
-
-		for (int y = 0; y < resolution; y++)
-		{
-			for (int x = 0; x < resolution; x++)
-			{
-				if (noiseBased)
-				{
-					float elev = noiseGen->Evaluate(x, y, 0);
-					for (NoiseLayerModule* mod : moduleManager->nlModules)
-					{
-						if (mod->active)
-						{
-							elev += mod->Evaluate(x, y, 0);
-						}
-					}
-					terrain.mesh->SetElevation(elev, x, y);
-				}
-				else {
-					float pos[3] = { (float)x, (float)y, 0.0f };
-					float texCoord[2] = { (float)x / (resolution - 1), (float)y / (resolution - 1) };
-					float minPos[3] = {0, 0, 0};
-					float maxPos[3] = {256, 256, 0};
-					terrain.mesh->SetElevation(EvaluateMeshNodeEditor(NodeInputParam(pos, texCoord, minPos, maxPos)).value, x, y);
-				}
-			}
-		}
-		terrain.mesh->RecalculateNormals();	
-	}
-	else{
-		s_Stats.vertCount = customModel->mesh->vertexCount;
-		for(int i=0;i<customModel->mesh->vertexCount;i++)
-		{
-			Vert tmp = customModelCopy->mesh->vert[i];
-			float x = tmp.position.x;
-			float y = tmp.position.y;
-			float z = tmp.position.z;
-			float elev = 0.0f;
-			if (noiseBased)
-			{
-				elev = noiseGen->Evaluate(x, y, z);
-				for (NoiseLayerModule* mod : moduleManager->nlModules)
-				{
-					if (mod->active)
-					{
-						elev += mod->Evaluate(x, y, z);
-					}
-				}
-			}
-			else {
-				float pos[3] = { x, y, z };
-				float texCoord[2] = { tmp.texCoord.x, tmp.texCoord.y };
-				float minPos[3] = {0, 0, 0};
-				float maxPos[3] = {-1, -1, -1};
-				elev =  EvaluateMeshNodeEditor(NodeInputParam(pos, texCoord, minPos, maxPos)).value;
-				
-			}
-			tmp.position *= scale;
-			tmp.position += elev * tmp.normal;
-			customModel->mesh->vert[i].extras1.x = elev;
-			customModel->mesh->vert[i].position = tmp.position;			
-		}
-		customModel->mesh->RecalculateNormals();
-		
-	}	
-	auto timeEnd = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double, std::milli> timeElapsed = timeEnd - timeBegin;
-	s_Stats.meshGenerationTime = timeElapsed.count();
-	isRemeshing = false;
-}
-
-static void RegenerateMesh() {
-
-	if (isRemeshing)
-		return;
-
-	if(isUsingBase)
-		terrain.UploadToGPU();
-	else
-		customModel->UploadToGPU();
-
-	noiseGen->UpdateLayers();
-
-	isRemeshing = true;
-
-	std::thread worker(FillMeshData);
-	worker.detach();
-
-
-}
-
-static void GenerateMesh()
+static void RegenerateMesh() 
 {
-	ResetShader();
-
-	FillMeshData();
-
-	terrain.SetupMeshOnGPU();
-	sea.SetupMeshOnGPU();
-	sea.mesh->GeneratePlane(256, 120);
-	sea.mesh->RecalculateNormals();
-	sea.UploadToGPU();
-
-	grid.SetupMeshOnGPU();
-	grid.mesh->GeneratePlane(50, 120);
-	grid.mesh->RecalculateNormals();
-	grid.UploadToGPU();
-
-	screenQuad.SetupMeshOnGPU();
-	screenQuad.mesh->GenerateScreenQuad();
-	screenQuad.mesh->RecalculateNormals();
-	screenQuad.UploadToGPU();
+	appState->meshGenerator->Generate();
 }
+
 
 static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bakeTexture = false) {
 
 	static float time;
 	time += deltaTime;
-	camera.UpdateCamera(CameraPosition, CameraRotation);
+	appState->cameras.main.UpdateCamera();
+
 	Shader* shader;
+	
 	// Texture Bake
-	if (isTextureBake)
+	if (appState->states.textureBake)
 	{
 		Camera cam;
-		float CameraP[3] = { 0.0f, 0.0f, CameraPosition[2] };
 		float CameraR[3] = { 5185.0f, 0.0f, 0.0f };
-		cam.far = 1000;
+		cam.cFar = 1000;
 		cam.aspect = 1;
-		cam.UpdateCamera(CameraP, CameraR);
-		shader = textureBakeShader;
+		
+		cam.position[0] = 0.0f;
+		cam.position[1] = 0.0f;
+		cam.position[2] = appState->cameras.main.position[2];
+
+		cam.rotation[0] = 5185.0f;
+		cam.rotation[1] = 0.0f;
+		cam.rotation[2] = 0.0f;
+
+		cam.UpdateCamera();
+
+		shader = appState->shaders.textureBake;
 		shader->Bind();
 		shader->SetTime(&time);
 		shader->SetMPV(cam.pv);
-		shader->SetUniformMat4("_Model", terrain.modelMatrix);
-		shader->SetLightCol(LightColor);
-		shader->SetLightPos(LightPosition);
+		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
+		shader->SetLightCol(appState->lightManager->color);
+		shader->SetLightPos(appState->lightManager->position);
 		float tmp[3];
 		tmp[0] = 1024;
 		tmp[1] = 1024;
 		tmp[2] = 1;
 		shader->SetUniform3f("_Resolution", tmp);
-		shader->SetUniform3f("_CameraPos", CameraPosition);
-		shader->SetUniformf("_SeaLevel", seaLevel);
-		shader->SetUniformf("_CameraNear", camera.near);
-		shader->SetUniformf("_CameraFar", camera.far);
+		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
+		shader->SetUniformf("_SeaLevel", appState->seaManager->level);
+		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
+		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
-		terrain.Render();
+		appState->models.coreTerrain->Render();
 	}
 	else {
-		if (skyboxEnabled)
-			RenderSky(camera.view, camera.pers);
+		if (appState->states.skyboxEnabled)
+			RenderSky(appState->cameras.main.view, appState->cameras.main.pers);
+
+
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		if (wireFrameMode)
-			shader = wireframeShader;
+
+		if (appState->states.wireFrameMode)
+			shader = appState->shaders.wireframe;
 		else
-			shader = shd;
+			shader = appState->shaders.terrain;
+
 		shader->Bind();
 		shader->SetTime(&time);
-		shader->SetMPV(camera.pv);
-		shader->SetUniformMat4("_Model", terrain.modelMatrix);
-		shader->SetLightCol(LightColor);
-		shader->SetLightPos(LightPosition);
+		shader->SetMPV(appState->cameras.main.pv);
+		appState->models.coreTerrain->Update();
+		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
+		shader->SetLightCol(appState->lightManager->color);
+		shader->SetLightPos(appState->lightManager->position);
 		float tmp[3];
-		tmp[0] = viewportMousePosX;
-		tmp[1] = viewportMousePosY;
+		tmp[0] = appState->globals.viewportMousePosX;
+		tmp[1] = appState->globals.viewportMousePosY;
 		tmp[2] = ImGui::GetIO().MouseDown[0];
 		shader->SetUniform3f("_MousePos", tmp);
 		tmp[0] = 800;
 		tmp[1] = 600;
 		tmp[2] = 1;
 		shader->SetUniform3f("_Resolution", tmp);
-		shader->SetUniform3f("_CameraPos", CameraPosition);
-		shader->SetUniformf("_SeaLevel", seaLevel);
-		shader->SetUniformf("_CameraNear", camera.near);
-		shader->SetUniformf("_CameraFar", camera.far);
+		shader->SetUniformf("_SeaLevel", appState->seaManager->level);
+		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
+		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
+		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
-		if(isUsingBase)
-			terrain.Render();
-		else
-			customModel->Render();
+		if(appState->mode == ApplicationMode::TERRAIN)
+			appState->models.coreTerrain->Render();
+		else if (appState->mode == ApplicationMode::CUSTOM_BASE)
+			appState->models.customBase->Render();
 
 
-		if (showFoliage)
+		if (appState->states.showFoliage)
 		{
-			shader = foliageShader;
+			shader = appState->shaders.foliage;
 			shader->Bind();
-		shader->SetTime(&time);
-		shader->SetMPV(camera.pv);
-		shader->SetUniformMat4("_Model", terrain.modelMatrix);
-		shader->SetLightCol(LightColor);
-		shader->SetLightPos(LightPosition);
-		float tmp[3];
-		tmp[0] = viewportMousePosX;
-		tmp[1] = viewportMousePosY;
-		tmp[2] = ImGui::GetIO().MouseDown[0];
-		shader->SetUniform3f("_MousePos", tmp);
-		tmp[0] = 800;
-		tmp[1] = 600;
-		tmp[2] = 1;
-		shader->SetUniform3f("_Resolution", tmp);
-		shader->SetUniform3f("_CameraPos", CameraPosition);
-		shader->SetUniformf("_SeaLevel", seaLevel);
-		shader->SetUniformf("_CameraNear", camera.near);
-		shader->SetUniformf("_CameraFar", camera.far);
-			RenderFoliage(shader, camera);
+			shader->SetTime(&time);
+			shader->SetMPV(appState->cameras.main.pv);
+			shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
+			shader->SetLightCol(appState->lightManager->color);
+			shader->SetLightPos(appState->lightManager->position);
+			float tmp[3];
+			tmp[0] = appState->globals.viewportMousePosX;
+			tmp[1] = appState->globals.viewportMousePosY;
+			tmp[2] = ImGui::GetIO().MouseDown[0];
+			shader->SetUniform3f("_MousePos", tmp);
+			tmp[0] = 800;
+			tmp[1] = 600;
+			tmp[2] = 1;
+			shader->SetUniform3f("_Resolution", tmp);
+			shader->SetUniformf("_SeaLevel", appState->seaManager->level);
+			shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
+			shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
+			shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
+			RenderFoliage(shader, appState->cameras.main);
 		}
 
 
@@ -524,32 +237,8 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		//grid->Render();
 
 
-		if (showSea && renderWater) {
-			waterShader->Bind();
-			waterShader->SetTime(&time);
-			waterShader->SetUniformf("_SeaAlpha", seaAlpha);
-			waterShader->SetUniformf("_SeaDistScale", seaDistortionScale);
-			waterShader->SetUniformf("_SeaDistStrength", seaDistortionStength);
-			waterShader->SetUniformf("_SeaReflectivity", seaReflectivity);
-			waterShader->SetUniformf("_SeaLevel", seaLevel);
-			waterShader->SetUniformf("_SeaWaveSpeed", seaWaveSpeed);
-			glActiveTexture(7);
-			glBindTexture(GL_TEXTURE_2D, reflectionfbo->GetColorTexture());
-			waterShader->SetUniformi("_ReflectionTexture", 7);
-			if (waterDudvMap)
-				waterDudvMap->Bind(8);
-			waterShader->SetUniformi("_DuDvMap", 8);
-			if (waterNormal)
-				waterNormal->Bind(9);
-			waterShader->SetUniformi("_NormalMap", 9);
-			sea.position.y = seaLevel;
-			sea.Update();
-			glm::mat4 tmp = glm::translate(camera.pv, glm::vec3(0, seaLevel, 0));
-			waterShader->SetUniform3f("_SeaColor", SeaColor);
-			waterShader->SetMPV(tmp);
-			waterShader->SetLightCol(LightColor);
-			waterShader->SetLightPos(LightPosition);
-			sea.Render();
+		if (appState->seaManager->enabled && renderWater) {
+			appState->seaManager->Render(appState->cameras.main, appState->lightManager, appState->frameBuffers.relflection, time);
 		}
 	}
 
@@ -561,46 +250,58 @@ void PostProcess(float deltatime)
 {
 	float pos[3] = { 0, 0, 1.8 };
 	float rot[3] = {0, 0, 0};
-	postCamera.aspect = 1;
-	postCamera.UpdateCamera(pos, rot);
+	appState->cameras.postPorcess.aspect = 1;
+	
+	appState->cameras.postPorcess.position[0] = 0.0f;
+	appState->cameras.postPorcess.position[0] = 0.0f;
+	appState->cameras.postPorcess.position[0] = 1.8f;
 
-	float viewDir[3] = { glm::value_ptr(camera.pv)[2], glm::value_ptr(camera.pv)[6], glm::value_ptr(camera.pv)[10] };
+	appState->cameras.postPorcess.rotation[0] = 0.0f;
+	appState->cameras.postPorcess.rotation[1] = 0.0f;
+	appState->cameras.postPorcess.rotation[2] = 0.0f;
 
-	postProcessingShader->Bind(); 
+	appState->cameras.postPorcess.UpdateCamera();
 
-	postProcessingShader->SetUniform3f("_CameraPosition", CameraPosition);
-	postProcessingShader->SetUniform3f("_ViewDir", viewDir);
+	float viewDir[3] = { glm::value_ptr(appState->cameras.main.pv)[2], glm::value_ptr(appState->cameras.main.pv)[6], glm::value_ptr(appState->cameras.main.pv)[10] };
 
-	postProcessingShader->SetUniform3f("cloudsBoxBoundsMin", cloudsBoxMin);
-	postProcessingShader->SetUniform3f("cloudsBoxBoundsMax", cloudsBoxMax);
+	appState->shaders.postProcess->Bind(); 
+
+	appState->shaders.postProcess->SetUniform3f("_CameraPosition", appState->cameras.main.position);
+	appState->shaders.postProcess->SetUniform3f("_ViewDir", viewDir);
+
+	float cloudsBoxMinMax[3] = {0.0f}; // Temporary
+
+	appState->shaders.postProcess->SetUniform3f("cloudsBoxBoundsMin", cloudsBoxMinMax);
+	appState->shaders.postProcess->SetUniform3f("cloudsBoxBoundsMax", cloudsBoxMinMax);
 	 
-	postProcessingShader->SetMPV(postCamera.pv);
+	appState->shaders.postProcess->SetMPV(appState->cameras.postPorcess.pv);
 
 	glActiveTexture(GL_TEXTURE5);	
 	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferColorTextureId());
-	postProcessingShader->SetUniformi("_ColorTexture", 5);
+	appState->shaders.postProcess->SetUniformi("_ColorTexture", 5);
 
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferDepthTextureId()); 
-	postProcessingShader->SetUniformi("_DepthTexture", 6);
+	appState->shaders.postProcess->SetUniformi("_DepthTexture", 6);
 
-	screenQuad.Render();
+	appState->models.screenQuad->Render();
 } 
  
 static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 {
-	if(!isUsingBase)
+	if(!appState->states.usingBase)
 	{
-		while(isRemeshing);
-		delete customModel;
-		delete customModelCopy;
+		while (appState->states.remeshing);
+		delete appState->models.customBase;
+		delete appState->models.customBaseCopy;
 	}
-	currentBaseModelName = mdstr;
-	if(currentBaseModelName.size() > 3)
+	if(mdstr.size() > 3)
 	{
-		isUsingBase = false;	
-		customModel = LoadModel(currentBaseModelName);
-		customModelCopy = LoadModel(currentBaseModelName); // Will Be Replaced with something efficient
+		appState->globals.currentBaseModelPath = mdstr;
+		appState->states.usingBase = false;	
+		appState->mode = ApplicationMode::CUSTOM_BASE;
+		appState->models.customBase = LoadModel(appState->globals.currentBaseModelPath);
+		appState->models.customBaseCopy = LoadModel(appState->globals.currentBaseModelPath); // Will Be Replaced with something efficient
 	}
 }
 
@@ -630,10 +331,11 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)plane->GetRendererID(), ImVec2(200, 200)) )
 		{
-			while (isRemeshing);
-			delete customModel;
-			delete customModelCopy;
-			isUsingBase = true;
+			while (appState->states.remeshing);
+			delete appState->models.customBase;
+			delete appState->models.customBaseCopy;
+			appState->states.usingBase = true;
+			appState->mode = ApplicationMode::TERRAIN;
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
@@ -681,19 +383,20 @@ static void ShowTerrainControls()
 
 	ShowChooseBaseModelPopup();
 	
-	if(!isUsingBase)
+	if(appState->mode != ApplicationMode::TERRAIN)
 	{
-		ImGui::Text(("Current Base Model : " + currentBaseModelName).c_str());
+		ImGui::Text(("Current Base Model : " + appState->globals.currentBaseModelPath).c_str());
 		if(ImGui::Button("Change Current Base"))
 		{
 			ImGui::OpenPopup("Choose Base Model");
 		}
 		if(ImGui::Button("Switch to Plane"))
 		{
-			while(isRemeshing);
-			delete customModel;
-			delete customModelCopy;
-			isUsingBase = true;
+			while(appState->states.remeshing);
+			delete appState->models.customBase;
+			delete appState->models.customBaseCopy;
+			appState->states.usingBase = true;
+			appState->mode = ApplicationMode::TERRAIN;
 		}
 	}
 	else
@@ -706,33 +409,45 @@ static void ShowTerrainControls()
 	}
 
 
-	ImGui::DragInt("Mesh Resolution", &resolution, 1, 2, 8192);
-	ImGui::DragFloat("Mesh Scale", &scale, 0.1f, 1.0f, 5000.0f);
-	ImGui::NewLine();
+	if(appState->mode == ApplicationMode::TERRAIN)
+		ImGui::DragInt("Mesh Resolution", &appState->globals.resolution, 1, 2, 16 * 4096);
 
-	// TMP
-	ImGui::DragFloat3("Clouds Box Max", cloudsBoxMax, 0.1f);
-	ImGui::DragFloat3("Clouds Box Min", cloudsBoxMin, 0.1f);
-	// TMP
+	if(appState->mode == ApplicationMode::TERRAIN || appState->mode == ApplicationMode::CUSTOM_BASE)
+		ImGui::DragFloat("Mesh Scale", &appState->globals.scale, 0.1f, 1.0f, 5000.0f);
 
 	ImGui::NewLine();
-	ImGui::Checkbox("Post Processing", &isPostProcess);
-	ImGui::Checkbox("Auto Save", &autoSave);
-	ImGui::Checkbox("Auto Update", &autoUpdate);
-	ImGui::Checkbox("Wireframe Mode", &wireFrameMode);
-	ImGui::Checkbox("Show Skybox", &skyboxEnabled);
-	ImGui::Checkbox("Show Foliage", &showFoliage);
-	ImGui::Checkbox("Infinite Explorer Mode", &isIExploreMode);
-	ImGui::Checkbox("Explorer Mode", &isExploreMode);
-	ImGui::Checkbox("Texture Bake Mode", &isTextureBake);
+
+	ImGui::Checkbox("Auto Update", &appState->states.autoUpdate);
+	ImGui::Checkbox("Post Processing", &appState->states.postProcess);
+	ImGui::Checkbox("Auto Save", &appState->states.autoSave);
+	ImGui::Checkbox("Wireframe Mode", &appState->states.wireFrameMode);
+	ImGui::Checkbox("Show Skybox", &appState->states.skyboxEnabled);
+	ImGui::Checkbox("Show Sea", &appState->seaManager->enabled);
+	ImGui::Checkbox("Show Foliage", &appState->states.showFoliage);
+	ImGui::Checkbox("Infinite Explorer Mode", &appState->states.iExploreMode);
+	ImGui::Checkbox("Explorer Mode", &appState->states.exploreMode);
+	ImGui::Checkbox("Texture Bake Mode", &appState->states.textureBake);
 	ImGui::NewLine();
 	if (ImGui::Button("Update Mesh"))
 		RegenerateMesh();
 
 	if (ImGui::Button("Recalculate Normals")) {
-		while (isRemeshing);
-		terrain.mesh->RecalculateNormals();
-		terrain.UploadToGPU();
+
+		while (appState->states.remeshing);
+		if (appState->mode == ApplicationMode::TERRAIN)
+		{
+			appState->models.coreTerrain->mesh->RecalculateNormals();
+			appState->models.coreTerrain->UploadToGPU();
+		}
+		else if (appState->mode == ApplicationMode::CUSTOM_BASE) 
+		{
+			appState->models.customBase->mesh->RecalculateNormals();
+			appState->models.customBase->UploadToGPU();
+		}
+		else
+		{
+			Log("Unsupported App Mode!");
+		}
 	}
 
 	if (ImGui::Button("Refresh Shaders")) {
@@ -740,74 +455,49 @@ static void ShowTerrainControls()
 	}
 
 	if (ImGui::Button("Use Custom Shaders")) {
-		activeWindows.shaderEditorWindow = true;
+		appState->windows.shaderEditorWindow = true;
 	}
 
 	if (ImGui::Button("Texture Settings")) {
-		activeWindows.texturEditorWindow = true;
+		appState->windows.texturEditorWindow = true;
 	}
 
 	if (ImGui::Button("Sea Settings")) {
-		activeWindows.seaEditor = true;
+		appState->windows.seaEditor = true;
 	}
 	if (ImGui::Button("Filter Settings")) {
-		activeWindows.filtersManager = true;
+		appState->windows.filtersManager = true;
 	}
 
 	if (ImGui::Button("Export Frame")) {
-		if(isTextureBake)
-			ExportTexture(textureFBO->GetRendererID() , ShowSaveFileDialog(".png"), 1024, 1024);
+		if(appState->states.textureBake)
+			ExportTexture(appState->frameBuffers.textureExport->GetRendererID() , ShowSaveFileDialog(".png"), 1024, 1024);
 		else
 			ExportTexture(GetViewportFramebufferId(), ShowSaveFileDialog(".png"), 800, 600);
-	}
-	ImGui::Separator();
-
-	if (ImGui::Button("Change Mode##4584")) {
-		noiseBased = !noiseBased;
-	}
-
-	if (noiseBased) {
-		ImGui::Text("Using Layer Based Workflow");
-	}
-	else {
-		ImGui::Text("Using Node Based Workflow");
 	}
 
 	ImGui::Separator();
 
 	ImGui::NewLine();
 
-	if(moduleManager->uiModules.size() > 0)
+	if(appState->modules.manager->uiModules.size() > 0)
 		ImGui::Text("UI Modules");
 	int i = 0;
-	for (UIModule* mod : moduleManager->uiModules)
+	for (UIModule* mod : appState->modules.manager->uiModules)
 		ImGui::Checkbox(MAKE_IMGUI_LABEL(i++, mod->windowName), &mod->active);
 
 	ImGui::Separator();
 
-	ImGui::NewLine();
-
-	if (moduleManager->nlModules.size() > 0)
-		ImGui::Text("Noise Layer Modules");
-	i = 0;
-	for (NoiseLayerModule* mod : moduleManager->nlModules)
-		ImGui::Checkbox(MAKE_IMGUI_LABEL(i++, mod->name), &mod->active);
-	ImGui::End();
-}
-
-static void ShowNoiseSettings() {
-	ImGui::Begin("Noise Settings");
-
-	noiseGen->Render();
-
+	
 	ImGui::End();
 }
 
 static void MouseMoveCallback(float x, float y) {
+	static glm::vec2 prevMousePos; // This is temporary
 	float deltaX = x - prevMousePos.x;
 	float deltaY = y - prevMousePos.y;
 
-	if (button2) {
+	if (appState->states.mouseButton2) {
 
 
 		if (deltaX > 200) {
@@ -818,8 +508,8 @@ static void MouseMoveCallback(float x, float y) {
 			deltaY = 0;
 		}
 
-		CameraRotation[0] += deltaX * mouseSpeed;
-		CameraRotation[1] += deltaY * mouseSpeed;
+		appState->cameras.main.rotation[0] += deltaX * appState->globals.mouseSpeed;
+		appState->cameras.main.rotation[1] += deltaY * appState->globals.mouseSpeed;
 	}
 
 
@@ -829,12 +519,12 @@ static void MouseMoveCallback(float x, float y) {
 }
 
 static void MouseScrollCallback(float amount) {
-	mouseScrollAmount = amount;
-	glm::vec3 pPos = glm::vec3(CameraPosition[0], CameraPosition[1], CameraPosition[2]);
-	pPos += front * amount * scrollSpeed;
-	CameraPosition[0] = pPos.x;
-	CameraPosition[1] = pPos.y;
-	CameraPosition[2] = pPos.z;
+	appState->globals.mouseScrollAmount = amount;
+	glm::vec3 pPos = glm::vec3(appState->cameras.main.position[0], appState->cameras.main.position[1], appState->cameras.main.position[2]);
+	pPos += appState->constants.FRONT * amount * appState->globals.scrollSpeed;
+	appState->cameras.main.position[0] = pPos.x;
+	appState->cameras.main.position[1] = pPos.y;
+	appState->cameras.main.position[2] = pPos.z;
 }
 
 
@@ -850,22 +540,24 @@ static void ShowMainScene() {
 			ImGuiIO io = ImGui::GetIO();
 			MouseMoveCallback(io.MousePos.x, io.MousePos.y);
 			MouseScrollCallback(io.MouseWheel);
-			button1 = io.MouseDown[0];
-			button2 = io.MouseDown[2];
-			button3 = io.MouseDown[1];
+			appState->states.mouseButton1 = io.MouseDown[0];
+			appState->states.mouseButton2 = io.MouseDown[2];
+			appState->states.mouseButton3 = io.MouseDown[1];
 			if (ImGui::GetIO().MouseDown[1]) {
-				CameraPosition[0] += -io.MouseDelta.x * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(CameraPosition[0], CameraPosition[1], CameraPosition[2]));
-				CameraPosition[1] += io.MouseDelta.y * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(CameraPosition[0], CameraPosition[1], CameraPosition[2]));
+				appState->cameras.main.position[0] += -io.MouseDelta.x * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(appState->cameras.main.position[0], appState->cameras.main.position[1], appState->cameras.main.position[2]));
+				appState->cameras.main.position[1] += io.MouseDelta.y * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(appState->cameras.main.position[0], appState->cameras.main.position[1], appState->cameras.main.position[2]));
 			}
-			viewportMousePosX = ImGui::GetIO().MousePos.x - viewportOffset.x;
-			viewportMousePosY = ImGui::GetIO().MousePos.y - viewportOffset.y;
+			appState->globals.viewportMousePosX = ImGui::GetIO().MousePos.x - viewportOffset.x;
+			appState->globals.viewportMousePosY = ImGui::GetIO().MousePos.y - viewportOffset.y;
 
 		}
 		ImVec2 wsize = ImGui::GetWindowSize();
-		if (isTextureBake)
-			ImGui::Image((ImTextureID)textureFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		else if (isPostProcess)
-			ImGui::Image((ImTextureID)postProcessFBO->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		appState->globals.viewportSize[0] = wsize.x;
+		appState->globals.viewportSize[1] = wsize.y;
+		if (appState->states.textureBake)
+			ImGui::Image((ImTextureID)appState->frameBuffers.textureExport->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+		else if (appState->states.postProcess)
+			ImGui::Image((ImTextureID)appState->frameBuffers.postProcess->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		else
 			ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
@@ -874,717 +566,36 @@ static void ShowMainScene() {
 }
 
 static void SaveFile(std::string file = ShowSaveFileDialog()) {
-	if (file.size() == 0)
-		return;
-	if (file.find(".terr3d") == std::string::npos)
-		file += ".terr3d";
+	appState->serailizer->SaveFile(file);
 
-	if (file.find("autosave.terr3d") == std::string::npos)
-		savePath = file;
+	//data["EnodeEditor"] = GetMeshNodeEditorSaveData();
 
-	nlohmann::json data;
-	data["type"] = "SAVEFILE";
-	data["serializerVersion"] = TERR3D_SERIALIZER_VERSION;
-	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
-	data["name"] = "TerraForge3D v2.0.0";
-	data["EnodeEditor"] = GetMeshNodeEditorSaveData();
-	data["styleData"] = GetStyleData();
-	data["appData"] = appData;
-	data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());
-	data["texLayers"] = SaveTextureLayerData();
-
+//	data["noiseLayers"] = noiseGen->Save();
 	
-	data["noiseLayers"] = noiseGen->Save();
-	nlohmann::json tmp;
-	tmp["autoUpdate"] = autoUpdate;
-	tmp["square"] = square;
-	tmp["nLOffsetX"] = nLOffsetX;
-	tmp["nLOffsetY"] = nLOffsetY;
-	tmp["nLOffsetZ"] = nLOffsetZ;
-	tmp["absolute"] = absolute;
-	tmp["flattenBase"] = flattenBase;
-	tmp["noiseBased"] = noiseBased ? true : false;
-	tmp["wireFrameMode"] = wireFrameMode;
-	tmp["skyboxEnabled"] = skyboxEnabled;
-	tmp["showSea"] = showSea;
-	tmp["vSync"] = vSync;
-	tmp["mouseSpeed"] = mouseSpeed;
-	tmp["scrollSpeed"] = scrollSpeed;
-	tmp["mouseScrollAmount"] = mouseScrollAmount;
-	tmp["scale"] = scale;
-	tmp["textureScale"] = textureScale;
-	tmp["textureScaleO"] = textureScaleO;
-	tmp["seaLevel"] = seaLevel;
-	tmp["seaAlpha"] = seaAlpha;
-	tmp["autoSave"] = autoSave;
-	tmp["seaDistortionStength"] = seaDistortionStength;
-	tmp["seaDistortionScale"] = seaDistortionScale;
-	tmp["seaReflectivity"] = seaReflectivity;
-	tmp["projectID"] = GetProjectId();
-	tmp["seaWaveSpeed"] = seaWaveSpeed;
-	tmp["projectDatabase"] = GetProjectDatabase();
-	tmp["projectDatabaseJs"] = nlohmann::json::parse(GetProjectDatabase());
-	tmp["dudvmapID"] = DuDvMapID;
-	tmp["waterNormalMap"] = waterNormalMap;
-
-	SaveProjectDatabase();
-
-	tmp["cameraPosX"] = CameraPosition[0];
-	tmp["cameraPosY"] = CameraPosition[2];
-	tmp["cameraPosZ"] = CameraPosition[1];
-
-	tmp["cameraRotX"] = CameraRotation[0];
-	tmp["cameraRotY"] = CameraRotation[1];
-	tmp["cameraRotZ"] = CameraRotation[2];
-
-	tmp["lightPosX"] = LightPosition[0];
-	tmp["lightPosY"] = LightPosition[2];
-	tmp["lightPosZ"] = LightPosition[1];
-
-	if (diffuse) {
-		bool isOk = true;
-		static std::string uid;
-		static std::string oPath = "";
-		try {
-			std::string path = GetProjectAsset(uid);
-			if (path.size() > 0 && diffuse->GetPath() == oPath) {
-				isOk = true;
-			}
-			else
-				isOk = false;
-		}
-		catch (...) {
-			isOk = false;
-		}
-		if (!isOk) {
-			uid = GenerateId(32);
-			oPath = diffuse->GetPath();
-			if (!PathExist(GetProjectResourcePath() + "\\textures"))
-				MkDir(GetProjectResourcePath() + "\\textures");
-			CopyFileData(diffuse->GetPath(), GetProjectResourcePath() + "\\textures\\" + uid);
-			RegisterProjectAsset(uid, "textures\\" + uid);
-			Log("Saved Texture with ID : " + uid);
-		}
-		tmp["diffuseTexId"] = uid;
-	}
-
-	tmp["isUsingBase"] = isUsingBase;
-
-	if(!isUsingBase)
-	{
-		std::string baseHash = MD5File(currentBaseModelName).ToString();
-		std::string projectAsset = GetProjectAsset(baseHash); 
-		if(projectAsset == "")
-		{
-			if (!PathExist(GetProjectResourcePath() + "\\models"))
-				MkDir(GetProjectResourcePath() + "\\models");
-			CopyFileData(currentBaseModelName, GetProjectResourcePath() + "\\models\\" + baseHash + currentBaseModelName.substr(currentBaseModelName.find_last_of(".")));
-			RegisterProjectAsset(baseHash, "models\\" + baseHash + currentBaseModelName.substr(currentBaseModelName.find_last_of(".")));
-		}
-		tmp["baseid"] = baseHash;
-	}
-
-	data["generals"] = tmp;
-
-	std::ofstream outfile;
-
-	outfile.open(file);
-	outfile << data.dump(4, ' ', false);
-	outfile.close();
-
-	outfile.open(GetProjectResourcePath() + "\\project.terr3d");
-	outfile << data.dump(4, ' ', false);
-	outfile.close();
 }
 
 static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
 
-	// For Now it dows not do anything id any error has occured but in later versions this will be reported to user!
+	appState->serailizer->LoadFile(file);
 
+	//noiseGen->Load(data["noiseLayers"]);
+	//SetMeshNodeEditorSaveData(data["EnodeEditor"]);
 
-	if (file.size() == 0)
-		return;
-	if (file.find(".terr3d") == std::string::npos)
-		file += ".terr3d";
-
-	if (file.find("autosave.terr3d") == std::string::npos)
-		savePath = file;
-
-	bool flagRd = true;
-	std::string sdata = ReadShaderSourceFile(file, &flagRd);
-	if (!flagRd) {
-		Log("Could not read file " + file);
-		return;
-	}
-	if (sdata.size() == 0) {
-		Log("Empty file.");
-		return;
-	}
-	nlohmann::json data;
-	try {
-		data = nlohmann::json::parse(sdata);
-	}
-	catch (...) {
-		Log("Failed to Parse file : " + file);
-	}
-
-	bool isSelfMade = true;
-
-	try {
-		if (data["versionHash"] != MD5File(GetExecutablePath()).ToString()) {
-			Log("The file you are tryng to open was made with a different version of TerraForge3D!\nTrying to check Serializer compatibility.");
-			isSelfMade = false;
-		}
-	}
-	catch (...) {
-		isSelfMade = false;
-		Log("Failed to verify File version!");
-		return;
-	}
-
-	if (!isSelfMade) {
-		try {
-			int sVersion = data["serializerVersion"];
-			if (sVersion < TERR3D_MIN_SERIALIZER_VERSION) {
-				Log("This file (" + file + ") cannot be opened as it was serialized using serializer V" + std::to_string(sVersion) + " but the minimum serializer version required is V" + std::to_string(TERR3D_MIN_SERIALIZER_VERSION));
-				return;
-			}
-			if (sVersion > TERR3D_MAX_SERIALIZER_VERSION) {
-				Log("This file (" + file + ") cannot be opened as it was serialized using serializer V" + std::to_string(sVersion) + " but the maximum serializer version supported is V" + std::to_string(TERR3D_MAX_SERIALIZER_VERSION));
-				return;
-			}
-		}
-		catch (...) {
-			Log("Failed to verify Serializer!");
-			return;
-		}
-	}
-
-
-	if (data["type"] == "THEME") {
-		LoadThemeFromStr(data.dump());
-	}
-
-
-	if (data["type"] != "SAVEFILE")
-		return;
-
-	LoadThemeFromStr(data["styleData"]);
-	//data["imguiData"] = ImGui::SaveIniSettingsToMemory();
-	appData = data["appData"];
-
-	// This should be replaced with something better
-	while (isRemeshing);
-	noiseGen->Load(data["noiseLayers"]);
-	nlohmann::json tmp = data["generals"];
-	try {
-		autoUpdate = tmp["autoUpdate"];
-
-		nLOffsetY = tmp["nLOffsetY"];
-		nLOffsetX = tmp["nLOffsetX"];
-		nLOffsetZ = tmp["nLOffsetZ"];
-
-		square = tmp["square"];
-		absolute = tmp["absolute"];
-		flattenBase = tmp["flattenBase"];
-		noiseBased = tmp["noiseBased"];
-		skyboxEnabled = tmp["skyboxEnabled"];
-		vSync = tmp["vSync"];
-		showSea = tmp["showSea"];
-		wireFrameMode = tmp["wireFrameMode"];
-		mouseSpeed = tmp["mouseSpeed"];
-		scrollSpeed = tmp["scrollSpeed"];
-		mouseScrollAmount = tmp["mouseScrollAmount"];
-		scale = tmp["scale"];
-		textureScale = tmp["textureScale"];
-		textureScaleO = tmp["textureScaleO"];
-		seaLevel = tmp["seaLevel"];
-		seaAlpha = tmp["seaAlpha"];
-		autoSave = tmp["autoSave"];
-		seaReflectivity = tmp["seaReflectivity"];
-		seaDistortionScale = tmp["seaDistortionScale"];
-		seaWaveSpeed = tmp["seaWaveSpeed"];
-		seaDistortionStength = tmp["seaDistortionStength"];
-		DuDvMapID = tmp["dudvmapID"];
-		waterNormalMap = tmp["waterNormalMap"];
-		tmp["isUsingBase"] = isUsingBase;
-
-	}
-	catch (...) {}
-	SetProjectId(tmp["projectID"]);
-	try {
-		SetProjectDatabase(tmp["projectDatabase"]);
-	}
-	catch (...) {}
-	Log("Loaded Project ID : " + GetProjectId());
-
-	LoadTextureLayerData(data["texLayers"]);
-	SetMeshNodeEditorSaveData(data["EnodeEditor"]);
-
-
-	CameraPosition[0] = tmp["cameraPosX"];
-	CameraPosition[2] = tmp["cameraPosY"];
-	CameraPosition[1] = tmp["cameraPosZ"];
-
-	CameraRotation[0] = tmp["cameraRotX"];
-	CameraRotation[1] = tmp["cameraRotY"];
-	CameraRotation[2] = tmp["cameraRotZ"];
-
-	LightPosition[0] = tmp["lightPosX"];
-	LightPosition[2] = tmp["lightPosY"];
-	LightPosition[1] = tmp["lightPosZ"];
-
-
-
-	try{
-		std::string baseHash = tmp["baseid"];
-		std::string projectAsset = GetProjectAsset(baseHash); 
-		if(projectAsset == "")
-		{
-			Log("Failed to load base model from save file!");
-			Log("Loaded Base Model!");
-			isUsingBase = true;
-		}
-		else
-		{
-			ChangeCustomModel(GetProjectResourcePath() + "\\" + projectAsset);
-			isUsingBase = false;
-		}
-	}catch(...)
-	{
-		delete customModel;
-		delete customModelCopy;
-		isUsingBase = true;
-		Log("Switching to Base Plane!");
-	}
-
-	if (DuDvMapID != "DEFAULT") {
-		delete waterDudvMap;
-		waterDudvMap = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(DuDvMapID));
-	}
-	else {
-		delete waterDudvMap;
-		waterDudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
-	}
-
-	if (waterNormalMap != "DEFAULT") {
-		delete waterNormal;
-		waterNormal = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(waterNormalMap));
-	}
-	else {
-		delete waterNormal;
-		waterNormal = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_normal.png");
-	}
-
-	if (diffuse)
-		delete diffuse;
-	try {
-		diffuse = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(tmp["diffuseTexId"]));
-	}
-
-	catch (...) {
-		Log("Cold not load texture from saved file.");
-		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
-	}
-
-	// For Future
-	// ImGui::LoadIniSettingsFromMemory(data["imguiData"].dump().c_str(), data["imguiData"].dump().size())
 }
 
-void zip_walk(struct zip_t* zip, const char* path, bool isFristLayer = true, std::string prevPath = "") {
-	DIR* dir;
-	struct dirent* entry;
-	char fullpath[MAX_PATH];
-	struct stat s;
-
-	memset(fullpath, 0, MAX_PATH);
-	dir = opendir(path);
-	assert(dir);
-
-	while ((entry = readdir(dir))) {
-		// skip "." and ".."
-		if (!strcmp(entry->d_name, ".\0") || !strcmp(entry->d_name, "..\0"))
-			continue;
-
-		snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
-		stat(fullpath, &s);
-		if (S_ISDIR(s.st_mode)) {
-			zip_walk(zip, fullpath, false, prevPath + entry->d_name + "\\");
-		}
-		else {
-			zip_entry_open(zip, (prevPath + entry->d_name).c_str());
-			zip_entry_fwrite(zip, fullpath);
-			zip_entry_close(zip);
-		}
-	}
-
-	closedir(dir);
-}
 
 static void PackProject(std::string path = ShowSaveFileDialog()) {
-	if (path.find(".terr3dpack") == std::string::npos)
-		path = path + ".terr3dpack";
-	if (savePath.size() > 0) {
-		SaveFile(savePath);
-	}
-	else {
-		if (!PathExist(GetExecutableDir() + "\\Data\\temp"))
-			MkDir(GetExecutableDir() + "\\Data\\temp");
-		std::string uid = GenerateId(64);
-		SaveFile(GetExecutableDir() + "\\Data\\temp\\" + uid);
-	}
-	zip_t* packed = zip_open(path.c_str(), 9, 'w');
-	zip_walk(packed, GetProjectResourcePath().c_str());
-	zip_close(packed);
+	appState->serailizer->PackProject(path);
 }
 
 static void LoadPackedProject(std::string path = ShowOpenFileDialog()) {
-	if (path.find(".terr3dpack") == std::string::npos)
-		path = path + ".terr3dpack";
-	std::string uid = GenerateId(64);
-	MkDir(GetExecutableDir() + "\\Data\\temp\\pcache_" + uid);
-	zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\temp\\pcache_" + uid).c_str(), [](const char* filename, void* arg) {return 1; }, (void*)0);
-
-	if (FileExists(GetExecutableDir() + "\\Data\\temp\\pcache_" + uid + "\\project.terr3d", true)) {
-		bool tmp = false;
-		std::string sdata = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\temp\\pcache_" + uid + "\\project.terr3d", &tmp);
-		if (sdata.size() <= 0) {
-			Log("Emppty Project File!");
-			return;
-		}
-		nlohmann::json data;
-		try {
-			data = nlohmann::json::parse(sdata);
-		}
-		catch (...) {
-			Log("Failed to Parse Project file!");
-			return;
-		}
-		std::string projId = data["generals"]["projectID"];
-		zip_extract(path.c_str(), (GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId).c_str(), [](const char* filename, void* arg) {Log(std::string("Extracted ") + filename); return 1; }, (void*)0);
-		std::string oriDir = path.substr(0, path.rfind("\\"));
-		std::string oriName = path.substr(path.rfind("\\") + 1);
-		CopyFileData((GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + projId + "\\project.terr3d").c_str(), oriDir + "\\" + oriName + ".terr3d");
-		OpenSaveFile(oriDir + "\\" + oriName + ".terr3d");
-	}
-	else {
-		Log("Not a valid terr3dpack file!");
-	}
-}
-
-static void ShowWindowMenuItem(const char* title, bool* val) {
-	ImGui::Checkbox(title, val);
-}
-
-void OpenURL(std::string url)
-{
-#ifdef  TERR3D_WIN32
-	std::string op = std::string("start ").append(url);
-	system(op.c_str());
-#else
-	std::string op = std::string("xdg-open ").append(url);
-	system(op.c_str());
-#endif //  TERR3D_WIN32
-
-}
-
-static void ShowMenu() {
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Open")) {
-				OpenSaveFile();
-			}
-
-			if (ImGui::MenuItem("Save")) {
-				SaveFile();
-			}
-
-			if (ImGui::MenuItem("Install Module")) {
-				moduleManager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
-			}
-
-			Model* modelToExport;
-			if(isUsingBase)
-				modelToExport = &terrain;
-			else
-				modelToExport = customModel;
-
-			if (ImGui::BeginMenu("Export Mesh As")) {
-				if (ImGui::MenuItem("Wavefont OBJ")) {
-					ExportModelAssimp(modelToExport, "obj", ShowSaveFileDialog(".obj\0"), "obj");
-				}
-
-				if (ImGui::MenuItem("FBX")) {
-					ExportModelAssimp(modelToExport, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
-				}
-
-				if (ImGui::MenuItem("GLTF v2")) {
-					ExportModelAssimp(modelToExport, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
-				}
-
-				if (ImGui::MenuItem("GLB v2")) {
-					ExportModelAssimp(modelToExport, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
-				}
-
-				if (ImGui::MenuItem("JSON")) {
-					ExportModelAssimp(modelToExport, "json", ShowSaveFileDialog(".json\0"));
-				}
-
-				if (ImGui::MenuItem("STL")) {
-					ExportModelAssimp(modelToExport, "stl", ShowSaveFileDialog(".stl\0"));
-				}
-
-				if (ImGui::MenuItem("PLY")) {
-					ExportModelAssimp(modelToExport, "ply", ShowSaveFileDialog(".ply\0"));
-				}
-
-				if (ImGui::MenuItem("Collada")) {
-					ExportModelAssimp(modelToExport, "collada", ShowSaveFileDialog(".dae\0"), "dae");
-				}
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Export Heightmap As")) {
-
-				if (ImGui::MenuItem("PNG")) {
-					if (ExportHeightmapPNG(terrain.mesh->Clone(), ShowSaveFileDialog(".png"))) {
-						successMessage = "Sucessfully exported heightmap!";
-						ImGui::BeginPopup("Success Messages");
-					}
-					else {
-						errorMessage = "One Export is already in progress!";
-						ImGui::BeginPopup("Error Messages");
-					}
-				}
-
-				if (ImGui::MenuItem("JPG")) {
-					if (ExportHeightmapJPG(terrain.mesh->Clone(), ShowSaveFileDialog(".jpg"))) {
-						successMessage = "Sucessfully exported heightmap!";
-						ImGui::BeginPopup("Success Messages");
-					}
-					else {
-						errorMessage = "One Export is already in progress!";
-						ImGui::BeginPopup("Error Messages");
-					}
-				}
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::MenuItem("Close")) {
-				savePath = "";
-			}
-
-			if (ImGui::MenuItem("Pack Project")) {
-				PackProject();
-			}
-
-			if (ImGui::MenuItem("Load Packed Project")) {
-				LoadPackedProject();
-			}
-
-			if (ImGui::MenuItem("Load Auto Saved Project")) {
-				OpenSaveFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
-			}
-
-			if (ImGui::MenuItem("Exit")) {
-				exit(0);
-			}
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Options"))
-		{
-			if (ImGui::MenuItem("Toggle System Console")) {
-				ToggleSystemConsole();
-			}
-
-			if (ImGui::MenuItem("Associate (.terr3d) File Type")) {
-				AccocFileType();
-			}
-
-			if (ImGui::MenuItem("Copy Version Hash")) {
-				char* output = new char[MD5File(GetExecutablePath()).ToString().size() + 1];
-				strcpy(output, MD5File(GetExecutablePath()).ToString().c_str());
-				const size_t len = strlen(output) + 1;
-#ifdef TERR3D_WIN32
-				HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-				memcpy(GlobalLock(hMem), output, len);
-				GlobalUnlock(hMem);
-				OpenClipboard(0);
-				EmptyClipboard();
-				SetClipboardData(CF_TEXT, hMem);
-				CloseClipboard();
-				delete[] output;
-#else
-				std::cout << "Version Hash : " << output << std::endl;
-#endif
-			}
-
-			if (ImGui::BeginMenu("Themes")) {
-				if (ImGui::MenuItem("Default")) {
-					LoadDefaultStyle();
-				}
-
-				if (ImGui::MenuItem("Black & White")) {
-					LoadBlackAndWhite();
-				}
-
-				if (ImGui::MenuItem("Cool Dark")) {
-					LoadDarkCoolStyle();
-				}
-
-				if (ImGui::MenuItem("Light Orange")) {
-					LoadLightOrngeStyle();
-				}
-
-				if (ImGui::MenuItem("Load Theme From File")) {
-					LoadThemeFromFile(openfilename());
-				}
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Widnows"))
-		{
-			ShowWindowMenuItem("Statistics", &activeWindows.statsWindow);
-
-			ShowWindowMenuItem("Theme Editor", &activeWindows.styleEditor);
-
-			ShowWindowMenuItem("Shader Editor", &activeWindows.shaderEditorWindow);
-
-			ShowWindowMenuItem("Foliage Manager", &activeWindows.foliageManager);
-
-			ShowWindowMenuItem("Elevation Node Editor", &activeWindows.elevationNodeEditorWindow);
-
-			ShowWindowMenuItem("Texture Settings", &activeWindows.texturEditorWindow);
-
-			ShowWindowMenuItem("Texture Store", &activeWindows.textureStore);
-
-			ShowWindowMenuItem("Sea Settings", &activeWindows.seaEditor);
-
-			ShowWindowMenuItem("Sky Settings", &activeWindows.skySettings);
-
-			ShowWindowMenuItem("Filters Manager", &activeWindows.filtersManager);
-
-			ShowWindowMenuItem("Module Manager", &activeWindows.modulesManager);
-
-			ShowWindowMenuItem("Supporters", &activeWindows.supportersTribute);
-
-			ShowWindowMenuItem("Open Source Liscenses", &activeWindows.osLisc);
-
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Help")) {
-			if (ImGui::MenuItem("Major Contributers"))
-				activeWindows.contribWindow = true;
-
-			if (ImGui::MenuItem("Tutorial"))
-				OpenURL("https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ");
-
-			if (ImGui::MenuItem("Social Handle"))
-				OpenURL("https://twitter.com/jaysmito101");
-
-			if (ImGui::MenuItem("Discord Server"))
-				OpenURL("https://discord.gg/AcgRafSfyB");
-
-			if (ImGui::MenuItem("GitHub Page"))
-				OpenURL("https://github.com/Jaysmito101/TerraForge3D");
-
-			if (ImGui::MenuItem("Documentation"))
-				OpenURL("https://github.com/Jaysmito101/TerraForge3D/wiki");
-
-			if (ImGui::MenuItem("Open Source Liscenses"))
-				activeWindows.osLisc = !activeWindows.osLisc;
-
-			ImGui::EndMenu();
-
-		}
-		ImGui::EndMainMenuBar();
-	}
-}
-
-static void ShowErrorModal() {
-	if (ImGui::BeginPopupModal("Error Messages")) {
-		ImGui::TextColored(ImVec4(0.7f, 0.2f, 0.2f, 1.0f), errorMessage.c_str());
-	}
-}
-
-static void ShowSuccessModal() {
-	if (ImGui::BeginPopupModal("Success Messages")) {
-		ImGui::TextColored(ImVec4(0.2f, 0.7f, 0.2f, 1.0f), successMessage.c_str());
-	}
-}
-
-static void ShowSeaSettings() {
-	ImGui::Begin("Sea Settings", &activeWindows.seaEditor);
-
-	ImGui::Checkbox("Show Sea Level", &showSea);
-
-	ImGui::Text("Sea Color");
-	ImGui::ColorEdit3("##seaColor", SeaColor);
-	ImGui::DragFloat("Alpha", &seaAlpha, 0.001f, 0, 1);
-	ImGui::DragFloat("Reflectivity", &seaReflectivity, 0.001f, 0, 1);
-
-	ImGui::Text("DuDv Map");
-	ImGui::SameLine();
-	if (ImGui::ImageButton((ImTextureID)waterDudvMap->GetRendererID(), ImVec2(50, 50))) {
-		std::string fileName = ShowOpenFileDialog(".png");
-		if (fileName.size() > 3) {
-			delete waterDudvMap;
-
-			std::string hash = MD5File(fileName).ToString();
-			if (GetProjectAsset(hash).size() != 0) {
-				DuDvMapID = hash;
-
-			}
-			else {
-				CopyFileData(fileName, GetProjectResourcePath() + "\\textures\\" + hash);
-				RegisterProjectAsset(hash, "textures\\" + hash);
-				DuDvMapID = hash;
-				waterDudvMap = new Texture2D(fileName);
-			}
-		}
-	}
-
-
-	ImGui::Text("Normal Map");
-	ImGui::SameLine();
-	if (ImGui::ImageButton((ImTextureID)waterNormal->GetRendererID(), ImVec2(50, 50))) {
-		std::string fileName = ShowOpenFileDialog(".png");
-		if (fileName.size() > 3) {
-			delete waterNormal;
-
-			std::string hash = MD5File(fileName).ToString();
-			if (GetProjectAsset(hash).size() != 0) {
-				waterNormalMap = hash;
-
-			}
-			else {
-				CopyFileData(fileName, GetProjectResourcePath() + "\\textures\\" + hash);
-				RegisterProjectAsset(hash, "textures\\" + hash);
-				waterNormalMap = hash;
-				waterNormal = new Texture2D(fileName);
-			}
-		}
-	}
-
-	ImGui::DragFloat("Distortion Strength", &seaDistortionStength, 0.001f);
-	ImGui::DragFloat("Distortion Scale", &seaDistortionScale, 0.1f);
-	ImGui::DragFloat("Wave Speed", &seaWaveSpeed, 0.01f);
-	ImGui::DragFloat("Level", &seaLevel, 0.1f);
-
-
-	ImGui::End();
+	appState->serailizer->LoadPackedProject(path);
 }
 
 
 static void ShowModuleManager() {
-	ImGui::Begin("Module Manager", &activeWindows.modulesManager);
-	moduleManager->Render();
+	ImGui::Begin("Module Manager", &appState->windows.modulesManager);
+	appState->modules.manager->Render();
 	ImGui::End();
 }
 
@@ -1609,7 +620,7 @@ static void OnBeforeImGuiRender() {
 	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
 		window_flags |= ImGuiWindowFlags_NoBackground;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+	ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
 	ImGui::PopStyleVar();
 	if (opt_fullscreen) {
 		ImGui::PopStyleVar(2);
@@ -1627,7 +638,6 @@ static void OnBeforeImGuiRender() {
 
 	style.WindowMinSize.x = minWinSizeX;
 
-	ShowMenu();
 }
 
 static void OnImGuiRenderEnd() {
@@ -1636,7 +646,7 @@ static void OnImGuiRenderEnd() {
 
 static void SetUpIcon() {
 #ifdef TERR3D_WIN32
-	HWND hwnd = glfwGetWin32Window(myApp->GetWindow()->GetNativeWindow());
+	HWND hwnd = glfwGetWin32Window(mainApp->GetWindow()->GetNativeWindow());
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
 	if (hIcon) {
 		//Change both icons to the same icon handle.
@@ -1657,24 +667,17 @@ public:
 	virtual void OnPreload() override {
 		SetTitle("TerraForge3D - Jaysmito Mukherjee");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
-		system((std::string("mkdir \"") + GetExecutableDir() + "\\Data\\cache\\autosave\"").c_str());
+		MkDir(GetExecutableDir() + "\\Data\\cache\\autosave\"");
 		SetupOSLiscences();
-		Sleep(1000);
 	}
 
 	virtual void OnUpdate(float deltatime) override
 	{
-		if (!isRuinning)
+		if (!appState->states.ruinning)
 			return;
 
-		if (!isExploreMode) {
-			if (reqTexRfrsh) {
-				if (diffuse)
-					delete diffuse;
-				diffuse = GetCurrentDiffuseTexture();
-				reqTexRfrsh = false;
-			}
-
+		if (!appState->states.exploreMode) {
+			
 			// CTRL Shortcuts
 			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL))) {
 
@@ -1688,16 +691,11 @@ public:
 					exit(0);
 				}
 
-				// Export Shortcut
-				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_E)) {
-					ExportOBJ(terrain.mesh->Clone(), ShowSaveFileDialog(".obj"));
-				}
-
 				// Save Shortcut
 				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
-					if (savePath.size() > 3) {
-						Log("Saved to " + savePath);
-						SaveFile(savePath);
+					if (appState->globals.currentOpenFilePath.size() > 3) {
+						Log("Saved to " + appState->globals.currentOpenFilePath);
+						SaveFile(appState->globals.currentOpenFilePath);
 					}
 					else {
 						SaveFile();
@@ -1706,9 +704,9 @@ public:
 
 				// Close Shortcut
 				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_W)) {
-					if (savePath.size() > 3) {
-						Log("CLosed file " + savePath);
-						savePath = "";
+					if (appState->globals.currentOpenFilePath.size() > 3) {
+						Log("CLosed file " + appState->globals.currentOpenFilePath);
+						appState->globals.currentOpenFilePath = "";
 					}
 					else {
 						Log("Shutting Down");
@@ -1721,42 +719,31 @@ public:
 
 					// Save As Shortcuts
 					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
-						savePath = "";
+						appState->globals.currentOpenFilePath = "";
 						SaveFile();
-					}
-
-					// Node Editor Shortcut
-					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_N)) {
-						activeWindows.elevationNodeEditorWindow = true;
-						noiseBased = false;
-					}
-
-					// Noise Layer Shortcut
-					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L)) {
-						activeWindows.elevationNodeEditorWindow = false;
-						noiseBased = true;
 					}
 
 					// Explorer Mode Shortcut
 					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_X)) {
 						Log("Toggle Explorer Mode");
-						isExploreMode = true;
+						appState->states.exploreMode = true;
 					}
 
 				}
 			}
 
-			if (isTextureBake) {
-				textureFBO->Begin();
+			appState->stats.deltatime = deltatime;
+
+			if (appState->states.textureBake) {
+				appState->frameBuffers.textureExport->Begin();
 				glViewport(0, 0, 1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime, false, true);
 			}
 			else {
-				reflectionfbo->Begin();
+				appState->frameBuffers.relflection->Begin();
 				glViewport(0, 0, 800, 600);
 				GetWindow()->Clear();
-				s_Stats.deltaTime = deltatime;
 				DoTheRederThing(deltatime);
 
 				glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
@@ -1764,18 +751,18 @@ public:
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime, true);
 
-				if (isPostProcess)
+				if (appState->states.postProcess)
 				{
-					postProcessFBO->Begin();
+					appState->frameBuffers.postProcess->Begin();
 					GetWindow()->Clear();
 					PostProcess(deltatime);
 				}
 			}
 
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			RenderImGui();
 
-			if (autoUpdate)
+			if (appState->states.autoUpdate)
 				RegenerateMesh();
 
 		}
@@ -1784,62 +771,59 @@ public:
 			if (!expH) {
 				GetWindow()->SetFullScreen(true);
 				glfwSetInputMode(GetWindow()->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-				ExPSaveCamera(CameraPosition, CameraRotation);
+				ExPSaveCamera(appState->cameras.main.position, appState->cameras.main.rotation);
 			}
 
 
-			expH = isExploreMode;
+			expH = appState->states.exploreMode;
+			appState->stats.deltatime = deltatime;
 
-
-
-			reflectionfbo->Begin();
+			appState->frameBuffers.relflection->Begin();
 			glViewport(0, 0, 800, 600);
 			GetWindow()->Clear();
-			s_Stats.deltaTime = deltatime;
 			DoTheRederThing(deltatime);
-			reflectionfbo->End();
+			appState->frameBuffers.relflection->End();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			int w, h;
 			glfwGetWindowSize(GetWindow()->GetNativeWindow(), &w, &h);
 			glViewport(0, 0, w, h);
 			GetWindow()->Clear();
-			s_Stats.deltaTime = deltatime;
-			UpdateExplorerControls(CameraPosition, CameraRotation, isIExploreMode, &nLOffsetX, &nLOffsetY);
+			UpdateExplorerControls(appState->cameras.main.position, appState->cameras.main.rotation, appState->states.iExploreMode, &appState->globals.offset[0], &appState->globals.offset[1]);
 			DoTheRederThing(deltatime, true);
 
-			if (isPostProcess)
+			if (appState->states.postProcess)
 			{
-				postProcessFBO->Begin();
+				appState->frameBuffers.postProcess->Begin();
 				PostProcess(deltatime);
 			}
 
 			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_ESCAPE))) {
-				isExploreMode = false;
+				appState->states.exploreMode = false;
 				expH = false;
 				glfwSetInputMode(GetWindow()->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				GetWindow()->SetFullScreen(false);
-				ExPRestoreCamera(CameraPosition, CameraRotation);
+				ExPRestoreCamera(appState->cameras.main.position, appState->cameras.main.rotation);
 			}
 
 
-			if (autoUpdate)
+			if (appState->states.autoUpdate)
 				RegenerateMesh();
 
 		}
 
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_I))
-			noiseGen->offset[0] -= 0.01f;
+			appState->globals.offset[0] -= 0.01f;
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_K))
-			noiseGen->offset[0] += 0.01f;
+			appState->globals.offset[0] += 0.01f;
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L))
-			noiseGen->offset[1] -= 0.01f;
+			appState->globals.offset[1] -= 0.01f;
 
 		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_J))
-			noiseGen->offset[1] += 0.01f;
+			appState->globals.offset[1] += 0.01f;
 
 
 		if (ReqRefresh())
@@ -1848,24 +832,23 @@ public:
 
 	virtual void OnOneSecondTick() override
 	{
-		if (!isRuinning)
+		if (!appState->states.ruinning)
 			return;
 
-		secondCounter++;
+		appState->globals.secondCounter++;
 
-		if (secondCounter % 5 == 0) {
-			if (autoSave) {
+		if (appState->globals.secondCounter % 5 == 0) {
+			if (appState->states.autoSave) {
 				SaveFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
 
-				if (savePath.size() > 3) {
-					SaveFile(savePath);
+				if (appState->globals.currentOpenFilePath.size() > 3) {
+					SaveFile(appState->globals.currentOpenFilePath);
 				}
 			}
 		}
 
-		GetWindow()->SetVSync(vSync);
-		s_Stats.frameRate = 1 / s_Stats.deltaTime;
-		MeshNodeEditorTick();
+		GetWindow()->SetVSync(appState->states.vSync);
+		appState->stats.frameRate = 1 / appState->stats.deltatime;
 		SecondlyShaderEditorUpdate();
 		UpdateTextureStore();
 		TextureSettingsTick();
@@ -1874,58 +857,73 @@ public:
 	virtual void OnImGuiRender() override
 	{
 		OnBeforeImGuiRender();
-		ShowGeneralControls();
-		ShowCameraControls();
-		ShowTerrainControls();
-		ShowLightingControls();
-		ShowNoiseSettings();
-		ShowMainScene();
-		ShowErrorModal();
-		ShowSuccessModal();
 
+		appState->mainMenu->ShowMainMenu();
+
+
+		ShowGeneralControls();
+
+		if (appState->windows.cameraControls)
+		{
+			ImGui::Begin("Camera Controls", &appState->windows.cameraControls);
+			appState->cameras.main.ShowSettings();
+			ImGui::Checkbox("Auto Calculate Aspect Ratio", &appState->states.autoAspectCalcRatio);
+			ImGui::End();
+		}
+		
+		if (appState->states.autoAspectCalcRatio)
+		{
+			appState->cameras.main.aspect = appState->globals.viewportSize[0] / appState->globals.viewportSize[1];
+		}
+
+		appState->lightManager->ShowSettings(true, &appState->windows.lightControls);
+
+		appState->meshGenerator->ShowSettings();
+		
+		ShowTerrainControls();
+
+
+
+		ShowMainScene();
 
 		// Optional Windows
 
-		if (activeWindows.statsWindow)
+		if (appState->windows.statsWindow)
 			ShowStats();
 
-		if (activeWindows.texturEditorWindow)
-			ShowTextureSettings(&activeWindows.texturEditorWindow);
+		if (appState->windows.texturEditorWindow)
+			ShowTextureSettings(&appState->windows.texturEditorWindow);
 
-		if (activeWindows.seaEditor)
-			ShowSeaSettings();
+		appState->seaManager->ShowSettings(&appState->windows.seaEditor);
 
-		if (activeWindows.modulesManager)
+		if (appState->windows.modulesManager)
 			ShowModuleManager();
 
-		if (activeWindows.styleEditor)
-			ShowStyleEditor(&activeWindows.styleEditor);
+		if (appState->windows.styleEditor)
+			ShowStyleEditor(&appState->windows.styleEditor);
 
-		if (activeWindows.foliageManager)
-			ShowFoliageManager(&activeWindows.foliageManager);
+		if (appState->windows.foliageManager)
+			ShowFoliageManager(&appState->windows.foliageManager);
 
-		if (activeWindows.shaderEditorWindow)
-			ShowShaderEditor(&activeWindows.shaderEditorWindow);
+		if (appState->windows.shaderEditorWindow)
+			ShowShaderEditor(&appState->windows.shaderEditorWindow);
 
-		if (activeWindows.elevationNodeEditorWindow)
-			ShowMeshNodeEditor(&activeWindows.elevationNodeEditorWindow);
+		if (appState->windows.textureStore)
+			ShowTextureStore(&appState->windows.textureStore);
 
-		if (activeWindows.textureStore)
-			ShowTextureStore(&activeWindows.textureStore);
+		if (appState->windows.filtersManager)
+			ShowFiltersMamager(&appState->windows.filtersManager);
 
-		if (activeWindows.filtersManager)
-			ShowFiltersMamager(&activeWindows.filtersManager);
+		if (appState->windows.osLisc)
+			ShowOSLiscences(&appState->windows.osLisc);
 
-		if (activeWindows.osLisc)
-			ShowOSLiscences(&activeWindows.osLisc);
+		if (appState->windows.supportersTribute)
+			ShowSupportersTribute(&appState->windows.supportersTribute);
 
-		if (activeWindows.supportersTribute)
-			ShowSupportersTribute(&activeWindows.supportersTribute);
+		if (appState->windows.skySettings)
+			ShowSkySettings(&appState->windows.skySettings);
 
-		if (activeWindows.skySettings)
-			ShowSkySettings(&activeWindows.skySettings);
-
-		for (UIModule* mod : moduleManager->uiModules)
+		for (UIModule* mod : appState->modules.manager->uiModules)
 		{
 			if (mod->active)
 			{
@@ -1935,7 +933,7 @@ public:
 			}
 		}
 
-		for (NoiseLayerModule* mod : moduleManager->nlModules)
+		for (NoiseLayerModule* mod : appState->modules.manager->nlModules)
 		{
 			if (mod->active)
 			{
@@ -1950,18 +948,27 @@ public:
 
 	virtual void OnStart(std::string loadFile) override
 	{
+		// Set random generator seed from current time
 		srand((unsigned int)time(NULL));
+
+		// Setup custom icon for the Main Window
 		SetUpIcon();
+		
+		SetUpApplicationState();
+		appState = GetApplicationState();
+		appState->mainApp = mainApp;
+
 		SetupViewportFrameBuffer();
 		SetupShaderManager(GetExecutableDir());
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
-		SetupTextureStore(GetExecutableDir(), &reqTexRfrsh);
-		diffuse = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png");
-		//gridTex = new Texture2D(GetExecutableDir() + "\\Data\\textures\\grid.png", false, true);
+		SetupTextureStore(GetExecutableDir(), &appState->states.reqTexRfrsh);
+
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
+		
 		LoadDefaultStyle();
+		
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
 		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow* window, int w, int h) {
 			glfwSwapBuffers(window);
@@ -1970,18 +977,33 @@ public:
 			ImGuiIO& io = ImGui::GetIO();
 			io.MouseWheel = (float)y;
 			});
+		
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		noiseGen = new LayeredNoiseManager();
-		moduleManager = new ModuleManager();
-		GenerateMesh();
-		SetupMeshNodeEditor(moduleManager);
+
+
+
+		appState->globals.kernelsIncludeDir = "\"" + GetExecutableDir() + "\\Data\\kernels" + "\"";
+
+		appState->modules.manager = new ModuleManager();
+		appState->meshGenerator = new MeshGeneratorManager(appState);
+		appState->mainMenu = new MainMenu(appState);
+
+		appState->seaManager = new SeaManager();
+		appState->lightManager = new LightManager();
+		appState->serailizer = new Serializer(appState);
+
+		ResetShader();
+		appState->meshGenerator->GenerateSync();
+
+		appState->models.coreTerrain->SetupMeshOnGPU();
+
+		appState->models.screenQuad->SetupMeshOnGPU();
+		appState->models.screenQuad->mesh->GenerateScreenQuad();
+		appState->models.screenQuad->mesh->RecalculateNormals();
+		appState->models.screenQuad->UploadToGPU();
+
 		glEnable(GL_DEPTH_TEST);
-		LightPosition[1] = -0.3f;
-		CameraPosition[1] = 0.2f;
-		CameraPosition[2] = 3.1f;
-		CameraRotation[1] = 2530.0f;
-		autoUpdate = false;
-		scale = 1;
+		appState->globals.scale = 1;
 
 		if (loadFile.size() > 0) {
 			Log("Loading File from " + loadFile);
@@ -1989,8 +1011,11 @@ public:
 		}
 
 		SetProjectId(GenerateId(32));
-		SetupFiltersManager(&autoUpdate, &terrain);
-		SetupTextureSettings(&reqTexRfrsh, &textureScale, &terrain);
+
+		SetupFiltersManager(&appState->states.autoUpdate, appState->models.coreTerrain);
+
+		float t = 1.0f;
+		SetupTextureSettings(&appState->states.reqTexRfrsh, &t, appState->models.coreTerrain);
 		SetupSky();
 
 		// Load Fonts
@@ -1999,44 +1024,52 @@ public:
 		LoadUIFont("OpenSans-Bold", 25, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Bold.ttf");
 
 
-		waterDudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
-		DuDvMapID = "DEFAULT";
-		Log("Loaded Water DUDV Map from " + GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
-		waterNormal = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_normal.png");
-		waterNormalMap = "DEFAULT";
-		Log("Loaded Water DUDV Map from " + GetExecutableDir() + "\\Data\\textures\\water_normal.png");
-		reflectionfbo = new FrameBuffer();
-		textureFBO = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
+		appState->frameBuffers.relflection = new FrameBuffer();
+		appState->frameBuffers.textureExport = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
 		LoadTextureThumbs();
 
 		bool tpp = false;
 
-		postProcessFBO = std::make_shared<FrameBuffer>(800, 600);
-		postProcessingShader = std::make_shared<Shader>(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\vert.glsl", &tpp), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\frag.glsl", &tpp));
+		appState->frameBuffers.postProcess = new FrameBuffer(800, 600);
+		appState->shaders.postProcess = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\vert.glsl", &tpp), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\frag.glsl", &tpp));
 
 		// For Debug Only
-		autoUpdate = true;
+		appState->states.autoUpdate = true;
+
 
 		Log("Started Up App!");
 	}
 
 	void OnEnd()
 	{
-		while (isRemeshing);
-		//ShutdownMeshNodeEditor();
-		//delete moduleManager;
-		delete noiseGen;
-		delete foliageShader;
-		delete shd;
-		delete wireframeShader;
-		delete reflectionfbo;
-		delete diffuse;
-		delete waterDudvMap;
+		while (appState->states.remeshing);
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(500ms);
+		delete appState->shaders.terrain;
+		delete appState->shaders.foliage;
+		delete appState->shaders.textureBake;
+		delete appState->shaders.wireframe;
+		delete appState->shaders.postProcess;
+
+		delete appState->mainMenu;
+
+//		delete appState->frameBuffers.main;
+		delete appState->frameBuffers.postProcess;
+		delete appState->frameBuffers.relflection;
+		delete appState->frameBuffers.textureExport;
+
+//		delete appState->seaManager;
+		delete appState->lightManager;
+		delete appState->serailizer;
+		DeleteApplicationState();
+
+		exit(0); // Temporary
 	}
 };
 
 Application* CreateApplication()
 {
-	myApp = new MyApp();
-	return myApp;
+	mainApp = new MyApp();
+	return mainApp;
 }

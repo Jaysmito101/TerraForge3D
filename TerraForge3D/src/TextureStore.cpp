@@ -436,7 +436,7 @@ static void ShowAbout() {
 	ImGui::Text("Not just free, but CC0, meaning you can use them for");
 	ImGui::Text("absolutely any purpose without restrictions.");
 	if (ImGui::Button("Open Website")) {
-		ShellExecute(NULL, L"open", L"https://polyhaven.com/", NULL, NULL, SW_SHOWNORMAL);
+		OpenURL("https://polyhaven.com/");
 	}
 }
 

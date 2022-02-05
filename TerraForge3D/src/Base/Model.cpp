@@ -73,7 +73,7 @@ void Model::Update()
 }
 
 void Model::Render()
-{
+{ 
 	if (!mesh)
 		return;
 	glBindVertexArray(vao);

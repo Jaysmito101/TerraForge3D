@@ -13,6 +13,7 @@
 #include  <stdlib.h>
 #include "glfw/glfw3.h"
 #include "Application.h"
+#include "Data/ProjectData.h"
 
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
@@ -21,6 +22,8 @@
 #define MAX_PATH PATH_MAX
 #else
 #include <atlstr.h>
+#include <windows.h>
+#include <Commdlg.h>
 #endif
 
 
@@ -440,4 +443,51 @@ void ShowMessageBox(std::string message, std::string title)
 #else
 	system(("zenity --info --text=" + message + " --title="+title + "").c_str());
 #endif
+}
+
+bool LoadFileIntoTexture(Texture2D* texture, bool loadToAssets, bool preserveData, bool readAlpha)
+{
+	std::string fileName = ShowOpenFileDialog(".png");
+	if (fileName.size() > 3)
+	{
+		if (texture)
+			delete texture;
+		texture = new Texture2D(fileName, preserveData, readAlpha);
+
+		if (loadToAssets)
+		{
+			std::string hash = MD5File(fileName).ToString();
+			if (GetProjectAsset(hash).size() == 0)
+			{
+				std::string path = GetProjectResourcePath() + "\\textures";
+				MkDir(path);
+				CopyFileData(fileName, path + "\\" + hash);
+				RegisterProjectAsset(hash, "textures" + hash);
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+void ToggleSystemConsole() {
+	static bool state = false;
+	state = !state;
+#ifdef TERR3D_WIN32
+	ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);
+#else 
+	std::cout << "Toogle Console Not Supported on Linux!" < std::endl;
+#endif
+}
+
+void OpenURL(std::string url)
+{
+#ifdef  TERR3D_WIN32
+	std::string op = std::string("start ").append(url);
+	system(op.c_str());
+#else
+	std::string op = std::string("xdg-open ").append(url);
+	system(op.c_str());
+#endif //  TERR3D_WIN32
+
 }

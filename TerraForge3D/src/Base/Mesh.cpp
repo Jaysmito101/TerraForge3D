@@ -24,7 +24,6 @@ Mesh::~Mesh() {
 
 void Mesh::RecalculateNormals()
 {
-
 		for (int i = 0; i < indexCount; i += 3)
 		{
 			const int ia = indices[i];

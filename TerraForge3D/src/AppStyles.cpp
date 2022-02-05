@@ -19,31 +19,6 @@
 static char themeName[256] = "Custom Theme\0";
 
 
-std::string RequestSaveFileName(HWND owner = NULL) {
-    OPENFILENAME ofn;
-    WCHAR fileName[MAX_PATH];
-    ZeroMemory(fileName, MAX_PATH);
-    ZeroMemory(&ofn, sizeof(ofn));
-
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = owner;
-    ofn.lpstrFilter = L"*.terr3d\0";
-    ofn.lpstrFile = fileName;
-    ofn.nMaxFile = MAX_PATH;
-    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-    ofn.lpstrDefExt = (LPWSTR)""; 
-
-    std::string fileNameStr;
-
-    if (GetSaveFileName(&ofn)) {
-        std::wstring ws(ofn.lpstrFile);
-        // your new String
-        std::string str(ws.begin(), ws.end());
-        return str;
-    }
-    return std::string("");
-}
-
 void LoadLightOrngeStyle() {
     auto& style = ImGui::GetStyle();
 
@@ -414,17 +389,7 @@ std::string GetStyleData() {
     return nlohmann::to_string(output);
 }
 
-static void ExportImGuiSettings() {
-    std::string outFile = RequestSaveFileName();
-    
-    
-    std::ofstream outfile;
-    if (outFile.find(".terr3d") == std::string::npos)
-        outFile = outFile + ".terr3d";
-    outfile.open(outFile);
-    outfile << GetStyleData();
-    outfile.close();
-}
+
 
 
 static bool ImportImGuiSettings(std::string settings) {
@@ -503,9 +468,7 @@ void ShowStyleEditor(bool* pOpen)
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
 
     ImGui::InputText("Theme Name", themeName, 256);
-    if (ImGui::Button("Save Theme")) {
-        ExportImGuiSettings();
-    }
+    
     // Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
     if (ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))
         style.GrabRounding = style.FrameRounding; // Make GrabRounding always the same value as FrameRounding

@@ -2,7 +2,8 @@
 
 
 
-#include <Mesh.h>
+#include "Base/Base.h"
+
 #include <string>
 
 
@@ -47,6 +48,7 @@ struct Hash {
 std::wstring s2ws(const std::string& s);
 #endif
 
+void OpenURL(std::string url);
 
 std::string ShowSaveFileDialog(std::string ext = ".terr3d");
 
@@ -102,6 +104,10 @@ bool IsKeyDown(int key);
 bool IsMouseButtonDown(int button);
 
 void ShowMessageBox(std::string message, std::string title = "Info");
+
+bool LoadFileIntoTexture(Texture2D* texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false);
+
+void ToggleSystemConsole();
 
 
 // KEY DEFINES

@@ -5,7 +5,7 @@
 #include <string>
 
 #ifdef TERR3D_WIN32
-
+#include <shellapi.h>
 #include <windows.h>
 
 static void AllocateConsole() {

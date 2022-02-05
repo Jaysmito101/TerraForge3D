@@ -60,15 +60,15 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateMipmap(GL_TEXTURE_2D); 
 		
-
+		 
 		if (preserveData)
 			m_Data = data;
 		else
 			stbi_image_free(data);
 	}
-	else {
+	else { 
 		std::cout << "Failed to load texture : " << path << std::endl;
 	}
 }
