@@ -163,18 +163,18 @@ void MeshGeneratorManager::GenerateForTerrain()
 	int res = appState->globals.resolution;
 	float scale = appState->globals.scale;
 	Model* mod = appState->models.coreTerrain;
-	for (int y = 0; y < res; y++)
+	for (int i = 0; i < mod->mesh->vertexCount; i++)
 	{
-		for (int x = 0; x < res; x++)
+		float x = mod->mesh->vert[i].position.x;
+		float y = 0;
+		float z = mod->mesh->vert[i].position.z;
+		float elev = 0.0f;
+		for (int i = 0; i < cpuNoiseLayers.size(); i++)
 		{
-			float elev = 0.0f;
-			for (int i = 0; i < cpuNoiseLayers.size(); i++)
-			{
-				if (cpuNoiseLayers[i]->enabled)
-					elev += cpuNoiseLayers[i]->EvaluateAt(x, y, 0);
-			}
-			mod->mesh->AddElevation(elev, x, y);
+			if(cpuNoiseLayers[i]->enabled)
+				elev += cpuNoiseLayers[i]->EvaluateAt(x, y, z);
 		}
+		mod->mesh->vert[i].position.y += elev;
 	}
 }
 
