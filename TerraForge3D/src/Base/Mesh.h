@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_FORCE_SIMD_AVX2
 #include <glm/glm.hpp>
 
 enum MeshType {

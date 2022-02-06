@@ -102,7 +102,7 @@ project "TerraForge3D"
 		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
 		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
 	}
-
+	
 	filter "system:windows"
 		staticruntime "On"
 		systemversion "latest"

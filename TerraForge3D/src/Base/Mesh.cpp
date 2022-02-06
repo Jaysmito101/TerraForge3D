@@ -6,6 +6,70 @@
 #include <glm/ext/matrix_relational.hpp>
 #include <glm/ext/vector_relational.hpp>
 #include <glm/ext/scalar_relational.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <cmath>
+
+// SIMD OPERATIONS
+
+#include <immintrin.h>
+// From :  https://geometrian.com/programming/tutorials/cross-product/index.php
+[[nodiscard]] inline static __m128 cross_product(__m128 const& vec0, __m128 const& vec1) {
+	__m128 tmp0 = _mm_shuffle_ps(vec0, vec0, _MM_SHUFFLE(3, 0, 2, 1));
+	__m128 tmp1 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 1, 0, 2));
+	__m128 tmp2 = _mm_mul_ps(tmp0, vec1);
+	__m128 tmp3 = _mm_mul_ps(tmp0, tmp1);
+	__m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
+	return _mm_sub_ps(tmp3, tmp4);
+}
+
+void normalize(const glm::vec4& lpInput, glm::vec4& lpOutput) {
+	const __m128& vInput = reinterpret_cast<const __m128&>(lpInput); // load input vector (x, y, z, a)
+	__m128 vSquared = _mm_mul_ps(vInput, vInput); // square the input values
+	__m128 vHalfSum = _mm_hadd_ps(vSquared, vSquared);
+	__m128 vSum = _mm_hadd_ps(vHalfSum, vHalfSum); // compute the sum of values
+	float fInvSqrt; _mm_store_ss(&fInvSqrt, _mm_rsqrt_ss(vSum)); // compute the inverse sqrt
+	__m128 vNormalized = _mm_mul_ps(vInput, _mm_set1_ps(fInvSqrt)); // normalize the input vector
+	lpOutput = reinterpret_cast<const glm::vec4&>(vNormalized); // store normalized vector (x, y, z, a)
+}
+
+// SIMD OPERATIONS
+
+// QUICK HACKS
+
+#define VEC3_SUB(a, b, out) out.x = a.x - b.x; \
+			    out.y = a.y - b.y; \
+			    out.z = a.z - b.z;
+
+#define VEC3_ADD(a, b, out) out.x = a.x + b.x; \
+			    out.y = a.y + b.y; \
+			    out.z = a.z + b.z;
+
+float inline __declspec (naked) __fastcall asm_sqrt(float n)
+{
+	_asm fld dword ptr [esp+4]
+	_asm fsqrt
+	_asm ret 4
+} 
+
+#define VEC3_NORMALIZE(v, out)  \
+{				\
+                                 \
+	float tempLength = ( (v.x) * (v.x) ) + ( (v.y) * (v.y) ) +( (v.z) * (v.z) ); \
+	float lengthSqrauedI = 1.0f / asm_sqrt(tempLength); \
+	out.x = (v.x) * lengthSqrauedI;              \
+	out.y = (v.y) * lengthSqrauedI;              \
+	out.z = (v.z) * lengthSqrauedI;              \
+}
+
+#define VEC3_CROSS(a, b, out) \
+{                             \
+	out.x = ( (a.y) * (b.z) ) - ( (a.z) * (b.y) ); \
+	out.y = ( (a.z) * (b.x) ) - ( (a.x) * (b.z) ); \
+	out.z = ( (a.x) * (b.y) ) - ( (a.y) * (b.x) ); \
+}
+
+// QUICK HACKS
 
 Mesh::Mesh()
 {
@@ -24,23 +88,35 @@ Mesh::~Mesh() {
 
 void Mesh::RecalculateNormals()
 {
+		glm::vec3 e1;
+		glm::vec3 e2;	
+		glm::vec3 no;
+
+		int iabc[3];
 		for (int i = 0; i < indexCount; i += 3)
 		{
-			const int ia = indices[i];
-			const int ib = indices[i + 1];
-			const int ic = indices[i + 2];
+			iabc[0] = indices[i];
+			iabc[1] = indices[i + 1];
+			iabc[2] = indices[i + 2];
 
-			const glm::vec3 e1 = glm::vec3(vert[ia].position) - glm::vec3(vert[ib].position);
-			const glm::vec3 e2 = glm::vec3(vert[ic].position) - glm::vec3(vert[ib].position);
-			const glm::vec3 no = cross(e1, e2);
+			glm::vec4& tmp4a = vert[iabc[0]].position;
+			glm::vec4& tmp4b = vert[iabc[1]].position;
+			glm::vec4& tmp4c = vert[iabc[2]].position;
+						
+			VEC3_SUB(tmp4a, tmp4b, e1);
+			VEC3_SUB(tmp4c, tmp4b, e2);
 
-			vert[ia].normal += glm::vec4(no, 0.0);
-			vert[ib].normal += glm::vec4(no, 0.0);
-			vert[ic].normal += glm::vec4(no, 0.0);
+			VEC3_CROSS(e1, e2, no);
+
+			VEC3_ADD(vert[iabc[0]].normal, no, vert[iabc[0]].normal);
+			VEC3_ADD(vert[iabc[1]].normal, no, vert[iabc[1]].normal);
+			VEC3_ADD(vert[iabc[2]].normal, no, vert[iabc[2]].normal);
 		}
 
 		for (int i = 0; i < vertexCount; i++)
-			vert[i].normal = glm::vec4(glm::normalize(glm::vec3(vert[i].normal)), 0.0f);
+		{
+			VEC3_NORMALIZE(vert[i].normal, vert[i].normal);
+		}
 
 }
 
