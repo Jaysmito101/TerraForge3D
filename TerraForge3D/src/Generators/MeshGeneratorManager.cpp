@@ -297,7 +297,7 @@ void MeshGeneratorManager::Load(nlohmann::json data)
 	for (int i = 0; i < data["cpunl"].size(); i++)
 	{
 		cpuNoiseLayers.push_back(new CPUNoiseLayersGenerator(appState));
-		cpuNoiseLayers.back()->Load(data[i]);
+		cpuNoiseLayers.back()->Load(data["cpunl"][i]);
 	}
 
 	for (int i = 0; i < gpuNoiseLayers.size(); i++)
@@ -307,7 +307,7 @@ void MeshGeneratorManager::Load(nlohmann::json data)
 	for (int i = 0; i < data["gpunl"].size(); i++)
 	{
 		gpuNoiseLayers.push_back(new GPUNoiseLayerGenerator(appState, kernels));
-		gpuNoiseLayers.back()->Load(data[i]);
+		gpuNoiseLayers.back()->Load(data["gpunl"][i]);
 	}
 
 }
