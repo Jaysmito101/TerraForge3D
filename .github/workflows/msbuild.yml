@@ -44,4 +44,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: TerraForge3D Build
-        path: bin\Debug-windows-x86
+        path: bin\Debug-windows-x86_64

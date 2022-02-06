@@ -10,31 +10,6 @@
 
 #include <cmath>
 
-// SIMD OPERATIONS
-
-#include <immintrin.h>
-// From :  https://geometrian.com/programming/tutorials/cross-product/index.php
-[[nodiscard]] inline static __m128 cross_product(__m128 const& vec0, __m128 const& vec1) {
-	__m128 tmp0 = _mm_shuffle_ps(vec0, vec0, _MM_SHUFFLE(3, 0, 2, 1));
-	__m128 tmp1 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 1, 0, 2));
-	__m128 tmp2 = _mm_mul_ps(tmp0, vec1);
-	__m128 tmp3 = _mm_mul_ps(tmp0, tmp1);
-	__m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
-	return _mm_sub_ps(tmp3, tmp4);
-}
-
-void normalize(const glm::vec4& lpInput, glm::vec4& lpOutput) {
-	const __m128& vInput = reinterpret_cast<const __m128&>(lpInput); // load input vector (x, y, z, a)
-	__m128 vSquared = _mm_mul_ps(vInput, vInput); // square the input values
-	__m128 vHalfSum = _mm_hadd_ps(vSquared, vSquared);
-	__m128 vSum = _mm_hadd_ps(vHalfSum, vHalfSum); // compute the sum of values
-	float fInvSqrt; _mm_store_ss(&fInvSqrt, _mm_rsqrt_ss(vSum)); // compute the inverse sqrt
-	__m128 vNormalized = _mm_mul_ps(vInput, _mm_set1_ps(fInvSqrt)); // normalize the input vector
-	lpOutput = reinterpret_cast<const glm::vec4&>(vNormalized); // store normalized vector (x, y, z, a)
-}
-
-// SIMD OPERATIONS
-
 // QUICK HACKS
 
 #define VEC3_SUB(a, b, out) out.x = a.x - b.x; \
@@ -44,19 +19,36 @@ void normalize(const glm::vec4& lpInput, glm::vec4& lpOutput) {
 #define VEC3_ADD(a, b, out) out.x = a.x + b.x; \
 			    out.y = a.y + b.y; \
 			    out.z = a.z + b.z;
-
-float inline __declspec (naked) __fastcall asm_sqrt(float n)
+/*
+// Does not work in 64 bit mode
+inline float __fastcall asm_sqrt(float n)
 {
 	_asm fld dword ptr [esp+4]
 	_asm fsqrt
 	_asm ret 4
 } 
+*/
+
+inline float Q_rsqrt(float number) {
+  long i;
+  float x2, y;
+  const float threehalfs = 1.5F;
+
+  x2 = number * 0.5F;
+  y = number;
+  i = *(long *) &y;
+  i = 0x5f3759df - (i >> 1);
+  y = *(float *) &i;
+  y = y * (threehalfs - (x2 * y * y));
+  // y = y * (threehalfs - (x2 * y * y));
+  return y;
+}
 
 #define VEC3_NORMALIZE(v, out)  \
 {				\
                                  \
 	float tempLength = ( (v.x) * (v.x) ) + ( (v.y) * (v.y) ) +( (v.z) * (v.z) ); \
-	float lengthSqrauedI = 1.0f / asm_sqrt(tempLength); \
+	float lengthSqrauedI = Q_rsqrt(tempLength); \
 	out.x = (v.x) * lengthSqrauedI;              \
 	out.y = (v.y) * lengthSqrauedI;              \
 	out.z = (v.z) * lengthSqrauedI;              \

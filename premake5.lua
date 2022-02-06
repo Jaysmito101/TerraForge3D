@@ -1,10 +1,15 @@
 workspace "TerraForge3D"
-	architecture "x86"
+	architecture "x86_64"
 	startproject "TerraForge3D"
 
 	configurations{
 		"Debug",
 		"Release"
+	}
+
+	flags
+	{
+		"MultiProcessorCompile"
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -75,7 +80,7 @@ project "TerraForge3D"
 	}
 
 	libdirs {
-		"./libs"
+		"./libs/x64"
 	}
 
 	links {
@@ -102,7 +107,7 @@ project "TerraForge3D"
 		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
 		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
 	}
-	
+
 	filter "system:windows"
 		staticruntime "On"
 		systemversion "latest"
@@ -120,8 +125,8 @@ project "TerraForge3D"
 
 		links
 		{
-			"libcrypto32MTd.lib",
-			"libssl32MTd.lib"
+			"libcryptoMTd.lib",
+			"libsslMTd.lib"
 		}
 
 	filter "configurations:Release"
@@ -131,6 +136,6 @@ project "TerraForge3D"
 
 		links
 		{
-			"libcrypto32MT.lib",
-			"libssl32MT.lib"
+			"libcryptoMT.lib",
+			"libsslMT.lib"
 		}

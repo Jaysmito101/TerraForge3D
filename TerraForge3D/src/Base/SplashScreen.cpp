@@ -40,7 +40,7 @@ namespace SplashScreen {
         switch (message)
         {
         case WM_CREATE:
-            hBitmap = (HBITMAP)LoadBitmap((HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE), MAKEINTRESOURCE(IDB_BITMAP1));;
+            hBitmap = (HBITMAP)LoadBitmap((HINSTANCE)GetWindowLong(hwnd, GWLP_HINSTANCE), MAKEINTRESOURCE(IDB_BITMAP1));;
             break;
         case WM_PAINT:
             PAINTSTRUCT     ps;
