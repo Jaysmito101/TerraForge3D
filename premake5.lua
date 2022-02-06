@@ -110,12 +110,14 @@ project "TerraForge3D"
 		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
 	}
 
+	buildoptions{
+		"/O2i",
+		"/openmp"
+	}
+
 	filter "system:windows"
 		staticruntime "On"
 		systemversion "latest"
-		buildoptions{
-			"/openmp"
-		}
 
 		defines {
 			"TERR3D_WIN32",
