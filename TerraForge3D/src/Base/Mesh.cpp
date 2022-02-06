@@ -105,6 +105,7 @@ void Mesh::RecalculateNormals()
 			VEC3_ADD(vert[iabc[2]].normal, no, vert[iabc[2]].normal);
 		}
 
+		#pragma openmp parallel for
 		for (int i = 0; i < vertexCount; i++)
 		{
 			VEC3_NORMALIZE(vert[i].normal, vert[i].normal);

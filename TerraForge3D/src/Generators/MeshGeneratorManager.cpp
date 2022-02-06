@@ -260,7 +260,7 @@ void MeshGeneratorManager::LoadKernels()
 	bool tmp = false;
 	std::string source = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\kernels\\generators\\generators.cl", &tmp);
 	kernels->AddSoruce(source);
-	kernels->BuildProgram("-I" + appState->globals.kernelsIncludeDir);
+	kernels->BuildProgram("-I" + appState->globals.kernelsIncludeDir + " -cl-fast-relaxed-math -cl-mad-enable");
 	kernels->AddKernel("clear_mesh_terrain");
 	kernels->AddKernel("clear_mesh_custom_base");
 	kernels->AddKernel("noise_layer_terrain");

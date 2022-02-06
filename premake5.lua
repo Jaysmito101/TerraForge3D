@@ -50,6 +50,8 @@ project "TerraForge3D"
 	language "C++"
 	staticruntime "on"
 
+
+
 	targetdir ("bin/" .. outputdir .."/")
 	objdir ("bin/intermediates/" .. outputdir .."/%{prj.name}")
 
@@ -111,6 +113,9 @@ project "TerraForge3D"
 	filter "system:windows"
 		staticruntime "On"
 		systemversion "latest"
+		buildoptions{
+			"/openmp"
+		}
 
 		defines {
 			"TERR3D_WIN32",
@@ -121,7 +126,7 @@ project "TerraForge3D"
 	filter "configurations:Debug"
 		defines "TERR3D_DEBUG"
 		buildoptions "/MTd"
-		symbols "on"
+		optimize "on"
 
 		links
 		{
