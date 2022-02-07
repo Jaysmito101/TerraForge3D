@@ -289,9 +289,9 @@ void PostProcess(float deltatime)
  
 static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 {
+	while (appState->states.remeshing);
 	if(!appState->states.usingBase)
 	{
-		while (appState->states.remeshing);
 		delete appState->models.customBase;
 		delete appState->models.customBaseCopy;
 	}
@@ -299,9 +299,9 @@ static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 	{
 		appState->globals.currentBaseModelPath = mdstr;
 		appState->states.usingBase = false;	
-		appState->mode = ApplicationMode::CUSTOM_BASE;
 		appState->models.customBase = LoadModel(appState->globals.currentBaseModelPath);
 		appState->models.customBaseCopy = LoadModel(appState->globals.currentBaseModelPath); // Will Be Replaced with something efficient
+		appState->mode = ApplicationMode::CUSTOM_BASE;
 	}
 }
 

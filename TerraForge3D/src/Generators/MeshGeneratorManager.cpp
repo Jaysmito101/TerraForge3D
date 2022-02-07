@@ -239,6 +239,12 @@ void MeshGeneratorManager::ExecuteKernels()
 
 		clearMeshGen->Generate(kernels);
 
+		for (int i = 0; i < gpuNoiseLayers.size(); i++)
+		{
+			if (gpuNoiseLayers[i]->enabled)
+				gpuNoiseLayers[i]->Generate(kernels);
+		}
+
 		kernels->ReadBuffer("mesh", true, appState->models.customBase->mesh->vertexCount * sizeof(Vert), appState->models.customBase->mesh->vert);
 	}
 }

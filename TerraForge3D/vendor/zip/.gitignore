@@ -54,5 +54,8 @@ CMakeFiles/
 zip.dir/
 test/test.exe.vcxproj.filters
 test/test.exe.vcxproj
+
+bin
+bin-int
 test/test.exe.dir/
 
