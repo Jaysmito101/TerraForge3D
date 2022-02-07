@@ -26,7 +26,7 @@ jobs:
         version: "5.0.0-beta1"
     
     - name: Generate Solution
-      run: premake5.exe vs2022
+      run: premake5.exe vs2019
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
