@@ -1,4 +1,4 @@
-name: MSBuild
+name: Windows Build Debug
 
 on: [push, pull_request]
 
