@@ -1,4 +1,4 @@
-name: Windows Build Release
+name: Windows Release Build
 
 on: [push, pull_request]
 
@@ -26,7 +26,7 @@ jobs:
         version: "5.0.0-beta1"
     
     - name: Generate Solution
-      run: premake5.exe vs2019
+      run: premake5.exe vs2022
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
@@ -43,5 +43,5 @@ jobs:
       
     - uses: actions/upload-artifact@v2
       with:
-        name: TerraForge3D Build Release
+        name: TerraForge3D Release Build
         path: bin\Release-windows-x86_64
