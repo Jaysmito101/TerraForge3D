@@ -19,6 +19,7 @@ typedef struct __attribute__ ((packed)) NoiseLayer
 	float weightedStrength;
 	float pingPongStrength;
 	float strength;
+	float depth;
 	float4 offset;
 	float4 value;
 } NoiseLayer;

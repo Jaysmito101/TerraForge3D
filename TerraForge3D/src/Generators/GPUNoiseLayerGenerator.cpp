@@ -87,6 +87,7 @@ nlohmann::json GPUNoiseLayerGenerator::SaveNoiseLayer(GPUNoiseLayer nl)
     data["offsetX"] = nl.offsetX;
     data["offsetY"] = nl.offsetY;
     data["offsetZ"] = nl.offsetZ;
+    data["domainWrapDepth"] = nl.domainWrapDepth;
     return data;
 }
 
@@ -104,6 +105,7 @@ GPUNoiseLayer GPUNoiseLayerGenerator::LoadNoiseLayer(nlohmann::json data)
     nl.offsetX = data["offsetX"];
     nl.offsetY = data["offsetY"];
     nl.offsetZ = data["offsetZ"];
+    nl.domainWrapDepth = data["domainWrapDepth"];
     return nl;
 }
  
@@ -153,13 +155,14 @@ void GPUNoiseLayerGenerator::Update()
                 ImGui::DragFloat(("Offset Z" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].offsetZ, 0.01f);
                 ImGui::DragFloat(("Strength" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].strength, 0.01f);
                 ImGui::DragFloat(("Frequency" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].frequency, 0.001f);
+		ImGui::DragFloat(("Domain Wrap Depth" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].domainWrapDepth, 0.1f);
                 if (noiseLayers[i].fractal != 0)
                 {
                     ImGui::DragFloat(("Octaves" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].octaves, 0.01f, 1, 128);
                     ImGui::DragFloat(("Lacunarity" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].lacunarity, 0.01f);
                     ImGui::DragFloat(("Gain" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].gain, 0.01f);
                     ImGui::DragFloat(("Weighted Strength" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].weightedStrength, 0.01f);
-                    ImGui::DragFloat(("Ping Pong Stremgth" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].pingPongStrength, 0.01f);
+                    ImGui::DragFloat(("Ping Pong Strength" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].pingPongStrength, 0.01f);
                 }
                 ImGui::Text("Fractal Type %f", noiseLayers[i].fractal);
                 if (ImGui::Button(("Change Fractal Type##GPUNL" + std::to_string(i)).c_str()))

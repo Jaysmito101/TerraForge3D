@@ -18,6 +18,7 @@ struct  GPUNoiseLayer
 	float weightedStrength = 0.2f;
 	float pingPongStrength = 0.2f ;
 	float strength = 1.0f ;
+	float domainWrapDepth = 0.0f ;
 	float offsetX = 0.0f, offsetY = 0.0f, offsetZ = 0.0f, offsetW = 0.0f;
 
 	float valueX, valueY, valueZ, valueW; // Ony for internal use on GPU side

@@ -18,7 +18,7 @@ float hash( float n )
     return fractf(sin(n)*43758.5453f);
 }
 
-float noise( float3 x )
+float snoise( float3 x )
 {
     // The noise function returns a value in the range -1.0f -> 1.0f
 
@@ -34,6 +34,19 @@ float noise( float3 x )
                    lerp( hash(n+170.0f), hash(n+171.0f),f.x),f.y),f.z);
 }
 
+
+float noise(float3 x, float depth)
+{
+	float3 d = x;
+	float n = 0.0f;
+	for(float i=0;i<depth;i+=1.0f)	
+	{
+		n = snoise(x);	
+		x += n;
+	}
+	return snoise(x);
+}
+
 float pingpong(float t)
 {
 	t -= (int)(t * 0.5f) * 2.0f;
@@ -41,7 +54,7 @@ float pingpong(float t)
 }
 
 float get_simple_noise(NoiseLayer nl){
-	return noise(nl.value.xyz * nl.frequency + nl.offset.xyz) * nl.strength;
+	return noise(nl.value.xyz * nl.frequency + nl.offset.xyz, nl.depth) * nl.strength;
 }
 
 float get_fbm_noise(NoiseLayer nl){
@@ -51,7 +64,7 @@ float get_fbm_noise(NoiseLayer nl){
 
 	for(int i=0;i<nl.octaves;i++)
 	{
-		float n = noise(val);
+		float n = noise(val, nl.depth);
 		sum += n * amp;
 		amp *= lerp(1.0f, (n + 1.0f) * 0.5f, nl.weightedStrength);
 
@@ -69,7 +82,7 @@ float get_ridged_noise(NoiseLayer nl){
 
 	for(int i=0;i<nl.octaves;i++)
 	{
-		float n = fabs(noise(val));
+		float n = fabs(noise(val, nl.depth));
 		sum += (n * -2.0f + 1.0f) * amp;
 		amp *= lerp(1.0f, 1.0f - n, nl.weightedStrength);
 
@@ -87,7 +100,7 @@ float get_pingpong_noise(NoiseLayer nl){
 
 	for(int i=0;i<nl.octaves;i++)
 	{
-		float n = pingpong(noise(val) * nl.pingPongStrength);
+		float n = pingpong(noise(val, nl.depth) * nl.pingPongStrength);
 		sum += (n - 0.5f) * 2.0f * amp;
 		amp *= lerp(1.0f, n, nl.weightedStrength);
 
