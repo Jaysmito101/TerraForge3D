@@ -52,6 +52,8 @@ namespace mu
 	public:
 
 		Parser();
+		~Parser();
+
 
 		void InitCharSets() override;
 		void InitFun() override;

@@ -87,6 +87,10 @@ namespace mu
 		InitOprt();
 	}
 
+	Parser::~Parser()
+	{
+	}
+
 	//---------------------------------------------------------------------------
 	/** \brief Define the character sets.
 		\sa DefineNameChars, DefineOprtChars, DefineInfixOprtChars

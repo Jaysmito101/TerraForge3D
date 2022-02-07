@@ -60,10 +60,12 @@ project "Assimp"
 
 	filter "configurations:Debug"
 		defines "TERR3D_DEBUG"
-		buildoptions "/MTd"
-		optimize "on"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
-		buildoptions "/MT"
-		optimize "on"	
+		optimize "Full"	
+		buildoptions{
+			"/Qpar",
+			"/fp:fast"
+		}

@@ -1,0 +1,77 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Tools
+      run: sudo apt-get -y install tree
+    - name: Configure
+      run: |
+        cmake -DSANITIZE_ADDRESS=On .
+    - name: Build
+      run: |
+        cmake --build .
+        tree -sha .
+    - name: Test
+      run: ASAN_OPTIONS=detect_leaks=0 LSAN_OPTIONS=verbosity=1:log_threads=1 ctest -VV
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Tools
+      run: brew install tree
+    - name: Configure
+      run: |
+        cmake -DSANITIZE_ADDRESS=On .
+    - name: Build
+      run: |
+        cmake --build .
+        tree -sha .
+    - name: Test
+      run:  ctest -VV
+
+  # freebsd:
+  #   runs-on: macos-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Build and Test
+  #     uses: vmactions/freebsd-vm@v0.1.2
+  #     with:
+  #       usesh: true
+  #       prepare: pkg install -y cmake tree lang/gcc
+  #       run: |
+  #         cmake .
+  #         cmake --build .
+  #         tree -sha .
+  #         ctest -VV
+
+  windows-msvc:
+    runs-on: "windows-latest"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run:  cmake .
+    - name: Build
+      run: |
+        cmake --build . --config "Debug"
+        tree /a /f .
+    - name: Test
+      run: ctest -VV -C "Debug"
+
+  windows-mingw:
+    runs-on: "windows-latest"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run:  cmake -G "MinGW Makefiles" .
+    - name: Build
+      run: |
+        mingw32-make
+        tree /a /f .
+    - name: Test
+      run: ctest -VV -C "Debug"

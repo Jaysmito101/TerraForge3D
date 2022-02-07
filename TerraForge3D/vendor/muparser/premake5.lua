@@ -32,10 +32,12 @@ project "MuParser"
 
 	filter "configurations:Debug"
 		runtime "Debug"
-		buildoptions "/MTd"
 		symbols "on"
 
 	filter "configurations:Release"
 		runtime "Release"
-		optimize "on"
-		buildoptions "/MT"
+		optimize "Full"	
+		buildoptions{
+			"/Qpar",
+			"/fp:fast"
+		}

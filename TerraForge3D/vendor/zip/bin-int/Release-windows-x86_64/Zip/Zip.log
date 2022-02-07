@@ -1,0 +1,3 @@
+﻿cl : command line warning D9025: overriding '/fp:precise' with '/fp:fast'
+  zip.c
+  Zip.vcxproj -> C:\Users\Jaysmito Mukherjee\Desktop\TerraForge3D\TerraForge3D\vendor\zip\bin\Release-windows-x86_64\Zip\Zip.lib

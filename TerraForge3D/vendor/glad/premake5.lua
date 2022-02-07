@@ -23,9 +23,12 @@ project "Glad"
 	filter "configurations:Debug"
 		runtime "Debug"
 		symbols "on"
-		buildoptions "/MTd"
+
 
 	filter "configurations:Release"
 		runtime "Release"
-		optimize "on"
-		buildoptions "/MT"
+		optimize "Full"	
+		buildoptions{
+			"/Qpar",
+			"/fp:fast"
+		}

@@ -10,6 +10,70 @@
 
 #include <cmath>
 
+#include <immintrin.h>
+
+// Load an FP32 3D vector from memory
+inline __m128 loadFloat3( const glm::vec3& pos )
+{
+    static_assert( sizeof( glm::vec3 ) == 12, "Expected to be 12 bytes (3 floats)" );
+
+    __m128 low = _mm_castpd_ps( _mm_load_sd( (const double*)&pos ) );
+    // Modern compilers are optimizing the following 2 intrinsics into a single insertps with a memory operand
+    __m128 high = _mm_load_ss( ( (const float*)&pos ) + 2 );
+    return _mm_insert_ps( low, high, 0x27 );
+}
+
+// Store an FP32 3D vector to memory
+inline void storeFloat3( glm::vec3& pos, __m128 vec )
+{
+    _mm_store_sd( (double*)&pos, _mm_castps_pd( vec ) );
+    ( (int*)( &pos ) )[ 2 ] = _mm_extract_ps( vec, 2 );
+}
+
+// Normalize a 3D vector; if the source is zero, will instead return a zero vector
+inline __m128 vector3Normalize( __m128 vec )
+{
+    // Compute x^2 + y^2 + z^2, broadcast the result to all 4 lanes
+    __m128 dp = _mm_dp_ps( vec, vec, 0b01111111 );
+    // res = vec / sqrt( dp )
+    __m128 res = _mm_div_ps( vec, _mm_sqrt_ps( dp ) );
+    // Compare for dp > 0
+    __m128 positiveLength = _mm_cmpgt_ps( dp, _mm_setzero_ps() );
+    // Zero out the vector if the dot product was zero
+    return _mm_and_ps( res, positiveLength );
+}
+
+// Copy-pasted from there: https://github.com/microsoft/DirectXMath/blob/jan2021/Inc/DirectXMathVector.inl#L9506-L9519
+// MIT license
+#ifdef __AVX__
+#define XM_PERMUTE_PS( v, c ) _mm_permute_ps( v, c )
+#else
+#define XM_PERMUTE_PS( v, c ) _mm_shuffle_ps( v, v, c )
+#endif
+
+#ifdef __AVX2__
+#define XM_FNMADD_PS( a, b, c ) _mm_fnmadd_ps((a), (b), (c))
+#else
+#define XM_FNMADD_PS( a, b, c ) _mm_sub_ps((c), _mm_mul_ps((a), (b)))
+#endif
+
+inline __m128 vector3Cross( __m128 V1, __m128 V2 )
+{
+    // y1,z1,x1,w1
+    __m128 vTemp1 = XM_PERMUTE_PS( V1, _MM_SHUFFLE( 3, 0, 2, 1 ) );
+    // z2,x2,y2,w2
+    __m128 vTemp2 = XM_PERMUTE_PS( V2, _MM_SHUFFLE( 3, 1, 0, 2 ) );
+    // Perform the left operation
+    __m128 vResult = _mm_mul_ps( vTemp1, vTemp2 );
+    // z1, x1, y1, w1
+    vTemp1 = XM_PERMUTE_PS( vTemp1, _MM_SHUFFLE( 3, 0, 2, 1 ) );
+    // y2, z2, x2, w2
+    vTemp2 = XM_PERMUTE_PS( vTemp2, _MM_SHUFFLE( 3, 1, 0, 2 ) );
+    // Perform the right operation
+    vResult = XM_FNMADD_PS( vTemp1, vTemp2, vResult );
+    return vResult;
+}
+
 // QUICK HACKS
 
 #define VEC3_SUB(a, b, out) out.x = a.x - b.x; \
@@ -85,6 +149,7 @@ void Mesh::RecalculateNormals()
 		glm::vec3 no;
 
 		int iabc[3];
+		#pragma loop( hint_parallel( 0 ) )
 		for (int i = 0; i < indexCount; i += 3)
 		{
 			iabc[0] = indices[i];
@@ -105,7 +170,7 @@ void Mesh::RecalculateNormals()
 			VEC3_ADD(vert[iabc[2]].normal, no, vert[iabc[2]].normal);
 		}
 
-		#pragma loop( hint_parallel( 8 ) )
+		#pragma loop( hint_parallel( 0 ) )
 		for (int i = 0; i < vertexCount; i++)
 		{
 			VEC3_NORMALIZE(vert[i].normal, vert[i].normal);

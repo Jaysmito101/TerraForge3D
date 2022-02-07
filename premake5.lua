@@ -110,11 +110,10 @@ project "TerraForge3D"
 		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
 	}
 
-	buildoptions{
-		"/O2bi",
-		"/Qpar",
-		"/fp:fast",
-		"/openmp"
+	inlining "Auto"
+
+	linkoptions {
+		"/PROFILE"
 	}
 
 	filter "system:windows"
@@ -129,8 +128,7 @@ project "TerraForge3D"
 
 	filter "configurations:Debug"
 		defines "TERR3D_DEBUG"
-		buildoptions "/MTd"
-		optimize "on"
+		symbols "on"
 
 		links
 		{
@@ -140,8 +138,14 @@ project "TerraForge3D"
 
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
-		buildoptions "/MT"
-		optimize "on"	
+		
+		optimize "Full"	
+
+		buildoptions{
+			"/Qpar",
+			"/fp:fast"
+		}
+	
 
 		links
 		{
