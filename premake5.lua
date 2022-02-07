@@ -49,7 +49,7 @@ project "TerraForge3D"
 	cppdialect "C++17"
 	language "C++"
 	staticruntime "on"
-
+	vectorextensions "SSE4.1"
 
 
 	targetdir ("bin/" .. outputdir .."/")
@@ -111,7 +111,9 @@ project "TerraForge3D"
 	}
 
 	buildoptions{
-		"/O2i",
+		"/O2bi",
+		"/Qpar",
+		"/fp:fast",
 		"/openmp"
 	}
 

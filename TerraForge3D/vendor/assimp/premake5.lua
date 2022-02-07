@@ -61,7 +61,7 @@ project "Assimp"
 	filter "configurations:Debug"
 		defines "TERR3D_DEBUG"
 		buildoptions "/MTd"
-		symbols "on"
+		optimize "on"
 
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
