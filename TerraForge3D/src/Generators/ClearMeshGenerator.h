@@ -20,6 +20,8 @@ public:
 	virtual void ShowSettings();
 
 	bool uiActive = false;
+	bool useGPU = false;
+	bool useGPUForNormals = false;
 	double time = 0;
 	ApplicationState* appState;
 	

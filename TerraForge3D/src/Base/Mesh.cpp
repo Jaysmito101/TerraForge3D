@@ -10,7 +10,9 @@
 
 #include <cmath>
 
+
 #include <immintrin.h>
+
 
 // Load an FP32 3D vector from memory
 inline __m128 loadFloat3( const glm::vec3& pos )
@@ -149,7 +151,7 @@ void Mesh::RecalculateNormals()
 		glm::vec3 no;
 
 		int iabc[3];
-		#pragma loop( hint_parallel( 0 ) )
+
 		for (int i = 0; i < indexCount; i += 3)
 		{
 			iabc[0] = indices[i];
@@ -170,7 +172,7 @@ void Mesh::RecalculateNormals()
 			VEC3_ADD(vert[iabc[2]].normal, no, vert[iabc[2]].normal);
 		}
 
-		#pragma loop( hint_parallel( 0 ) )
+
 		for (int i = 0; i < vertexCount; i++)
 		{
 			VEC3_NORMALIZE(vert[i].normal, vert[i].normal);

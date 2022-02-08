@@ -17,7 +17,7 @@ __kernel void clear_mesh_terrain(__global Vert* mesh)
 __kernel void clear_mesh_custom_base(__global Vert* mesh, __global Vert* mesh_copy)
 {
 	int i = get_global_id(0);
-	mesh[i] = mesh_copy[i];
+	mesh[i].position = mesh_copy[i].position;
 	mesh[i].normal.x = 0.0f;
 	mesh[i].normal.y = 0.0f;
 	mesh[i].normal.z = 0.0f;

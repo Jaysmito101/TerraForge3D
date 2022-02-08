@@ -44,6 +44,7 @@ include "Tools/ModuleSDK"
 include "Tools/PyModuleSDK"
 
 project "TerraForge3D"
+	openmp "On"
 	location "TerraForge3D"
 	kind "WindowedApp"
 	cppdialect "C++17"

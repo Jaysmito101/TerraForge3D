@@ -9,10 +9,14 @@ __kernel void noise_layer_terrain(__global Vert* mesh, __global NoiseLayer* nl, 
 	int i = get_global_id(0);
 	int size=*nls;
 	float n = 0.0f;
+	float4 position = mesh[i].position;
+	position.y = 0.0f;
+	NoiseLayer noiseLayer;
 	for(int j=0;j<size;j++)
 	{
-		nl[j].value = mesh[i].position;
-		n += get_noise(nl[j]);
+		noiseLayer = nl[j];
+		noiseLayer.value = position;
+		n += get_noise(noiseLayer);
 	}
 	mesh[i].position.y += n;
 
@@ -20,13 +24,16 @@ __kernel void noise_layer_terrain(__global Vert* mesh, __global NoiseLayer* nl, 
 
 __kernel void noise_layer_custom_base(__global Vert* mesh, __global Vert* mesh_copy, __global NoiseLayer* nl, __global int* nls)
 {
-	int i = get_global_id(0);	
+	int i = get_global_id(0);
 	int size=*nls;
 	float n = 0.0f;
+	float4 position = mesh_copy[i].position;	
+	NoiseLayer noiseLayer;
 	for(int j=0;j<size;j++)
 	{
-		nl[j].value = mesh[i].position;
-		n += get_noise(nl[j]);
+		noiseLayer = nl[j];
+		noiseLayer.value = position;
+		n += get_noise(noiseLayer);
 	}
 	mesh[i].position += mesh_copy[i].normal * n;
 }

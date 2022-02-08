@@ -43,17 +43,39 @@ void MeshGeneratorManager::Generate()
 	*isRemeshing = true;
 	std::thread worker([this] {
 		START_PROFILER();
-		ExecuteKernels();
-		ExecuteCPUGenerators();
+		if(!clearMeshGen->useGPU)
+		{
+			clearMeshGen->Generate(nullptr);
+			ExecuteCPUGenerators();
+			ExecuteKernels();
+			if(!clearMeshGen->useGPUForNormals)
+			{
+				if (appState->mode == ApplicationMode::TERRAIN)
+				{
+					appState->models.coreTerrain->mesh->RecalculateNormals();
+				}
+				else if (appState->mode == ApplicationMode::CUSTOM_BASE)
+				{
+					appState->models.customBase->mesh->RecalculateNormals();
+				}
 
-		if (appState->mode == ApplicationMode::TERRAIN)
-		{
-			appState->models.coreTerrain->mesh->RecalculateNormals();
+			}
 		}
-		else if (appState->mode == ApplicationMode::CUSTOM_BASE)
+		else
 		{
-			appState->models.customBase->mesh->RecalculateNormals();
+			ExecuteKernels();
+			ExecuteCPUGenerators();
+			if (appState->mode == ApplicationMode::TERRAIN)
+			{
+				appState->models.coreTerrain->mesh->RecalculateNormals();
+			}
+			else if (appState->mode == ApplicationMode::CUSTOM_BASE)
+			{
+				appState->models.customBase->mesh->RecalculateNormals();
+			}
+
 		}
+
 		END_PROFILER(time);
 		*isRemeshing = false;
 		});
@@ -66,8 +88,17 @@ void MeshGeneratorManager::GenerateSync()
 
 	*isRemeshing = true;
 
-	ExecuteKernels();
-	ExecuteCPUGenerators();
+//	if(!clearMeshGen->useGPU)
+//	{
+//		clearMeshGen->Generate(nullptr);
+//		ExecuteCPUGenerators();
+//		ExecuteKernels();
+//	}
+//	else
+//	{
+		ExecuteKernels();
+		ExecuteCPUGenerators();
+//	}
 
 	if (appState->mode == ApplicationMode::TERRAIN)
 	{
@@ -218,12 +249,27 @@ void MeshGeneratorManager::ExecuteKernels()
 		kernels->CreateBuffer("mesh", CL_MEM_READ_WRITE, appState->models.coreTerrain->mesh->vertexCount * sizeof(Vert));
 		kernels->WriteBuffer("mesh", true, appState->models.coreTerrain->mesh->vertexCount * sizeof(Vert), appState->models.coreTerrain->mesh->vert);
 
-		clearMeshGen->Generate(kernels);
+		if(clearMeshGen->useGPU)
+			clearMeshGen->Generate(kernels);
 
 		for (int i = 0; i < gpuNoiseLayers.size(); i++)
 		{
 			if (gpuNoiseLayers[i]->enabled)
 				gpuNoiseLayers[i]->Generate(kernels);
+		}
+
+		if(clearMeshGen->useGPUForNormals)
+		{
+			kernels->CreateBuffer("indices", CL_MEM_READ_WRITE, appState->models.coreTerrain->mesh->indexCount * sizeof(int));
+			kernels->WriteBuffer("indices", true, appState->models.coreTerrain->mesh->indexCount * sizeof(int), appState->models.coreTerrain->mesh->indices);
+
+			kernels->SetKernelArg("gen_normals", 0, "mesh");
+			kernels->SetKernelArg("gen_normals", 1, "indices");
+
+			kernels->ExecuteKernel("gen_normals", cl::NDRange(1), cl::NDRange(appState->models.coreTerrain->mesh->indexCount));
+
+			kernels->SetKernelArg("normalize_normals", 0, "mesh");
+			kernels->ExecuteKernel("normalize_normals", cl::NDRange(1), cl::NDRange(appState->models.coreTerrain->mesh->vertexCount));
 		}
 
 		kernels->ReadBuffer("mesh", true, appState->models.coreTerrain->mesh->vertexCount * sizeof(Vert), appState->models.coreTerrain->mesh->vert);
@@ -237,12 +283,27 @@ void MeshGeneratorManager::ExecuteKernels()
 		kernels->CreateBuffer("mesh_copy", CL_MEM_READ_WRITE, appState->models.customBase->mesh->vertexCount * sizeof(Vert));
 		kernels->WriteBuffer("mesh_copy", true, appState->models.customBase->mesh->vertexCount * sizeof(Vert), appState->models.customBaseCopy->mesh->vert);
 
-		clearMeshGen->Generate(kernels);
+		if(clearMeshGen->useGPU)
+			clearMeshGen->Generate(kernels);
 
 		for (int i = 0; i < gpuNoiseLayers.size(); i++)
 		{
 			if (gpuNoiseLayers[i]->enabled)
 				gpuNoiseLayers[i]->Generate(kernels);
+		}
+
+		if(clearMeshGen->useGPUForNormals)
+		{
+			kernels->CreateBuffer("indices", CL_MEM_READ_WRITE, appState->models.customBase->mesh->indexCount * sizeof(int));
+			kernels->WriteBuffer("indices", true, appState->models.customBase->mesh->indexCount * sizeof(int), appState->models.customBase->mesh->indices);
+
+			kernels->SetKernelArg("gen_normals", 0, "mesh");
+			kernels->SetKernelArg("gen_normals", 1, "indices");
+
+			kernels->ExecuteKernel("gen_normals", cl::NDRange(1), cl::NDRange(appState->models.customBase->mesh->indexCount));
+
+			kernels->SetKernelArg("normalize_normals", 0, "mesh");
+			kernels->ExecuteKernel("normalize_normals", cl::NDRange(1), cl::NDRange(appState->models.customBase->mesh->vertexCount));
 		}
 
 		kernels->ReadBuffer("mesh", true, appState->models.customBase->mesh->vertexCount * sizeof(Vert), appState->models.customBase->mesh->vert);
@@ -271,6 +332,8 @@ void MeshGeneratorManager::LoadKernels()
 	kernels->AddKernel("clear_mesh_custom_base");
 	kernels->AddKernel("noise_layer_terrain");
 	kernels->AddKernel("noise_layer_custom_base");
+	kernels->AddKernel("gen_normals");
+	kernels->AddKernel("normalize_normals");
 } 
 
 nlohmann::json MeshGeneratorManager::Save()
