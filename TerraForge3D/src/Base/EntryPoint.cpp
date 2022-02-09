@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+#include "Logging/Logger.h"
+
 #ifdef TERR3D_WIN32
 #include <shellapi.h>
 #include <windows.h>
@@ -35,12 +37,13 @@ static std::string ParseArgs(PWSTR pCmdLine) {
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	AllocateConsole();
 	Application* app = CreateApplication();
 	app->OnPreload();
+	Logger logger(app->logsDir);
 	app->Init();
 	{
 		SplashScreen::Init(hInstance);
-		AllocateConsole();
 		app->OnStart(ParseArgs(pCmdLine));
 		SplashScreen::Destory();
 	}
@@ -54,6 +57,7 @@ int main(int argc, char** argv)
 {
 	Application* app = CreateApplication();
 	app->OnPreload();
+	Logger logger(app->logsDir);
 	app->Init();
 	{
 		std::string args = "";

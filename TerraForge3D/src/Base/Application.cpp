@@ -69,6 +69,11 @@ void Application::SetWindowConfigPath(std::string path)
 	windowConfigPath = path;
 }
 
+void Application::SetLogsDir(std::string ld)
+{
+	logsDir = ld;
+}
+
 void Application::SetTitle(std::string title)
 {
 	m_WindowTitle = title;

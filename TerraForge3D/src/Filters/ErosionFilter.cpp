@@ -230,7 +230,8 @@ void ErosionFilter::Apply()
             water *= (1 - evaporateSpeed);
         }
 
-        std::cout << "Processed " + std::to_string(iteration) << " particles.\r";
+	if(iteration % 10000)
+	        std::cout << "Processed " + std::to_string(iteration) << " particles.\r";
     }
     std::cout << "Finished Terrain Erosion Simulation\n";
 

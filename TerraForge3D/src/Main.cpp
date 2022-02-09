@@ -666,6 +666,8 @@ class MyApp : public Application
 public:
 	virtual void OnPreload() override {
 		SetTitle("TerraForge3D - Jaysmito Mukherjee");
+		MkDir(GetExecutableDir() + "\\Data\\logs");
+		SetLogsDir(GetExecutableDir() + "\\Data\\logs");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
 		MkDir(GetExecutableDir() + "\\Data\\cache\\autosave\"");
 		SetupOSLiscences();
@@ -950,6 +952,7 @@ public:
 	{
 		// Set random generator seed from current time
 		srand((unsigned int)time(NULL));
+
 
 		// Setup custom icon for the Main Window
 		SetUpIcon();

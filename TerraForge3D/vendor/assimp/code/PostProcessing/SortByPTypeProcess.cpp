@@ -150,7 +150,9 @@ void SortByPTypeProcess::Execute( aiScene* pScene) {
     std::vector<unsigned int>::iterator meshIdx = replaceMeshIndex.begin();
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         aiMesh* const mesh = pScene->mMeshes[i];
-        ai_assert(0 != mesh->mPrimitiveTypes);
+        //ai_assert(0 != mesh->mPrimitiveTypes);
+        if (0 == mesh->mPrimitiveTypes)
+            mesh->mPrimitiveTypes |= aiPrimitiveType_TRIANGLE;
 
         // if there's just one primitive type in the mesh there's nothing to do for us
         unsigned int num = 0;
