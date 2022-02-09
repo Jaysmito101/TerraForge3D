@@ -13,7 +13,6 @@
 #include <FoliagePlacement.h>
 #include <SkySettings.h>
 #include <SupportersTribute.h>
-#include <MeshNodeEditor.h>
 #include <ExportManager.h>
 #include <TextureStore.h>
 
@@ -480,11 +479,11 @@ static void ShowTerrainControls()
 
 	ImGui::NewLine();
 
-	if(appState->modules.manager->uiModules.size() > 0)
-		ImGui::Text("UI Modules");
-	int i = 0;
-	for (UIModule* mod : appState->modules.manager->uiModules)
-		ImGui::Checkbox(MAKE_IMGUI_LABEL(i++, mod->windowName), &mod->active);
+	//if(appState->modules.manager->uiModules.size() > 0)
+	//	ImGui::Text("UI Modules");
+	//int i = 0;
+	//for (UIModule* mod : appState->modules.manager->uiModules)
+		//ImGui::Checkbox(MAKE_IMGUI_LABEL(i++, mod->windowName), &mod->active);
 
 	ImGui::Separator();
 
@@ -1067,7 +1066,7 @@ public:
 		delete appState->serailizer;
 		DeleteApplicationState();
 
-		exit(0); // Temporary
+//		exit(0); // Temporary
 	}
 };
 

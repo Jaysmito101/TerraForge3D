@@ -8,6 +8,8 @@
 #include "CPUNoiseLayersGenerator.h"
 #include "GPUNoiseLayerGenerator.h"
 
+#include "CPUNodeEditor/CPUNodeEditor.h"
+
 #include "Profiler.h"
 
 MeshGeneratorManager::MeshGeneratorManager(ApplicationState* as)
@@ -131,7 +133,7 @@ void MeshGeneratorManager::ShowSettings()
 		ImGui::Text("CPU Noise Layer Generators");
 		for (int i = 0; i < cpuNoiseLayers.size(); i++)
 		{
-			if (ImGui::CollapsingHeader((cpuNoiseLayers[i]->name + "##CPUNL" + std::to_string(i)).c_str(), cpuNoiseLayers[i]->uiActive))
+			if (ImGui::CollapsingHeader((cpuNoiseLayers[i]->name + "##CPUNL" + std::to_string(i)).c_str()))
 			{
 				cpuNoiseLayers[i]->ShowSetting(i);
 				if (ImGui::Button(("Delete##CPUNOUSELAYER" + std::to_string(i)).c_str()))
@@ -153,7 +155,7 @@ void MeshGeneratorManager::ShowSettings()
 		ImGui::Text("GPU Noise Layer Generators");
 		for (int i = 0; i < gpuNoiseLayers.size(); i++)
 		{
-			if (ImGui::CollapsingHeader((gpuNoiseLayers[i]->name + "##GPUNL" + std::to_string(i)).c_str(), gpuNoiseLayers[i]->uiActive))
+			if (ImGui::CollapsingHeader((gpuNoiseLayers[i]->name + "##GPUNL" + std::to_string(i)).c_str()))
 			{
 				gpuNoiseLayers[i]->ShowSetting(i);
 				if (ImGui::Button(("Delete##GPUNOUSELAYER" + std::to_string(i)).c_str()))
@@ -172,6 +174,28 @@ void MeshGeneratorManager::ShowSettings()
 		}
 		ImGui::Separator();
 
+		ImGui::Text("CPU Node Editor Generators");
+		for (int i = 0; i < cpuNodeEditors.size(); i++)
+		{
+			if (ImGui::CollapsingHeader((cpuNodeEditors[i]->name + "##CPUNE" + std::to_string(i)).c_str()))
+			{
+				cpuNodeEditors[i]->ShowSetting(i);
+				if (ImGui::Button(("Delete##CPNE" + std::to_string(i)).c_str()))
+				{
+					while (*isRemeshing);
+					cpuNodeEditors.erase(cpuNodeEditors.begin() + i);
+					break;
+				}
+			}
+			ImGui::Separator();
+		}
+		if (ImGui::Button("Add##CPUNE"))
+		{
+			while (*isRemeshing);
+			cpuNodeEditors.push_back(new CPUNodeEditor(appState));
+		}
+		ImGui::Separator();
+
 		ImGui::Text("Time : %lf ms", time);
 		
 
@@ -187,6 +211,11 @@ void MeshGeneratorManager::ShowSettings()
 	{
 		gpuNoiseLayers[i]->Update();
 	}
+
+	for (int i = 0; i < cpuNodeEditors.size(); i++)
+	{
+		cpuNodeEditors[i]->Update();
+	}
 }
 
 void MeshGeneratorManager::GenerateForTerrain()
@@ -196,14 +225,29 @@ void MeshGeneratorManager::GenerateForTerrain()
 	Model* mod = appState->models.coreTerrain;
 	for (int i = 0; i < mod->mesh->vertexCount; i++)
 	{
-		float x = mod->mesh->vert[i].position.x;
-		float y = 0;
-		float z = mod->mesh->vert[i].position.z;
 		float elev = 0.0f;
-		for (int i = 0; i < cpuNoiseLayers.size(); i++)
+		NodeInputParam inp;
+		inp.x = mod->mesh->vert[i].position.x;
+		inp.y = 0.0f;
+		inp.z = mod->mesh->vert[i].position.z;
+		inp.minX = 0.0f;
+		inp.minY = 0.0f;
+		inp.minZ = 0.0f;
+		inp.maxX = scale;
+		inp.maxY = scale;
+		inp.maxZ = scale;
+		inp.texX = mod->mesh->vert[i].texCoord.x;
+		inp.texY = mod->mesh->vert[i].texCoord.y;
+		for (int j = 0; j < cpuNoiseLayers.size(); j++)
 		{
-			if(cpuNoiseLayers[i]->enabled)
-				elev += cpuNoiseLayers[i]->EvaluateAt(x, y, z);
+			if(cpuNoiseLayers[j]->enabled)
+				elev += cpuNoiseLayers[j]->EvaluateAt(inp.x, inp.y, inp.z);
+		}
+
+		for(int j = 0 ; j<cpuNodeEditors.size();j++)
+		{
+			if(cpuNodeEditors[j]->enabled)
+				elev += cpuNodeEditors[j]->EvaluateAt(inp);
 		}
 		mod->mesh->vert[i].position.y += elev;
 	}
@@ -218,14 +262,29 @@ void MeshGeneratorManager::GenerateForCustomBase()
 	for (int i = 0; i < customModel->mesh->vertexCount; i++)
 	{
 		Vert tmp = customModelCopy->mesh->vert[i];
-		float x = tmp.position.x;
-		float y = tmp.position.y;
-		float z = tmp.position.z;
 		float elev = 0.0f;
-		for (int i = 0; i < cpuNoiseLayers.size(); i++)
+		NodeInputParam inp;
+		inp.x = tmp.position.x;
+		inp.y = 0.0f;
+		inp.z = tmp.position.z;
+		inp.minX = 0.0f;
+		inp.minY = 0.0f;
+		inp.minZ = 0.0f;
+		inp.maxX = scale;
+		inp.maxY = scale;
+		inp.maxZ = scale;
+		inp.texX = tmp.texCoord.x;
+		inp.texY = tmp.texCoord.y;
+		for (int j = 0; j < cpuNoiseLayers.size(); j++)
 		{
-			if(cpuNoiseLayers[i]->enabled)
-				elev += cpuNoiseLayers[i]->EvaluateAt(x, y, z);
+			if(cpuNoiseLayers[j]->enabled)
+				elev += cpuNoiseLayers[j]->EvaluateAt(inp.x, inp.y, inp.z);
+		}
+
+		for(int j = 0 ; j<cpuNodeEditors.size();j++)
+		{
+			if(cpuNodeEditors[j]->enabled)
+				elev += cpuNodeEditors[j]->EvaluateAt(inp);
 		}
 		tmp.position *= scale;
 		tmp.position += elev * tmp.normal;
@@ -351,6 +410,12 @@ nlohmann::json MeshGeneratorManager::Save()
 		tmp.push_back(gpuNoiseLayers[i]->Save());
 	}
 	data["gpunl"] = tmp;
+	tmp = nlohmann::json();
+	for (int i = 0; i < cpuNodeEditors.size(); i++)
+	{
+		tmp.push_back(cpuNodeEditors[i]->Save());
+	}
+	data["cpune"] = tmp;
 	return data;
 }
 
@@ -379,4 +444,13 @@ void MeshGeneratorManager::Load(nlohmann::json data)
 		gpuNoiseLayers.back()->Load(data["gpunl"][i]);
 	}
 
+	for (int i = 0; i < cpuNodeEditors.size(); i++)
+		delete cpuNodeEditors[i];
+
+	cpuNodeEditors.clear();
+	for (int i = 0; i < data["cpune"].size(); i++)
+	{
+		cpuNodeEditors.push_back(new CPUNodeEditor(appState));
+		cpuNodeEditors.back()->Load(data["cpune"][i]);
+	}
 }

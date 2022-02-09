@@ -6,6 +6,10 @@ class ClearMeshGenerator;
 class CPUNoiseLayersGenerator;
 class GPUNoiseLayerGenerator;
 
+class CPUNodeEditor;
+
+
+
 #include "Base/OpenCL/ComputeKernel.h"
 #include "json.hpp"
 
@@ -46,4 +50,5 @@ private:
 	ClearMeshGenerator* clearMeshGen;
 	std::vector<CPUNoiseLayersGenerator*> cpuNoiseLayers;
 	std::vector<GPUNoiseLayerGenerator*> gpuNoiseLayers;
+	std::vector<CPUNodeEditor*> cpuNodeEditors;
 };

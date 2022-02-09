@@ -4,7 +4,7 @@
 #include "Profiler.h"
 #include "Data/ApplicationState.h"
 
-int count = 0;
+int count = 1;
 
 CPUNoiseLayersGenerator::CPUNoiseLayersGenerator(ApplicationState* as)
 {
