@@ -47,10 +47,10 @@ void GPUNoiseLayerGenerator::Generate(ComputeKernel* kernels)
         kernels->SetKernelArg("noise_layer_custom_base", 3, "noise_layers_size");
 
         vc = appState->models.customBase->mesh->vertexCount;
-        if (appState->models.customBase->mesh->vertexCount % localSize != 0)
-            localSize = 1;
+        //if (appState->models.customBase->mesh->vertexCount % localSize != 0)
+        //    localSize = 1;
 
-        kernels->ExecuteKernel("noise_layer_custom_base", cl::NDRange(localSize), cl::NDRange(appState->models.customBase->mesh->vertexCount / localSize));
+        kernels->ExecuteKernel("noise_layer_custom_base", cl::NDRange(localSize), cl::NDRange(appState->models.customBase->mesh->vertexCount));
     }
 
     END_PROFILER(time);
