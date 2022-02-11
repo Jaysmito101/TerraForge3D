@@ -51,7 +51,7 @@ public:
 	bool uiActive = false;
 	bool enabled = true;
 	double time = 0;
-	int localSize = 16;
+	int localSize = 256;
 	int vc = 0;
 	ApplicationState* appState;
 	std::string uid = "";

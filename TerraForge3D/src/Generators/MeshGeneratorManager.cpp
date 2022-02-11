@@ -50,23 +50,14 @@ void MeshGeneratorManager::Generate()
 			clearMeshGen->Generate(nullptr);
 			ExecuteCPUGenerators();
 			ExecuteKernels();
-			if(!clearMeshGen->useGPUForNormals)
-			{
-				if (appState->mode == ApplicationMode::TERRAIN)
-				{
-					appState->models.coreTerrain->mesh->RecalculateNormals();
-				}
-				else if (appState->mode == ApplicationMode::CUSTOM_BASE)
-				{
-					appState->models.customBase->mesh->RecalculateNormals();
-				}
-
-			}
 		}
 		else
 		{
 			ExecuteKernels();
 			ExecuteCPUGenerators();
+		}
+		if(!appState->states.useGPUForNormals )
+		{
 			if (appState->mode == ApplicationMode::TERRAIN)
 			{
 				appState->models.coreTerrain->mesh->RecalculateNormals();
@@ -75,9 +66,7 @@ void MeshGeneratorManager::Generate()
 			{
 				appState->models.customBase->mesh->RecalculateNormals();
 			}
-
 		}
-
 		END_PROFILER(time);
 		*isRemeshing = false;
 		});

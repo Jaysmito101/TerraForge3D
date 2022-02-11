@@ -66,7 +66,6 @@ nlohmann::json ClearMeshGenerator::Save()
     nlohmann::json data;
     data["uiActive"] = uiActive;
     data["useGPU"] = useGPU;
-    data["useGPUForNormals"] = useGPUForNormals;
     return data;
 }
 
@@ -74,19 +73,17 @@ void ClearMeshGenerator::Load(nlohmann::json data)
 {
     uiActive = data["uiActive"];
     useGPU = data["useGPU"];
-    useGPUForNormals = data["useGPUForNormals"];
 }
 
 void ClearMeshGenerator::ShowSettings()
 {
     if(ImGui::Checkbox("Use GPU##CMG", &useGPU))
     {
-        if(useGPU)
-            useGPUForNormals = false;
+
     }
-    if(!useGPU)
-    {
-        ImGui::Checkbox("Use GPU For Normals##CMG", &useGPUForNormals);
-    }
+
+
+    ImGui::Checkbox("Use GPU For Normals(Flat Shading)##CMG", &appState->states.useGPUForNormals);
+
     ImGui::Text("Time : %lf ms", time);
 }

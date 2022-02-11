@@ -120,7 +120,7 @@ nlohmann::json ApplicationStateStates::Save()
 	data["textureBake"] = textureBake;
 	data["postProcess"] = postProcess;
 	data["autoAspectCalcRatio"] = autoAspectCalcRatio;
-
+	data["useGPUForNormals"] = useGPUForNormals;
 	return data;
 }
 
@@ -138,7 +138,7 @@ void ApplicationStateStates::Load(nlohmann::json data)
 	textureBake = data["textureBake"];
 	postProcess = data["postProcess"];
 	autoAspectCalcRatio = data["autoAspectCalcRatio"];
-
+	useGPUForNormals = data["useGPUForNormals"];
 }
 
 nlohmann::json ApplicationStateGlobals::Save()

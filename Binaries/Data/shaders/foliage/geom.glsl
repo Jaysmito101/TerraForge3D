@@ -6,6 +6,7 @@ layout(triangle_strip, max_vertices = 3) out;
 uniform mat4 _PV;
 uniform mat4 _Model;
 
+
 out float height;
 out float Distance;
 out vec4 FragPos;

@@ -33,10 +33,14 @@ void GPUNoiseLayerGenerator::Generate(ComputeKernel* kernels)
         kernels->SetKernelArg("noise_layer_terrain", 2, "noise_layers_size");
 
         vc = appState->models.coreTerrain->mesh->vertexCount;
-        //if (appState->models.coreTerrain->mesh->vertexCount % localSize != 0)
-        //    localSize = 1;
+	int ls = localSize;
+	while(ls > 0 && vc % ls != 0)
+	{
+		ls = ls / 2;	
+	}
+	if(ls==0) ls = 1;
 
-        kernels->ExecuteKernel("noise_layer_terrain", cl::NDRange(localSize), cl::NDRange(appState->models.coreTerrain->mesh->vertexCount));
+        kernels->ExecuteKernel("noise_layer_terrain", cl::NDRange(ls), cl::NDRange(vc));
     }
     else if (appState->mode == ApplicationMode::CUSTOM_BASE)
     {        
@@ -47,10 +51,14 @@ void GPUNoiseLayerGenerator::Generate(ComputeKernel* kernels)
         kernels->SetKernelArg("noise_layer_custom_base", 3, "noise_layers_size");
 
         vc = appState->models.customBase->mesh->vertexCount;
-        //if (appState->models.customBase->mesh->vertexCount % localSize != 0)
-        //    localSize = 1;
+        int ls = localSize;
+	while(ls > 0 && vc % ls != 0)
+	{
+		ls = ls / 2;	
+	}
+	if(ls==0) ls = 1;
 
-        kernels->ExecuteKernel("noise_layer_custom_base", cl::NDRange(localSize), cl::NDRange(appState->models.customBase->mesh->vertexCount));
+        kernels->ExecuteKernel("noise_layer_custom_base", cl::NDRange(ls), cl::NDRange(vc));
     }
 
     END_PROFILER(time);

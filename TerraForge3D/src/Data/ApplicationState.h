@@ -78,6 +78,7 @@ struct ApplicationStateWindows {
 	bool lightControls = true;
 	bool cameraControls = true;
 
+
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 };
@@ -101,6 +102,7 @@ struct ApplicationStateStates
 	bool iExploreMode = false;
 	bool showFoliage = true;
 	bool textureBake = false;
+	bool useGPUForNormals = true;
 	bool postProcess = false;
 	bool autoAspectCalcRatio = true;
 	std::atomic<bool> ruinning = true;
