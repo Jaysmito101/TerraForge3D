@@ -324,8 +324,13 @@ void MeshGeneratorManager::ExecuteKernels()
 
 			kernels->SetKernelArg("gen_normals", 0, "mesh");
 			kernels->SetKernelArg("gen_normals", 1, "indices");
+			
+			int ls = 512;
+			int ic = appState->models.coreTerrain->mesh->indexCount;
+			while(ic % ls != 0)
+				ls /= 2;
 
-			kernels->ExecuteKernel("gen_normals", cl::NDRange(1), cl::NDRange(appState->models.coreTerrain->mesh->indexCount));
+			kernels->ExecuteKernel("gen_normals", cl::NDRange(ls), cl::NDRange(ic));
 
 			kernels->SetKernelArg("normalize_normals", 0, "mesh");
 			kernels->ExecuteKernel("normalize_normals", cl::NDRange(1), cl::NDRange(appState->models.coreTerrain->mesh->vertexCount));
@@ -359,7 +364,12 @@ void MeshGeneratorManager::ExecuteKernels()
 			kernels->SetKernelArg("gen_normals", 0, "mesh");
 			kernels->SetKernelArg("gen_normals", 1, "indices");
 
-			kernels->ExecuteKernel("gen_normals", cl::NDRange(1), cl::NDRange(appState->models.customBase->mesh->indexCount));
+			int ls = 512;
+			int ic = appState->models.customBase->mesh->indexCount;
+			while(ic % ls != 0)
+				ls /= 2;
+
+			kernels->ExecuteKernel("gen_normals", cl::NDRange(ls), cl::NDRange(ic));
 
 			kernels->SetKernelArg("normalize_normals", 0, "mesh");
 			kernels->ExecuteKernel("normalize_normals", cl::NDRange(1), cl::NDRange(appState->models.customBase->mesh->vertexCount));

@@ -33,10 +33,10 @@ void GPUNoiseLayerGenerator::Generate(ComputeKernel* kernels)
         kernels->SetKernelArg("noise_layer_terrain", 2, "noise_layers_size");
 
         vc = appState->models.coreTerrain->mesh->vertexCount;
-        if (appState->models.coreTerrain->mesh->vertexCount % localSize != 0)
-            localSize = 1;
+        //if (appState->models.coreTerrain->mesh->vertexCount % localSize != 0)
+        //    localSize = 1;
 
-        kernels->ExecuteKernel("noise_layer_terrain", cl::NDRange(localSize), cl::NDRange(appState->models.coreTerrain->mesh->vertexCount / localSize));
+        kernels->ExecuteKernel("noise_layer_terrain", cl::NDRange(localSize), cl::NDRange(appState->models.coreTerrain->mesh->vertexCount));
     }
     else if (appState->mode == ApplicationMode::CUSTOM_BASE)
     {        
