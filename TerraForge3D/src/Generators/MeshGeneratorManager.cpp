@@ -239,6 +239,7 @@ void MeshGeneratorManager::GenerateForTerrain()
 				elev += cpuNodeEditors[j]->EvaluateAt(inp);
 		}
 		mod->mesh->vert[i].position.y += elev;
+		mod->mesh->vert[i].extras1.x += elev;
 	}
 }
 
@@ -277,8 +278,8 @@ void MeshGeneratorManager::GenerateForCustomBase()
 		}
 		tmp.position *= scale;
 		tmp.position += elev * tmp.normal;
-		customModel->mesh->vert[i].extras1.x = elev;
-		customModel->mesh->vert[i].position = tmp.position;
+		customModel->mesh->vert[i].extras1.x += elev;
+		customModel->mesh->vert[i].position += tmp.position;
 	}
 }
 

@@ -19,6 +19,7 @@ __kernel void noise_layer_terrain(__global Vert* mesh, __global NoiseLayer* nl, 
 		n += get_noise(noiseLayer);
 	}
 	mesh[i].position.y += n;
+	mesh[i].extras1.x += n;
 
 }
 
@@ -36,6 +37,7 @@ __kernel void noise_layer_custom_base(__global Vert* mesh, __global Vert* mesh_c
 		n += get_noise(noiseLayer);
 	}
 	mesh[i].position += mesh_copy[i].normal * n;
+	mesh[i].extras1.x += n;
 }
 
 #endif // NOISE_LAYER_CL
