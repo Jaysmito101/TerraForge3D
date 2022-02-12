@@ -1,0 +1,20 @@
+[Window][DockSpace Demo]
+Pos=0,0
+Size=640,480
+Collapsed=0
+
+[Window][Module Maker]
+Pos=0,23
+Size=640,457
+Collapsed=0
+DockId=0x3BC79352,0
+
+[Window][Debug##Default]
+ViewportPos=198,221
+ViewportId=0x9F5F46A1
+Size=400,400
+Collapsed=0
+
+[Docking][Data]
+DockSpace ID=0x3BC79352 Window=0x4647B76E Pos=138,184 Size=640,457 CentralNode=1 Selected=0xEC914432
+
