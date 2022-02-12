@@ -158,6 +158,11 @@ nlohmann::json ApplicationStateGlobals::Save()
 	data["offsetY"] = offset[1];
 	data["offsetZ"] = offset[2];
 
+	data["hMapCX"] = hMapC[0];
+	data["hMapCY"] = hMapC[1];
+	data["hMapCZ"] = hMapC[2];
+	data["hMapCW"] = hMapC[3];
+
 	return data;
 }
 
@@ -175,4 +180,9 @@ void ApplicationStateGlobals::Load(nlohmann::json data)
 	offset[0] = data["offsetX"];
 	offset[1] = data["offsetY"];
 	offset[2] = data["offsetZ"];
+
+	hMapC[0] = data["hMapCX"];
+	hMapC[1] = data["hMapCY"];
+	hMapC[2] = data["hMapCZ"];
+	hMapC[3] = data["hMapCW"];
 }

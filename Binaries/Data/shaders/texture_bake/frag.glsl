@@ -5,6 +5,9 @@ out vec4 FragColor;
 
 uniform vec3 _LightPosition;
 uniform vec3 _LightColor;
+uniform vec3 _HMapMinMax;
+
+uniform float _Mode;
 
 in float height;
 in float Distance;
@@ -70,11 +73,16 @@ vec4 GetTextureColorBasedOnHeight(vec2 coord){
     return accum;
 }
 
-
+ 
 void main()
 {	
 
 	vec3 objectColor = vec3(1, 1, 1);
-	objectColor = GetTextureColorBasedOnHeight(TexCoord).xyz;
+	if(_Mode == 0.0f)
+		objectColor = GetTextureColorBasedOnHeight(TexCoord).xyz;
+	else if(_Mode == 1.0f)
+		objectColor = vec3( (height - _HMapMinMax.x) / (_HMapMinMax.y - _HMapMinMax.x) );
+	else if(_Mode == 2.0f)
+		objectColor = Normal;
     FragColor = vec4(objectColor, 1.0f);
 } 

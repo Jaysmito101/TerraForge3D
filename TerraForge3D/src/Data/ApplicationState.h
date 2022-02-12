@@ -139,6 +139,7 @@ struct ApplicationStateGlobals
 	std::string kernelsIncludeDir = "";
 
 	float viewportSize[4];
+	float hMapC[4];
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
