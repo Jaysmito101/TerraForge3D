@@ -131,6 +131,7 @@ struct ApplicationStateGlobals
 	int resolution = 256;
 	int numberOfNoiseTypes = 3;
 	int secondCounter = 0;
+	int textureBakeMode = 0;
 
 	nlohmann::json appData;
 

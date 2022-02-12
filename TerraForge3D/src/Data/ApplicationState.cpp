@@ -150,10 +150,14 @@ nlohmann::json ApplicationStateGlobals::Save()
 	data["mouseScrollAmount"] = mouseScrollAmount;
 	data["viewportMousePosX"] = viewportMousePosX;
 	data["viewportMousePosY"] = viewportMousePosY;
+
 	data["scale"] = scale;
 	data["resolution"] = resolution;
+	data["textureBakeMode"] = textureBakeMode;
+
 	data["openFilePath"] = currentOpenFilePath;
 	data["customBaseModelPath"] = currentBaseModelPath;
+
 	data["offsetX"] = offset[0];
 	data["offsetY"] = offset[1];
 	data["offsetZ"] = offset[2];
@@ -175,8 +179,11 @@ void ApplicationStateGlobals::Load(nlohmann::json data)
 	viewportMousePosY = data["viewportMousePosY"];
 	scale = data["scale"];
 	resolution = data["resolution"];
+	textureBakeMode = data["textureBakeMode"];
+
 	currentOpenFilePath = data["openFilePath"];
 	currentBaseModelPath = data["customBaseModelPath"];
+
 	offset[0] = data["offsetX"];
 	offset[1] = data["offsetY"];
 	offset[2] = data["offsetZ"];
