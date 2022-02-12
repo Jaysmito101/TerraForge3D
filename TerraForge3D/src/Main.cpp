@@ -157,11 +157,9 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		tmp[2] = 1;
 		shader->SetUniform3f("_Resolution", tmp);
 		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
-		shader->SetUniform3f("_HMapMinMax", appState->globals.hMapC);
 		shader->SetUniformf("_SeaLevel", appState->seaManager->level);
 		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
-		shader->SetUniformf("_Mode", appState->globals.textureBakeMode);
 		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 		appState->models.coreTerrain->Render();
 	}
@@ -417,27 +415,6 @@ static void ShowTerrainControls()
 
 	if(appState->mode == ApplicationMode::TERRAIN || appState->mode == ApplicationMode::CUSTOM_BASE)
 		ImGui::DragFloat("Mesh Scale", &appState->globals.scale, 0.1f, 1.0f, 5000.0f);
-
-
-	static const char* tbmi[] = {"Diffuse Map", "Heigt Map", "Normal Map"};
-	if (ImGui::BeginCombo("Texture Bake Mode##combo", tbmi[appState->globals.textureBakeMode]))
-	{
-	    for (int n = 0; n < IM_ARRAYSIZE(tbmi); n++)
-	    {
-        	bool is_selected = (appState->globals.textureBakeMode == n);
-	        if (ImGui::Selectable(tbmi[n], is_selected))
-        	    appState->globals.textureBakeMode = n;
-	        if (is_selected)
-        	    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-	    }	
-	    ImGui::EndCombo();
-	}
-
-	if(appState->globals.textureBakeMode == 1)
-	{
-		ImGui::DragFloat2("Height Map Min Max", appState->globals.hMapC, 0.01f);
-	}
-
 
 	ImGui::NewLine();
 

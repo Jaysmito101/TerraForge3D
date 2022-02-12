@@ -1,5 +1,5 @@
 #include <Model.h>
-#include <iostream>
+
 
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -36,22 +36,14 @@ void Model::SetupMeshOnGPU() {
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, extras1));
 	glEnableVertexAttribArray(3);
-
-	std::cout << "Setup Model " << name << " on GPU.\n";
 }
 
 void Model::UploadToGPU()
 {
 	if (!mesh)
-	{
-		std::cout << "In Model " << name << " mesh not available.\n";
 		return;
-	}
 	if (!mesh->IsValid())
-	{
-		std::cout << "In Model " << name << " mesh not valid.\n";
 		return;
-	}
 
 	glBindVertexArray(vao);
 

@@ -131,7 +131,6 @@ struct ApplicationStateGlobals
 	int resolution = 256;
 	int numberOfNoiseTypes = 3;
 	int secondCounter = 0;
-	int textureBakeMode = 0;
 
 	nlohmann::json appData;
 
@@ -140,7 +139,6 @@ struct ApplicationStateGlobals
 	std::string kernelsIncludeDir = "";
 
 	float viewportSize[4];
-	float hMapC[4];
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
