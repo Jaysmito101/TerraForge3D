@@ -30,20 +30,21 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
         x = inputPins[0]->other->Evaluate(input).value;
     else
         x = input.texX;
-    
+
     if (inputPins[1]->IsLinked())
         y = inputPins[1]->other->Evaluate(input).value;
     else
         y = input.texY;
+
 
     if (inputPins[2]->IsLinked())
         sc = inputPins[2]->other->Evaluate(input).value;
     else
         sc = scale;
     mutex.lock();
-    int xC = (int)(x * texture->GetWidth());
-    int yC = (int)(y * texture->GetHeight());
-    unsigned char elevC = texture->GetData()[xC * texture->GetWidth() * 3 + yC * 3 + channel];
+    int xC = (int)(x * (texture->GetWidth()-1));
+    int yC = (int)(y * (texture->GetHeight()-1));
+    unsigned char elevC = texture->GetData()[yC * texture->GetWidth() * 3 + xC * 3 + channel];
     res = (float)elevC / 256;
     res = res * 2.0 - 1.0f;
     mutex.unlock();

@@ -191,6 +191,7 @@ nlohmann::json CPUNodeEditor::Save()
 
 void CPUNodeEditor::Load(nlohmann::json data)
 {
+	while(appState->states.remeshing);
 	editor->Load(data["nodeEditor"]);
 	windowStat = data["windowStat"];
 	enabled = data["enabled"];
