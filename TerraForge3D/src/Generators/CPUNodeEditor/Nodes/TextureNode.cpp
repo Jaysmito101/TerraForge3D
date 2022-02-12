@@ -42,7 +42,7 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
         sc = scale;
     mutex.lock();
     int xC = (int)(x * texture->GetWidth());
-    int yC = (int)(y * texture->GetWidth());
+    int yC = (int)(y * texture->GetHeight());
     unsigned char elevC = texture->GetData()[xC * texture->GetWidth() * 3 + yC * 3 + channel];
     res = (float)elevC / 256;
     res = res * 2.0 - 1.0f;
