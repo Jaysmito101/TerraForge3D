@@ -136,12 +136,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p>Wanna Get Featured? Post in #showcase of our <a href="https://discord.gg/9ebyYwSktZ">discord server</a>.</p>
                     <br>
                     <br>
-                    <img src="https://i.ibb.co/CHvqgjh/rough-Terrain.png" alt="rough-Terrain" border="0"><h3 style="color: white;">By JacobsSight</h3> 
+                    <img width=400 src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://s10.gifyu.com/images/T2ee533c6583ffcf41.gif" alt="Grassy-Terrain" border="0"><h3 style="color: white;">By Jaysmito Mukherjee</h3> 
                     <br />
-                    <h3 style='color: white;'>Unity Plane Explorer Game With Using TerraForge3D for all terrains</h3> 
-                    <h2><a href="https://jaysmito101.itch.io/terraforge3d-demo">Click Here</a></h2>
+                    <br />
+                    <img width=400 src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://i.ibb.co/bBDws27/Terrain.png" alt="Muddy-Terrain" border="0"><h3 style="color: white;">By Jaysmito Mukherjee</h3> 
+                    <br />
+                    <br />
+                    <img width=400 src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://i.ibb.co/CHvqgjh/rough-Terrain.png" alt="rough-Terrain" border="0"><h3 style="color: white;">By JacobsSight</h3> 
+                    <br />
+                    <br />
+                    <img width=400 src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://i.ibb.co/sjdCTYK/Screenshot-468.png" alt="Game-Terrain" border="0"><h3 style="color: white;">By JacobsSight</h3> 
+                    <h3 style='color: white;'>Unity Plane Explorer Game With Using TerraForge3D for all terrains
+                        <br />
+                    <a href="https://jaysmito101.itch.io/terraforge3d-demo">Click here to Play</a></h3>
                     <br><br>
-                    <h3 style="color: white;">Version 1.8 Demo - Jaysmito Mukherjee</h3> <img style="width: 400px;" src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase5.gif"> </div>
             </div>
         </div>
         <div class="slide" id="3">
@@ -253,6 +261,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             log: function() {}
         };
     }
+        function init() {
+  var imgDefer = document.getElementsByTagName('img');
+  for (var i = 0; i < imgDefer.length; i++) {
+    if (imgDefer[i].getAttribute('data-src')) {
+      imgDefer[i].setAttribute('src',imgDefer[i].getAttribute('data-src'));
+    }
+  }
+}
+
+window.onload = init;
     </script>
 </body>
 
