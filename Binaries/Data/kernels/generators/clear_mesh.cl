@@ -12,6 +12,8 @@ __kernel void clear_mesh_terrain(__global Vert* mesh)
 	mesh[i].normal.w = 0.0f;
 	mesh[i].position.y = 0.0f;
 	mesh[i].extras1.x = 0.0f;
+	mesh[i].extras1.y = 0.0f;
+	mesh[i].extras1.z = 0.0f;
 
 }
 
@@ -24,6 +26,8 @@ __kernel void clear_mesh_custom_base(__global Vert* mesh, __global Vert* mesh_co
 	mesh[i].normal.z = 0.0f;
 	mesh[i].normal.w = 0.0f;
 	mesh[i].extras1.x = 0.0f;
+	mesh[i].extras1.y = 0.0f;
+	mesh[i].extras1.z = 0.0f;
 }
 
 #endif //  CLEAR_MESH_CL

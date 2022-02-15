@@ -19,7 +19,14 @@ AdvancedErosionFilter::AdvancedErosionFilter(Model* model)
 void AdvancedErosionFilter::Render()
 {
 
-    ImGui::DragInt("Local Work Group Size##windErosionFilter", &localWorkSize, 1, 1);
+	ImGui::DragInt("Local Work Group Size##windErosionFilter", &localWorkSize, 1, 1);
+	ImGui::DragInt("Num Particles##WERO", &particles, 1, 100);
+	ImGui::DragFloat("DT##WERO", &particle.dt, 0.01f);
+	ImGui::DragFloat("Suspension##WERO", &particle.suspension, 0.0001f);
+	ImGui::DragFloat("Abrasion##WERO", &particle.abrasion, 0.0001f);
+	ImGui::DragFloat("Roughness##WERO", &particle.roughness, 0.01f);
+	ImGui::DragFloat("Settling##WERO", &particle.settling, 0.01f);
+	ImGui::DragFloat("Sediment##WERO", &particle.sediment, 0.01f);
 
 
 }
@@ -43,7 +50,7 @@ void AdvancedErosionFilter::Apply()
                  
         tmp = false;
 
-        if(model->mesh->vertexCount % localWorkSize != 0)
+        if(particles % localWorkSize != 0)
         {
             std::cout << std::endl << "Invalid Local Work Group Size. Falling back to 1." << std::endl;
             localWorkSize = 1;
@@ -56,21 +63,28 @@ void AdvancedErosionFilter::Apply()
 
         kernels.Clear();
         kernels.AddSoruce(kernelSrc);
-        kernels.BuildProgram("");
+        kernels.BuildProgram("-I\"" + GetExecutableDir() + "\\Data\\kernels" + "\"");
         kernels.AddKernel("erode");
 
         kernels.CreateBuffer("mesh", CL_MEM_READ_WRITE, sizeof(Vert) * model->mesh->vertexCount);
         kernels.WriteBuffer("mesh", true, sizeof(Vert) * model->mesh->vertexCount, model->mesh->vert);
 
-        kernels.SetKernelArg("erode", 0, "mesh");
+	particle.seed = (float)rand();
+	particle.dimX = particle.dimY = model->mesh->res;
+		
+        kernels.CreateBuffer("part", CL_MEM_READ_WRITE, sizeof(WindErosionParticle));
+        kernels.WriteBuffer("part", true, sizeof(WindErosionParticle), &particle);
 
+        kernels.SetKernelArg("erode", 0, "mesh");
+        kernels.SetKernelArg("erode", 1, "part");
+	
         std::cout << std::endl << "Starting processing erosion." << std::endl;
 
-        cl::NDRange global(model->mesh->vertexCount / localWorkSize);
+        cl::NDRange global(particles);
         cl::NDRange local(localWorkSize);
         kernels.ExecuteKernel("erode", local, global);
 
-        std::cout << std::endl << "Finished processing erosion." << std::endl;
+        std::cout << "Finished processing erosion." << std::endl;
 
         kernels.ReadBuffer("mesh", true, sizeof(Vert) * model->mesh->vertexCount, model->mesh->vert);
     }

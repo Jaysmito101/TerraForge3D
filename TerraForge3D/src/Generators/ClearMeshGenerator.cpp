@@ -41,7 +41,9 @@ void ClearMeshGenerator::Generate(ComputeKernel* kernels)
            for(int i=0;i<vc;i++)
            {
               mes->vert[i].normal.x = mes->vert[i].normal.y = mes->vert[i].normal.z = mes->vert[i].position.y = 0.0f;
-              mes->vert[i].extras1.x =0.0f;
+              mes->vert[i].extras1.x = 0.0f;
+              mes->vert[i].extras1.y = 0.0f;
+              mes->vert[i].extras1.z = 0.0f;
            }
       }
       else if (appState->mode == ApplicationMode::CUSTOM_BASE)
@@ -54,6 +56,8 @@ void ClearMeshGenerator::Generate(ComputeKernel* kernels)
           mes->vert[i].normal.x = mes->vert[i].normal.y = mes->vert[i].normal.z = 0.0f;
           mes->vert[i].position = mesC->vert[i].position;
           mes->vert[i].extras1.x = 0.0f;
+          mes->vert[i].extras1.y = 0.0f;
+          mes->vert[i].extras1.z = 0.0f;
        }
   }
 

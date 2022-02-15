@@ -24,6 +24,26 @@ typedef struct __attribute__ ((packed)) NoiseLayer
 	float4 value;
 } NoiseLayer;
 
+typedef struct __attribute__ ((packed)) WindParticle
+{
+	float dt;
+	float suspension;
+	float abrasion;
+	float roughness;
+	float settling;
+	float sediment;
+	float height;	
+	float index;
+	float seed;
+
+	float2 dim;	
+	float2 pos;
+
+	float4 pspeed;
+
+	float4 speed;
+} WindParticle;
+
 void print_nl(NoiseLayer nl)
 {
 	printf("Octaves : %f\nFractals : %f\nFrequency : %f\nStrength : %f\n", nl.octaves, nl.fractal, nl.frequency, nl.strength);

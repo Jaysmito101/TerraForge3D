@@ -23,75 +23,87 @@
 <hr/>
 
 # TerraForge3D
-3D Procedural Terrain Generation Tool in OpenGL/C++
 
+TerraForge3D is a state of the art professional procedural terrain generation and modelling tool. This is being maintained actively. This has got everything you need to bring your imagination to life.
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (380).png" width="1000">
+A huge benefit is that TerraForge3D is 100% free and opensource. It is the worlds best free terrain generator. TerraForge3D is very easy to get started with. There are also a series of tutorials(on youtube), documentations for your help.
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase6.gif" width="1000">
+Also if you have any question or problem or suggestion you can directly reach out to me via my email jaysmito101@gmail.com . 
+Or you could join out official discord server with a charming community(including me) to help you out with anny issues.
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (364).png" width="1000">
+## Discord Server : https://discord.gg/AcgRafSfyB
 
-<img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/Version 2.0/Screenshot (359).png" width="1000">
+# Showcase
 
-<a href="https://youtu.be/EhkgesSzT8U"><img src="https://github.com/Jaysmito101/TerraGen3D/raw/master/Screenshots/ShowCase4.gif" width="1000"></a>
+Here are some of the terrains created with TerraForge3D. (You can send your artwork either via the discord server or https://github.com/Jaysmito101/TerraForge3D/issues/10)
 
+<img width="500" src="./Screenshots/Showcase/Sandy%20Desert%201.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Sandy%20Desert%202.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Muddy%20Forest.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Grassy%20Hillock.png" /> <br />
 
-<a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
+# Screenshots
 
-Give your valuable feedback : https://github.com/Jaysmito101/TerraForge3D/discussions/6
+Here are some of the screenshots of the application with all its ui, ...
 
-Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
+<img width="500" src="./Screenshots/UI/CB.png" /> <br />
+<img width="500" src="./Screenshots/UI/NE.png" /> <br />
+<img width="500" src="./Screenshots/UI/NEFE.png" /> <br />
 
-## Join the Discord Server for any help or posting your showcases and get featured in the website : https://discord.gg/AcgRafSfyB
+### A Request
+
+Please consider Giving your valuable feedback : https://github.com/Jaysmito101/TerraForge3D/discussions/6
+
+Also Please consider <b>starring</b> this repository. (Everyone who starred this repository will be credited in the application itself)
+
+## Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
 
 # Features
 
-* Tribute to all who **Starred** or **Contributed** to the project
-* Support fo installable native modules(dll) like blender addons
-* Procedurally generated fully customizable skies
-* 30+ different nodes
-* Export to 4+ 3D formats
-* Runs on any hardware ( no need for any powerful graphics card or processor)
-* Very easy to learn
-* Procedural Texturing
-* Realistic Hydraulic Erosion Simulation (CPU & GPU modes)
-* Use custom HDRI Skyboxes
-* Water with reflections, ripples, waves.
-* Compute Shaders
-* Infinite First Person Terrain Explorer
-* Maze Generator using Binary Tree Algorithm
-* Generte 3D Terrain Procedrally
-* First Person Terrain Explorer
-* An Highly abstracted API for OpenGL which can be reused by other projects
-* Foliage and custom model importer and renderer
-* Pack Projects into completely portable `.terr3dpack` files
-* A Texture Store Powered By <a href = "https://polyhaven.com/"> PolyHaven </a>
-* Export Terrain mesh as OBJ
-* Easy and Userfriendly UI
-* Autosave and backup projects
-* Caching system
-* Asset Management
-* You can write and test your own shaders
-* An Inbuilt IDE for shaders
-* Test under different lighting
-* A proper 3D viewer
-* Sea with waves amd custom color
-* Video Tutorials(<a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>)
-* A Node based as well as Layer based workflow
-* Save the project(custom `.terr3d` files)
-* Hieght map visualizer in node editor
-* Wireframe mode
-* Custom Lighiting
-* Customizable Geometry Shaders included in rendering pipeline
-* Skyboxes
-* Multithreded Mesh Generation
-* Custom 3D Mathematical functions for height
-* Export to heightmaps(both PNG and also custom format)
-* Custom Skyboxes
-* Completely usable 3D procedural modelling and texturing pipeline
+TerraForge3D has got a series of features. Listing all of them is a very difficult task. Here are some of the major features.
 
-# Note
+### GPU Powered Terrain Generation
+
+TerraForge3D utilizes the power of your GPU to generate the terrains blazing fast. TerraForge3D utilizes OpenCL 2.0 to use your GPU. With GPU mesh generation you can work with extremely huge meshs in realtime.
+
+### CPU Powered Terrain Generation
+
+There are somethings which cannot possible be done on a GPU as efficiently(like the node editor) so you can optionally mix GPU generation with CPU generation to get more control. Also if you GPU doesnt support OpenCL 2.0 you can still use the CPU mesh Generation. Also TerraForge's CPU Mesh Generation algorithms are made keeping efficiency and speed in mind thus they are extremely fast.
+
+### No Limit on Resolution
+
+Most terrain generation applications limit you to a certain maximum resolution or only certain resolutions like (128, 256, ...) but not TerraForge3D! TerraForge3D Allows you to work with any resolution you can imagine of.
+
+### Advanced Node Editor
+
+TerraForge3D has a very advanced Node Editor with 40+ different nodes which let you completely control how the terrain is generated. You can even use mathematical functions to shape your terrain!
+
+### Physically Based Erosion
+
+TerraForge3D has several erosion algorithms(hydraulic, wind, ...) which lets you simulate the simulation on you procedurally generated terrains giving it an extra touch of realism. These algorithms simulate actual rain, wind, dust to give the best effect.
+
+### Custom Sky
+
+TerraForge3D allows you to completely customize the sky. You can use a sky box, sky dome. You can procedurally generate a sky or use a HDRI.
+
+### Sea Level Visualization
+
+TerraForge3D also lets you visualize a sea to give you a idea of the sea level.
+
+### Custom Shaders
+
+TerraForge3D allows you to have a custom shader(in GLSL). TerraForge3D also provides a inbuilt editor for writing your shaders!
+
+### Texture Store & Texture Settings
+
+TerraForge3D gives you a huge collection of textures to download and use free of cost! Also TerraForge3D's texture settings give you fine control over how the mesh is textured.
+
+### Universal
+
+TerraForge3D can export to a whole lot of 3D file formats like OBJ, GLTF, GLB, STL, ... . Also you can export heightmaps as PNG, JPG, ... . This makes TerraForge3D totally compitable with any program you can think of! Be it Blender, Unreal Engine, Uniy, Maya, anything.
+
+
+# Some Advices
 
 * When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails
 * You can Show/Hide the console from Menu > Options > Toggle System Console.
@@ -101,29 +113,13 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Since this project has become very large I would really love some help.
 For a guide on how to get started developing TerraForge3D https://terraforge3d.gitbook.io/docs/developers-guide
-Here are some things that you might contribute:
-
-* A Documentation (written or video guide)
-* Add comments to the source code
-* Add the small values here and there to serialization which I may have missed
-* Report any bug you can find.
-* Add a new node
-* You can post the screenshots of your creations to https://github.com/Jaysmito101/TerraGen3D/issues/10
-
-# What of SHOWCASE?
-
-After every 10 - 15 posts in https://github.com/Jaysmito101/TerraGen3D/issues/10 I would make a montage of all of them to show the capabilities of TerraGen3D!
 
 # Support
 
+Any support is highly appretiated!
+Please considering tweeting about this to spread the word and help this project grow.
+You could join my patreon and get early access to TerraForge3D builds, some great terrain files, many more things (<a href="https://patreon.com/jaysmito101">Patreon</a>)
 
-Any support would be highly appretiated!
-
-For example you could add a feature and contribute via pull requests or you could even report any issues with the program!
-
-And the best thing you could do to support this project is spread word about this so that more people who might be interested in this may use this!
-
-Please considering tweeting about this! 
 
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
@@ -135,12 +131,12 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
 
-Docs : https://terraforge3d.gitbook.io/docs
-
-<a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+# Docs : https://terraforge3d.gitbook.io/docs
 
 # Supporters & Sponsers
 
 * <a href="https://gitbook.com/">GitBook</a>
+
+<a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.TerraGen3D&left_color=gray&right_color=green&style=for-the-badge">
