@@ -77,54 +77,44 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <br>
                         <br>
                         <object type="image/svg+xml" data="https://gh-card.dev/repos/Jaysmito101/TerraForge3D.svg?fullname=&link_target=_blank"></object>
-                        <h1 style="color: white;" id="what-can-this-do-">What can this do?</h1>
-                        <p>
-                            <ul style="text-align: justify; letter-spacing: 1px; color: white; font-size: 14px;">
-                                <li>Tribute to all who <strong>Starred</strong> or <strong>Contributed</strong> to the project</li>
-                                <li>Procedural Texturing</li>
-                                <li>Realistic Hydraulic Erosion Simulation (CPU &amp; GPU modes)</li>
-                                <li>Use custom HDRI Skyboxes</li>
-                                <li>Water with reflections, ripples, waves.</li>
-                                <li>OpenCL Support</li>
-                                <li>Compute Shaders</li>
-                                <li>Infinite First Person Terrain Explorer</li>
-                                <li>Maze Generator using Binary Tree Algorithm</li>
-                                <li>Generte 3D Terrain Procedrally</li>
-                                <li>First Person Terrain Explorer</li>
-                                <li>An Highly abstracted API for OpenGL which can be reused by other projects</li>
-                                <li>Foliage and custom model importer and renderer</li>
-                                <li>Pack Projects into completely portable <code>.terr3dpack</code> files</li>
-                                <li>A Texture Store Powered By <a href="https://polyhaven.com/"> PolyHaven </a></li>
-                                <li>Export Terrain mesh as OBJ</li>
-                                <li>Easy and Userfriendly UI</li>
-                                <li>Autosave and backup projects</li>
-                                <li>Caching system</li>
-                                <li>Asset Management</li>
-                                <li>You can write and test your own shaders</li>
-                                <li>An Inbuilt IDE for shaders</li>
-                                <li>Test under different lighting</li>
-                                <li>A proper 3D viewer</li>
-                                <li>Sea with waves amd custom color</li>
-                                <li>Video Tutorials(<a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>)</li>
-                                <li>A Node based as well as Layer based workflow</li>
-                                <li>Save the project(custom <code>.terr3d</code> files)</li>
-                                <li>Hieght map visualizer in node editor</li>
-                                <li>Wireframe mode</li>
-                                <li>Custom Lighiting</li>
-                                <li>Customizable Geometry Shaders included in rendering pipeline</li>
-                                <li>Skyboxes</li>
-                                <li>Multithreded Mesh Generation</li>
-                                <li>Plot 3D Mathematical Function ver Terrain</li>
-                                <li>Export to heightmaps(both PNG and also custom format)</li>
-                                <li>Custom Skyboxes</li>
-                                <li>Completely usable 3D procedural modelling and texturing pipeline</li>
-                            </ul>
-                            <h1 style="color: white;" id="note">Note</h1>
-                            <ul style="text-align: justify; letter-spacing: 1px; color: white; font-size: 14px;">
-                                <li>When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails</li>
-                                <li>You can Show/Hide the console from Menu &gt; Options &gt; Toggle System Console.</li>
-                                <li>Whenever you feel that something is wrong or the app is slow check the console for updates</li>
-                            </ul>
+                        <h1 id="features">Features</h1>
+<p>TerraForge3D has got a series of features. Listing all of them is a very difficult task. Here are some of the major features.</p>
+<h3 id="gpu-powered-terrain-generation">GPU Powered Terrain Generation</h3>
+<p>TerraForge3D utilizes the power of your GPU to generate the terrains blazing fast. TerraForge3D utilizes OpenCL 2.0 to use your GPU. With GPU mesh generation you can work with extremely huge meshs in realtime.</p>
+<h3 id="cpu-powered-terrain-generation">CPU Powered Terrain Generation</h3>
+<p>There are somethings which cannot possible be done on a GPU as efficiently(like the node editor) so you can optionally mix GPU generation with CPU generation to get more control. Also if you GPU doesnt support OpenCL 2.0 you can still use the CPU mesh Generation. Also TerraForge&#39;s CPU Mesh Generation algorithms are made keeping efficiency and speed in mind thus they are extremely fast.</p>
+<h3 id="no-limit-on-resolution">No Limit on Resolution</h3>
+<p>Most terrain generation applications limit you to a certain maximum resolution or only certain resolutions like (128, 256, ...) but not TerraForge3D! TerraForge3D Allows you to work with any resolution you can imagine of.</p>
+<h3 id="advanced-node-editor">Advanced Node Editor</h3>
+<p>TerraForge3D has a very advanced Node Editor with 40+ different nodes which let you completely control how the terrain is generated. You can even use mathematical functions to shape your terrain!</p>
+<h3 id="physically-based-erosion">Physically Based Erosion</h3>
+<p>TerraForge3D has several erosion algorithms(hydraulic, wind, ...) which lets you simulate the simulation on you procedurally generated terrains giving it an extra touch of realism. These algorithms simulate actual rain, wind, dust to give the best effect.</p>
+<h3 id="custom-sky">Custom Sky</h3>
+<p>TerraForge3D allows you to completely customize the sky. You can use a sky box, sky dome. You can procedurally generate a sky or use a HDRI.</p>
+<h3 id="sea-level-visualization">Sea Level Visualization</h3>
+<p>TerraForge3D also lets you visualize a sea to give you a idea of the sea level.</p>
+<h3 id="custom-shaders">Custom Shaders</h3>
+<p>TerraForge3D allows you to have a custom shader(in GLSL). TerraForge3D also provides a inbuilt editor for writing your shaders!</p>
+<h3 id="texture-store-texture-settings">Texture Store &amp; Texture Settings</h3>
+<p>TerraForge3D gives you a huge collection of textures to download and use free of cost! Also TerraForge3D&#39;s texture settings give you fine control over how the mesh is textured.</p>
+<h3 id="universal">Universal</h3>
+<p>TerraForge3D can export to a whole lot of 3D file formats like OBJ, GLTF, GLB, STL, ... . Also you can export heightmaps as PNG, JPG, ... . This makes TerraForge3D totally compitable with any program you can think of! Be it Blender, Unreal Engine, Uniy, Maya, anything.</p>
+<h1 id="some-advices">Some Advices</h1>
+<ul>
+<li>When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails</li>
+<li>You can Show/Hide the console from Menu &gt; Options &gt; Toggle System Console.</li>
+<li>Whenever you feel that something is wrong or the app is slow check the console for updates</li>
+</ul>
+<h1 id="support">Support</h1>
+<p>Any support is highly appretiated!
+Please considering tweeting about this to spread the word and help this project grow.
+You could join my patreon and get early access to TerraForge3D builds, some great terrain files, many more things (<a href="https://patreon.com/jaysmito101">Patreon</a>)</p>
+<p><a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a></p>
+<p>Give your valuable feedback : <a href="https://github.com/Jaysmito101/TerraGen3D/discussions/6">https://github.com/Jaysmito101/TerraGen3D/discussions/6</a></p>
+<p>Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a></p>
+<p>Join the Discord Server : <a href="https://discord.gg/AcgRafSfyB">https://discord.gg/AcgRafSfyB</a></p>
+<h1 id="docs-https-terraforge3d-gitbook-io-docs">Docs : <a href="https://terraforge3d.gitbook.io/docs">https://terraforge3d.gitbook.io/docs</a></h1>
+
                         </p>
                     </div>
                 </div>
