@@ -14,6 +14,7 @@ GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState* as, ComputeKern
     uid = GenerateId(32);
     name = "GPU Noise Layer " + std::to_string(count++);   
     kernels->CreateBuffer("noise_layers_size", CL_MEM_READ_WRITE, sizeof(int));
+    noiseLayers.push_back(GPUNoiseLayer());
 }
 
 void GPUNoiseLayerGenerator::Generate(ComputeKernel* kernels)
@@ -152,7 +153,16 @@ void GPUNoiseLayerGenerator::Update()
     {
         ImGui::Begin((name + "##" + uid).c_str(), &windowStat);
 
-        for (int i = 0; i < noiseLayers.size(); i++)
+        ImGui::Text("Global Settings");
+        ImGui::DragFloat(("Offset X" + std::string("##GPUNL")).c_str(), &noiseLayers[0].offsetX, 0.01f);
+        ImGui::DragFloat(("Offset Y" + std::string("##GPUNL")).c_str(), &noiseLayers[0].offsetY, 0.01f);
+        ImGui::DragFloat(("Offset Z" + std::string("##GPUNL")).c_str(), &noiseLayers[0].offsetZ, 0.01f);
+        ImGui::DragFloat(("Strength" + std::string("##GPUNL")).c_str(), &noiseLayers[0].strength, 0.01f);
+        ImGui::DragFloat(("Frequency" + std::string("##GPUNL")).c_str(), &noiseLayers[0].frequency, 0.001f);
+
+	ImGui::Separator();
+
+        for (int i = 1; i < noiseLayers.size(); i++)
         {
             if (ImGui::CollapsingHeader(("Noise Layer " + std::to_string(i + 1)).c_str()))
             {

@@ -18,22 +18,131 @@ float hash( float n )
     return fractf(sin(n)*43758.5453f);
 }
 
-float snoise( float3 x )
-{
-    // The noise function returns a value in the range -1.0f -> 1.0f
+float4 mod(float4 x, float y){ return x - y * floor(x/y);}
+float3 mod3(float3 x, float y){ return x - y * floor(x/y);}
 
-    float3 p = floor(x);
-    float3 f = fractf3(x);
+float4 permute(float4 x){return mod(((x*34.0f)+1.0f)*x, 289.0f);}
+float4 taylorInvSqrt(float4 r){return 1.79284291400159f - 0.85373472095314f * r;}
 
-    f       = f*f*(3.0f-2.0f*f);
-    float n = p.x + p.y*57.0f + 113.0f*p.z;
+float snoise(float3 v){ 
+  float2  C;
+  C.x = 1.0f/6.0f;
+  C.y= 1.0f/3.0f;
 
-    return lerp(lerp(lerp( hash(n+0.0f), hash(n+1.0f),f.x),
-                   lerp( hash(n+57.0f), hash(n+58.0f),f.x),f.y),
-               lerp(lerp( hash(n+113.0f), hash(n+114.0f),f.x),
-                   lerp( hash(n+170.0f), hash(n+171.0f),f.x),f.y),f.z);
+  float4  D;
+  D.x = 0.0f;
+  D.y = 0.5f;
+  D.z = 1.0f;
+  D.w = 2.0f;
+
+// First corner
+  float3 i  = floor(v + dot(v, C.yyy) );
+  float3 x0 =   v - i + dot(i, C.xxx) ;
+
+// Other corners
+  float3 g = step(x0.yzx, x0.xyz);
+  float3 l = 1.0f - g;
+  float3 i1 = min( g.xyz, l.zxy );
+  float3 i2 = max( g.xyz, l.zxy );
+
+  //  x0 = x0 - 0. + 0.0f * C 
+  float3 x1 = x0 - i1 + 1.0f * C.xxx;
+  float3 x2 = x0 - i2 + 2.0f * C.xxx;
+  float3 x3 = x0 - 1.0f + 3.0f * C.xxx;
+
+float4 t1, t2, t3;
+t1.x = t2.x = t3.x = 0.0f;
+t1.w = t2.w = t3.w = 1.0f;
+
+t1.y = i1.z;
+t1.z = i2.z;
+
+t2.y = i1.y;
+t2.z = i2.y;
+
+t3.y = i1.x;
+t3.z = i2.x;
+
+// Permutations
+  i = mod3(i, 289.0f ); 
+  float4 p = permute( permute( permute( 
+             i.z + t1)
+           + i.y + t2) 
+           + i.x + t3);
+
+// Gradients
+// ( N*N points uniformly over a square, mapped onto an octahedron.)
+  float n_ = 1.0f/7.0f; // N=7
+  float3  ns = n_ * D.wyz - D.xzx;
+
+  float4 j = p - 49.0f * floor(p * ns.z *ns.z);  //  mod(p,N*N)
+
+  float4 x_ = floor(j * ns.z);
+  float4 y_ = floor(j - 7.0f * x_ );    // mod(j,N)
+
+  float4 x = x_ *ns.x + ns.yyyy;
+  float4 y = y_ *ns.x + ns.yyyy;
+  float4 h = 1.0f - fabs(x) - fabs(y);
+
+  float4 b0;
+  b0.x = x.x;
+  b0.y = x.y;
+  b0.z = y.x;
+  b0.w = y.y;
+
+  float4 b1;
+  b1.x = x.z;
+  b1.y = x.w;
+  b1.z = y.z;
+  b1.w = y.w;
+
+  float4 s0 = floor(b0)*2.0f + 1.0f;
+  float4 s1 = floor(b1)*2.0f + 1.0f;
+  float4 sh = -step(h, 0.0f);
+
+  float4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+  float4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+
+  float3 p0;
+  p0.x = a0.x;
+  p0.y = a0.y;
+  p0.z = h.x;
+  float3 p1;
+  p1.x = a0.z;
+  p1.y = a0.w;
+  p1.z = h.y;
+  float3 p2;
+  p2.x = a1.x;
+  p2.y = a1.y;
+  p2.z = h.z;
+  float3 p3;
+  p3.x = a1.z;
+  p3.y = a1.w;
+  p3.z = h.w;
+  float4 tmp;
+  tmp.x = dot(p0,p0); 
+  tmp.y = dot(p1,p1); 
+  tmp.z = dot(p2,p2); 
+  tmp.w = dot(p3,p3); 
+//Normalise gradients
+  float4 norm = taylorInvSqrt(tmp);
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+  tmp.x = dot(x0,x0);
+  tmp.y = dot(x1,x1);
+  tmp.z = dot(x2,x2);
+  tmp.w = dot(x3,x3);
+// Mix final noise value
+  float4 m = max(0.6f - tmp, 0.0f);
+  m = m * m;
+  tmp.x = dot(p0,x0);
+  tmp.y = dot(p1,x1);
+  tmp.z = dot(p2,x2);
+  tmp.w = dot(p3,x3);
+  return 42.0f * dot( m*m, tmp );
 }
-
 
 float noise(float3 x, float depth)
 {
