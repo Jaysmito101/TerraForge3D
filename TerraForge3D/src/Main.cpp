@@ -1049,6 +1049,7 @@ public:
 
 		LoadUIFont("Open-Sans-Regular", 18, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Regular.ttf");
 		LoadUIFont("OpenSans-Bold", 25, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Bold.ttf");
+		LoadUIFont("OpenSans-Semi-Bold", 22, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Bold.ttf");
 
 
 		appState->frameBuffers.relflection = new FrameBuffer();
@@ -1062,6 +1063,23 @@ public:
 
 		// For Debug Only
 		appState->states.autoUpdate = true;
+
+		if(IsNetWorkConnected())
+		{
+			if(FileExists(GetExecutableDir() + "\\Data\\configs\\server.terr3d"))
+			{
+				bool ttmp = false;
+				std::string uid = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\configs\\server.terr3d", &ttmp);
+				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
+			}
+			else
+			{
+				DownloadFile("https://terraforge3d.maxalpha.repl.co", "/register", GetExecutableDir() + "\\Data\\configs\\server.terr3d");
+				bool ttmp = false;
+				std::string uid = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\configs\\server.terr3d", &ttmp);
+				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
+			}
+		}
 
 
 		Log("Started Up App!");

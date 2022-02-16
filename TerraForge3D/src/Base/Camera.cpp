@@ -50,7 +50,7 @@ nlohmann::json Camera::Save()
 	tmp["x"] = position[0];
 	tmp["y"] = position[1];
 	tmp["z"] = position[2];
-	data["position "] = tmp;
+	data["position"] = tmp;
 
 	tmp = nlohmann::json();
 	tmp["x"] = rotation[0];

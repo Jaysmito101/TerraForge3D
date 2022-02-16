@@ -13,11 +13,13 @@ CPUNoiseLayersGenerator::CPUNoiseLayersGenerator(ApplicationState* as)
 	name = "CPU Noise Layer " + std::to_string(count++);
 	appState = as;
 	noiseManager = new LayeredNoiseManager();
+	maskManager = new GeneratorMaskManager(nullptr, uid, as);
 }
 
 CPUNoiseLayersGenerator::~CPUNoiseLayersGenerator()
 {
 	delete noiseManager;
+	delete maskManager;
 }
 
 nlohmann::json CPUNoiseLayersGenerator::Save()
@@ -29,6 +31,7 @@ nlohmann::json CPUNoiseLayersGenerator::Save()
 	data["noise"] = noiseManager->Save();
 	data["uiActive"] = uiActive;
 	data["enabled"] = enabled;
+	data["maskManager"] = maskManager->Save();
 	return data;
 }
 
@@ -39,6 +42,7 @@ void CPUNoiseLayersGenerator::Load(nlohmann::json data)
 	windowStat = data["wind"];
 	uiActive = data["uiActive"];
 	enabled = data["enabled"];
+	maskManager->Load(data["maskManager"]);
 	noiseManager->Load(data["noise"]);
 }
 
@@ -50,6 +54,12 @@ void CPUNoiseLayersGenerator::ShowSetting(int id)
 	{
 		windowStat = true;
 	}
+	ImGui::Separator();
+	if(ImGui::CollapsingHeader(("Custom Base Mask##GMSK" + uid).c_str() ) )
+	{
+		maskManager->ShowSettings();
+	}
+	ImGui::Separator();
 	ImGui::Text("UID : %s", uid.data());
 	ImGui::Text("Time : %lf ms", time);
 }
@@ -70,5 +80,8 @@ void CPUNoiseLayersGenerator::Update()
 
 float CPUNoiseLayersGenerator::EvaluateAt(float x, float y, float z)
 {
-	return noiseManager->Evaluate(x, y, z);
+	if(maskManager->enabled)		
+		return maskManager->EvaluateAt(x, y, z, noiseManager->Evaluate(x, y, z));
+	else
+		return noiseManager->Evaluate(x, y, z);
 }

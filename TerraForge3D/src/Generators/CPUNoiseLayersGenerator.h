@@ -3,6 +3,7 @@
 struct ApplicationState;
 
 #include "NoiseLayers/LayeredNoiseManager.h"
+#include "GeneratorMask.h"
 
 #include <string>
 
@@ -31,4 +32,5 @@ public:
 	std::string name;
 	ApplicationState* appState;
 	LayeredNoiseManager* noiseManager;
+	GeneratorMaskManager* maskManager;
 };

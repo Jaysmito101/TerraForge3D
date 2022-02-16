@@ -7,8 +7,9 @@
 #include "ClearMeshGenerator.h"
 #include "CPUNoiseLayersGenerator.h"
 #include "GPUNoiseLayerGenerator.h"
-
 #include "CPUNodeEditor/CPUNodeEditor.h"
+
+#include "Base/UIFontManager.h"
 
 #include "Profiler.h"
 
@@ -112,14 +113,18 @@ void MeshGeneratorManager::ShowSettings()
 	{
 		ImGui::Begin("Mesh Generators", &windowStat);
 
+		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
 		ImGui::Text("Base Mesh Generators");
+		ImGui::PopFont();
 		if (ImGui::CollapsingHeader("Auto Base Mesh Gen (GPU)", clearMeshGen->uiActive))
 		{
 			clearMeshGen->ShowSettings();
 		}
 		ImGui::Separator();
 
+		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
 		ImGui::Text("CPU Noise Layer Generators");
+		ImGui::PopFont();
 		for (int i = 0; i < cpuNoiseLayers.size(); i++)
 		{
 			if (ImGui::CollapsingHeader((cpuNoiseLayers[i]->name + "##CPUNL" + std::to_string(i)).c_str()))
@@ -141,7 +146,9 @@ void MeshGeneratorManager::ShowSettings()
 		}
 		ImGui::Separator();
 
+		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
 		ImGui::Text("GPU Noise Layer Generators");
+		ImGui::PopFont();
 		for (int i = 0; i < gpuNoiseLayers.size(); i++)
 		{
 			if (ImGui::CollapsingHeader((gpuNoiseLayers[i]->name + "##GPUNL" + std::to_string(i)).c_str()))
@@ -163,7 +170,9 @@ void MeshGeneratorManager::ShowSettings()
 		}
 		ImGui::Separator();
 
+		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
 		ImGui::Text("CPU Node Editor Generators");
+		ImGui::PopFont();
 		for (int i = 0; i < cpuNodeEditors.size(); i++)
 		{
 			if (ImGui::CollapsingHeader((cpuNodeEditors[i]->name + "##CPUNE" + std::to_string(i)).c_str()))
