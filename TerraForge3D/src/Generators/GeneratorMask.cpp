@@ -129,6 +129,8 @@ float GeneratorMaskManager::EvaluateAt(float x, float y, float z, float value)
 			m += EvaluateHillMask(&masks[i], x, y, z);
 		else if(masks[i].type == MASK_LAYER_CRATOR)
 			m += EvaluateCratorMask(&masks[i], x, y, z);
+		else if(masks[i].type == MASK_LAYER_CLIFF)
+			m += EvaluateCliffMask(&masks[i], x, y, z);
 	}
 
 	switch(type)
@@ -186,6 +188,8 @@ void GeneratorMaskManager::ShowSettings()
 				ShowHillMaskSettingS(&masks[i], uid + std::to_string(i));
 			else if(masks[i].type == MASK_LAYER_CRATOR)
 				ShowCratorMaskSettingS(&masks[i], uid + std::to_string(i));
+			else if(masks[i].type == MASK_LAYER_CLIFF)
+				ShowCliffMaskSettingS(&masks[i], uid + std::to_string(i));
 			if(ImGui::Button(("Delete##GMSK" + std::to_string(i) + uid).c_str()))
 			{
 				while(appState->states.remeshing);
@@ -212,11 +216,20 @@ void GeneratorMaskManager::ShowSettings()
 			ImGui::CloseCurrentPopup();
 		}
 
-		if(ImGui::Button(("Crator##GMSK" + uid).c_str()))
+		if(ImGui::Button(("Crater##GMSK" + uid).c_str()))
 		{
 			masks.push_back(GeneratorMask());
 			masks.back().type = MASK_LAYER_CRATOR;
 			masks.back().d1[0] = masks.back().d3[0] = masks.back().d3[1] = 1.0f;
+			
+			gmcount++;
+			ImGui::CloseCurrentPopup();
+		}
+		if(ImGui::Button(("Cliff##GMSK" + uid).c_str()))
+		{
+			masks.push_back(GeneratorMask());
+			masks.back().type = MASK_LAYER_CLIFF;
+			masks.back().d1[2] = masks.back().d1[1] = 1.0f;
 			
 			gmcount++;
 			ImGui::CloseCurrentPopup();

@@ -36,6 +36,7 @@ static const char* generator_mask_type_names[] = {"Additive", "Average Additive"
 
 #define MASK_LAYER_HILL 0.0f
 #define MASK_LAYER_CRATOR 1.0f
+#define MASK_LAYER_CLIFF 2.0f
 
 struct ApplicationState;
 
