@@ -60,7 +60,8 @@ IDI_ICON1               ICON                    "../../resources/icon.ico"
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "../../resources/splash.bmp"
+SPLASH1             BITMAP                  "../../resources/splash1.bmp"
+SPLASH2             BITMAP                  "../../resources/splash2.bmp"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

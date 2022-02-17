@@ -4,6 +4,7 @@
 #include <resource.h>
 #include <windows.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <tchar.h>
 #include <iostream>
@@ -40,7 +41,13 @@ namespace SplashScreen {
         switch (message)
         {
         case WM_CREATE:
-            hBitmap = (HBITMAP)LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1));;
+	    srand(time(NULL));
+	    if(rand()%2==0){
+	            hBitmap = (HBITMAP)LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(SPLASH1));
+	    }
+	    else {
+	            hBitmap = (HBITMAP)LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(SPLASH2));
+	    }
             break;
         case WM_PAINT:
             PAINTSTRUCT     ps;

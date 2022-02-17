@@ -3,7 +3,8 @@
 // Used by TerraForge3D.rc
 //
 #define IDI_ICON1                       101
-#define IDB_BITMAP1                     102
+#define SPLASH1				102
+#define SPLASH2				103
 
 // Next default values for new objects
 // 

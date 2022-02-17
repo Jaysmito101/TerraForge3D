@@ -38,9 +38,9 @@ Or you could join out official discord server with a charming community(includin
 Here are some of the terrains created with TerraForge3D. (You can send your artwork either via the discord server or https://github.com/Jaysmito101/TerraForge3D/issues/10)
 
 <img width="500" src="./Screenshots/Showcase/Sandy%20Desert%201.png" /> <br />
-<img width="500" src="./Screenshots/Showcase/Sandy%20Desert%202.png" /> <br />
 <img width="500" src="./Screenshots/Showcase/Muddy%20Forest.png" /> <br />
-<img width="500" src="./Screenshots/Showcase/Grassy%20Hillock.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Volcano.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Desert%20Night.png" /> <br />
 
 # Screenshots
 
@@ -81,6 +81,10 @@ TerraForge3D has a very advanced Node Editor with 40+ different nodes which let 
 ### Physically Based Erosion
 
 TerraForge3D has several erosion algorithms(hydraulic, wind, ...) which lets you simulate the simulation on you procedurally generated terrains giving it an extra touch of realism. These algorithms simulate actual rain, wind, dust to give the best effect.
+
+### Custom Shape Generation
+
+Procedural is great! But sometimes there must be a human touch! Thus TerraForge3D lets you customize your terrain by pmanyally placing terrrain features like hills, caters, cliffs, etc and combine it with procedural terrain.
 
 ### Custom Sky
 
