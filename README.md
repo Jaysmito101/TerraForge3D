@@ -126,7 +126,7 @@ Any support is highly appretiated!
 Please considering tweeting about this to spread the word and help this project grow.
 You could join my patreon and get early access to TerraForge3D builds, some great terrain files, many more things (<a href="https://patreon.com/jaysmito101">Patreon</a>)
 
-
+# Download TerraForge3D : https://github.com/Jaysmito101/TerraForge3D/releases/download/v2.2/TerraForge3D.Win32.zip
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
