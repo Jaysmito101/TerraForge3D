@@ -46,8 +46,10 @@ Here are some of the terrains created with TerraForge3D. (You can send your artw
 
 Here are some of the screenshots of the application with all its ui, ...
 
+<img width="500" src="./Screenshots/UI/VC.png" /> <br />
 <img width="500" src="./Screenshots/UI/CB.png" /> <br />
 <img width="500" src="./Screenshots/UI/NE.png" /> <br />
+<img width="500" src="./Screenshots/UI/QB.png" /> <br />
 <img width="500" src="./Screenshots/UI/NEFE.png" /> <br />
 
 ### A Request
