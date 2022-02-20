@@ -49,7 +49,7 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 
 		glGenTextures(1, &m_RendererID);
 		glBindTexture(GL_TEXTURE_2D, m_RendererID);
-
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		if(readAlpha)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		else
