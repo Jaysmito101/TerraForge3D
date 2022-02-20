@@ -27,7 +27,7 @@ public:
 
 	inline int GetNativeShader() { return m_Shader; }
 
-	int m_Shader, m_UniformId, m_LightPosUniformID, m_LightColUniformID, m_TimeUniformID;
+	int m_Shader=0, m_UniformId=0, m_LightPosUniformID=0, m_LightColUniformID=0, m_TimeUniformID=0;
 	std::unordered_map<std::string, uint32_t> uniformLocations;
 
 };
