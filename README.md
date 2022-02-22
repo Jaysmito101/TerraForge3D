@@ -1,2 +1,5 @@
 # TerraForge3D
-3D Procedural Terrain Generation and Texturing Tool in OpenGL/C++
+
+This Branch is for the TerraForge3D Website
+
+Checkout <a href="https://github.com/Jaysmito101/TerraForge3D">master</a> for more details.

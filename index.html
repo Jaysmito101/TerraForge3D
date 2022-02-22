@@ -1,268 +1,633 @@
-<!DOCTYPE html>
+<!doctype html>
+<!--
+	The7 by TEMPLATE STOCK
+	templatestock.co @templatestock
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
 <html>
-
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>TerraForge3D</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="content-language" content="en-us">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="css/fontAwesome.css">
-    <link rel="stylesheet" href="css/light-box.css">
-    <link rel="stylesheet" href="css/templatemo-main.css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
-    <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KQNK74G');</script>
-<!-- End Google Tag Manager -->
-</head>
 
-<body>
-    <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KQNK74G"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-    <div class="sequence">
-        <div class="seq-preloader">
-            <svg width="39" height="16" viewBox="0 0 39 16" xmlns="http://www.w3.org/2000/svg" class="seq-preload-indicator">
-                <g fill="#F96D38">
-                    <path class="seq-preload-circle seq-preload-circle-1" d="M3.999 12.012c2.209 0 3.999-1.791 3.999-3.999s-1.79-3.999-3.999-3.999-3.999 1.791-3.999 3.999 1.79 3.999 3.999 3.999z" />
-                    <path class="seq-preload-circle seq-preload-circle-2" d="M15.996 13.468c3.018 0 5.465-2.447 5.465-5.466 0-3.018-2.447-5.465-5.465-5.465-3.019 0-5.466 2.447-5.466 5.465 0 3.019 2.447 5.466 5.466 5.466z" />
-                    <path class="seq-preload-circle seq-preload-circle-3" d="M31.322 15.334c4.049 0 7.332-3.282 7.332-7.332 0-4.049-3.282-7.332-7.332-7.332s-7.332 3.283-7.332 7.332c0 4.05 3.283 7.332 7.332 7.332z" />
-                </g>
-            </svg>
-        </div>
-    </div>
-    <nav>
-        <div class="logo"> <img src="img/logo.png" alt=""> </div>
-        <div class="mini-logo"> <img src="img/mini_logo.png" alt=""> </div>
-        <ul>
-            <li><a href="#1"><i class="fa fa-home"></i> <em> </em></a></li>
-            <li><a href="#1"><i class="fa fa-home"></i> <em> </em></a></li>
-            <li><a href="#1"><i class="fa fa-home"></i> <em> </em></a></li>
-            <li><a href="#1"><i class="fa fa-home"></i> <em> </em></a></li>
-            <li><a href="#1"><i class="fa fa-home"></i> <em> </em></a></li>
-            <li><a slide="1" href="#1"><i class="fa fa-home"></i> <em>Home</em></a></li>
-            <li><a slide="2" href="#2"><i class="fa fa-user"></i> <em>Showcase</em></a></li>
-            <li><a slide="3" href="#3"><i class="fab fa-youtube"></i> <em>Tutorials</em></a></li>
-            <li><a slide="4" href="#4"><i class="fa fa-file"></i> <em>Docs</em></a></li>
-            <li><a slide="5" href="#5"><i class="fa fa-envelope"></i> <em>Contact</em></a></li>
-            <li><a href="https://github.com/Jaysmito101/TerraForge3D"><i class="fab fa-github"></i> <em>GitHub</em></a></li>
-            <li><a href="https://www.youtube.com/watch?v=at_IHCtiCDg&list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ"><i class="fab fa-youtube"></i> <em>YouTube</em></a></li>
-            <li><a href="https://discord.gg/9ebyYwSktZ"><i  class="fab fa-discord"></i> <em>Discord</em></a></li>
-            <li><a href="https://www.patreon.com/jaysmito101"><i class="fab fa-patreon"></i> <em>Patreon</em></a></li>
-        </ul>
-    </nav>
-    <div class="slides">
-        <div class="slide" id="1">
-            <div class="content first-content">
-                <div class="container-fluid">
-                    <div class="col-md-3">
-                        <div class="author-image"><img src="img/mini_logo_other.png" alt="Author Image"></div>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/simplegrid.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/lightcase.css">
+    <link rel="stylesheet" href="js/owl-carousel/owl.carousel.css" />
+    <link rel="stylesheet" href="js/owl-carousel/owl.theme.css" />
+    <link rel="stylesheet" href="js/owl-carousel/owl.transitions.css" />
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+           <!--[if lt IE 9]>
+             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+         <![endif]-->
+            <!-- Google Tag Manager -->
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KQNK74G');</script>
+        <!-- End Google Tag Manager -->
+    </head>
+    <body id="home">
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KQNK74G"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <!-- End Google Tag Manager (noscript) -->
+            <!-- Header -->
+            <header id="top-header" class="header-home">
+                <div class="grid">
+                    <div class="col-1-1">
+                        <div class="content">
+                            <div class="logo-wrap">
+                                <a href="#0" class="logo">TerraForge3D</a>
+                            </div>
+                            <nav class="navigation">
+                                <input type="checkbox" id="nav-button">
+                                <label for="nav-button" onclick></label>
+                                <ul class="nav-container">
+                                    <li><a href="#home" class="current">Home</a></li>
+                                    <li><a href="#services">Features</a></li>
+                                    <li><a href="#work">Showcase</a></li>
+                                    <li><a href="#blog">Blog</a></li>
+                                    <li><a href="#pricing">Pricing</a></li>
+                                    <li><a href="#team">Team</a></li>
+                                    <li><a href="#contact">Contact</a></li>
+                                    <li><a href="https://github.com/Jaysmito101/TerraForge3D">GitHub</a></li>
+                                    <li><a href="https://discord.gg/9ebyYwSktZ">Discord</a></li>                         
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
-                    <div class="col-md-9">
-                        <h2>TerraForge3D</h2>
-                        <p>Free and Opensource 3D Procedural Terrain Generation and Texturing Tool. Not just limited to Terrains but all sorts of models! Extremely easy to use yet extremely powerful!</p>
-                        <div class="fb-btn"><a downloaf href="https://github.com/Jaysmito101/TerraForge3D/releases/download/v2.2/TerraForge3D.Win64.zip">Download</a></div>
-                        <div class="fb-btn"><a downloaf href="https://github.com/Jaysmito101/TerraForge3D/archive/refs/tags/v2.2/zip">Download Source</a></div>
-                        <br>
-                        <br>
-                        <object type="image/svg+xml" data="https://gh-card.dev/repos/Jaysmito101/TerraForge3D.svg?fullname=&link_target=_blank"></object>
-                        <h1 id="features">Features</h1>
-<p>TerraForge3D has got a series of features. Listing all of them is a very difficult task. Here are some of the major features.</p>
-<h3 id="gpu-powered-terrain-generation">GPU Powered Terrain Generation</h3>
-<p>TerraForge3D utilizes the power of your GPU to generate the terrains blazing fast. TerraForge3D utilizes OpenCL 2.0 to use your GPU. With GPU mesh generation you can work with extremely huge meshs in realtime.</p>
-<h3 id="cpu-powered-terrain-generation">CPU Powered Terrain Generation</h3>
-<p>There are somethings which cannot possible be done on a GPU as efficiently(like the node editor) so you can optionally mix GPU generation with CPU generation to get more control. Also if you GPU doesnt support OpenCL 2.0 you can still use the CPU mesh Generation. Also TerraForge&#39;s CPU Mesh Generation algorithms are made keeping efficiency and speed in mind thus they are extremely fast.</p>
-<h3 id="no-limit-on-resolution">No Limit on Resolution</h3>
-<p>Most terrain generation applications limit you to a certain maximum resolution or only certain resolutions like (128, 256, ...) but not TerraForge3D! TerraForge3D Allows you to work with any resolution you can imagine of.</p>
-<h3 id="advanced-node-editor">Advanced Node Editor</h3>
-<p>TerraForge3D has a very advanced Node Editor with 40+ different nodes which let you completely control how the terrain is generated. You can even use mathematical functions to shape your terrain!</p>
-<h3 id="physically-based-erosion">Physically Based Erosion</h3>
-<p>TerraForge3D has several erosion algorithms(hydraulic, wind, ...) which lets you simulate the simulation on you procedurally generated terrains giving it an extra touch of realism. These algorithms simulate actual rain, wind, dust to give the best effect.</p>
-<h3 id="custom-sky">Custom Sky</h3>
-<p>TerraForge3D allows you to completely customize the sky. You can use a sky box, sky dome. You can procedurally generate a sky or use a HDRI.</p>
-<h3 id="sea-level-visualization">Sea Level Visualization</h3>
-<p>TerraForge3D also lets you visualize a sea to give you a idea of the sea level.</p>
-<h3 id="custom-shaders">Custom Shaders</h3>
-<p>TerraForge3D allows you to have a custom shader(in GLSL). TerraForge3D also provides a inbuilt editor for writing your shaders!</p>
-<h3 id="texture-store-texture-settings">Texture Store &amp; Texture Settings</h3>
-<p>TerraForge3D gives you a huge collection of textures to download and use free of cost! Also TerraForge3D&#39;s texture settings give you fine control over how the mesh is textured.</p>
-<h3 id="universal">Universal</h3>
-<p>TerraForge3D can export to a whole lot of 3D file formats like OBJ, GLTF, GLB, STL, ... . Also you can export heightmaps as PNG, JPG, ... . This makes TerraForge3D totally compitable with any program you can think of! Be it Blender, Unreal Engine, Uniy, Maya, anything.</p>
-<h1 id="some-advices">Some Advices</h1>
-<ul>
-<li>When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails</li>
-<li>You can Show/Hide the console from Menu &gt; Options &gt; Toggle System Console.</li>
-<li>Whenever you feel that something is wrong or the app is slow check the console for updates</li>
-</ul>
-<h1 id="support">Support</h1>
-<p>Any support is highly appretiated!
-Please considering tweeting about this to spread the word and help this project grow.
-You could join my patreon and get early access to TerraForge3D builds, some great terrain files, many more things (<a href="https://patreon.com/jaysmito101">Patreon</a>)</p>
-<p><a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a></p>
-<p>Give your valuable feedback : <a href="https://github.com/Jaysmito101/TerraGen3D/discussions/6">https://github.com/Jaysmito101/TerraGen3D/discussions/6</a></p>
-<p>Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a></p>
-<p>Join the Discord Server : <a href="https://discord.gg/AcgRafSfyB">https://discord.gg/AcgRafSfyB</a></p>
-<h1 id="docs-https-terraforge3d-gitbook-io-docs">Docs : <a href="https://terraforge3d.gitbook.io/docs">https://terraforge3d.gitbook.io/docs</a></h1>
+                </div>
+            </header>
+            <!-- End Header -->
 
-                        </p>
+            <!-- Parallax Section -->
+            <div class="parallax-section parallax1">
+                <div class="grid grid-pad">
+                    <div class="col-1-1">
+                       <div class="content content-header" >
+                        <h2>Terrain Generation For the Future</h2>
+                        <p>TerraForge3D is a Opensource procedural terrain generation toolkit as well as a procedural modellling toolkit. TerraForge3D is suitable for modern 3D Environment design. It can be used for both low poly games as well as for cinematic shots in films.</p>
+                        <a target="_blank" class="btn btn-ghost" href="https://github.com/Jaysmito101/TerraForge3D/releases/download/v2.2/TerraForge3D.Win64.zip">Download Now</a>
+                        <a target="_blank" class="btn btn-ghost" href="https://github.com/Jaysmito101/TerraForge3D">Star us on GitHub</a>
+                        <a target="_blank" class="btn btn-ghost" href="https://discord.gg/9ebyYwSktZ">Join the Community on Discord</a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="slide" id="2">
-            <div class="content second-content">
-                <div class="container-fluid">
-                    <p style="font-size:25px;">Wanna Get Featured? Post in #showcase of our <a href="https://discord.gg/9ebyYwSktZ">discord server</a>.</p>
-                    <br>
-                    <br>
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://s10.gifyu.com/images/T2ee533c6583ffcf41.gif" alt="Grassy-Terrain" border="0"><h3 style="color: white;">By Jaysmito Mukherjee</h3> 
-                    <br />
-                    <br />
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://i.ibb.co/bBDws27/Terrain.png" alt="Muddy-Terrain" border="0"><h3 style="color: white;">By Jaysmito Mukherjee</h3> 
-                    <br />
-                    <br />
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://i.ibb.co/CHvqgjh/rough-Terrain.png" alt="Rough-Terrain" border="0"><h3 style="color: white;">By JacobsSight</h3> 
-                    <br />
-                    <br />
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="https://i.ibb.co/sjdCTYK/Screenshot-468.png" alt="Game-Terrain" border="0"> 
-                    <h3 style='color: white;'>Unity Plane Explorer Game With Using TerraForge3D for all terrains
-                        <br />
-                    <a href="https://jaysmito101.itch.io/terraforge3d-demo">Click here to Play</a></h3>
-                    <br><br>
-            </div>
-        </div>
-        <div class="slide" id="3">
-            <div class="content third-content">
-                <div class="grid" id="vid-tuts"></div>
-            </div>
-        </div>
-        <div class="slide" id="4">
-            <div class="content fourth-content">
-                <h1 style="color: #fff;"><a href="https://terraforge3d.gitbook.io/docs/">Docs (External)</a></h1> 
-                <br />
-                <iframe style="width:90%;height:90%;" src="https://terraforge3d.gitbook.io/docs/" name="Docs Frame" allowfullscreen></iframe>
-            </div>
-        </div>
-        <div class="slide" id="5">
-            <div class="content fifth-content">
-                <div class="container-fluid">
-                    <div class="col-md-6">
-                        <div id="map">
-                            <!-- How to change your own map point
-            1. Go to Google Maps
-            2. Click on your location point
-            3. Click "Share" and choose "Embed map" tab
-            4. Copy only URL and paste it within the src="" field below
-    -->
-                            <iframe src="https://discord.com/widget?id=892829904918425660&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+        <!-- End Parallax Section -->
+
+        <!-- CurveUp -->
+        <svg class="curveUpColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+
+        <!-- Services Section -->
+        <div class="wrap services-wrap" id="services">
+            <section class="grid grid-pad services">
+                <h2>Features</h2>
+                <div class="col-1-4 service-box service-1" >
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-heart4"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>GPU Powered</h3>
+                            <p>TerraForge3D utilizes the power of your GPU to generate the terrains blazing fast. TerraForge3D utilizes OpenCL 2.0 to use your GPU. With GPU mesh generation you can work with extremely huge meshs in realtime.</p>
+                            <!-- <a class="btn read-more" href="#0">Read More</a> -->
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <form id="contact" action="https://formspree.io/f/mknyjgkz" method="POST">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <input name="name" type="text" class="form-control" id="name" placeholder="Your name..." required=""> </fieldset>
+                </div>
+                <div class="col-1-4 service-box service-2" >
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-star4"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>CPU Powered</h3>
+                            <p>There are somethings which cannot possible be done on a GPU as efficiently(like the node editor) so you can optionally mix GPU generation with CPU generation to get more control.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1-4 service-box service-3">
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-display"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>Advanced Node Editor</h3>
+                            <p>TerraForge3D has a very advanced Node Editor with 40+ different nodes which let you completely control how the terrain is generated. You can even use mathematical functions to shape your terrain!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1-4 service-box service-4" >
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-user6"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>Erosion</h3>
+                            <p>TerraForge3D has several erosion algorithms(hydraulic, wind, ...) which lets you simulate the simulation on you procedurally generated terrains giving it an extra touch of realism. These algorithms simulate actual rain, wind, dust to give the best effect.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1-4 service-box service-1" >
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-heart4"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>Custom Shape</h3>
+                            <p>Procedural is great! But sometimes there must be a human touch! Thus TerraForge3D lets you customize your terrain by pmanyally placing terrrain features like hills, caters, cliffs, etc and combine it with procedural terrain.</p>
+                            <!-- <a class="btn read-more" href="#0">Read More</a> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1-4 service-box service-2" >
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-star4"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>Custom Sky</h3>
+                            <p>TerraForge3D allows you to completely customize the sky. You can use a sky box, sky dome. You can procedurally generate a sky or use a HDRI.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1-4 service-box service-3">
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-display"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>Sea Level Visualization</h3>
+                            <p>TerraForge3D also lets you visualize a sea to give you a idea of the sea level.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1-4 service-box service-4" >
+                    <div class="content">
+                        <div class="service-icon">
+                            <i class="circle-icon icon-user6"></i>
+                        </div>
+                        <div class="service-entry">
+                            <h3>Universal</h3>
+                            <p>TerraForge3D can export to a whole lot of 3D file formats like OBJ, GLTF, GLB, STL, ... . Also you can export heightmaps as PNG, JPG, ... . This makes TerraForge3D totally compitable with any program you can think of! Be it Blender, Unreal Engine, Uniy, Maya, anything.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- End Services Section -->
+
+        <!-- CurveDown -->
+        <svg class="curveDownColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 0 C 50 100 80 100 100 0 Z"></path>
+        </svg>
+
+        <!-- Work Section -->
+        <div class="wrap grey recent-wrap" id="work">
+            <section class="grid grid-pad">
+                <h2>Showcase</h2>
+                <b>Send us your artwork via out <a href="https://discord.gg/dqCdjA4G4s">discord server</a> or email us at terraforge3d@gmail.com</b>
+
+                <!-- Start of Filter section -->
+                <div class="col-1-1 mix">
+                    <ul class="filters" >
+                        <li class="filter active" data-filter="all">All</li>
+                        <li class="filter" data-filter=".concept">Concept Art</li>
+                        <li class="filter" data-filter=".game">Game Art</li>
+                        <li class="filter" data-filter=".cinematic">Cinematic</li>
+                    </ul>
+                </div>
+                <!-- End of Filter section -->
+                <div class="portfolio-items" >
+                    <div class="col-1-3 mix cinematic">
+                        <div class="content">
+                            <div class="recent-work">
+                                <img src="https://i.ibb.co/TgGr0fZ/slash1.png" alt="">                                    
+                                <div class="overlay">
+                                    <span>The Deserted Night</span>
+                                    <h2><a class="img-wrap" data-rel="lightcase:cinematic" title="The Deserted Night - Jaysmito Mukherjee" href="https://i.ibb.co/hmNCd6k/slash1.png">Jaysmito Mukherjee</a></h2>
                                 </div>
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <input name="email" type="email" class="form-control" id="email" placeholder="Your email..." required=""> </fieldset>
+
+                            </div>
+                        </div>
+                    </div>            
+                    <!--- SSS -->
+                    <div class="col-1-3 mix cinematic">
+                        <div class="content">
+                            <div class="recent-work">
+                                <img src="https://i.ibb.co/YQC6pZY/Volcano.png" alt="">                                    
+                                <div class="overlay">
+                                    <span>Erupting Volcano</span>
+                                    <h2><a class="img-wrap" data-rel="lightcase:cinematic" title="Erupting Volcano - Jaysmito Mukherjee" href="https://i.ibb.co/B3pmqNd/Volcano.png">Jaysmito Mukherjee</a></h2>
                                 </div>
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <input name="subject" type="text" class="form-control" id="subject" placeholder="Subject..." required=""> </fieldset>
+
+                            </div>
+                        </div>
+                    </div>            
+                    <!--- SSS -->
+                    <div class="col-1-3 mix game">
+                        <div class="content">
+                            <div class="recent-work">
+                                <img src="https://i.ibb.co/7bRyGRr/rough-Terrain.png" alt="">                                    
+                                <div class="overlay">
+                                    <span>Rocky Lands</span>
+                                    <h2><a class="img-wrap" data-rel="lightcase:game" title="Rocky Lands - Jacobs Sight" href="https://i.ibb.co/cxCTNC2/rough-Terrain.png">Jacobs Sight</a></h2>
                                 </div>
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <textarea name="message" rows="6" class="form-control" id="message" placeholder="Your message..." required=""></textarea>
-                                    </fieldset>
+
+                            </div>
+                        </div>
+                    </div>            
+                    <!--- SSS -->
+                    <div class="col-1-3 mix cinematic">
+                        <div class="content">
+                            <div class="recent-work">
+                                <img src="https://i.ibb.co/N76fxZy/Terrain.png" alt="">                                    
+                                <div class="overlay">
+                                    <span>Snaky River</span>
+                                    <h2><a class="img-wrap" data-rel="lightcase:cinematic" title="Snaky River - Jaysmito Mukherjee" href="https://i.ibb.co/Fnbc6gD/Terrain.png">Jaysmito Mukherjee</a></h2>
                                 </div>
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <button type="submit" id="form-submit" class="btn">Send Now</button>
-                                    </fieldset>
+
+                            </div>
+                        </div>
+                    </div>            
+                    <!--- SSS -->
+                    <div class="col-1-3 mix cinematic">
+                        <div class="content">
+                            <div class="recent-work">
+                                <img src="https://i.ibb.co/S60Qkss/desert.png" alt="">                                    
+                                <div class="overlay">
+                                    <span>The Desert</span>
+                                    <h2><a class="img-wrap" data-rel="lightcase:cinematic" title="The Desert - Jaysmito Mukherjee" href="https://i.ibb.co/HKYNcFF/desert.png">Jaysmito Mukherjee</a></h2>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>            
+                    <!--- SSS -->
+                    <div class="col-1-3 mix cinematic">
+                        <div class="content">
+                            <div class="recent-work">
+                                <img src="https://i.ibb.co/mvWTQPB/T2.gif" alt="">                                    
+                                <div class="overlay">
+                                    <span>The Wet Mossland</span>
+                                    <h2><a class="img-wrap" data-rel="lightcase:cinematic" title="The Wet Mossland - Jaysmito Mukherjee" href="https://cdn.discordapp.com/attachments/892983953248645180/942480423739600946/T2.gif">Jaysmito Mukherjee</a></h2>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>            
+                    <!--- SSS -->
+                    
+                </div>
+
+                <!--- <div class="col-1-1"><a class="btn" href="#0">View More</a></div> -->
+                <b>Send us your artwork via out <a href="https://discord.gg/dqCdjA4G4s">discord server</a> or email us at terraforge3d@gmail.com</b>
+
+            </section>  
+        </div>
+        <!-- End Work Section -->
+
+        <!-- CurveUp -->
+        <svg class="curveUpColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+
+        <!-- Quotes Section -->
+        <div class="wrap services-wrap" >
+            <section class="grid grid-pad">
+                <div class="col-1-1 service-box cl-client-carousel-container">
+                    <div class="content">
+                        <div class="cl-client-carousel">
+
+                            <div class="item client-carousel-item"><!-- Start of item -->
+                                <div class="quotes-icon">
+                                    <i class="icon-quotes-left"></i>
+                                </div>
+                                <p>Nothing</p>
+                                <h4>-Noone</h4>
+                            </div><!-- End of item -->
+
+                          
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- End Quotes Section -->
+
+        <!-- CurveDown -->
+        <svg class="curveDownColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 0 C 50 100 80 100 100 0 Z"></path>
+        </svg>
+
+        <!-- Blog Section -->
+        <div class="wrap blog-grid grey" id="blog">
+            <div class="grid grid-pad">
+                <div class="content" >
+                    <h2>Our Blog</h2>
+                    <b>Nothing yet!</b>
+                    <!--
+                    <div class="col-1-2" >
+                        <article class="post-wrap">
+                            <div class="post-img">
+                                <a href="#0"><img src="images/post/post-n1.jpg" alt=""></a>
+                            </div>
+                            <div class="post">
+                                <h2 class="entry-title"><a href="#0">Drawing hour</a></h2>
+                                <div class="post-meta">
+                                    <a href="#0">15 Januar, 2015</a> <span class="mid-sep">·</span> <a href="#0">Graphic Design</a>
+                                </div>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla, sequi, quas, assumenda harum nam reiciendis obcaecati maxime <a href="#0">suscipit</a> quibusdam.
+                                </p>
+                                <a class="btn read-more" href="#0">Read More</a>
+                            </div>
+                        </article>
+                    </div>
+                -->
+                </div>
+            </div>
+        </div>
+        <!-- End Blog Section -->
+
+        <!-- CurveUp -->
+        <svg class="curveUpColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+
+        <!-- Pricing Section -->
+        <div class="wrap" id="pricing">
+            <div class="grid grid-pad">
+                <div class="content" >
+                    <div class="col-1-1">
+                        <section id="price-tables">
+                            <h2>Pricing Tables</h2>
+                            <ul id="plans">
+                                <li class="plan" >
+                                    <ul class="plan-wrap">
+                                        <li class="title"><h2>Basic</h2></li>
+                                        <li class="price"><p>FREE</p></li>
+                                        <li>
+                                            <ul class="options">
+                                                <li>All Features in TerraForge3D</li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="btn btn-price" href="https://github.com/Jaysmito101/TerraForge3D/releases/download/v2.2/TerraForge3D.Win64.zip">Get Started</a></li>
+                                    </ul>
+                                </li>
+                               
+                               <li class="plan" >
+                                    <ul class="plan-wrap">
+                                        <li class="title"><h2>Premium</h2></li>
+                                        <li class="price"><p>$9/MO</p></li>
+                                        <li>
+                                            <ul class="options">
+                                                <li>All Features in BASIC</li>
+                                                <li>24/7 Email Support</li>
+                                                <li>Discord Benefits</li>
+                                                <li>Custom Features on demand</li>
+                                                <li>Demo Project Files</li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="btn btn-price" href="https://www.patreon.com/jaysmito101">Get Started</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Pricing Section -->
+
+        <!-- CurveDown -->
+        <svg class="curveDownColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 0 C 50 100 80 100 100 0 Z"></path>
+        </svg>
+
+        <!-- Parallax Section - Counter -->
+        <div class="parallax-section parallax2">                    
+            <div class="wrap">
+                <section class="grid grid-pad callout">
+                    <div class="col-1-3">
+                        <div class="content" >
+                            <div class="info-counter">
+                                <div class="info-counter-row">
+                                    <i class="info-counter-icon icon-mug"></i>
+                                </div>
+                                <div class="info-counter-content">
+                                    <h5 class="info-counter-number">
+                                        <span class="counter">7</span>
+                                        <span class="info-counter-units">Cups</span>
+                                    </h5>
+                                    <div class="info-counter-text">Average weekly coffee drank</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-1-3">
+                        <div class="content" >
+                            <div class="info-counter">
+                                <div class="info-counter-row">
+                                    <i class="info-counter-icon icon-embed"></i>
+                                </div>
+                                <div class="info-counter-content">
+                                    <h5 class="info-counter-number">
+                                        <span class="counter">100000</span>
+                                        <span class="info-counter-units">Lines</span>
+                                    </h5>
+                                    <div class="info-counter-text">Average weekly lines of code</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-1-3">
+                        <div class="content" >
+                            <div class="info-counter">
+                                <div class="info-counter-row">
+                                    <i class="info-counter-icon icon-trophy"></i>
+                                </div>
+                                <div class="info-counter-content">
+                                    <h5 class="info-counter-number">
+                                        <span class="counter">100</span>
+                                        <span class="info-counter-units">Customers</span>
+                                    </h5>
+                                    <div class="info-counter-text">Average yearly happy clients</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- End Parallax Section -->
+
+        <!-- CurveUp -->
+        <svg class="curveUpColor curveGrey" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+
+        <!-- Team Section -->
+        <div class="wrap team-wrap grey" id="team">
+            <div class="grid grid-pad">
+                <div class="content" >
+                    <h2>Our Team</h2>
+                    <div class="col-1-4" >
+                        <div class="content staff-content">
+                            <div class="recent-work staff-img">
+                                <div class="img-wrap staff-img">
+                                    <img src="https://avatars.githubusercontent.com/u/73700725?v=4" alt="">
+                                    <div class="team-social">
+                                        <a class="sl-tw" href="https://twitter.com/jaysmito101"><i class="icon-twitter"></i></a>
+                                        <a class="sl-gp" href="https://www.youtube.com/channel/UCvVUCzb12l-3FM740TdD-Vw"><i class="icon-youtube"></i></a>
+                                        <a class="sl-ln" href="https://www.linkedin.com/in/jaysmito/"><i class="icon-linkedin"></i></a>
+                                    </div>
+                                </div>
+                                <div class="work-info staff-info">
+                                    <h5>Jaysmito Mukherjee</h5>
+                                    <span>Owner & Maintainer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Team Section -->
+
+        <!-- CurveUp -->
+        <svg class="curveUpColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+
+        <!-- Clients Logos Section -->
+        <div class="wrap" >
+            <div class="grid grid-pad">
+                <div class="col-1-1">
+                    <div class="content">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Clients Logos Section -->
+
+        <!-- CurveDown -->
+        <svg class="curveDownColor curveMapUp" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 0 C 50 100 80 100 100 0 Z"></path>
+        </svg>
+
+        <!-- Parallax Section -->
+        <div class="map" style="display: none;">                    
+            <div class="wrap">
+                <section id="cd-google-map">
+                    <div id="google-container"></div>
+                    <div id="cd-zoom-in"></div>
+                    <div id="cd-zoom-out"></div>
+                </section>
+            </div>
+        </div>
+        <!-- End Parallax Section -->
+
+        <!-- CurveUp -->
+        <svg  style="display: none;" class="curveUpColor curveMapDown" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+
+        <!-- Contact Section -->
+        <div class="wrap contact" id="contact">
+            <div class="grid grid-pad" >
+                <h2>Contact</h2>
+                <div class="col-1-2" >
+                    <div class="content address">
+                        <h3>Talk to us</h3>
+                          <iframe src="https://discord.com/widget?id=892829904918425660&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                        
+                    </div>
+                </div>
+                <div class="col-1-2 pleft-25" >
+                    <div class="content contact-form">
+                        <form class="form" action="https://formspree.io/f/mknyjgkz" method="POST">
+                            <input type="text" class="comment-name" placeholder="Name*" name="Name" required>
+                            <input type="email" name="Email" class="comment-email" placeholder="Email*" required>
+                            <input type="text" name="Subject" class="comment-subject" placeholder="Subject">
+                            <textarea name="Message" class="required comment-text" placeholder="Message..." required></textarea>
+                            <input type="submit" value="Send Message" class="btn submit comment-submit">
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="footer">
-        <div class="content">
-            <p>Copyright &copy; 2021 Jaysmito Mukherjee. </div>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script>
-    window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')
-    </script>
-    <script src="js/vendor/bootstrap.min.js"></script>
-    <script src="js/datepicker.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
-    <script type="text/javascript">
-    $(document).ready(function() {
-        // navigation click actions 
-        $('.scroll-link').on('click', function(event) {
-            event.preventDefault();
-            var sectionID = $(this).attr("data-id");
-            scrollToID('#' + sectionID, 750);
-        });
-        // scroll to top action
-        $('.scroll-top').on('click', function(event) {
-            event.preventDefault();
-            $('html, body').animate({
-                scrollTop: 0
-            }, 'slow');
-        });
-        // mobile nav toggle
-        $('#nav-toggle').on('click', function(event) {
-            event.preventDefault();
-            $('#main-nav').toggleClass("open");
-        });
-    });
-    // scroll function
-    function scrollToID(id, speed) {
-        var offSet = 0;
-        var targetOffset = $(id).offset().top - offSet;
-        var mainNav = $('#main-nav');
-        $('html,body').animate({
-            scrollTop: targetOffset
-        }, speed);
-        if(mainNav.hasClass("open")) {
-            mainNav.css("height", "1px").removeClass("in").addClass("collapse");
-            mainNav.removeClass("open");
-        }
-    }
-    if(typeof console === "undefined") {
-        console = {
-            log: function() {}
-        };
-    }
-        function init() {
-  var imgDefer = document.getElementsByTagName('img');
-  for (var i = 0; i < imgDefer.length; i++) {
-    if (imgDefer[i].getAttribute('data-src')) {
-      imgDefer[i].setAttribute('src',imgDefer[i].getAttribute('data-src'));
-    }
-      imgDefer[i].width = "300";
-  }
-}
+        <!-- End Contact Section -->
 
-window.onload = init;
-    </script>
-</body>
+        <!-- CurveDown -->
+        <svg class="curveDownColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 0 C 50 100 80 100 100 0 Z"></path>
+        </svg>
 
-</html>
+        <!-- Footer -->
+        <footer class="wrap">
+            <div class="grid grid-pad" >
+                
+            </div>
+            <div class="social-footer">
+                <div class="grid grid-pad">
+                    <div class="col-1-1" >
+                        <div class="content">
+                            <div class="social-set">
+                                <a  href="https://twitter.com/jaysmito101"><i class="icon-twitter"></i></a>
+                                <a  href="https://www.youtube.com/channel/UCvVUCzb12l-3FM740TdD-Vw"><i class="icon-youtube"></i></a>
+                            </div>
+                            <p class="source-org copyright">© 2022 | All Rights Reserved Created By Jaysmito Mukherjee.
+                                <br>
+                                <br>
+                            Website Template From <a href="http://templatestock.co">Template Stock</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- End Footer -->
+
+        <div class="loader-overlay">
+            <div class="loader">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
+
+        <!-- JS -->
+        <script src="js/jquery.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/mixitup.js"></script>
+        <script src="js/smoothscroll.js"></script>
+        <script src="js/jquery.nav.js"></script>
+        <script src="js/owl-carousel/owl.carousel.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+        <script src="js/jquery.counterup.min.js"></script>
+        <script src="js/lightcase.min.js"></script>
+    </body>
+    </html>
