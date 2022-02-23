@@ -56,11 +56,13 @@ $(window).load(function() {
 	$(".loader-overlay").fadeOut("slow");
 })
 
+/*
 //Counter
 $('.counter').counterUp({
     delay: 10,
     time: 1000
 });
+*/
 
 $('a[data-rel^=lightcase]').lightcase();
 
