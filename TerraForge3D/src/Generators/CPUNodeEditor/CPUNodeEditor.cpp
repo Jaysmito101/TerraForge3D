@@ -45,6 +45,8 @@
 #include "Nodes/TextureNode.h"
 #include "Nodes/HillNode.h"
 #include "Nodes/MinValNode.h"
+#include "Nodes/SquareNode.h"
+#include "Nodes/ClampNode.h"
 
 #include <iostream>
 #include <mutex>
@@ -97,8 +99,9 @@ static void ShowNodeMaker(std::string& uid, NodeEditor* editor)
     NODE_MAKER_SHOW(SinNode, "Sin");
     NODE_MAKER_SHOW(CosNode, "Cos");
     NODE_MAKER_SHOW(TanNode, "Tan");
-    NODE_MAKER_SHOW(AbsNode, "Absolute Value");
+    NODE_MAKER_SHOW(SquareNode, "Square");
     NODE_MAKER_SHOW(BlendNode, "Blend");
+    NODE_MAKER_SHOW(ClampNode, "Clamp");
     NODE_MAKER_SHOW(CurveNode, "Curve Editor");
     NODE_MAKER_SHOW(RandomNumberNode, "Random Number");
     NODE_MAKER_SHOW(NoisePerlinNode, "Perlin Noise");
@@ -146,6 +149,7 @@ CPUNodeEditor::CPUNodeEditor(ApplicationState* as)
 			case CPUNodeEditorE::CPUNodeType::Div:                  node = new DivNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Sin:                  node = new SinNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Cos:                  node = new CosNode(); break;
+			case CPUNodeEditorE::CPUNodeType::Square:               node = new SquareNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Tan:                  node = new TanNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Abs:                  node = new AbsNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Blend:                node = new BlendNode(); break;
@@ -162,8 +166,9 @@ CPUNodeEditor::CPUNodeEditor(ApplicationState* as)
 			case CPUNodeEditorE::CPUNodeType::Pixelate:             node = new PixelateNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Visualizer:           node = new VisualizerNode(); break;
 			case CPUNodeEditorE::CPUNodeType::Hill:                 node = new HillNode(); break;
+			case CPUNodeEditorE::CPUNodeType::Clamp:                node = new ClampNode(); break;
 			case CPUNodeEditorE::CPUNodeType::MinVal:               node = new MinValNode(); break;
-//        case CPUNodeEditor::CPUNodeType::Module:               node = new ModuleNode(data["mid"], modMan->FindNodeModule(data["mid"])); break;
+//          case CPUNodeEditor::CPUNodeType::Module:                node = new ModuleNode(data["mid"], modMan->FindNodeModule(data["mid"])); break;
 			default:                                                 node = nullptr; Log("Unknown Node Type!"); break;
 		}
 		return node;

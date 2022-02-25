@@ -11,7 +11,7 @@
 
 #define CLAMP01(x) x > 1 ? 1 : ( x < 0 ? 0 : x )
 
-static float fract(float value) { float temp; return modf(value, &temp); }
+static float fract(float v) { return v - floorf(v); }
 
 NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {

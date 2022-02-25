@@ -44,6 +44,7 @@ enum CPUNodePinType {
 		Mul,
 		Div,
 		Sin,
+		Square,
 		Cos,
 		Tan,
 		Abs,
@@ -62,6 +63,7 @@ enum CPUNodePinType {
 		RectangleMask,
 		Visualizer,
 		Hill,
+		Clamp,
 		MeshNodeTypeCount
 	};
 

@@ -11,13 +11,23 @@ NodeOutput MinValNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
     float x = inputf;
     if (inputPins[0]->IsLinked())
         x = inputPins[0]->other->Evaluate(input).value;
-    float y = thresholdf;
+    float t = thresholdf;
     if (inputPins[1]->IsLinked())
-        y = inputPins[1]->other->Evaluate(input).value;
-    if(x > thresholdf)
-        return NodeOutput({ outputr });
+        t = inputPins[1]->other->Evaluate(input).value;
+    if(x > t)
+    {
+        if(inputPins[3]->IsLinked())
+            return NodeOutput({ inputPins[3]->Evaluate(input) });
+        else
+            return NodeOutput({ outputr });
+    }
     else
-        return NodeOutput({ outputf });
+    {
+        if(inputPins[2]->IsLinked())
+            return NodeOutput({ inputPins[2]->Evaluate(input) });
+        else
+            return NodeOutput({ outputf });
+    }
 }
 
 void MinValNode::Load(nlohmann::json data)
@@ -68,13 +78,23 @@ void MinValNode::OnRender()
         ImGui::PopItemWidth();
     }
 
-    ImGui::PushItemWidth(100);
-    ImGui::DragFloat(("##" + std::to_string(inputPins[2]->id)).c_str(), &outputf, 0.01f);
-    ImGui::PopItemWidth();
+    inputPins[2]->Render();
+    if(inputPins[2]->IsLinked())
+        ImGui::Text("Output F");
+    else{
+        ImGui::PushItemWidth(100);
+        ImGui::DragFloat(("##" + std::to_string(inputPins[2]->id)).c_str(), &outputf, 0.01f);
+        ImGui::PopItemWidth();
+    }
 
-    ImGui::PushItemWidth(100);
-    ImGui::DragFloat(("##" + std::to_string(inputPins[3]->id)).c_str(), &outputr, 0.01f);
-    ImGui::PopItemWidth();
+    inputPins[3]->Render();
+    if(inputPins[3]->IsLinked())
+        ImGui::Text("Output R");
+    else{
+        ImGui::PushItemWidth(100);
+        ImGui::DragFloat(("##" + std::to_string(inputPins[3]->id)).c_str(), &outputr, 0.01f);
+        ImGui::PopItemWidth();
+    }
 }
 
 MinValNode::MinValNode()
