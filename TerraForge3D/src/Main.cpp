@@ -498,11 +498,14 @@ static void ShowTerrainControls()
 		if(appState->states.textureBake){
 			if(appState->frameBuffers.texBakeMain)
 		    	delete appState->frameBuffers.texBakeMain;
-			appState->frameBuffers.texBakeMain = new Framerate(appState->globals.texBakeRes, appState->globals.texBakeRes);
+			appState->frameBuffers.texBakeMain = new FrameBuffer(appState->globals.texBakeRes, appState->globals.texBakeRes);
 			appState->frameBuffers.texBakeMain->Begin();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ExportTexture(appState->frameBuffers.texBakeMain->GetRendererID() , ShowSaveFileDialog(".png"), appState->globals.texBakeRes, appState->globals.texBakeRes);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			delete appState->frameBuffers.texBakeMain;
+			appState->frameBuffers.texBakeMain = nullptr;
+			
 		}
 		else
 			ExportTexture(GetViewportFramebufferId(), ShowSaveFileDialog(".png"), 800, 600);
