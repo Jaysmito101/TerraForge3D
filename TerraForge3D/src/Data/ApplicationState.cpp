@@ -154,6 +154,7 @@ nlohmann::json ApplicationStateGlobals::Save()
 	data["scale"] = scale;
 	data["resolution"] = resolution;
 	data["textureBakeMode"] = textureBakeMode;
+	data["texBakeRes"] = texBakeRes;
 
 	data["openFilePath"] = currentOpenFilePath;
 	data["customBaseModelPath"] = currentBaseModelPath;
@@ -180,6 +181,7 @@ void ApplicationStateGlobals::Load(nlohmann::json data)
 	scale = data["scale"];
 	resolution = data["resolution"];
 	textureBakeMode = data["textureBakeMode"];
+	texBakeRes = data["texBakeRes"];
 
 	currentOpenFilePath = data["openFilePath"];
 	currentBaseModelPath = data["customBaseModelPath"];

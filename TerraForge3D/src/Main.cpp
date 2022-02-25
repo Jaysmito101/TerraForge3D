@@ -437,6 +437,7 @@ static void ShowTerrainControls()
 	{
 		ImGui::DragFloat2("Height Map Min Max", appState->globals.hMapC, 0.01f);
 	}
+	ImGui::DragInt("Texture Export Resolution", &appState->globals.texBakeRes, 4);
 
 
 	ImGui::NewLine();
@@ -494,8 +495,15 @@ static void ShowTerrainControls()
 	}
 
 	if (ImGui::Button("Export Frame")) {
-		if(appState->states.textureBake)
-			ExportTexture(appState->frameBuffers.textureExport->GetRendererID() , ShowSaveFileDialog(".png"), 1024, 1024);
+		if(appState->states.textureBake){
+			if(appState->frameBuffers.texBakeMain)
+		    	delete appState->frameBuffers.texBakeMain;
+			appState->frameBuffers.texBakeMain = new Framerate(appState->globals.texBakeRes, appState->globals.texBakeRes);
+			appState->frameBuffers.texBakeMain->Begin();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			ExportTexture(appState->frameBuffers.texBakeMain->GetRendererID() , ShowSaveFileDialog(".png"), appState->globals.texBakeRes, appState->globals.texBakeRes);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 		else
 			ExportTexture(GetViewportFramebufferId(), ShowSaveFileDialog(".png"), 800, 600);
 	}

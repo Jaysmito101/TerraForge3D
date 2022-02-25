@@ -30,6 +30,7 @@ struct ApplicationStateFrameBuffers
 	FrameBuffer* textureExport;
 	FrameBuffer* postProcess;
 	FrameBuffer* main;
+	FrameBuffer* texBakeMain = nullptr;
 };
 
 struct ApplicationStateShaders
@@ -132,6 +133,7 @@ struct ApplicationStateGlobals
 	int numberOfNoiseTypes = 3;
 	int secondCounter = 0;
 	int textureBakeMode = 0;
+	int texBakeRes = 1024;
 
 	nlohmann::json appData;
 
