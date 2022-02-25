@@ -50,6 +50,7 @@ project "TerraForge3D"
 	cppdialect "C++17"
 	language "C++"
 	staticruntime "on"
+        atl "Static"
 	vectorextensions "SSE4.1"
 
 
