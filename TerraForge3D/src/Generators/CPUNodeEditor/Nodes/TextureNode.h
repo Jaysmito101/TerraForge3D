@@ -20,7 +20,10 @@ public:
 	Texture2D* texture;
 	float scale;
 	bool isDefault;
-
+	
+        bool inv;
+        bool npScale;
+	
 private:
 	void ChangeTexture();
 	std::mutex mutex;
