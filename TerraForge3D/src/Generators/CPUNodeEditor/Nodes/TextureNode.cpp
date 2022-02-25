@@ -46,7 +46,7 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
     
     
     x = fract(x * sc);
-    y = fract(y * ac);
+    y = fract(y * sc);
     
     mutex.lock();
     int xC = (int)(x * (texture->GetWidth()-1));
@@ -160,8 +160,8 @@ void TextureNode::OnRender()
     
     ImGui::NewLine();
     
-    ImGui::Checkbox(("Inverse Texture##tinv" + std::string(id)).c_str(), &inv);
-    ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::string(id)).c_str(), &npScale);
+    ImGui::Checkbox(("Inverse Texture##tinv" + std::to_string(id)).c_str(), &inv);
+    ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale);
 
     ImGui::NewLine();
 
