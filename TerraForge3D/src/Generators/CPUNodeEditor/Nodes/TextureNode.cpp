@@ -11,6 +11,8 @@
 
 #define CLAMP01(x) x > 1 ? 1 : ( x < 0 ? 0 : x )
 
+static float fract(float value) { float temp; return modf(value, &temp); }
+
 NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
     if (isDefault)
@@ -41,12 +43,20 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
         sc = inputPins[2]->other->Evaluate(input).value;
     else
         sc = scale;
+    
+    
+    x = fract(x * sc);
+    y = fract(y * ac);
+    
     mutex.lock();
     int xC = (int)(x * (texture->GetWidth()-1));
     int yC = (int)(y * (texture->GetHeight()-1));
     unsigned char elevC = texture->GetData()[yC * texture->GetWidth() * 3 + xC * 3 + channel];
     res = (float)elevC / 256;
-    res = res * 2.0 - 1.0f;
+    if(npScale)
+        res = res * 2.0f - 1.0f;
+    if(inv)
+        res = 1.0f - res;
     mutex.unlock();
     return NodeOutput({ res });
 }
@@ -57,6 +67,8 @@ void TextureNode::Load(nlohmann::json data)
     if (isDefault && data["isDefault"])
         return;
     isDefault = data["isDefault"];
+    npScale = data["npsc"];
+    inv = data["inv"];
     if (isDefault)
     {
         delete texture;
@@ -86,6 +98,8 @@ nlohmann::json TextureNode::Save()
     data["type"] = MeshNodeEditor::MeshNodeType::Texture;
     data["scale"] = scale;
     data["isDefault"] = isDefault;
+    data["inv"] = inv;
+    data["npsc"] = npScale;
     
     if (!isDefault)
     {
@@ -143,6 +157,11 @@ void TextureNode::OnRender()
     ImGui::SameLine();
     ImGui::Text("B");
     outputPins[2]->Render();
+    
+    ImGui::NewLine();
+    
+    ImGui::Checkbox(("Inverse Texture##tinv" + std::string(id)).c_str(), &inv);
+    ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::string(id)).c_str(), &npScale);
 
     ImGui::NewLine();
 
@@ -179,4 +198,6 @@ TextureNode::TextureNode()
     texture = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png", false, false);
     isDefault = true;
     scale = 1.0f;
+    inv = false;
+    npScale = true;
 }
