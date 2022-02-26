@@ -50,8 +50,10 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 
     float cr = cos(rota * 3.1415926535f / 180.0f);
     float sr = sin(rota * 3.1415926535f / 180.0f);
-    x = x * cr - y * sr;
-    y = y * sr + y * cr;
+    float tx = x;
+    float ty = y;
+    x = tx * cr - ty * sr;
+    y = tx * sr + ty * cr;
 
     x = x * 0.5f + 0.5f;
     y = y * 0.5f + 0.5f;
