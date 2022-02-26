@@ -81,7 +81,7 @@ void CPUNoiseLayersGenerator::Update()
 float CPUNoiseLayersGenerator::EvaluateAt(float x, float y, float z)
 {
 	if(maskManager->enabled)		
-		return maskManager->EvaluateAt(x, y, z, noiseManager->Evaluate(x, y, z));
+		return maskManager->EvaluateAt(x, y, z, noiseManager->Evaluate(x + noiseManager->offset[0], y + noiseManager->offset[1], z + noiseManager->offset[2]));
 	else
 		return noiseManager->Evaluate(x, y, z);
 }
