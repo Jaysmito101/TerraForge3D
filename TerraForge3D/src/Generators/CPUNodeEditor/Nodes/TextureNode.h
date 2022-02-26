@@ -24,7 +24,7 @@ public:
 	bool autoTiled;
     bool inv;
     bool npScale;
-	int numTiles;
+	float numTiles;
 	float posi[2];
 	
 private:

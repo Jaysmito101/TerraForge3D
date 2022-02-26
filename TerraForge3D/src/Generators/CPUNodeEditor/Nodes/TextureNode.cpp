@@ -49,7 +49,7 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 
     if(!autoTiled)
     {
-        if(x > numTiles || y > numTiles)
+        if(x > numTiles/2.0f || y > numTiles/2.0f || x < -numTiles/2.0f || y < -numTiles/2.0f)
             return NodeOutput({ 0.0f });
     }
     
@@ -186,9 +186,12 @@ void TextureNode::OnRender()
 
     if(!autoTiled)
     {
-        ImGui::DragInt(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f);
+        ImGui::DragFloat(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f);
     }
+    
+    ImGui::PushItemWidth(100);
     ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f);
+    ImGui::PopItemWidth();
 
     ImGui::NewLine();
 
