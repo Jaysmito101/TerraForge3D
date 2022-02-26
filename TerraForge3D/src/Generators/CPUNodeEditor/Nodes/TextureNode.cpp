@@ -48,10 +48,10 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
     x = (x * 2.0f - 1.0f) * sc - posi[0];
     y = (y * 2.0f - 1.0f) * sc - posi[1];
 
-    float rad = sqrt(x*x + y*y);
-    float theta = atan(y / x);
-    x = rad * cos(theta - rota * 3.1415926535f / 180.0f);
-    y = rad * sin(theta - rota * 3.1415926535f / 180.0f);
+    float cr = cos(rota * 3.1415926535f / 180.0f);
+    float sr = sin(rota * 3.1415926535f / 180.0f);
+    x = x * cr - y * sr;
+    y = y * sr + y * cr;
 
     x = x * 0.5f + 0.5f;
     y = y * 0.5f + 0.5f;
