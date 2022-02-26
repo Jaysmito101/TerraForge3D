@@ -16,13 +16,16 @@ public:
 	virtual void OnRender();
 
 	TextureNode();
+	~TextureNode();
 
 	Texture2D* texture;
 	float scale;
 	bool isDefault;
-	
-        bool inv;
-        bool npScale;
+	bool autoTiled;
+    bool inv;
+    bool npScale;
+	int numTiles;
+	float posi[2];
 	
 private:
 	void ChangeTexture();

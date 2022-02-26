@@ -44,9 +44,18 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
     else
         sc = scale;
     
+    x = ((x * 2.0f - 1.0f) * sc - posi[0]) * 0.5f + 0.5f;
+    y = ((y * 2.0f - 1.0f) * sc - posi[1]) * 0.5f + 0.5f;
+
+    if(!autoTiled)
+    {
+        if(x > numTiles || y > numTiles)
+            return NodeOutput({ 0.0f });
+    }
     
-    x = fract(x * sc);
-    y = fract(y * sc);
+    x = fract(x);
+    y = fract(y);
+    
     
     mutex.lock();
     int xC = (int)(x * (texture->GetWidth()-1));
@@ -57,6 +66,8 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
         res = res * 2.0f - 1.0f;
     if(inv)
         res = 1.0f - res;
+
+    
     mutex.unlock();
     return NodeOutput({ res });
 }
@@ -69,6 +80,11 @@ void TextureNode::Load(nlohmann::json data)
     isDefault = data["isDefault"];
     npScale = data["npsc"];
     inv = data["inv"];
+    autoTiled = data["autoTiled"];
+    numTiles = data["numTiles"];
+    posi[0] = data["posiX"];
+    posi[1] = data["posiY"];
+
     if (isDefault)
     {
         delete texture;
@@ -100,6 +116,10 @@ nlohmann::json TextureNode::Save()
     data["isDefault"] = isDefault;
     data["inv"] = inv;
     data["npsc"] = npScale;
+    data["autoTiled"] = autoTiled;
+    data["numTiles"] = numTiles;
+    data["posiX"] = posi[0];
+    data["posiY"] = posi[1];
     
     if (!isDefault)
     {
@@ -160,8 +180,15 @@ void TextureNode::OnRender()
     
     ImGui::NewLine();
     
+    ImGui::Checkbox(("Auto Tiled##tild" + std::to_string(id)).c_str(), &autoTiled);
     ImGui::Checkbox(("Inverse Texture##tinv" + std::to_string(id)).c_str(), &inv);
     ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale);
+
+    if(!autoTiled)
+    {
+        ImGui::DragInt(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f);
+    }
+    ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f);
 
     ImGui::NewLine();
 
@@ -186,6 +213,12 @@ void TextureNode::ChangeTexture()
 }
 
 
+TextureNode::~TextureNode()
+{
+    if(texture)
+        delete texture;
+}
+
 TextureNode::TextureNode()
 {
     inputPins.push_back(new NodeEditorPin());
@@ -200,4 +233,7 @@ TextureNode::TextureNode()
     scale = 1.0f;
     inv = false;
     npScale = true;
+    autoTiled = true;
+    numTiles = 1;
+    posi[0] = posi[1] = 0.0f;
 }
