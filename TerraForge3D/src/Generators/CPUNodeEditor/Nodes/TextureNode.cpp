@@ -49,7 +49,7 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 
     if(!autoTiled)
     {
-        if(x > numTiles/2.0f || y > numTiles/2.0f || x < -numTiles/2.0f || y < -numTiles/2.0f)
+        if(x > numTiles || y > numTiles || x < 0 || y < 0)
             return NodeOutput({ 0.0f });
     }
     
