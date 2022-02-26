@@ -26,6 +26,7 @@ public:
     bool npScale;
 	float numTiles;
 	float posi[2];
+	float rota;
 	
 private:
 	void ChangeTexture();

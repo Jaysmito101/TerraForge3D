@@ -7,6 +7,7 @@
 #include <iostream>
 #include <implot.h>
 #include <mutex>
+#include <cmath>
 #include "Base/ImGuiCurveEditor.h"
 
 #define CLAMP01(x) x > 1 ? 1 : ( x < 0 ? 0 : x )
@@ -44,8 +45,16 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
     else
         sc = scale;
     
-    x = ((x * 2.0f - 1.0f) * sc - posi[0]) * 0.5f + 0.5f;
-    y = ((y * 2.0f - 1.0f) * sc - posi[1]) * 0.5f + 0.5f;
+    x = (x * 2.0f - 1.0f) * sc - posi[0];
+    y = (y * 2.0f - 1.0f) * sc - posi[1];
+
+    float rad = sqrt(x*x + y*y);
+    float theta = atan(y / x);
+    x = rad * cos(theta - rota * 3.1415926535f / 180.0f);
+    y = rad * sin(theta - rota * 3.1415926535f / 180.0f);
+
+    x = x * 0.5f + 0.5f;
+    y = y * 0.5f + 0.5f;
 
     if(!autoTiled)
     {
@@ -84,6 +93,7 @@ void TextureNode::Load(nlohmann::json data)
     numTiles = data["numTiles"];
     posi[0] = data["posiX"];
     posi[1] = data["posiY"];
+    rota = data["rota"];
 
     if (isDefault)
     {
@@ -120,7 +130,8 @@ nlohmann::json TextureNode::Save()
     data["numTiles"] = numTiles;
     data["posiX"] = posi[0];
     data["posiY"] = posi[1];
-    
+    data["rota"] = rota;
+
     if (!isDefault)
     {
         std::string hash = MD5File(texture->GetPath()).ToString();
@@ -192,6 +203,7 @@ void TextureNode::OnRender()
     ImGui::PushItemWidth(100);
     ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f);
     ImGui::PopItemWidth();
+    ImGui::DragFloat(("Rotation##rota" + std::to_string(id)).c_str(), &rota, 0.1f);
 
     ImGui::NewLine();
 
@@ -238,5 +250,6 @@ TextureNode::TextureNode()
     npScale = true;
     autoTiled = true;
     numTiles = 1;
+    rota = 0.0f;
     posi[0] = posi[1] = 0.0f;
 }
