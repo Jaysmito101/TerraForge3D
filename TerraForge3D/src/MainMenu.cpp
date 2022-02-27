@@ -179,7 +179,12 @@ void MainMenu::ShowOptionsMenu()
 		if (ImGui::MenuItem("Default")) {
 			LoadDefaultStyle();
 		}
-
+		
+		if(ImGui::MenuItem("Maya Theme"))
+		{
+			LoadMayaStyle();
+		}
+		
 		if (ImGui::MenuItem("Black & White")) {
 			LoadBlackAndWhite();
 		}

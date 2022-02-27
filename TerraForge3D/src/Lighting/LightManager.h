@@ -15,6 +15,8 @@ public:
 	void Load(nlohmann::json data);
 
 	float color[4];
+	float ambientColor[4];
+	float strength;
 	glm::vec3 position;
 
 	int lightManagerID;

@@ -186,6 +186,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
 		shader->SetLightCol(appState->lightManager->color);
 		shader->SetLightPos(appState->lightManager->position);
+		shader->SetUniformf("_LightStrength", appState->lightManager->strength);
 		float tmp[3];
 		tmp[0] = appState->globals.viewportMousePosX;
 		tmp[1] = appState->globals.viewportMousePosY;
