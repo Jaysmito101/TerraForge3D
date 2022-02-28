@@ -21,8 +21,7 @@ project "ModuleSDK"
 	
 	links
 	{
-		"ImGui",
-		"opengl32"
+		"TerraForge3DLib"
 	}
 
 	defines

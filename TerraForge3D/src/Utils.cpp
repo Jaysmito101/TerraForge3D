@@ -120,6 +120,25 @@ std::string openfilename() {
 	return ShowOpenFileDialog(".obj");
 }
 
+bool DeleteFileT(std::string path)
+{
+  try {
+    if (std::filesystem::remove(path)){
+       std::cout << "File " << path << " deleted.\n";
+    }
+    else
+    {
+       std::cout << "File " << path << " could not be deleted.\n";
+       return false;
+    }
+  }
+  catch(const std::filesystem::filesystem_error& err) {
+     std::cout << "filesystem error: " << err.what() << '\n';
+     return false;
+  }
+  return true;
+}
+
 std::string ShowOpenFileDialog(std::string ext) {
 #ifdef TERR3D_WIN32
 	OPENFILENAME ofn;
@@ -245,7 +264,8 @@ bool IsNetWorkConnected()
 	bool bConnect = InternetCheckConnectionW(L"http://www.google.com", FLAG_ICC_FORCE_CONNECTION, 0);
 	return bConnect;
 #else
-	return true; // I dont know how this works on linux
+	// Return true if internet connection is alive else false
+	return true;
 #endif
 }
 

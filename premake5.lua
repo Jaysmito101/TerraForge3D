@@ -39,32 +39,28 @@ include "TerraForge3D/vendor/lua"
 include "TerraForge3D/vendor/assimp"
 include "TerraForge3D/vendor/muparser"
 
-include "Tools/ModuleMaker"
-include "Tools/ModuleSDK"
-include "Tools/PyModuleSDK"
 
-project "TerraForge3D"
+project "TerraForge3DLib"
 	openmp "On"
 	location "TerraForge3D"
-	kind "WindowedApp"
+	kind "StaticLib"
 	cppdialect "C++17"
 	language "C++"
 	staticruntime "on"
         atl "Static"
 	vectorextensions "SSE4.1"
-
+	inlining "Auto"
 
 	targetdir ("bin/" .. outputdir .."/")
 	objdir ("bin/intermediates/" .. outputdir .."/%{prj.name}")
 
 	files {
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/src/**.hpp",
-		"%{prj.name}/src/**.inl",
-		"%{prj.name}/src/**.rc",
-		"%{prj.name}/vendor/glm/**.hpp",
-		"%{prj.name}/vendor/glm/**.inl"
+		"./TerraForge3D/src/**.h",
+		"./TerraForge3D/src/**.cpp",
+		"./TerraForge3D/src/**.hpp",
+		"./TerraForge3D/src/**.inl",
+		"./TerraForge3D/vendor/glm/**.hpp",
+		"./TerraForge3D/vendor/glm/**.inl"
 	}
 
 	includedirs {
@@ -107,15 +103,9 @@ project "TerraForge3D"
 		"Assimp"
 	}
 
-	postbuildcommands  {
-		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
-		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
-	}
-
-	inlining "Auto"
-
-	linkoptions {
-		"/PROFILE"
+	excludes {
+		"./TerraForge3D/src/Main.cpp",
+		"./TerraForge3D/src/Base/EntryPoint.cpp"
 	}
 
 	filter "system:windows"
@@ -154,3 +144,79 @@ project "TerraForge3D"
 			"libcryptoMT.lib",
 			"libsslMT.lib"
 		}
+
+project "TerraForge3D"
+	openmp "On"
+	location "TerraForge3D"
+	kind "WindowedApp"
+	cppdialect "C++17"
+	language "C++"
+	staticruntime "on"
+        atl "Static"
+	vectorextensions "SSE4.1"
+	inlining "Auto"
+
+
+	targetdir ("bin/" .. outputdir .."/")
+	objdir ("bin/intermediates/" .. outputdir .."/%{prj.name}")
+
+	files {
+		"./TerraForge3D/src/Main.cpp",
+		"./TerraForge3D/src/Base/EntryPoint.cpp",
+		"./TerraForge3D/src/TerraForge3D.rc"
+	}
+
+	includedirs {
+		"./TerraForge3D/vendor/assimp/include",
+		"./TerraForge3D/src",
+		"./TerraForge3D/src/Base",
+		"./TerraForge3D/vendor",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.Zip}/src",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImPlot}",
+		"%{IncludeDir.Lua}",
+		"%{IncludeDir.MuParser}",
+		"%{IncludeDir.ImGuiNodeEditor}"
+	}
+
+	links {
+		"TerraForge3DLib"
+	}
+
+	postbuildcommands  {
+		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
+		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
+	}
+
+	filter "system:windows"
+		staticruntime "On"
+		systemversion "latest"
+
+		defines {
+			"TERR3D_WIN32",
+			"WIN32_LEAN_AND_MEAN",
+			"_CRT_SECURE_NO_WARNINGS"
+		}
+
+	filter "configurations:Debug"
+		defines "TERR3D_DEBUG"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "TERR3D_RELEASE"
+		
+		optimize "Full"	
+
+		buildoptions{
+			"/Qpar",
+			"/fp:fast"
+		}
+	
+
+include "Tools/ModuleMaker"
+include "Tools/ModuleSDK"
+include "Tools/PyModuleSDK"
+

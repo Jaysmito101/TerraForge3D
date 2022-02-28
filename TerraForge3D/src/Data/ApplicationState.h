@@ -8,6 +8,7 @@
 #include "Data/Serializer.h"
 #include "MainMenu.h"
 #include "Generators/MeshGeneratorManager.h"
+#include "TextureStore/TextureStore.h"
 
 #include "json.hpp"
 
@@ -181,6 +182,7 @@ struct ApplicationState
 	ApplicationStateConstants constants;
 
 	SeaManager* seaManager;
+
 	LightManager* lightManager;
 
 	Serializer* serailizer;
@@ -188,6 +190,8 @@ struct ApplicationState
 	MeshGeneratorManager* meshGenerator;
 
 	MainMenu* mainMenu;
+
+	TextureStore* textureStore;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

@@ -4,7 +4,7 @@
 #include <AppStyles.h>
 #include <ExplorerControls.h>
 #include <Data/VersionInfo.h>
-#include <TextureSettings.h>
+
 #include <ViewportFramebuffer.h>
 #include <Modules/ModuleManager.h>
 #include <AppShaderEditor.h>
@@ -14,7 +14,7 @@
 #include <SkySettings.h>
 #include <SupportersTribute.h>
 #include <ExportManager.h>
-#include <TextureStore.h>
+#include <TextureStore/TextureStore.h>
 
 // TerraForge3D Base
 
@@ -162,7 +162,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		shader->SetUniformf("_Mode", appState->globals.textureBakeMode);
-		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
+		//UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 		appState->models.coreTerrain->Render();
 	}
 	else {
@@ -202,7 +202,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		shader->SetUniformf("_FlatShade", appState->states.useGPUForNormals ? 1.0f : 0.0f);
 
-		UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
+		//UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 		if(appState->mode == ApplicationMode::TERRAIN)
 			appState->models.coreTerrain->Render();
 		else if (appState->mode == ApplicationMode::CUSTOM_BASE)
@@ -501,7 +501,9 @@ static void ShowTerrainControls()
 		    	delete appState->frameBuffers.texBakeMain;
 			appState->frameBuffers.texBakeMain = new FrameBuffer(appState->globals.texBakeRes, appState->globals.texBakeRes);
 			appState->frameBuffers.texBakeMain->Begin();
+			glViewport(0, 0, appState->globals.texBakeRes, appState->globals.texBakeRes);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			DoTheRederThing(appState->stats.deltatime, false, true);
 			ExportTexture(appState->frameBuffers.texBakeMain->GetRendererID() , ShowSaveFileDialog(".png"), appState->globals.texBakeRes, appState->globals.texBakeRes);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			delete appState->frameBuffers.texBakeMain;
@@ -774,7 +776,7 @@ public:
 
 			if (appState->states.textureBake) {
 				appState->frameBuffers.textureExport->Begin();
-				glViewport(0, 0, 1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
+				glViewport(0, 0, 1024, 1024);
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime, false, true);
 			}
@@ -888,8 +890,6 @@ public:
 		GetWindow()->SetVSync(appState->states.vSync);
 		appState->stats.frameRate = 1 / appState->stats.deltatime;
 		SecondlyShaderEditorUpdate();
-		UpdateTextureStore();
-		TextureSettingsTick();
 	}
 
 	virtual void OnImGuiRender() override
@@ -929,8 +929,8 @@ public:
 		if (appState->windows.statsWindow)
 			ShowStats();
 
-		if (appState->windows.texturEditorWindow)
-			ShowTextureSettings(&appState->windows.texturEditorWindow);
+		//if (appState->windows.texturEditorWindow)
+			//ShowTextureSettings(&appState->windows.texturEditorWindow);
 
 		appState->seaManager->ShowSettings(&appState->windows.seaEditor);
 
@@ -946,8 +946,8 @@ public:
 		if (appState->windows.shaderEditorWindow)
 			ShowShaderEditor(&appState->windows.shaderEditorWindow);
 
-		if (appState->windows.textureStore)
-			ShowTextureStore(&appState->windows.textureStore);
+		if(appState->windows.textureStore)
+			appState->textureStore->ShowSettings(&appState->windows.textureStore);
 
 		if (appState->windows.filtersManager)
 			ShowFiltersMamager(&appState->windows.filtersManager);
@@ -961,25 +961,6 @@ public:
 		if (appState->windows.skySettings)
 			ShowSkySettings(&appState->windows.skySettings);
 
-		for (UIModule* mod : appState->modules.manager->uiModules)
-		{
-			if (mod->active)
-			{
-				ImGui::Begin(mod->windowName.c_str(), &mod->active);
-				mod->Render();
-				ImGui::End();
-			}
-		}
-
-		for (NoiseLayerModule* mod : appState->modules.manager->nlModules)
-		{
-			if (mod->active)
-			{
-				ImGui::Begin(mod->name.c_str());
-				mod->Render();
-				ImGui::End();
-			}
-		}
 
 		OnImGuiRenderEnd();
 	}
@@ -1002,7 +983,7 @@ public:
 		SetupFoliageManager();
 		SetupSupportersTribute();
 		SetupExplorerControls();
-		SetupTextureStore(GetExecutableDir(), &appState->states.reqTexRfrsh);
+
 
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		
@@ -1030,6 +1011,7 @@ public:
 		appState->seaManager = new SeaManager();
 		appState->lightManager = new LightManager();
 		appState->serailizer = new Serializer(appState);
+		appState->textureStore = new TextureStore(appState);
 
 		ResetShader();
 		appState->meshGenerator->GenerateSync();
@@ -1054,7 +1036,7 @@ public:
 		SetupFiltersManager(&appState->states.autoUpdate, appState->models.coreTerrain);
 
 		float t = 1.0f;
-		SetupTextureSettings(&appState->states.reqTexRfrsh, &t, appState->models.coreTerrain);
+
 		SetupSky();
 
 		// Load Fonts
@@ -1066,7 +1048,7 @@ public:
 
 		appState->frameBuffers.relflection = new FrameBuffer();
 		appState->frameBuffers.textureExport = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
-		LoadTextureThumbs();
+	
 
 		bool tpp = false;
 

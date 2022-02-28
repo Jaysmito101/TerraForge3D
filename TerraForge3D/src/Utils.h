@@ -99,6 +99,8 @@ void MkDir(std::string path);
 
 void CopyFileData(std::string source, std::string destination);
 
+bool DeleteFileT(std::string path);
+
 bool IsKeyDown(int key);
 
 bool IsMouseButtonDown(int button);

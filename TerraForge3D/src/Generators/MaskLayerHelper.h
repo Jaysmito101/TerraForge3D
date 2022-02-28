@@ -130,7 +130,7 @@ inline float EvaluateCratorMask(GeneratorMask* mask, float x, float y, float z)
 
 inline void ShowCliffMaskSettingS(GeneratorMask* mask, std::string id)
 {
-	ImGui::Text("Mode : Hill");
+	ImGui::Text("Mode : Cliff");
 	ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f);
 	ImGui::DragFloat(MAKE_IMGUI_ID("Depth", id), &mask->d1[0], 0.01f);
 	ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f);
@@ -171,6 +171,47 @@ inline float EvaluateCliffMask(GeneratorMask* mask, float x, float y, float z)
 		Y = x - mask->pos[0];
 	}
 
+
+	float steepness = mask->d1[2];
+	float height = mask->d1[1];
+	float depth = mask->d1[0];
+
+	float f = -steepness*X*X + height;
+	float g = height;
+	if(X >= 0)
+		g = depth;
+	return MAX(f, g);
+}
+
+inline void ShowPlatueMaskSettingS(GeneratorMask* mask, std::string id)
+{
+	ImGui::Text("Mode : Platue");
+	ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f);
+	ImGui::DragFloat(MAKE_IMGUI_ID("Depth", id), &mask->d1[0], 0.01f);
+	ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f);
+	ImGui::DragFloat(MAKE_IMGUI_ID("Steepness", id), &mask->d1[2], 0.01f);
+	ImGui::DragFloat(MAKE_IMGUI_ID("Angle", id), &mask->d2[3], 0.01f);
+}
+
+inline float EvaluatePlataueMask(GeneratorMask* mask, float x, float y, float z)
+{
+	float X;
+	float Y;
+	if(mask->d1[3] == 0.0f)
+	{
+		X = x - mask->pos[0];
+		Y = y - mask->pos[1];
+	}
+	else if(mask->d1[3] == 1.0f)
+	{
+		X = y - mask->pos[1];
+		Y = z - mask->pos[2];
+	}
+	else if(mask->d1[3] == 2.0f)
+	{
+		X = z - mask->pos[2];
+		Y = x - mask->pos[0];
+	}
 
 	float steepness = mask->d1[2];
 	float height = mask->d1[1];

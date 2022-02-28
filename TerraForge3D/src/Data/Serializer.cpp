@@ -4,7 +4,6 @@
 #include "ProjectData.h"
 #include "VersionInfo.h"
 #include "ApplicationState.h"
-#include "TextureSettings.h"
 #include "AppStyles.h"
 
 #include "dirent/dirent.h"
@@ -83,7 +82,6 @@ nlohmann::json Serializer::Serialize()
 	TRY_CATCH_ERR_SERIALIZE(data["appData"] = appState->globals.appData;, "Failed to save App Data");
 	TRY_CATCH_ERR_SERIALIZE(data["appStyles"] = GetStyleData();, "Failed to save app styles");
 	TRY_CATCH_ERR_SERIALIZE(data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory()); , "Failed to save ImGui Data.");
-	TRY_CATCH_ERR_SERIALIZE(data["texLayers"] = SaveTextureLayerData(); , "Failed to save texture layers.");
 	TRY_CATCH_ERR_SERIALIZE(data["camera"] = appState->cameras.Save(); , "Failed to save cameras.");
 	TRY_CATCH_ERR_SERIALIZE(data["windows"] = appState->windows.Save(); , "Failed to save window states");
 	TRY_CATCH_ERR_SERIALIZE(data["states"] = appState->states.Save(); , "Failed to save states.");
@@ -268,7 +266,6 @@ ApplicationState* Serializer::Deserialize(nlohmann::json d)
 
 	TRY_CATCH_ERR_DESERIALIZE(SetProjectId(data["projectID"]); , "Failed to load Project ID.");
 	TRY_CATCH_ERR_DESERIALIZE(SetProjectDatabase(data["projectDatabase"]); , "Failed to load project database.");
-	TRY_CATCH_ERR_DESERIALIZE(LoadTextureLayerData(data["texLayers"]);, "Failed to load texture layer data.");
 
 	std::cout << "Loaded Project ID : " << GetProjectId() << std::endl;
 
