@@ -9,6 +9,7 @@
 #include "MainMenu.h"
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
+#include "SupportersTribute.h"
 
 #include "json.hpp"
 
@@ -27,7 +28,7 @@ struct ApplicationStateModels
 
 struct ApplicationStateFrameBuffers
 {
-	FrameBuffer* relflection;
+	FrameBuffer* reflection;
 	FrameBuffer* textureExport;
 	FrameBuffer* postProcess;
 	FrameBuffer* main;
@@ -156,6 +157,22 @@ struct ApplicationStateConstants
 	glm::vec3 FRONT			 = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 BACK			 = glm::vec3(0.0f, 1.0f, 1.0f);
 
+	std::string executableDir = "";
+	std::string dataDir = "";
+	std::string cacheDir = "";
+	std::string texturesDir = "";
+	std::string projectsDir = "";
+	std::string tempDir = "";
+	std::string shadersDir = "";
+	std::string kernelsDir = "";
+	std::string fontsDir = "";
+	std::string liscensesDir = "";
+	std::string skyboxDir = "";
+	std::string modulesDir = "";
+	std::string modelsDir = "";
+	std::string configsDir = "";
+	std::string logsDir = "";
+
 };
 
 enum ApplicationMode
@@ -181,17 +198,13 @@ struct ApplicationState
 	ApplicationStateGlobals globals;
 	ApplicationStateConstants constants;
 
-	SeaManager* seaManager;
-
-	LightManager* lightManager;
-
-	Serializer* serailizer;
-
-	MeshGeneratorManager* meshGenerator;
-
-	MainMenu* mainMenu;
-
-	TextureStore* textureStore;
+	SeaManager* seaManager = nullptr;
+	LightManager* lightManager = nullptr;
+	Serializer* serailizer = nullptr;
+	MeshGeneratorManager* meshGenerator = nullptr;
+	MainMenu* mainMenu = nullptr;
+	TextureStore* textureStore = nullptr;
+	SupportersTribute* supportersTribute = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 
@@ -200,9 +213,3 @@ struct ApplicationState
 
 	~ApplicationState();
 };
-
-void SetUpApplicationState();
-
-void DeleteApplicationState();
-
-ApplicationState* GetApplicationState();

@@ -109,23 +109,6 @@ void MainMenu::ShowFileMenu()
 		ImGui::EndMenu();
 	}
 
-	if (appState->mode == ApplicationMode::TERRAIN)
-	{
-
-		if (ImGui::BeginMenu("Export Heightmap As")) {
-
-			if (ImGui::MenuItem("PNG")) {
-				ExportHeightmapPNG(appState->models.coreTerrain->mesh->Clone(), ShowSaveFileDialog(".png"));
-			}
-
-			if (ImGui::MenuItem("JPG")) {
-				ExportHeightmapJPG(appState->models.coreTerrain->mesh->Clone(), ShowSaveFileDialog(".png"));
-			}
-			ImGui::EndMenu();
-		}
-
-	}
-
 	if (ImGui::MenuItem("Close")) {
 		appState->globals.currentOpenFilePath = "";
 	}
@@ -211,11 +194,11 @@ void MainMenu::ShowWindowsMenu()
 
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
 
-	ShowWindowMenuItem("Shader Editor", &appState->windows.shaderEditorWindow);
+//	ShowWindowMenuItem("Shader Editor", &appState->windows.shaderEditorWindow);
 
 	ShowWindowMenuItem("Foliage Manager", &appState->windows.foliageManager);
 
-	ShowWindowMenuItem("Texture Settings", &appState->windows.texturEditorWindow);
+//	ShowWindowMenuItem("Texture Settings", &appState->windows.texturEditorWindow);
 
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
 

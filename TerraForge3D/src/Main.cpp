@@ -1,20 +1,13 @@
 #include "../resource.h"
 
-#include <Utils.h>
 #include <AppStyles.h>
 #include <ExplorerControls.h>
-#include <Data/VersionInfo.h>
 
-#include <ViewportFramebuffer.h>
-#include <Modules/ModuleManager.h>
-#include <AppShaderEditor.h>
-#include <OSLiscenses.h>
+#include "OSLiscenses.h"
 #include <FiltersManager.h>
 #include <FoliagePlacement.h>
 #include <SkySettings.h>
-#include <SupportersTribute.h>
-#include <ExportManager.h>
-#include <TextureStore/TextureStore.h>
+
 
 // TerraForge3D Base
 
@@ -30,13 +23,16 @@
 // TerraForge3D Application
 #include "Data/ProjectData.h"
 #include "Data/ApplicationState.h"
+#include "Data/VersionInfo.h"
 #include "Generators/MeshGeneratorManager.h"
+#include "TextureStore/TextureStore.h"
+#include "ExportManager.h"
+#include "Utils.h"
+#include "SupportersTribute.h"
+#include "Platform.h"
 
 #undef cNear
 #undef cFar
-
-#include <FastNoiseLite.h>
-
 
 #include <json.hpp>
 #include <zip.h>
@@ -105,11 +101,23 @@ static void ResetShader() {
 		delete appState->shaders.foliage;
 
 	if (!appState->shaders.wireframe)
-		appState->shaders.wireframe = new Shader(GetDefaultVertexShaderSource(), GetDefaultFragmentShaderSource(), GetWireframeGeometryShaderSource());
+	{
+		appState->shaders.wireframe = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\vert.glsl", &res),
+												 ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\frag.glsl", &res),
+												 ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\geom.glsl", &res));
+	}
+
+	appState->shaders.textureBake = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\texture_bake\\vert.glsl", &res),
+											   ReadShaderSourceFile(appState->constants.shadersDir + "\\texture_bake\\frag.glsl", &res),
+											   ReadShaderSourceFile(appState->constants.shadersDir + "\\texture_bake\\geom.glsl", &res));
+
+	appState->shaders.terrain = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\vert.glsl", &res),
+										   ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\frag.glsl", &res),
+										   ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\geom.glsl", &res));
 	
-	appState->shaders.textureBake = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\texture_bake\\geom.glsl", &res));
-	appState->shaders.terrain = new Shader(GetVertexShaderSource(), GetFragmentShaderSource(), GetGeometryShaderSource());
-	appState->shaders.foliage = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\vert.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\frag.glsl", &res), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\foliage\\geom.glsl", &res));
+	appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\vert.glsl", &res),
+										   ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\frag.glsl", &res),
+										   ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\geom.glsl", &res));
 }
 
 static void RegenerateMesh() 
@@ -242,7 +250,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 
 
 		if (appState->seaManager->enabled && renderWater) {
-			appState->seaManager->Render(appState->cameras.main, appState->lightManager, appState->frameBuffers.relflection, time);
+			appState->seaManager->Render(appState->cameras.main, appState->lightManager, appState->frameBuffers.reflection, time);
 		}
 	}
 
@@ -281,11 +289,11 @@ void PostProcess(float deltatime)
 	appState->shaders.postProcess->SetMPV(appState->cameras.postPorcess.pv);
 
 	glActiveTexture(GL_TEXTURE5);	
-	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferColorTextureId());
+	glBindTexture(GL_TEXTURE_2D, appState->frameBuffers.main->GetColorTexture());
 	appState->shaders.postProcess->SetUniformi("_ColorTexture", 5);
 
 	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, GetViewportFramebufferDepthTextureId()); 
+	glBindTexture(GL_TEXTURE_2D, appState->frameBuffers.main->GetDepthTexture()); 
 	appState->shaders.postProcess->SetUniformi("_DepthTexture", 6);
 
 	appState->models.screenQuad->Render();
@@ -312,12 +320,12 @@ static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 static void ShowChooseBaseModelPopup()
 {
 	// TEMP
-	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\plane.png", false, false);
-	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\sphere.png", false, false);
-	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cube.png", false, false);
-	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cone.png", false, false);
-	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\cylinder.png", false, false);
-	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(GetExecutableDir() + "\\Data\\textures\\ui_thumbs\\torus.png", false, false);
+	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\plane.png", false, false);
+	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\sphere.png", false, false);
+	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\cube.png", false, false);
+	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\cone.png", false, false);
+	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\cylinder.png", false, false);
+	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\torus.png", false, false);
 	// TEMP
 
 	if (ImGui::BeginPopup("Choose Base Model"))
@@ -345,32 +353,32 @@ static void ShowChooseBaseModelPopup()
 		ImGui::SameLine();
 		if (ImGui::ImageButton((ImTextureID)sphere->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\sphere.obj");
+			ChangeCustomModel(appState->constants.modelsDir + "\\sphere.obj");
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
 		if (ImGui::ImageButton((ImTextureID)cube->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cube.obj");
+			ChangeCustomModel(appState->constants.modelsDir + "\\cube.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
 
 		if (ImGui::ImageButton((ImTextureID)torus->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\torus.obj");
+			ChangeCustomModel(appState->constants.modelsDir + "\\torus.obj");
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
 		if (ImGui::ImageButton((ImTextureID)cone->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cone.obj");
+			ChangeCustomModel(appState->constants.modelsDir + "\\cone.obj");
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
 		if (ImGui::ImageButton((ImTextureID)cyllinder->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(GetExecutableDir() + "\\Data\\models\\cylinder.obj");
+			ChangeCustomModel(appState->constants.modelsDir + "\\cylinder.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -511,7 +519,7 @@ static void ShowTerrainControls()
 			
 		}
 		else
-			ExportTexture(GetViewportFramebufferId(), ShowSaveFileDialog(".png"), 800, 600);
+			ExportTexture(appState->frameBuffers.main->GetRendererID(), ShowSaveFileDialog(".png"), 800, 600);
 	}
 
 	ImGui::Separator();
@@ -597,28 +605,18 @@ static void ShowMainScene() {
 		else if (appState->states.postProcess)
 			ImGui::Image((ImTextureID)appState->frameBuffers.postProcess->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		else
-			ImGui::Image((ImTextureID)GetViewportFramebufferColorTextureId(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((ImTextureID)appState->frameBuffers.main->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::EndChild();
 	}
 	ImGui::End();
 }
 
 static void SaveFile(std::string file = ShowSaveFileDialog()) {
-	appState->serailizer->SaveFile(file);
-
-	//data["EnodeEditor"] = GetMeshNodeEditorSaveData();
-
-//	data["noiseLayers"] = noiseGen->Save();
-	
+	appState->serailizer->SaveFile(file);	
 }
 
 static void OpenSaveFile(std::string file = ShowOpenFileDialog(".terr3d")) {
-
 	appState->serailizer->LoadFile(file);
-
-	//noiseGen->Load(data["noiseLayers"]);
-	//SetMeshNodeEditorSaveData(data["EnodeEditor"]);
-
 }
 
 
@@ -708,6 +706,7 @@ public:
 		SetLogsDir(GetExecutableDir() + "\\Data\\logs");
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
 		MkDir(GetExecutableDir() + "\\Data\\cache\\autosave\"");
+		MkDir(GetExecutableDir() + "\\Data\\temp\"");
 		SetupOSLiscences();
 	}
 
@@ -781,13 +780,13 @@ public:
 				DoTheRederThing(deltatime, false, true);
 			}
 			else {
-				appState->frameBuffers.relflection->Begin();
-				glViewport(0, 0, 800, 600);
+				appState->frameBuffers.reflection->Begin();
+				glViewport(0, 0, appState->frameBuffers.reflection->GetWidth(), appState->frameBuffers.reflection->GetHeight());
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime);
 
-				glBindFramebuffer(GL_FRAMEBUFFER, GetViewportFramebufferId());
-				glViewport(0, 0, 800, 600);
+				glBindFramebuffer(GL_FRAMEBUFFER, appState->frameBuffers.main->GetRendererID());
+				glViewport(0, 0, appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
 				GetWindow()->Clear();
 				DoTheRederThing(deltatime, true);
 
@@ -802,8 +801,6 @@ public:
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			RenderImGui();
 
-			if (appState->states.autoUpdate)
-				RegenerateMesh();
 
 		}
 		else {
@@ -818,11 +815,11 @@ public:
 			expH = appState->states.exploreMode;
 			appState->stats.deltatime = deltatime;
 
-			appState->frameBuffers.relflection->Begin();
-			glViewport(0, 0, 800, 600);
+			appState->frameBuffers.reflection->Begin();
+			glViewport(0, 0, appState->frameBuffers.reflection->GetWidth(), appState->frameBuffers.reflection->GetHeight());
 			GetWindow()->Clear();
 			DoTheRederThing(deltatime);
-			appState->frameBuffers.relflection->End();
+			appState->frameBuffers.reflection->End();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			int w, h;
@@ -847,27 +844,12 @@ public:
 			}
 
 
-			if (appState->states.autoUpdate)
-				RegenerateMesh();
 
 		}
 
+		if (appState->states.autoUpdate)
+			RegenerateMesh();
 
-		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_I))
-			appState->globals.offset[0] -= 0.01f;
-
-		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_K))
-			appState->globals.offset[0] += 0.01f;
-
-		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_L))
-			appState->globals.offset[1] -= 0.01f;
-
-		if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_J))
-			appState->globals.offset[1] += 0.01f;
-
-
-		if (ReqRefresh())
-			ResetShader();
 	}
 
 	virtual void OnOneSecondTick() override
@@ -879,7 +861,7 @@ public:
 
 		if (appState->globals.secondCounter % 5 == 0) {
 			if (appState->states.autoSave) {
-				SaveFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
+				SaveFile(appState->constants.cacheDir + "\\autosave\\autosave.terr3d");
 
 				if (appState->globals.currentOpenFilePath.size() > 3) {
 					SaveFile(appState->globals.currentOpenFilePath);
@@ -889,7 +871,6 @@ public:
 
 		GetWindow()->SetVSync(appState->states.vSync);
 		appState->stats.frameRate = 1 / appState->stats.deltatime;
-		SecondlyShaderEditorUpdate();
 	}
 
 	virtual void OnImGuiRender() override
@@ -943,8 +924,8 @@ public:
 		if (appState->windows.foliageManager)
 			ShowFoliageManager(&appState->windows.foliageManager);
 
-		if (appState->windows.shaderEditorWindow)
-			ShowShaderEditor(&appState->windows.shaderEditorWindow);
+		//if (appState->windows.shaderEditorWindow)
+		//	ShowShaderEditor(&appState->windows.shaderEditorWindow);
 
 		if(appState->windows.textureStore)
 			appState->textureStore->ShowSettings(&appState->windows.textureStore);
@@ -956,7 +937,7 @@ public:
 			ShowOSLiscences(&appState->windows.osLisc);
 
 		if (appState->windows.supportersTribute)
-			ShowSupportersTribute(&appState->windows.supportersTribute);
+			appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
 
 		if (appState->windows.skySettings)
 			ShowSkySettings(&appState->windows.skySettings);
@@ -974,14 +955,27 @@ public:
 		// Setup custom icon for the Main Window
 		SetUpIcon();
 		
-		SetUpApplicationState();
-		appState = GetApplicationState();
+		appState = new ApplicationState();
 		appState->mainApp = mainApp;
 
-		SetupViewportFrameBuffer();
-		SetupShaderManager(GetExecutableDir());
+		appState->constants.executableDir = GetExecutableDir();
+		appState->constants.dataDir = appState->constants.executableDir + PATH_SEPERATOR "Data";
+		appState->constants.cacheDir = appState->constants.dataDir  	+ PATH_SEPERATOR "cache";
+		appState->constants.texturesDir = appState->constants.dataDir  	+ PATH_SEPERATOR "textures";
+		appState->constants.projectsDir = appState->constants.cacheDir  + PATH_SEPERATOR "project_data";
+		appState->constants.tempDir = appState->constants.dataDir  		+ PATH_SEPERATOR "temp";
+		appState->constants.shadersDir = appState->constants.dataDir  	+ PATH_SEPERATOR "shaders";
+		appState->constants.kernelsDir = appState->constants.dataDir  	+ PATH_SEPERATOR "kernels";
+		appState->constants.fontsDir = appState->constants.dataDir  	+ PATH_SEPERATOR "fonts";
+		appState->constants.liscensesDir = appState->constants.dataDir 	+ PATH_SEPERATOR "licenses";
+		appState->constants.skyboxDir = appState->constants.dataDir  	+ PATH_SEPERATOR "skybox";
+		appState->constants.modulesDir = appState->constants.dataDir  	+ PATH_SEPERATOR "modules";
+		appState->constants.configsDir = appState->constants.dataDir  	+ PATH_SEPERATOR "configs";
+		appState->constants.logsDir = appState->constants.dataDir  		+ PATH_SEPERATOR "logs";
+		appState->constants.modelsDir = appState->constants.dataDir  	+ PATH_SEPERATOR "models";
+		appState->supportersTribute = new SupportersTribute();
+
 		SetupFoliageManager();
-		SetupSupportersTribute();
 		SetupExplorerControls();
 
 
@@ -1002,7 +996,7 @@ public:
 
 
 
-		appState->globals.kernelsIncludeDir = "\"" + GetExecutableDir() + "\\Data\\kernels" + "\"";
+		appState->globals.kernelsIncludeDir = "\"" + appState->constants.kernelsDir + "\"";
 
 		appState->modules.manager = new ModuleManager();
 		appState->meshGenerator = new MeshGeneratorManager(appState);
@@ -1041,36 +1035,43 @@ public:
 
 		// Load Fonts
 
-		LoadUIFont("Open-Sans-Regular", 18, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Regular.ttf");
-		LoadUIFont("OpenSans-Bold", 25, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Bold.ttf");
-		LoadUIFont("OpenSans-Semi-Bold", 22, GetExecutableDir() + "\\Data\\fonts\\OpenSans-Bold.ttf");
+		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + "\\OpenSans-Regular.ttf");
+		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + "\\OpenSans-Bold.ttf");
+		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + "\\OpenSans-Bold.ttf");
 
+		// The framebuffer used for reflections in the sea
+		appState->frameBuffers.reflection = new FrameBuffer();
 
-		appState->frameBuffers.relflection = new FrameBuffer();
-		appState->frameBuffers.textureExport = new FrameBuffer(1024, 1024); // This should be 4096 instead of 1024 but my computer is too weak to go for 4096
+		// This is the framebuffer for previewing the texture to export
+		appState->frameBuffers.textureExport = new FrameBuffer(1024, 1024);
+
+		// The main frame buffer
+		appState->frameBuffers.main = new FrameBuffer(1280, 720);
+
+		// The Framebuffer used for post processing
+		appState->frameBuffers.postProcess = new FrameBuffer(1280, 720);
 	
 
 		bool tpp = false;
 
-		appState->frameBuffers.postProcess = new FrameBuffer(800, 600);
-		appState->shaders.postProcess = new Shader(ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\vert.glsl", &tpp), ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\post_processing\\frag.glsl", &tpp));
+		appState->shaders.postProcess = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\post_processing\\vert.glsl", &tpp),
+												ReadShaderSourceFile(appState->constants.shadersDir + "\\post_processing\\frag.glsl", &tpp));
 
-		// For Debug Only
 		appState->states.autoUpdate = true;
 
 		if(IsNetWorkConnected())
 		{
-			if(FileExists(GetExecutableDir() + "\\Data\\configs\\server.terr3d"))
+			if(FileExists(appState->constants.configsDir + "\\server.terr3d"))
 			{
 				bool ttmp = false;
-				std::string uid = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\configs\\server.terr3d", &ttmp);
+				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + "\\server.terr3d", &ttmp);
 				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
 			}
 			else
 			{
-				DownloadFile("https://terraforge3d.maxalpha.repl.co", "/register", GetExecutableDir() + "\\Data\\configs\\server.terr3d");
+				DownloadFile("https://terraforge3d.maxalpha.repl.co", "/register", appState->constants.configsDir + "\\server.terr3d");
 				bool ttmp = false;
-				std::string uid = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\configs\\server.terr3d", &ttmp);
+				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + "\\server.terr3d", &ttmp);
 				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
 			}
 		}
@@ -1091,19 +1092,19 @@ public:
 		delete appState->shaders.wireframe;
 		delete appState->shaders.postProcess;
 
+		delete appState->supportersTribute;
+
 		delete appState->mainMenu;
 
-//		delete appState->frameBuffers.main;
+		delete appState->frameBuffers.main;
 		delete appState->frameBuffers.postProcess;
-		delete appState->frameBuffers.relflection;
+		delete appState->frameBuffers.reflection;
 		delete appState->frameBuffers.textureExport;
 
 //		delete appState->seaManager;
 		delete appState->lightManager;
 		delete appState->serailizer;
-		DeleteApplicationState();
-
-//		exit(0); // Temporary
+		delete appState;
 	}
 };
 

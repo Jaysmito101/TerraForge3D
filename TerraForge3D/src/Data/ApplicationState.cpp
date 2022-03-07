@@ -1,22 +1,5 @@
 #include "ApplicationState.h"
 
-static ApplicationState* appState = nullptr;
-
-void SetUpApplicationState()
-{
-	appState = new ApplicationState();
-}
-
-void DeleteApplicationState()
-{
-	delete appState;
-}
-
-ApplicationState* GetApplicationState()
-{
-	return appState;
-}
-
 ApplicationState::ApplicationState()
 {
 
@@ -53,8 +36,8 @@ ApplicationStateModels::~ApplicationStateModels()
 nlohmann::json ApplicationStateCameras::Save()
 {
 	nlohmann::json data = nlohmann::json();
-	data["main"] = appState->cameras.main.Save();
-	data["postProcess"] = appState->cameras.postPorcess.Save();
+	data["main"] = main.Save();
+	data["postProcess"] = postPorcess.Save();
 	return data;
 }
 

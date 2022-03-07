@@ -1,15 +1,32 @@
 #pragma once
+
 #include <string>
-#include <Texture2D.h>
+#include <vector>
+
+#include <json.hpp>
+
+class Texture2D;
+
 
 struct GitHubData {
-
-	std::string name;
-	Texture2D* avatar;
-
-
+	std::string name = "";
+	Texture2D* avatar = nullptr;
 };
 
-void SetupSupportersTribute();
+class SupportersTribute
+{
+public:
+	SupportersTribute();
+	~SupportersTribute();
+	void ShowSettings(bool* pOpen);
 
-void ShowSupportersTribute(bool* pOpen);
+private:
+	void LoadstargazersData(nlohmann::json& data);
+	void LoadcontributorsData(nlohmann::json& data);
+
+public:
+	std::vector<GitHubData> stargazers;
+	std::vector<GitHubData> contributors;
+};
+
+

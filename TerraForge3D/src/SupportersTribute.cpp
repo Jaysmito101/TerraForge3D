@@ -1,14 +1,16 @@
 #include "SupportersTribute.h"
+
+#include "Base/Texture2D.h"
+
 #include <Utils.h>
 #include <imgui.h>
 #include <vector>
 #include <string>
 #include <json.hpp>
 
-std::vector<GitHubData> stargazers;
-std::vector<GitHubData> contributors;
 
-void LoadstargazersData(nlohmann::json& data) {
+void SupportersTribute::LoadstargazersData(nlohmann::json& data)
+ {
 	bool isNetWorkConnected = IsNetWorkConnected();
 	for (nlohmann::json item : data) {
 		GitHubData st;
@@ -26,7 +28,7 @@ void LoadstargazersData(nlohmann::json& data) {
 	}
 }
 
-void LoadcontributorsData(nlohmann::json& data) {
+void SupportersTribute::LoadcontributorsData(nlohmann::json& data) {
 	bool isNetWorkConnected = IsNetWorkConnected();
 	for (nlohmann::json item : data) {
 		GitHubData st;
@@ -45,13 +47,19 @@ void LoadcontributorsData(nlohmann::json& data) {
 }
 
 
-void SetupSupportersTribute()
+SupportersTribute::SupportersTribute()
 {
-	if (IsNetWorkConnected() && !FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache")) {
+	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache") || rand() % 5 == 0)) {
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
 		
 		{
-			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers");
+			std::string repoDataStr = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D");
+			nlohmann::json repoData = nlohmann::json::parse(repoDataStr);
+			int stargazerCount = repoData["stargazers_count"];
+			int perPage = 30;
+			int lastPage = stargazerCount / perPage;
+
+			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&page=" + std::to_string(lastPage));
 			SaveToFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", stargazersRawData);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
@@ -90,7 +98,22 @@ void SetupSupportersTribute()
 	}
 }
 
-void ShowSupportersTribute(bool* pOpen)
+SupportersTribute::~SupportersTribute()
+{
+	for(auto& st : stargazers)
+	{
+		if(st.avatar)
+			delete st.avatar;
+	}
+	
+	for(auto& co : contributors)
+	{
+		if(co.avatar)
+			delete co.avatar;
+	}	
+}
+
+void SupportersTribute::ShowSettings(bool* pOpen)
 {
 	ImGui::Begin("Supporters", pOpen, ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowSize(ImVec2(250, 250));

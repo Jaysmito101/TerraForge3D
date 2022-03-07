@@ -13,9 +13,9 @@
 #include <iostream>
 
 
-#define TRY_CATCH_ERR_SERIALIZE(code, message) try{ code } catch(std::exception& ex){onError(message, true);}
-#define TRY_CATCH_ERR_DESERIALIZE(code, message) try{ code } catch(std::exception& ex){onError(message, false);}
-#define TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(code, message, errorCode) try{ code } catch(std::exception& ex){onError(message, false); errorCode}
+#define TRY_CATCH_ERR_SERIALIZE(code, message) try{ code } catch(...){onError(message, true);}
+#define TRY_CATCH_ERR_DESERIALIZE(code, message) try{ code } catch(...){onError(message, false);}
+#define TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(code, message, errorCode) try{ code } catch(...){onError(message, false); errorCode}
 
 static void zip_walk(struct zip_t* zip, const char* path, bool isFristLayer = true, std::string prevPath = "") {
 	DIR* dir;

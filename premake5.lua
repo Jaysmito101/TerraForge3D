@@ -26,6 +26,8 @@ IncludeDir["Zip"] = "TerraForge3D/vendor/zip"
 IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
 IncludeDir["Lua"] = "TerraForge3D/vendor/lua"
 IncludeDir["MuParser"] = "TerraForge3D/vendor/muparser/include"
+IncludeDir["JSON"] = "TerraForge3D/vendor/json"
+IncludeDir["FastNoiseLite"] = "TerraForge3D/vendor/FastNoiseLite"
 
 include "TerraForge3D/vendor/glfw"
 include "TerraForge3D/vendor/glad"
@@ -76,6 +78,8 @@ project "TerraForge3DLib"
 		"%{IncludeDir.ImPlot}",
 		"%{IncludeDir.Lua}",
 		"%{IncludeDir.MuParser}",
+		"%{IncludeDir.JSON}",
+		"%{IncludeDir.FastNoiseLite}",
 		"%{IncludeDir.ImGuiNodeEditor}"
 	}
 

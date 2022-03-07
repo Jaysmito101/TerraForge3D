@@ -16,6 +16,9 @@ public:
 	uint32_t GetDepthTexture();
 	uint32_t GetRendererID();
 
+	inline int GetWidth() {return width;}
+	inline int GetHeight() {return height;}
+
 private:
 	uint32_t colorTexture, depthTexture, fbo;
 	int width, height;
