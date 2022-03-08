@@ -1,0 +1,289 @@
+[Window][Debug##Default]
+ViewportPos=224,247
+ViewportId=0x9F5F46A1
+Size=400,400
+Collapsed=0
+
+[Window][Dear ImGui Demo]
+ViewportPos=243,232
+ViewportId=0xE927CF2F
+Size=866,497
+Collapsed=0
+
+[Window][Application Statistics]
+Pos=60,60
+Size=32,35
+Collapsed=0
+
+[Window][Example: Log]
+Pos=60,60
+Size=500,400
+Collapsed=0
+
+[Window][Example: Console]
+ViewportPos=577,158
+ViewportId=0xA4D966FE
+Size=584,457
+Collapsed=0
+DockId=0x3BC79352,1
+
+[Window][Dear ImGui Style Editor]
+ViewportPos=94,117
+ViewportId=0x6D551092
+Size=353,722
+Collapsed=0
+
+[Window][Hello, world!]
+ViewportPos=18,296
+ViewportId=0xEBE6C6E6
+Size=866,497
+Collapsed=0
+
+[Window][Example: Property editor]
+ViewportPos=65,165
+ViewportId=0x593C5C9B
+Size=430,450
+Collapsed=0
+
+[Window][Hello]
+Pos=60,60
+Size=65,48
+Collapsed=0
+
+[Window][About Dear ImGui]
+Pos=60,60
+Size=570,109
+Collapsed=0
+
+[Window][Hellow rod]
+Pos=60,60
+Size=58,48
+Collapsed=0
+
+[Window][Statistics]
+Pos=0,483
+Size=797,222
+Collapsed=0
+DockId=0x00000007,4
+
+[Window][General Controls]
+Pos=0,258
+Size=319,222
+Collapsed=0
+DockId=0x00000007,2
+
+[Window][System Console]
+ViewportPos=577,159
+ViewportId=0xA4D966FE
+Size=584,457
+Collapsed=0
+DockId=0x3BC79352,2
+
+[Window][Camera Controls]
+Pos=0,258
+Size=319,222
+Collapsed=0
+DockId=0x00000007,3
+
+[Window][Terrain Controls]
+Pos=0,33
+Size=319,224
+Collapsed=0
+DockId=0x3BC79352,0
+
+[Window][Light Controls]
+Pos=291,462
+Size=289,243
+Collapsed=0
+DockId=0x3BC79352,0
+
+[Window][Noise Settings]
+Pos=582,28
+Size=784,677
+Collapsed=0
+DockId=0x00000015,1
+
+[Window][Viewport]
+Pos=0,28
+Size=319,228
+Collapsed=0
+DockId=0x00000006,0
+
+[Window][Teffgsf]
+Pos=60,60
+Size=129,75
+Collapsed=0
+
+[Window][DockSpace Demo]
+Size=1366,705
+Collapsed=0
+
+[Window][Theme Editor]
+ViewportPos=663,106
+ViewportId=0x1974BBCA
+Size=622,459
+Collapsed=0
+
+[Window][Shader Editor Window (Beta)]
+Pos=978,235
+Size=388,470
+Collapsed=0
+DockId=0x00000008,0
+
+[Window][Create Shader##shaderEditor]
+ViewportPos=417,138
+ViewportId=0xAA02EECC
+Pos=408,0
+Size=194,538
+Collapsed=0
+DockId=0x3BC79352,0
+
+[Window][Elevation Node Editor]
+Pos=582,23
+Size=784,434
+Collapsed=0
+DockId=0x00000015,0
+
+[Window][Dashboard]
+Pos=0,258
+Size=319,222
+Collapsed=0
+DockId=0x00000007,0
+
+[Window][Sun Controls]
+Pos=0,461
+Size=580,244
+Collapsed=0
+DockId=0x3BC79352,1
+
+[Window][Texture Settings]
+Pos=582,28
+Size=784,677
+Collapsed=0
+DockId=0x00000015,2
+
+[Window][Sea Settings]
+Pos=954,28
+Size=412,677
+Collapsed=0
+DockId=0x00000013,0
+
+[Window][Contributers]
+ViewportPos=512,286
+ViewportId=0x67743C4C
+Size=275,108
+Collapsed=0
+
+[Window][Texture Store]
+Pos=582,28
+Size=784,677
+Collapsed=0
+DockId=0x00000015,2
+
+[Window][Open Source LICENSES]
+ViewportPos=393,165
+ViewportId=0x929E0302
+Size=506,503
+Collapsed=0
+
+[Window][Foliage Manager]
+Pos=1081,28
+Size=285,677
+Collapsed=0
+DockId=0x00000012,0
+
+[Window][Mesh Node Editor]
+Pos=582,28
+Size=784,677
+Collapsed=0
+DockId=0x00000015,0
+
+[Window][Mesh Node Editor Debugger]
+Pos=0,28
+Size=580,578
+Collapsed=0
+DockId=0x3BC79352,1
+
+[Window][Shader Editor Window]
+ViewportPos=815,93
+ViewportId=0xFFE85315
+Size=388,677
+Collapsed=0
+
+[Window][Sky Settings]
+Pos=954,371
+Size=412,334
+Collapsed=0
+DockId=0x00000014,0
+
+[Window][Filters Manager]
+Pos=1076,28
+Size=290,677
+Collapsed=0
+DockId=0x00000016,0
+
+[Window][Supporters]
+Pos=582,28
+Size=250,250
+Collapsed=0
+DockId=0x00000015,2
+
+[Window][DockSpace]
+Pos=0,0
+Size=640,480
+Collapsed=0
+
+[Window][Camera Controls##0]
+Pos=0,483
+Size=1184,222
+Collapsed=0
+DockId=0x00000007,3
+
+[Window][Light Setting##0]
+Pos=0,258
+Size=319,222
+Collapsed=0
+DockId=0x00000007,1
+
+[Window][Sea Setings]
+Pos=1186,28
+Size=180,677
+Collapsed=0
+DockId=0x00000003,0
+
+[Window][Mesh Generators]
+Pos=321,28
+Size=319,452
+Collapsed=0
+DockId=0x0000000A,0
+
+[Window][Textute Store Settings]
+Pos=321,28
+Size=319,452
+Collapsed=0
+DockId=0x0000000A,1
+
+[Table][0xD0F0C6E3,2]
+Column 0  Weight=1.0000
+Column 1  Weight=1.0000
+
+[Docking][Data]
+DockSpace         ID=0x09EF459F Window=0x9A404470 Pos=660,111 Size=640,452 Split=X
+  DockNode        ID=0x00000009 Parent=0x09EF459F SizeRef=797,452 Split=X
+    DockNode      ID=0x00000002 Parent=0x00000009 SizeRef=1184,677 Split=Y Selected=0x995B0CF8
+      DockNode    ID=0x00000006 Parent=0x00000002 SizeRef=1184,453 CentralNode=1 Selected=0x995B0CF8
+      DockNode    ID=0x00000007 Parent=0x00000002 SizeRef=1184,222 Selected=0xDE657D5B
+    DockNode      ID=0x00000003 Parent=0x00000009 SizeRef=180,677 Selected=0xAEFA9AC5
+  DockNode        ID=0x0000000A Parent=0x09EF459F SizeRef=567,452 Selected=0x5AF6475A
+DockSpace         ID=0x3BC79352 Pos=0,51 Size=1366,677 Split=Y
+  DockNode        ID=0x00000005 Parent=0x3BC79352 SizeRef=160,398 Split=X Selected=0xF498C204
+    DockNode      ID=0x0000000F Parent=0x00000005 SizeRef=370,525 Split=X Selected=0xE88D3F1B
+      DockNode    ID=0x00000011 Parent=0x0000000F SizeRef=497,677 Split=X Selected=0xE88D3F1B
+        DockNode  ID=0x00000015 Parent=0x00000011 SizeRef=492,677 CentralNode=1 Selected=0xE88D3F1B
+        DockNode  ID=0x00000016 Parent=0x00000011 SizeRef=290,677 Selected=0xE5CE34ED
+      DockNode    ID=0x00000012 Parent=0x0000000F SizeRef=285,677 Selected=0x213F919C
+    DockNode      ID=0x00000010 Parent=0x00000005 SizeRef=412,525 Split=Y Selected=0xD47684FE
+      DockNode    ID=0x00000013 Parent=0x00000010 SizeRef=412,341 Selected=0xD47684FE
+      DockNode    ID=0x00000014 Parent=0x00000010 SizeRef=412,334 Selected=0xB2796EE4
+  DockNode        ID=0x00000008 Parent=0x3BC79352 SizeRef=160,277 Selected=0x6C0FE6DB
+
