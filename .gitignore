@@ -3,6 +3,9 @@ bin
 vendor/premake/**.**
 scripts/__pycache__
 TerraForge3D
+Docs
+Tools
+vendor
 
 **.sln
 **.vcxproj
