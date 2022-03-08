@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          ref: ${{ github.head_ref }}        
           submodules: true
 
       - name: Build Docs
@@ -34,12 +35,12 @@ jobs:
 
           # Optional. Local file path to the repository.
           # Defaults to the root of the repository.
-          repository: ./ghpages
+          repository: .
 
           # Optional commit user and author settings
           commit_user_name: DocumentationBot
           commit_user_email: jaysmito101@gmail.com
-          commit_author: DocumentationBot <jaysmito101@gmail.com>
+          # commit_author: DocumentationBot <jaysmito101@gmail.com>
 
           # Optional. Options used by `git-add`.
           # See https://git-scm.com/docs/git-add#_options
@@ -65,4 +66,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: TerraForge3D Docs
-          path: Docs\html
+          path: ./documentation
