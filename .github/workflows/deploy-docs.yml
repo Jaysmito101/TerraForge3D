@@ -19,8 +19,8 @@ jobs:
         run: |
           scripts\DeployDocs.bat
           cd ..
-          mkdir TEMP
-          (robocopy TerraForge3D\\Docs\\html\\ TEMP\\ /s /e /MT /IS /IT /IM)  ^& echo "Done!"
+         mkdir TEMP
+          cmd /c "(robocopy TerraForge3D\\Docs\\html\\ TEMP\\ /s /e /MT /IS /IT /IM)  ^& echo Done!"
           cd TerraForge3D
 
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
 
       - name: Deploy Docs
         run: |
-          (robocopy TEMP\\ TerraForge3D\\documentation\\ /s /e /MT /IS /IT /IM)  ^&  echo "Done!"
+          cmd /c "(robocopy TEMP\\ TerraForge3D\\documentation\\ /s /e /MT /IS /IT /IM)  ^&  echo Done!"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
