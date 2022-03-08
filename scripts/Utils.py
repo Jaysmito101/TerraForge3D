@@ -85,7 +85,7 @@ def DownloadFile(url, filepath):
                 if (avgKBPerSecond > 1024):
                     avgMBPerSecond = avgKBPerSecond / 1024
                     avgSpeedString = '{:.2f} MB/s'.format(avgMBPerSecond)
-                sys.stdout.write('\r[{}{}] {:.2f}% ({}) (Estimated Time: {})    '.format('█' * done, '.' * (50-done), percentage, avgSpeedString, estimatedTimeString))
+                sys.stdout.write('\r[{}{}] {:.2f}% ({}) (Estimated Time: {})    '.format('#' * done, '.' * (50-done), percentage, avgSpeedString, estimatedTimeString))
                 sys.stdout.flush()
     sys.stdout.write('\n')
 
@@ -128,7 +128,7 @@ def UnzipFile(filepath, deleteZipFile=True):
             if (avgKBPerSecond > 1024):
                 avgMBPerSecond = avgKBPerSecond / 1024
                 avgSpeedString = '{:.2f} MB/s'.format(avgMBPerSecond)
-            sys.stdout.write('\r[{}{}] {:.2f}% ({}) (Estimated Time: {})     '.format('█' * done, '.' * (50-done), percentage, avgSpeedString, estimatedTimeString))
+            sys.stdout.write('\r[{}{}] {:.2f}% ({}) (Estimated Time: {})     '.format('#' * done, '.' * (50-done), percentage, avgSpeedString, estimatedTimeString))
             sys.stdout.flush()
     sys.stdout.write('\n')
 
