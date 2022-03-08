@@ -1,6 +1,6 @@
 .vs
 bin
-vendor/premake/**.**
+vendor
 scripts/__pycache__
 TerraForge3D/vendor/glad/bin
 TerraForge3D/vendor/glad/bin-int
