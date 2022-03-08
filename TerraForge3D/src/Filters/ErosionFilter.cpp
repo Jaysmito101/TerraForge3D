@@ -2,6 +2,8 @@
 #include <imgui.h>
 #include <iostream>
 
+#include "Data/ApplicationState.h"
+
 #define MAX(x, y) x>y?x:y
 #define MIN(x, y) x<y?x:y
 
@@ -65,6 +67,23 @@ HeightAndGradient CalculateHeightAndGradient(float *nodes, int mapSize, float po
 
 void ErosionFilter::Apply()
 {
+	Model *model;
+
+	if(appState->mode == ApplicationMode::TERRAIN)
+	{
+		model = appState->models.coreTerrain;
+	}
+
+	else if(appState->mode == ApplicationMode::CUSTOM_BASE)
+	{
+		model = appState->models.customBase;
+	}
+
+	else
+	{
+		return;
+	}
+
 	srand(time(NULL));
 	model->mesh->RecalculateNormals();
 	int mapSize = model->mesh->res;

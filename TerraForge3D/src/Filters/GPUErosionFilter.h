@@ -6,8 +6,8 @@ class GPUErosionFilter : public Filter
 {
 
 public:
-	GPUErosionFilter(Model *model)
-		:Filter(model, "Simple Erosion Filter (GPU)") {}
+	GPUErosionFilter(ApplicationState *appState)
+		:Filter(appState, "Simple Erosion Filter (GPU)") {}
 
 	virtual void Render() override;
 	virtual nlohmann::json Save() override;

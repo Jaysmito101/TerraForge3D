@@ -1,6 +1,8 @@
 #include "Base/OpenCL/ComputeKernel.h"
 #include "AdvancedErosionFilter.h"
 
+#include "Data/ApplicationState.h"
+
 #include "Utils.h"
 
 #include <imgui.h>
@@ -11,8 +13,8 @@
 #define MAX(x, y) x>y?x:y
 #define MIN(x, y) x<y?x:y
 
-AdvancedErosionFilter::AdvancedErosionFilter(Model *model)
-	: Filter(model, "Wind Erosion Filter (GPU)")
+AdvancedErosionFilter::AdvancedErosionFilter(ApplicationState *appState)
+	: Filter(appState, "Wind Erosion Filter (GPU)")
 {
 }
 
@@ -39,6 +41,23 @@ void AdvancedErosionFilter::Load(nlohmann::json data)
 
 void AdvancedErosionFilter::Apply()
 {
+	Model *model;
+
+	if(appState->mode == ApplicationMode::TERRAIN)
+	{
+		model = appState->models.coreTerrain;
+	}
+
+	else if(appState->mode == ApplicationMode::CUSTOM_BASE)
+	{
+		model = appState->models.customBase;
+	}
+
+	else
+	{
+		return;
+	}
+
 	srand(time(NULL));
 	model->mesh->RecalculateNormals();
 	bool tmp = false;

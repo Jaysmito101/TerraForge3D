@@ -4,7 +4,7 @@
 #include "ProjectData.h"
 #include "VersionInfo.h"
 #include "ApplicationState.h"
-#include "AppStyles.h"
+#include "Misc/AppStyles.h"
 
 #include "dirent/dirent.h"
 #include "zip.h"

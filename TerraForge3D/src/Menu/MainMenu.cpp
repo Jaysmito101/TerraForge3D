@@ -2,9 +2,9 @@
 
 #include "imgui/imgui.h"
 
-#include "Utils.h"
-#include "AppStyles.h"
-#include "ExportManager.h"
+#include "Utils/Utils.h"
+#include "Misc/AppStyles.h"
+#include "Misc/ExportManager.h"
 #include "Data/ApplicationState.h"
 
 static void ShowWindowMenuItem(const char *title, bool *val)

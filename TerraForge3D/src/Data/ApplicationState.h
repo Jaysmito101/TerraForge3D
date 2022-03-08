@@ -6,10 +6,11 @@
 #include "Sea/SeaManager.h"
 #include "Lighting/LightManager.h"
 #include "Data/Serializer.h"
-#include "MainMenu.h"
+#include "Menu/MainMenu.h"
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
-#include "SupportersTribute.h"
+#include "Misc/SupportersTribute.h"
+#include "Filters/FiltersManager.h"
 
 #include "json.hpp"
 
@@ -206,6 +207,7 @@ struct ApplicationState
 	MainMenu *mainMenu = nullptr;
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;
+	FiltersManager *filtersManager = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

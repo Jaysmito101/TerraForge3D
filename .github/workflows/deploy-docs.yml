@@ -15,9 +15,9 @@ jobs:
           ref: master        
           submodules: true
 
-      - name: Build Docs
+      - name: Generate Docs
         run: |
-          scripts\DeployDocs.bat
+          scripts\GenerateDocs.bat
           cd ..
           mkdir TEMP
           cmd /c "(robocopy TerraForge3D\\Docs\\html\\ TEMP\\ /s /e /MT /IS /IT /IM)  ^& echo Done!"

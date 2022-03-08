@@ -6,8 +6,8 @@ class DrawFilter : public Filter
 {
 
 public:
-	DrawFilter(Model *model)
-		:Filter(model, "Draw Filter") {}
+	DrawFilter(ApplicationState *appState)
+		:Filter(appState, "Draw Filter") {}
 
 	virtual void Render() override;
 	virtual nlohmann::json Save() override;

@@ -2,6 +2,8 @@
 #include <imgui.h>
 #include <iostream>
 
+#include "Data/ApplicationState.h"
+
 #include <ComputeShader.h>
 #include <ShaderStorageBuffer.h>
 
@@ -55,6 +57,23 @@ void GPUErosionFilter::Load(nlohmann::json data)
 
 void GPUErosionFilter::Apply()
 {
+	Model *model;
+
+	if(appState->mode == ApplicationMode::TERRAIN)
+	{
+		model = appState->models.coreTerrain;
+	}
+
+	else if(appState->mode == ApplicationMode::CUSTOM_BASE)
+	{
+		model = appState->models.customBase;
+	}
+
+	else
+	{
+		return;
+	}
+
 	float maxHeight = model->mesh->maxHeight;
 	float minHeight = model->mesh->minHeight;
 	model->mesh->RecalculateNormals();

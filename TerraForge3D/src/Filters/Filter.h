@@ -2,11 +2,13 @@
 #include <Model.h>
 #include <json.hpp>
 
+class ApplicationState;
+
 class Filter
 {
 public:
-	Filter(Model *model, std::string name = "Filter")
-		:name(name), model(model) {}
+	Filter(ApplicationState *appState, std::string name = "Filter")
+		:name(name), appState(appState) {}
 
 	virtual void Load(nlohmann::json data) = 0;
 	virtual nlohmann::json Save() = 0;
@@ -14,6 +16,6 @@ public:
 	virtual void Apply() = 0;
 	virtual void OnAttach() {};
 
-	Model *model;
+	ApplicationState *appState;
 	std::string name;
 };

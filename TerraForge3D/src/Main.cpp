@@ -1,12 +1,9 @@
 #include "../resource.h"
 
-#include <AppStyles.h>
-#include <ExplorerControls.h>
+#include <Misc/ExplorerControls.h>
 
-#include "OSLiscenses.h"
-#include <FiltersManager.h>
-#include <FoliagePlacement.h>
-#include <SkySettings.h>
+#include <Foliage/FoliagePlacement.h>
+#include <Sky/SkySettings.h>
 
 
 // TerraForge3D Base
@@ -26,10 +23,13 @@
 #include "Data/VersionInfo.h"
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
-#include "ExportManager.h"
-#include "Utils.h"
-#include "SupportersTribute.h"
+#include "Misc/ExportManager.h"
+#include "Misc/OSLiscenses.h"
+#include "Misc/AppStyles.h"
+#include "Misc/SupportersTribute.h"
+
 #include "Platform.h"
+#include "Utils/Utils.h"
 
 #undef cNear
 #undef cFar
@@ -1016,7 +1016,7 @@ public:
 
 		if (appState->windows.filtersManager)
 		{
-			ShowFiltersMamager(&appState->windows.filtersManager);
+			appState->filtersManager->ShowSettings(&appState->windows.filtersManager);
 		}
 
 		if (appState->windows.osLisc)
@@ -1101,7 +1101,7 @@ public:
 		}
 
 		SetProjectId(GenerateId(32));
-		SetupFiltersManager(&appState->states.autoUpdate, appState->models.coreTerrain);
+		appState->filtersManager = new FiltersManager(appState);
 		float t = 1.0f;
 		SetupSky();
 		// Load Fonts
@@ -1159,6 +1159,7 @@ public:
 		delete appState->frameBuffers.postProcess;
 		delete appState->frameBuffers.reflection;
 		delete appState->frameBuffers.textureExport;
+		delete appState->filtersManager;
 //		delete appState->seaManager;
 		delete appState->lightManager;
 		delete appState->serailizer;

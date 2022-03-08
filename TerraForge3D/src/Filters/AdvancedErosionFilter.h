@@ -39,7 +39,7 @@ class AdvancedErosionFilter : public Filter
 {
 
 public:
-	AdvancedErosionFilter(Model *model);
+	AdvancedErosionFilter(ApplicationState *appState);
 
 	virtual void Render() override;
 	virtual nlohmann::json Save() override;

@@ -68,6 +68,7 @@ project "TerraForge3DLib"
 	includedirs {
 		"./TerraForge3D/vendor/assimp/include",
 		"./TerraForge3D/src",
+		"./TerraForge3D/src/Utils",
 		"./TerraForge3D/src/Base",
 		"./TerraForge3D/vendor",
 		"%{IncludeDir.GLFW}",

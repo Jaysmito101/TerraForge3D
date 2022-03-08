@@ -6,8 +6,8 @@ class ErosionFilter : public Filter
 {
 
 public:
-	ErosionFilter(Model *model)
-		:Filter(model, "Simple Erosion Filter (CPU)") {}
+	ErosionFilter(ApplicationState *appState)
+		:Filter(appState, "Simple Erosion Filter (CPU)") {}
 
 	virtual void Render() override;
 	virtual nlohmann::json Save() override;

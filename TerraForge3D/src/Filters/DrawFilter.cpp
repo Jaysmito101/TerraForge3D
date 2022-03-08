@@ -1,5 +1,5 @@
 #include "DrawFilter.h"
-
+#include "Data/ApplicationState.h"
 #include "imgui.h"
 
 #include "Base/ImGuiShapes.h"
@@ -8,6 +8,23 @@
 
 void DrawFilter::Render()
 {
+	Model *model;
+
+	if(appState->mode == ApplicationMode::TERRAIN)
+	{
+		model = appState->models.coreTerrain;
+	}
+
+	else if(appState->mode == ApplicationMode::CUSTOM_BASE)
+	{
+		model = appState->models.customBase;
+	}
+
+	else
+	{
+		return;
+	}
+
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1, 1, 1, 1));
 	ImGui::BeginChild("##DrawFilterDrawArea", ImVec2(200, 200));
 
