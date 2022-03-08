@@ -5,7 +5,8 @@
 #include <json.hpp>
 
 
-class Camera {
+class Camera
+{
 public:
 	glm::mat4 view;
 	glm::mat4 pers;
@@ -35,7 +36,7 @@ public:
 
 	void Load(nlohmann::json data);
 
-	void ShowSettings(bool renderWindow = false, bool* pOpen = nullptr);
+	void ShowSettings(bool renderWindow = false, bool *pOpen = nullptr);
 
 	void UpdateCamera();
 };

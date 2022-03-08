@@ -25,13 +25,16 @@ void LayeredNoiseManager::Render()
 	ImGui::Checkbox("Square Value##LayeredNoiseManager", &sq);
 	ImGui::NewLine();
 	ImGui::Text("Noise Layers");
-	std::vector<NoiseLayer*> nl = noiseLayers;
+	std::vector<NoiseLayer *> nl = noiseLayers;
+
 	for (int i = 0; i < nl.size(); i++)
 	{
 		bool state = ImGui::CollapsingHeader((std::string("##noiseLayerName") + std::to_string(i)).c_str());
+
 		if (state)
 		{
 			nl[i]->Render(i);
+
 			if (toAdd.size() == 0)
 			{
 				if (ImGui::Button("Duplicate"))
@@ -41,19 +44,25 @@ void LayeredNoiseManager::Render()
 					toAdd.back()->Load(data);
 				}
 			}
-			if (noiseLayers.size() > 1 && toDelete.size() == 0) {
+
+			if (noiseLayers.size() > 1 && toDelete.size() == 0)
+			{
 				ImGui::SameLine();
+
 				if (ImGui::Button("Delete"))
 				{
 					toDelete.push_back(i);
 				}
 			}
 		}
-		else {
+
+		else
+		{
 			ImGui::SameLine();
 			ImGui::Text(nl[i]->name.data());
 		}
 	}
+
 	if (toAdd.size() == 0)
 	{
 		if (ImGui::Button("Add New Layer"))
@@ -87,14 +96,20 @@ void LayeredNoiseManager::Load(nlohmann::json data)
 	offset[2] = data["offsetZ"];
 	strength = data["strength"];
 	mutex.lock();
-	for (NoiseLayer* nl : noiseLayers)
+
+	for (NoiseLayer *nl : noiseLayers)
+	{
 		delete nl;
+	}
+
 	noiseLayers.clear();
+
 	for (nlohmann::json tmp : data["noiseLayers"])
 	{
 		noiseLayers.push_back(new NoiseLayer());
 		noiseLayers.back()->Load(tmp);
 	}
+
 	mutex.unlock();
 }
 
@@ -102,11 +117,14 @@ nlohmann::json LayeredNoiseManager::Save()
 {
 	nlohmann::json data, tmp, tmp2;
 	mutex.lock();
-	for (int i = 0; i < noiseLayers.size(); i++) {
+
+	for (int i = 0; i < noiseLayers.size(); i++)
+	{
 		tmp2 = noiseLayers[i]->Save();
 		tmp2["index"] = i;
 		tmp.push_back(tmp2);
 	}
+
 	mutex.unlock();
 	data["noiseLayers"] = tmp;
 	data["sq"] = sq;
@@ -120,14 +138,22 @@ nlohmann::json LayeredNoiseManager::Save()
 
 float LayeredNoiseManager::Evaluate(float x, float y, float z)
 {
-	std::vector<NoiseLayer*> nl = noiseLayers;
+	std::vector<NoiseLayer *> nl = noiseLayers;
 	float noise = 0.0f;
-	for (NoiseLayer* n : nl)
+
+	for (NoiseLayer *n : nl)
 		noise += n->Evaluate({ x + offset[0], y + offset[1], z + offset[2] });
 	noise *= strength;
+
 	if (absv)
+	{
 		noise = abs(noise);
+	}
+
 	if (sq)
+	{
 		noise = noise * noise;
+	}
+
 	return noise;
 }

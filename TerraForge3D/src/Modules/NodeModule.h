@@ -8,8 +8,8 @@ struct NodeInputParam;
 class NodeModule : public Module
 {
 public:
-	NodeModule(std::string id, ModuleManager* manager);
-	
+	NodeModule(std::string id, ModuleManager *manager);
+
 	void Render();
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

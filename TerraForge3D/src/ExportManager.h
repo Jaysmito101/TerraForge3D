@@ -5,4 +5,4 @@
 
 class Model;
 
-void ExportModelAssimp(Model* model, std::string , std::string path, std::string extension = "");
+void ExportModelAssimp(Model *model, std::string, std::string path, std::string extension = "");

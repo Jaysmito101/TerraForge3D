@@ -9,9 +9,9 @@ struct ApplicationState;
 class ClearMeshGenerator
 {
 public:
-	ClearMeshGenerator(ApplicationState* appState, ComputeKernel* kernel);
+	ClearMeshGenerator(ApplicationState *appState, ComputeKernel *kernel);
 
-	virtual void Generate(ComputeKernel* kernels);
+	virtual void Generate(ComputeKernel *kernels);
 
 	virtual nlohmann::json Save();
 
@@ -23,6 +23,6 @@ public:
 	bool useGPU = false;
 	bool useGPUForNormals = false;
 	double time = 0;
-	ApplicationState* appState;
-	
+	ApplicationState *appState;
+
 };

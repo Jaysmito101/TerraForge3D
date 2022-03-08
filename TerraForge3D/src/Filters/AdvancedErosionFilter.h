@@ -13,7 +13,7 @@ struct WindErosionParticle
 	float roughness = 0.005f;
 	float settling = 0.01f;
 	float sediment = 0.25f;
-	float height = 0.0f;	
+	float height = 0.0f;
 	float index = 0.0f;
 	float seed = 0.0f;
 
@@ -35,11 +35,12 @@ struct WindErosionParticle
 };
 #pragma pack(pop)
 
-class AdvancedErosionFilter : public Filter {
+class AdvancedErosionFilter : public Filter
+{
 
 public:
-	AdvancedErosionFilter(Model* model);
- 
+	AdvancedErosionFilter(Model *model);
+
 	virtual void Render() override;
 	virtual nlohmann::json Save() override;
 	virtual void Load(nlohmann::json data) override;

@@ -12,7 +12,7 @@ struct ApplicationState;
 class CPUNoiseLayersGenerator
 {
 public:
-	CPUNoiseLayersGenerator(ApplicationState* appState);
+	CPUNoiseLayersGenerator(ApplicationState *appState);
 	~CPUNoiseLayersGenerator();
 
 	nlohmann::json Save();
@@ -30,7 +30,7 @@ public:
 	double time = 0;
 	std::string uid;
 	std::string name;
-	ApplicationState* appState;
-	LayeredNoiseManager* noiseManager;
-	GeneratorMaskManager* maskManager;
+	ApplicationState *appState;
+	LayeredNoiseManager *noiseManager;
+	GeneratorMaskManager *maskManager;
 };

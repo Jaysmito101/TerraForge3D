@@ -17,6 +17,7 @@ TerraForge3D/vendor/assimp/bin-int
 **.filters
 **.aps
 **.ini
+**.orig
 
 TerraForge3D/**.exe
 TerraForge3D/**.obj

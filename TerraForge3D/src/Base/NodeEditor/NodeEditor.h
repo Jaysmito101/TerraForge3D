@@ -22,12 +22,12 @@ enum NodeEditorPinType
 	PinTypeCount
 };
 
-struct NodeOutput 
+struct NodeOutput
 {
 	float value;
 };
 
-struct NodeInputParam 
+struct NodeInputParam
 {
 	float x;
 	float y;
@@ -45,7 +45,7 @@ struct NodeInputParam
 	float maxZ;
 
 	NodeInputParam();
-	NodeInputParam(float* pos, float* texCoord, float* minPos, float* maxPos);
+	NodeInputParam(float *pos, float *texCoord, float *minPos, float *maxPos);
 };
 
 
@@ -55,7 +55,7 @@ void SeUIDSeed(int seed);
 class NodeEditorNode;
 class NodeEditorPin;
 
-struct NodeEditorConfig 
+struct NodeEditorConfig
 {
 	std::string saveFile;
 	std::function<void(void)> updateFunc;
@@ -65,13 +65,13 @@ struct NodeEditorConfig
 	NodeEditorConfig(std::string saveFile = "NodeEditor.terr3d");
 };
 
-class NodeEditorLink 
+class NodeEditorLink
 {
 public:
 	int id;
 	ImGuiNodeEditor::LinkId _id;
-	NodeEditorPin* from;
-	NodeEditorPin* to;
+	NodeEditorPin *from;
+	NodeEditorPin *to;
 	ImVec4 color = ImVec4(1, 1, 1, 1);
 	float thickness = 1.0f;
 
@@ -86,9 +86,9 @@ class NodeEditorPin
 public:
 	int id;
 	ImGuiNodeEditor::PinId _id;
-	NodeEditorLink* link;
-	NodeEditorPin* other;
-	NodeEditorNode* parent;
+	NodeEditorLink *link;
+	NodeEditorPin *other;
+	NodeEditorNode *parent;
 	NodeEditorPinType type;
 	std::mutex mutex;
 	ImU32 color = ImColor(94, 95, 191);
@@ -98,8 +98,8 @@ public:
 	virtual void Load(nlohmann::json data);
 	virtual void Begin();
 	virtual void End();
-	bool ValidateLink(NodeEditorLink* link);
-	void Link(NodeEditorLink* link);
+	bool ValidateLink(NodeEditorLink *link);
+	void Link(NodeEditorLink *link);
 	bool IsLinked();
 	void Unlink();
 	void Render();
@@ -117,16 +117,16 @@ public:
 	bool reqNodePosLoad;
 	int id;
 	ImGuiNodeEditor::NodeId _id;
-	std::vector<NodeEditorPin*> outputPins;
-	std::vector<NodeEditorPin*> inputPins;
+	std::vector<NodeEditorPin *> outputPins;
+	std::vector<NodeEditorPin *> inputPins;
 	char userData[128];
 	std::string name;
 	ImU32 headerColor = ImColor(59, 29, 209);
 	std::mutex m;
 
-	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin) = 0;
-	virtual std::vector<NodeEditorPin*> GetPins();
-	virtual bool OnLink(NodeEditorPin* pin, NodeEditorLink* link);
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin) = 0;
+	virtual std::vector<NodeEditorPin *> GetPins();
+	virtual bool OnLink(NodeEditorPin *pin, NodeEditorLink *link);
 	virtual void OnDelete();
 
 	nlohmann::json SaveInternal();
@@ -144,26 +144,26 @@ public:
 };
 
 
-class NodeEditor 
+class NodeEditor
 {
 public:
-	ImGuiNodeEditor::EditorContext* context;
+	ImGuiNodeEditor::EditorContext *context;
 	std::string name = "Node Editor";
 	NodeEditorConfig config;
-	std::unordered_map<uintptr_t,  NodeEditorLink*> links;
-	std::unordered_map<uintptr_t,  NodeEditorNode*> nodes;
-	std::unordered_map<uintptr_t, NodeEditorPin*> pins;
-	NodeEditorNode* outputNode = nullptr;
+	std::unordered_map<uintptr_t,  NodeEditorLink *> links;
+	std::unordered_map<uintptr_t,  NodeEditorNode *> nodes;
+	std::unordered_map<uintptr_t, NodeEditorPin *> pins;
+	NodeEditorNode *outputNode = nullptr;
 	std::mutex mutex;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 	void Render();
-	void AddNode(NodeEditorNode* node);
-	void DeleteNode(NodeEditorNode* node);
-	void DeleteLink(NodeEditorLink* link);
+	void AddNode(NodeEditorNode *node);
+	void DeleteNode(NodeEditorNode *node);
+	void DeleteLink(NodeEditorLink *link);
 	void Reset();
-	void SetOutputNode(NodeEditorNode* node);
+	void SetOutputNode(NodeEditorNode *node);
 
 	NodeEditor(NodeEditorConfig config = NodeEditorConfig());
 	~NodeEditor();

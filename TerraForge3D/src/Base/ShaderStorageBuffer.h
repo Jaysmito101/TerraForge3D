@@ -2,7 +2,8 @@
 
 #include <cstdint>
 
-class ShaderStorageBuffer {
+class ShaderStorageBuffer
+{
 
 public:
 	ShaderStorageBuffer();
@@ -11,8 +12,8 @@ public:
 	void Bind(int index);
 	void Bind();
 	void Unbind();
-	void SetData(void* data, unsigned int size, bool dynamic = true);
-	void GetData(void* data, int size);
+	void SetData(void *data, unsigned int size, bool dynamic = true);
+	void GetData(void *data, int size);
 
 	uint32_t rendererId;
 };

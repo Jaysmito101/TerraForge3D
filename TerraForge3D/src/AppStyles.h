@@ -7,7 +7,7 @@ void LoadDarkCoolStyle();
 void LoadLightOrngeStyle();
 void LoadBlackAndWhite();
 void LoadMayaStyle();
-void ShowStyleEditor(bool* pOpen);
+void ShowStyleEditor(bool *pOpen);
 
 bool LoadThemeFromFile(std::string filename);
 bool LoadThemeFromStr(std::string data);

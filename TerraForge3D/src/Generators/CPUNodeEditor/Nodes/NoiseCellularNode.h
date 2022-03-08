@@ -5,11 +5,12 @@
 
 class FastNoiseLite;
 
-class NoiseCellularNode : public NodeEditorNode {
+class NoiseCellularNode : public NodeEditorNode
+{
 public:
 
 
-	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin);
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin);
 
 	virtual void Load(nlohmann::json data);
 	virtual nlohmann::json Save();
@@ -21,5 +22,5 @@ public:
 	int seed, octaves;
 	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength, cellularJitter;
 	int fractalType, distanceFunc;
-	FastNoiseLite* noiseGen;
+	FastNoiseLite *noiseGen;
 };

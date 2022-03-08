@@ -6,14 +6,15 @@
 #include <windows.h>
 #include <string>
 
-namespace SplashScreen {
+namespace SplashScreen
+{
 
 
-	void Init(HINSTANCE hInstance);
-	void Destory();
-	void SetSplashMessage(std::string message);
-	void HideSplashScreen();
-	void ShowSplashScreen();
+void Init(HINSTANCE hInstance);
+void Destory();
+void SetSplashMessage(std::string message);
+void HideSplashScreen();
+void ShowSplashScreen();
 }
 
 #endif

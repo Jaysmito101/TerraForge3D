@@ -7,17 +7,18 @@
 #include <Camera.h>
 #include <Shader.h>
 
-struct FoliageItem {
+struct FoliageItem
+{
 	std::string name;
 	std::string modelDir;
-	Texture2D* texture;
+	Texture2D *texture;
 	bool textureLoaded = false;
-	Model* model;
+	Model *model;
 	bool active = true;
 };
 
 void SetupFoliageManager();
 
-void ShowFoliageManager(bool* pOpen);
+void ShowFoliageManager(bool *pOpen);
 
-void RenderFoliage(Shader* shader, Camera& camera);
+void RenderFoliage(Shader *shader, Camera &camera);

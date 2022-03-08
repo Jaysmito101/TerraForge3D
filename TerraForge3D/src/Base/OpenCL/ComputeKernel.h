@@ -34,9 +34,9 @@ public:
 
 	void SetKernelArg(std::string name, int arg, std::string bufferName);
 
-	void ReadBuffer(std::string name, bool blocking, size_t size, void* data);
+	void ReadBuffer(std::string name, bool blocking, size_t size, void *data);
 
-	void WriteBuffer(std::string name, bool blocking, size_t size, void* data);
+	void WriteBuffer(std::string name, bool blocking, size_t size, void *data);
 
 	void CreateBuffer(std::string name, int type, size_t size);
 

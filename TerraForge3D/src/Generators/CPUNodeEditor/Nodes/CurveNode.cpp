@@ -9,16 +9,19 @@
 // Temporary
 
 template <typename t>
-static void ReserveVector(std::vector<t>& vec, int amount)
+static void ReserveVector(std::vector<t> &vec, int amount)
 {
 	int size = vec.size();
+
 	for (int i = size; i <= amount; i++)
+	{
 		vec.push_back(t());
+	}
 }
 
-static const char* axises[3] = {"X", "Y", "Z"};
+static const char *axises[3] = {"X", "Y", "Z"};
 
-NodeOutput CurveNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
+NodeOutput CurveNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 {
 	float result = 0;
 	float axisVal = 0;
@@ -26,23 +29,30 @@ NodeOutput CurveNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 
 	switch (axis)
 	{
-	case 0 :
-		axisVal = input.x;
-		axisMax = input.maxX;
-		break;
-	case 1:
-		axisVal = input.y;
-		axisMax = input.maxY;
-		break;
-	case 2:
-		axisVal = input.z;
-		axisMax = input.maxZ;
-		break;
-	default:
-		break;
+		case 0 :
+			axisVal = input.x;
+			axisMax = input.maxX;
+			break;
+
+		case 1:
+			axisVal = input.y;
+			axisMax = input.maxY;
+			break;
+
+		case 2:
+			axisVal = input.z;
+			axisMax = input.maxZ;
+			break;
+
+		default:
+			break;
 	}
+
 	if (axisMax == 0)
+	{
 		axisMax = 1;
+	}
+
 	return NodeOutput({ ImGui::CurveValueSmooth((axisVal/axisMax), maxPoints, curve.data()) });
 }
 
@@ -50,8 +60,12 @@ void CurveNode::Load(nlohmann::json data)
 {
 	maxPoints = data["maxPoints"];
 	ReserveVector(curve, (maxPoints > data["curveSize"] ? maxPoints : data["curveSize"]));
+
 	for (nlohmann::json tmp : data["curve"])
+	{
 		curve[tmp["index"]] = ImVec2(tmp["x"], tmp["y"]);
+	}
+
 	axis = data["axis"];
 }
 
@@ -61,6 +75,7 @@ nlohmann::json CurveNode::Save()
 	nlohmann::json tmp;
 	data["type"] = MeshNodeEditor::MeshNodeType::Curve;
 	int i = 0;
+
 	for (ImVec2 point : curve)
 	{
 		nlohmann::json tmp2;
@@ -69,6 +84,7 @@ nlohmann::json CurveNode::Save()
 		tmp2["index"] = i++;
 		tmp.push_back(tmp2);
 	}
+
 	data["curve"] = tmp;
 	data["curveSize"] = curve.size();
 	data["maxPoints"] = maxPoints;
@@ -79,33 +95,37 @@ nlohmann::json CurveNode::Save()
 void CurveNode::OnRender()
 {
 	DrawHeader("Curve Editor");
-
 	ImGui::Dummy(ImVec2(150, 10));
 	ImGui::SameLine();
 	ImGui::Text("Out");
 	outputPins[0]->Render();
-
 	ImGui::Text("Max Points");
 	ImGui::PushItemWidth(100);
-	if (ImGui::DragInt(("##dI" + std::to_string(id)).c_str(), &maxPoints, 1, 10, 256))
-		ReserveVector(curve, maxPoints);
-	ImGui::PopItemWidth();
 
+	if (ImGui::DragInt(("##dI" + std::to_string(id)).c_str(), &maxPoints, 1, 10, 256))
+	{
+		ReserveVector(curve, maxPoints);
+	}
+
+	ImGui::PopItemWidth();
 	ImGui::NewLine();
 
 	if (ImGui::Curve(("##" + std::to_string(id)).c_str(), ImVec2(200, 200), maxPoints, curve.data()))
 	{
-
 	}
 
 	ImGui::Text("Current Axis: ");
 	ImGui::SameLine();
 	ImGui::Text(axises[axis]);
+
 	if (ImGui::Button(("Change Axis##" + std::to_string(id)).c_str()))
 	{
 		axis++;
+
 		if (axis == 3)
+		{
 			axis = 0;
+		}
 	}
 }
 

@@ -18,10 +18,11 @@ class CPUNodeEditor;
 
 #include <atomic>
 
-class MeshGeneratorManager {
+class MeshGeneratorManager
+{
 public:
 
-	MeshGeneratorManager(ApplicationState* appState);
+	MeshGeneratorManager(ApplicationState *appState);
 	~MeshGeneratorManager();
 
 	void Generate();
@@ -43,12 +44,12 @@ public:
 	bool windowStat = true;
 
 private:
-	ApplicationState* appState;
-	Model* tmpModel;
-	std::atomic<bool>* isRemeshing;
-	ComputeKernel* kernels;
-	ClearMeshGenerator* clearMeshGen;
-	std::vector<CPUNoiseLayersGenerator*> cpuNoiseLayers;
-	std::vector<GPUNoiseLayerGenerator*> gpuNoiseLayers;
-	std::vector<CPUNodeEditor*> cpuNodeEditors;
+	ApplicationState *appState;
+	Model *tmpModel;
+	std::atomic<bool> *isRemeshing;
+	ComputeKernel *kernels;
+	ClearMeshGenerator *clearMeshGen;
+	std::vector<CPUNoiseLayersGenerator *> cpuNoiseLayers;
+	std::vector<GPUNoiseLayerGenerator *> gpuNoiseLayers;
+	std::vector<CPUNodeEditor *> cpuNodeEditors;
 };

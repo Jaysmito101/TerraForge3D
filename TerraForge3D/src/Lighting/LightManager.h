@@ -9,7 +9,7 @@ public:
 	LightManager();
 	~LightManager();
 
-	void ShowSettings(bool renderWindow = false, bool* pOpen = nullptr);
+	void ShowSettings(bool renderWindow = false, bool *pOpen = nullptr);
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

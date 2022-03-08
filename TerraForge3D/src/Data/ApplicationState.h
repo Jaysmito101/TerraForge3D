@@ -15,12 +15,12 @@
 
 struct ApplicationStateModels
 {
-	Model* coreTerrain;
-	Model* grid; // For future use
-	Model* screenQuad;
+	Model *coreTerrain;
+	Model *grid; // For future use
+	Model *screenQuad;
 
-	Model* customBase;
-	Model* customBaseCopy;
+	Model *customBase;
+	Model *customBaseCopy;
 
 	ApplicationStateModels();
 	~ApplicationStateModels();
@@ -28,23 +28,23 @@ struct ApplicationStateModels
 
 struct ApplicationStateFrameBuffers
 {
-	FrameBuffer* reflection;
-	FrameBuffer* textureExport;
-	FrameBuffer* postProcess;
-	FrameBuffer* main;
-	FrameBuffer* texBakeMain = nullptr;
+	FrameBuffer *reflection;
+	FrameBuffer *textureExport;
+	FrameBuffer *postProcess;
+	FrameBuffer *main;
+	FrameBuffer *texBakeMain = nullptr;
 };
 
 struct ApplicationStateShaders
 {
-	Shader* terrain = nullptr;
-	Shader* wireframe = nullptr;
-	Shader* textureBake = nullptr;
-	Shader* foliage = nullptr;
-	Shader* postProcess = nullptr;
+	Shader *terrain = nullptr;
+	Shader *wireframe = nullptr;
+	Shader *textureBake = nullptr;
+	Shader *foliage = nullptr;
+	Shader *postProcess = nullptr;
 
 	// For future use
-	Shader* meshNormals = nullptr;
+	Shader *meshNormals = nullptr;
 };
 
 struct ApplicationStateCameras
@@ -65,7 +65,8 @@ struct ApplicationStateStatistics
 	int vertexCount = 0;
 };
 
-struct ApplicationStateWindows {
+struct ApplicationStateWindows
+{
 	bool styleEditor = false;
 	bool statsWindow = false;
 	bool shaderEditorWindow = false;
@@ -88,7 +89,7 @@ struct ApplicationStateWindows {
 
 struct ApplicationStateModules
 {
-	ModuleManager* manager;
+	ModuleManager *manager;
 };
 
 struct ApplicationStateStates
@@ -117,7 +118,7 @@ struct ApplicationStateStates
 
 struct ApplicationStateTextures
 {
-	Texture2D* grid;
+	Texture2D *grid;
 };
 
 struct ApplicationStateGlobals
@@ -129,7 +130,7 @@ struct ApplicationStateGlobals
 	float viewportMousePosY = 0;
 	float scale = 1.0f;
 	float offset[3];
-	
+
 
 	int resolution = 256;
 	int numberOfNoiseTypes = 3;
@@ -184,7 +185,7 @@ enum ApplicationMode
 
 struct ApplicationState
 {
-	Application* mainApp;
+	Application *mainApp;
 
 	ApplicationStateModels models;
 	ApplicationStateFrameBuffers frameBuffers;
@@ -198,13 +199,13 @@ struct ApplicationState
 	ApplicationStateGlobals globals;
 	ApplicationStateConstants constants;
 
-	SeaManager* seaManager = nullptr;
-	LightManager* lightManager = nullptr;
-	Serializer* serailizer = nullptr;
-	MeshGeneratorManager* meshGenerator = nullptr;
-	MainMenu* mainMenu = nullptr;
-	TextureStore* textureStore = nullptr;
-	SupportersTribute* supportersTribute = nullptr;
+	SeaManager *seaManager = nullptr;
+	LightManager *lightManager = nullptr;
+	Serializer *serailizer = nullptr;
+	MeshGeneratorManager *meshGenerator = nullptr;
+	MainMenu *mainMenu = nullptr;
+	TextureStore *textureStore = nullptr;
+	SupportersTribute *supportersTribute = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

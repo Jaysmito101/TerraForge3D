@@ -2,12 +2,13 @@
 
 #include "Base/NodeEditor/NodeEditor.h"
 
-class DummyNode : public NodeEditorNode {
+class DummyNode : public NodeEditorNode
+{
 public:
 
 
-	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin);
-	virtual bool OnLink(NodeEditorPin* pin, NodeEditorLink* link);
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin);
+	virtual bool OnLink(NodeEditorPin *pin, NodeEditorLink *link);
 	virtual void OnDelete();
 
 	virtual void Load(nlohmann::json data);

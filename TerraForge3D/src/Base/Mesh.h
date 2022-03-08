@@ -3,12 +3,13 @@
 #define GLM_FORCE_SIMD_AVX2
 #include <glm/glm.hpp>
 
-enum MeshType {
+enum MeshType
+{
 	Plane = 0,
 	Icosphere
 };
 
-struct Vert 
+struct Vert
 {
 	glm::vec4 position;
 	glm::vec4 normal;
@@ -17,7 +18,7 @@ struct Vert
 };
 
 class Mesh
- {
+{
 public:
 	Mesh();
 
@@ -41,12 +42,12 @@ public:
 
 	glm::vec3 GetNormals(int x, int y);
 
-	Mesh* Clone();
+	Mesh *Clone();
 
 	bool IsValid();
 
-	Vert* vert;
-	int* indices;
+	Vert *vert;
+	int *indices;
 	int vertexCount;
 	int indexCount;
 	int res;

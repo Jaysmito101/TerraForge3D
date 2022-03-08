@@ -5,7 +5,7 @@ struct ApplicationState;
 class MainMenu
 {
 public:
-	MainMenu(ApplicationState* appState);
+	MainMenu(ApplicationState *appState);
 	~MainMenu();
 
 	void ShowMainMenu();
@@ -16,5 +16,5 @@ public:
 	void ShowHelpMenu();
 
 private:
-	ApplicationState* appState;
+	ApplicationState *appState;
 };

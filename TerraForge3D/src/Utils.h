@@ -10,34 +10,39 @@
 
 std::string UChar2Hex(unsigned char c);
 
-struct Hash {
+struct Hash
+{
 
-	Hash() {
-
+	Hash()
+	{
 	}
 
-	Hash(unsigned char* d, int l) {
+	Hash(unsigned char *d, int l)
+	{
 		length = l;
 		data = new unsigned char[length];
 		memcpy_s(data, length, d, l);
 	}
 
-	~Hash() {
+	~Hash()
+	{
 		//delete[] data;
 	}
 
-	std::string ToString() {
+	std::string ToString()
+	{
 		std::string hash;
-		for (int i = 0; i < length; i++) 
+
+		for (int i = 0; i < length; i++)
 		{
-			
 			hash += UChar2Hex(data[i]);
 		}
+
 		return hash;
 	}
 
 	int length = 0;
-	unsigned char* data;
+	unsigned char *data;
 };
 
 
@@ -45,7 +50,7 @@ struct Hash {
 
 
 #ifdef TERR3D_WIN32
-std::wstring s2ws(const std::string& s);
+std::wstring s2ws(const std::string &s);
 #endif
 
 void OpenURL(std::string url);
@@ -56,7 +61,7 @@ std::string openfilename();
 
 std::string ShowOpenFileDialog(std::string ext = "*.glsl");
 
-std::string ReadShaderSourceFile(std::string path, bool* result);
+std::string ReadShaderSourceFile(std::string path, bool *result);
 
 std::string GetExecutablePath();
 
@@ -66,17 +71,17 @@ std::string GenerateId(uint32_t length);
 
 std::string FetchURL(std::string baseURL, std::string path);
 
-char* UChar2Char(unsigned char* data, int length);
+char *UChar2Char(unsigned char *data, int length);
 
 bool FileExists(std::string path, bool writeAccess = false);
 
-bool PathExist(const std::string& s);
+bool PathExist(const std::string &s);
 
 bool IsNetWorkConnected();
 
-char* ReadBinaryFile(std::string path, int* size, uint32_t sizeToLoad = -1);
+char *ReadBinaryFile(std::string path, int *size, uint32_t sizeToLoad = -1);
 
-char* ReadBinaryFile(std::string path, uint32_t sizeToLoad = -1);
+char *ReadBinaryFile(std::string path, uint32_t sizeToLoad = -1);
 
 Hash MD5File(std::string path);
 
@@ -84,13 +89,13 @@ void DownloadFile(std::string baseURL, std::string urlPath, std::string path, in
 
 void SaveToFile(std::string filename, std::string content = "");
 
-void Log(const char* log);
+void Log(const char *log);
 
 void Log(std::string log);
 
 #ifdef TERR3D_WIN32
 #include <windows.h>
-void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue);
+void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue);
 #endif
 
 void AccocFileType();
@@ -107,7 +112,7 @@ bool IsMouseButtonDown(int button);
 
 void ShowMessageBox(std::string message, std::string title = "Info");
 
-bool LoadFileIntoTexture(Texture2D* texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false);
+bool LoadFileIntoTexture(Texture2D *texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false);
 
 void ToggleSystemConsole();
 

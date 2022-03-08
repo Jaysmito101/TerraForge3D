@@ -6,7 +6,7 @@
 
 int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name);
 
-void Log(const char* log);
+void Log(const char *log);
 
 void Log(std::string log);
 

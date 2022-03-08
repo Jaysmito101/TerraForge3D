@@ -3,11 +3,12 @@
 #include "Base/NodeEditor/NodeEditor.h"
 #include <vector>
 
-class SinNode : public NodeEditorNode {
+class SinNode : public NodeEditorNode
+{
 public:
 
 
-	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin);
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin);
 
 	virtual void Load(nlohmann::json data);
 	virtual nlohmann::json Save();
