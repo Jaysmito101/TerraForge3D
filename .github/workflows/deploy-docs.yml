@@ -30,7 +30,9 @@ jobs:
 
       - name: Deploy Docs
         run: |
+          cd ..
           cmd /c "(robocopy TEMP\\ TerraForge3D\\documentation\\ /s /e /MT /IS /IT /IM)  ^&  echo Done!"
+          cd TerraForge3D
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
