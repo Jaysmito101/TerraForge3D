@@ -19,7 +19,7 @@ jobs:
         run: |
           scripts\DeployDocs.bat
           cd ..
-         mkdir TEMP
+          mkdir TEMP
           cmd /c "(robocopy TerraForge3D\\Docs\\html\\ TEMP\\ /s /e /MT /IS /IT /IM)  ^& echo Done!"
           cd TerraForge3D
 
