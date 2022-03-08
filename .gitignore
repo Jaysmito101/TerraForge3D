@@ -22,3 +22,6 @@ TerraForge3D/**.exe
 TerraForge3D/**.obj
 TerraForge3D/**.lib
 TerraForge3D/**.pdb
+
+Docs/html
+Docs/latex
