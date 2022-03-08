@@ -41,13 +41,9 @@ jobs:
           commit_user_email: jaysmito101@gmail.com
           commit_author: DocumentationBot <jaysmito101@gmail.com>
 
-          # Optional. Option used by `git-status` to determine if the repository is
-          # dirty. See https://git-scm.com/docs/git-status#_options
-          status_options: "--untracked-files=no"
-
           # Optional. Options used by `git-add`.
           # See https://git-scm.com/docs/git-add#_options
-          add_options: "-u"
+          add_options: "--all"
 
           # Optional. Options used by `git-push`.
           # See https://git-scm.com/docs/git-push#_options
