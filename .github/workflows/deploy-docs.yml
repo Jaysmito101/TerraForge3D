@@ -10,13 +10,27 @@ jobs:
     runs-on: windows-2019
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          ref: ${{ github.head_ref }}        
+          ref: master        
           submodules: true
 
       - name: Build Docs
-        run: scripts\DeployDocs.bat
+        run: |
+          scripts\DeployDocs.bat
+          cd ..
+          mkdir TEMP
+          (robocopy TerraForge3D\\Docs\\html\\ TEMP\\ /s /e /MT /IS /IT /IM)  ^& echo "Done!"
+          cd TerraForge3D
+
+      - uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          submodules: true
+
+      - name: Deploy Docs
+        run: |
+          (robocopy TEMP\\ TerraForge3D\\documentation\\ /s /e /MT /IS /IT /IM)  ^&  echo "Done!"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
