@@ -1,6 +1,6 @@
 name: Deploy Documentation
 
-on: [push, pull_request]
+on: [push]
 
 env:
   BUILD_CONFIGURATION: Release
