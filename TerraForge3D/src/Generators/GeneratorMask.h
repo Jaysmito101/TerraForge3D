@@ -32,7 +32,7 @@ enum GeneratorMaskType
 	GeneratorMask_Count
 };
 
-static const char* generator_mask_type_names[] = {"Additive", "Average Additive", "Multiplicative", "Average Multiplicative"};
+static const char *generator_mask_type_names[] = {"Additive", "Average Additive", "Multiplicative", "Average Multiplicative"};
 
 #define MASK_LAYER_HILL 0.0f
 #define MASK_LAYER_CRATOR 1.0f
@@ -43,7 +43,7 @@ struct ApplicationState;
 class GeneratorMaskManager
 {
 public:
-	GeneratorMaskManager(ComputeKernel* kernel, std::string uid, ApplicationState* appState);
+	GeneratorMaskManager(ComputeKernel *kernel, std::string uid, ApplicationState *appState);
 	~GeneratorMaskManager();
 
 	nlohmann::json SaveGeneratorMask(GeneratorMask mask);
@@ -64,5 +64,5 @@ public:
 	std::string uid;
 	int gmcount = 0;
 	GeneratorMaskType type = GeneratorMaskType::GeneratorMask_Additive;
-	ApplicationState* appState;
+	ApplicationState *appState;
 };

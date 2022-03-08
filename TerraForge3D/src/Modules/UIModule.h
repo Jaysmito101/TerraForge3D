@@ -5,8 +5,8 @@
 class UIModule : public Module
 {
 public:
-	UIModule(std::string id, ModuleManager* manager);
-	
+	UIModule(std::string id, ModuleManager *manager);
+
 	void Render();
 
 	std::string windowName;

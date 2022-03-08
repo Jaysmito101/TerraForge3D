@@ -20,52 +20,54 @@ struct ApplicationState;
 namespace CPUNodeEditorE
 {
 
-enum CPUNodePinType {
-		Float = 0,
-		Boolean,
-		Vec2,
-		Vec3,
-		MeshNodePinTypeCount
-	};
+enum CPUNodePinType
+{
+	Float = 0,
+	Boolean,
+	Vec2,
+	Vec3,
+	MeshNodePinTypeCount
+};
 
-	enum CPUNodeType {
-		Dummy = 0,
-		Output,
-		MeshCoordinates,
-		MinMeshCoordinates,
-		MaxMeshCoordinates,
-		TextureCoordinates,
-		TimeBasedSeed,
-		RandomNumber,
-		Duplicate,
-		MinVal,
-		Add,
-		Sub,
-		Mul,
-		Div,
-		Sin,
-		Square,
-		Cos,
-		Tan,
-		Abs,
-		Blend,
-		Curve,
-		NoiseOpenSimplex2,
-		NoiseOpenSimplex2S,
-		NoiseCellular,
-		NoisePerlin,
-		NoiseValueCubic,
-		NoiseValue,
-		MathFunction,
-		Module,
-		Pixelate,
-		Texture,
-		RectangleMask,
-		Visualizer,
-		Hill,
-		Clamp,
-		MeshNodeTypeCount
-	};
+enum CPUNodeType
+{
+	Dummy = 0,
+	Output,
+	MeshCoordinates,
+	MinMeshCoordinates,
+	MaxMeshCoordinates,
+	TextureCoordinates,
+	TimeBasedSeed,
+	RandomNumber,
+	Duplicate,
+	MinVal,
+	Add,
+	Sub,
+	Mul,
+	Div,
+	Sin,
+	Square,
+	Cos,
+	Tan,
+	Abs,
+	Blend,
+	Curve,
+	NoiseOpenSimplex2,
+	NoiseOpenSimplex2S,
+	NoiseCellular,
+	NoisePerlin,
+	NoiseValueCubic,
+	NoiseValue,
+	MathFunction,
+	Module,
+	Pixelate,
+	Texture,
+	RectangleMask,
+	Visualizer,
+	Hill,
+	Clamp,
+	MeshNodeTypeCount
+};
 
 
 }
@@ -77,7 +79,7 @@ enum CPUNodePinType {
 class CPUNodeEditor
 {
 public:
-	CPUNodeEditor(ApplicationState* appState);
+	CPUNodeEditor(ApplicationState *appState);
 	~CPUNodeEditor();
 
 	nlohmann::json Save();
@@ -95,8 +97,8 @@ public:
 	double time = 0;
 	std::string uid;
 	std::string name;
-	ApplicationState* appState;
-	NodeEditor* editor;
+	ApplicationState *appState;
+	NodeEditor *editor;
 
 	std::mutex m;
 };

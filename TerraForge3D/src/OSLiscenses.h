@@ -2,4 +2,4 @@
 
 void SetupOSLiscences();
 
-void ShowOSLiscences(bool* pOpen);
+void ShowOSLiscences(bool *pOpen);

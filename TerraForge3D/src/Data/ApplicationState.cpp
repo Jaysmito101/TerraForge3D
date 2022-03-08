@@ -2,12 +2,10 @@
 
 ApplicationState::ApplicationState()
 {
-
 }
 
 ApplicationState::~ApplicationState()
 {
-
 }
 
 ApplicationStateModels::ApplicationStateModels()
@@ -15,7 +13,6 @@ ApplicationStateModels::ApplicationStateModels()
 	coreTerrain = new Model("Terrain");
 	grid = new Model("Grid");
 	screenQuad = new Model("Sreen Quad");
-
 	customBase = nullptr;
 	customBaseCopy = nullptr;
 }
@@ -27,10 +24,14 @@ ApplicationStateModels::~ApplicationStateModels()
 	delete screenQuad;
 
 	if (customBase)
+	{
 		delete customBase;
+	}
 
 	if (customBaseCopy)
+	{
 		delete customBaseCopy;
+	}
 }
 
 nlohmann::json ApplicationStateCameras::Save()
@@ -50,7 +51,6 @@ void ApplicationStateCameras::Load(nlohmann::json data)
 nlohmann::json ApplicationStateWindows::Save()
 {
 	nlohmann::json data;
-
 	data["styleEditor"] = styleEditor;
 	data["statsWindow"] = statsWindow;
 	data["shaderEditor"] = shaderEditorWindow;
@@ -65,7 +65,6 @@ nlohmann::json ApplicationStateWindows::Save()
 	data["modulesManager"] = modulesManager;
 	data["lightControls"] = lightControls;
 	data["cameraControls"] = cameraControls;
-
 	return data;
 }
 
@@ -90,7 +89,6 @@ void ApplicationStateWindows::Load(nlohmann::json data)
 nlohmann::json ApplicationStateStates::Save()
 {
 	nlohmann::json data;
-
 	data["usingBase"] = usingBase;
 	data["skyboxEnabled"] = skyboxEnabled;
 	data["vSync"] = vSync;
@@ -127,30 +125,24 @@ void ApplicationStateStates::Load(nlohmann::json data)
 nlohmann::json ApplicationStateGlobals::Save()
 {
 	nlohmann::json data;
-
 	data["mouseSpeed"] = mouseSpeed;
 	data["scrollSpeed"] = scrollSpeed;
 	data["mouseScrollAmount"] = mouseScrollAmount;
 	data["viewportMousePosX"] = viewportMousePosX;
 	data["viewportMousePosY"] = viewportMousePosY;
-
 	data["scale"] = scale;
 	data["resolution"] = resolution;
 	data["textureBakeMode"] = textureBakeMode;
 	data["texBakeRes"] = texBakeRes;
-
 	data["openFilePath"] = currentOpenFilePath;
 	data["customBaseModelPath"] = currentBaseModelPath;
-
 	data["offsetX"] = offset[0];
 	data["offsetY"] = offset[1];
 	data["offsetZ"] = offset[2];
-
 	data["hMapCX"] = hMapC[0];
 	data["hMapCY"] = hMapC[1];
 	data["hMapCZ"] = hMapC[2];
 	data["hMapCW"] = hMapC[3];
-
 	return data;
 }
 
@@ -165,14 +157,11 @@ void ApplicationStateGlobals::Load(nlohmann::json data)
 	resolution = data["resolution"];
 	textureBakeMode = data["textureBakeMode"];
 	texBakeRes = data["texBakeRes"];
-
 	currentOpenFilePath = data["openFilePath"];
 	currentBaseModelPath = data["customBaseModelPath"];
-
 	offset[0] = data["offsetX"];
 	offset[1] = data["offsetY"];
 	offset[2] = data["offsetZ"];
-
 	hMapC[0] = data["hMapCX"];
 	hMapC[1] = data["hMapCY"];
 	hMapC[2] = data["hMapCZ"];

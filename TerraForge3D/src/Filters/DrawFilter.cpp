@@ -8,46 +8,42 @@
 
 void DrawFilter::Render()
 {
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1, 1, 1, 1));
+	ImGui::BeginChild("##DrawFilterDrawArea", ImVec2(200, 200));
 
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1, 1, 1, 1));
-    ImGui::BeginChild("##DrawFilterDrawArea", ImVec2(200, 200));
+	if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+	{
+		ImVec2 bmin = ImGui::GetItemRectMin();
+		ImDrawList *list = ImGui::GetWindowDrawList();
+		ImVec2 pos = ImGui::GetMousePos();
+		list->AddCircleFilled(pos, 10, ImColor(0, 0, 0));
+		int res = model->mesh->res;
+		pos.x -= bmin.x;
+		pos.y -= bmin.y;
+		pos.x *= res /200.0;
+		pos.y *= res/ 200.0;
 
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-    {
-        ImVec2 bmin = ImGui::GetItemRectMin();
+		for (int i = pos.y - radius; i < pos.y + radius; i++)
+		{
+			for (int j = pos.x - radius; j < pos.x + radius; j++)
+			{
+				model->mesh->AddElevation(strength, i, j);
+			}
+		}
 
-        ImDrawList* list = ImGui::GetWindowDrawList();
-        ImVec2 pos = ImGui::GetMousePos();
-        list->AddCircleFilled(pos, 10, ImColor(0, 0, 0));
+		model->mesh->RecalculateNormals();
+		model->UploadToGPU();
+	}
 
-        int res = model->mesh->res;
-        pos.x -= bmin.x;
-        pos.y -= bmin.y;
-        pos.x *= res /200.0;
-        pos.y *= res/ 200.0;
-        for (int i = pos.y - radius; i < pos.y + radius; i++)
-        {
-            for (int j = pos.x - radius; j < pos.x + radius; j++)
-            {
-                    model->mesh->AddElevation(strength, i, j);
-            }
-        }
-        model->mesh->RecalculateNormals();
-        model->UploadToGPU();
-    }
-
-
-
-    ImGui::EndChild();
-    ImGui::PopStyleColor();
-
-    ImGui::DragFloat("Brush Strength", &strength, 0.01f);
-    ImGui::DragFloat("Brush Radius", &radius, 0.01f);
+	ImGui::EndChild();
+	ImGui::PopStyleColor();
+	ImGui::DragFloat("Brush Strength", &strength, 0.01f);
+	ImGui::DragFloat("Brush Radius", &radius, 0.01f);
 }
 
 nlohmann::json DrawFilter::Save()
 {
-    return nlohmann::json();
+	return nlohmann::json();
 }
 
 void DrawFilter::Load(nlohmann::json data)

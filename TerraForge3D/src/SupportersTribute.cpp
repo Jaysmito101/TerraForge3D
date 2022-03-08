@@ -9,38 +9,55 @@
 #include <json.hpp>
 
 
-void SupportersTribute::LoadstargazersData(nlohmann::json& data)
- {
+void SupportersTribute::LoadstargazersData(nlohmann::json &data)
+{
 	bool isNetWorkConnected = IsNetWorkConnected();
-	for (nlohmann::json item : data) {
+
+	for (nlohmann::json item : data)
+	{
 		GitHubData st;
 		st.name = item["login"];
+
 		if (!PathExist(GetExecutableDir() + "\\Data\\cache\\github_avatars"))
+		{
 			MkDir(GetExecutableDir() + "\\Data\\cache\\github_avatars");
-		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected) {
+		}
+
+		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
+		{
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
 			DownloadFile(baseURL, pathURL, GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
 		}
+
 		st.avatar = new Texture2D(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
 		stargazers.push_back(st);
 	}
 }
 
-void SupportersTribute::LoadcontributorsData(nlohmann::json& data) {
+void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
+{
 	bool isNetWorkConnected = IsNetWorkConnected();
-	for (nlohmann::json item : data) {
+
+	for (nlohmann::json item : data)
+	{
 		GitHubData st;
 		st.name = item["login"];
+
 		if (!PathExist(GetExecutableDir() + "\\Data\\cache\\github_avatars"))
+		{
 			MkDir(GetExecutableDir() + "\\Data\\cache\\github_avatars");
-		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected) {
+		}
+
+		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
+		{
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
 			DownloadFile(baseURL, pathURL, GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
 		}
+
 		st.avatar = new Texture2D(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
 		contributors.push_back(st);
 	}
@@ -49,22 +66,20 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json& data) {
 
 SupportersTribute::SupportersTribute()
 {
-	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache") || rand() % 5 == 0)) {
+	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache") || rand() % 5 == 0))
+	{
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
-		
 		{
 			std::string repoDataStr = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D");
 			nlohmann::json repoData = nlohmann::json::parse(repoDataStr);
 			int stargazerCount = repoData["stargazers_count"];
 			int perPage = 30;
 			int lastPage = stargazerCount / perPage;
-
 			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&page=" + std::to_string(lastPage));
 			SaveToFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", stargazersRawData);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
 		}
-
 		{
 			std::string contributorsRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/contributors");
 			SaveToFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", contributorsRawData);
@@ -72,27 +87,35 @@ SupportersTribute::SupportersTribute()
 			LoadcontributorsData(contributorsData);
 		}
 	}
-	else {
+
+	else
+	{
 		bool tmp = false;
 		Log("Trying to load cached data.");
 
-		if (FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache")) {
+		if (FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache"))
+		{
 			Log("Found Stargazers Cached Data!");
 			std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", &tmp);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
 		}
-		else {
+
+		else
+		{
 			Log("Stargazers Cached Data not found!");
 		}
 
-		if (FileExists(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache")) {
+		if (FileExists(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache"))
+		{
 			Log("Found Contributors Cached Data!");
 			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", &tmp);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
 			LoadcontributorsData(contributorsData);
 		}
-		else {
+
+		else
+		{
 			Log("Contributors Cached Data not found!");
 		}
 	}
@@ -100,48 +123,62 @@ SupportersTribute::SupportersTribute()
 
 SupportersTribute::~SupportersTribute()
 {
-	for(auto& st : stargazers)
+	for(auto &st : stargazers)
 	{
 		if(st.avatar)
+		{
 			delete st.avatar;
+		}
 	}
-	
-	for(auto& co : contributors)
+
+	for(auto &co : contributors)
 	{
 		if(co.avatar)
+		{
 			delete co.avatar;
-	}	
+		}
+	}
 }
 
-void SupportersTribute::ShowSettings(bool* pOpen)
+void SupportersTribute::ShowSettings(bool *pOpen)
 {
 	ImGui::Begin("Supporters", pOpen, ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowSize(ImVec2(250, 250));
-
 	ImGui::Separator();
 	ImGui::Text("Contributors");
 
-	for (GitHubData st : contributors) {
+	for (GitHubData st : contributors)
+	{
 		uint32_t avTexId = 0;
+
 		if (st.avatar)
+		{
 			avTexId = st.avatar->GetRendererID();
+		}
+
 		ImGui::Image((ImTextureID)avTexId, ImVec2(30, 30));
 		ImGui::SameLine();
 		ImGui::Text(st.name.c_str());
 	}
-	ImGui::Separator();
 
+	ImGui::Separator();
 	ImGui::Separator();
 	ImGui::Text("Stargazers");
 
-	for (GitHubData st : stargazers) {
+	for (GitHubData st : stargazers)
+	{
 		uint32_t avTexId = 0;
+
 		if (st.avatar)
+		{
 			avTexId = st.avatar->GetRendererID();
+		}
+
 		ImGui::Image((ImTextureID)avTexId, ImVec2(30, 30));
 		ImGui::SameLine();
 		ImGui::Text(st.name.c_str());
 	}
+
 	ImGui::Separator();
 	ImGui::End();
 }

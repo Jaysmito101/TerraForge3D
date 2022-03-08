@@ -2,10 +2,11 @@
 
 #include "Filter.h"
 
-class GPUErosionFilter : public Filter {
+class GPUErosionFilter : public Filter
+{
 
 public:
-	GPUErosionFilter(Model* model)
+	GPUErosionFilter(Model *model)
 		:Filter(model, "Simple Erosion Filter (GPU)") {}
 
 	virtual void Render() override;

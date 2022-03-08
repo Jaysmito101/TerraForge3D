@@ -7,5 +7,5 @@ public:
 	Logger(std::string logDir);
 	~Logger();
 
-	LoggingOutputStreambuf* mLogHandler;
+	LoggingOutputStreambuf *mLogHandler;
 };

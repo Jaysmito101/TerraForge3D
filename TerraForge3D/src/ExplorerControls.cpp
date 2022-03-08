@@ -17,7 +17,7 @@ void SetupExplorerControls()
 	mosePos.y = (float)y;
 }
 
-void UpdateExplorerControls(float* pos, float* rot, bool isIEx, float* xO, float* yO)
+void UpdateExplorerControls(float *pos, float *rot, bool isIEx, float *xO, float *yO)
 {
 	double x, y;
 	glfwGetCursorPos(Application::Get()->GetWindow()->GetNativeWindow(), &x, &y);
@@ -27,10 +27,10 @@ void UpdateExplorerControls(float* pos, float* rot, bool isIEx, float* xO, float
 	mosePos.y = (float)y;
 	rot[0] += dX * 10.0f;
 	rot[1] += dY * 10.0f;
-
 	static float movementSpeed = 0.001f;
 
-	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_W)) {
+	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_W))
+	{
 		glm::vec3 pPos = glm::vec3(pos[0], pos[1], pos[2]);
 		float dist = pPos.y * pPos.y+ 10;
 		pPos += glm::vec3(0.0f, 0.0f, -1.0f) * dist * movementSpeed;
@@ -39,7 +39,8 @@ void UpdateExplorerControls(float* pos, float* rot, bool isIEx, float* xO, float
 		pos[2] = pPos.z;
 	}
 
-	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_S)) {
+	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_S))
+	{
 		glm::vec3 pPos = glm::vec3(pos[0], pos[1], pos[2]);
 		float dist = pPos.y * pPos.y+ 10;
 		pPos -= glm::vec3(0.0f, 0.0f, -1.0f) * dist * movementSpeed;
@@ -48,7 +49,8 @@ void UpdateExplorerControls(float* pos, float* rot, bool isIEx, float* xO, float
 		pos[2] = pPos.z;
 	}
 
-	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_A)) {
+	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_A))
+	{
 		glm::vec3 pPos = glm::vec3(pos[0], pos[1], pos[2]);
 		float dist = pPos.y * pPos.y+ 10;
 		pPos -= glm::vec3(1.0f, 0.0f, 0.0f) * dist * movementSpeed;
@@ -57,7 +59,8 @@ void UpdateExplorerControls(float* pos, float* rot, bool isIEx, float* xO, float
 		pos[2] = pPos.z;
 	}
 
-	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_D)) {
+	if (glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), GLFW_KEY_D))
+	{
 		glm::vec3 pPos = glm::vec3(pos[0], pos[1], pos[2]);
 		float dist = pPos.y * pPos.y+ 10;
 		pPos += glm::vec3(1.0f, 0.0f, 0.0f) * dist * movementSpeed;
@@ -67,23 +70,21 @@ void UpdateExplorerControls(float* pos, float* rot, bool isIEx, float* xO, float
 	}
 }
 
-void ExPRestoreCamera(float* pos, float* rot)
+void ExPRestoreCamera(float *pos, float *rot)
 {
 	pos[0] = cpos[0];
 	pos[1] = cpos[1];
 	pos[2] = cpos[2];
-			 
 	rot[0] = crot[0];
 	rot[1] = crot[1];
 	rot[2] = crot[2];
 }
 
-void ExPSaveCamera(float* pos, float* rot)
+void ExPSaveCamera(float *pos, float *rot)
 {
 	cpos[0] = pos[0];
 	cpos[1] = pos[1];
 	cpos[2] = pos[2];
-
 	crot[0] = rot[0];
 	crot[1] = rot[1];
 	crot[2] = rot[2];

@@ -3,4 +3,4 @@
 #include <Model.h>
 #include <string>
 
-Model* LoadModel(std::string path);
+Model *LoadModel(std::string path);

@@ -4,7 +4,7 @@
 
 #define PATH_SEPERATOR "\\"
 
-#else 
+#else
 
 #define PATH_SEPERATOR "/"
 

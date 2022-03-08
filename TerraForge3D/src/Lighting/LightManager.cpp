@@ -21,12 +21,14 @@ LightManager::~LightManager()
 {
 }
 
-void LightManager::ShowSettings(bool renderWindow, bool* pOpen)
+void LightManager::ShowSettings(bool renderWindow, bool *pOpen)
 {
 	if (*pOpen)
 	{
 		if (renderWindow)
+		{
 			ImGui::Begin(("Light Setting##" + std::to_string(lightManagerID)).c_str(), pOpen);
+		}
 
 		ImGui::Text("Strength");
 		ImGui::DragFloat("##lightStrength", &strength, 0.1f);
@@ -38,7 +40,9 @@ void LightManager::ShowSettings(bool renderWindow, bool* pOpen)
 		ImGui::ColorEdit3("##lightColor", color);
 
 		if (renderWindow)
+		{
 			ImGui::End();
+		}
 	}
 }
 
@@ -64,11 +68,9 @@ void LightManager::Load(nlohmann::json data)
 	position[0] = data["position"]["x"];
 	position[1] = data["position"]["y"];
 	position[2] = data["position"]["z"];
-
 	color[0] = data["color"]["r"];
 	color[1] = data["color"]["g"];
 	color[2] = data["color"]["b"];
 	color[3] = data["color"]["a"];
-
 	strength = data["strength"];
 }

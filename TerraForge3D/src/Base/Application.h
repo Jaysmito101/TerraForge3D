@@ -1,10 +1,11 @@
-                           #pragma once
+#pragma once
 
 #include <Window.h>
 #include <string>
 
 
-class Application {
+class Application
+{
 public:
 	Application();
 	~Application();
@@ -15,7 +16,7 @@ public:
 	virtual void OnEnd() {};
 	virtual void OnPreload() {};
 
-	
+
 	void SetWindowConfigPath(std::string title);
 	void SetTitle(std::string title);
 	void SetLogsDir(std::string ld);
@@ -27,11 +28,20 @@ public:
 	void ImGuiRenderEnd();
 	void Run(std::string loadFile = "");
 
-	inline void Close() { isActive = false; }
+	inline void Close()
+	{
+		isActive = false;
+	}
 
-	Window* GetWindow() { return m_Window; }
+	Window *GetWindow()
+	{
+		return m_Window;
+	}
 
-	static inline Application* Get() { return s_App; }
+	static inline Application *Get()
+	{
+		return s_App;
+	}
 
 	std::string logsDir = "";
 
@@ -40,7 +50,7 @@ private:
 	std::string windowConfigPath = "windowconfigs.terr3d";
 	float previousTime;
 	bool isActive;
-	Window* m_Window;
+	Window *m_Window;
 private:
-	static Application* s_App;
-};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+	static Application *s_App;
+};

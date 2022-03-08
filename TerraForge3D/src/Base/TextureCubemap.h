@@ -7,13 +7,14 @@
 #define TEXTURE_CUBEMAP_PX 0
 #define TEXTURE_CUBEMAP_NX 1
 #define TEXTURE_CUBEMAP_PY 2
-#define TEXTURE_CUBEMAP_NY 3 
-#define TEXTURE_CUBEMAP_PZ 4 
+#define TEXTURE_CUBEMAP_NY 3
+#define TEXTURE_CUBEMAP_PZ 4
 #define TEXTURE_CUBEMAP_NZ 5
 
 
 
-class TextureCubemap {
+class TextureCubemap
+{
 public:
 	TextureCubemap();
 	~TextureCubemap();
@@ -26,8 +27,8 @@ public:
 	void UploadDataToGPU();
 	void Bind(int slot);
 
-	Texture2D* textures[6];
-	unsigned char* facesData[6];
+	Texture2D *textures[6];
+	unsigned char *facesData[6];
 	IVec2 facesSizes[6];
 	uint32_t rendereID;
 	std::vector<std::string> faces;

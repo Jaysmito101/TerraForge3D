@@ -21,4 +21,4 @@ void SaveProjectDatabase();
 
 std::string GetProjectResourcePath();
 
-std::string SaveProjectTexture(Texture2D* texture);
+std::string SaveProjectTexture(Texture2D *texture);

@@ -29,9 +29,9 @@ struct  GPUNoiseLayer
 class GPUNoiseLayerGenerator
 {
 public:
-	GPUNoiseLayerGenerator(ApplicationState* appState, ComputeKernel* kernel);
+	GPUNoiseLayerGenerator(ApplicationState *appState, ComputeKernel *kernel);
 
-	virtual void Generate(ComputeKernel* kernels);
+	virtual void Generate(ComputeKernel *kernels);
 
 	virtual nlohmann::json Save();
 
@@ -53,7 +53,7 @@ public:
 	double time = 0;
 	int localSize = 256;
 	int vc = 0;
-	ApplicationState* appState;
+	ApplicationState *appState;
 	std::string uid = "";
 	std::string name = "";
 	std::vector<GPUNoiseLayer> noiseLayers;

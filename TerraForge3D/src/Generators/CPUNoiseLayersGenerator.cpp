@@ -6,7 +6,7 @@
 
 int count = 1;
 
-CPUNoiseLayersGenerator::CPUNoiseLayersGenerator(ApplicationState* as)
+CPUNoiseLayersGenerator::CPUNoiseLayersGenerator(ApplicationState *as)
 {
 	uid = GenerateId(32);
 	name.reserve(1024);
@@ -50,15 +50,19 @@ void CPUNoiseLayersGenerator::ShowSetting(int id)
 {
 	ImGui::InputText(("Name##CPUNL" + std::to_string(id)).c_str(), name.data(), 1024);
 	ImGui::Checkbox(("Enabled##CPUNL" + std::to_string(id)).c_str(), &enabled);
+
 	if (ImGui::Button(("Edit##CPUNL" + std::to_string(id)).c_str()))
 	{
 		windowStat = true;
 	}
+
 	ImGui::Separator();
+
 	if(ImGui::CollapsingHeader(("Custom Base Mask##GMSK" + uid).c_str() ) )
 	{
 		maskManager->ShowSettings();
 	}
+
 	ImGui::Separator();
 	ImGui::Text("UID : %s", uid.data());
 	ImGui::Text("Time : %lf ms", time);
@@ -72,6 +76,7 @@ void CPUNoiseLayersGenerator::Update()
 		noiseManager->Render();
 		ImGui::End();
 	}
+
 	if (!appState->states.remeshing)
 	{
 		noiseManager->UpdateLayers();
@@ -80,8 +85,13 @@ void CPUNoiseLayersGenerator::Update()
 
 float CPUNoiseLayersGenerator::EvaluateAt(float x, float y, float z)
 {
-	if(maskManager->enabled)		
+	if(maskManager->enabled)
+	{
 		return maskManager->EvaluateAt(x, y, z, noiseManager->Evaluate(x + noiseManager->offset[0], y + noiseManager->offset[1], z + noiseManager->offset[2]));
+	}
+
 	else
+	{
 		return noiseManager->Evaluate(x, y, z);
+	}
 }

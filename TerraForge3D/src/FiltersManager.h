@@ -1,5 +1,5 @@
 #include <Model.h>
 
-void SetupFiltersManager(bool* autoUpdate, Model* model);
+void SetupFiltersManager(bool *autoUpdate, Model *model);
 
-void ShowFiltersMamager(bool* pOpen);
+void ShowFiltersMamager(bool *pOpen);

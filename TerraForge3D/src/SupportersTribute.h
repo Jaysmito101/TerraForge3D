@@ -8,9 +8,10 @@
 class Texture2D;
 
 
-struct GitHubData {
+struct GitHubData
+{
 	std::string name = "";
-	Texture2D* avatar = nullptr;
+	Texture2D *avatar = nullptr;
 };
 
 class SupportersTribute
@@ -18,11 +19,11 @@ class SupportersTribute
 public:
 	SupportersTribute();
 	~SupportersTribute();
-	void ShowSettings(bool* pOpen);
+	void ShowSettings(bool *pOpen);
 
 private:
-	void LoadstargazersData(nlohmann::json& data);
-	void LoadcontributorsData(nlohmann::json& data);
+	void LoadstargazersData(nlohmann::json &data);
+	void LoadcontributorsData(nlohmann::json &data);
 
 public:
 	std::vector<GitHubData> stargazers;

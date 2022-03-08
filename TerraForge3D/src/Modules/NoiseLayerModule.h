@@ -6,8 +6,8 @@
 class NoiseLayerModule : public Module
 {
 public:
-	NoiseLayerModule(std::string id, ModuleManager* manager);
-	
+	NoiseLayerModule(std::string id, ModuleManager *manager);
+
 	void Render();
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

@@ -7,8 +7,10 @@ struct GLFWwindow;
 
 using EventFn = std::function<void(int, int)>;
 
-struct ClearColor {
-	ClearColor() {
+struct ClearColor
+{
+	ClearColor()
+	{
 		r = g = b = 0;
 	}
 
@@ -20,7 +22,8 @@ struct ClearColor {
 	float b;
 };
 
-class Window {
+class Window
+{
 public:
 	Window(std::string title);
 	~Window();
@@ -38,12 +41,18 @@ public:
 	void SetFullScreen(bool fullscreen);
 	void SetVisible(bool visibility);
 
-	inline bool IsVSyncEnabled() { return vSyncState; }
-	inline GLFWwindow* GetNativeWindow() { return m_Window; }
+	inline bool IsVSyncEnabled()
+	{
+		return vSyncState;
+	}
+	inline GLFWwindow *GetNativeWindow()
+	{
+		return m_Window;
+	}
 
 private:
 	bool isActive, vSyncState, isFullscreen = false;
-	GLFWwindow* m_Window;
+	GLFWwindow *m_Window;
 	EventFn m_CloseEventCallback, m_ResizeEventCallback, m_MouseEventCallback;
 	ClearColor m_ClearColor;
 };

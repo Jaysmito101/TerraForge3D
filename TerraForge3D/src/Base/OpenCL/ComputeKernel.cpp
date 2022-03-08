@@ -36,7 +36,6 @@ ComputeKernel::ComputeKernel(std::function<void(std::string)> errFunc, std::func
 
 	platform = platforms[0];
 	onStatus("Using OpenCL Platform : " + platform.getInfo<CL_PLATFORM_NAME>() );
-
 	std::vector<cl::Device> devices;
 	platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
 
@@ -48,9 +47,10 @@ ComputeKernel::ComputeKernel(std::function<void(std::string)> errFunc, std::func
 
 	bool tmp = false;
 
-	for (auto& d : devices)
+	for (auto &d : devices)
 	{
 		tmp = (d.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU);
+
 		if (tmp)
 		{
 			device = d;
@@ -58,13 +58,14 @@ ComputeKernel::ComputeKernel(std::function<void(std::string)> errFunc, std::func
 			break;
 		}
 	}
-	if (!tmp) {
+
+	if (!tmp)
+	{
 		device = devices[0];
 		onStatus("Using CPU Device : " + device.getInfo<CL_DEVICE_NAME>());
 	}
 
 	context = cl::Context({device});
-
 	queue = cl::CommandQueue(context, device);
 }
 
@@ -114,13 +115,12 @@ void ComputeKernel::SetKernelArg(std::string name, int arg, std::string buffer)
 	kernels[name].setArg(arg, buffers[buffer].buffer);
 }
 
-void ComputeKernel::ReadBuffer(std::string buffer, bool blocking, size_t size, void* data)
+void ComputeKernel::ReadBuffer(std::string buffer, bool blocking, size_t size, void *data)
 {
 	queue.enqueueReadBuffer(buffers[buffer].buffer, blocking ? CL_TRUE : CL_FALSE, 0, size, data);
 }
 
-void ComputeKernel::WriteBuffer(std::string buffer, bool blocking, size_t size, void* data)
+void ComputeKernel::WriteBuffer(std::string buffer, bool blocking, size_t size, void *data)
 {
 	queue.enqueueWriteBuffer(buffers[buffer].buffer, blocking ? CL_TRUE : CL_FALSE, 0, size, data);
 }
- 

@@ -10,9 +10,9 @@ class Serializer
 {
 public:
 
-	Serializer(ApplicationState* state);
+	Serializer(ApplicationState *state);
 
-	Serializer(ApplicationState* state, std::function<void(std::string, bool)> errorFunc);
+	Serializer(ApplicationState *state, std::function<void(std::string, bool)> errorFunc);
 
 	~Serializer();
 
@@ -26,10 +26,10 @@ public:
 
 	void LoadFile(std::string path);
 
-	ApplicationState* Deserialize(nlohmann::json data);
+	ApplicationState *Deserialize(nlohmann::json data);
 
 private:
 	nlohmann::json data;
 	std::function<void(std::string, bool)> onError;
-	ApplicationState* appState;
+	ApplicationState *appState;
 };

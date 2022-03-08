@@ -21,7 +21,7 @@ public:
 	float strength;
 	bool absv; // Temporary
 	bool sq;  // Temporary
-	std::vector<NoiseLayer*> noiseLayers, toAdd;
+	std::vector<NoiseLayer *> noiseLayers, toAdd;
 	std::vector<int> toDelete;
 
 	std::mutex mutex;

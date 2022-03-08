@@ -2,9 +2,10 @@
 #include <Model.h>
 #include <json.hpp>
 
-class Filter {
+class Filter
+{
 public:
-	Filter(Model* model, std::string name = "Filter")
+	Filter(Model *model, std::string name = "Filter")
 		:name(name), model(model) {}
 
 	virtual void Load(nlohmann::json data) = 0;
@@ -13,6 +14,6 @@ public:
 	virtual void Apply() = 0;
 	virtual void OnAttach() {};
 
-	Model* model;
+	Model *model;
 	std::string name;
 };

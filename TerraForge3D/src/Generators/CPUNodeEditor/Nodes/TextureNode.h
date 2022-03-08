@@ -5,11 +5,12 @@
 
 class Texture2D;
 
-class TextureNode : public NodeEditorNode {
+class TextureNode : public NodeEditorNode
+{
 public:
 
 
-	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin);
+	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin);
 
 	virtual void Load(nlohmann::json data);
 	virtual nlohmann::json Save();
@@ -18,16 +19,16 @@ public:
 	TextureNode();
 	~TextureNode();
 
-	Texture2D* texture;
+	Texture2D *texture;
 	float scale;
 	bool isDefault;
 	bool autoTiled;
-    bool inv;
-    bool npScale;
+	bool inv;
+	bool npScale;
 	float numTiles;
 	float posi[2];
 	float rota;
-	
+
 private:
 	void ChangeTexture();
 	std::mutex mutex;

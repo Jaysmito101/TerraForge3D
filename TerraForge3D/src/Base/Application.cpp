@@ -14,23 +14,28 @@
 #include <iostream>
 #include <string>
 
-static void Log(const char* log) {
+static void Log(const char *log)
+{
 	std::cout << log << std::endl;
 };
 
-static void InitGlad() {
-	if (!gladLoadGL()) {
+static void InitGlad()
+{
+	if (!gladLoadGL())
+	{
 		Log("Failed to Initialize GLAD!");
 		exit(-1);
 	}
 }
 
-static void InitImGui(std::string& configPath) {
+static void InitImGui(std::string &configPath)
+{
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImPlot::CreateContext();
 	ImNodes::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGuiIO &io = ImGui::GetIO();
+	(void)io;
 	io.IniFilename = configPath.c_str();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -38,17 +43,20 @@ static void InitImGui(std::string& configPath) {
 	io.ConfigViewportsNoTaskBarIcon = false;
 	io.ConfigViewportsNoAutoMerge = true;
 	ImGui::StyleColorsDark();
-	ImGuiStyle& style = ImGui::GetStyle();
+	ImGuiStyle &style = ImGui::GetStyle();
+
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
-	ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(Application::Get()->GetWindow()->GetNativeWindow()) , true);
+
+	ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(Application::Get()->GetWindow()->GetNativeWindow()), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-static void ImGuiShutdown() {
+static void ImGuiShutdown()
+{
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImNodes::DestroyContext();
@@ -56,7 +64,7 @@ static void ImGuiShutdown() {
 	ImGui::DestroyContext();
 }
 
-Application* Application::s_App;
+Application *Application::s_App;
 
 
 
@@ -79,7 +87,8 @@ void Application::SetTitle(std::string title)
 	m_WindowTitle = title;
 }
 
-void Application::Init() {
+void Application::Init()
+{
 	m_Window = new Window(m_WindowTitle);
 	m_Window->SetVSync(true);
 	m_Window->SetVisible(false);
@@ -91,26 +100,26 @@ void Application::Init() {
 
 void Application::Render()
 {
-
 }
 
-void Application::ImGuiRenderBegin() 
+void Application::ImGuiRenderBegin()
 {
-	ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO &io = ImGui::GetIO();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
 }
 
-void Application::ImGuiRenderEnd() 
+void Application::ImGuiRenderEnd()
 {
 	ImGui::EndFrame();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO &io = ImGui::GetIO();
+
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
-		GLFWwindow* backup_current_context = glfwGetCurrentContext();
+		GLFWwindow *backup_current_context = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
 		glfwMakeContextCurrent(backup_current_context);
@@ -122,7 +131,8 @@ bool Application::IsActive()
 	return isActive;
 }
 
-void Application::RenderImGui() {
+void Application::RenderImGui()
+{
 	glEnable(GL_BLEND);
 	ImGuiRenderBegin();
 	OnImGuiRender();
@@ -134,20 +144,25 @@ void Application::Run(std::string loadFile)
 {
 	m_Window->SetVisible(true);
 	float oneSecCounter = 0;
-	while (isActive) {
+
+	while (isActive)
+	{
 		float currentTime = glfwGetTime();
 		float deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 		oneSecCounter += deltaTime;
 		OnUpdate(deltaTime);
+
 		if (oneSecCounter >= 1)
 		{
 			OnOneSecondTick();
 			oneSecCounter = 0;
 		}
+
 		Render();
 		m_Window->Update();
 	}
+
 	OnEnd();
 	ImGuiShutdown();
 }
