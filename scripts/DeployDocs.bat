@@ -6,4 +6,4 @@ vendor\\doxygen\\doxygen
 
 git clone --single-branch --branch gh-pages https://github.com/Jaysmito101/TerraForge3D ./ghpages
 
-robocopy Docs\\html\\ ghpages\\documentation\\ /s /e /MT /IS /IT /IM
+xcopy Docs\\html\\ ghpages\\documentation\\  /E /H /C /R /Q /Y
