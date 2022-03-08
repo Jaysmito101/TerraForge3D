@@ -1,4 +1,4 @@
-python SetupDoxygen.py
+python scripts/SetupDoxygen.py
 
 vendor\\doxygen\\doxygen
 
