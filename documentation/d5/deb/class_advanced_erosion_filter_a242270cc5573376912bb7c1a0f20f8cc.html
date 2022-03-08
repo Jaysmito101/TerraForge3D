@@ -130,55 +130,73 @@ $(document).ready(function(){initNavTree('d5/deb/class_advanced_erosion_filter_a
 
 <p>Implements <a class="el" href="../../d2/d70/class_filter.html">Filter</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d4/dc2/_advanced_erosion_filter_8cpp_source.html#l00040">40</a> of file <a class="el" href="../../d4/dc2/_advanced_erosion_filter_8cpp_source.html">AdvancedErosionFilter.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   41</span>{</div>
-<div class="line"><span class="lineno">   42</span>    srand(time(NULL));</div>
-<div class="line"><span class="lineno">   43</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno">   44</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<p class="definition">Definition at line <a class="el" href="../../d4/dc2/_advanced_erosion_filter_8cpp_source.html#l00042">42</a> of file <a class="el" href="../../d4/dc2/_advanced_erosion_filter_8cpp_source.html">AdvancedErosionFilter.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   43</span>{</div>
+<div class="line"><span class="lineno">   44</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *model;</div>
 <div class="line"><span class="lineno">   45</span> </div>
-<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::TERRAIN)</div>
 <div class="line"><span class="lineno">   47</span>    {</div>
-<div class="line"><span class="lineno">   48</span>        tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>        <span class="keywordflow">if</span>(particles % localWorkSize != 0)</div>
-<div class="line"><span class="lineno">   51</span>        {</div>
-<div class="line"><span class="lineno">   52</span>            std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Invalid Local Work Group Size. Falling back to 1.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">   53</span>            localWorkSize = 1;</div>
-<div class="line"><span class="lineno">   54</span>        }</div>
+<div class="line"><span class="lineno">   48</span>        model = appState-&gt;models.coreTerrain;</div>
+<div class="line"><span class="lineno">   49</span>    }</div>
+<div class="line"><span class="lineno">   50</span> </div>
+<div class="line"><span class="lineno">   51</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">   52</span>    {</div>
+<div class="line"><span class="lineno">   53</span>        model = appState-&gt;models.customBase;</div>
+<div class="line"><span class="lineno">   54</span>    }</div>
 <div class="line"><span class="lineno">   55</span> </div>
-<div class="line"><span class="lineno">   56</span>        std::string kernelSrc = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\kernels\\advanced_erosion.cl&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">   57</span>        <span class="comment">// Some constants</span></div>
-<div class="line"><span class="lineno">   58</span>        kernelSrc = std::regex_replace(kernelSrc, std::regex(<span class="stringliteral">&quot;LOCAL_WORK_SIZE&quot;</span>), std::to_string(localWorkSize));</div>
-<div class="line"><span class="lineno">   59</span>        kernels.Clear();</div>
-<div class="line"><span class="lineno">   60</span>        kernels.AddSoruce(kernelSrc);</div>
-<div class="line"><span class="lineno">   61</span>        kernels.BuildProgram(<span class="stringliteral">&quot;-I\&quot;&quot;</span> + GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\kernels&quot;</span> + <span class="stringliteral">&quot;\&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno">   62</span>        kernels.AddKernel(<span class="stringliteral">&quot;erode&quot;</span>);</div>
-<div class="line"><span class="lineno">   63</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount);</div>
-<div class="line"><span class="lineno">   64</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">   65</span>        particle.seed = (float)rand();</div>
-<div class="line"><span class="lineno">   66</span>        particle.dimX = particle.dimY = model-&gt;mesh-&gt;res;</div>
-<div class="line"><span class="lineno">   67</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;part&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a>));</div>
-<div class="line"><span class="lineno">   68</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;part&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a>), &amp;particle);</div>
-<div class="line"><span class="lineno">   69</span>        kernels.SetKernelArg(<span class="stringliteral">&quot;erode&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
-<div class="line"><span class="lineno">   70</span>        kernels.SetKernelArg(<span class="stringliteral">&quot;erode&quot;</span>, 1, <span class="stringliteral">&quot;part&quot;</span>);</div>
-<div class="line"><span class="lineno">   71</span>        std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Starting processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">   72</span>        cl::NDRange global(particles);</div>
-<div class="line"><span class="lineno">   73</span>        cl::NDRange local(localWorkSize);</div>
-<div class="line"><span class="lineno">   74</span>        kernels.ExecuteKernel(<span class="stringliteral">&quot;erode&quot;</span>, local, global);</div>
-<div class="line"><span class="lineno">   75</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Finished processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">   76</span>        kernels.ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">   77</span>    }</div>
-<div class="line"><span class="lineno">   78</span> </div>
-<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">catch</span> (std::exception ex)</div>
-<div class="line"><span class="lineno">   80</span>    {</div>
-<div class="line"><span class="lineno">   81</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;OpenCL Exception : &quot;</span> &lt;&lt; ex.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">   82</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   83</span>    }</div>
-<div class="line"><span class="lineno">   84</span> </div>
-<div class="line"><span class="lineno">   85</span>    <span class="comment">// Deletion</span></div>
-<div class="line"><span class="lineno">   86</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno">   87</span>    model-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno">   88</span>}</div>
+<div class="line"><span class="lineno">   56</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   57</span>    {</div>
+<div class="line"><span class="lineno">   58</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   59</span>    }</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>    srand(time(NULL));</div>
+<div class="line"><span class="lineno">   62</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno">   63</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   64</span> </div>
+<div class="line"><span class="lineno">   65</span>    <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">   66</span>    {</div>
+<div class="line"><span class="lineno">   67</span>        tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   68</span> </div>
+<div class="line"><span class="lineno">   69</span>        <span class="keywordflow">if</span>(particles % localWorkSize != 0)</div>
+<div class="line"><span class="lineno">   70</span>        {</div>
+<div class="line"><span class="lineno">   71</span>            std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Invalid Local Work Group Size. Falling back to 1.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   72</span>            localWorkSize = 1;</div>
+<div class="line"><span class="lineno">   73</span>        }</div>
+<div class="line"><span class="lineno">   74</span> </div>
+<div class="line"><span class="lineno">   75</span>        std::string kernelSrc = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\kernels\\advanced_erosion.cl&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">   76</span>        <span class="comment">// Some constants</span></div>
+<div class="line"><span class="lineno">   77</span>        kernelSrc = std::regex_replace(kernelSrc, std::regex(<span class="stringliteral">&quot;LOCAL_WORK_SIZE&quot;</span>), std::to_string(localWorkSize));</div>
+<div class="line"><span class="lineno">   78</span>        kernels.Clear();</div>
+<div class="line"><span class="lineno">   79</span>        kernels.AddSoruce(kernelSrc);</div>
+<div class="line"><span class="lineno">   80</span>        kernels.BuildProgram(<span class="stringliteral">&quot;-I\&quot;&quot;</span> + GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\kernels&quot;</span> + <span class="stringliteral">&quot;\&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">   81</span>        kernels.AddKernel(<span class="stringliteral">&quot;erode&quot;</span>);</div>
+<div class="line"><span class="lineno">   82</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount);</div>
+<div class="line"><span class="lineno">   83</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">   84</span>        particle.seed = (float)rand();</div>
+<div class="line"><span class="lineno">   85</span>        particle.dimX = particle.dimY = model-&gt;mesh-&gt;res;</div>
+<div class="line"><span class="lineno">   86</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;part&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a>));</div>
+<div class="line"><span class="lineno">   87</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;part&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a>), &amp;particle);</div>
+<div class="line"><span class="lineno">   88</span>        kernels.SetKernelArg(<span class="stringliteral">&quot;erode&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
+<div class="line"><span class="lineno">   89</span>        kernels.SetKernelArg(<span class="stringliteral">&quot;erode&quot;</span>, 1, <span class="stringliteral">&quot;part&quot;</span>);</div>
+<div class="line"><span class="lineno">   90</span>        std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Starting processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   91</span>        cl::NDRange global(particles);</div>
+<div class="line"><span class="lineno">   92</span>        cl::NDRange local(localWorkSize);</div>
+<div class="line"><span class="lineno">   93</span>        kernels.ExecuteKernel(<span class="stringliteral">&quot;erode&quot;</span>, local, global);</div>
+<div class="line"><span class="lineno">   94</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Finished processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   95</span>        kernels.ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">   96</span>    }</div>
+<div class="line"><span class="lineno">   97</span> </div>
+<div class="line"><span class="lineno">   98</span>    <span class="keywordflow">catch</span> (std::exception ex)</div>
+<div class="line"><span class="lineno">   99</span>    {</div>
+<div class="line"><span class="lineno">  100</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;OpenCL Exception : &quot;</span> &lt;&lt; ex.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  101</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  102</span>    }</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>    <span class="comment">// Deletion</span></div>
+<div class="line"><span class="lineno">  105</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno">  106</span>    model-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno">  107</span>}</div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
 <div class="ttc" id="astruct_vert_html"><div class="ttname"><a href="../../d1/dea/struct_vert.html">Vert</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/da1/_mesh_8h_source.html#l00012">Mesh.h:13</a></div></div>
 <div class="ttc" id="astruct_wind_erosion_particle_html"><div class="ttname"><a href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d4e/_advanced_erosion_filter_8h_source.html#l00008">AdvancedErosionFilter.h:9</a></div></div>
 </div><!-- fragment -->

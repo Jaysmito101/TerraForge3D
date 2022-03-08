@@ -28,6 +28,7 @@ var hierarchy =
       [ "ErosionFilter", "d3/d96/class_erosion_filter.html", null ],
       [ "GPUErosionFilter", "d4/dc6/class_g_p_u_erosion_filter.html", null ]
     ] ],
+    [ "FiltersManager", "da/d39/class_filters_manager.html", null ],
     [ "FoliageItem", "d2/de8/struct_foliage_item.html", null ],
     [ "FrameBuffer", "d8/d23/class_frame_buffer.html", null ],
     [ "GeneratorMask", "da/d74/struct_generator_mask.html", null ],
@@ -100,7 +101,6 @@ var hierarchy =
     [ "Serializer", "d0/dc2/class_serializer.html", null ],
     [ "Shader", "d1/d51/class_shader.html", null ],
     [ "ShaderStorageBuffer", "d4/dc3/class_shader_storage_buffer.html", null ],
-    [ "SimplexNoise", "da/d8f/class_simplex_noise.html", null ],
     [ "std::streambuf", null, [
       [ "LoggingOutputStreambuf", "da/d90/class_logging_output_streambuf.html", null ]
     ] ],

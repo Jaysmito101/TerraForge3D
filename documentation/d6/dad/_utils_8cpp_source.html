@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TerraForge3D: TerraForge3D/src/Utils.cpp Source File</title>
+<title>TerraForge3D: TerraForge3D/src/Utils/Utils.cpp Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
 <script type="text/javascript" src="../../jquery.js"></script>
@@ -449,9 +449,9 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>{</div>
 <div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    <span class="keywordtype">int</span> size = 1;</div>
 <div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *data = (<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *)ReadBinaryFile(path, &amp;size);</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>[MD5_DIGEST_LENGTH];</div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    MD5(data, size, <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>);</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <a class="code hl_struct" href="../../d2/d7a/struct_hash.html">Hash</a> resultHash(<a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>, MD5_DIGEST_LENGTH);</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> hash[MD5_DIGEST_LENGTH];</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    MD5(data, size, hash);</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <a class="code hl_struct" href="../../d2/d7a/struct_hash.html">Hash</a> resultHash(hash, MD5_DIGEST_LENGTH);</div>
 <div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    <span class="keyword">delete</span>[] data;</div>
 <div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <span class="keywordflow">return</span> resultHash;</div>
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>}</div>
@@ -646,14 +646,14 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span> </div>
 <div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>        <span class="keywordflow">if</span> (loadToAssets)</div>
 <div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>        {</div>
-<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>            std::string <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a> = MD5File(fileName).ToString();</div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>            std::string hash = MD5File(fileName).ToString();</div>
 <div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span> </div>
-<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>            <span class="keywordflow">if</span> (GetProjectAsset(<a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>).size() == 0)</div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>            <span class="keywordflow">if</span> (GetProjectAsset(hash).size() == 0)</div>
 <div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>            {</div>
 <div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>                std::string path = GetProjectResourcePath() + <span class="stringliteral">&quot;\\textures&quot;</span>;</div>
 <div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span>                MkDir(path);</div>
-<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span>                CopyFileData(fileName, path + <span class="stringliteral">&quot;\\&quot;</span> + <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>);</div>
-<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>                RegisterProjectAsset(<a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>, <span class="stringliteral">&quot;textures&quot;</span> + <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>);</div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span>                CopyFileData(fileName, path + <span class="stringliteral">&quot;\\&quot;</span> + hash);</div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>                RegisterProjectAsset(hash, <span class="stringliteral">&quot;textures&quot;</span> + hash);</div>
 <div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>            }</div>
 <div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>        }</div>
 <div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span> </div>
@@ -684,7 +684,6 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    system(op.c_str());</div>
 <div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span><span class="preprocessor">#endif </span><span class="comment">//  TERR3D_WIN32</span></div>
 <div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>}</div>
-<div class="ttc" id="a_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54_html_a39b91b979c2d169ec26079a983134a54"><div class="ttname"><a href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a></div><div class="ttdeci">static uint8_t hash(int32_t i)</div><div class="ttdoc">Helper function to hash an integer using the above permutation table.</div><div class="ttdef"><b>Definition:</b> <a href="../../d9/dd6/_simplex_noise_8cpp_source.html#l00101">SimplexNoise.cpp:101</a></div></div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 <div class="ttc" id="astruct_hash_html"><div class="ttname"><a href="../../d2/d7a/struct_hash.html">Hash</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/dc1/_utils_8h_source.html#l00013">Utils.h:14</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -692,7 +691,7 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><b>Utils.cpp</b></li>
+    <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_36d36b6231b0c4e5daf102c9979382d5.html">Utils</a></li><li class="navelem"><b>Utils.cpp</b></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>

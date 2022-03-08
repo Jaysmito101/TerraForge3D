@@ -195,7 +195,7 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a780e4dff11aab729f
 <div class="line"><span class="lineno"> 1101</span>        }</div>
 <div class="line"><span class="lineno"> 1102</span> </div>
 <div class="line"><span class="lineno"> 1103</span>        SetProjectId(GenerateId(32));</div>
-<div class="line"><span class="lineno"> 1104</span>        SetupFiltersManager(&amp;appState-&gt;states.autoUpdate, appState-&gt;models.coreTerrain);</div>
+<div class="line"><span class="lineno"> 1104</span>        appState-&gt;filtersManager = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a>(appState);</div>
 <div class="line"><span class="lineno"> 1105</span>        <span class="keywordtype">float</span> t = 1.0f;</div>
 <div class="line"><span class="lineno"> 1106</span>        SetupSky();</div>
 <div class="line"><span class="lineno"> 1107</span>        <span class="comment">// Load Fonts</span></div>
@@ -235,6 +235,7 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a780e4dff11aab729f
 <div class="line"><span class="lineno"> 1141</span> </div>
 <div class="line"><span class="lineno"> 1142</span>        Log(<span class="stringliteral">&quot;Started Up App!&quot;</span>);</div>
 <div class="line"><span class="lineno"> 1143</span>    }</div>
+<div class="ttc" id="aclass_filters_manager_html"><div class="ttname"><a href="../../da/d39/class_filters_manager.html">FiltersManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/ddf/_filters_manager_8h_source.html#l00011">FiltersManager.h:12</a></div></div>
 <div class="ttc" id="aclass_frame_buffer_html"><div class="ttname"><a href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d89/_frame_buffer_8h_source.html#l00005">FrameBuffer.h:6</a></div></div>
 <div class="ttc" id="aclass_light_manager_html"><div class="ttname"><a href="../../d1/d3e/class_light_manager.html">LightManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/d11/_light_manager_8h_source.html#l00006">LightManager.h:7</a></div></div>
 <div class="ttc" id="aclass_main_menu_html"><div class="ttname"><a href="../../d4/d04/class_main_menu.html">MainMenu</a></div><div class="ttdef"><b>Definition:</b> <a href="../../db/db6/_main_menu_8h_source.html#l00005">MainMenu.h:6</a></div></div>
@@ -245,7 +246,7 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a780e4dff11aab729f
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
 <div class="ttc" id="aclass_supporters_tribute_html"><div class="ttname"><a href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00017">SupportersTribute.h:18</a></div></div>
 <div class="ttc" id="aclass_texture_store_html"><div class="ttname"><a href="../../d0/d8a/class_texture_store.html">TextureStore</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d2b/_texture_store_8h_source.html#l00034">TextureStore.h:35</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00186">ApplicationState.h:187</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

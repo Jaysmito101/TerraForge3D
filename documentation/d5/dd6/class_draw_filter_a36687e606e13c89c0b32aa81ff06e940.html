@@ -132,38 +132,56 @@ $(document).ready(function(){initNavTree('d5/dd6/class_draw_filter_a36687e606e13
 
 <p class="definition">Definition at line <a class="el" href="../../d4/db9/_draw_filter_8cpp_source.html#l00009">9</a> of file <a class="el" href="../../d4/db9/_draw_filter_8cpp_source.html">DrawFilter.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   10</span>{</div>
-<div class="line"><span class="lineno">   11</span>    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1, 1, 1, 1));</div>
-<div class="line"><span class="lineno">   12</span>    ImGui::BeginChild(<span class="stringliteral">&quot;##DrawFilterDrawArea&quot;</span>, ImVec2(200, 200));</div>
-<div class="line"><span class="lineno">   13</span> </div>
-<div class="line"><span class="lineno">   14</span>    <span class="keywordflow">if</span> (ImGui::IsWindowHovered() &amp;&amp; ImGui::IsMouseDown(ImGuiMouseButton_Left))</div>
-<div class="line"><span class="lineno">   15</span>    {</div>
-<div class="line"><span class="lineno">   16</span>        ImVec2 bmin = ImGui::GetItemRectMin();</div>
-<div class="line"><span class="lineno">   17</span>        ImDrawList *list = ImGui::GetWindowDrawList();</div>
-<div class="line"><span class="lineno">   18</span>        ImVec2 pos = ImGui::GetMousePos();</div>
-<div class="line"><span class="lineno">   19</span>        list-&gt;AddCircleFilled(pos, 10, ImColor(0, 0, 0));</div>
-<div class="line"><span class="lineno">   20</span>        <span class="keywordtype">int</span> res = model-&gt;mesh-&gt;res;</div>
-<div class="line"><span class="lineno">   21</span>        pos.x -= bmin.x;</div>
-<div class="line"><span class="lineno">   22</span>        pos.y -= bmin.y;</div>
-<div class="line"><span class="lineno">   23</span>        pos.x *= res /200.0;</div>
-<div class="line"><span class="lineno">   24</span>        pos.y *= res/ 200.0;</div>
-<div class="line"><span class="lineno">   25</span> </div>
-<div class="line"><span class="lineno">   26</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = pos.y - radius; i &lt; pos.y + radius; i++)</div>
-<div class="line"><span class="lineno">   27</span>        {</div>
-<div class="line"><span class="lineno">   28</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = pos.x - radius; j &lt; pos.x + radius; j++)</div>
-<div class="line"><span class="lineno">   29</span>            {</div>
-<div class="line"><span class="lineno">   30</span>                model-&gt;mesh-&gt;AddElevation(strength, i, j);</div>
-<div class="line"><span class="lineno">   31</span>            }</div>
-<div class="line"><span class="lineno">   32</span>        }</div>
-<div class="line"><span class="lineno">   33</span> </div>
-<div class="line"><span class="lineno">   34</span>        model-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno">   35</span>        model-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno">   36</span>    }</div>
-<div class="line"><span class="lineno">   37</span> </div>
-<div class="line"><span class="lineno">   38</span>    ImGui::EndChild();</div>
-<div class="line"><span class="lineno">   39</span>    ImGui::PopStyleColor();</div>
-<div class="line"><span class="lineno">   40</span>    ImGui::DragFloat(<span class="stringliteral">&quot;Brush Strength&quot;</span>, &amp;strength, 0.01f);</div>
-<div class="line"><span class="lineno">   41</span>    ImGui::DragFloat(<span class="stringliteral">&quot;Brush Radius&quot;</span>, &amp;radius, 0.01f);</div>
-<div class="line"><span class="lineno">   42</span>}</div>
+<div class="line"><span class="lineno">   11</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *model;</div>
+<div class="line"><span class="lineno">   12</span> </div>
+<div class="line"><span class="lineno">   13</span>    <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::TERRAIN)</div>
+<div class="line"><span class="lineno">   14</span>    {</div>
+<div class="line"><span class="lineno">   15</span>        model = appState-&gt;models.coreTerrain;</div>
+<div class="line"><span class="lineno">   16</span>    }</div>
+<div class="line"><span class="lineno">   17</span> </div>
+<div class="line"><span class="lineno">   18</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">   19</span>    {</div>
+<div class="line"><span class="lineno">   20</span>        model = appState-&gt;models.customBase;</div>
+<div class="line"><span class="lineno">   21</span>    }</div>
+<div class="line"><span class="lineno">   22</span> </div>
+<div class="line"><span class="lineno">   23</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   24</span>    {</div>
+<div class="line"><span class="lineno">   25</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   26</span>    }</div>
+<div class="line"><span class="lineno">   27</span> </div>
+<div class="line"><span class="lineno">   28</span>    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1, 1, 1, 1));</div>
+<div class="line"><span class="lineno">   29</span>    ImGui::BeginChild(<span class="stringliteral">&quot;##DrawFilterDrawArea&quot;</span>, ImVec2(200, 200));</div>
+<div class="line"><span class="lineno">   30</span> </div>
+<div class="line"><span class="lineno">   31</span>    <span class="keywordflow">if</span> (ImGui::IsWindowHovered() &amp;&amp; ImGui::IsMouseDown(ImGuiMouseButton_Left))</div>
+<div class="line"><span class="lineno">   32</span>    {</div>
+<div class="line"><span class="lineno">   33</span>        ImVec2 bmin = ImGui::GetItemRectMin();</div>
+<div class="line"><span class="lineno">   34</span>        ImDrawList *list = ImGui::GetWindowDrawList();</div>
+<div class="line"><span class="lineno">   35</span>        ImVec2 pos = ImGui::GetMousePos();</div>
+<div class="line"><span class="lineno">   36</span>        list-&gt;AddCircleFilled(pos, 10, ImColor(0, 0, 0));</div>
+<div class="line"><span class="lineno">   37</span>        <span class="keywordtype">int</span> res = model-&gt;mesh-&gt;res;</div>
+<div class="line"><span class="lineno">   38</span>        pos.x -= bmin.x;</div>
+<div class="line"><span class="lineno">   39</span>        pos.y -= bmin.y;</div>
+<div class="line"><span class="lineno">   40</span>        pos.x *= res /200.0;</div>
+<div class="line"><span class="lineno">   41</span>        pos.y *= res/ 200.0;</div>
+<div class="line"><span class="lineno">   42</span> </div>
+<div class="line"><span class="lineno">   43</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = pos.y - radius; i &lt; pos.y + radius; i++)</div>
+<div class="line"><span class="lineno">   44</span>        {</div>
+<div class="line"><span class="lineno">   45</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = pos.x - radius; j &lt; pos.x + radius; j++)</div>
+<div class="line"><span class="lineno">   46</span>            {</div>
+<div class="line"><span class="lineno">   47</span>                model-&gt;mesh-&gt;AddElevation(strength, i, j);</div>
+<div class="line"><span class="lineno">   48</span>            }</div>
+<div class="line"><span class="lineno">   49</span>        }</div>
+<div class="line"><span class="lineno">   50</span> </div>
+<div class="line"><span class="lineno">   51</span>        model-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno">   52</span>        model-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno">   53</span>    }</div>
+<div class="line"><span class="lineno">   54</span> </div>
+<div class="line"><span class="lineno">   55</span>    ImGui::EndChild();</div>
+<div class="line"><span class="lineno">   56</span>    ImGui::PopStyleColor();</div>
+<div class="line"><span class="lineno">   57</span>    ImGui::DragFloat(<span class="stringliteral">&quot;Brush Strength&quot;</span>, &amp;strength, 0.01f);</div>
+<div class="line"><span class="lineno">   58</span>    ImGui::DragFloat(<span class="stringliteral">&quot;Brush Radius&quot;</span>, &amp;radius, 0.01f);</div>
+<div class="line"><span class="lineno">   59</span>}</div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

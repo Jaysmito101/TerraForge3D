@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TerraForge3D: TerraForge3D/src/Utils.h Source File</title>
+<title>TerraForge3D: TerraForge3D/src/Utils/Utils.h Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
 <script type="text/javascript" src="../../jquery.js"></script>
@@ -141,14 +141,14 @@ $(document).ready(function(){initNavTree('d9/dc1/_utils_8h_source.html','../../'
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    std::string ToString()</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    {</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        std::string <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        std::string hash;</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; length; i++)</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        {</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a> += UChar2Hex(data[i]);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            hash += UChar2Hex(data[i]);</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        }</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordflow">return</span> hash;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    }</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordtype">int</span> length = 0;</div>
@@ -369,7 +369,6 @@ $(document).ready(function(){initNavTree('d9/dc1/_utils_8h_source.html','../../'
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="preprocessor">#define TERR3D_KEY_MENU               348</span></div>
 <div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
 <div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="preprocessor">#define TERR3D_KEY_LAST               TERR3D_KEY_MENU</span></div>
-<div class="ttc" id="a_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54_html_a39b91b979c2d169ec26079a983134a54"><div class="ttname"><a href="../../d9/dd6/_simplex_noise_8cpp_a39b91b979c2d169ec26079a983134a54.html#a39b91b979c2d169ec26079a983134a54">hash</a></div><div class="ttdeci">static uint8_t hash(int32_t i)</div><div class="ttdoc">Helper function to hash an integer using the above permutation table.</div><div class="ttdef"><b>Definition:</b> <a href="../../d9/dd6/_simplex_noise_8cpp_source.html#l00101">SimplexNoise.cpp:101</a></div></div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 <div class="ttc" id="astruct_hash_html"><div class="ttname"><a href="../../d2/d7a/struct_hash.html">Hash</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/dc1/_utils_8h_source.html#l00013">Utils.h:14</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -377,7 +376,7 @@ $(document).ready(function(){initNavTree('d9/dc1/_utils_8h_source.html','../../'
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><b>Utils.h</b></li>
+    <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_36d36b6231b0c4e5daf102c9979382d5.html">Utils</a></li><li class="navelem"><b>Utils.h</b></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
