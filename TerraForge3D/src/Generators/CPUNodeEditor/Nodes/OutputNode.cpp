@@ -1,4 +1,4 @@
-#include "OutputNode.h"
+#include "Generators/CPUNodeEditor/Nodes/OutputNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include <iostream>

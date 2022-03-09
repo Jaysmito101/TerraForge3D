@@ -1,4 +1,4 @@
-#include "ErosionFilter.h"
+#include "Filters/ErosionFilter.h"
 #include <imgui.h>
 #include <iostream>
 

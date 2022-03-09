@@ -1,4 +1,4 @@
-#include "BlendNode.h"
+#include "Generators/CPUNodeEditor/Nodes/BlendNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

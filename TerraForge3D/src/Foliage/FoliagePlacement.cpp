@@ -1,4 +1,4 @@
-#include "FoliagePlacement.h"
+#include "Foliage/FoliagePlacement.h"
 #include "Utils.h"
 #include "Base/ModelImporter.h"
 #include <Shader.h>

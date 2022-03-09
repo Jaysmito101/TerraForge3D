@@ -1,13 +1,13 @@
-#include "MeshGeneratorManager.h"
+#include "Generators/MeshGeneratorManager.h"
 
-#include "Utils.h"
+#include "Utils/Utils.h"
 #include "Base/Base.h"
 #include "Data/ApplicationState.h"
 
-#include "ClearMeshGenerator.h"
-#include "CPUNoiseLayersGenerator.h"
-#include "GPUNoiseLayerGenerator.h"
-#include "CPUNodeEditor/CPUNodeEditor.h"
+#include "Generators/ClearMeshGenerator.h"
+#include "Generators/CPUNoiseLayersGenerator.h"
+#include "Generators/GPUNoiseLayerGenerator.h"
+#include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include "Base/UIFontManager.h"
 

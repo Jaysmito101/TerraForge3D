@@ -1,4 +1,4 @@
-#include "MeshCoordinatesNode.h"
+#include "Generators/CPUNodeEditor/Nodes/MeshCoordinatesNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include <iostream>

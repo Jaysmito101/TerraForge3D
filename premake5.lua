@@ -67,9 +67,9 @@ project "TerraForge3DLib"
 
 	includedirs {
 		"./TerraForge3D/vendor/assimp/include",
-		"./TerraForge3D/src",
-		"./TerraForge3D/src/Utils",
-		"./TerraForge3D/src/Base",
+		"./TerraForge3D/include",
+		"./TerraForge3D/include/Utils",
+		"./TerraForge3D/include/Base",
 		"./TerraForge3D/vendor",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
@@ -173,8 +173,7 @@ project "TerraForge3D"
 
 	includedirs {
 		"./TerraForge3D/vendor/assimp/include",
-		"./TerraForge3D/src",
-		"./TerraForge3D/src/Base",
+		"./TerraForge3D/include",
 		"./TerraForge3D/vendor",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
@@ -222,6 +221,3 @@ project "TerraForge3D"
 	
 
 include "Tools/ModuleMaker"
-include "Tools/ModuleSDK"
-include "Tools/PyModuleSDK"
-

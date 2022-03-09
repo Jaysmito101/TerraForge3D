@@ -1,4 +1,4 @@
-#include "MinValNode.h"
+#include "Generators/CPUNodeEditor/Nodes/MinValNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

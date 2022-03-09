@@ -1,4 +1,4 @@
-#include "MainMenu.h"
+#include "Menu/MainMenu.h"
 
 #include "imgui/imgui.h"
 
@@ -69,7 +69,7 @@ void MainMenu::ShowFileMenu()
 
 	if (ImGui::MenuItem("Install Module"))
 	{
-		appState->modules.manager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
+//		appState->modules.manager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
 	}
 
 	Model *modelToExport;

@@ -1,4 +1,4 @@
-#include "MathFunctionNode.h"
+#include "Generators/CPUNodeEditor/Nodes/MathFunctionNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include "muParser.h"

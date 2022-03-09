@@ -1,4 +1,4 @@
-#include "TimeBasedSeedNode.h"
+#include "Generators/CPUNodeEditor/Nodes/TimeBasedSeedNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include <iostream>

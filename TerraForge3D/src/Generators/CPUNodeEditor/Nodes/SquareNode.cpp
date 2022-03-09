@@ -1,4 +1,4 @@
-#include "SquareNode.h"
+#include "Generators/CPUNodeEditor/Nodes/SquareNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

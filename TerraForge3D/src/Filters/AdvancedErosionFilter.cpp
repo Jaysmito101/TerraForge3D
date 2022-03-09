@@ -1,9 +1,9 @@
 #include "Base/OpenCL/ComputeKernel.h"
-#include "AdvancedErosionFilter.h"
+#include "Filters/AdvancedErosionFilter.h"
 
 #include "Data/ApplicationState.h"
 
-#include "Utils.h"
+#include "Utils/Utils.h"
 
 #include <imgui.h>
 #include <iostream>

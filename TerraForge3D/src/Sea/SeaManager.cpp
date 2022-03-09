@@ -1,6 +1,6 @@
-#include "SeaManager.h"
+#include "Sea/SeaManager.h"
 
-#include "Utils.h"
+#include "Utils/Utils.h"
 #include "Base/Base.h"
 #include "Data/ProjectData.h"
 

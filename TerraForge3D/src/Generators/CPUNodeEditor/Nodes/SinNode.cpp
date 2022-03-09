@@ -1,4 +1,4 @@
-#include "SinNode.h"
+#include "Generators/CPUNodeEditor/Nodes/SinNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

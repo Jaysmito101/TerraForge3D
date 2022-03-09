@@ -1,10 +1,10 @@
 #pragma once
-#include <EntryPoint.h>
-#include <SplashScreen.h>
+#include "Base/EntryPoint.h"
+#include "Base/SplashScreen.h"
+#include "Base/Logging/Logger.h"
+
 #include <iostream>
 #include <string>
-
-#include "Logging/Logger.h"
 
 #ifdef TERR3D_WIN32
 #include <shellapi.h>

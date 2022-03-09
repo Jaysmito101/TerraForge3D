@@ -1,4 +1,4 @@
-#include "MaxMeshCoordinatesNode.h"
+#include "Generators/CPUNodeEditor/Nodes/MaxMeshCoordinatesNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include <iostream>

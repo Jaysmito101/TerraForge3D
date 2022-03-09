@@ -1,4 +1,4 @@
-#include "VisualizerNode.h"
+#include "Generators/CPUNodeEditor/Nodes/VisualizerNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include "Utils.h"
 #include "implot.h"

@@ -1,5 +1,5 @@
-#include "GeneratorMask.h"
-#include "MaskLayerHelper.h"
+#include "Generators/GeneratorMask.h"
+#include "Generators/MaskLayerHelper.h"
 #include "Data/ApplicationState.h"
 
 #include "imgui/imgui.h"

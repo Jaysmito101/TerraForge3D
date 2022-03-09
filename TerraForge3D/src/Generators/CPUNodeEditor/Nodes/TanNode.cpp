@@ -1,4 +1,4 @@
-#include "TanNode.h"
+#include "Generators/CPUNodeEditor/Nodes/TanNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

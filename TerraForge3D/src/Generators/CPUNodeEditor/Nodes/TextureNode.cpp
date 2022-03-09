@@ -1,7 +1,7 @@
-#include "TextureNode.h"
-#include "Utils.h"
+#include "Generators/CPUNodeEditor/Nodes/TextureNode.h"
+#include "Utils/Utils.h"
 #include "Data/ProjectData.h"
-#include "Texture2D.h"
+#include "Base/Texture2D.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

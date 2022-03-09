@@ -1,5 +1,5 @@
-#include "GPUNoiseLayerGenerator.h"
-#include "Utils.h"
+#include "Generators/GPUNoiseLayerGenerator.h"
+#include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
 

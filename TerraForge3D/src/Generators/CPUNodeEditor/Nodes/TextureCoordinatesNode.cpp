@@ -1,4 +1,4 @@
-#include "TextureCoordinatesNode.h"
+#include "Generators/CPUNodeEditor/Nodes/TextureCoordinatesNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include <iostream>

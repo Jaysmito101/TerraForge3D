@@ -1,4 +1,4 @@
-#include "GPUErosionFilter.h"
+#include "Filters/GPUErosionFilter.h"
 #include <imgui.h>
 #include <iostream>
 

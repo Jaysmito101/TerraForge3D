@@ -1,4 +1,4 @@
-#include "MinMeshCoordinatesNode.h"
+#include "Generators/CPUNodeEditor/Nodes/MinMeshCoordinatesNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include <iostream>

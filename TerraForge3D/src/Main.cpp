@@ -1,4 +1,4 @@
-#include "../resource.h"
+#include "resource.h"
 
 #include <Misc/ExplorerControls.h>
 
@@ -34,7 +34,7 @@
 #undef cNear
 #undef cFar
 
-#include <json.hpp>
+#include "json/json.hpp"
 #include <zip.h>
 #include <sys/stat.h>
 #include <dirent/dirent.h>
@@ -683,7 +683,7 @@ static void LoadPackedProject(std::string path = ShowOpenFileDialog())
 static void ShowModuleManager()
 {
 	ImGui::Begin("Module Manager", &appState->windows.modulesManager);
-	appState->modules.manager->Render();
+	//appState->modules.manager->Render();
 	ImGui::End();
 }
 

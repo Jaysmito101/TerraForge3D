@@ -1,4 +1,4 @@
-#include "NoiseOpenSimplex2Node.h"
+#include "Generators/CPUNodeEditor/Nodes/NoiseOpenSimplex2Node.h"
 #include "FastNoiseLite.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 

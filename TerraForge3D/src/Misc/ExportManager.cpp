@@ -1,14 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-
-#include "ExportManager.h"
-#include <Utils.h>
 #include <fstream>
 #include <iostream>
 #include <atomic>
 #include <thread>
-#include <MathUtils.h>
-#include <Model.h>
+
+#include "Misc/ExportManager.h"
+#include "Utils/Utils.h"
+#include "Utils/MathUtils.h"
+#include "Base/Model.h"
 
 #include <stb/stb_image.h>
 #include "stb/stb_image_write.h"

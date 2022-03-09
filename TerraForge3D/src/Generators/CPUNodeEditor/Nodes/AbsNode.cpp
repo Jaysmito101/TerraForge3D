@@ -1,4 +1,4 @@
-#include "AbsNode.h"
+#include "Generators/CPUNodeEditor/Nodes/AbsNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

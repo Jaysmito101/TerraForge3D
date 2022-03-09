@@ -1,4 +1,4 @@
-#include "ClampNode.h"
+#include "Generators/CPUNodeEditor/Nodes/ClampNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

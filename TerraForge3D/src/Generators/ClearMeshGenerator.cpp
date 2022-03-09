@@ -1,7 +1,8 @@
-#include "ClearMeshGenerator.h"
-#include "Utils.h"
+#include "Generators/ClearMeshGenerator.h"
+#include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
+
 ClearMeshGenerator::ClearMeshGenerator(ApplicationState *as, ComputeKernel *kernels)
 {
 	bool tmp = false;

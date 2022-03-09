@@ -1,4 +1,4 @@
-#include "NoiseCellularNode.h"
+#include "Generators/CPUNodeEditor/Nodes/NoiseCellularNode.h"
 #include "FastNoiseLite.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 

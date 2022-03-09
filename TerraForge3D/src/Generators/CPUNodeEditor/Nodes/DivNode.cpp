@@ -1,4 +1,4 @@
-#include "DivNode.h"
+#include "Generators/CPUNodeEditor/Nodes/DivNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 #include <iostream>

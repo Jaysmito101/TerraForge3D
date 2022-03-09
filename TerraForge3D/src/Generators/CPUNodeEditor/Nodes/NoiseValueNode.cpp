@@ -1,5 +1,5 @@
-#include "NoiseValueNode.h"
-#include "FastNoiseLite.h"
+#include "Generators/CPUNodeEditor/Nodes/NoiseValueNode.h"
+#include "FastNoiseLite/FastNoiseLite.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 static const char *fractalTypes[] = { "None", "FBm", "Ridged", "PingPong" };

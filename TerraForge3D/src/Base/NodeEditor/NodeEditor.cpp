@@ -1,4 +1,4 @@
-#include "NodeEditor.h"
+#include "Base/NodeEditor/NodeEditor.h"
 #include "Base/ImGuiShapes.h"
 #include "Base/UIFontManager.h"
 #include "glfw/glfw3.h"

@@ -1,6 +1,6 @@
-#include "CPUNoiseLayersGenerator.h"
+#include "Generators/CPUNoiseLayersGenerator.h"
 
-#include "Utils.h"
+#include "Utils/Utils.h"
 #include "Profiler.h"
 #include "Data/ApplicationState.h"
 

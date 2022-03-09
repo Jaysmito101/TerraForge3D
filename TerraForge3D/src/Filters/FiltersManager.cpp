@@ -1,11 +1,11 @@
-#include "FiltersManager.h"
-#include "Filter.h"
-#include "Data\ApplicationState.h"
+#include "Filters/FiltersManager.h"
+#include "Filters/Filter.h"
+#include "Data/ApplicationState.h"
 
-#include "ErosionFilter.h"
-#include "DrawFilter.h"
-#include "AdvancedErosionFilter.h"
-#include "GPUErosionFilter.h"
+#include "Filters/ErosionFilter.h"
+#include "Filters/DrawFilter.h"
+#include "Filters/AdvancedErosionFilter.h"
+#include "Filters/GPUErosionFilter.h"
 
 #include <imgui.h>
 
