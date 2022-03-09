@@ -108,12 +108,12 @@ $(document).ready(function(){initNavTree('d0/dcf/_serializer_8cpp_source.html','
   <div class="headertitle"><div class="title">Serializer.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Serializer.h&quot;</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Utils.h&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;ModelImporter.h&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;ProjectData.h&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;VersionInfo.h&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;ApplicationState.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Data/Serializer.h&quot;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Utils/Utils.h&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Base/ModelImporter.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Data/ProjectData.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;Data/VersionInfo.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;Data/ApplicationState.h&quot;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;Misc/AppStyles.h&quot;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;dirent/dirent.h&quot;</span></div>
@@ -165,7 +165,7 @@ $(document).ready(function(){initNavTree('d0/dcf/_serializer_8cpp_source.html','
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>}</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>Serializer::Serializer(<a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *state)</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>Serializer::Serializer(ApplicationState *state)</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    :appState(state)</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>{</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    onError = [](std::string message, <span class="keywordtype">bool</span> whileSerialize)</div>
@@ -174,7 +174,7 @@ $(document).ready(function(){initNavTree('d0/dcf/_serializer_8cpp_source.html','
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    };</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>}</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>Serializer::Serializer(<a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *state, std::function&lt;<span class="keywordtype">void</span>(std::string, <span class="keywordtype">bool</span>)&gt; errorFunc)</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>Serializer::Serializer(ApplicationState *state, std::function&lt;<span class="keywordtype">void</span>(std::string, <span class="keywordtype">bool</span>)&gt; errorFunc)</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    :appState(state)</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>{</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>}</div>
@@ -379,7 +379,7 @@ $(document).ready(function(){initNavTree('d0/dcf/_serializer_8cpp_source.html','
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    Deserialize(tmp);</div>
 <div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>}</div>
 <div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *Serializer::Deserialize(nlohmann::json d)</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>ApplicationState *Serializer::Deserialize(nlohmann::json d)</div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>{</div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    data = d;</div>
 <div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Wating for remesh cycle to finish ...\n&quot;</span>;</div>
@@ -472,7 +472,6 @@ $(document).ready(function(){initNavTree('d0/dcf/_serializer_8cpp_source.html','
 <div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <span class="keywordflow">return</span> appState;</div>
 <div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>}</div>
 <div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span> </div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

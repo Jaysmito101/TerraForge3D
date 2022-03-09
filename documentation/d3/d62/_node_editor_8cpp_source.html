@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
   <div class="headertitle"><div class="title">NodeEditor.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;NodeEditor.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Base/NodeEditor/NodeEditor.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Base/ImGuiShapes.h&quot;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Base/UIFontManager.h&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;glfw/glfw3.h&quot;</span></div>
@@ -190,7 +190,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    ImGuiNodeEditor::EndPin();</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>}</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="keywordtype">bool</span> NodeEditorPin::ValidateLink(<a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *lnk)</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="keywordtype">bool</span> NodeEditorPin::ValidateLink(NodeEditorLink *lnk)</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>{</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">if</span> (link)</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    {</div>
@@ -210,7 +210,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordflow">return</span> parent-&gt;OnLink(<span class="keyword">this</span>, lnk);</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>}</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keywordtype">void</span> NodeEditorPin::Link(<a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *lnk)</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keywordtype">void</span> NodeEditorPin::Link(NodeEditorLink *lnk)</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>{</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    link = lnk;</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
@@ -273,10 +273,10 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    link = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>}</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> NodeEditorPin::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input)</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>NodeOutput NodeEditorPin::Evaluate(NodeInputParam input)</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>{</div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    mutex.lock();</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> o = parent-&gt;Evaluate(input, <span class="keyword">this</span>);</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    NodeOutput o = parent-&gt;Evaluate(input, <span class="keyword">this</span>);</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    mutex.unlock();</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    <span class="keywordflow">return</span> o;</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>}</div>
@@ -297,7 +297,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="keywordflow">return</span> pins;</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>}</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="keywordtype">bool</span> NodeEditorNode::OnLink(<a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin, <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link)</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="keywordtype">bool</span> NodeEditorNode::OnLink(NodeEditorPin *pin, NodeEditorLink *link)</div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>{</div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>}</div>
@@ -402,12 +402,12 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
 <div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="keywordtype">void</span> NodeEditorNode::Setup()</div>
 <div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>{</div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin : inputPins)</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    <span class="keywordflow">for</span> (NodeEditorPin *pin : inputPins)</div>
 <div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    {</div>
 <div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>        pin-&gt;parent = <span class="keyword">this</span>;</div>
 <div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    }</div>
 <div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin : outputPins)</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    <span class="keywordflow">for</span> (NodeEditorPin *pin : outputPins)</div>
 <div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    {</div>
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>        pin-&gt;parent = <span class="keyword">this</span>;</div>
 <div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    }</div>
@@ -453,14 +453,14 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span> </div>
 <div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="keywordflow">for</span> (nlohmann::json ndata : data[<span class="stringliteral">&quot;nodes&quot;</span>])</div>
 <div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    {</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *nd = (config.insNodeFunc(ndata));</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>        NodeEditorNode *nd = (config.insNodeFunc(ndata));</div>
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        nd-&gt;LoadInternal(ndata);</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>        <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>(nd);</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>        AddNode(nd);</div>
 <div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    }</div>
 <div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span> </div>
 <div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    <span class="keywordflow">for</span> (nlohmann::json ldata : data[<span class="stringliteral">&quot;links&quot;</span>])</div>
 <div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    {</div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *lnk = <span class="keyword">new</span> <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a>();</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        NodeEditorLink *lnk = <span class="keyword">new</span> NodeEditorLink();</div>
 <div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>        lnk-&gt;Load(ldata);</div>
 <div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>        ImGuiNodeEditor::PinId fromId, toId;</div>
 <div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        fromId = (int)ldata[<span class="stringliteral">&quot;from&quot;</span>];</div>
@@ -502,7 +502,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>            {</div>
 <div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>                <span class="keywordflow">if</span> (ImGuiNodeEditor::AcceptNewItem())</div>
 <div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>                {</div>
-<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>                    <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link = <span class="keyword">new</span> <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a>();</div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>                    NodeEditorLink *link = <span class="keyword">new</span> NodeEditorLink();</div>
 <div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>                    link-&gt;from = pins[iPid.Get()];</div>
 <div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>                    link-&gt;to = pins[oPid.Get()];</div>
 <div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>                    <span class="keywordtype">bool</span> lnkFrm = link-&gt;from-&gt;ValidateLink(link);</div>
@@ -520,7 +520,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span> </div>
 <div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(iPid)</div>
 <div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>            {</div>
-<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[iPid.Get()];</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>                NodeEditorPin *pin = pins[iPid.Get()];</div>
 <div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span> </div>
 <div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>                <span class="keywordflow">if</span>(pin-&gt;IsLinked())</div>
 <div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>                {</div>
@@ -530,7 +530,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span> </div>
 <div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (oPid)</div>
 <div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>            {</div>
-<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[oPid.Get()];</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>                NodeEditorPin *pin = pins[oPid.Get()];</div>
 <div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span> </div>
 <div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>                <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
 <div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>                {</div>
@@ -545,7 +545,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>        {</div>
 <div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span>            <span class="keywordflow">if</span> (ImGuiNodeEditor::AcceptNewItem())</div>
 <div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>            {</div>
-<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[nPid.Get()];</div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>                NodeEditorPin *pin = pins[nPid.Get()];</div>
 <div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span> </div>
 <div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>                <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
 <div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>                {</div>
@@ -572,7 +572,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00462" name="l00462"></a><span class="lineno">  462</span>            {</div>
 <div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span>                <span class="keywordflow">if</span> (!(outputNode &amp;&amp; nId == outputNode-&gt;_id))</div>
 <div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span>                {</div>
-<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>                    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = nodes[nId.Get()];</div>
+<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>                    NodeEditorNode *node = nodes[nId.Get()];</div>
 <div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span>                    DeleteNode(node);</div>
 <div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span>                }</div>
 <div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span>            }</div>
@@ -586,7 +586,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span>            {</div>
 <div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span>                <span class="keywordflow">if</span> (lId &amp;&amp; ImGuiNodeEditor::AcceptDeletedItem())</div>
 <div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span>                {</div>
-<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>                    <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link = links[lId.Get()];</div>
+<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>                    NodeEditorLink *link = links[lId.Get()];</div>
 <div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>                    DeleteLink(link);</div>
 <div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span>                }</div>
 <div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span>            }</div>
@@ -607,11 +607,11 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00497" name="l00497"></a><span class="lineno">  497</span>            {</div>
 <div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span>                <span class="keywordflow">if</span> (!(sNode.Get() == outputNode-&gt;_id.Get()))</div>
 <div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>                {</div>
-<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>                    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = (config.insNodeFunc(nodes[sNode.Get()]-&gt;Save()));</div>
+<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>                    NodeEditorNode *node = (config.insNodeFunc(nodes[sNode.Get()]-&gt;Save()));</div>
 <div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span>                    ImVec2 prePos = ImGuiNodeEditor::GetNodePosition(sNode);</div>
 <div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>                    ImGuiNodeEditor::SetNodePosition(node-&gt;_id, ImVec2(prePos.x + 10, prePos.y + 10));</div>
 <div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>                    ImGuiNodeEditor::DeselectNode(sNode);</div>
-<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>                    <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>(node);</div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>                    AddNode(node);</div>
 <div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>                }</div>
 <div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>            }</div>
 <div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>        }</div>
@@ -640,7 +640,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>    ImGuiNodeEditor::SetCurrentEditor(<span class="keyword">nullptr</span>);</div>
 <div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>}</div>
 <div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span> </div>
-<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span><span class="keywordtype">void</span> NodeEditor::DeleteLink(<a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link)</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span><span class="keywordtype">void</span> NodeEditor::DeleteLink(NodeEditorLink *link)</div>
 <div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>{</div>
 <div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>    link-&gt;from-&gt;link = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span>    link-&gt;to-&gt;link = <span class="keyword">nullptr</span>;</div>
@@ -648,7 +648,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>    <span class="keyword">delete</span> link;</div>
 <div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>}</div>
 <div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span> </div>
-<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span><span class="keywordtype">void</span> NodeEditor::AddNode(<a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node)</div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span><span class="keywordtype">void</span> NodeEditor::AddNode(NodeEditorNode *node)</div>
 <div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>{</div>
 <div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>    nodes[node-&gt;_id.Get()] = node;</div>
 <div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span> </div>
@@ -661,7 +661,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span> </div>
 <div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span>    <span class="keywordflow">if</span> (nodes.size() &gt; 2 &amp;&amp; nodes.find(lastNodeId.Get()) != nodes.end() &amp;&amp; !node-&gt;reqNodePosLoad)</div>
 <div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span>    {</div>
-<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *lastNode = nodes[lastNodeId.Get()];</div>
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>        NodeEditorNode *lastNode = nodes[lastNodeId.Get()];</div>
 <div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>        node-&gt;nodePosition = lastNode-&gt;nodePosition;</div>
 <div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>        node-&gt;reqNodePosLoad = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>    }</div>
@@ -669,7 +669,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>    lastNodeId = node-&gt;_id;</div>
 <div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>}</div>
 <div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span> </div>
-<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>NodeEditor::NodeEditor(<a class="code hl_struct" href="../../d2/d48/struct_node_editor_config.html">NodeEditorConfig</a> aconfig)</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>NodeEditor::NodeEditor(NodeEditorConfig aconfig)</div>
 <div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span>{</div>
 <div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>    config = aconfig;</div>
 <div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>    ImGuiNodeEditor::Config iconfig;</div>
@@ -677,7 +677,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>    context = ImGuiNodeEditor::CreateEditor(&amp;iconfig);</div>
 <div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>}</div>
 <div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span> </div>
-<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span><span class="keywordtype">void</span> NodeEditor::DeleteNode(<a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node)</div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span><span class="keywordtype">void</span> NodeEditor::DeleteNode(NodeEditorNode *node)</div>
 <div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>{</div>
 <div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span>    mutex.lock();</div>
 <div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span> </div>
@@ -688,7 +688,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>        node-&gt;OnDelete();</div>
 <div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>        std::vector&lt;NodeEditorPin *&gt; mPins = node-&gt;GetPins();</div>
 <div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span> </div>
-<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>        <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin : mPins)</div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>        <span class="keywordflow">for</span> (NodeEditorPin *pin : mPins)</div>
 <div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>        {</div>
 <div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>            <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
 <div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span>            {</div>
@@ -724,7 +724,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span>        DeleteNode(it.second);</div>
 <div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span>    }</div>
 <div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span> </div>
-<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = outputNode;</div>
+<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>    NodeEditorNode *node = outputNode;</div>
 <div class="line"><a id="l00618" name="l00618"></a><span class="lineno">  618</span> </div>
 <div class="line"><a id="l00619" name="l00619"></a><span class="lineno">  619</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : node-&gt;GetPins())</div>
 <div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>    {</div>
@@ -734,7 +734,7 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>    node-&gt;Setup();</div>
 <div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>}</div>
 <div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span> </div>
-<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span><span class="keywordtype">void</span> NodeEditor::SetOutputNode(<a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node)</div>
+<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span><span class="keywordtype">void</span> NodeEditor::SetOutputNode(NodeEditorNode *node)</div>
 <div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>{</div>
 <div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span>    outputNode = node;</div>
 <div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span> </div>
@@ -770,13 +770,6 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span>    maxY = maxPos[1];</div>
 <div class="line"><a id="l00661" name="l00661"></a><span class="lineno">  661</span>    maxZ = maxPos[2];</div>
 <div class="line"><a id="l00662" name="l00662"></a><span class="lineno">  662</span>}</div>
-<div class="ttc" id="aclass_add_node_html"><div class="ttname"><a href="../../dc/d48/class_add_node.html">AddNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d46/_add_node_8h_source.html#l00006">AddNode.h:7</a></div></div>
-<div class="ttc" id="aclass_node_editor_link_html"><div class="ttname"><a href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00068">NodeEditor.h:69</a></div></div>
-<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00113">NodeEditor.h:114</a></div></div>
-<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
-<div class="ttc" id="astruct_node_editor_config_html"><div class="ttname"><a href="../../d2/d48/struct_node_editor_config.html">NodeEditorConfig</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00058">NodeEditor.h:59</a></div></div>
-<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
-<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

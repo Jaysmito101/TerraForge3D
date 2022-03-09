@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('dc/df0/_main_menu_8cpp_source.html','.
   <div class="headertitle"><div class="title">MainMenu.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;MainMenu.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Menu/MainMenu.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;imgui/imgui.h&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
@@ -124,7 +124,7 @@ $(document).ready(function(){initNavTree('dc/df0/_main_menu_8cpp_source.html','.
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>MainMenu::MainMenu(<a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *as)</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>MainMenu::MainMenu(ApplicationState *as)</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    :appState(as)</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>{</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>}</div>
@@ -179,10 +179,10 @@ $(document).ready(function(){initNavTree('dc/df0/_main_menu_8cpp_source.html','.
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Install Module&quot;</span>))</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    {</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        appState-&gt;modules.manager-&gt;InstallModule(ShowOpenFileDialog(<span class="stringliteral">&quot;*.terr3dmodule&quot;</span>));</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment">//      appState-&gt;modules.manager-&gt;InstallModule(ShowOpenFileDialog(&quot;*.terr3dmodule&quot;));</span></div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    }</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *modelToExport;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    Model *modelToExport;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordflow">switch</span> (appState-&gt;mode)</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    {</div>
@@ -388,8 +388,6 @@ $(document).ready(function(){initNavTree('dc/df0/_main_menu_8cpp_source.html','.
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        appState-&gt;windows.osLisc = !appState-&gt;windows.osLisc;</div>
 <div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    }</div>
 <div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>}</div>
-<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -108,32 +108,32 @@ $(document).ready(function(){initNavTree('dd/d8e/_filters_manager_8cpp_source.ht
   <div class="headertitle"><div class="title">FiltersManager.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;FiltersManager.h&quot;</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Filter.h&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Data\ApplicationState.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Filters/FiltersManager.h&quot;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Filters/Filter.h&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Data/ApplicationState.h&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;ErosionFilter.h&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;DrawFilter.h&quot;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;AdvancedErosionFilter.h&quot;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;GPUErosionFilter.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;Filters/ErosionFilter.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;Filters/DrawFilter.h&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;Filters/AdvancedErosionFilter.h&quot;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;Filters/GPUErosionFilter.h&quot;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;imgui.h&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>FiltersManager::FiltersManager(<a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *as)</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>FiltersManager::FiltersManager(ApplicationState *as)</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>{</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    appState = as;</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    filters.clear();</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    filters.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d3/d96/class_erosion_filter.html">ErosionFilter</a>(appState));</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    filters.push_back(<span class="keyword">new</span> ErosionFilter(appState));</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    filters.back()-&gt;OnAttach();</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    filters.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d5/deb/class_advanced_erosion_filter.html">AdvancedErosionFilter</a>(appState));</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    filters.push_back(<span class="keyword">new</span> AdvancedErosionFilter(appState));</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    filters.back()-&gt;OnAttach();</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    filters.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d5/dd6/class_draw_filter.html">DrawFilter</a>(appState));</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    filters.push_back(<span class="keyword">new</span> DrawFilter(appState));</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    filters.back()-&gt;OnAttach();</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>}</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>FiltersManager::~FiltersManager()</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>{</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="../../d2/d70/class_filter.html">Filter</a> *filter : filters)</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordflow">for</span>(Filter *filter : filters)</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    {</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        <span class="keywordflow">if</span>(filter)</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        {</div>
@@ -159,7 +159,7 @@ $(document).ready(function(){initNavTree('dd/d8e/_filters_manager_8cpp_source.ht
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    {</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keywordtype">int</span> cop = 0;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d2/d70/class_filter.html">Filter</a> *filter : filters)</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="keywordflow">for</span> (Filter *filter : filters)</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        {</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            ImGui::Separator();</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>            cop++;</div>
@@ -183,11 +183,6 @@ $(document).ready(function(){initNavTree('dd/d8e/_filters_manager_8cpp_source.ht
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    ImGui::End();</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>}</div>
-<div class="ttc" id="aclass_advanced_erosion_filter_html"><div class="ttname"><a href="../../d5/deb/class_advanced_erosion_filter.html">AdvancedErosionFilter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d4e/_advanced_erosion_filter_8h_source.html#l00038">AdvancedErosionFilter.h:39</a></div></div>
-<div class="ttc" id="aclass_draw_filter_html"><div class="ttname"><a href="../../d5/dd6/class_draw_filter.html">DrawFilter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/d53/_draw_filter_8h_source.html#l00005">DrawFilter.h:6</a></div></div>
-<div class="ttc" id="aclass_erosion_filter_html"><div class="ttname"><a href="../../d3/d96/class_erosion_filter.html">ErosionFilter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../de/d35/_erosion_filter_8h_source.html#l00005">ErosionFilter.h:6</a></div></div>
-<div class="ttc" id="aclass_filter_html"><div class="ttname"><a href="../../d2/d70/class_filter.html">Filter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d2d/_filter_8h_source.html#l00007">Filter.h:8</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

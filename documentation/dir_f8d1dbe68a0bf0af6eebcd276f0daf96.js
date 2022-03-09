@@ -14,9 +14,5 @@ var dir_f8d1dbe68a0bf0af6eebcd276f0daf96 =
     [ "Sky", "dir_39dec8438070bd017e4874dd7e048a42.html", "dir_39dec8438070bd017e4874dd7e048a42" ],
     [ "TextureStore", "dir_d39d793270f92141a97537bc5dbdc588.html", "dir_d39d793270f92141a97537bc5dbdc588" ],
     [ "Utils", "dir_36d36b6231b0c4e5daf102c9979382d5.html", "dir_36d36b6231b0c4e5daf102c9979382d5" ],
-    [ "Main.cpp", "d5/d12/_main_8cpp_source.html", null ],
-    [ "Platform.h", "d2/dc9/_platform_8h_source.html", null ],
-    [ "Profiler.h", "d6/df1/_profiler_8h_source.html", null ],
-    [ "resource.h", "d8/d01/resource_8h_source.html", null ],
-    [ "TerraForge3D.h", "df/df3/_terra_forge3_d_8h_source.html", null ]
+    [ "Main.cpp", "d5/d12/_main_8cpp_source.html", null ]
 ];

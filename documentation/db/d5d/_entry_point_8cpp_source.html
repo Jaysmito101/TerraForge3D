@@ -109,12 +109,12 @@ $(document).ready(function(){initNavTree('db/d5d/_entry_point_8cpp_source.html',
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;EntryPoint.h&gt;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;SplashScreen.h&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;Logging/Logger.h&quot;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Base/EntryPoint.h&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Base/SplashScreen.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Base/Logging/Logger.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;shellapi.h&gt;</span></div>
@@ -151,9 +151,9 @@ $(document).ready(function(){initNavTree('db/d5d/_entry_point_8cpp_source.html',
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="keywordtype">int</span> WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, <span class="keywordtype">int</span> nCmdShow)</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>{</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    AllocateConsole();</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_class" href="../../de/d6b/class_application.html">Application</a> *app = CreateApplication();</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    Application *app = CreateApplication();</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    app-&gt;OnPreload();</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <a class="code hl_class" href="../../d3/d42/class_logger.html">Logger</a> logger(app-&gt;logsDir);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    Logger logger(app-&gt;logsDir);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    app-&gt;Init();</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    {</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        SplashScreen::Init(hInstance);</div>
@@ -168,9 +168,9 @@ $(document).ready(function(){initNavTree('db/d5d/_entry_point_8cpp_source.html',
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv)</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>{</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <a class="code hl_class" href="../../de/d6b/class_application.html">Application</a> *app = CreateApplication();</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    Application *app = CreateApplication();</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    app-&gt;OnPreload();</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <a class="code hl_class" href="../../d3/d42/class_logger.html">Logger</a> logger(app-&gt;logsDir);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    Logger logger(app-&gt;logsDir);</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    app-&gt;Init();</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    {</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        std::string args = <span class="stringliteral">&quot;&quot;</span>;</div>
@@ -187,8 +187,6 @@ $(document).ready(function(){initNavTree('db/d5d/_entry_point_8cpp_source.html',
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclass_application_html"><div class="ttname"><a href="../../de/d6b/class_application.html">Application</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/da3/_application_8h_source.html#l00007">Application.h:8</a></div></div>
-<div class="ttc" id="aclass_logger_html"><div class="ttname"><a href="../../d3/d42/class_logger.html">Logger</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/dec/_logger_8h_source.html#l00004">Logger.h:5</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

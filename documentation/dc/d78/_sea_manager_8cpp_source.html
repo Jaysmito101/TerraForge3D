@@ -108,15 +108,15 @@ $(document).ready(function(){initNavTree('dc/d78/_sea_manager_8cpp_source.html',
   <div class="headertitle"><div class="title">SeaManager.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;SeaManager.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Sea/SeaManager.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Utils.h&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Utils/Utils.h&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Base/Base.h&quot;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;Data/ProjectData.h&quot;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>SeaManager::SeaManager()</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    model = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Sea&quot;</span>);</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    model = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Sea&quot;</span>);</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    model-&gt;SetupMeshOnGPU();</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    model-&gt;mesh-&gt;GeneratePlane(256, 120);</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
@@ -131,9 +131,9 @@ $(document).ready(function(){initNavTree('dc/d78/_sea_manager_8cpp_source.html',
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    std::string vertexShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\vert.glsl&quot;</span>, &amp;tmp);</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    std::string fragmentShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\frag.glsl&quot;</span>, &amp;tmp);</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    std::string geometryShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\geom.glsl&quot;</span>, &amp;tmp);</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    shader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertexShaderSource, fragmentShaderSource, geometryShaderSource);</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    dudvMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\water_dudv.png&quot;</span>);</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    normalMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\water_normal.png&quot;</span>);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    shader = <span class="keyword">new</span> Shader(vertexShaderSource, fragmentShaderSource, geometryShaderSource);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    dudvMap = <span class="keyword">new</span> Texture2D(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\water_dudv.png&quot;</span>);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    normalMap = <span class="keyword">new</span> Texture2D(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\water_normal.png&quot;</span>);</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>}</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>SeaManager::~SeaManager()</div>
@@ -177,14 +177,14 @@ $(document).ready(function(){initNavTree('dc/d78/_sea_manager_8cpp_source.html',
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        <span class="keyword">delete</span> dudvMap;</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    }</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    dudvMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetProjectResourcePath() + <span class="stringliteral">&quot;\\&quot;</span> + GetProjectAsset(data[<span class="stringliteral">&quot;dudvMap&quot;</span>]));</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    dudvMap = <span class="keyword">new</span> Texture2D(GetProjectResourcePath() + <span class="stringliteral">&quot;\\&quot;</span> + GetProjectAsset(data[<span class="stringliteral">&quot;dudvMap&quot;</span>]));</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="keywordflow">if</span> (normalMap)</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    {</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keyword">delete</span> normalMap;</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    }</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    normalMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetProjectResourcePath() + <span class="stringliteral">&quot;\\&quot;</span> + GetProjectAsset(data[<span class="stringliteral">&quot;normalMap&quot;</span>]));</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    normalMap = <span class="keyword">new</span> Texture2D(GetProjectResourcePath() + <span class="stringliteral">&quot;\\&quot;</span> + GetProjectAsset(data[<span class="stringliteral">&quot;normalMap&quot;</span>]));</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>}</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>nlohmann::json SeaManager::Save()</div>
@@ -208,7 +208,7 @@ $(document).ready(function(){initNavTree('dc/d78/_sea_manager_8cpp_source.html',
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>}</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="keywordtype">void</span> SeaManager::Render(<a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> &amp;camera, <a class="code hl_class" href="../../d1/d3e/class_light_manager.html">LightManager</a> *lights, <span class="keywordtype">void</span> *reflectionTexture, <span class="keywordtype">float</span> time)</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="keywordtype">void</span> SeaManager::Render(Camera &amp;camera, LightManager *lights, <span class="keywordtype">void</span> *reflectionTexture, <span class="keywordtype">float</span> time)</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>{</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    shader-&gt;Bind();</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    shader-&gt;SetTime(&amp;time);</div>
@@ -281,11 +281,6 @@ $(document).ready(function(){initNavTree('dc/d78/_sea_manager_8cpp_source.html',
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        ImGui::End();</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    }</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>}</div>
-<div class="ttc" id="aclass_camera_html"><div class="ttname"><a href="../../da/dbb/class_camera.html">Camera</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d91/_camera_8h_source.html#l00008">Camera.h:9</a></div></div>
-<div class="ttc" id="aclass_light_manager_html"><div class="ttname"><a href="../../d1/d3e/class_light_manager.html">LightManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/d11/_light_manager_8h_source.html#l00006">LightManager.h:7</a></div></div>
-<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
-<div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
-<div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

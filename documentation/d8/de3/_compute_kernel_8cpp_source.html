@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('d8/de3/_compute_kernel_8cpp_source.htm
   <div class="headertitle"><div class="title">ComputeKernel.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;ComputeKernel.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Base/OpenCL/ComputeKernel.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('d8/de3/_compute_kernel_8cpp_source.htm
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>}</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>ComputeKernel::ComputeKernel()</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    :<a class="code hl_class" href="../../d3/daa/class_compute_kernel.html">ComputeKernel</a>(OnError, OnStatus)</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    :ComputeKernel(OnError, OnStatus)</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>{</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>}</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
@@ -214,7 +214,7 @@ $(document).ready(function(){initNavTree('d8/de3/_compute_kernel_8cpp_source.htm
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="keywordtype">void</span> ComputeKernel::CreateBuffer(std::string name, <span class="keywordtype">int</span> type, <span class="keywordtype">size_t</span> size)</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>{</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <a class="code hl_struct" href="../../d6/da2/struct_open_c_l_buffer.html">OpenCLBuffer</a> buffer;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    OpenCLBuffer buffer;</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    buffer.size = size;</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    buffer.buffer = cl::Buffer(context, type, size);</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    buffers[name] = buffer;</div>
@@ -234,8 +234,6 @@ $(document).ready(function(){initNavTree('d8/de3/_compute_kernel_8cpp_source.htm
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>{</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    queue.enqueueWriteBuffer(buffers[buffer].buffer, blocking ? CL_TRUE : CL_FALSE, 0, size, data);</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>}</div>
-<div class="ttc" id="aclass_compute_kernel_html"><div class="ttname"><a href="../../d3/daa/class_compute_kernel.html">ComputeKernel</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dc7/_compute_kernel_8h_source.html#l00016">ComputeKernel.h:17</a></div></div>
-<div class="ttc" id="astruct_open_c_l_buffer_html"><div class="ttname"><a href="../../d6/da2/struct_open_c_l_buffer.html">OpenCLBuffer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dc7/_compute_kernel_8h_source.html#l00010">ComputeKernel.h:11</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

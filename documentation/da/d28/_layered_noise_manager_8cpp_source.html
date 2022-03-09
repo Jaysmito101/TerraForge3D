@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    strength = 1.0f;</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    absv = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    sq = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    noiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a>());</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    noiseLayers.push_back(<span class="keyword">new</span> NoiseLayer());</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>}</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keywordtype">void</span> LayeredNoiseManager::Render()</div>
@@ -150,7 +150,7 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Duplicate&quot;</span>))</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>                {</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>                    nlohmann::json data = nl[i]-&gt;Save();</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                    toAdd.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a>());</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                    toAdd.push_back(<span class="keyword">new</span> NoiseLayer());</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                    toAdd.back()-&gt;Load(data);</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                }</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>            }</div>
@@ -177,7 +177,7 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    {</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add New Layer&quot;</span>))</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        {</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            toAdd.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a>());</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            toAdd.push_back(<span class="keyword">new</span> NoiseLayer());</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        }</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    }</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>}</div>
@@ -207,7 +207,7 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    strength = data[<span class="stringliteral">&quot;strength&quot;</span>];</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    mutex.lock();</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a> *nl : noiseLayers)</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordflow">for</span> (NoiseLayer *nl : noiseLayers)</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    {</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="keyword">delete</span> nl;</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    }</div>
@@ -216,7 +216,7 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keywordflow">for</span> (nlohmann::json tmp : data[<span class="stringliteral">&quot;noiseLayers&quot;</span>])</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    {</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        noiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a>());</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        noiseLayers.push_back(<span class="keyword">new</span> NoiseLayer());</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        noiseLayers.back()-&gt;Load(tmp);</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    }</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
@@ -251,7 +251,7 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    std::vector&lt;NoiseLayer *&gt; nl = noiseLayers;</div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <span class="keywordtype">float</span> noise = 0.0f;</div>
 <div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a> *n : nl)</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordflow">for</span> (NoiseLayer *n : nl)</div>
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        noise += n-&gt;Evaluate({ x + offset[0], y + offset[1], z + offset[2] });</div>
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    noise *= strength;</div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
@@ -267,7 +267,6 @@ $(document).ready(function(){initNavTree('da/d28/_layered_noise_manager_8cpp_sou
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keywordflow">return</span> noise;</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>}</div>
-<div class="ttc" id="aclass_noise_layer_html"><div class="ttname"><a href="../../d7/dc4/class_noise_layer.html">NoiseLayer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d8f/_noise_layer_8h_source.html#l00015">NoiseLayer.h:16</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

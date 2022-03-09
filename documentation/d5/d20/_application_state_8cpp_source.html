@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
   <div class="headertitle"><div class="title">ApplicationState.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;ApplicationState.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Data/ApplicationState.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>ApplicationState::ApplicationState()</div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>{</div>
@@ -120,9 +120,9 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>ApplicationStateModels::ApplicationStateModels()</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    coreTerrain = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Terrain&quot;</span>);</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    grid = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Grid&quot;</span>);</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    screenQuad = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Sreen Quad&quot;</span>);</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    coreTerrain = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Terrain&quot;</span>);</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    grid = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Grid&quot;</span>);</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    screenQuad = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Sreen Quad&quot;</span>);</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    customBase = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    customBaseCopy = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>}</div>
@@ -277,7 +277,6 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    hMapC[2] = data[<span class="stringliteral">&quot;hMapCZ&quot;</span>];</div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    hMapC[3] = data[<span class="stringliteral">&quot;hMapCW&quot;</span>];</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>}</div>
-<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

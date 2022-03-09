@@ -108,14 +108,14 @@ $(document).ready(function(){initNavTree('d8/d97/_noise_cellular_node_8cpp_sourc
   <div class="headertitle"><div class="title">NoiseCellularNode.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;NoiseCellularNode.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Generators/CPUNodeEditor/Nodes/NoiseCellularNode.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;FastNoiseLite.h&quot;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Generators/CPUNodeEditor/CPUNodeEditor.h&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *fractalTypes[] = { <span class="stringliteral">&quot;None&quot;</span>, <span class="stringliteral">&quot;FBm&quot;</span>, <span class="stringliteral">&quot;Ridged&quot;</span>, <span class="stringliteral">&quot;PingPong&quot;</span> };</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *distFuncs[] = { <span class="stringliteral">&quot;EuclideanSq&quot;</span>, <span class="stringliteral">&quot;Euclidean&quot;</span>, <span class="stringliteral">&quot;Manhattan&quot;</span>, <span class="stringliteral">&quot;Euclidean Manhattan Hybrid&quot;</span> };</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> NoiseCellularNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>NodeOutput NoiseCellularNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>{</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keywordflow">if</span>(!inputPins[0]-&gt;IsLinked())</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    {</div>
@@ -229,7 +229,7 @@ $(document).ready(function(){initNavTree('d8/d97/_noise_cellular_node_8cpp_sourc
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        st = inputPins[7]-&gt;other-&gt;Evaluate(input).value;</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    }</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ noiseGen-&gt;GetNoise(input.x, input.y, input.z) * st });</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordflow">return</span> NodeOutput({ noiseGen-&gt;GetNoise(input.x, input.y, input.z) * st });</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>}</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="keywordtype">void</span> NoiseCellularNode::Load(nlohmann::json data)</div>
@@ -459,17 +459,17 @@ $(document).ready(function(){initNavTree('d8/d97/_noise_cellular_node_8cpp_sourc
 <div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>NoiseCellularNode::NoiseCellularNode()</div>
 <div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>{</div>
 <div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    headerColor = ImColor(NOISE_NODE_COLOR);</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    seed = 42;</div>
 <div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    frequency = 0.01f;</div>
 <div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    fractalType = 0;</div>
@@ -489,9 +489,6 @@ $(document).ready(function(){initNavTree('d8/d97/_noise_cellular_node_8cpp_sourc
 <div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>{</div>
 <div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    <span class="keyword">delete</span> noiseGen;</div>
 <div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>}</div>
-<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
-<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
-<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

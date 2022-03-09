@@ -293,7 +293,7 @@ $(document).ready(function(){initNavTree('d4/d1c/_noise_layer_8cpp_source.html',
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    SetDistanceFunc(noiseGen, distanceFunc);</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>}</div>
 <div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="keywordtype">float</span> NoiseLayer::Evaluate(<a class="code hl_struct" href="../../da/d1c/struct_noise_layer_input.html">NoiseLayerInput</a> input)</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="keywordtype">float</span> NoiseLayer::Evaluate(NoiseLayerInput input)</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>{</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keywordflow">return</span> enabled ? noiseGen-&gt;GetNoise(input.x + offset[0], input.y + offset[1], input.z + offset[2]) * strength : 0.0f;</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>}</div>
@@ -430,7 +430,6 @@ $(document).ready(function(){initNavTree('d4/d1c/_noise_layer_8cpp_source.html',
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>        }</div>
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    }</div>
 <div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>}</div>
-<div class="ttc" id="astruct_noise_layer_input_html"><div class="ttname"><a href="../../da/d1c/struct_noise_layer_input.html">NoiseLayerInput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d8f/_noise_layer_8h_source.html#l00008">NoiseLayer.h:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

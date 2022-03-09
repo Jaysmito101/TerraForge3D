@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('da/d48/_log_handler_8cpp_source.html',
   <div class="headertitle"><div class="title">LogHandler.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;LogHandler.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Base/Logging/LogHandler.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keywordtype">int</span> LoggingOutputStreambuf::overflow( <span class="keywordtype">int</span> ch )</div>
@@ -136,7 +136,7 @@ $(document).ready(function(){initNavTree('da/d48/_log_handler_8cpp_source.html',
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>LoggingOutputStreambuf::LoggingOutputStreambuf(</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    std::ostream &amp;dest,</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    std::string <span class="keyword">const</span> &amp;logfileName )</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    : <a class="code hl_class" href="../../da/d90/class_logging_output_streambuf.html">LoggingOutputStreambuf</a>( dest.rdbuf(), logfileName )</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    : LoggingOutputStreambuf( dest.rdbuf(), logfileName )</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>{</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    dest.rdbuf( <span class="keyword">this</span> );</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    dest &lt;&lt; <span class="stringliteral">&quot;Starting Logger &quot;</span> &lt;&lt; logfileName &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
@@ -152,7 +152,6 @@ $(document).ready(function(){initNavTree('da/d48/_log_handler_8cpp_source.html',
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    myLogFile.close();</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>}</div>
-<div class="ttc" id="aclass_logging_output_streambuf_html"><div class="ttname"><a href="../../da/d90/class_logging_output_streambuf.html">LoggingOutputStreambuf</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d4f/_log_handler_8h_source.html#l00004">LogHandler.h:5</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
