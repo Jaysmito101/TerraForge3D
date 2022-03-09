@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('da/d84/_renderer_8cpp_source.html','..
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">namespace </span>Renderer</div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>{</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keywordtype">void</span> RenderModel(Model *model, Camera *camera, FrameBuffer *framebuffer, Shader *shader, Texture2D *diffuse, glm::vec3 lightPosition, <span class="keywordtype">float</span> *lightColor, <span class="keywordtype">float</span> time)</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keywordtype">void</span> RenderModel(<a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *model, <a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> *camera, <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *framebuffer, <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *shader, <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *diffuse, glm::vec3 lightPosition, <span class="keywordtype">float</span> *lightColor, <span class="keywordtype">float</span> time)</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    framebuffer-&gt;Begin();</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    shader-&gt;Bind();</div>
@@ -135,7 +135,7 @@ $(document).ready(function(){initNavTree('da/d84/_renderer_8cpp_source.html','..
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    framebuffer-&gt;End();</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keywordtype">void</span> RenderModels(std::vector&lt;Model *&gt; models, Camera *camera, FrameBuffer *framebuffer, Shader *shader, std::vector&lt;Texture2D *&gt; diffuse, glm::vec3 lightPosition, <span class="keywordtype">float</span> *lightColor, <span class="keywordtype">float</span> time)</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keywordtype">void</span> RenderModels(std::vector&lt;Model *&gt; models, <a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> *camera, <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *framebuffer, <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *shader, std::vector&lt;Texture2D *&gt; diffuse, glm::vec3 lightPosition, <span class="keywordtype">float</span> *lightColor, <span class="keywordtype">float</span> time)</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>{</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordflow">if</span> (models.size() != diffuse.size())</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    {</div>
@@ -167,6 +167,11 @@ $(document).ready(function(){initNavTree('da/d84/_renderer_8cpp_source.html','..
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>}</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>}</div>
+<div class="ttc" id="aclass_camera_html"><div class="ttname"><a href="../../da/dbb/class_camera.html">Camera</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d91/_camera_8h_source.html#l00008">Camera.h:9</a></div></div>
+<div class="ttc" id="aclass_frame_buffer_html"><div class="ttname"><a href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d89/_frame_buffer_8h_source.html#l00005">FrameBuffer.h:6</a></div></div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
+<div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
+<div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

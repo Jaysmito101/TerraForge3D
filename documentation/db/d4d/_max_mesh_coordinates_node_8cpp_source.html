@@ -113,26 +113,26 @@ $(document).ready(function(){initNavTree('db/d4d/_max_mesh_coordinates_node_8cpp
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>NodeOutput MaxMeshCoordinatesNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> MaxMeshCoordinatesNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>{</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    <span class="keywordtype">int</span> <span class="keywordtype">id</span> = pin-&gt;id;</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keywordflow">if</span> (outputPins[0]-&gt;<span class="keywordtype">id</span> == <span class="keywordtype">id</span>)</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        <span class="keywordflow">return</span> NodeOutput({input.maxX});</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({input.maxX});</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (outputPins[1]-&gt;<span class="keywordtype">id</span> == <span class="keywordtype">id</span>)</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        <span class="keywordflow">return</span> NodeOutput({ input.maxY});</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ input.maxY});</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (outputPins[2]-&gt;<span class="keywordtype">id</span> == <span class="keywordtype">id</span>)</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keywordflow">return</span> NodeOutput({ input.maxZ});</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordflow">return</span> NodeOutput();</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ input.maxZ});</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>();</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>}</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keywordtype">void</span> MaxMeshCoordinatesNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keywordtype">void</span> MaxMeshCoordinatesNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>{</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>}</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>nlohmann::json MaxMeshCoordinatesNode::Save()</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> MaxMeshCoordinatesNode::Save()</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>{</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::MaxMeshCoordinates;</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>}</div>
@@ -157,10 +157,14 @@ $(document).ready(function(){initNavTree('db/d4d/_max_mesh_coordinates_node_8cpp
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>MaxMeshCoordinatesNode::MaxMeshCoordinatesNode()</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>{</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    headerColor = ImColor(VALUE_NODE_COLOR);</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

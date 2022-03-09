@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('d6/d27/_hill_node_8cpp_source.html','.
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define MIN(x, y) x &gt; y ? x : y</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>NodeOutput HillNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> HillNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>{</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="keywordtype">float</span> xC, yC, hC;</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
@@ -160,10 +160,10 @@ $(document).ready(function(){initNavTree('d6/d27/_hill_node_8cpp_source.html','.
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    yN = yN * 2 - 1;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordtype">float</span> h = 1 - (SQUARE((yN - yC) / radius) + SQUARE((xN - xC) / radius));</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    h *= pow(2.71828, -p * (SQUARE(xN - xC) + SQUARE(yN - yC)));</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordflow">return</span> NodeOutput({ h * height });</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ h * height });</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>}</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> HillNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> HillNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>{</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    pos[0] = data[<span class="stringliteral">&quot;posX&quot;</span>];</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    pos[1] = data[<span class="stringliteral">&quot;posY&quot;</span>];</div>
@@ -173,9 +173,9 @@ $(document).ready(function(){initNavTree('d6/d27/_hill_node_8cpp_source.html','.
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    p = data[<span class="stringliteral">&quot;p&quot;</span>];</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>}</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>nlohmann::json HillNode::Save()</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> HillNode::Save()</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>{</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::Hill;</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    data[<span class="stringliteral">&quot;posX&quot;</span>] = pos[0];</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    data[<span class="stringliteral">&quot;posY&quot;</span>] = pos[1];</div>
@@ -203,18 +203,22 @@ $(document).ready(function(){initNavTree('d6/d27/_hill_node_8cpp_source.html','.
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>HillNode::HillNode()</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>{</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    headerColor = ImColor(MATH_NODE_COLOR);</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    pos[0] = pos[1] = pos[2] = 0;</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    height = 1.0f;</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    radius = 1.0f;</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    p = 1.0f;</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('da/d6f/_random_number_node_8cpp_source
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>NodeOutput RandomNumberNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> RandomNumberNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>{</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keywordtype">int</span> s, mx, mn;</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    s = mx = mn = 0;</div>
@@ -160,19 +160,19 @@ $(document).ready(function(){initNavTree('da/d6f/_random_number_node_8cpp_source
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    std::seed_seq seq{seed};</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    engine.seed(seq);</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    std::uniform_int_distribution&lt;int&gt; dist(mn, mx);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordflow">return</span> NodeOutput({(float)dist(engine)});</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({(float)dist(engine)});</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>}</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> RandomNumberNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> RandomNumberNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>{</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    seed = data[<span class="stringliteral">&quot;seed&quot;</span>];</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    min = data[<span class="stringliteral">&quot;min&quot;</span>];</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    max = data[<span class="stringliteral">&quot;max&quot;</span>];</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>}</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>nlohmann::json RandomNumberNode::Save()</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> RandomNumberNode::Save()</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>{</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::RandomNumber;</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    data[<span class="stringliteral">&quot;seed&quot;</span>] = seed;</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    data[<span class="stringliteral">&quot;min&quot;</span>] = min;</div>
@@ -219,15 +219,19 @@ $(document).ready(function(){initNavTree('da/d6f/_random_number_node_8cpp_source
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>RandomNumberNode::RandomNumberNode()</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>{</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    headerColor = ImColor(NOISE_NODE_COLOR);</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    seed = 42;</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    min = 0;</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    max = 10;</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

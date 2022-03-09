@@ -483,19 +483,19 @@ $(document).ready(function(){initNavTree('db/daf/_app_styles_8cpp_source.html','
 <div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span> </div>
 <div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>std::string GetStyleData()</div>
 <div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>{</div>
-<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>    nlohmann::json output;</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> output;</div>
 <div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>    output[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;THEME&quot;</span>;</div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    nlohmann::json colors;</div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    nlohmann::json styles;</div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    nlohmann::json color;</div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    nlohmann::json tmp;</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> colors;</div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> styles;</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> color;</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
 <div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    ImGuiStyle &amp;style = ImGui::GetStyle();</div>
 <div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span> </div>
 <div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; ImGuiCol_COUNT; i++)</div>
 <div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>    {</div>
 <div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>        <span class="keyword">const</span> ImVec4 &amp;col = style.Colors[i];</div>
 <div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>        <span class="keyword">const</span> <span class="keywordtype">char</span> *name = ImGui::GetStyleColorName(i);</div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        color = nlohmann::json();</div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        color = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
 <div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>        color[<span class="stringliteral">&quot;x&quot;</span>] = col.x;</div>
 <div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>        color[<span class="stringliteral">&quot;y&quot;</span>] = col.y;</div>
 <div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>        color[<span class="stringliteral">&quot;z&quot;</span>] = col.z;</div>
@@ -529,7 +529,7 @@ $(document).ready(function(){initNavTree('db/daf/_app_styles_8cpp_source.html','
 <div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>    styles[<span class="stringliteral">&quot;TabBorderSize&quot;</span>] = style.TabBorderSize;</div>
 <div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>    output[<span class="stringliteral">&quot;styles&quot;</span>] = styles;</div>
 <div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>    output[<span class="stringliteral">&quot;themeName&quot;</span>] = themeName;</div>
-<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    <span class="keywordflow">return</span> nlohmann::to_string(output);</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="../../d3/d9b/namespacenlohmann_a6ce645a0b8717757e096a5b5773b7a16.html#a6ce645a0b8717757e096a5b5773b7a16">nlohmann::to_string</a>(output);</div>
 <div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>}</div>
 <div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span> </div>
 <div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span> </div>
@@ -539,7 +539,7 @@ $(document).ready(function(){initNavTree('db/daf/_app_styles_8cpp_source.html','
 <div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>{</div>
 <div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>    <span class="keywordflow">try</span></div>
 <div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>    {</div>
-<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>        nlohmann::json theme = nlohmann::json::parse(settings);</div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>        <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> theme = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(settings);</div>
 <div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span> </div>
 <div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>        <span class="keywordflow">if</span> (std::string(theme[<span class="stringliteral">&quot;type&quot;</span>]) != <span class="stringliteral">&quot;THEME&quot;</span>)</div>
 <div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>        {</div>
@@ -791,6 +791,10 @@ $(document).ready(function(){initNavTree('db/daf/_app_styles_8cpp_source.html','
 <div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span>    ImGui::PopItemWidth();</div>
 <div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span>    ImGui::End();</div>
 <div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a6ce645a0b8717757e096a5b5773b7a16_html_a6ce645a0b8717757e096a5b5773b7a16"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a6ce645a0b8717757e096a5b5773b7a16.html#a6ce645a0b8717757e096a5b5773b7a16">nlohmann::to_string</a></div><div class="ttdeci">NLOHMANN_BASIC_JSON_TPL_DECLARATION std::string to_string(const NLOHMANN_BASIC_JSON_TPL &amp;j)</div><div class="ttdoc">user-defined to_string function for JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l26693">json.hpp:26693</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

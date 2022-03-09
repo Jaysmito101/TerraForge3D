@@ -120,9 +120,9 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>ApplicationStateModels::ApplicationStateModels()</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    coreTerrain = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Terrain&quot;</span>);</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    grid = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Grid&quot;</span>);</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    screenQuad = <span class="keyword">new</span> Model(<span class="stringliteral">&quot;Sreen Quad&quot;</span>);</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    coreTerrain = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Terrain&quot;</span>);</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    grid = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Grid&quot;</span>);</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    screenQuad = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Sreen Quad&quot;</span>);</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    customBase = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    customBaseCopy = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>}</div>
@@ -144,23 +144,23 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    }</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>}</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>nlohmann::json ApplicationStateCameras::Save()</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ApplicationStateCameras::Save()</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>{</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    nlohmann::json data = nlohmann::json();</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    data[<span class="stringliteral">&quot;main&quot;</span>] = main.Save();</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    data[<span class="stringliteral">&quot;postProcess&quot;</span>] = postPorcess.Save();</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>}</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keywordtype">void</span> ApplicationStateCameras::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keywordtype">void</span> ApplicationStateCameras::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>{</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    main.Load(data[<span class="stringliteral">&quot;main&quot;</span>]);</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    postPorcess.Load(data[<span class="stringliteral">&quot;postProcess&quot;</span>]);</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>}</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>nlohmann::json ApplicationStateWindows::Save()</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ApplicationStateWindows::Save()</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>{</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    data[<span class="stringliteral">&quot;styleEditor&quot;</span>] = styleEditor;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    data[<span class="stringliteral">&quot;statsWindow&quot;</span>] = statsWindow;</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    data[<span class="stringliteral">&quot;shaderEditor&quot;</span>] = shaderEditorWindow;</div>
@@ -178,7 +178,7 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>}</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keywordtype">void</span> ApplicationStateWindows::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keywordtype">void</span> ApplicationStateWindows::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>{</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    styleEditor = data[<span class="stringliteral">&quot;styleEditor&quot;</span>];</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    statsWindow = data[<span class="stringliteral">&quot;statsWindow&quot;</span>];</div>
@@ -196,9 +196,9 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    cameraControls = data[<span class="stringliteral">&quot;cameraControls&quot;</span>];</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>}</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>nlohmann::json ApplicationStateStates::Save()</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ApplicationStateStates::Save()</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>{</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    data[<span class="stringliteral">&quot;usingBase&quot;</span>] = usingBase;</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    data[<span class="stringliteral">&quot;skyboxEnabled&quot;</span>] = skyboxEnabled;</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    data[<span class="stringliteral">&quot;vSync&quot;</span>] = vSync;</div>
@@ -215,7 +215,7 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>}</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keywordtype">void</span> ApplicationStateStates::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keywordtype">void</span> ApplicationStateStates::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>{</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    usingBase = data[<span class="stringliteral">&quot;usingBase&quot;</span>];</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    skyboxEnabled = data[<span class="stringliteral">&quot;skyboxEnabled&quot;</span>];</div>
@@ -232,9 +232,9 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    useGPUForNormals = data[<span class="stringliteral">&quot;useGPUForNormals&quot;</span>];</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>}</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>nlohmann::json ApplicationStateGlobals::Save()</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ApplicationStateGlobals::Save()</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>{</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    data[<span class="stringliteral">&quot;mouseSpeed&quot;</span>] = mouseSpeed;</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    data[<span class="stringliteral">&quot;scrollSpeed&quot;</span>] = scrollSpeed;</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    data[<span class="stringliteral">&quot;mouseScrollAmount&quot;</span>] = mouseScrollAmount;</div>
@@ -256,7 +256,7 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>}</div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="keywordtype">void</span> ApplicationStateGlobals::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="keywordtype">void</span> ApplicationStateGlobals::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>{</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    mouseSpeed = data[<span class="stringliteral">&quot;mouseSpeed&quot;</span>];</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    scrollSpeed = data[<span class="stringliteral">&quot;scrollSpeed&quot;</span>];</div>
@@ -277,6 +277,9 @@ $(document).ready(function(){initNavTree('d5/d20/_application_state_8cpp_source.
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    hMapC[2] = data[<span class="stringliteral">&quot;hMapCZ&quot;</span>];</div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    hMapC[3] = data[<span class="stringliteral">&quot;hMapCW&quot;</span>];</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>}</div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

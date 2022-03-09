@@ -124,8 +124,8 @@ $(document).ready(function(){initNavTree('df/d48/_g_p_u_erosion_filter_8cpp_sour
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define MAX(x, y) x&gt;y?x:y</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#define MIN(x, y) x&lt;y?x:y</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>ComputeShader *shd;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>ShaderStorageBuffer *heightMap_ssbo, *brushIndexOffset_ssbo, *brushWeights_ssbo, *randomIndex_ssbo;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><a class="code hl_class" href="../../d0/d73/class_compute_shader.html">ComputeShader</a> *shd;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><a class="code hl_class" href="../../d4/dc3/class_shader_storage_buffer.html">ShaderStorageBuffer</a> *heightMap_ssbo, *brushIndexOffset_ssbo, *brushWeights_ssbo, *randomIndex_ssbo;</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">static</span> <span class="keywordtype">int</span> randRange(<span class="keywordtype">int</span> l, <span class="keywordtype">int</span> h)</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>{</div>
@@ -156,18 +156,18 @@ $(document).ready(function(){initNavTree('df/d48/_g_p_u_erosion_filter_8cpp_sour
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    ImGui::DragFloat(<span class="stringliteral">&quot;Inertia##GPUErosionFilter&quot;</span>, &amp;inertia, 0.01f, 0, 1);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>}</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>nlohmann::json GPUErosionFilter::Save()</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> GPUErosionFilter::Save()</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>{</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">return</span> nlohmann::json();</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">return</span> <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">void</span> GPUErosionFilter::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">void</span> GPUErosionFilter::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>{</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>}</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keywordtype">void</span> GPUErosionFilter::Apply()</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>{</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    Model *model;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *model;</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::TERRAIN)</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    {</div>
@@ -196,11 +196,11 @@ $(document).ready(function(){initNavTree('df/d48/_g_p_u_erosion_filter_8cpp_sour
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    shaderSrc = std::regex_replace(shaderSrc, std::regex(<span class="stringliteral">&quot;LAYOUT_SIZE_Y&quot;</span>), std::to_string(1));</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    shaderSrc = std::regex_replace(shaderSrc, std::regex(<span class="stringliteral">&quot;LAYOUT_SIZE_Z&quot;</span>), std::to_string(1));</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    shaderSrc = std::regex_replace(shaderSrc, std::regex(<span class="stringliteral">&quot;MESH_RESOLUTION&quot;</span>), std::to_string(model-&gt;mesh-&gt;res));</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    shd = <span class="keyword">new</span> ComputeShader(shaderSrc);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    heightMap_ssbo = <span class="keyword">new</span> ShaderStorageBuffer();</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    brushIndexOffset_ssbo = <span class="keyword">new</span> ShaderStorageBuffer();</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    brushWeights_ssbo = <span class="keyword">new</span> ShaderStorageBuffer();</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    randomIndex_ssbo = <span class="keyword">new</span> ShaderStorageBuffer();</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    shd = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d73/class_compute_shader.html">ComputeShader</a>(shaderSrc);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    heightMap_ssbo = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/dc3/class_shader_storage_buffer.html">ShaderStorageBuffer</a>();</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    brushIndexOffset_ssbo = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/dc3/class_shader_storage_buffer.html">ShaderStorageBuffer</a>();</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    brushWeights_ssbo = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/dc3/class_shader_storage_buffer.html">ShaderStorageBuffer</a>();</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    randomIndex_ssbo = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/dc3/class_shader_storage_buffer.html">ShaderStorageBuffer</a>();</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keywordtype">float</span> *hMap = <span class="keyword">new</span> <span class="keywordtype">float</span>[model-&gt;mesh-&gt;vertexCount];</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; model-&gt;mesh-&gt;vertexCount; i++)</div>
@@ -290,6 +290,11 @@ $(document).ready(function(){initNavTree('df/d48/_g_p_u_erosion_filter_8cpp_sour
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="keywordtype">void</span> GPUErosionFilter::OnAttach()</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>{</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>}</div>
+<div class="ttc" id="aclass_compute_shader_html"><div class="ttname"><a href="../../d0/d73/class_compute_shader.html">ComputeShader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d0/d0b/_compute_shader_8h_source.html#l00006">ComputeShader.h:7</a></div></div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
+<div class="ttc" id="aclass_shader_storage_buffer_html"><div class="ttname"><a href="../../d4/dc3/class_shader_storage_buffer.html">ShaderStorageBuffer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dbc/_shader_storage_buffer_8h_source.html#l00005">ShaderStorageBuffer.h:6</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

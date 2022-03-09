@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('dd/d95/_sky_settings_8cpp_source.html'
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;imgui.h&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;hdritocubemap/HdriToCubemap.hpp&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>TextureCubemap *cubemap;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a> *cubemap;</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keywordtype">void</span> SetupSky()</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>{</div>
@@ -149,17 +149,17 @@ $(document).ready(function(){initNavTree('dd/d95/_sky_settings_8cpp_source.html'
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keywordtype">bool</span> linearFilter = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    HdriToCubemap&lt;unsigned char&gt; hdriToCube_ldr(path, cubemapResolution, linearFilter);</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    cubemap-&gt;facesData[TEXTURE_CUBEMAP_PX] = hdriToCube_ldr.getLeft();</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_PX] = IVec2(hdriToCube_ldr.getCubemapResolution());</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_PX] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(hdriToCube_ldr.getCubemapResolution());</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    cubemap-&gt;facesData[TEXTURE_CUBEMAP_NX] = hdriToCube_ldr.getRight();</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_NX] = IVec2(hdriToCube_ldr.getCubemapResolution());</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_NX] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(hdriToCube_ldr.getCubemapResolution());</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    cubemap-&gt;facesData[TEXTURE_CUBEMAP_PY] = hdriToCube_ldr.getDown();</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_PY] = IVec2(hdriToCube_ldr.getCubemapResolution());</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_PY] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(hdriToCube_ldr.getCubemapResolution());</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    cubemap-&gt;facesData[TEXTURE_CUBEMAP_NY] = hdriToCube_ldr.getUp();</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_NY] = IVec2(hdriToCube_ldr.getCubemapResolution());</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_NY] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(hdriToCube_ldr.getCubemapResolution());</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    cubemap-&gt;facesData[TEXTURE_CUBEMAP_PZ] = hdriToCube_ldr.getBack();</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_PZ] = IVec2(hdriToCube_ldr.getCubemapResolution());</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_PZ] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(hdriToCube_ldr.getCubemapResolution());</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    cubemap-&gt;facesData[TEXTURE_CUBEMAP_NZ] = hdriToCube_ldr.getFront();</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_NZ] = IVec2(hdriToCube_ldr.getCubemapResolution());</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    cubemap-&gt;facesSizes[TEXTURE_CUBEMAP_NZ] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(hdriToCube_ldr.getCubemapResolution());</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    cubemap-&gt;UploadDataToGPU();</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>}</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
@@ -273,6 +273,8 @@ $(document).ready(function(){initNavTree('dd/d95/_sky_settings_8cpp_source.html'
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    RenderSkybox(view, pers, useBox, useProcedural, cirrus, cumulus, cltime, fsun, upf);</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>}</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="ttc" id="aclass_texture_cubemap_html"><div class="ttname"><a href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d33/_texture_cubemap_8h_source.html#l00016">TextureCubemap.h:17</a></div></div>
+<div class="ttc" id="astruct_i_vec2_html"><div class="ttname"><a href="../../dc/d6f/struct_i_vec2.html">IVec2</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/dea/_base_math_8h_source.html#l00003">BaseMath.h:4</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('de/de4/_curve_node_8cpp_source.html','
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *axises[3] = {<span class="stringliteral">&quot;X&quot;</span>, <span class="stringliteral">&quot;Y&quot;</span>, <span class="stringliteral">&quot;Z&quot;</span>};</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>NodeOutput CurveNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> CurveNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>{</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">float</span> result = 0;</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordtype">float</span> axisVal = 0;</div>
@@ -163,15 +163,15 @@ $(document).ready(function(){initNavTree('de/de4/_curve_node_8cpp_source.html','
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        axisMax = 1;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    }</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keywordflow">return</span> NodeOutput({ ImGui::CurveValueSmooth((axisVal/axisMax), maxPoints, curve.data()) });</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ ImGui::CurveValueSmooth((axisVal/axisMax), maxPoints, curve.data()) });</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>}</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keywordtype">void</span> CurveNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keywordtype">void</span> CurveNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>{</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    maxPoints = data[<span class="stringliteral">&quot;maxPoints&quot;</span>];</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    ReserveVector(curve, (maxPoints &gt; data[<span class="stringliteral">&quot;curveSize&quot;</span>] ? maxPoints : data[<span class="stringliteral">&quot;curveSize&quot;</span>]));</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordflow">for</span> (nlohmann::json tmp : data[<span class="stringliteral">&quot;curve&quot;</span>])</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp : data[<span class="stringliteral">&quot;curve&quot;</span>])</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    {</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        curve[tmp[<span class="stringliteral">&quot;index&quot;</span>]] = ImVec2(tmp[<span class="stringliteral">&quot;x&quot;</span>], tmp[<span class="stringliteral">&quot;y&quot;</span>]);</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    }</div>
@@ -179,24 +179,24 @@ $(document).ready(function(){initNavTree('de/de4/_curve_node_8cpp_source.html','
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    axis = data[<span class="stringliteral">&quot;axis&quot;</span>];</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>}</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>nlohmann::json CurveNode::Save()</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> CurveNode::Save()</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>{</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    nlohmann::json data;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    nlohmann::json tmp;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::Curve;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordtype">int</span> i = 0;</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordflow">for</span> (ImVec2 point : curve)</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    {</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        nlohmann::json tmp2;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp2;</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        tmp2[<span class="stringliteral">&quot;x&quot;</span>] = point.x;</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        tmp2[<span class="stringliteral">&quot;y&quot;</span>] = point.y;</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        tmp2[<span class="stringliteral">&quot;index&quot;</span>] = i++;</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        tmp.push_back(tmp2);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(tmp2);</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    }</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    data[<span class="stringliteral">&quot;curve&quot;</span>] = tmp;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    data[<span class="stringliteral">&quot;curveSize&quot;</span>] = curve.size();</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    data[<span class="stringliteral">&quot;curveSize&quot;</span>] = curve.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>();</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    data[<span class="stringliteral">&quot;maxPoints&quot;</span>] = maxPoints;</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    data[<span class="stringliteral">&quot;axis&quot;</span>] = axis;</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keywordflow">return</span> data;</div>
@@ -241,13 +241,19 @@ $(document).ready(function(){initNavTree('de/de4/_curve_node_8cpp_source.html','
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>CurveNode::CurveNode()</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>{</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    headerColor = ImColor(OP_NODE_COLOR);</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    maxPoints = 10;</div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    ReserveVector(curve, maxPoints);</div>
 <div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    curve[0].x = -1;</div>
 <div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    axis = 0;</div>
 <div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0_html_a33c7c8638bb0b12e6d1b69d8106dd2e0"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">nlohmann::basic_json::size</a></div><div class="ttdeci">size_type size() const noexcept</div><div class="ttdoc">returns the number of elements</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22912">json.hpp:22912</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4_html_ab9e0253c92736db021840105d374c4c4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">nlohmann::basic_json::push_back</a></div><div class="ttdeci">void push_back(basic_json &amp;&amp;val)</div><div class="ttdoc">add an object to an array</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l23148">json.hpp:23148</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -211,7 +211,7 @@ $(document).ready(function(){initNavTree('df/dba/_im_gui_curve_editor_8cpp_sourc
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">double</span> ease(<span class="keywordtype">int</span> easetype, <span class="keywordtype">double</span> t)</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>{</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keyword">using namespace </span>std;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keyword">using namespace </span><a class="code hl_namespace" href="../../d8/dcc/namespacestd.html">std</a>;</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> d = 1.f;</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> pi = 3.1415926535897932384626433832795;</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> pi2 = 3.1415926535897932384626433832795 / 2;</div>
@@ -591,7 +591,7 @@ $(document).ready(function(){initNavTree('df/dba/_im_gui_curve_editor_8cpp_sourc
 <div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span>    }</div>
 <div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span> </div>
 <div class="line"><a id="l00483" name="l00483"></a><span class="lineno">  483</span>    <span class="comment">// interpolant</span></div>
-<div class="line"><a id="l00484" name="l00484"></a><span class="lineno">  484</span>    <span class="keyword">const</span> <span class="keywordtype">float</span> h = (t - key[(k - 1) * size]) / (key[k * size] - key[(k - 1) * size]);</div>
+<div class="line"><a id="l00484" name="l00484"></a><span class="lineno">  484</span>    <span class="keyword">const</span> <span class="keywordtype">float</span> h = (t - <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a3c6e0b8a9c15224a8228b9a98ca1531d">key</a>[(k - 1) * size]) / (<a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a3c6e0b8a9c15224a8228b9a98ca1531d">key</a>[k * size] - <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a3c6e0b8a9c15224a8228b9a98ca1531d">key</a>[(k - 1) * size]);</div>
 <div class="line"><a id="l00485" name="l00485"></a><span class="lineno">  485</span> </div>
 <div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>    <span class="comment">// init result</span></div>
 <div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; dim; i++)</div>
@@ -619,7 +619,7 @@ $(document).ready(function(){initNavTree('df/dba/_im_gui_curve_editor_8cpp_sourc
 <div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span> </div>
 <div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; dim; j++)</div>
 <div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>        {</div>
-<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>            v[j] += b * key[kn * size + j + 1];</div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>            v[j] += b * <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a3c6e0b8a9c15224a8228b9a98ca1531d">key</a>[kn * size + j + 1];</div>
 <div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>        }</div>
 <div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>    }</div>
 <div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>}</div>
@@ -957,6 +957,8 @@ $(document).ready(function(){initNavTree('df/dba/_im_gui_curve_editor_8cpp_sourc
 <div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span>}</div>
 <div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span> </div>
 <div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span>}; <span class="comment">// namespace ImGui</span></div>
+<div class="ttc" id="anamespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042_html_a59e696b1dad6d0d99c172ac4518c2042a3c6e0b8a9c15224a8228b9a98ca1531d"><div class="ttname"><a href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a3c6e0b8a9c15224a8228b9a98ca1531d">nlohmann::detail::parse_event_t::key</a></div><div class="ttdeci">@ key</div><div class="ttdoc">the parser read a key of a value in an object</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="../../d8/dcc/namespacestd.html">std</a></div><div class="ttdoc">STL namespace.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('df/d86/_min_val_node_8cpp_source.html'
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;Base/ImGuiCurveEditor.h&quot;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>NodeOutput MinValNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> MinValNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>{</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="keywordtype">float</span> x = inputf;</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
@@ -135,21 +135,21 @@ $(document).ready(function(){initNavTree('df/d86/_min_val_node_8cpp_source.html'
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keywordflow">if</span>(x &gt; t)</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    {</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        <span class="keywordflow">if</span>(inputPins[3]-&gt;IsLinked())</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            <span class="keywordflow">return</span> NodeOutput({ inputPins[3]-&gt;Evaluate(input) });</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ inputPins[3]-&gt;Evaluate(input) });</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            <span class="keywordflow">return</span> NodeOutput({ outputr });</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ outputr });</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    }</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    {</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        <span class="keywordflow">if</span>(inputPins[2]-&gt;IsLinked())</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>            <span class="keywordflow">return</span> NodeOutput({ inputPins[2]-&gt;Evaluate(input) });</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>            <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ inputPins[2]-&gt;Evaluate(input) });</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            <span class="keywordflow">return</span> NodeOutput({ outputf });</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ outputf });</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    }</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="keywordtype">void</span> MinValNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="keywordtype">void</span> MinValNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>{</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    inputf = data[<span class="stringliteral">&quot;inputf&quot;</span>];</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    outputf = data[<span class="stringliteral">&quot;outputf&quot;</span>];</div>
@@ -157,9 +157,9 @@ $(document).ready(function(){initNavTree('df/d86/_min_val_node_8cpp_source.html'
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    thresholdf = data[<span class="stringliteral">&quot;thresholdf&quot;</span>];</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>}</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>nlohmann::json MinValNode::Save()</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> MinValNode::Save()</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>{</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::MinVal;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    data[<span class="stringliteral">&quot;inputf&quot;</span>] = inputf;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    data[<span class="stringliteral">&quot;outputf&quot;</span>] = outputf;</div>
@@ -233,15 +233,19 @@ $(document).ready(function(){initNavTree('df/d86/_min_val_node_8cpp_source.html'
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>MinValNode::MinValNode()</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>{</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin()); <span class="comment">// FOR FUTURE</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin()); <span class="comment">// FOR FUTURE</span></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>()); <span class="comment">// FOR FUTURE</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>()); <span class="comment">// FOR FUTURE</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    headerColor = ImColor(OP_NODE_COLOR);</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    outputf = inputf = outputr = thresholdf = 0.0f;</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    thresholdf = 0.5f;</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

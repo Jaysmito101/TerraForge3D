@@ -236,9 +236,9 @@ $(document).ready(function(){initNavTree('d4/d1c/_noise_layer_8cpp_source.html',
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <span class="keyword">delete</span> noiseGen;</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>}</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>nlohmann::json NoiseLayer::Save()</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> NoiseLayer::Save()</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>{</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    data[<span class="stringliteral">&quot;noiseType&quot;</span>] = noiseType;</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    data[<span class="stringliteral">&quot;frequency&quot;</span>] = frequency;</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    data[<span class="stringliteral">&quot;seed&quot;</span>] = seed;</div>
@@ -259,7 +259,7 @@ $(document).ready(function(){initNavTree('d4/d1c/_noise_layer_8cpp_source.html',
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>}</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="keywordtype">void</span> NoiseLayer::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="keywordtype">void</span> NoiseLayer::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>{</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    frequency = data[<span class="stringliteral">&quot;frequency&quot;</span>];</div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    noiseGen-&gt;SetFrequency(frequency);</div>
@@ -293,7 +293,7 @@ $(document).ready(function(){initNavTree('d4/d1c/_noise_layer_8cpp_source.html',
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    SetDistanceFunc(noiseGen, distanceFunc);</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>}</div>
 <div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="keywordtype">float</span> NoiseLayer::Evaluate(NoiseLayerInput input)</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="keywordtype">float</span> NoiseLayer::Evaluate(<a class="code hl_struct" href="../../da/d1c/struct_noise_layer_input.html">NoiseLayerInput</a> input)</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>{</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keywordflow">return</span> enabled ? noiseGen-&gt;GetNoise(input.x + offset[0], input.y + offset[1], input.z + offset[2]) * strength : 0.0f;</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>}</div>
@@ -430,6 +430,8 @@ $(document).ready(function(){initNavTree('d4/d1c/_noise_layer_8cpp_source.html',
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>        }</div>
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    }</div>
 <div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_noise_layer_input_html"><div class="ttname"><a href="../../da/d1c/struct_noise_layer_input.html">NoiseLayerInput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d8f/_noise_layer_8h_source.html#l00008">NoiseLayer.h:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

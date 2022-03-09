@@ -123,8 +123,8 @@ $(document).ready(function(){initNavTree('d4/dc2/_advanced_erosion_filter_8cpp_s
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#define MAX(x, y) x&gt;y?x:y</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define MIN(x, y) x&lt;y?x:y</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>AdvancedErosionFilter::AdvancedErosionFilter(ApplicationState *appState)</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    : Filter(appState, <span class="stringliteral">&quot;Wind Erosion Filter (GPU)&quot;</span>)</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>AdvancedErosionFilter::AdvancedErosionFilter(<a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState)</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    : <a class="code hl_class" href="../../d2/d70/class_filter.html">Filter</a>(appState, <span class="stringliteral">&quot;Wind Erosion Filter (GPU)&quot;</span>)</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>{</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>}</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
@@ -140,18 +140,18 @@ $(document).ready(function(){initNavTree('d4/dc2/_advanced_erosion_filter_8cpp_s
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    ImGui::DragFloat(<span class="stringliteral">&quot;Sediment##WERO&quot;</span>, &amp;particle.sediment, 0.01f);</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>}</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>nlohmann::json AdvancedErosionFilter::Save()</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> AdvancedErosionFilter::Save()</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>{</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">return</span> nlohmann::json();</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">return</span> <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>}</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keywordtype">void</span> AdvancedErosionFilter::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keywordtype">void</span> AdvancedErosionFilter::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>{</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="keywordtype">void</span> AdvancedErosionFilter::Apply()</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>{</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    Model *model;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *model;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::TERRAIN)</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    {</div>
@@ -189,12 +189,12 @@ $(document).ready(function(){initNavTree('d4/dc2/_advanced_erosion_filter_8cpp_s
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        kernels.AddSoruce(kernelSrc);</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        kernels.BuildProgram(<span class="stringliteral">&quot;-I\&quot;&quot;</span> + GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\kernels&quot;</span> + <span class="stringliteral">&quot;\&quot;&quot;</span>);</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        kernels.AddKernel(<span class="stringliteral">&quot;erode&quot;</span>);</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(Vert) * model-&gt;mesh-&gt;vertexCount);</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(Vert) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        particle.seed = (float)rand();</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        particle.dimX = particle.dimY = model-&gt;mesh-&gt;res;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;part&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(WindErosionParticle));</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;part&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(WindErosionParticle), &amp;particle);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        kernels.CreateBuffer(<span class="stringliteral">&quot;part&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a>));</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        kernels.WriteBuffer(<span class="stringliteral">&quot;part&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a>), &amp;particle);</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        kernels.SetKernelArg(<span class="stringliteral">&quot;erode&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        kernels.SetKernelArg(<span class="stringliteral">&quot;erode&quot;</span>, 1, <span class="stringliteral">&quot;part&quot;</span>);</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Starting processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
@@ -202,7 +202,7 @@ $(document).ready(function(){initNavTree('d4/dc2/_advanced_erosion_filter_8cpp_s
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        cl::NDRange local(localWorkSize);</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        kernels.ExecuteKernel(<span class="stringliteral">&quot;erode&quot;</span>, local, global);</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Finished processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        kernels.ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(Vert) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        kernels.ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * model-&gt;mesh-&gt;vertexCount, model-&gt;mesh-&gt;vert);</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    }</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">catch</span> (std::exception ex)</div>
@@ -215,6 +215,13 @@ $(document).ready(function(){initNavTree('d4/dc2/_advanced_erosion_filter_8cpp_s
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    model-&gt;UploadToGPU();</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>}</div>
+<div class="ttc" id="aclass_filter_html"><div class="ttname"><a href="../../d2/d70/class_filter.html">Filter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d2d/_filter_8h_source.html#l00007">Filter.h:8</a></div></div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
+<div class="ttc" id="astruct_vert_html"><div class="ttname"><a href="../../d1/dea/struct_vert.html">Vert</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/da1/_mesh_8h_source.html#l00012">Mesh.h:13</a></div></div>
+<div class="ttc" id="astruct_wind_erosion_particle_html"><div class="ttname"><a href="../../d6/dfa/struct_wind_erosion_particle.html">WindErosionParticle</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d4e/_advanced_erosion_filter_8h_source.html#l00008">AdvancedErosionFilter.h:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

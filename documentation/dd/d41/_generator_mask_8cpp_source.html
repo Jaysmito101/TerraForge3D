@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>GeneratorMaskManager::GeneratorMaskManager(ComputeKernel *kernel, std::string <span class="keywordtype">id</span>, ApplicationState *as)</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>GeneratorMaskManager::GeneratorMaskManager(<a class="code hl_class" href="../../d3/daa/class_compute_kernel.html">ComputeKernel</a> *kernel, std::string <span class="keywordtype">id</span>, <a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *as)</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>{</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    uid = id;</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    appState = as;</div>
@@ -124,7 +124,7 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keywordflow">if</span>(kernel)</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    {</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        kernel-&gt;CreateBuffer(<span class="stringliteral">&quot;mask_items_count&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        kernel-&gt;CreateBuffer(<span class="stringliteral">&quot;mask_items&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(GeneratorMask) * MAX_GENERATOR_MASKS);</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        kernel-&gt;CreateBuffer(<span class="stringliteral">&quot;mask_items&quot;</span>, CL_MEM_READ_WRITE, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a>) * MAX_GENERATOR_MASKS);</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    }</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>}</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
@@ -133,9 +133,9 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>{</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>}</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>nlohmann::json GeneratorMaskManager::SaveGeneratorMask(GeneratorMask mask)</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> GeneratorMaskManager::SaveGeneratorMask(<a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a> mask)</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>{</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = mask.type;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    data[<span class="stringliteral">&quot;posX&quot;</span>] = mask.pos[0];</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    data[<span class="stringliteral">&quot;posY&quot;</span>] = mask.pos[1];</div>
@@ -159,9 +159,9 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>GeneratorMask GeneratorMaskManager::LoadGeneratorMask(nlohmann::json data)</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a> GeneratorMaskManager::LoadGeneratorMask(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>{</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    GeneratorMask mask;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a> mask;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    mask.type = data[<span class="stringliteral">&quot;type&quot;</span>]  ;</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    mask.pos[0] = data[<span class="stringliteral">&quot;posX&quot;</span>];</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    mask.pos[1] = data[<span class="stringliteral">&quot;posY&quot;</span>];</div>
@@ -185,26 +185,26 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keywordflow">return</span> mask;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>}</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>nlohmann::json GeneratorMaskManager::Save()</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> GeneratorMaskManager::Save()</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>{</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    data[<span class="stringliteral">&quot;uid&quot;</span>] = uid;</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    data[<span class="stringliteral">&quot;enabled&quot;</span>] = enabled;</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    data[<span class="stringliteral">&quot;gmcount&quot;</span>] = gmcount;</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    data[<span class="stringliteral">&quot;count&quot;</span>] = masks.size();</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = type;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    nlohmann::json msks;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> msks;</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;masks.size(); i++)</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    {</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        msks.push_back(SaveGeneratorMask(masks[i]));</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        msks.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(SaveGeneratorMask(masks[i]));</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    }</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    data[<span class="stringliteral">&quot;masks&quot;</span>] = msks;</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>}</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="keywordtype">void</span> GeneratorMaskManager::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="keywordtype">void</span> GeneratorMaskManager::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>{</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    uid = data[<span class="stringliteral">&quot;uid&quot;</span>];</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    enabled = data[<span class="stringliteral">&quot;enabled&quot;</span>];</div>
@@ -244,27 +244,27 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    {</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        <span class="keywordflow">case</span> GeneratorMask_Additive:</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        {</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>            value = value + m;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>            <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> = <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> + m;</div>
 <div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        }</div>
 <div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
 <div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        <span class="keywordflow">case</span> GeneratorMask_AverageAdditive:</div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        {</div>
 <div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>            m = m / (float)masks.size();</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>            value = value + m;</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>            <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> = <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> + m;</div>
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        }</div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        <span class="keywordflow">case</span> GeneratorMask_Multiplicative:</div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        {</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>            value = value * m;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>            <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> = <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> * m;</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        }</div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        <span class="keywordflow">case</span> GeneratorMask_AverageMultiplicative:</div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        {</div>
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>            m = m / (float)masks.size();</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>            value = value * m;</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>            <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> = <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a> * m;</div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        }</div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
@@ -272,7 +272,7 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    };</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    <span class="keywordflow">return</span> value;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">value</a>;</div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>}</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="keywordtype">void</span> GeneratorMaskManager::ShowSettings()</div>
@@ -339,7 +339,7 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>    {</div>
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        <span class="keywordflow">if</span>(ImGui::Button((<span class="stringliteral">&quot;Hill##GMSK&quot;</span> + uid).c_str()))</div>
 <div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>        {</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>            masks.push_back(GeneratorMask());</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>            masks.push_back(<a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a>());</div>
 <div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>            masks.back().type = MASK_LAYER_HILL;</div>
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>            masks.back().d1[0] = masks.back().d1[1] = masks.back().d1[2] = 1.0f;</div>
 <div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>            gmcount++;</div>
@@ -348,7 +348,7 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span> </div>
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        <span class="keywordflow">if</span>(ImGui::Button((<span class="stringliteral">&quot;Crater##GMSK&quot;</span> + uid).c_str()))</div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        {</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>            masks.push_back(GeneratorMask());</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>            masks.push_back(<a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a>());</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>            masks.back().type = MASK_LAYER_CRATOR;</div>
 <div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>            masks.back().d1[0] = masks.back().d3[0] = masks.back().d3[1] = 1.0f;</div>
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>            gmcount++;</div>
@@ -357,7 +357,7 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
 <div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>        <span class="keywordflow">if</span>(ImGui::Button((<span class="stringliteral">&quot;Cliff##GMSK&quot;</span> + uid).c_str()))</div>
 <div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        {</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>            masks.push_back(GeneratorMask());</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>            masks.push_back(<a class="code hl_struct" href="../../da/d74/struct_generator_mask.html">GeneratorMask</a>());</div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>            masks.back().type = MASK_LAYER_CLIFF;</div>
 <div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            masks.back().d1[2] = masks.back().d1[1] = 1.0f;</div>
 <div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>            gmcount++;</div>
@@ -367,6 +367,12 @@ $(document).ready(function(){initNavTree('dd/d41/_generator_mask_8cpp_source.htm
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>        ImGui::EndPopup();</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    }</div>
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>}</div>
+<div class="ttc" id="aclass_compute_kernel_html"><div class="ttname"><a href="../../d3/daa/class_compute_kernel.html">ComputeKernel</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dc7/_compute_kernel_8h_source.html#l00016">ComputeKernel.h:17</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4_html_ab9e0253c92736db021840105d374c4c4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">nlohmann::basic_json::push_back</a></div><div class="ttdeci">void push_back(basic_json &amp;&amp;val)</div><div class="ttdoc">add an object to an array</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l23148">json.hpp:23148</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042_html_a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804"><div class="ttname"><a href="../../dc/df0/namespacenlohmann_1_1detail_a59e696b1dad6d0d99c172ac4518c2042.html#a59e696b1dad6d0d99c172ac4518c2042a2063c1608d6e0baf80249c42e2be5804">nlohmann::detail::parse_event_t::value</a></div><div class="ttdeci">@ value</div><div class="ttdoc">the parser finished reading a JSON value</div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
+<div class="ttc" id="astruct_generator_mask_html"><div class="ttname"><a href="../../da/d74/struct_generator_mask.html">GeneratorMask</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/d4a/_generator_mask_8h_source.html#l00013">GeneratorMask.h:14</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

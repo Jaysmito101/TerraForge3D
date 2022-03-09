@@ -144,20 +144,20 @@ $(document).ready(function(){initNavTree('d1/d33/_camera_8cpp_source.html','../.
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    camID = ID++;</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>}</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>nlohmann::json Camera::Save()</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Camera::Save()</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>{</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    data[<span class="stringliteral">&quot;cNear&quot;</span>] = cNear;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    data[<span class="stringliteral">&quot;cFar&quot;</span>] = cFar;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    data[<span class="stringliteral">&quot;aspect&quot;</span>] = aspect;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    data[<span class="stringliteral">&quot;fov&quot;</span>] = fov;</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    data[<span class="stringliteral">&quot;ID&quot;</span>] = camID;</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    nlohmann::json tmp;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = position[0];</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = position[1];</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = position[2];</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    data[<span class="stringliteral">&quot;position&quot;</span>] = tmp;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    tmp = nlohmann::json();</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = rotation[0];</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = rotation[1];</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = rotation[2];</div>
@@ -165,7 +165,7 @@ $(document).ready(function(){initNavTree('d1/d33/_camera_8cpp_source.html','../.
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>}</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keywordtype">void</span> Camera::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keywordtype">void</span> Camera::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>{</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    cNear = data[<span class="stringliteral">&quot;cNear&quot;</span>];</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    cFar = data[<span class="stringliteral">&quot;cFar&quot;</span>];</div>
@@ -234,6 +234,8 @@ $(document).ready(function(){initNavTree('d1/d33/_camera_8cpp_source.html','../.
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        }</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    }</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

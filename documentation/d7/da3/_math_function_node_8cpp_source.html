@@ -125,7 +125,7 @@ $(document).ready(function(){initNavTree('d7/da3/_math_function_node_8cpp_source
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="comment">// TODO</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>}</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>NodeOutput MathFunctionNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> MathFunctionNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>{</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keywordflow">try</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    {</div>
@@ -137,20 +137,20 @@ $(document).ready(function(){initNavTree('d7/da3/_math_function_node_8cpp_source
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        x = (input.x / input.maxX) * 2 - 1;</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        y = (input.y / input.maxY) * 2 - 1;</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        z = (input.z / input.maxZ) * 2 - 1;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keywordflow">return</span> NodeOutput({(float)parser-&gt;Eval() * factor});</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({(float)parser-&gt;Eval() * factor});</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    }</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">catch</span> (...)</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    {</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    }</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordflow">return</span> NodeOutput({0.0f});</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({0.0f});</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>}</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keywordtype">void</span> MathFunctionNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keywordtype">void</span> MathFunctionNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>{</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    std::string expr = data[<span class="stringliteral">&quot;expr&quot;</span>];</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    memcpy(inputExpression, expr.data(), data.size());</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    memcpy(inputExpression, expr.data(), data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>());</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    mathInputWidth = data[<span class="stringliteral">&quot;mathInputWidth&quot;</span>];</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    factor = data[<span class="stringliteral">&quot;factor&quot;</span>];</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="comment">/*</span></div>
@@ -167,11 +167,11 @@ $(document).ready(function(){initNavTree('d7/da3/_math_function_node_8cpp_source
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment">    */</span></div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>}</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>nlohmann::json MathFunctionNode::Save()</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> MathFunctionNode::Save()</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>{</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    nlohmann::json data;</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    nlohmann::json tmp;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    nlohmann::json tmp2;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp2;</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::MathFunction;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    data[<span class="stringliteral">&quot;expr&quot;</span>] = std::string(inputExpression);</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    data[<span class="stringliteral">&quot;mathInputWidth&quot;</span>] = mathInputWidth;</div>
@@ -282,8 +282,8 @@ $(document).ready(function(){initNavTree('d7/da3/_math_function_node_8cpp_source
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>MathFunctionNode::MathFunctionNode()</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>{</div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    headerColor = ImColor(VALUE_NODE_COLOR);</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    parser = <span class="keyword">new</span> mu::Parser();</div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    memset(inputExpression, 0, <span class="keyword">sizeof</span>(inputExpression));</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    memset(varname, 0, <span class="keyword">sizeof</span>(varname));</div>
@@ -296,6 +296,11 @@ $(document).ready(function(){initNavTree('d7/da3/_math_function_node_8cpp_source
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    parser-&gt;DefineVar(L<span class="stringliteral">&quot;y&quot;</span>, &amp;y);</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    parser-&gt;DefineVar(L<span class="stringliteral">&quot;z&quot;</span>, &amp;z);</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0_html_a33c7c8638bb0b12e6d1b69d8106dd2e0"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">nlohmann::basic_json::size</a></div><div class="ttdeci">size_type size() const noexcept</div><div class="ttdoc">returns the number of elements</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22912">json.hpp:22912</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('d1/d08/_noise_perlin_node_8cpp_source.
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *fractalTypes[] = { <span class="stringliteral">&quot;None&quot;</span>, <span class="stringliteral">&quot;FBm&quot;</span>, <span class="stringliteral">&quot;Ridged&quot;</span>, <span class="stringliteral">&quot;PingPong&quot;</span> };</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>NodeOutput NoisePerlinNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a> NoisePerlinNode::Evaluate(<a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> input, <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin)</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    <span class="keywordflow">if</span>(!inputPins[0]-&gt;IsLinked())</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    {</div>
@@ -218,10 +218,10 @@ $(document).ready(function(){initNavTree('d1/d08/_noise_perlin_node_8cpp_source.
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        st = inputPins[7]-&gt;other-&gt;Evaluate(input).value;</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    }</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordflow">return</span> NodeOutput({ noiseGen-&gt;GetNoise(input.x, input.y, input.z) * st });</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordflow">return</span> <a class="code hl_struct" href="../../d6/d3b/struct_node_output.html">NodeOutput</a>({ noiseGen-&gt;GetNoise(input.x, input.y, input.z) * st });</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>}</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="keywordtype">void</span> NoisePerlinNode::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="keywordtype">void</span> NoisePerlinNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>{</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    frequency = data[<span class="stringliteral">&quot;frequency&quot;</span>];</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    seed = data[<span class="stringliteral">&quot;seed&quot;</span>];</div>
@@ -234,9 +234,9 @@ $(document).ready(function(){initNavTree('d1/d08/_noise_perlin_node_8cpp_source.
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    fractalType = data[<span class="stringliteral">&quot;fractalType&quot;</span>];</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>}</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>nlohmann::json NoisePerlinNode::Save()</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> NoisePerlinNode::Save()</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>{</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    nlohmann::json data;</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = MeshNodeEditor::MeshNodeType::NoisePerlin;</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    data[<span class="stringliteral">&quot;frequency&quot;</span>] = frequency;</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    data[<span class="stringliteral">&quot;seed&quot;</span>] = seed;</div>
@@ -412,16 +412,16 @@ $(document).ready(function(){initNavTree('d1/d08/_noise_perlin_node_8cpp_source.
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>NoisePerlinNode::NoisePerlinNode()</div>
 <div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>{</div>
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    headerColor = ImColor(NOISE_NODE_COLOR);</div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    inputPins.push_back(<span class="keyword">new</span> NodeEditorPin());</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    outputPins.push_back(<span class="keyword">new</span> NodeEditorPin(NodeEditorPinType::Output));</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>());</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    outputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a>(NodeEditorPinType::Output));</div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    seed = 42;</div>
 <div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    frequency = 0.01f;</div>
 <div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    fractalType = 0;</div>
@@ -439,6 +439,10 @@ $(document).ready(function(){initNavTree('d1/d08/_noise_perlin_node_8cpp_source.
 <div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>{</div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>    <span class="keyword">delete</span> noiseGen;</div>
 <div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>}</div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_node_input_param_html"><div class="ttname"><a href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00030">NodeEditor.h:31</a></div></div>
+<div class="ttc" id="astruct_node_output_html"><div class="ttname"><a href="../../d6/d3b/struct_node_output.html">NodeOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00025">NodeEditor.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

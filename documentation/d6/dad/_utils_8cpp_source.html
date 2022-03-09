@@ -445,13 +445,13 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <span class="keywordflow">return</span> ReadBinaryFile(path, &amp;size, sizeToLoad);</div>
 <div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>}</div>
 <div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span> </div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>Hash MD5File(std::string path)</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><a class="code hl_struct" href="../../d2/d7a/struct_hash.html">Hash</a> MD5File(std::string path)</div>
 <div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>{</div>
 <div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    <span class="keywordtype">int</span> size = 1;</div>
 <div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *data = (<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *)ReadBinaryFile(path, &amp;size);</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> hash[MD5_DIGEST_LENGTH];</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code hl_function" href="../../dc/df0/namespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8.html#a679e5e522ac6afa5d5923292fab450b8">hash</a>[MD5_DIGEST_LENGTH];</div>
 <div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    MD5(data, size, hash);</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    Hash resultHash(hash, MD5_DIGEST_LENGTH);</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <a class="code hl_struct" href="../../d2/d7a/struct_hash.html">Hash</a> resultHash(hash, MD5_DIGEST_LENGTH);</div>
 <div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    <span class="keyword">delete</span>[] data;</div>
 <div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <span class="keywordflow">return</span> resultHash;</div>
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>}</div>
@@ -631,7 +631,7 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>}</div>
 <div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span> </div>
-<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span><span class="keywordtype">bool</span> LoadFileIntoTexture(Texture2D *texture, <span class="keywordtype">bool</span> loadToAssets, <span class="keywordtype">bool</span> preserveData, <span class="keywordtype">bool</span> readAlpha)</div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span><span class="keywordtype">bool</span> LoadFileIntoTexture(<a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *texture, <span class="keywordtype">bool</span> loadToAssets, <span class="keywordtype">bool</span> preserveData, <span class="keywordtype">bool</span> readAlpha)</div>
 <div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>{</div>
 <div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>    std::string fileName = ShowOpenFileDialog(<span class="stringliteral">&quot;.png&quot;</span>);</div>
 <div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span> </div>
@@ -642,11 +642,11 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>            <span class="keyword">delete</span> texture;</div>
 <div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>        }</div>
 <div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span> </div>
-<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>        texture = <span class="keyword">new</span> Texture2D(fileName, preserveData, readAlpha);</div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>        texture = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(fileName, preserveData, readAlpha);</div>
 <div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span> </div>
 <div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>        <span class="keywordflow">if</span> (loadToAssets)</div>
 <div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>        {</div>
-<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>            std::string hash = MD5File(fileName).ToString();</div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>            std::string <a class="code hl_function" href="../../dc/df0/namespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8.html#a679e5e522ac6afa5d5923292fab450b8">hash</a> = MD5File(fileName).ToString();</div>
 <div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span> </div>
 <div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>            <span class="keywordflow">if</span> (GetProjectAsset(hash).size() == 0)</div>
 <div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>            {</div>
@@ -684,6 +684,9 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    system(op.c_str());</div>
 <div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span><span class="preprocessor">#endif </span><span class="comment">//  TERR3D_WIN32</span></div>
 <div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>}</div>
+<div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
+<div class="ttc" id="anamespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8_html_a679e5e522ac6afa5d5923292fab450b8"><div class="ttname"><a href="../../dc/df0/namespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8.html#a679e5e522ac6afa5d5923292fab450b8">nlohmann::detail::hash</a></div><div class="ttdeci">std::size_t hash(const BasicJsonType &amp;j)</div><div class="ttdoc">hash a JSON value</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l05240">json.hpp:5240</a></div></div>
+<div class="ttc" id="astruct_hash_html"><div class="ttname"><a href="../../d2/d7a/struct_hash.html">Hash</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/dc1/_utils_8h_source.html#l00013">Utils.h:14</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

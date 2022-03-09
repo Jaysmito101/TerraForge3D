@@ -156,14 +156,14 @@ $(document).ready(function(){initNavTree('d2/ddd/_light_manager_8cpp_source.html
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    }</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>}</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>nlohmann::json LightManager::Save()</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> LightManager::Save()</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>{</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    nlohmann::json data, tmp;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data, tmp;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = position.x;</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = position.y;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = position.z;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    data[<span class="stringliteral">&quot;position&quot;</span>] = tmp;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    tmp = nlohmann::json();</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    tmp[<span class="stringliteral">&quot;r&quot;</span>] = color[0];</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    tmp[<span class="stringliteral">&quot;g&quot;</span>] = color[1];</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    tmp[<span class="stringliteral">&quot;b&quot;</span>] = color[2];</div>
@@ -173,7 +173,7 @@ $(document).ready(function(){initNavTree('d2/ddd/_light_manager_8cpp_source.html
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keywordflow">return</span> data;</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>}</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="keywordtype">void</span> LightManager::Load(nlohmann::json data)</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="keywordtype">void</span> LightManager::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>{</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    position[0] = data[<span class="stringliteral">&quot;position&quot;</span>][<span class="stringliteral">&quot;x&quot;</span>];</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    position[1] = data[<span class="stringliteral">&quot;position&quot;</span>][<span class="stringliteral">&quot;y&quot;</span>];</div>
@@ -184,6 +184,8 @@ $(document).ready(function(){initNavTree('d2/ddd/_light_manager_8cpp_source.html
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    color[3] = data[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;a&quot;</span>];</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    strength = data[<span class="stringliteral">&quot;strength&quot;</span>];</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

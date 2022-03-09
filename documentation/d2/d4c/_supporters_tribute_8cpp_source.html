@@ -119,13 +119,13 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;json.hpp&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keywordtype">void</span> SupportersTribute::LoadstargazersData(nlohmann::json &amp;data)</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keywordtype">void</span> SupportersTribute::LoadstargazersData(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> &amp;data)</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>{</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keywordtype">bool</span> isNetWorkConnected = IsNetWorkConnected();</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordflow">for</span> (nlohmann::json item : data)</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> item : data)</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    {</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        GitHubData st;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <a class="code hl_struct" href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a> st;</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        st.name = item[<span class="stringliteral">&quot;login&quot;</span>];</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keywordflow">if</span> (!PathExist(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars&quot;</span>))</div>
@@ -141,18 +141,18 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>            DownloadFile(baseURL, pathURL, GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        }</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        st.avatar = <span class="keyword">new</span> Texture2D(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        st.avatar = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        stargazers.push_back(st);</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    }</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>}</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keywordtype">void</span> SupportersTribute::LoadcontributorsData(nlohmann::json &amp;data)</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keywordtype">void</span> SupportersTribute::LoadcontributorsData(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> &amp;data)</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>{</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">bool</span> isNetWorkConnected = IsNetWorkConnected();</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keywordflow">for</span> (nlohmann::json item : data)</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> item : data)</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    {</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        GitHubData st;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <a class="code hl_struct" href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a> st;</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        st.name = item[<span class="stringliteral">&quot;login&quot;</span>];</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="keywordflow">if</span> (!PathExist(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars&quot;</span>))</div>
@@ -168,7 +168,7 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>            DownloadFile(baseURL, pathURL, GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        }</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        st.avatar = <span class="keyword">new</span> Texture2D(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        st.avatar = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        contributors.push_back(st);</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    }</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>}</div>
@@ -181,19 +181,19 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        Log(<span class="stringliteral">&quot;Internet Connection is Live!\nFetching Latest Supporters data.&quot;</span>);</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        {</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>            std::string repoDataStr = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D&quot;</span>);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            nlohmann::json repoData = nlohmann::json::parse(repoDataStr);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> repoData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(repoDataStr);</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>            <span class="keywordtype">int</span> stargazerCount = repoData[<span class="stringliteral">&quot;stargazers_count&quot;</span>];</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            <span class="keywordtype">int</span> perPage = 30;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>            <span class="keywordtype">int</span> lastPage = stargazerCount / perPage;</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>            std::string stargazersRawData = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&amp;page=&quot;</span> + std::to_string(lastPage));</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>            SaveToFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>, stargazersRawData);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>            nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> stargazersData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(stargazersRawData);</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>            LoadstargazersData(stargazersData);</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        }</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        {</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>            std::string contributorsRawData = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D/contributors&quot;</span>);</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            SaveToFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>, contributorsRawData);</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> contributorsData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(contributorsRawData);</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            LoadcontributorsData(contributorsData);</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        }</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    }</div>
@@ -207,7 +207,7 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        {</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>            Log(<span class="stringliteral">&quot;Found Stargazers Cached Data!&quot;</span>);</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>            std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>, &amp;tmp);</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>            nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> stargazersData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(stargazersRawData);</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>            LoadstargazersData(stargazersData);</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        }</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
@@ -220,7 +220,7 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        {</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>            Log(<span class="stringliteral">&quot;Found Contributors Cached Data!&quot;</span>);</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>            std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>, &amp;tmp);</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>            nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> contributorsData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(contributorsRawData);</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>            LoadcontributorsData(contributorsData);</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        }</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
@@ -257,7 +257,7 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    ImGui::Separator();</div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    ImGui::Text(<span class="stringliteral">&quot;Contributors&quot;</span>);</div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    <span class="keywordflow">for</span> (GitHubData st : contributors)</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    <span class="keywordflow">for</span> (<a class="code hl_struct" href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a> st : contributors)</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    {</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        uint32_t avTexId = 0;</div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
@@ -275,7 +275,7 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    ImGui::Separator();</div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    ImGui::Text(<span class="stringliteral">&quot;Stargazers&quot;</span>);</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <span class="keywordflow">for</span> (GitHubData st : stargazers)</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <span class="keywordflow">for</span> (<a class="code hl_struct" href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a> st : stargazers)</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    {</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        uint32_t avTexId = 0;</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
@@ -292,6 +292,10 @@ $(document).ready(function(){initNavTree('d2/d4c/_supporters_tribute_8cpp_source
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    ImGui::Separator();</div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    ImGui::End();</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>}</div>
+<div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_git_hub_data_html"><div class="ttname"><a href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00011">SupportersTribute.h:12</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
