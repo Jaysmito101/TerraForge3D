@@ -1,6 +1,6 @@
 name: Deploy Documentation
 
-on: [push]
+on: [push, workflow_dispatch]
 
 env:
   BUILD_CONFIGURATION: Release
