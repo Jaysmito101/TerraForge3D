@@ -1,5 +1,7 @@
 var NAVTREEINDEX7 =
 {
+"functions_func_r.html":[3,3,1,15],
+"functions_func_s.html":[3,3,1,16],
 "functions_func_t.html":[3,3,1,17],
 "functions_func_u.html":[3,3,1,18],
 "functions_func_v.html":[3,3,1,19],
@@ -33,6 +35,6 @@ var NAVTREEINDEX7 =
 "namespacemembers_type.html":[2,1,2],
 "namespaces.html":[2,0],
 "pages.html":[],
-"":[2,0,0,0,0],
-"":[2,0,0,0,2]
+"":[2,0,0,0,2],
+"":[2,0,0,0,0]
 };

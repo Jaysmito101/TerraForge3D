@@ -28,6 +28,7 @@ var hierarchy =
     [ "ComputeShader", "d0/d73/class_compute_shader.html", null ],
     [ "CPUNodeEditor", "d5/dcc/class_c_p_u_node_editor.html", null ],
     [ "CPUNoiseLayersGenerator", "d8/d4a/class_c_p_u_noise_layers_generator.html", null ],
+    [ "CubeMapManager", "da/d98/class_cube_map_manager.html", null ],
     [ "Filter", "d2/d70/class_filter.html", [
       [ "AdvancedErosionFilter", "d5/deb/class_advanced_erosion_filter.html", null ],
       [ "DrawFilter", "d5/dd6/class_draw_filter.html", null ],
@@ -199,6 +200,7 @@ var hierarchy =
     [ "Serializer", "d0/dc2/class_serializer.html", null ],
     [ "Shader", "d1/d51/class_shader.html", null ],
     [ "ShaderStorageBuffer", "d4/dc3/class_shader_storage_buffer.html", null ],
+    [ "SkyManager", "db/d15/class_sky_manager.html", null ],
     [ "std::conditional::type", null, [
       [ "nlohmann::detail::conjunction< B1, Bn... >", "df/d9c/structnlohmann_1_1detail_1_1conjunction_3_01_b1_00_01_bn_8_8_8_01_4.html", null ]
     ] ],

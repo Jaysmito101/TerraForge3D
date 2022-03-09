@@ -111,14 +111,36 @@ $(document).ready(function(){initNavTree('d8/dac/_cube_map_8h_source.html','../.
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;glm/glm.hpp&gt;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;TextureCubemap.h&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Base/TextureCubemap.h&quot;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keywordtype">void</span> SetupCubemap();</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keywordtype">void</span> RenderSkybox(glm::mat4 view, glm::mat4 proj, <span class="keywordtype">bool</span> useBox, <span class="keywordtype">bool</span> useProcedural, <span class="keywordtype">float</span> cirrus, <span class="keywordtype">float</span> cumulus, <span class="keywordtype">float</span> time, <span class="keywordtype">float</span> *fsun, <span class="keywordtype">float</span> upF);</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a> *GetSkyboxCubemapTexture();</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">class </span><a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a>;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">class </span><a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">class </span><a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a>;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">class </span><a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="../../da/d98/class_cube_map_manager.html">   11</a></span><span class="keyword">class </span><a class="code hl_class" href="../../da/d98/class_cube_map_manager.html">CubeMapManager</a></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <a class="code hl_class" href="../../da/d98/class_cube_map_manager.html">CubeMapManager</a>(<a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState);</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <a class="code hl_class" href="../../da/d98/class_cube_map_manager.html">~CubeMapManager</a>();</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keywordtype">void</span> RenderSkybox(glm::mat4 view, glm::mat4 proj, <span class="keywordtype">bool</span> useBox, <span class="keywordtype">bool</span> useProcedural, <span class="keywordtype">float</span> cirrus, <span class="keywordtype">float</span> cumulus, <span class="keywordtype">float</span> time, <span class="keywordtype">float</span> *fsun, <span class="keywordtype">float</span> upF);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a> *GetSkyboxCubemapTexture();</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *skyboxShader = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *skyproShader = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a> *cubemap = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *skySphere = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    uint32_t textureID = 0;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    uint32_t vao = 0;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>};</div>
+<div class="ttc" id="aclass_cube_map_manager_html"><div class="ttname"><a href="../../da/d98/class_cube_map_manager.html">CubeMapManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/dac/_cube_map_8h_source.html#l00011">CubeMap.h:12</a></div></div>
+<div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
+<div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
 <div class="ttc" id="aclass_texture_cubemap_html"><div class="ttname"><a href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d33/_texture_cubemap_8h_source.html#l00016">TextureCubemap.h:17</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00188">ApplicationState.h:189</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

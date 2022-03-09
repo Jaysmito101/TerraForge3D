@@ -287,7 +287,7 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    {</div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        <span class="keywordflow">if</span> (appState-&gt;states.skyboxEnabled)</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        {</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>            RenderSky(appState-&gt;cameras.main.view, appState-&gt;cameras.main.pers);</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>            appState-&gt;skyManager-&gt;RenderSky(appState-&gt;cameras.main.view, appState-&gt;cameras.main.pers);</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        }</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        glEnable(GL_DEPTH_TEST);</div>
@@ -1141,7 +1141,7 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span> </div>
 <div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>        <span class="keywordflow">if</span> (appState-&gt;windows.skySettings)</div>
 <div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>        {</div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>            ShowSkySettings(&amp;appState-&gt;windows.skySettings);</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>            appState-&gt;skyManager-&gt;ShowSettings(&amp;appState-&gt;windows.skySettings);</div>
 <div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>        }</div>
 <div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span> </div>
 <div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>        OnImGuiRenderEnd();</div>
@@ -1192,28 +1192,28 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>        appState-&gt;mainMenu = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/d04/class_main_menu.html">MainMenu</a>(appState);</div>
 <div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>        appState-&gt;seaManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d3/dac/class_sea_manager.html">SeaManager</a>();</div>
 <div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>        appState-&gt;lightManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d3e/class_light_manager.html">LightManager</a>();</div>
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>        appState-&gt;serailizer = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/dc2/class_serializer.html">Serializer</a>(appState);</div>
-<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>        appState-&gt;textureStore = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d8a/class_texture_store.html">TextureStore</a>(appState);</div>
-<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>        ResetShader();</div>
-<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>        appState-&gt;meshGenerator-&gt;GenerateSync();</div>
-<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>        appState-&gt;models.coreTerrain-&gt;SetupMeshOnGPU();</div>
-<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>        appState-&gt;models.screenQuad-&gt;SetupMeshOnGPU();</div>
-<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;GenerateScreenQuad();</div>
-<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>        appState-&gt;models.screenQuad-&gt;UploadToGPU();</div>
-<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>        glEnable(GL_DEPTH_TEST);</div>
-<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>        appState-&gt;globals.scale = 1;</div>
-<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span> </div>
-<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>        <span class="keywordflow">if</span> (loadFile.size() &gt; 0)</div>
-<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>        {</div>
-<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>            Log(<span class="stringliteral">&quot;Loading File from &quot;</span> + loadFile);</div>
-<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>            OpenSaveFile(loadFile);</div>
-<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>        }</div>
-<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span> </div>
-<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>        SetProjectId(GenerateId(32));</div>
-<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>        appState-&gt;filtersManager = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a>(appState);</div>
-<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>        <span class="keywordtype">float</span> t = 1.0f;</div>
-<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>        SetupSky();</div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>        appState-&gt;skyManager = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d15/class_sky_manager.html">SkyManager</a>(appState);</div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>        appState-&gt;serailizer = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/dc2/class_serializer.html">Serializer</a>(appState);</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>        appState-&gt;textureStore = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d8a/class_texture_store.html">TextureStore</a>(appState);</div>
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>        ResetShader();</div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>        appState-&gt;meshGenerator-&gt;GenerateSync();</div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>        appState-&gt;models.coreTerrain-&gt;SetupMeshOnGPU();</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>        appState-&gt;models.screenQuad-&gt;SetupMeshOnGPU();</div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;GenerateScreenQuad();</div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>        appState-&gt;models.screenQuad-&gt;UploadToGPU();</div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>        glEnable(GL_DEPTH_TEST);</div>
+<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span>        appState-&gt;globals.scale = 1;</div>
+<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span> </div>
+<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>        <span class="keywordflow">if</span> (loadFile.size() &gt; 0)</div>
+<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>        {</div>
+<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>            Log(<span class="stringliteral">&quot;Loading File from &quot;</span> + loadFile);</div>
+<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>            OpenSaveFile(loadFile);</div>
+<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>        }</div>
+<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span> </div>
+<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>        SetProjectId(GenerateId(32));</div>
+<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>        appState-&gt;filtersManager = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a>(appState);</div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>        <span class="keywordtype">float</span> t = 1.0f;</div>
 <div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>        <span class="comment">// Load Fonts</span></div>
 <div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>        LoadUIFont(<span class="stringliteral">&quot;Open-Sans-Regular&quot;</span>, 18, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Regular.ttf&quot;</span>);</div>
 <div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>        LoadUIFont(<span class="stringliteral">&quot;OpenSans-Bold&quot;</span>, 25, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Bold.ttf&quot;</span>);</div>
@@ -1265,23 +1265,24 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>        <span class="keyword">delete</span> appState-&gt;shaders.postProcess;</div>
 <div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>        <span class="keyword">delete</span> appState-&gt;supportersTribute;</div>
 <div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span>        <span class="keyword">delete</span> appState-&gt;mainMenu;</div>
-<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.main;</div>
-<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.postProcess;</div>
-<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.reflection;</div>
-<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.textureExport;</div>
-<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>        <span class="keyword">delete</span> appState-&gt;filtersManager;</div>
-<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span><span class="comment">//      delete appState-&gt;seaManager;</span></div>
-<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span>        <span class="keyword">delete</span> appState-&gt;lightManager;</div>
-<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>        <span class="keyword">delete</span> appState-&gt;serailizer;</div>
-<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>        <span class="keyword">delete</span> appState;</div>
-<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>    }</div>
-<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span>};</div>
-<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span> </div>
-<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span><a class="code hl_class" href="../../de/d6b/class_application.html">Application</a> *CreateApplication()</div>
-<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span>{</div>
-<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>    mainApp = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/da7/class_my_app.html">MyApp</a>();</div>
-<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>    <span class="keywordflow">return</span> mainApp;</div>
-<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>}</div>
+<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>        <span class="keyword">delete</span> appState-&gt;skyManager;</div>
+<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.main;</div>
+<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.postProcess;</div>
+<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.reflection;</div>
+<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.textureExport;</div>
+<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>        <span class="keyword">delete</span> appState-&gt;filtersManager;</div>
+<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span><span class="comment">//      delete appState-&gt;seaManager;</span></div>
+<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>        <span class="keyword">delete</span> appState-&gt;lightManager;</div>
+<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>        <span class="keyword">delete</span> appState-&gt;serailizer;</div>
+<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>        <span class="keyword">delete</span> appState;</div>
+<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span>    }</div>
+<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>};</div>
+<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span> </div>
+<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span><a class="code hl_class" href="../../de/d6b/class_application.html">Application</a> *CreateApplication()</div>
+<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>{</div>
+<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>    mainApp = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/da7/class_my_app.html">MyApp</a>();</div>
+<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>    <span class="keywordflow">return</span> mainApp;</div>
+<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span>}</div>
 <div class="ttc" id="aclass_application_html"><div class="ttname"><a href="../../de/d6b/class_application.html">Application</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/da3/_application_8h_source.html#l00007">Application.h:8</a></div></div>
 <div class="ttc" id="aclass_camera_html"><div class="ttname"><a href="../../da/dbb/class_camera.html">Camera</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d91/_camera_8h_source.html#l00008">Camera.h:9</a></div></div>
 <div class="ttc" id="aclass_filters_manager_html"><div class="ttname"><a href="../../da/d39/class_filters_manager.html">FiltersManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/ddf/_filters_manager_8h_source.html#l00011">FiltersManager.h:12</a></div></div>
@@ -1295,9 +1296,10 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="ttc" id="aclass_sea_manager_html"><div class="ttname"><a href="../../d3/dac/class_sea_manager.html">SeaManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d0a/_sea_manager_8h_source.html#l00009">SeaManager.h:10</a></div></div>
 <div class="ttc" id="aclass_serializer_html"><div class="ttname"><a href="../../d0/dc2/class_serializer.html">Serializer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de0/_serializer_8h_source.html#l00009">Serializer.h:10</a></div></div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
+<div class="ttc" id="aclass_sky_manager_html"><div class="ttname"><a href="../../db/d15/class_sky_manager.html">SkyManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/da4/_sky_settings_8h_source.html#l00010">SkySettings.h:11</a></div></div>
 <div class="ttc" id="aclass_supporters_tribute_html"><div class="ttname"><a href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00017">SupportersTribute.h:18</a></div></div>
 <div class="ttc" id="aclass_texture_store_html"><div class="ttname"><a href="../../d0/d8a/class_texture_store.html">TextureStore</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d2b/_texture_store_8h_source.html#l00034">TextureStore.h:35</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00187">ApplicationState.h:188</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00188">ApplicationState.h:189</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
