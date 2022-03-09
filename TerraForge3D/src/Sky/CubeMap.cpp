@@ -13,17 +13,15 @@
 #include "Base/Model.h"
 #include "Base/ModelImporter.h"
 #include "Utils/Utils.h"
+#include "Data/ApplicationState.h"
 
-static uint32_t textureID;
-static uint32_t vao;
-bool tmpb = false;
+static bool tmpb = false;
 static std::string vertShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\vert.glsl", &tmpb);
 static std::string fragShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\frag.glsl", &tmpb);
 static std::string fragProShader = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\skybox\\procedural_clouds.glsl", &tmpb);
 
 
-static Shader *skyboxShader, *skyproShader;
-float skyboxVertices[] =
+static float skyboxVertices[] =
 {
 	// positions
 	-1.0f,  1.0f, -1.0f,
@@ -69,28 +67,45 @@ float skyboxVertices[] =
 	    1.0f, -1.0f,  1.0f
     };
 
-static TextureCubemap cubemap;
-static Model *skySphere;
-
-unsigned int loadCubemap(std::vector<std::string> faces)
+CubeMapManager::~CubeMapManager()
 {
-	return textureID;
+	if(skyboxShader)
+	{
+		delete skyboxShader;
+	}
+
+	if(skyproShader)
+	{
+		delete skyproShader;
+	}
+
+	if(skySphere)
+	{
+		delete skySphere;
+	}
+
+	if(cubemap)
+	{
+		delete cubemap;
+	}
 }
 
-void SetupCubemap()
+CubeMapManager::CubeMapManager(ApplicationState *as)
 {
-	std::vector<std::string> faces =
+	appState = as;
+	static std::vector<std::string> faces =
 	{
-		GetExecutableDir() + "\\Data\\skybox\\px.jpg",
-		GetExecutableDir() + "\\Data\\skybox\\nx.jpg",
-		GetExecutableDir() + "\\Data\\skybox\\py.jpg",
-		GetExecutableDir() + "\\Data\\skybox\\ny.jpg",
-		GetExecutableDir() + "\\Data\\skybox\\pz.jpg",
-		GetExecutableDir() + "\\Data\\skybox\\nz.jpg"
+		appState->constants.skyboxDir + "\\px.jpg",
+		appState->constants.skyboxDir + "\\nx.jpg",
+		appState->constants.skyboxDir + "\\py.jpg",
+		appState->constants.skyboxDir + "\\ny.jpg",
+		appState->constants.skyboxDir + "\\pz.jpg",
+		appState->constants.skyboxDir + "\\nz.jpg"
 	};
-	cubemap.SetUpOnGPU();
-	cubemap.LoadFaces(faces);
-	cubemap.UploadDataToGPU();
+	cubemap = new TextureCubemap();
+	cubemap->SetUpOnGPU();
+	cubemap->LoadFaces(faces);
+	cubemap->UploadDataToGPU();
 	skyboxShader = new Shader(vertShader, fragShader);
 	skyproShader = new Shader(vertShader, fragProShader);
 	glGenVertexArrays(1, &vao);
@@ -107,7 +122,7 @@ void SetupCubemap()
 }
 
 
-void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural, float cirrus, float cumulus, float time, float *fsun, float upf)
+void CubeMapManager::RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural, float cirrus, float cumulus, float time, float *fsun, float upf)
 {
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
@@ -120,7 +135,7 @@ void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedura
 	}
 
 	shd->Bind();
-	cubemap.Bind(0);
+	cubemap->Bind(0);
 	view = glm::mat4(glm::mat3(view));
 	shd->SetUniformMat4("_P", proj);
 	shd->SetUniformMat4("_V", view);
@@ -146,7 +161,7 @@ void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedura
 	glEnable(GL_DEPTH_TEST);
 }
 
-TextureCubemap *GetSkyboxCubemapTexture()
+TextureCubemap *CubeMapManager::GetSkyboxCubemapTexture()
 {
-	return &cubemap;
+	return cubemap;
 }

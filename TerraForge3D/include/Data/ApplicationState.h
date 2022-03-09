@@ -11,6 +11,7 @@
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
 #include "Filters/FiltersManager.h"
+#include "Sky/SkySettings.h"
 
 #include "json/json.hpp"
 
@@ -208,6 +209,7 @@ struct ApplicationState
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;
 	FiltersManager *filtersManager = nullptr;
+	SkyManager *skyManager = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

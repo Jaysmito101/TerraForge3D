@@ -177,7 +177,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	{
 		if (appState->states.skyboxEnabled)
 		{
-			RenderSky(appState->cameras.main.view, appState->cameras.main.pers);
+			appState->skyManager->RenderSky(appState->cameras.main.view, appState->cameras.main.pers);
 		}
 
 		glEnable(GL_DEPTH_TEST);
@@ -1031,7 +1031,7 @@ public:
 
 		if (appState->windows.skySettings)
 		{
-			ShowSkySettings(&appState->windows.skySettings);
+			appState->skyManager->ShowSettings(&appState->windows.skySettings);
 		}
 
 		OnImGuiRenderEnd();
@@ -1082,6 +1082,7 @@ public:
 		appState->mainMenu = new MainMenu(appState);
 		appState->seaManager = new SeaManager();
 		appState->lightManager = new LightManager();
+		appState->skyManager = new SkyManager(appState);
 		appState->serailizer = new Serializer(appState);
 		appState->textureStore = new TextureStore(appState);
 		ResetShader();
@@ -1103,7 +1104,6 @@ public:
 		SetProjectId(GenerateId(32));
 		appState->filtersManager = new FiltersManager(appState);
 		float t = 1.0f;
-		SetupSky();
 		// Load Fonts
 		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + "\\OpenSans-Regular.ttf");
 		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + "\\OpenSans-Bold.ttf");
@@ -1155,6 +1155,7 @@ public:
 		delete appState->shaders.postProcess;
 		delete appState->supportersTribute;
 		delete appState->mainMenu;
+		delete appState->skyManager;
 		delete appState->frameBuffers.main;
 		delete appState->frameBuffers.postProcess;
 		delete appState->frameBuffers.reflection;

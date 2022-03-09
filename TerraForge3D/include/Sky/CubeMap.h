@@ -1,10 +1,28 @@
 #pragma once
 #include <glm/glm.hpp>
 
-#include <TextureCubemap.h>
+#include "Base/TextureCubemap.h"
 
-void SetupCubemap();
+class ApplicationState;
+class Shader;
+class TextureCubemap;
+class Model;
 
-void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural, float cirrus, float cumulus, float time, float *fsun, float upF);
+class CubeMapManager
+{
+public:
+	CubeMapManager(ApplicationState *appState);
+	~CubeMapManager();
 
-TextureCubemap *GetSkyboxCubemapTexture();
+	void RenderSkybox(glm::mat4 view, glm::mat4 proj, bool useBox, bool useProcedural, float cirrus, float cumulus, float time, float *fsun, float upF);
+
+	TextureCubemap *GetSkyboxCubemapTexture();
+public:
+	ApplicationState *appState = nullptr;
+	Shader *skyboxShader = nullptr;
+	Shader *skyproShader = nullptr;
+	TextureCubemap *cubemap = nullptr;
+	Model *skySphere = nullptr;
+	uint32_t textureID = 0;
+	uint32_t vao = 0;
+};

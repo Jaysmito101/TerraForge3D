@@ -1,19 +1,27 @@
 #include "Sky/SkySettings.h"
 #include "Sky/CubeMap.h"
 #include "Utils/Utils.h"
+#include "Data/ApplicationState.h"
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 #include <hdritocubemap/HdriToCubemap.hpp>
 
-TextureCubemap *cubemap;
-
-void SetupSky()
+SkyManager::~SkyManager()
 {
-	SetupCubemap();
-	cubemap = GetSkyboxCubemapTexture();
+	if(cubemapManager)
+	{
+		delete cubemapManager;
+	}
 }
 
-static void ChangeCubemapTile(int face)
+SkyManager::SkyManager(ApplicationState *as)
+{
+	appState = as;
+	cubemapManager = new CubeMapManager(appState);
+	cubemap = cubemapManager->GetSkyboxCubemapTexture();
+}
+
+void SkyManager::ChangeCubemapTile(int face)
 {
 	std::string path = ShowOpenFileDialog(".png");
 
@@ -24,15 +32,9 @@ static void ChangeCubemapTile(int face)
 	}
 }
 
-static bool useBox = false;
-static bool useProcedural = true;
-static float cltime = 0.0f;
-static float upf = 0.35f;
-static float cirrus = 0.4f;
-static float cumulus = 0.8f;
-static float fsun[3] = {0, 0.2, 0.1};
 
-static void LoadHDRI(std::string path)
+
+void SkyManager::LoadHDRI(std::string path)
 {
 	// load hdr or ldr image
 	int cubemapResolution = 1024;
@@ -53,7 +55,7 @@ static void LoadHDRI(std::string path)
 	cubemap->UploadDataToGPU();
 }
 
-void ShowSkySettings(bool *pOpen)
+void SkyManager::ShowSettings(bool *pOpen)
 {
 	ImGui::Begin("Sky Settings", pOpen);
 
@@ -158,8 +160,8 @@ void ShowSkySettings(bool *pOpen)
 	ImGui::End();
 }
 
-void RenderSky(glm::mat4 view, glm::mat4 pers)
+void SkyManager::RenderSky(glm::mat4 view, glm::mat4 pers)
 {
-	RenderSkybox(view, pers, useBox, useProcedural, cirrus, cumulus, cltime, fsun, upf);
+	cubemapManager->RenderSkybox(view, pers, useBox, useProcedural, cirrus, cumulus, cltime, fsun, upf);
 }
 
