@@ -1,7 +1,7 @@
 #include <json.hpp>
 
 
-#include "AppStyles.h"
+#include "Misc/AppStyles.h"
 
 #include <ctype.h>
 #include <limits.h>

@@ -1,4 +1,4 @@
-#include "LightManager.h"
+#include "Lighting/LightManager.h"
 #include "imgui/imgui.h"
 
 #include "glm/gtc/type_ptr.hpp"

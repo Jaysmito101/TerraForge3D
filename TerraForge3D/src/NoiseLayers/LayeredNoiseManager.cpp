@@ -1,4 +1,4 @@
-#include "LayeredNoiseManager.h"
+#include "NoiseLayers/LayeredNoiseManager.h"
 
 #include "imgui.h"
 

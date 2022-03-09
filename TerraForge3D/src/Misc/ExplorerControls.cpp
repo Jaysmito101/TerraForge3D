@@ -1,6 +1,6 @@
-#include "ExplorerControls.h"
+#include "Misc/ExplorerControls.h"
 
-#include <Application.h>
+#include "Base/Application.h"
 
 #include <Utils.h>
 #include <GLFW/glfw3.h>

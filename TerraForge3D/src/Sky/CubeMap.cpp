@@ -1,4 +1,4 @@
-#include "CubeMap.h"
+#include "Sky/CubeMap.h"
 
 #include <cstdint>
 #include <vector>
@@ -10,10 +10,9 @@
 #include <Shader.h>
 #include <glm/glm.hpp>
 
-#include "Model.h"
-#include "ModelImporter.h"
-
-#include <Utils.h>
+#include "Base/Model.h"
+#include "Base/ModelImporter.h"
+#include "Utils/Utils.h"
 
 static uint32_t textureID;
 static uint32_t vao;

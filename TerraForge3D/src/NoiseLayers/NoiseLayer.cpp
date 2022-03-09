@@ -1,4 +1,4 @@
-#include "NoiseLayer.h"
+#include "NoiseLayers/NoiseLayer.h"
 
 #include "imgui.h"
 #include "FastNoiseLite.h"

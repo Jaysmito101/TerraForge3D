@@ -1,11 +1,8 @@
-#include "SkySettings.h"
-
-#include "CubeMap.h"
-
+#include "Sky/SkySettings.h"
+#include "Sky/CubeMap.h"
+#include "Utils/Utils.h"
 
 #include <imgui.h>
-#include "Utils.h"
-
 #include <hdritocubemap/HdriToCubemap.hpp>
 
 TextureCubemap *cubemap;

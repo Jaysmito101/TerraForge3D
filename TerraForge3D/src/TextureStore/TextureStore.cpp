@@ -1,7 +1,6 @@
-#include "TextureStore.h"
-
+#include "TExtureStore/TextureStore.h"
 #include "Data/ApplicationState.h"
-#include "Utils.h"
+#include "Utils/Utils.h"
 
 #include <cstdlib>
 #include <iostream>
