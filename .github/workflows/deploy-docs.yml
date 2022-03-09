@@ -22,8 +22,7 @@ jobs:
           mkdir TEMP
           cmd /c "(robocopy TerraForge3D\\Docs\\html\\ TEMP\\ /s /e /MT /IS /IT /IM)  ^& echo Done!"
           cd TerraForge3D
-          cmd /c "echo Last Updated = %time% %date%>> log.txt"
-
+        
       - uses: actions/checkout@v3
         with:
           ref: gh-pages
@@ -34,6 +33,7 @@ jobs:
           cd ..
           cmd /c "(robocopy TEMP\\ TerraForge3D\\documentation\\ /s /e /MT /IS /IT /IM)  ^&  echo Done!"
           cd TerraForge3D
+          cmd /c "echo Last Updated = %time% %date%>> log.txt"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
