@@ -120,14 +120,15 @@ $(document).ready(function(){initNavTree('d7/df9/class_texture_cubemap_a351e63a7
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html#l00092">92</a> of file <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html">TextureCubemap.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   93</span>{</div>
-<div class="line"><span class="lineno">   94</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 6; i++)</div>
-<div class="line"><span class="lineno">   95</span>        <span class="keywordflow">if</span> (facesData[i])</div>
-<div class="line"><span class="lineno">   96</span>        {</div>
-<div class="line"><span class="lineno">   97</span>            <span class="keyword">delete</span>[] facesData[i];</div>
-<div class="line"><span class="lineno">   98</span>        }</div>
-<div class="line"><span class="lineno">   99</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html#l00104">104</a> of file <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html">TextureCubemap.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  105</span>{</div>
+<div class="line"><span class="lineno">  106</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 6; i++)</div>
+<div class="line"><span class="lineno">  107</span>        <span class="keywordflow">if</span> (facesData[i])</div>
+<div class="line"><span class="lineno">  108</span>        {</div>
+<div class="line"><span class="lineno">  109</span>            <span class="keyword">delete</span> facesData[i];</div>
+<div class="line"><span class="lineno">  110</span>            facesData[i] = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  111</span>        }</div>
+<div class="line"><span class="lineno">  112</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
