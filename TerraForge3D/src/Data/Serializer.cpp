@@ -93,8 +93,9 @@ nlohmann::json Serializer::Serialize()
 	TRY_CATCH_ERR_SERIALIZE(data["states"] = appState->states.Save();, "Failed to save states.");
 	TRY_CATCH_ERR_SERIALIZE(data["globals"] = appState->globals.Save();, "Failed to save globals.");
 	TRY_CATCH_ERR_SERIALIZE(data["sea"] = appState->seaManager->Save();, "Failed to save Sea.");
-	TRY_CATCH_ERR_SERIALIZE(data["projectID"] = GetProjectId();, "Failed to save project id.");
-	TRY_CATCH_ERR_SERIALIZE(SaveProjectDatabase(); data["projectDatabase"] = GetProjectDatabase();, "Failed to save project database.");
+	TRY_CATCH_ERR_SERIALIZE(data["foliage"] = appState->foliageManager->Save();, "Failed to save foliage manager.");
+	TRY_CATCH_ERR_SERIALIZE(data["projectID"] = appState->projectManager->GetId();, "Failed to save project id.");
+	TRY_CATCH_ERR_SERIALIZE(appState->projectManager->SaveDatabase(); data["projectDatabase"] = appState->projectManager->GetDatabase();, "Failed to save project database.");
 	TRY_CATCH_ERR_SERIALIZE(data["lighting"] = appState->lightManager->Save();, "Failed to save lighting data.");
 	TRY_CATCH_ERR_SERIALIZE(data["generators"] = appState->meshGenerator->Save();, "Failed to save generators.");
 	TRY_CATCH_ERR_SERIALIZE(
@@ -103,13 +104,13 @@ nlohmann::json Serializer::Serialize()
 {
 	std::string baseHash = MD5File(appState->globals.currentBaseModelPath)
 		                       .ToString();
-		std::string projectAsset = GetProjectAsset(baseHash);
+		std::string projectAsset = appState->projectManager->GetAsset(baseHash);
 
 		if (projectAsset == "")
 		{
-			MkDir(GetProjectResourcePath() + "\\models");
-			CopyFileData(appState->globals.currentBaseModelPath, GetProjectResourcePath() + "\\models\\" + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
-			RegisterProjectAsset(baseHash, "models\\" + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
+			MkDir(appState->projectManager->GetResourcePath() + "\\models");
+			CopyFileData(appState->globals.currentBaseModelPath, appState->projectManager->GetResourcePath() + "\\models\\" + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
+			appState->projectManager->RegisterAsset(baseHash, "models\\" + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
 		}
 
 		data["baseid"] = baseHash;
@@ -128,14 +129,14 @@ void Serializer::PackProject(std::string path)
 
 	Serialize();
 	std::ofstream outfile;
-	outfile.open(GetProjectResourcePath() + "\\project.terr3d");
+	outfile.open(appState->projectManager->GetResourcePath() + "\\project.terr3d");
 	outfile << data.dump(4, ' ', false);
 	outfile.close();
 	MkDir(GetExecutableDir() + "\\Data\\temp");
 	std::string uid = GenerateId(64);
 	SaveFile(GetExecutableDir() + "\\Data\\temp\\" + uid);
 	zip_t *packed = zip_open(path.c_str(), 9, 'w');
-	zip_walk(packed, GetProjectResourcePath().c_str());
+	zip_walk(packed, appState->projectManager->GetResourcePath().c_str());
 	zip_close(packed);
 }
 
@@ -214,7 +215,7 @@ void Serializer::SaveFile(std::string path)
 
 	Serialize();
 	std::ofstream outfile;
-	outfile.open(GetProjectResourcePath() + "\\project.terr3d");
+	outfile.open(appState->projectManager->GetResourcePath() + "\\project.terr3d");
 	outfile << data.dump(4, ' ', false);
 	outfile.close();
 	outfile.open(path);
@@ -313,14 +314,15 @@ ApplicationState *Serializer::Deserialize(nlohmann::json d)
 	TRY_CATCH_ERR_DESERIALIZE(appState->globals.appData = data["appData"];, "Failed to app data.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->globals.appData = data["appData"];, "Failed to app data.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->mode = data["mode"];, "Failed to app mode.");
-	TRY_CATCH_ERR_DESERIALIZE(SetProjectId(data["projectID"]);, "Failed to load Project ID.");
-	TRY_CATCH_ERR_DESERIALIZE(SetProjectDatabase(data["projectDatabase"]);, "Failed to load project database.");
-	std::cout << "Loaded Project ID : " << GetProjectId() << std::endl;
+	TRY_CATCH_ERR_DESERIALIZE(appState->projectManager->SetId(data["projectID"]);, "Failed to load Project ID.");
+	TRY_CATCH_ERR_DESERIALIZE(appState->projectManager->SetDatabase(data["projectDatabase"]);, "Failed to load project database.");
+	std::cout << "Loaded Project ID : " << appState->projectManager->GetId() << std::endl;
 	TRY_CATCH_ERR_DESERIALIZE(appState->cameras.Load(data["camera"]);, "Failed to load camera.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->windows.Load(data["windows"]);, "Failed to load windows.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->states.Load(data["states"]);, "Failed to load states.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->globals.Load(data["globals"]);, "Failed to load globals.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->seaManager->Load(data["sea"]);, "Failed to load sea.");
+	TRY_CATCH_ERR_DESERIALIZE(appState->foliageManager->Load(data["foliage"]);, "Failed to load foliage.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->lightManager->Load(data["lighting"]);, "Failed to load lighting.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->meshGenerator->Load(data["generators"]);, "Failed to load generators.");
 	TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(
@@ -328,7 +330,7 @@ ApplicationState *Serializer::Deserialize(nlohmann::json d)
 	    if (appState->mode == ApplicationMode::CUSTOM_BASE)
 {
 	std::string baseHash = data["baseid"];
-		std::string projectAsset = GetProjectAsset(baseHash);
+		std::string projectAsset = appState->projectManager->GetAsset(baseHash);
 
 		if (projectAsset == "")
 		{
@@ -344,7 +346,7 @@ ApplicationState *Serializer::Deserialize(nlohmann::json d)
 				delete appState->models.customBaseCopy;
 			}
 
-			appState->globals.currentBaseModelPath = GetProjectResourcePath() + "\\" + projectAsset;
+			appState->globals.currentBaseModelPath = appState->projectManager->GetResourcePath() + "\\" + projectAsset;
 			appState->models.customBase = LoadModel(appState->globals.currentBaseModelPath);
 			appState->models.customBaseCopy = LoadModel(appState->globals.currentBaseModelPath);
 			appState->states.usingBase = false;

@@ -3,9 +3,11 @@
 #include "Utils/Utils.h"
 #include "Base/Base.h"
 #include "Data/ProjectData.h"
+#include "Data/ApplicationState.h"
 
-SeaManager::SeaManager()
+SeaManager::SeaManager(ApplicationState *as)
 {
+	appState = as;
 	model = new Model("Sea");
 	model->SetupMeshOnGPU();
 	model->mesh->GeneratePlane(256, 120);
@@ -67,14 +69,14 @@ void SeaManager::Load(nlohmann::json data)
 		delete dudvMap;
 	}
 
-	dudvMap = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(data["dudvMap"]));
+	dudvMap = new Texture2D(appState->projectManager->GetResourcePath() + "\\" + appState->projectManager->GetAsset(data["dudvMap"]));
 
 	if (normalMap)
 	{
 		delete normalMap;
 	}
 
-	normalMap = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(data["normalMap"]));
+	normalMap = new Texture2D(appState->projectManager->GetResourcePath() + "\\" + appState->projectManager->GetAsset(data["normalMap"]));
 }
 
 nlohmann::json SeaManager::Save()
@@ -93,8 +95,8 @@ nlohmann::json SeaManager::Save()
 	jcolor["g"] = color[1];
 	jcolor["b"] = color[2];
 	data["color"] = jcolor;
-	data["dudvMap"] = SaveProjectTexture(dudvMap);
-	data["normalMap"] = SaveProjectTexture(normalMap);
+	data["dudvMap"] = appState->projectManager->SaveTexture(dudvMap);
+	data["normalMap"] = appState->projectManager->SaveTexture(normalMap);
 	return data;
 }
 
@@ -157,7 +159,7 @@ void SeaManager::ShowSettings(bool *pOpen)
 
 		if (ImGui::ImageButton((ImTextureID)dudvMap->GetRendererID(), ImVec2(50, 50)))
 		{
-			LoadFileIntoTexture(dudvMap);
+			LoadTexture(dudvMap);
 		}
 
 		ImGui::Text("Normal Map");
@@ -165,7 +167,7 @@ void SeaManager::ShowSettings(bool *pOpen)
 
 		if (ImGui::ImageButton((ImTextureID)normalMap->GetRendererID(), ImVec2(50, 50)))
 		{
-			LoadFileIntoTexture(normalMap);
+			LoadTexture(normalMap);
 		}
 
 		ImGui::End();

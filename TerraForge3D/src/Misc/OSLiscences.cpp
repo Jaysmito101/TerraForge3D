@@ -1,35 +1,38 @@
-#include "Misc/OSLiscenses.h"
-
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-
+#include "Misc/OSLiscences.h"
 
 #include "imgui.h"
-#include <string>
+
 #include <string>
 #include <vector>
 #include <iostream>
 #include <filesystem>
-#include <experimental/filesystem>
-#include <Utils.h>
-namespace fs = std::experimental::filesystem;
 
-std::vector<std::pair<std::string, std::string>> osls;
+#include "Utils/Utils.h"
+#include "Data/ApplicationState.h"
 
-void SetupOSLiscences()
+namespace fs = std::filesystem;
+
+OSLiscences::~OSLiscences()
 {
-	std::string path = GetExecutableDir() + "\\Data\\licenses";
+	osls.clear();
+}
+
+OSLiscences::OSLiscences(ApplicationState *as)
+{
+	appState = as;
+	std::string path = appState->constants.liscensesDir;
 
 	for (const auto &entry : fs::directory_iterator(path))
 	{
 		std::string path{ entry.path().u8string() };
-		std::string name{entry.path().filename().u8string()};
+		std::string name{ entry.path().filename().u8string()};
 		bool tmp = false;
 		name = name.substr(0, name.size() - 3);
 		osls.push_back(std::make_pair(name, ReadShaderSourceFile(path, &tmp)));
 	}
 }
 
-static void ShowLisc(std::string &name, std::string &content, int id)
+void OSLiscences::ShowLisc(std::string &name, std::string &content, int id)
 {
 	bool state = ImGui::CollapsingHeader(("##LiscItem" + std::to_string(id)).c_str());
 	ImGui::SameLine();
@@ -42,7 +45,7 @@ static void ShowLisc(std::string &name, std::string &content, int id)
 }
 
 
-void ShowOSLiscences(bool *pOpen)
+void OSLiscences::ShowSettings(bool *pOpen)
 {
 	ImGui::Begin("Open Source LICENSES", pOpen);
 	int id = 0;

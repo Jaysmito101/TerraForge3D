@@ -137,7 +137,7 @@ void TextureNode::Load(nlohmann::json data)
 	{
 		std::string hash = data["texture"];
 
-		if (!ProjectAssetExists(hash))
+		if (!ProjectManager::Get()->AssetExists(hash))
 		{
 			ShowMessageBox("Failed to Load Texture : " + hash, "Error");
 			isDefault = true;
@@ -146,7 +146,7 @@ void TextureNode::Load(nlohmann::json data)
 		else
 		{
 			delete texture;
-			texture = new Texture2D(GetProjectResourcePath() + "\\" + GetProjectAsset(hash));
+			texture = new Texture2D(ProjectManager::Get()->GetResourcePath() + "\\" + ProjectManager::Get()->GetAsset(hash));
 			Log("Loaded Cached Texture : " + hash);
 		}
 	}
@@ -173,11 +173,9 @@ nlohmann::json TextureNode::Save()
 		std::string hash = MD5File(texture->GetPath()).ToString();
 		data["texture"] = hash;
 
-		if (!ProjectAssetExists(hash))
+		if (!ProjectManager::Get()->AssetExists(hash))
 		{
-			MkDir(GetProjectResourcePath() + "\\textures");
-			CopyFileData(texture->GetPath(), GetProjectResourcePath() + "\\textures\\" + hash);
-			RegisterProjectAsset(hash, "textures\\" + hash);
+			ProjectManager::Get()->SaveTexture(texture);
 			Log("Cached " + texture->GetPath());
 		}
 
@@ -187,7 +185,6 @@ nlohmann::json TextureNode::Save()
 		}
 	}
 
-	// TODO : Save Image
 	return data;
 }
 

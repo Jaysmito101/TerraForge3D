@@ -1,32 +1,48 @@
 #include "Data/ProjectData.h"
-#include <Utils.h>
-#include <json.hpp>
+#include "Data/ApplicationState.h"
+#include "Utils/Utils.h"
 
-nlohmann::json projectDatase;
+#include <json/json.hpp>
 
-std::string projectID = "";
 
-void SetProjectId(std::string id)
+ProjectManager *ProjectManager::s_ProjectManager;
+
+ProjectManager *ProjectManager::Get()
+{
+	return s_ProjectManager;
+}
+
+ProjectManager::~ProjectManager()
+{
+}
+
+ProjectManager::ProjectManager(ApplicationState *as)
+{
+	appState = as;
+	s_ProjectManager = this;
+}
+
+void ProjectManager::SetId(std::string id)
 {
 	projectID = id;
 }
 
-std::string GetProjectId()
+std::string ProjectManager::GetId()
 {
 	return projectID;
 }
 
-nlohmann::json GetProjectDatabase()
+nlohmann::json ProjectManager::GetDatabase()
 {
 	return projectDatase;
 }
 
-void RegisterProjectAsset(std::string uid, std::string path)
+void ProjectManager::RegisterAsset(std::string uid, std::string path)
 {
 	projectDatase[uid] = path;
 }
 
-std::string GetProjectAsset(std::string id)
+std::string ProjectManager::GetAsset(std::string id)
 {
 	if(projectDatase.find(id) != projectDatase.end())
 	{
@@ -36,32 +52,32 @@ std::string GetProjectAsset(std::string id)
 	return "";
 }
 
-bool ProjectAssetExists(std::string id)
+bool ProjectManager::AssetExists(std::string id)
 {
 	return (projectDatase.find(id) != projectDatase.end());
 }
 
-void SetProjectDatabase(nlohmann::json db)
+void ProjectManager::SetDatabase(nlohmann::json db)
 {
 	projectDatase = db;
 }
 
-void SaveProjectDatabase()
+void ProjectManager::SaveDatabase()
 {
-	if (!PathExist(GetProjectResourcePath()))
+	if (!PathExist(GetResourcePath()))
 	{
-		MkDir(GetProjectResourcePath());
+		MkDir(GetResourcePath());
 	}
 
-	SaveToFile(GetProjectResourcePath() + "\\project_database.terr3d", projectDatase.dump());
+	SaveToFile(GetResourcePath() + "\\project_database.terr3d", projectDatase.dump());
 }
 
-std::string GetProjectResourcePath()
+std::string ProjectManager::GetResourcePath()
 {
-	return GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetProjectId();
+	return GetExecutableDir() + "\\Data\\cache\\project_data\\project_" + GetId();
 }
 
-std::string SaveProjectTexture(Texture2D *texture)
+std::string ProjectManager::SaveTexture(Texture2D *texture)
 {
 	std::string path = texture->GetPath();
 
@@ -72,11 +88,11 @@ std::string SaveProjectTexture(Texture2D *texture)
 
 	std::string hash = MD5File(path).ToString();
 
-	if (GetProjectAsset(hash).size() <= 0)
+	if (GetAsset(hash).size() <= 0)
 	{
-		MkDir(GetProjectResourcePath() + "\\textures");
-		CopyFileData(path, GetProjectResourcePath() + "\\textures\\" + hash);
-		RegisterProjectAsset(hash, "textures\\" + hash);
+		MkDir(GetResourcePath() + "\\textures");
+		CopyFileData(path, GetResourcePath() + "\\textures\\" + hash);
+		RegisterAsset(hash, "textures\\" + hash);
 	}
 
 	return hash;

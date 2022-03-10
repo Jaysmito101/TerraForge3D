@@ -521,7 +521,7 @@ void ShowMessageBox(std::string message, std::string title)
 #endif
 }
 
-bool LoadFileIntoTexture(Texture2D *texture, bool loadToAssets, bool preserveData, bool readAlpha)
+bool LoadTexture(Texture2D *texture, bool loadToAssets, bool preserveData, bool readAlpha, ProjectManager *projectManager)
 {
 	std::string fileName = ShowOpenFileDialog(".png");
 
@@ -536,15 +536,7 @@ bool LoadFileIntoTexture(Texture2D *texture, bool loadToAssets, bool preserveDat
 
 		if (loadToAssets)
 		{
-			std::string hash = MD5File(fileName).ToString();
-
-			if (GetProjectAsset(hash).size() == 0)
-			{
-				std::string path = GetProjectResourcePath() + "\\textures";
-				MkDir(path);
-				CopyFileData(fileName, path + "\\" + hash);
-				RegisterProjectAsset(hash, "textures" + hash);
-			}
+			projectManager->SaveTexture(texture);
 		}
 
 		return true;

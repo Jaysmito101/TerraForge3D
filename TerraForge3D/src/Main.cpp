@@ -2,8 +2,7 @@
 
 #include <Misc/ExplorerControls.h>
 
-#include <Foliage/FoliagePlacement.h>
-#include <Sky/SkySettings.h>
+
 
 
 // TerraForge3D Base
@@ -23,8 +22,10 @@
 #include "Data/VersionInfo.h"
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
+#include "Foliage/FoliagePlacement.h"
 #include "Misc/ExportManager.h"
-#include "Misc/OSLiscenses.h"
+#include "Misc/OSLiscences.h"
+#include "Sky/SkySettings.h"
 #include "Misc/AppStyles.h"
 #include "Misc/SupportersTribute.h"
 
@@ -250,7 +251,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 			shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
 			shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 			shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
-			RenderFoliage(shader, appState->cameras.main);
+			appState->foliageManager->RenderFoliage(appState->cameras.main);
 		}
 
 		// For Future
@@ -772,7 +773,6 @@ public:
 		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
 		MkDir(GetExecutableDir() + "\\Data\\cache\\autosave\"");
 		MkDir(GetExecutableDir() + "\\Data\\temp\"");
-		SetupOSLiscences();
 	}
 
 	virtual void OnUpdate(float deltatime) override
@@ -1003,7 +1003,7 @@ public:
 
 		if (appState->windows.foliageManager)
 		{
-			ShowFoliageManager(&appState->windows.foliageManager);
+			appState->foliageManager->ShowSettings(&appState->windows.foliageManager);
 		}
 
 		//if (appState->windows.shaderEditorWindow)
@@ -1021,7 +1021,7 @@ public:
 
 		if (appState->windows.osLisc)
 		{
-			ShowOSLiscences(&appState->windows.osLisc);
+			appState->osLiscences->ShowSettings(&appState->windows.osLisc);
 		}
 
 		if (appState->windows.supportersTribute)
@@ -1061,7 +1061,6 @@ public:
 		appState->constants.logsDir = appState->constants.dataDir  		+ PATH_SEPERATOR "logs";
 		appState->constants.modelsDir = appState->constants.dataDir  	+ PATH_SEPERATOR "models";
 		appState->supportersTribute = new SupportersTribute();
-		SetupFoliageManager();
 		SetupExplorerControls();
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		LoadDefaultStyle();
@@ -1080,10 +1079,13 @@ public:
 		appState->modules.manager = new ModuleManager();
 		appState->meshGenerator = new MeshGeneratorManager(appState);
 		appState->mainMenu = new MainMenu(appState);
-		appState->seaManager = new SeaManager();
+		appState->seaManager = new SeaManager(appState);
 		appState->lightManager = new LightManager();
 		appState->skyManager = new SkyManager(appState);
+		appState->foliageManager = new FoliageManager(appState);
+		appState->projectManager = new ProjectManager(appState);
 		appState->serailizer = new Serializer(appState);
+		appState->osLiscences = new OSLiscences(appState);
 		appState->textureStore = new TextureStore(appState);
 		ResetShader();
 		appState->meshGenerator->GenerateSync();
@@ -1101,7 +1103,7 @@ public:
 			OpenSaveFile(loadFile);
 		}
 
-		SetProjectId(GenerateId(32));
+		appState->projectManager->SetId(GenerateId(32));
 		appState->filtersManager = new FiltersManager(appState);
 		float t = 1.0f;
 		// Load Fonts
@@ -1161,6 +1163,9 @@ public:
 		delete appState->frameBuffers.reflection;
 		delete appState->frameBuffers.textureExport;
 		delete appState->filtersManager;
+		delete appState->osLiscences;
+		delete appState->projectManager;
+		delete appState->foliageManager;
 //		delete appState->seaManager;
 		delete appState->lightManager;
 		delete appState->serailizer;

@@ -6,7 +6,7 @@
 
 #include <string>
 
-
+class ProjectManager;
 
 std::string UChar2Hex(unsigned char c);
 
@@ -112,7 +112,7 @@ bool IsMouseButtonDown(int button);
 
 void ShowMessageBox(std::string message, std::string title = "Info");
 
-bool LoadFileIntoTexture(Texture2D *texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false);
+bool LoadTexture(Texture2D *texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false, ProjectManager *projectManager = nullptr);
 
 void ToggleSystemConsole();
 

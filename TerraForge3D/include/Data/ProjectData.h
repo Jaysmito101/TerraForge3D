@@ -1,24 +1,44 @@
 #pragma once
 
 #include <string>
-#include "Base/Base.h"
 
-void SetProjectId(std::string id);
+#include "Base/Texture2D.h"
+#include "json/json.hpp"
 
-std::string GetProjectId();
+class ApplicationState;
 
-nlohmann::json GetProjectDatabase();
+class ProjectManager
+{
+public:
+	ProjectManager(ApplicationState *appState);
+	~ProjectManager();
 
-void RegisterProjectAsset(std::string uid, std::string path);
+	void SetId(std::string id);
 
-std::string GetProjectAsset(std::string id);
+	std::string GetId();
 
-bool ProjectAssetExists(std::string id);
+	nlohmann::json GetDatabase();
 
-void SetProjectDatabase(nlohmann::json db);
+	void RegisterAsset(std::string uid, std::string path);
 
-void SaveProjectDatabase();
+	std::string GetAsset(std::string id);
 
-std::string GetProjectResourcePath();
+	bool AssetExists(std::string id);
 
-std::string SaveProjectTexture(Texture2D *texture);
+	void SetDatabase(nlohmann::json db);
+
+	void SaveDatabase();
+
+	std::string GetResourcePath();
+
+	std::string SaveTexture(Texture2D *texture);
+
+	static ProjectManager *Get();
+
+public:
+	ApplicationState *appState = nullptr;
+	std::string projectID = "";
+	nlohmann::json projectDatase;
+private:
+	static ProjectManager *s_ProjectManager;
+};

@@ -6,11 +6,13 @@
 
 #include "Lighting/LightManager.h"
 
+class ApplicationState;
+
 class SeaManager
 {
 public:
 
-	SeaManager();
+	SeaManager(ApplicationState *appState);
 	~SeaManager();
 
 	void Load(nlohmann::json data);
@@ -27,6 +29,7 @@ private:
 	Texture2D *dudvMap;
 	Texture2D *normalMap;
 	Shader *shader;
+	ApplicationState *appState;
 
 	float alpha = 0.5f;
 	float distrotionScale = 1.0f;

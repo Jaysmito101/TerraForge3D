@@ -2,6 +2,7 @@
 
 #include "Base/Base.h"
 
+#include "Data/ProjectData.h"
 #include "Modules/ModuleManager.h"
 #include "Sea/SeaManager.h"
 #include "Lighting/LightManager.h"
@@ -11,7 +12,9 @@
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
 #include "Filters/FiltersManager.h"
+#include "Foliage/FoliagePlacement.h"
 #include "Sky/SkySettings.h"
+#include "Misc/OSLiscences.h"
 
 #include "json/json.hpp"
 
@@ -210,6 +213,9 @@ struct ApplicationState
 	SupportersTribute *supportersTribute = nullptr;
 	FiltersManager *filtersManager = nullptr;
 	SkyManager *skyManager = nullptr;
+	OSLiscences *osLiscences = nullptr;
+	ProjectManager *projectManager = nullptr;
+	FoliageManager *foliageManager = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 
