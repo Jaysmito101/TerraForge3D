@@ -15,6 +15,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 	m_InternalFormat = GL_RGB8;
 	m_DataFormat = GL_RGB;
 	m_Data = new unsigned char[width * height * 3];
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &m_RendererID);
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

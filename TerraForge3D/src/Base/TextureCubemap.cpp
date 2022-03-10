@@ -4,7 +4,15 @@
 #include <stb/stb_image.h>
 #include <glad/glad.h>
 
-#include <BaseMath.h>
+#include "Base/BaseMath.h"
+
+#include <iostream>
+
+static void Log(const char *str)
+{
+	std::cout << str << std::endl;
+}
+
 
 TextureCubemap::TextureCubemap()
 {
@@ -14,6 +22,9 @@ TextureCubemap::TextureCubemap()
 	faces.push_back("");
 	faces.push_back("");
 	faces.push_back("");
+	memset(facesData, 0, sizeof(facesData));
+	memset(facesSizes, 0, sizeof(facesSizes));
+	memset(textures, 0, sizeof(textures));
 }
 
 
@@ -36,6 +47,7 @@ TextureCubemap::~TextureCubemap()
 
 void TextureCubemap::SetUpOnGPU()
 {
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &rendereID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, rendereID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -94,7 +106,8 @@ void TextureCubemap::DeleteData()
 	for (int i = 0; i < 6; i++)
 		if (facesData[i])
 		{
-			delete[] facesData[i];
+			delete facesData[i];
+			facesData[i] = nullptr;
 		}
 }
 
@@ -107,6 +120,7 @@ bool TextureCubemap::UploadFaceToGPU(int face)
 		if (textures[face])
 		{
 			delete textures[face];
+			textures[face] = nullptr;
 		}
 
 		textures[face] = new Texture2D(facesSizes[face].x, facesSizes[face].y);

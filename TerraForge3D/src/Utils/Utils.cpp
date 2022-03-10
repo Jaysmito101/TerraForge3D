@@ -348,27 +348,32 @@ Hash MD5File(std::string path)
 
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size)
 {
-	std::ofstream outfile;
-	httplib::Client cli(baseURL);
-	int done = 0;
-	outfile.open(path.c_str(), std::ios::binary | std::ios::out);
-	std::cout << "Starting download - " << baseURL << urlPath << std::endl;
-	auto res = cli.Get(urlPath.c_str(),
-	                   [&](const char *data, size_t data_length)
+	try
 	{
-		done = done + data_length;
-
-		if (size > 0)
+		std::ofstream outfile;
+		httplib::Client cli(baseURL);
+		int done = 0;
+		outfile.open(path.c_str(), std::ios::binary | std::ios::out);
+		std::cout << "Starting download - " << baseURL << urlPath << std::endl;
+		auto res = cli.Get(urlPath.c_str(),
+		                   [&](const char *data, size_t data_length)
 		{
-			float percent = (float)done / (float)size;
-			std::cout << "Downloaded " << (int)(percent * 100) << "%      \r";
-		}
+			done = done + data_length;
 
-		outfile.write(data, data_length);
-		return true;
-	});
-	std::cout << "Download Complete - " << path << std::endl;
-	outfile.close();
+			if (size > 0)
+			{
+				float percent = (float)done / (float)size;
+				std::cout << "Downloaded " << (int)(percent * 100) << "%      \r";
+			}
+
+			outfile.write(data, data_length);
+			return true;
+		});
+		std::cout << "Download Complete - " << path << std::endl;
+		outfile.close();
+	}
+
+	catch(...) {}
 }
 
 void SaveToFile(std::string filename, std::string content)

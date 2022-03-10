@@ -208,8 +208,8 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		tmp[1] = appState->globals.viewportMousePosY;
 		tmp[2] = ImGui::GetIO().MouseDown[0];
 		shader->SetUniform3f("_MousePos", tmp);
-		tmp[0] = 800;
-		tmp[1] = 600;
+		tmp[0] = appState->frameBuffers.main->GetWidth();
+		tmp[1] = appState->frameBuffers.main->GetHeight();
 		tmp[2] = 1;
 		shader->SetUniform3f("_Resolution", tmp);
 		shader->SetUniformf("_SeaLevel", appState->seaManager->level);
@@ -238,13 +238,14 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 			shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
 			shader->SetLightCol(appState->lightManager->color);
 			shader->SetLightPos(appState->lightManager->position);
+			shader->SetUniformf("_LightStrength", appState->lightManager->strength);
 			float tmp[3];
 			tmp[0] = appState->globals.viewportMousePosX;
 			tmp[1] = appState->globals.viewportMousePosY;
 			tmp[2] = ImGui::GetIO().MouseDown[0];
 			shader->SetUniform3f("_MousePos", tmp);
-			tmp[0] = 800;
-			tmp[1] = 600;
+			tmp[0] = appState->frameBuffers.main->GetWidth();
+			tmp[1] = appState->frameBuffers.main->GetHeight();
 			tmp[2] = 1;
 			shader->SetUniform3f("_Resolution", tmp);
 			shader->SetUniformf("_SeaLevel", appState->seaManager->level);
