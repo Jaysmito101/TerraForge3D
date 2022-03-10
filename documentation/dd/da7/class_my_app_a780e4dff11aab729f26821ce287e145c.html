@@ -155,99 +155,104 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a780e4dff11aab729f
 <div class="line"><span class="lineno"> 1061</span>        appState-&gt;constants.logsDir = appState-&gt;constants.dataDir       + PATH_SEPERATOR <span class="stringliteral">&quot;logs&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1062</span>        appState-&gt;constants.modelsDir = appState-&gt;constants.dataDir     + PATH_SEPERATOR <span class="stringliteral">&quot;models&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1063</span>        appState-&gt;supportersTribute = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a>();</div>
-<div class="line"><span class="lineno"> 1064</span>        SetupFoliageManager();</div>
-<div class="line"><span class="lineno"> 1065</span>        SetupExplorerControls();</div>
-<div class="line"><span class="lineno"> 1066</span>        ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;</div>
-<div class="line"><span class="lineno"> 1067</span>        LoadDefaultStyle();</div>
-<div class="line"><span class="lineno"> 1068</span>        GetWindow()-&gt;SetShouldCloseCallback(OnAppClose);</div>
-<div class="line"><span class="lineno"> 1069</span>        glfwSetFramebufferSizeCallback(GetWindow()-&gt;GetNativeWindow(), [](GLFWwindow* window, <span class="keywordtype">int</span> w, <span class="keywordtype">int</span> h)</div>
-<div class="line"><span class="lineno"> 1070</span>        {</div>
-<div class="line"><span class="lineno"> 1071</span>            glfwSwapBuffers(window);</div>
-<div class="line"><span class="lineno"> 1072</span>        });</div>
-<div class="line"><span class="lineno"> 1073</span>        glfwSetScrollCallback(GetWindow()-&gt;GetNativeWindow(), [](GLFWwindow *, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y)</div>
-<div class="line"><span class="lineno"> 1074</span>        {</div>
-<div class="line"><span class="lineno"> 1075</span>            ImGuiIO &amp;io = ImGui::GetIO();</div>
-<div class="line"><span class="lineno"> 1076</span>            io.MouseWheel = (float)y;</div>
-<div class="line"><span class="lineno"> 1077</span>        });</div>
-<div class="line"><span class="lineno"> 1078</span>        GetWindow()-&gt;SetClearColor({ 0.1f, 0.1f, 0.1f });</div>
-<div class="line"><span class="lineno"> 1079</span>        appState-&gt;globals.kernelsIncludeDir = <span class="stringliteral">&quot;\&quot;&quot;</span> + appState-&gt;constants.kernelsDir + <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1080</span>        appState-&gt;modules.manager = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d79/class_module_manager.html">ModuleManager</a>();</div>
-<div class="line"><span class="lineno"> 1081</span>        appState-&gt;meshGenerator = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a>(appState);</div>
-<div class="line"><span class="lineno"> 1082</span>        appState-&gt;mainMenu = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/d04/class_main_menu.html">MainMenu</a>(appState);</div>
-<div class="line"><span class="lineno"> 1083</span>        appState-&gt;seaManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d3/dac/class_sea_manager.html">SeaManager</a>();</div>
-<div class="line"><span class="lineno"> 1084</span>        appState-&gt;lightManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d3e/class_light_manager.html">LightManager</a>();</div>
-<div class="line"><span class="lineno"> 1085</span>        appState-&gt;skyManager = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d15/class_sky_manager.html">SkyManager</a>(appState);</div>
-<div class="line"><span class="lineno"> 1086</span>        appState-&gt;serailizer = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/dc2/class_serializer.html">Serializer</a>(appState);</div>
-<div class="line"><span class="lineno"> 1087</span>        appState-&gt;textureStore = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d8a/class_texture_store.html">TextureStore</a>(appState);</div>
-<div class="line"><span class="lineno"> 1088</span>        ResetShader();</div>
-<div class="line"><span class="lineno"> 1089</span>        appState-&gt;meshGenerator-&gt;GenerateSync();</div>
-<div class="line"><span class="lineno"> 1090</span>        appState-&gt;models.coreTerrain-&gt;SetupMeshOnGPU();</div>
-<div class="line"><span class="lineno"> 1091</span>        appState-&gt;models.screenQuad-&gt;SetupMeshOnGPU();</div>
-<div class="line"><span class="lineno"> 1092</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;GenerateScreenQuad();</div>
-<div class="line"><span class="lineno"> 1093</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno"> 1094</span>        appState-&gt;models.screenQuad-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno"> 1095</span>        glEnable(GL_DEPTH_TEST);</div>
-<div class="line"><span class="lineno"> 1096</span>        appState-&gt;globals.scale = 1;</div>
-<div class="line"><span class="lineno"> 1097</span> </div>
-<div class="line"><span class="lineno"> 1098</span>        <span class="keywordflow">if</span> (loadFile.size() &gt; 0)</div>
-<div class="line"><span class="lineno"> 1099</span>        {</div>
-<div class="line"><span class="lineno"> 1100</span>            Log(<span class="stringliteral">&quot;Loading File from &quot;</span> + loadFile);</div>
-<div class="line"><span class="lineno"> 1101</span>            OpenSaveFile(loadFile);</div>
-<div class="line"><span class="lineno"> 1102</span>        }</div>
-<div class="line"><span class="lineno"> 1103</span> </div>
-<div class="line"><span class="lineno"> 1104</span>        SetProjectId(GenerateId(32));</div>
-<div class="line"><span class="lineno"> 1105</span>        appState-&gt;filtersManager = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a>(appState);</div>
-<div class="line"><span class="lineno"> 1106</span>        <span class="keywordtype">float</span> t = 1.0f;</div>
-<div class="line"><span class="lineno"> 1107</span>        <span class="comment">// Load Fonts</span></div>
-<div class="line"><span class="lineno"> 1108</span>        LoadUIFont(<span class="stringliteral">&quot;Open-Sans-Regular&quot;</span>, 18, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Regular.ttf&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1109</span>        LoadUIFont(<span class="stringliteral">&quot;OpenSans-Bold&quot;</span>, 25, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Bold.ttf&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1110</span>        LoadUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>, 22, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Bold.ttf&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1111</span>        <span class="comment">// The framebuffer used for reflections in the sea</span></div>
-<div class="line"><span class="lineno"> 1112</span>        appState-&gt;frameBuffers.reflection = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>();</div>
-<div class="line"><span class="lineno"> 1113</span>        <span class="comment">// This is the framebuffer for previewing the texture to export</span></div>
-<div class="line"><span class="lineno"> 1114</span>        appState-&gt;frameBuffers.textureExport = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>(1024, 1024);</div>
-<div class="line"><span class="lineno"> 1115</span>        <span class="comment">// The main frame buffer</span></div>
-<div class="line"><span class="lineno"> 1116</span>        appState-&gt;frameBuffers.main = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>(1280, 720);</div>
-<div class="line"><span class="lineno"> 1117</span>        <span class="comment">// The Framebuffer used for post processing</span></div>
-<div class="line"><span class="lineno"> 1118</span>        appState-&gt;frameBuffers.postProcess = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>(1280, 720);</div>
-<div class="line"><span class="lineno"> 1119</span>        <span class="keywordtype">bool</span> tpp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1120</span>        appState-&gt;shaders.postProcess = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(ReadShaderSourceFile(appState-&gt;constants.shadersDir + <span class="stringliteral">&quot;\\post_processing\\vert.glsl&quot;</span>, &amp;tpp),</div>
-<div class="line"><span class="lineno"> 1121</span>                ReadShaderSourceFile(appState-&gt;constants.shadersDir + <span class="stringliteral">&quot;\\post_processing\\frag.glsl&quot;</span>, &amp;tpp));</div>
-<div class="line"><span class="lineno"> 1122</span>        appState-&gt;states.autoUpdate = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1123</span> </div>
-<div class="line"><span class="lineno"> 1124</span>        <span class="keywordflow">if</span>(IsNetWorkConnected())</div>
-<div class="line"><span class="lineno"> 1125</span>        {</div>
-<div class="line"><span class="lineno"> 1126</span>            <span class="keywordflow">if</span>(FileExists(appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>))</div>
-<div class="line"><span class="lineno"> 1127</span>            {</div>
-<div class="line"><span class="lineno"> 1128</span>                <span class="keywordtype">bool</span> ttmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1129</span>                std::string uid = ReadShaderSourceFile(appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>, &amp;ttmp);</div>
-<div class="line"><span class="lineno"> 1130</span>                Log(<span class="stringliteral">&quot;Connection to Backend : &quot;</span> + FetchURL(<span class="stringliteral">&quot;https://terraforge3d.maxalpha.repl.co&quot;</span>, <span class="stringliteral">&quot;/startup/&quot;</span> + uid));</div>
-<div class="line"><span class="lineno"> 1131</span>            }</div>
-<div class="line"><span class="lineno"> 1132</span> </div>
-<div class="line"><span class="lineno"> 1133</span>            <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno"> 1134</span>            {</div>
-<div class="line"><span class="lineno"> 1135</span>                DownloadFile(<span class="stringliteral">&quot;https://terraforge3d.maxalpha.repl.co&quot;</span>, <span class="stringliteral">&quot;/register&quot;</span>, appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1136</span>                <span class="keywordtype">bool</span> ttmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1137</span>                std::string uid = ReadShaderSourceFile(appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>, &amp;ttmp);</div>
-<div class="line"><span class="lineno"> 1138</span>                Log(<span class="stringliteral">&quot;Connection to Backend : &quot;</span> + FetchURL(<span class="stringliteral">&quot;https://terraforge3d.maxalpha.repl.co&quot;</span>, <span class="stringliteral">&quot;/startup/&quot;</span> + uid));</div>
-<div class="line"><span class="lineno"> 1139</span>            }</div>
-<div class="line"><span class="lineno"> 1140</span>        }</div>
-<div class="line"><span class="lineno"> 1141</span> </div>
-<div class="line"><span class="lineno"> 1142</span>        Log(<span class="stringliteral">&quot;Started Up App!&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1143</span>    }</div>
+<div class="line"><span class="lineno"> 1064</span>        SetupExplorerControls();</div>
+<div class="line"><span class="lineno"> 1065</span>        ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;</div>
+<div class="line"><span class="lineno"> 1066</span>        LoadDefaultStyle();</div>
+<div class="line"><span class="lineno"> 1067</span>        GetWindow()-&gt;SetShouldCloseCallback(OnAppClose);</div>
+<div class="line"><span class="lineno"> 1068</span>        glfwSetFramebufferSizeCallback(GetWindow()-&gt;GetNativeWindow(), [](GLFWwindow* window, <span class="keywordtype">int</span> w, <span class="keywordtype">int</span> h)</div>
+<div class="line"><span class="lineno"> 1069</span>        {</div>
+<div class="line"><span class="lineno"> 1070</span>            glfwSwapBuffers(window);</div>
+<div class="line"><span class="lineno"> 1071</span>        });</div>
+<div class="line"><span class="lineno"> 1072</span>        glfwSetScrollCallback(GetWindow()-&gt;GetNativeWindow(), [](GLFWwindow *, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y)</div>
+<div class="line"><span class="lineno"> 1073</span>        {</div>
+<div class="line"><span class="lineno"> 1074</span>            ImGuiIO &amp;io = ImGui::GetIO();</div>
+<div class="line"><span class="lineno"> 1075</span>            io.MouseWheel = (float)y;</div>
+<div class="line"><span class="lineno"> 1076</span>        });</div>
+<div class="line"><span class="lineno"> 1077</span>        GetWindow()-&gt;SetClearColor({ 0.1f, 0.1f, 0.1f });</div>
+<div class="line"><span class="lineno"> 1078</span>        appState-&gt;globals.kernelsIncludeDir = <span class="stringliteral">&quot;\&quot;&quot;</span> + appState-&gt;constants.kernelsDir + <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1079</span>        appState-&gt;modules.manager = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d79/class_module_manager.html">ModuleManager</a>();</div>
+<div class="line"><span class="lineno"> 1080</span>        appState-&gt;meshGenerator = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a>(appState);</div>
+<div class="line"><span class="lineno"> 1081</span>        appState-&gt;mainMenu = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/d04/class_main_menu.html">MainMenu</a>(appState);</div>
+<div class="line"><span class="lineno"> 1082</span>        appState-&gt;seaManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d3/dac/class_sea_manager.html">SeaManager</a>(appState);</div>
+<div class="line"><span class="lineno"> 1083</span>        appState-&gt;lightManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d3e/class_light_manager.html">LightManager</a>();</div>
+<div class="line"><span class="lineno"> 1084</span>        appState-&gt;skyManager = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d15/class_sky_manager.html">SkyManager</a>(appState);</div>
+<div class="line"><span class="lineno"> 1085</span>        appState-&gt;foliageManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/da2/class_foliage_manager.html">FoliageManager</a>(appState);</div>
+<div class="line"><span class="lineno"> 1086</span>        appState-&gt;projectManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d93/class_project_manager.html">ProjectManager</a>(appState);</div>
+<div class="line"><span class="lineno"> 1087</span>        appState-&gt;serailizer = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/dc2/class_serializer.html">Serializer</a>(appState);</div>
+<div class="line"><span class="lineno"> 1088</span>        appState-&gt;osLiscences = <span class="keyword">new</span> <a class="code hl_class" href="../../da/dfe/class_o_s_liscences.html">OSLiscences</a>(appState);</div>
+<div class="line"><span class="lineno"> 1089</span>        appState-&gt;textureStore = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d8a/class_texture_store.html">TextureStore</a>(appState);</div>
+<div class="line"><span class="lineno"> 1090</span>        ResetShader();</div>
+<div class="line"><span class="lineno"> 1091</span>        appState-&gt;meshGenerator-&gt;GenerateSync();</div>
+<div class="line"><span class="lineno"> 1092</span>        appState-&gt;models.coreTerrain-&gt;SetupMeshOnGPU();</div>
+<div class="line"><span class="lineno"> 1093</span>        appState-&gt;models.screenQuad-&gt;SetupMeshOnGPU();</div>
+<div class="line"><span class="lineno"> 1094</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;GenerateScreenQuad();</div>
+<div class="line"><span class="lineno"> 1095</span>        appState-&gt;models.screenQuad-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno"> 1096</span>        appState-&gt;models.screenQuad-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno"> 1097</span>        glEnable(GL_DEPTH_TEST);</div>
+<div class="line"><span class="lineno"> 1098</span>        appState-&gt;globals.scale = 1;</div>
+<div class="line"><span class="lineno"> 1099</span> </div>
+<div class="line"><span class="lineno"> 1100</span>        <span class="keywordflow">if</span> (loadFile.size() &gt; 0)</div>
+<div class="line"><span class="lineno"> 1101</span>        {</div>
+<div class="line"><span class="lineno"> 1102</span>            Log(<span class="stringliteral">&quot;Loading File from &quot;</span> + loadFile);</div>
+<div class="line"><span class="lineno"> 1103</span>            OpenSaveFile(loadFile);</div>
+<div class="line"><span class="lineno"> 1104</span>        }</div>
+<div class="line"><span class="lineno"> 1105</span> </div>
+<div class="line"><span class="lineno"> 1106</span>        appState-&gt;projectManager-&gt;SetId(GenerateId(32));</div>
+<div class="line"><span class="lineno"> 1107</span>        appState-&gt;filtersManager = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a>(appState);</div>
+<div class="line"><span class="lineno"> 1108</span>        <span class="keywordtype">float</span> t = 1.0f;</div>
+<div class="line"><span class="lineno"> 1109</span>        <span class="comment">// Load Fonts</span></div>
+<div class="line"><span class="lineno"> 1110</span>        LoadUIFont(<span class="stringliteral">&quot;Open-Sans-Regular&quot;</span>, 18, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Regular.ttf&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1111</span>        LoadUIFont(<span class="stringliteral">&quot;OpenSans-Bold&quot;</span>, 25, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Bold.ttf&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1112</span>        LoadUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>, 22, appState-&gt;constants.fontsDir + <span class="stringliteral">&quot;\\OpenSans-Bold.ttf&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1113</span>        <span class="comment">// The framebuffer used for reflections in the sea</span></div>
+<div class="line"><span class="lineno"> 1114</span>        appState-&gt;frameBuffers.reflection = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>();</div>
+<div class="line"><span class="lineno"> 1115</span>        <span class="comment">// This is the framebuffer for previewing the texture to export</span></div>
+<div class="line"><span class="lineno"> 1116</span>        appState-&gt;frameBuffers.textureExport = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>(1024, 1024);</div>
+<div class="line"><span class="lineno"> 1117</span>        <span class="comment">// The main frame buffer</span></div>
+<div class="line"><span class="lineno"> 1118</span>        appState-&gt;frameBuffers.main = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>(1280, 720);</div>
+<div class="line"><span class="lineno"> 1119</span>        <span class="comment">// The Framebuffer used for post processing</span></div>
+<div class="line"><span class="lineno"> 1120</span>        appState-&gt;frameBuffers.postProcess = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a>(1280, 720);</div>
+<div class="line"><span class="lineno"> 1121</span>        <span class="keywordtype">bool</span> tpp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1122</span>        appState-&gt;shaders.postProcess = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(ReadShaderSourceFile(appState-&gt;constants.shadersDir + <span class="stringliteral">&quot;\\post_processing\\vert.glsl&quot;</span>, &amp;tpp),</div>
+<div class="line"><span class="lineno"> 1123</span>                ReadShaderSourceFile(appState-&gt;constants.shadersDir + <span class="stringliteral">&quot;\\post_processing\\frag.glsl&quot;</span>, &amp;tpp));</div>
+<div class="line"><span class="lineno"> 1124</span>        appState-&gt;states.autoUpdate = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1125</span> </div>
+<div class="line"><span class="lineno"> 1126</span>        <span class="keywordflow">if</span>(IsNetWorkConnected())</div>
+<div class="line"><span class="lineno"> 1127</span>        {</div>
+<div class="line"><span class="lineno"> 1128</span>            <span class="keywordflow">if</span>(FileExists(appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>))</div>
+<div class="line"><span class="lineno"> 1129</span>            {</div>
+<div class="line"><span class="lineno"> 1130</span>                <span class="keywordtype">bool</span> ttmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1131</span>                std::string uid = ReadShaderSourceFile(appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>, &amp;ttmp);</div>
+<div class="line"><span class="lineno"> 1132</span>                Log(<span class="stringliteral">&quot;Connection to Backend : &quot;</span> + FetchURL(<span class="stringliteral">&quot;https://terraforge3d.maxalpha.repl.co&quot;</span>, <span class="stringliteral">&quot;/startup/&quot;</span> + uid));</div>
+<div class="line"><span class="lineno"> 1133</span>            }</div>
+<div class="line"><span class="lineno"> 1134</span> </div>
+<div class="line"><span class="lineno"> 1135</span>            <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno"> 1136</span>            {</div>
+<div class="line"><span class="lineno"> 1137</span>                DownloadFile(<span class="stringliteral">&quot;https://terraforge3d.maxalpha.repl.co&quot;</span>, <span class="stringliteral">&quot;/register&quot;</span>, appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1138</span>                <span class="keywordtype">bool</span> ttmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1139</span>                std::string uid = ReadShaderSourceFile(appState-&gt;constants.configsDir + <span class="stringliteral">&quot;\\server.terr3d&quot;</span>, &amp;ttmp);</div>
+<div class="line"><span class="lineno"> 1140</span>                Log(<span class="stringliteral">&quot;Connection to Backend : &quot;</span> + FetchURL(<span class="stringliteral">&quot;https://terraforge3d.maxalpha.repl.co&quot;</span>, <span class="stringliteral">&quot;/startup/&quot;</span> + uid));</div>
+<div class="line"><span class="lineno"> 1141</span>            }</div>
+<div class="line"><span class="lineno"> 1142</span>        }</div>
+<div class="line"><span class="lineno"> 1143</span> </div>
+<div class="line"><span class="lineno"> 1144</span>        Log(<span class="stringliteral">&quot;Started Up App!&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1145</span>    }</div>
 <div class="ttc" id="aclass_filters_manager_html"><div class="ttname"><a href="../../da/d39/class_filters_manager.html">FiltersManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/ddf/_filters_manager_8h_source.html#l00011">FiltersManager.h:12</a></div></div>
+<div class="ttc" id="aclass_foliage_manager_html"><div class="ttname"><a href="../../d5/da2/class_foliage_manager.html">FoliageManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d39/_foliage_placement_8h_source.html#l00028">FoliagePlacement.h:29</a></div></div>
 <div class="ttc" id="aclass_frame_buffer_html"><div class="ttname"><a href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d89/_frame_buffer_8h_source.html#l00005">FrameBuffer.h:6</a></div></div>
 <div class="ttc" id="aclass_light_manager_html"><div class="ttname"><a href="../../d1/d3e/class_light_manager.html">LightManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/d11/_light_manager_8h_source.html#l00006">LightManager.h:7</a></div></div>
 <div class="ttc" id="aclass_main_menu_html"><div class="ttname"><a href="../../d4/d04/class_main_menu.html">MainMenu</a></div><div class="ttdef"><b>Definition:</b> <a href="../../db/db6/_main_menu_8h_source.html#l00005">MainMenu.h:6</a></div></div>
 <div class="ttc" id="aclass_mesh_generator_manager_html"><div class="ttname"><a href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d77/_mesh_generator_manager_8h_source.html#l00021">MeshGeneratorManager.h:22</a></div></div>
 <div class="ttc" id="aclass_module_manager_html"><div class="ttname"><a href="../../d8/d79/class_module_manager.html">ModuleManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/dd1/_module_manager_8h_source.html#l00009">ModuleManager.h:10</a></div></div>
-<div class="ttc" id="aclass_sea_manager_html"><div class="ttname"><a href="../../d3/dac/class_sea_manager.html">SeaManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d0a/_sea_manager_8h_source.html#l00009">SeaManager.h:10</a></div></div>
+<div class="ttc" id="aclass_o_s_liscences_html"><div class="ttname"><a href="../../da/dfe/class_o_s_liscences.html">OSLiscences</a></div><div class="ttdef"><b>Definition:</b> <a href="../../db/d76/_o_s_liscences_8h_source.html#l00008">OSLiscences.h:9</a></div></div>
+<div class="ttc" id="aclass_project_manager_html"><div class="ttname"><a href="../../d7/d93/class_project_manager.html">ProjectManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dde/_project_data_8h_source.html#l00010">ProjectData.h:11</a></div></div>
+<div class="ttc" id="aclass_sea_manager_html"><div class="ttname"><a href="../../d3/dac/class_sea_manager.html">SeaManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d0a/_sea_manager_8h_source.html#l00011">SeaManager.h:12</a></div></div>
 <div class="ttc" id="aclass_serializer_html"><div class="ttname"><a href="../../d0/dc2/class_serializer.html">Serializer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de0/_serializer_8h_source.html#l00009">Serializer.h:10</a></div></div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
 <div class="ttc" id="aclass_sky_manager_html"><div class="ttname"><a href="../../db/d15/class_sky_manager.html">SkyManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/da4/_sky_settings_8h_source.html#l00010">SkySettings.h:11</a></div></div>
 <div class="ttc" id="aclass_supporters_tribute_html"><div class="ttname"><a href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00017">SupportersTribute.h:18</a></div></div>
 <div class="ttc" id="aclass_texture_store_html"><div class="ttname"><a href="../../d0/d8a/class_texture_store.html">TextureStore</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d2b/_texture_store_8h_source.html#l00034">TextureStore.h:35</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00188">ApplicationState.h:189</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00191">ApplicationState.h:192</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

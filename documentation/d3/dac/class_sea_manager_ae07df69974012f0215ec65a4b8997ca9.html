@@ -121,40 +121,40 @@ $(document).ready(function(){initNavTree('d3/dac/class_sea_manager_ae07df6997401
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00140">140</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  141</span>{</div>
-<div class="line"><span class="lineno">  142</span>    <span class="keywordflow">if</span> (*pOpen)</div>
-<div class="line"><span class="lineno">  143</span>    {</div>
-<div class="line"><span class="lineno">  144</span>        ImGui::Begin(<span class="stringliteral">&quot;Sea Setings&quot;</span>, pOpen);</div>
-<div class="line"><span class="lineno">  145</span>        ImGui::Checkbox(<span class="stringliteral">&quot;Sea Enabled&quot;</span>, &amp;enabled);</div>
-<div class="line"><span class="lineno">  146</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Sea Level&quot;</span>, &amp;level, 0.1f);</div>
-<div class="line"><span class="lineno">  147</span>        ImGui::Text(<span class="stringliteral">&quot;Sea Color&quot;</span>);</div>
-<div class="line"><span class="lineno">  148</span>        ImGui::ColorEdit3(<span class="stringliteral">&quot;##seaColor&quot;</span>, color);</div>
-<div class="line"><span class="lineno">  149</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Alpha&quot;</span>, &amp;alpha, 0.01f, 0, 1);</div>
-<div class="line"><span class="lineno">  150</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Scale&quot;</span>, &amp;scale, 0.1f);</div>
-<div class="line"><span class="lineno">  151</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Reflectvity&quot;</span>, &amp;reflectivity, 0.01f, 0, 1);</div>
-<div class="line"><span class="lineno">  152</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Distortion Strength&quot;</span>, &amp;distrotionStrength, 0.001f, 0, 1);</div>
-<div class="line"><span class="lineno">  153</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Distortion Scale&quot;</span>, &amp;distrotionScale, 0.001f, 0, 1);</div>
-<div class="line"><span class="lineno">  154</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Wave Speed&quot;</span>, &amp;waveSpeed, 0.01f, 0, 1);</div>
-<div class="line"><span class="lineno">  155</span>        ImGui::Text(<span class="stringliteral">&quot;DuDv Map&quot;</span>);</div>
-<div class="line"><span class="lineno">  156</span>        ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  157</span> </div>
-<div class="line"><span class="lineno">  158</span>        <span class="keywordflow">if</span> (ImGui::ImageButton((ImTextureID)dudvMap-&gt;GetRendererID(), ImVec2(50, 50)))</div>
-<div class="line"><span class="lineno">  159</span>        {</div>
-<div class="line"><span class="lineno">  160</span>            LoadFileIntoTexture(dudvMap);</div>
-<div class="line"><span class="lineno">  161</span>        }</div>
-<div class="line"><span class="lineno">  162</span> </div>
-<div class="line"><span class="lineno">  163</span>        ImGui::Text(<span class="stringliteral">&quot;Normal Map&quot;</span>);</div>
-<div class="line"><span class="lineno">  164</span>        ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  165</span> </div>
-<div class="line"><span class="lineno">  166</span>        <span class="keywordflow">if</span> (ImGui::ImageButton((ImTextureID)normalMap-&gt;GetRendererID(), ImVec2(50, 50)))</div>
-<div class="line"><span class="lineno">  167</span>        {</div>
-<div class="line"><span class="lineno">  168</span>            LoadFileIntoTexture(normalMap);</div>
-<div class="line"><span class="lineno">  169</span>        }</div>
-<div class="line"><span class="lineno">  170</span> </div>
-<div class="line"><span class="lineno">  171</span>        ImGui::End();</div>
-<div class="line"><span class="lineno">  172</span>    }</div>
-<div class="line"><span class="lineno">  173</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  143</span>{</div>
+<div class="line"><span class="lineno">  144</span>    <span class="keywordflow">if</span> (*pOpen)</div>
+<div class="line"><span class="lineno">  145</span>    {</div>
+<div class="line"><span class="lineno">  146</span>        ImGui::Begin(<span class="stringliteral">&quot;Sea Setings&quot;</span>, pOpen);</div>
+<div class="line"><span class="lineno">  147</span>        ImGui::Checkbox(<span class="stringliteral">&quot;Sea Enabled&quot;</span>, &amp;enabled);</div>
+<div class="line"><span class="lineno">  148</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Sea Level&quot;</span>, &amp;level, 0.1f);</div>
+<div class="line"><span class="lineno">  149</span>        ImGui::Text(<span class="stringliteral">&quot;Sea Color&quot;</span>);</div>
+<div class="line"><span class="lineno">  150</span>        ImGui::ColorEdit3(<span class="stringliteral">&quot;##seaColor&quot;</span>, color);</div>
+<div class="line"><span class="lineno">  151</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Alpha&quot;</span>, &amp;alpha, 0.01f, 0, 1);</div>
+<div class="line"><span class="lineno">  152</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Scale&quot;</span>, &amp;scale, 0.1f);</div>
+<div class="line"><span class="lineno">  153</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Reflectvity&quot;</span>, &amp;reflectivity, 0.01f, 0, 1);</div>
+<div class="line"><span class="lineno">  154</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Distortion Strength&quot;</span>, &amp;distrotionStrength, 0.001f, 0, 1);</div>
+<div class="line"><span class="lineno">  155</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Distortion Scale&quot;</span>, &amp;distrotionScale, 0.001f, 0, 1);</div>
+<div class="line"><span class="lineno">  156</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Wave Speed&quot;</span>, &amp;waveSpeed, 0.01f, 0, 1);</div>
+<div class="line"><span class="lineno">  157</span>        ImGui::Text(<span class="stringliteral">&quot;DuDv Map&quot;</span>);</div>
+<div class="line"><span class="lineno">  158</span>        ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>        <span class="keywordflow">if</span> (ImGui::ImageButton((ImTextureID)dudvMap-&gt;GetRendererID(), ImVec2(50, 50)))</div>
+<div class="line"><span class="lineno">  161</span>        {</div>
+<div class="line"><span class="lineno">  162</span>            LoadTexture(dudvMap);</div>
+<div class="line"><span class="lineno">  163</span>        }</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>        ImGui::Text(<span class="stringliteral">&quot;Normal Map&quot;</span>);</div>
+<div class="line"><span class="lineno">  166</span>        ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  167</span> </div>
+<div class="line"><span class="lineno">  168</span>        <span class="keywordflow">if</span> (ImGui::ImageButton((ImTextureID)normalMap-&gt;GetRendererID(), ImVec2(50, 50)))</div>
+<div class="line"><span class="lineno">  169</span>        {</div>
+<div class="line"><span class="lineno">  170</span>            LoadTexture(normalMap);</div>
+<div class="line"><span class="lineno">  171</span>        }</div>
+<div class="line"><span class="lineno">  172</span> </div>
+<div class="line"><span class="lineno">  173</span>        ImGui::End();</div>
+<div class="line"><span class="lineno">  174</span>    }</div>
+<div class="line"><span class="lineno">  175</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

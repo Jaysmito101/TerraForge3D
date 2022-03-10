@@ -143,44 +143,44 @@ $(document).ready(function(){initNavTree('d3/dac/class_sea_manager_a23c97e5da2ea
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00101">101</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  102</span>{</div>
-<div class="line"><span class="lineno">  103</span>    shader-&gt;Bind();</div>
-<div class="line"><span class="lineno">  104</span>    shader-&gt;SetTime(&amp;time);</div>
-<div class="line"><span class="lineno">  105</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaAlpha&quot;</span>, alpha);</div>
-<div class="line"><span class="lineno">  106</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaDistScale&quot;</span>, distrotionScale);</div>
-<div class="line"><span class="lineno">  107</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaDistStrength&quot;</span>, distrotionStrength);</div>
-<div class="line"><span class="lineno">  108</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaReflectivity&quot;</span>, reflectivity);</div>
-<div class="line"><span class="lineno">  109</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaLevel&quot;</span>, level);</div>
-<div class="line"><span class="lineno">  110</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaWaveSpeed&quot;</span>, waveSpeed);</div>
-<div class="line"><span class="lineno">  111</span>    glActiveTexture(7);</div>
-<div class="line"><span class="lineno">  112</span>    glBindTexture(GL_TEXTURE_2D, (GLuint)reflectionTexture);</div>
-<div class="line"><span class="lineno">  113</span>    shader-&gt;SetUniformi(<span class="stringliteral">&quot;_ReflectionTexture&quot;</span>, 7);</div>
-<div class="line"><span class="lineno">  114</span> </div>
-<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">if</span> (dudvMap)</div>
-<div class="line"><span class="lineno">  116</span>    {</div>
-<div class="line"><span class="lineno">  117</span>        dudvMap-&gt;Bind(8);</div>
-<div class="line"><span class="lineno">  118</span>    }</div>
-<div class="line"><span class="lineno">  119</span> </div>
-<div class="line"><span class="lineno">  120</span>    shader-&gt;SetUniformi(<span class="stringliteral">&quot;_DuDvMap&quot;</span>, 8);</div>
+<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00103">103</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  104</span>{</div>
+<div class="line"><span class="lineno">  105</span>    shader-&gt;Bind();</div>
+<div class="line"><span class="lineno">  106</span>    shader-&gt;SetTime(&amp;time);</div>
+<div class="line"><span class="lineno">  107</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaAlpha&quot;</span>, alpha);</div>
+<div class="line"><span class="lineno">  108</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaDistScale&quot;</span>, distrotionScale);</div>
+<div class="line"><span class="lineno">  109</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaDistStrength&quot;</span>, distrotionStrength);</div>
+<div class="line"><span class="lineno">  110</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaReflectivity&quot;</span>, reflectivity);</div>
+<div class="line"><span class="lineno">  111</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaLevel&quot;</span>, level);</div>
+<div class="line"><span class="lineno">  112</span>    shader-&gt;SetUniformf(<span class="stringliteral">&quot;_SeaWaveSpeed&quot;</span>, waveSpeed);</div>
+<div class="line"><span class="lineno">  113</span>    glActiveTexture(7);</div>
+<div class="line"><span class="lineno">  114</span>    glBindTexture(GL_TEXTURE_2D, (GLuint)reflectionTexture);</div>
+<div class="line"><span class="lineno">  115</span>    shader-&gt;SetUniformi(<span class="stringliteral">&quot;_ReflectionTexture&quot;</span>, 7);</div>
+<div class="line"><span class="lineno">  116</span> </div>
+<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">if</span> (dudvMap)</div>
+<div class="line"><span class="lineno">  118</span>    {</div>
+<div class="line"><span class="lineno">  119</span>        dudvMap-&gt;Bind(8);</div>
+<div class="line"><span class="lineno">  120</span>    }</div>
 <div class="line"><span class="lineno">  121</span> </div>
-<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">if</span> (normalMap)</div>
-<div class="line"><span class="lineno">  123</span>    {</div>
-<div class="line"><span class="lineno">  124</span>        normalMap-&gt;Bind(9);</div>
-<div class="line"><span class="lineno">  125</span>    }</div>
-<div class="line"><span class="lineno">  126</span> </div>
-<div class="line"><span class="lineno">  127</span>    shader-&gt;SetUniformi(<span class="stringliteral">&quot;_NormalMap&quot;</span>, 9);</div>
-<div class="line"><span class="lineno">  128</span>    model-&gt;position.y = level;</div>
-<div class="line"><span class="lineno">  129</span>    model-&gt;scale.x = scale;</div>
-<div class="line"><span class="lineno">  130</span>    model-&gt;scale.z = scale;</div>
-<div class="line"><span class="lineno">  131</span>    model-&gt;Update();</div>
-<div class="line"><span class="lineno">  132</span>    shader-&gt;SetUniform3f(<span class="stringliteral">&quot;_SeaColor&quot;</span>, color);</div>
-<div class="line"><span class="lineno">  133</span>    glm::mat4 mpv = camera.pv * model-&gt;modelMatrix;</div>
-<div class="line"><span class="lineno">  134</span>    shader-&gt;SetMPV(mpv);</div>
-<div class="line"><span class="lineno">  135</span>    shader-&gt;SetLightCol(lights-&gt;color);</div>
-<div class="line"><span class="lineno">  136</span>    shader-&gt;SetLightPos(lights-&gt;position);</div>
-<div class="line"><span class="lineno">  137</span>    model-&gt;Render();</div>
-<div class="line"><span class="lineno">  138</span>}</div>
+<div class="line"><span class="lineno">  122</span>    shader-&gt;SetUniformi(<span class="stringliteral">&quot;_DuDvMap&quot;</span>, 8);</div>
+<div class="line"><span class="lineno">  123</span> </div>
+<div class="line"><span class="lineno">  124</span>    <span class="keywordflow">if</span> (normalMap)</div>
+<div class="line"><span class="lineno">  125</span>    {</div>
+<div class="line"><span class="lineno">  126</span>        normalMap-&gt;Bind(9);</div>
+<div class="line"><span class="lineno">  127</span>    }</div>
+<div class="line"><span class="lineno">  128</span> </div>
+<div class="line"><span class="lineno">  129</span>    shader-&gt;SetUniformi(<span class="stringliteral">&quot;_NormalMap&quot;</span>, 9);</div>
+<div class="line"><span class="lineno">  130</span>    model-&gt;position.y = level;</div>
+<div class="line"><span class="lineno">  131</span>    model-&gt;scale.x = scale;</div>
+<div class="line"><span class="lineno">  132</span>    model-&gt;scale.z = scale;</div>
+<div class="line"><span class="lineno">  133</span>    model-&gt;Update();</div>
+<div class="line"><span class="lineno">  134</span>    shader-&gt;SetUniform3f(<span class="stringliteral">&quot;_SeaColor&quot;</span>, color);</div>
+<div class="line"><span class="lineno">  135</span>    glm::mat4 mpv = camera.pv * model-&gt;modelMatrix;</div>
+<div class="line"><span class="lineno">  136</span>    shader-&gt;SetMPV(mpv);</div>
+<div class="line"><span class="lineno">  137</span>    shader-&gt;SetLightCol(lights-&gt;color);</div>
+<div class="line"><span class="lineno">  138</span>    shader-&gt;SetLightPos(lights-&gt;position);</div>
+<div class="line"><span class="lineno">  139</span>    model-&gt;Render();</div>
+<div class="line"><span class="lineno">  140</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

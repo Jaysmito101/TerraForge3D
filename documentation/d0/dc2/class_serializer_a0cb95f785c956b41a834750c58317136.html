@@ -121,25 +121,25 @@ $(document).ready(function(){initNavTree('d0/dc2/class_serializer_a0cb95f785c956
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00122">122</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  123</span>{</div>
-<div class="line"><span class="lineno">  124</span>    <span class="keywordflow">if</span> (path.find(<span class="stringliteral">&quot;.terr3dpack&quot;</span>) == std::string::npos)</div>
-<div class="line"><span class="lineno">  125</span>    {</div>
-<div class="line"><span class="lineno">  126</span>        path = path + <span class="stringliteral">&quot;.terr3dpack&quot;</span>;</div>
-<div class="line"><span class="lineno">  127</span>    }</div>
-<div class="line"><span class="lineno">  128</span> </div>
-<div class="line"><span class="lineno">  129</span>    Serialize();</div>
-<div class="line"><span class="lineno">  130</span>    std::ofstream outfile;</div>
-<div class="line"><span class="lineno">  131</span>    outfile.open(GetProjectResourcePath() + <span class="stringliteral">&quot;\\project.terr3d&quot;</span>);</div>
-<div class="line"><span class="lineno">  132</span>    outfile &lt;&lt; data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  133</span>    outfile.close();</div>
-<div class="line"><span class="lineno">  134</span>    MkDir(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\temp&quot;</span>);</div>
-<div class="line"><span class="lineno">  135</span>    std::string uid = GenerateId(64);</div>
-<div class="line"><span class="lineno">  136</span>    SaveFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\temp\\&quot;</span> + uid);</div>
-<div class="line"><span class="lineno">  137</span>    zip_t *packed = zip_open(path.c_str(), 9, <span class="charliteral">&#39;w&#39;</span>);</div>
-<div class="line"><span class="lineno">  138</span>    zip_walk(packed, GetProjectResourcePath().c_str());</div>
-<div class="line"><span class="lineno">  139</span>    zip_close(packed);</div>
-<div class="line"><span class="lineno">  140</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00123">123</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  124</span>{</div>
+<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">if</span> (path.find(<span class="stringliteral">&quot;.terr3dpack&quot;</span>) == std::string::npos)</div>
+<div class="line"><span class="lineno">  126</span>    {</div>
+<div class="line"><span class="lineno">  127</span>        path = path + <span class="stringliteral">&quot;.terr3dpack&quot;</span>;</div>
+<div class="line"><span class="lineno">  128</span>    }</div>
+<div class="line"><span class="lineno">  129</span> </div>
+<div class="line"><span class="lineno">  130</span>    Serialize();</div>
+<div class="line"><span class="lineno">  131</span>    std::ofstream outfile;</div>
+<div class="line"><span class="lineno">  132</span>    outfile.open(appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\project.terr3d&quot;</span>);</div>
+<div class="line"><span class="lineno">  133</span>    outfile &lt;&lt; data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  134</span>    outfile.close();</div>
+<div class="line"><span class="lineno">  135</span>    MkDir(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\temp&quot;</span>);</div>
+<div class="line"><span class="lineno">  136</span>    std::string uid = GenerateId(64);</div>
+<div class="line"><span class="lineno">  137</span>    SaveFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\temp\\&quot;</span> + uid);</div>
+<div class="line"><span class="lineno">  138</span>    zip_t *packed = zip_open(path.c_str(), 9, <span class="charliteral">&#39;w&#39;</span>);</div>
+<div class="line"><span class="lineno">  139</span>    zip_walk(packed, appState-&gt;projectManager-&gt;GetResourcePath().c_str());</div>
+<div class="line"><span class="lineno">  140</span>    zip_close(packed);</div>
+<div class="line"><span class="lineno">  141</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4_html_a476756fb08e7f2416aad116d137977f4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">nlohmann::basic_json::dump</a></div><div class="ttdeci">string_t dump(const int indent=-1, const char indent_char=' ', const bool ensure_ascii=false, const error_handler_t error_handler=error_handler_t::strict) const</div><div class="ttdoc">serialization</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l20117">json.hpp:20117</a></div></div>
 </div><!-- fragment -->
 </div>
