@@ -28,7 +28,7 @@
 //SAF_Handle.cpp line:458 old line:INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
 #ifdef __linux__
 //  INFILE = _open(infilename, _O_RDONLY);
-#elif
+#else
 //  INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
 #endif
 
