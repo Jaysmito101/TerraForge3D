@@ -12,7 +12,9 @@
 
 #include <stb/stb_image.h>
 #include "stb/stb_image_write.h"
+#ifdef TERR3D_WIN32
 #undef __cplusplus // Temporary
+#endif
 #include <assimp/scene.h>
 #include <assimp/Exporter.hpp>
 
@@ -60,7 +62,8 @@ void ExportModelAssimp(Model *model, std::string format, std::string path, std::
 		glm::vec4 &v = model->mesh->vert[i].position;
 		glm::vec2 &t = model->mesh->vert[i].texCoord;
 		pMesh->mVertices[i] = aiVector3D(v.x, v.y, v.z);
-		pMesh->mTextureCoords[0][i] = aiVector3D(t.x, t.y, 0);
+		float temp = 0;
+		pMesh->mTextureCoords[0][i] = aiVector3D(t.x, t.y, temp);
 	}
 
 	pMesh->mFaces = new aiFace[model->mesh->indexCount / 3];

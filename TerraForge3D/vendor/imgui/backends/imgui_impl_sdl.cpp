@@ -21,6 +21,7 @@
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
 //  2022-XX-XX: Platform: Added support for multiple windows via the ImGuiPlatformIO interface.
+//  2022-02-04: Added SDL_Renderer* parameter to ImGui_ImplSDL2_InitForSDLRenderer(), so we can use SDL_GetRendererOutputSize() instead of SDL_GL_GetDrawableSize() when bound to a SDL_Renderer.
 //  2022-01-26: Inputs: replaced short-lived io.AddKeyModsEvent() (added two weeks ago)with io.AddKeyEvent() using ImGuiKey_ModXXX flags. Sorry for the confusion.
 //  2021-01-20: Inputs: calling new io.AddKeyAnalogEvent() for gamepad support, instead of writing directly to io.NavInputs[].
 //  2022-01-17: Inputs: calling new io.AddMousePosEvent(), io.AddMouseButtonEvent(), io.AddMouseWheelEvent() API (1.87+).
@@ -89,14 +90,16 @@ static const Uint32 SDL_WINDOW_VULKAN = 0x10000000;
 // SDL Data
 struct ImGui_ImplSDL2_Data
 {
-    SDL_Window* Window;
-    Uint64      Time;
-    Uint32      MouseWindowID;
-    int         MouseButtonsDown;
-    SDL_Cursor* MouseCursors[ImGuiMouseCursor_COUNT];
-    char*       ClipboardTextData;
-    bool        MouseCanUseGlobalState;
-    bool        UseVulkan;
+    SDL_Window*     Window;
+    SDL_Renderer*   Renderer;
+    Uint64          Time;
+    Uint32          MouseWindowID;
+    int             MouseButtonsDown;
+    SDL_Cursor*     MouseCursors[ImGuiMouseCursor_COUNT];
+    int             PendingMouseLeaveFrame;
+    char*           ClipboardTextData;
+    bool            MouseCanUseGlobalState;
+    bool            UseVulkan;
 
     ImGui_ImplSDL2_Data()   { memset(this, 0, sizeof(*this)); }
 };
@@ -313,16 +316,19 @@ bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event)
         }
         case SDL_WINDOWEVENT:
         {
-            // When capturing mouse, SDL will send a bunch of conflicting LEAVE/ENTER event on every mouse move, but the final ENTER tends to be right.
-            // However we won't get a correct LEAVE event for a captured window.
+            // - When capturing mouse, SDL will send a bunch of conflicting LEAVE/ENTER event on every mouse move, but the final ENTER tends to be right.
+            // - However we won't get a correct LEAVE event for a captured window.
+            // - In some cases, when detaching a window from main viewport SDL may send SDL_WINDOWEVENT_ENTER one frame too late,
+            //   causing SDL_WINDOWEVENT_LEAVE on previous frame to interrupt drag operation by clear mouse position. This is why
+            //   we delay process the SDL_WINDOWEVENT_LEAVE events by one frame. See issue #5012 for details.
             Uint8 window_event = event->window.event;
             if (window_event == SDL_WINDOWEVENT_ENTER)
-                bd->MouseWindowID = event->window.windowID;
-            if (window_event == SDL_WINDOWEVENT_LEAVE)
             {
-                bd->MouseWindowID = 0;
-                io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+                bd->MouseWindowID = event->window.windowID;
+                bd->PendingMouseLeaveFrame = 0;
             }
+            if (window_event == SDL_WINDOWEVENT_LEAVE)
+                bd->PendingMouseLeaveFrame = ImGui::GetFrameCount() + 1;
             if (window_event == SDL_WINDOWEVENT_FOCUS_GAINED)
                 io.AddFocusEvent(true);
             else if (window_event == SDL_WINDOWEVENT_FOCUS_LOST)
@@ -344,7 +350,7 @@ bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event)
     return false;
 }
 
-static bool ImGui_ImplSDL2_Init(SDL_Window* window, void* sdl_gl_context)
+static bool ImGui_ImplSDL2_Init(SDL_Window* window, SDL_Renderer* renderer, void* sdl_gl_context)
 {
     ImGuiIO& io = ImGui::GetIO();
     IM_ASSERT(io.BackendPlatformUserData == NULL && "Already initialized a platform backend!");
@@ -370,12 +376,13 @@ static bool ImGui_ImplSDL2_Init(SDL_Window* window, void* sdl_gl_context)
         io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;  // We can create multi-viewports on the Platform side (optional)
 
     // SDL on Linux/OSX doesn't report events for unfocused windows (see https://github.com/ocornut/imgui/issues/4960)
-#ifdef _WIN32
+#ifndef __APPLE__
     if (mouse_can_use_global_state)
         io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport;// We can call io.AddMouseViewportEvent() with correct data (optional)
 #endif
 
     bd->Window = window;
+    bd->Renderer = renderer;
     bd->MouseCanUseGlobalState = mouse_can_use_global_state;
 
     io.SetClipboardTextFn = ImGui_ImplSDL2_SetClipboardText;
@@ -426,7 +433,7 @@ static bool ImGui_ImplSDL2_Init(SDL_Window* window, void* sdl_gl_context)
 
 bool ImGui_ImplSDL2_InitForOpenGL(SDL_Window* window, void* sdl_gl_context)
 {
-    return ImGui_ImplSDL2_Init(window, sdl_gl_context);
+    return ImGui_ImplSDL2_Init(window, NULL, sdl_gl_context);
 }
 
 bool ImGui_ImplSDL2_InitForVulkan(SDL_Window* window)
@@ -434,7 +441,7 @@ bool ImGui_ImplSDL2_InitForVulkan(SDL_Window* window)
 #if !SDL_HAS_VULKAN
     IM_ASSERT(0 && "Unsupported");
 #endif
-    if (!ImGui_ImplSDL2_Init(window, NULL))
+    if (!ImGui_ImplSDL2_Init(window, NULL, NULL))
         return false;
     ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
     bd->UseVulkan = true;
@@ -446,17 +453,17 @@ bool ImGui_ImplSDL2_InitForD3D(SDL_Window* window)
 #if !defined(_WIN32)
     IM_ASSERT(0 && "Unsupported");
 #endif
-    return ImGui_ImplSDL2_Init(window, NULL);
+    return ImGui_ImplSDL2_Init(window, NULL, NULL);
 }
 
 bool ImGui_ImplSDL2_InitForMetal(SDL_Window* window)
 {
-    return ImGui_ImplSDL2_Init(window, NULL);
+    return ImGui_ImplSDL2_Init(window, NULL, NULL);
 }
 
-bool ImGui_ImplSDL2_InitForSDLRenderer(SDL_Window* window)
+bool ImGui_ImplSDL2_InitForSDLRenderer(SDL_Window* window, SDL_Renderer* renderer)
 {
-    return ImGui_ImplSDL2_Init(window, NULL);
+    return ImGui_ImplSDL2_Init(window, renderer, NULL);
 }
 
 void ImGui_ImplSDL2_Shutdown()
@@ -648,7 +655,10 @@ void ImGui_ImplSDL2_NewFrame()
     SDL_GetWindowSize(bd->Window, &w, &h);
     if (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_MINIMIZED)
         w = h = 0;
-    SDL_GL_GetDrawableSize(bd->Window, &display_w, &display_h);
+    if (bd->Renderer != NULL)
+        SDL_GetRendererOutputSize(bd->Renderer, &display_w, &display_h);
+    else
+        SDL_GL_GetDrawableSize(bd->Window, &display_w, &display_h);
     io.DisplaySize = ImVec2((float)w, (float)h);
     if (w > 0 && h > 0)
         io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
@@ -658,6 +668,12 @@ void ImGui_ImplSDL2_NewFrame()
     Uint64 current_time = SDL_GetPerformanceCounter();
     io.DeltaTime = bd->Time > 0 ? (float)((double)(current_time - bd->Time) / frequency) : (float)(1.0f / 60.0f);
     bd->Time = current_time;
+
+    if (bd->PendingMouseLeaveFrame && bd->PendingMouseLeaveFrame == ImGui::GetFrameCount())
+    {
+        bd->MouseWindowID = 0;
+        io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+    }
 
     ImGui_ImplSDL2_UpdateMouseData();
     ImGui_ImplSDL2_UpdateMouseCursor();

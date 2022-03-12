@@ -7,11 +7,32 @@
 #include <Utils.h>
 #include <fstream>
 #include <iostream>
-#include  <io.h>
 #include <sys/stat.h>
-#include  <stdio.h>
-#include  <stdlib.h>
-#include "glfw/glfw3.h"
+#include  <cstdio>
+#include  <cstdlib>
+#ifdef _WIN32
+    #include <io.h>
+#elif __linux__
+    #include <inttypes.h>
+    #include <unistd.h>
+    #define __int64 int64_t
+    #define _close close
+    #define _read read
+    #define _lseek64 lseek64
+    #define _O_RDONLY O_RDONLY
+    #define _open open
+    #define _lseeki64 lseek64
+    #define _lseek lseek
+    #define stricmp strcasecmp
+#endif
+//SAF_Handle.cpp line:458 old line:INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
+#ifdef __linux__
+//  INFILE = _open(infilename, _O_RDONLY);
+#elif
+//  INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
+#endif
+
+#include "GLFW/glfw3.h"
 #include "Application.h"
 #include "Data/ProjectData.h"
 
@@ -113,7 +134,7 @@ std::string ShowSaveFileDialog(std::string ext)
 	FILE *f = popen("zenity --file-selection --save", "r");
 	fgets(filename, PATH_MAX, f);
 	pclose(f);
-	return std::steing(fileName);
+	return std::string(filename);
 #endif
 }
 
@@ -178,7 +199,7 @@ std::string ShowOpenFileDialog(std::string ext)
 	FILE *f = popen("zenity --file-selection", "r");
 	fgets(filename, PATH_MAX, f);
 	pclose(f);
-	return std::steing(fileName);
+	return std::string(filename);
 #endif
 }
 
@@ -265,6 +286,7 @@ char *UChar2Char(unsigned char *data, int length)
 
 bool FileExists(std::string path, bool writeAccess)
 {
+#ifdef TERR3D_WIN32
 	if ((_access(path.c_str(), 0)) != -1)
 	{
 		if (!writeAccess)
@@ -277,8 +299,11 @@ bool FileExists(std::string path, bool writeAccess)
 			return true;
 		}
 	}
-
 	return false;
+#else
+	struct stat buffer;   
+  	return (stat (path.c_str(), &buffer) == 0); 
+#endif
 }
 
 bool PathExist(const std::string &s)
@@ -495,10 +520,10 @@ void CopyFileData(std::string source, std::string destination)
 #ifdef TERR3D_WIN32
 	CopyFileW(CString(source.c_str()), CString(destination.c_str()), false);
 #else
-	int srcsize = get_file_size(source.c_str());
+	int srcsize = get_file_size(source.data());
 	char *data = (char *)malloc(srcsize);
-	int fsource = open(source.c_str(), O_RDONLY | O_BINARY);
-	int fdest = open(destination.c_str(), O_WRONLY | O_CREAT | O_BINARY, 0777);
+	int fsource = open(source.c_str(), O_RDONLY);
+	int fdest = open(destination.c_str(), O_WRONLY | O_CREAT , 0777);
 	read(fsource, data, srcsize);
 	write(fdest, data, srcsize);
 	close(fsource);
@@ -557,7 +582,7 @@ void ToggleSystemConsole()
 #ifdef TERR3D_WIN32
 	ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);
 #else
-	std::cout << "Toogle Console Not Supported on Linux!" < std::endl;
+	std::cout << "Toogle Console Not Supported on Linux!" << std::endl;
 #endif
 }
 

@@ -59,7 +59,7 @@ NodeOutput CurveNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 void CurveNode::Load(nlohmann::json data)
 {
 	maxPoints = data["maxPoints"];
-	ReserveVector(curve, (maxPoints > data["curveSize"] ? maxPoints : data["curveSize"]));
+	ReserveVector(curve, (maxPoints > data["curveSize"].get<int>() ? maxPoints : data["curveSize"].get<int>()));
 
 	for (nlohmann::json tmp : data["curve"])
 	{

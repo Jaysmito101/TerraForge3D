@@ -1,3 +1,5 @@
+#define JSON_NOEXCEPTION
+
 #include "Misc/SupportersTribute.h"
 
 #include "Base/Texture2D.h"
@@ -66,6 +68,10 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
 
 SupportersTribute::SupportersTribute()
 {
+	// Temporary for running on linux
+	#ifndef TERR3D_WIN32
+	return;
+	#endif
 	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache") || rand() % 5 == 0))
 	{
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");

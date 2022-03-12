@@ -1,7 +1,7 @@
 #include "Base/NodeEditor/NodeEditor.h"
 #include "Base/ImGuiShapes.h"
 #include "Base/UIFontManager.h"
-#include "glfw/glfw3.h"
+#include "GLFW/glfw3.h"
 #include "Application.h"
 
 static int uidSeed = 1;
@@ -573,8 +573,10 @@ void NodeEditor::DeleteNode(NodeEditorNode *node)
 
 	if (nodes.find(node->_id.Get()) != nodes.end())
 	{
+		#ifdef TERR3D_WIN32
 		using namespace std::chrono_literals; // This Line is temporary
 		std::this_thread::sleep_for(500ms); // This Line is temporary
+		#endif
 		node->OnDelete();
 		std::vector<NodeEditorPin *> mPins = node->GetPins();
 

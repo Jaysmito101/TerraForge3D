@@ -6,7 +6,12 @@
 #include "Data/ApplicationState.h"
 #include "Misc/AppStyles.h"
 
+#ifdef TERR3D_WIN32
 #include "dirent/dirent.h"
+#else
+#include "sys/stat.h"
+#include "dirent.h"
+#endif
 #include "zip.h"
 
 #include <fstream>

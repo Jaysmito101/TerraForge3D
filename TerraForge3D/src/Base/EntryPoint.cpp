@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
 		if (argc == 2)
 		{
-			argc = std::string(argv[1]);
+			args = std::string(argv[1]);
 		}
 
 		app->OnStart(args);

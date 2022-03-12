@@ -1,6 +1,8 @@
 #include "TextureCubemap.h"
 
 #include <iostream>
+#include <cstdlib>
+#include <cstring>
 #include <stb/stb_image.h>
 #include <glad/glad.h>
 

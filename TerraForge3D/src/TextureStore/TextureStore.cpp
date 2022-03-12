@@ -1,11 +1,13 @@
-#include "TExtureStore/TextureStore.h"
+#include "TextureStore/TextureStore.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <filesystem>
 
+#ifdef TERR3D_WIN32
 inline char *strcasestr(const char *str, const char *pattern)
 {
 	size_t i;
@@ -36,7 +38,7 @@ inline char *strcasestr(const char *str, const char *pattern)
 
 	return NULL;
 }
-
+#endif
 
 
 nlohmann::json TextureStore::LoadTextureDatabaseJ()

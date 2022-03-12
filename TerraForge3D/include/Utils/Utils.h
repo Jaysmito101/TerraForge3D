@@ -5,6 +5,7 @@
 #include "Base/Base.h"
 
 #include <string>
+#include <cstring>
 
 class ProjectManager;
 
@@ -21,7 +22,7 @@ struct Hash
 	{
 		length = l;
 		data = new unsigned char[length];
-		memcpy_s(data, length, d, l);
+		std::memcpy(data, d, length);
 	}
 
 	~Hash()

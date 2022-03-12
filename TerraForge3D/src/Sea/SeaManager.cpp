@@ -5,6 +5,8 @@
 #include "Data/ProjectData.h"
 #include "Data/ApplicationState.h"
 
+#include <cstdint>
+
 SeaManager::SeaManager(ApplicationState *as)
 {
 	appState = as;
@@ -111,7 +113,7 @@ void SeaManager::Render(Camera &camera, LightManager *lights, void *reflectionTe
 	shader->SetUniformf("_SeaLevel", level);
 	shader->SetUniformf("_SeaWaveSpeed", waveSpeed);
 	glActiveTexture(7);
-	glBindTexture(GL_TEXTURE_2D, (GLuint)reflectionTexture);
+	glBindTexture(GL_TEXTURE_2D, (GLuint)((uintptr_t)reflectionTexture));
 	shader->SetUniformi("_ReflectionTexture", 7);
 
 	if (dudvMap)

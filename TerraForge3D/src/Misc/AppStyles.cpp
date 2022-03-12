@@ -10,7 +10,7 @@
 #include <string>
 #include <stdlib.h>
 #include <fstream>
-#include <Windows.h>
+
 #include <iostream>
 
 #define MAX(A, B)            (((A) >= (B)) ? (A) : (B))

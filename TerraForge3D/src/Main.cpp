@@ -2,16 +2,19 @@
 
 #include <Misc/ExplorerControls.h>
 
+#include "Platform.h"
 
 
 
 // TerraForge3D Base
 
-
-#define GLFW_EXPOSE_NATIVE_WIN32 // For Windows
 #include <glad/glad.h>
+
+#ifdef TERR3D_WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32 // For Windows
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#endif
 
 #include "Base/Base.h"
 #include "Base/EntryPoint.h"
@@ -38,7 +41,12 @@
 #include "json/json.hpp"
 #include <zip.h>
 #include <sys/stat.h>
+
+#ifdef TERR3D_WIN32
 #include <dirent/dirent.h>
+#else
+#include <dirent.h>
+#endif
 
 
 
@@ -109,20 +117,20 @@ static void ResetShader()
 
 	if (!appState->shaders.wireframe)
 	{
-		appState->shaders.wireframe = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\vert.glsl", &res),
-		        ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\frag.glsl", &res),
-		        ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\geom.glsl", &res));
+		appState->shaders.wireframe = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "vert.glsl", &res),
+		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "frag.glsl", &res),
+		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "geom.glsl", &res));
 	}
 
-	appState->shaders.textureBake = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\texture_bake\\vert.glsl", &res),
-	        ReadShaderSourceFile(appState->constants.shadersDir + "\\texture_bake\\frag.glsl", &res),
-	        ReadShaderSourceFile(appState->constants.shadersDir + "\\texture_bake\\geom.glsl", &res));
-	appState->shaders.terrain = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\vert.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\frag.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + "\\default\\geom.glsl", &res));
-	appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\vert.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\frag.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\geom.glsl", &res));
+	appState->shaders.textureBake = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "vert.glsl", &res),
+	        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "frag.glsl", &res),
+	        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "geom.glsl", &res));
+	appState->shaders.terrain = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "vert.glsl", &res),
+	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "frag.glsl", &res),
+	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "geom.glsl", &res));
+	appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "foliage" PATH_SEPERATOR "vert.glsl", &res),
+	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "foliage" PATH_SEPERATOR "frag.glsl", &res),
+	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "foliage" PATH_SEPERATOR "geom.glsl", &res));
 }
 
 static void RegenerateMesh()
@@ -318,12 +326,12 @@ static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
 static void ShowChooseBaseModelPopup()
 {
 	// TEMP
-	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\plane.png", false, false);
-	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\sphere.png", false, false);
-	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\cube.png", false, false);
-	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\cone.png", false, false);
-	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\cylinder.png", false, false);
-	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(appState->constants.texturesDir + "\\ui_thumbs\\torus.png", false, false);
+	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPERATOR "ui_thumbs" PATH_SEPERATOR "plane.png", false, false);
+	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPERATOR "ui_thumbs" PATH_SEPERATOR "sphere.png", false, false);
+	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPERATOR "ui_thumbs" PATH_SEPERATOR "cube.png", false, false);
+	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPERATOR "ui_thumbs" PATH_SEPERATOR "cone.png", false, false);
+	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPERATOR "ui_thumbs" PATH_SEPERATOR "cylinder.png", false, false);
+	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPERATOR "ui_thumbs" PATH_SEPERATOR "torus.png", false, false);
 	// TEMP
 
 	if (ImGui::BeginPopup("Choose Base Model"))
@@ -356,7 +364,7 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)sphere->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + "\\sphere.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "sphere.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -364,13 +372,13 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)cube->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + "\\cube.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "cube.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
 		if (ImGui::ImageButton((ImTextureID)torus->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + "\\torus.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "torus.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -378,7 +386,7 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)cone->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + "\\cone.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "cone.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -386,7 +394,7 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)cyllinder->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + "\\cylinder.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "cylinder.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -769,11 +777,11 @@ public:
 	virtual void OnPreload() override
 	{
 		SetTitle("TerraForge3D - Jaysmito Mukherjee");
-		MkDir(GetExecutableDir() + "\\Data\\logs");
-		SetLogsDir(GetExecutableDir() + "\\Data\\logs");
-		SetWindowConfigPath(GetExecutableDir() + "\\Data\\configs\\windowconfigs.terr3d");
-		MkDir(GetExecutableDir() + "\\Data\\cache\\autosave\"");
-		MkDir(GetExecutableDir() + "\\Data\\temp\"");
+		MkDir(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "logs");
+		SetLogsDir(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "logs");
+		SetWindowConfigPath(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "configs" PATH_SEPERATOR "windowconfigs.terr3d");
+		MkDir(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "cache" PATH_SEPERATOR "autosave\"");
+		MkDir(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "temp\"");
 	}
 
 	virtual void OnUpdate(float deltatime) override
@@ -944,7 +952,7 @@ public:
 		{
 			if (appState->states.autoSave)
 			{
-				SaveFile(appState->constants.cacheDir + "\\autosave\\autosave.terr3d");
+				SaveFile(appState->constants.cacheDir + PATH_SEPERATOR "autosave" PATH_SEPERATOR "autosave.terr3d");
 
 				if (appState->globals.currentOpenFilePath.size() > 3)
 				{
@@ -1076,7 +1084,7 @@ public:
 			io.MouseWheel = (float)y;
 		});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		appState->globals.kernelsIncludeDir = "\"" + appState->constants.kernelsDir + "\"";
+		appState->globals.kernelsIncludeDir = "\""+ appState->constants.kernelsDir + "\"";
 		appState->modules.manager = new ModuleManager();
 		appState->meshGenerator = new MeshGeneratorManager(appState);
 		appState->mainMenu = new MainMenu(appState);
@@ -1108,9 +1116,9 @@ public:
 		appState->filtersManager = new FiltersManager(appState);
 		float t = 1.0f;
 		// Load Fonts
-		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + "\\OpenSans-Regular.ttf");
-		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + "\\OpenSans-Bold.ttf");
-		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + "\\OpenSans-Bold.ttf");
+		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + PATH_SEPERATOR "OpenSans-Regular.ttf");
+		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + PATH_SEPERATOR "OpenSans-Bold.ttf");
+		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + PATH_SEPERATOR "OpenSans-Bold.ttf");
 		// The framebuffer used for reflections in the sea
 		appState->frameBuffers.reflection = new FrameBuffer();
 		// This is the framebuffer for previewing the texture to export
@@ -1120,24 +1128,24 @@ public:
 		// The Framebuffer used for post processing
 		appState->frameBuffers.postProcess = new FrameBuffer(1280, 720);
 		bool tpp = false;
-		appState->shaders.postProcess = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\post_processing\\vert.glsl", &tpp),
-		        ReadShaderSourceFile(appState->constants.shadersDir + "\\post_processing\\frag.glsl", &tpp));
+		appState->shaders.postProcess = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "post_processing" PATH_SEPERATOR "vert.glsl", &tpp),
+		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "post_processing" PATH_SEPERATOR "frag.glsl", &tpp));
 		appState->states.autoUpdate = true;
 
 		if(IsNetWorkConnected())
 		{
-			if(FileExists(appState->constants.configsDir + "\\server.terr3d"))
+			if(FileExists(appState->constants.configsDir + PATH_SEPERATOR "server.terr3d"))
 			{
 				bool ttmp = false;
-				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + "\\server.terr3d", &ttmp);
+				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + PATH_SEPERATOR "server.terr3d", &ttmp);
 				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
 			}
 
 			else
 			{
-				DownloadFile("https://terraforge3d.maxalpha.repl.co", "/register", appState->constants.configsDir + "\\server.terr3d");
+				DownloadFile("https://terraforge3d.maxalpha.repl.co", "/register", appState->constants.configsDir + PATH_SEPERATOR "server.terr3d");
 				bool ttmp = false;
-				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + "\\server.terr3d", &ttmp);
+				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + PATH_SEPERATOR "server.terr3d", &ttmp);
 				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
 			}
 		}

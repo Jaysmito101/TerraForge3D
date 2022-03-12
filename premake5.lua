@@ -71,6 +71,7 @@ project "TerraForge3DLib"
 		"./TerraForge3D/include/Utils",
 		"./TerraForge3D/include/Base",
 		"./TerraForge3D/vendor",
+		"./TerraForge3D/vendor/openssl",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
@@ -85,7 +86,7 @@ project "TerraForge3DLib"
 	}
 
 	libdirs {
-		"./libs/x64"
+		"./libs/win32/x64"
 	}
 
 	links {
@@ -112,6 +113,11 @@ project "TerraForge3DLib"
 		"./TerraForge3D/src/Main.cpp",
 		"./TerraForge3D/src/Base/EntryPoint.cpp"
 	}
+	
+	filter "system:not windows"
+		defines {
+			"NULL=0"
+		}
 
 	filter "system:windows"
 		staticruntime "On"
@@ -127,8 +133,7 @@ project "TerraForge3DLib"
 		defines "TERR3D_DEBUG"
 		symbols "on"
 
-		links
-		{
+		links {
 			"libcryptoMTd.lib",
 			"libsslMTd.lib"
 		}
@@ -144,8 +149,7 @@ project "TerraForge3DLib"
 		}
 	
 
-		links
-		{
+		links {
 			"libcryptoMT.lib",
 			"libsslMT.lib"
 		}
@@ -167,14 +171,15 @@ project "TerraForge3D"
 
 	files {
 		"./TerraForge3D/src/Main.cpp",
-		"./TerraForge3D/src/Base/EntryPoint.cpp",
-		"./TerraForge3D/src/TerraForge3D.rc"
+		"./TerraForge3D/src/Base/EntryPoint.cpp"
 	}
+
 
 	includedirs {
 		"./TerraForge3D/vendor/assimp/include",
 		"./TerraForge3D/include",
 		"./TerraForge3D/vendor",
+		"./TerraForge3D/openssl",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
@@ -189,6 +194,7 @@ project "TerraForge3D"
 	links {
 		"TerraForge3DLib"
 	}
+		
 
 	postbuildcommands  {
 		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
@@ -205,9 +211,43 @@ project "TerraForge3D"
 			"_CRT_SECURE_NO_WARNINGS"
 		}
 
+		files {
+			"./TerraForge3D/src/TerraForge3D.rc"
+		}
+
+	filter "system:not windows"
+		defines {
+			"NULL=0" 
+		}
+
+		libdirs	{
+			"./libs/linux"
+		}
+
+		links {
+			"GLFW",
+			"GL",
+			"OpenCL",
+			"libssl",
+			"libcrypto",
+			"Glad",
+			"Zip",
+			"ImGui",
+			"ImNodes",
+			"ImPlot",
+			"ImGuiNodeEditor",
+			"ImColorTextEdit",
+			"Lua",
+			"MuParser",
+			"Assimp",
+			"dl",
+			"pthread"
+		}
+
 	filter "configurations:Debug"
 		defines "TERR3D_DEBUG"
 		symbols "on"
+
 
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
@@ -220,4 +260,5 @@ project "TerraForge3D"
 		}
 	
 
-include "Tools/ModuleMaker"
+filter "system:windows"
+	include "Tools/ModuleMaker"
