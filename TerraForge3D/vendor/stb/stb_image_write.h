@@ -158,6 +158,8 @@ LICENSE
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef TERR3D_WIN32
+
 inline int sprintf_s(char* buffer, size_t sizeOfBuffer, const char* format, ...)
 {
     va_list ap;
@@ -176,6 +178,8 @@ inline int sprintf_s(char (&buffer)[sizeOfBuffer], const char* format, ...)
     va_end(ap);
     return result;
 }
+
+#endif
 
 
 // if STB_IMAGE_WRITE_STATIC causes problems, try defining STBIWDEF to 'inline' or 'static inline'
