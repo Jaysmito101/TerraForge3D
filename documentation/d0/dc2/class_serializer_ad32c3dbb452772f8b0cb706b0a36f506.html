@@ -121,32 +121,32 @@ $(document).ready(function(){initNavTree('d0/dc2/class_serializer_ad32c3dbb45277
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00199">199</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  200</span>{</div>
-<div class="line"><span class="lineno">  201</span>    <span class="keywordflow">if</span> (path.size() &lt;= 3)</div>
-<div class="line"><span class="lineno">  202</span>    {</div>
-<div class="line"><span class="lineno">  203</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  204</span>    }</div>
-<div class="line"><span class="lineno">  205</span> </div>
-<div class="line"><span class="lineno">  206</span>    <span class="keywordflow">if</span> (path.find(<span class="stringliteral">&quot;.terr3d&quot;</span>) == std::string::npos)</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00204">204</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  205</span>{</div>
+<div class="line"><span class="lineno">  206</span>    <span class="keywordflow">if</span> (path.size() &lt;= 3)</div>
 <div class="line"><span class="lineno">  207</span>    {</div>
-<div class="line"><span class="lineno">  208</span>        path = path + <span class="stringliteral">&quot;.terr3d&quot;</span>;</div>
+<div class="line"><span class="lineno">  208</span>        <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  209</span>    }</div>
 <div class="line"><span class="lineno">  210</span> </div>
-<div class="line"><span class="lineno">  211</span>    <span class="keywordflow">if</span> (path != appState-&gt;globals.currentOpenFilePath)</div>
+<div class="line"><span class="lineno">  211</span>    <span class="keywordflow">if</span> (path.find(<span class="stringliteral">&quot;.terr3d&quot;</span>) == std::string::npos)</div>
 <div class="line"><span class="lineno">  212</span>    {</div>
-<div class="line"><span class="lineno">  213</span>        appState-&gt;globals.currentOpenFilePath = path;</div>
+<div class="line"><span class="lineno">  213</span>        path = path + <span class="stringliteral">&quot;.terr3d&quot;</span>;</div>
 <div class="line"><span class="lineno">  214</span>    }</div>
 <div class="line"><span class="lineno">  215</span> </div>
-<div class="line"><span class="lineno">  216</span>    Serialize();</div>
-<div class="line"><span class="lineno">  217</span>    std::ofstream outfile;</div>
-<div class="line"><span class="lineno">  218</span>    outfile.open(appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\project.terr3d&quot;</span>);</div>
-<div class="line"><span class="lineno">  219</span>    outfile &lt;&lt; data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  220</span>    outfile.close();</div>
-<div class="line"><span class="lineno">  221</span>    outfile.open(path);</div>
-<div class="line"><span class="lineno">  222</span>    outfile &lt;&lt; data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  223</span>    outfile.close();</div>
-<div class="line"><span class="lineno">  224</span>}</div>
+<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">if</span> (path != appState-&gt;globals.currentOpenFilePath)</div>
+<div class="line"><span class="lineno">  217</span>    {</div>
+<div class="line"><span class="lineno">  218</span>        appState-&gt;globals.currentOpenFilePath = path;</div>
+<div class="line"><span class="lineno">  219</span>    }</div>
+<div class="line"><span class="lineno">  220</span> </div>
+<div class="line"><span class="lineno">  221</span>    Serialize();</div>
+<div class="line"><span class="lineno">  222</span>    std::ofstream outfile;</div>
+<div class="line"><span class="lineno">  223</span>    outfile.open(appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\project.terr3d&quot;</span>);</div>
+<div class="line"><span class="lineno">  224</span>    outfile &lt;&lt; data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  225</span>    outfile.close();</div>
+<div class="line"><span class="lineno">  226</span>    outfile.open(path);</div>
+<div class="line"><span class="lineno">  227</span>    outfile &lt;&lt; data.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  228</span>    outfile.close();</div>
+<div class="line"><span class="lineno">  229</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4_html_a476756fb08e7f2416aad116d137977f4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">nlohmann::basic_json::dump</a></div><div class="ttdeci">string_t dump(const int indent=-1, const char indent_char=' ', const bool ensure_ascii=false, const error_handler_t error_handler=error_handler_t::strict) const</div><div class="ttdoc">serialization</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l20117">json.hpp:20117</a></div></div>
 </div><!-- fragment -->
 </div>

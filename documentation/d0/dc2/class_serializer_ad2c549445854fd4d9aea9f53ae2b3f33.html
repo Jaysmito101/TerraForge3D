@@ -120,52 +120,52 @@ $(document).ready(function(){initNavTree('d0/dc2/class_serializer_ad2c549445854f
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00076">76</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   77</span>{</div>
-<div class="line"><span class="lineno">   78</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
-<div class="line"><span class="lineno">   79</span>    data = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
-<div class="line"><span class="lineno">   80</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;SAVEFILE&quot;</span>;</div>
-<div class="line"><span class="lineno">   81</span>    data[<span class="stringliteral">&quot;serailizerVersion&quot;</span>] = TERR3D_SERIALIZER_VERSION;</div>
-<div class="line"><span class="lineno">   82</span>    data[<span class="stringliteral">&quot;maxSerailizerVersion&quot;</span>] = TERR3D_MAX_SERIALIZER_VERSION;</div>
-<div class="line"><span class="lineno">   83</span>    data[<span class="stringliteral">&quot;minSerailizerVersion&quot;</span>] = TERR3D_MIN_SERIALIZER_VERSION;</div>
-<div class="line"><span class="lineno">   84</span>    data[<span class="stringliteral">&quot;versionHash&quot;</span>] = MD5File(GetExecutablePath()).ToString();</div>
-<div class="line"><span class="lineno">   85</span>    data[<span class="stringliteral">&quot;name&quot;</span>] = <span class="stringliteral">&quot;TerraForge3D v2.2.0&quot;</span>;</div>
-<div class="line"><span class="lineno">   86</span>    data[<span class="stringliteral">&quot;mode&quot;</span>] = appState-&gt;mode;</div>
-<div class="line"><span class="lineno">   87</span>    <span class="comment">// SAVE NODE GENERATORS DATA</span></div>
-<div class="line"><span class="lineno">   88</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;appData&quot;</span>] = appState-&gt;globals.appData;, <span class="stringliteral">&quot;Failed to save App Data&quot;</span>);</div>
-<div class="line"><span class="lineno">   89</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;appStyles&quot;</span>] = GetStyleData();, <span class="stringliteral">&quot;Failed to save app styles&quot;</span>);</div>
-<div class="line"><span class="lineno">   90</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;imguiData&quot;</span>] = std::string(ImGui::SaveIniSettingsToMemory());, <span class="stringliteral">&quot;Failed to save ImGui Data.&quot;</span>);</div>
-<div class="line"><span class="lineno">   91</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;camera&quot;</span>] = appState-&gt;cameras.Save();, <span class="stringliteral">&quot;Failed to save cameras.&quot;</span>);</div>
-<div class="line"><span class="lineno">   92</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;windows&quot;</span>] = appState-&gt;windows.Save();, <span class="stringliteral">&quot;Failed to save window states&quot;</span>);</div>
-<div class="line"><span class="lineno">   93</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;states&quot;</span>] = appState-&gt;states.Save();, <span class="stringliteral">&quot;Failed to save states.&quot;</span>);</div>
-<div class="line"><span class="lineno">   94</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;globals&quot;</span>] = appState-&gt;globals.Save();, <span class="stringliteral">&quot;Failed to save globals.&quot;</span>);</div>
-<div class="line"><span class="lineno">   95</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;sea&quot;</span>] = appState-&gt;seaManager-&gt;Save();, <span class="stringliteral">&quot;Failed to save Sea.&quot;</span>);</div>
-<div class="line"><span class="lineno">   96</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;foliage&quot;</span>] = appState-&gt;foliageManager-&gt;Save();, <span class="stringliteral">&quot;Failed to save foliage manager.&quot;</span>);</div>
-<div class="line"><span class="lineno">   97</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;projectID&quot;</span>] = appState-&gt;projectManager-&gt;GetId();, <span class="stringliteral">&quot;Failed to save project id.&quot;</span>);</div>
-<div class="line"><span class="lineno">   98</span>    TRY_CATCH_ERR_SERIALIZE(appState-&gt;projectManager-&gt;SaveDatabase(); data[<span class="stringliteral">&quot;projectDatabase&quot;</span>] = appState-&gt;projectManager-&gt;GetDatabase();, <span class="stringliteral">&quot;Failed to save project database.&quot;</span>);</div>
-<div class="line"><span class="lineno">   99</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;lighting&quot;</span>] = appState-&gt;lightManager-&gt;Save();, <span class="stringliteral">&quot;Failed to save lighting data.&quot;</span>);</div>
-<div class="line"><span class="lineno">  100</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;generators&quot;</span>] = appState-&gt;meshGenerator-&gt;Save();, <span class="stringliteral">&quot;Failed to save generators.&quot;</span>);</div>
-<div class="line"><span class="lineno">  101</span>    TRY_CATCH_ERR_SERIALIZE(</div>
-<div class="line"><span class="lineno">  102</span> </div>
-<div class="line"><span class="lineno">  103</span>        <span class="keywordflow">if</span> (!appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
-<div class="line"><span class="lineno">  104</span>{</div>
-<div class="line"><span class="lineno">  105</span>    std::string baseHash = MD5File(appState-&gt;globals.currentBaseModelPath)</div>
-<div class="line"><span class="lineno">  106</span>                               .ToString();</div>
-<div class="line"><span class="lineno">  107</span>        std::string projectAsset = appState-&gt;projectManager-&gt;GetAsset(baseHash);</div>
-<div class="line"><span class="lineno">  108</span> </div>
-<div class="line"><span class="lineno">  109</span>        if (projectAsset == <span class="stringliteral">&quot;&quot;</span>)</div>
-<div class="line"><span class="lineno">  110</span>        {</div>
-<div class="line"><span class="lineno">  111</span>            MkDir(appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\models&quot;</span>);</div>
-<div class="line"><span class="lineno">  112</span>            CopyFileData(appState-&gt;globals.currentBaseModelPath, appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\models\\&quot;</span> + baseHash + appState-&gt;globals.currentBaseModelPath.substr(appState-&gt;globals.currentBaseModelPath.find_last_of(<span class="stringliteral">&quot;.&quot;</span>)));</div>
-<div class="line"><span class="lineno">  113</span>            appState-&gt;projectManager-&gt;RegisterAsset(baseHash, <span class="stringliteral">&quot;models\\&quot;</span> + baseHash + appState-&gt;globals.currentBaseModelPath.substr(appState-&gt;globals.currentBaseModelPath.find_last_of(<span class="stringliteral">&quot;.&quot;</span>)));</div>
-<div class="line"><span class="lineno">  114</span>        }</div>
-<div class="line"><span class="lineno">  115</span> </div>
-<div class="line"><span class="lineno">  116</span>        data[<span class="stringliteral">&quot;baseid&quot;</span>] = baseHash;</div>
-<div class="line"><span class="lineno">  117</span>    }</div>
-<div class="line"><span class="lineno">  118</span>    , <span class="stringliteral">&quot;Failed to save custom base model.&quot;</span></div>
-<div class="line"><span class="lineno">  119</span>    );</div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><span class="lineno">  121</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00081">81</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   82</span>{</div>
+<div class="line"><span class="lineno">   83</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
+<div class="line"><span class="lineno">   84</span>    data = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
+<div class="line"><span class="lineno">   85</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;SAVEFILE&quot;</span>;</div>
+<div class="line"><span class="lineno">   86</span>    data[<span class="stringliteral">&quot;serailizerVersion&quot;</span>] = TERR3D_SERIALIZER_VERSION;</div>
+<div class="line"><span class="lineno">   87</span>    data[<span class="stringliteral">&quot;maxSerailizerVersion&quot;</span>] = TERR3D_MAX_SERIALIZER_VERSION;</div>
+<div class="line"><span class="lineno">   88</span>    data[<span class="stringliteral">&quot;minSerailizerVersion&quot;</span>] = TERR3D_MIN_SERIALIZER_VERSION;</div>
+<div class="line"><span class="lineno">   89</span>    data[<span class="stringliteral">&quot;versionHash&quot;</span>] = MD5File(GetExecutablePath()).ToString();</div>
+<div class="line"><span class="lineno">   90</span>    data[<span class="stringliteral">&quot;name&quot;</span>] = <span class="stringliteral">&quot;TerraForge3D v2.2.0&quot;</span>;</div>
+<div class="line"><span class="lineno">   91</span>    data[<span class="stringliteral">&quot;mode&quot;</span>] = appState-&gt;mode;</div>
+<div class="line"><span class="lineno">   92</span>    <span class="comment">// SAVE NODE GENERATORS DATA</span></div>
+<div class="line"><span class="lineno">   93</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;appData&quot;</span>] = appState-&gt;globals.appData;, <span class="stringliteral">&quot;Failed to save App Data&quot;</span>);</div>
+<div class="line"><span class="lineno">   94</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;appStyles&quot;</span>] = GetStyleData();, <span class="stringliteral">&quot;Failed to save app styles&quot;</span>);</div>
+<div class="line"><span class="lineno">   95</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;imguiData&quot;</span>] = std::string(ImGui::SaveIniSettingsToMemory());, <span class="stringliteral">&quot;Failed to save ImGui Data.&quot;</span>);</div>
+<div class="line"><span class="lineno">   96</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;camera&quot;</span>] = appState-&gt;cameras.Save();, <span class="stringliteral">&quot;Failed to save cameras.&quot;</span>);</div>
+<div class="line"><span class="lineno">   97</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;windows&quot;</span>] = appState-&gt;windows.Save();, <span class="stringliteral">&quot;Failed to save window states&quot;</span>);</div>
+<div class="line"><span class="lineno">   98</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;states&quot;</span>] = appState-&gt;states.Save();, <span class="stringliteral">&quot;Failed to save states.&quot;</span>);</div>
+<div class="line"><span class="lineno">   99</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;globals&quot;</span>] = appState-&gt;globals.Save();, <span class="stringliteral">&quot;Failed to save globals.&quot;</span>);</div>
+<div class="line"><span class="lineno">  100</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;sea&quot;</span>] = appState-&gt;seaManager-&gt;Save();, <span class="stringliteral">&quot;Failed to save Sea.&quot;</span>);</div>
+<div class="line"><span class="lineno">  101</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;foliage&quot;</span>] = appState-&gt;foliageManager-&gt;Save();, <span class="stringliteral">&quot;Failed to save foliage manager.&quot;</span>);</div>
+<div class="line"><span class="lineno">  102</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;projectID&quot;</span>] = appState-&gt;projectManager-&gt;GetId();, <span class="stringliteral">&quot;Failed to save project id.&quot;</span>);</div>
+<div class="line"><span class="lineno">  103</span>    TRY_CATCH_ERR_SERIALIZE(appState-&gt;projectManager-&gt;SaveDatabase(); data[<span class="stringliteral">&quot;projectDatabase&quot;</span>] = appState-&gt;projectManager-&gt;GetDatabase();, <span class="stringliteral">&quot;Failed to save project database.&quot;</span>);</div>
+<div class="line"><span class="lineno">  104</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;lighting&quot;</span>] = appState-&gt;lightManager-&gt;Save();, <span class="stringliteral">&quot;Failed to save lighting data.&quot;</span>);</div>
+<div class="line"><span class="lineno">  105</span>    TRY_CATCH_ERR_SERIALIZE(data[<span class="stringliteral">&quot;generators&quot;</span>] = appState-&gt;meshGenerator-&gt;Save();, <span class="stringliteral">&quot;Failed to save generators.&quot;</span>);</div>
+<div class="line"><span class="lineno">  106</span>    TRY_CATCH_ERR_SERIALIZE(</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>        <span class="keywordflow">if</span> (!appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">  109</span>{</div>
+<div class="line"><span class="lineno">  110</span>    std::string baseHash = MD5File(appState-&gt;globals.currentBaseModelPath)</div>
+<div class="line"><span class="lineno">  111</span>                               .ToString();</div>
+<div class="line"><span class="lineno">  112</span>        std::string projectAsset = appState-&gt;projectManager-&gt;GetAsset(baseHash);</div>
+<div class="line"><span class="lineno">  113</span> </div>
+<div class="line"><span class="lineno">  114</span>        if (projectAsset == <span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><span class="lineno">  115</span>        {</div>
+<div class="line"><span class="lineno">  116</span>            MkDir(appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\models&quot;</span>);</div>
+<div class="line"><span class="lineno">  117</span>            CopyFileData(appState-&gt;globals.currentBaseModelPath, appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\models\\&quot;</span> + baseHash + appState-&gt;globals.currentBaseModelPath.substr(appState-&gt;globals.currentBaseModelPath.find_last_of(<span class="stringliteral">&quot;.&quot;</span>)));</div>
+<div class="line"><span class="lineno">  118</span>            appState-&gt;projectManager-&gt;RegisterAsset(baseHash, <span class="stringliteral">&quot;models\\&quot;</span> + baseHash + appState-&gt;globals.currentBaseModelPath.substr(appState-&gt;globals.currentBaseModelPath.find_last_of(<span class="stringliteral">&quot;.&quot;</span>)));</div>
+<div class="line"><span class="lineno">  119</span>        }</div>
+<div class="line"><span class="lineno">  120</span> </div>
+<div class="line"><span class="lineno">  121</span>        data[<span class="stringliteral">&quot;baseid&quot;</span>] = baseHash;</div>
+<div class="line"><span class="lineno">  122</span>    }</div>
+<div class="line"><span class="lineno">  123</span>    , <span class="stringliteral">&quot;Failed to save custom base model.&quot;</span></div>
+<div class="line"><span class="lineno">  124</span>    );</div>
+<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><span class="lineno">  126</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 <div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
 </div><!-- fragment -->

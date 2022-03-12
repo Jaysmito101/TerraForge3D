@@ -209,16 +209,20 @@ $(document).ready(function(){initNavTree('d5/dd4/class_math_function_node_aa99dc
 <div class="line"><span class="lineno">  158</span> </div>
 <div class="line"><span class="lineno">  159</span>            <span class="keywordflow">try</span></div>
 <div class="line"><span class="lineno">  160</span>            {</div>
-<div class="line"><span class="lineno">  161</span>                parser-&gt;SetExpr(wide);</div>
-<div class="line"><span class="lineno">  162</span>                compiled = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  163</span>            }</div>
-<div class="line"><span class="lineno">  164</span> </div>
-<div class="line"><span class="lineno">  165</span>            <span class="keywordflow">catch</span> (...)</div>
-<div class="line"><span class="lineno">  166</span>            {</div>
+<div class="line"><span class="lineno">  161</span><span class="preprocessor">                #ifdef TERR3D_WIN32</span></div>
+<div class="line"><span class="lineno">  162</span>                parser-&gt;SetExpr(wide);</div>
+<div class="line"><span class="lineno">  163</span><span class="preprocessor">                #else</span></div>
+<div class="line"><span class="lineno">  164</span>                parser-&gt;SetExpr(std::string(inputExpression));</div>
+<div class="line"><span class="lineno">  165</span><span class="preprocessor">                #endif</span></div>
+<div class="line"><span class="lineno">  166</span>                compiled = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  167</span>            }</div>
-<div class="line"><span class="lineno">  168</span>        }</div>
-<div class="line"><span class="lineno">  169</span>    }</div>
-<div class="line"><span class="lineno">  170</span>}</div>
+<div class="line"><span class="lineno">  168</span> </div>
+<div class="line"><span class="lineno">  169</span>            <span class="keywordflow">catch</span> (...)</div>
+<div class="line"><span class="lineno">  170</span>            {</div>
+<div class="line"><span class="lineno">  171</span>            }</div>
+<div class="line"><span class="lineno">  172</span>        }</div>
+<div class="line"><span class="lineno">  173</span>    }</div>
+<div class="line"><span class="lineno">  174</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

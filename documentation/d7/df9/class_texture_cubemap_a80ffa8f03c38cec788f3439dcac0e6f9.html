@@ -131,36 +131,36 @@ $(document).ready(function(){initNavTree('d7/df9/class_texture_cubemap_a80ffa8f0
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html#l00073">73</a> of file <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html">TextureCubemap.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   74</span>{</div>
-<div class="line"><span class="lineno">   75</span>    <span class="keywordtype">bool</span> res = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   76</span>    <span class="keywordtype">int</span> width, height, nrChannels;</div>
-<div class="line"><span class="lineno">   77</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *data = stbi_load(path.c_str(), &amp;width, &amp;height, &amp;nrChannels, 3);</div>
-<div class="line"><span class="lineno">   78</span>    facesSizes[face] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(width, height);</div>
-<div class="line"><span class="lineno">   79</span> </div>
-<div class="line"><span class="lineno">   80</span>    <span class="keywordflow">if</span> (data)</div>
-<div class="line"><span class="lineno">   81</span>    {</div>
-<div class="line"><span class="lineno">   82</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Loaded : &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">   83</span> </div>
-<div class="line"><span class="lineno">   84</span>        <span class="keywordflow">if</span>(facesData[face])</div>
-<div class="line"><span class="lineno">   85</span>        {</div>
-<div class="line"><span class="lineno">   86</span>            stbi_image_free(facesData[face]);</div>
-<div class="line"><span class="lineno">   87</span>        }</div>
-<div class="line"><span class="lineno">   88</span> </div>
-<div class="line"><span class="lineno">   89</span>        facesData[face] = data;</div>
-<div class="line"><span class="lineno">   90</span>        res = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   91</span>    }</div>
-<div class="line"><span class="lineno">   92</span> </div>
-<div class="line"><span class="lineno">   93</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   94</span>    {</div>
-<div class="line"><span class="lineno">   95</span>        res = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   96</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Failed to load : &quot;</span> &lt;&lt; path &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">   97</span>        stbi_image_free(data);</div>
-<div class="line"><span class="lineno">   98</span>    }</div>
-<div class="line"><span class="lineno">   99</span> </div>
-<div class="line"><span class="lineno">  100</span>    faces[face] = path;</div>
-<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">return</span> res;</div>
-<div class="line"><span class="lineno">  102</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html#l00075">75</a> of file <a class="el" href="../../d3/d04/_texture_cubemap_8cpp_source.html">TextureCubemap.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   76</span>{</div>
+<div class="line"><span class="lineno">   77</span>    <span class="keywordtype">bool</span> res = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   78</span>    <span class="keywordtype">int</span> width, height, nrChannels;</div>
+<div class="line"><span class="lineno">   79</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *data = stbi_load(path.c_str(), &amp;width, &amp;height, &amp;nrChannels, 3);</div>
+<div class="line"><span class="lineno">   80</span>    facesSizes[face] = <a class="code hl_struct" href="../../dc/d6f/struct_i_vec2.html">IVec2</a>(width, height);</div>
+<div class="line"><span class="lineno">   81</span> </div>
+<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">if</span> (data)</div>
+<div class="line"><span class="lineno">   83</span>    {</div>
+<div class="line"><span class="lineno">   84</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Loaded : &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   85</span> </div>
+<div class="line"><span class="lineno">   86</span>        <span class="keywordflow">if</span>(facesData[face])</div>
+<div class="line"><span class="lineno">   87</span>        {</div>
+<div class="line"><span class="lineno">   88</span>            stbi_image_free(facesData[face]);</div>
+<div class="line"><span class="lineno">   89</span>        }</div>
+<div class="line"><span class="lineno">   90</span> </div>
+<div class="line"><span class="lineno">   91</span>        facesData[face] = data;</div>
+<div class="line"><span class="lineno">   92</span>        res = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   93</span>    }</div>
+<div class="line"><span class="lineno">   94</span> </div>
+<div class="line"><span class="lineno">   95</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   96</span>    {</div>
+<div class="line"><span class="lineno">   97</span>        res = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   98</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Failed to load : &quot;</span> &lt;&lt; path &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   99</span>        stbi_image_free(data);</div>
+<div class="line"><span class="lineno">  100</span>    }</div>
+<div class="line"><span class="lineno">  101</span> </div>
+<div class="line"><span class="lineno">  102</span>    faces[face] = path;</div>
+<div class="line"><span class="lineno">  103</span>    <span class="keywordflow">return</span> res;</div>
+<div class="line"><span class="lineno">  104</span>}</div>
 <div class="ttc" id="astruct_i_vec2_html"><div class="ttname"><a href="../../dc/d6f/struct_i_vec2.html">IVec2</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/dea/_base_math_8h_source.html#l00003">BaseMath.h:4</a></div></div>
 </div><!-- fragment -->
 </div>

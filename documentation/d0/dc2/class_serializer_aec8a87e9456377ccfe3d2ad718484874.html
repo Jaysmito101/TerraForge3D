@@ -121,52 +121,52 @@ $(document).ready(function(){initNavTree('d0/dc2/class_serializer_aec8a87e945637
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00226">226</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  227</span>{</div>
-<div class="line"><span class="lineno">  228</span>    <span class="keywordflow">if</span> (path.size() &lt;= 3)</div>
-<div class="line"><span class="lineno">  229</span>    {</div>
-<div class="line"><span class="lineno">  230</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  231</span>    }</div>
-<div class="line"><span class="lineno">  232</span> </div>
-<div class="line"><span class="lineno">  233</span>    <span class="keywordflow">if</span> (path.find(<span class="stringliteral">&quot;.terr3d&quot;</span>) == std::string::npos)</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00231">231</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  232</span>{</div>
+<div class="line"><span class="lineno">  233</span>    <span class="keywordflow">if</span> (path.size() &lt;= 3)</div>
 <div class="line"><span class="lineno">  234</span>    {</div>
-<div class="line"><span class="lineno">  235</span>        path = path + <span class="stringliteral">&quot;.terr3d&quot;</span>;</div>
+<div class="line"><span class="lineno">  235</span>        <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  236</span>    }</div>
 <div class="line"><span class="lineno">  237</span> </div>
-<div class="line"><span class="lineno">  238</span>    <span class="keywordtype">bool</span> flagRd = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  239</span>    std::string sdata = ReadShaderSourceFile(path, &amp;flagRd);</div>
-<div class="line"><span class="lineno">  240</span> </div>
-<div class="line"><span class="lineno">  241</span>    <span class="keywordflow">if</span> (!flagRd)</div>
-<div class="line"><span class="lineno">  242</span>    {</div>
-<div class="line"><span class="lineno">  243</span>        Log(<span class="stringliteral">&quot;Could not read file : &quot;</span> + path);</div>
-<div class="line"><span class="lineno">  244</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  245</span>    }</div>
-<div class="line"><span class="lineno">  246</span> </div>
-<div class="line"><span class="lineno">  247</span>    <span class="keywordflow">if</span> (sdata.size() == 0)</div>
-<div class="line"><span class="lineno">  248</span>    {</div>
-<div class="line"><span class="lineno">  249</span>        Log(<span class="stringliteral">&quot;Empty file.&quot;</span>);</div>
-<div class="line"><span class="lineno">  250</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  251</span>    }</div>
-<div class="line"><span class="lineno">  252</span> </div>
-<div class="line"><span class="lineno">  253</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
-<div class="line"><span class="lineno">  254</span> </div>
-<div class="line"><span class="lineno">  255</span>    <span class="keywordflow">try</span></div>
-<div class="line"><span class="lineno">  256</span>    {</div>
-<div class="line"><span class="lineno">  257</span>        tmp = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(sdata);</div>
-<div class="line"><span class="lineno">  258</span>    }</div>
+<div class="line"><span class="lineno">  238</span>    <span class="keywordflow">if</span> (path.find(<span class="stringliteral">&quot;.terr3d&quot;</span>) == std::string::npos)</div>
+<div class="line"><span class="lineno">  239</span>    {</div>
+<div class="line"><span class="lineno">  240</span>        path = path + <span class="stringliteral">&quot;.terr3d&quot;</span>;</div>
+<div class="line"><span class="lineno">  241</span>    }</div>
+<div class="line"><span class="lineno">  242</span> </div>
+<div class="line"><span class="lineno">  243</span>    <span class="keywordtype">bool</span> flagRd = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  244</span>    std::string sdata = ReadShaderSourceFile(path, &amp;flagRd);</div>
+<div class="line"><span class="lineno">  245</span> </div>
+<div class="line"><span class="lineno">  246</span>    <span class="keywordflow">if</span> (!flagRd)</div>
+<div class="line"><span class="lineno">  247</span>    {</div>
+<div class="line"><span class="lineno">  248</span>        Log(<span class="stringliteral">&quot;Could not read file : &quot;</span> + path);</div>
+<div class="line"><span class="lineno">  249</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  250</span>    }</div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>    <span class="keywordflow">if</span> (sdata.size() == 0)</div>
+<div class="line"><span class="lineno">  253</span>    {</div>
+<div class="line"><span class="lineno">  254</span>        Log(<span class="stringliteral">&quot;Empty file.&quot;</span>);</div>
+<div class="line"><span class="lineno">  255</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  256</span>    }</div>
+<div class="line"><span class="lineno">  257</span> </div>
+<div class="line"><span class="lineno">  258</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
 <div class="line"><span class="lineno">  259</span> </div>
-<div class="line"><span class="lineno">  260</span>    <span class="keywordflow">catch</span> (...)</div>
+<div class="line"><span class="lineno">  260</span>    <span class="keywordflow">try</span></div>
 <div class="line"><span class="lineno">  261</span>    {</div>
-<div class="line"><span class="lineno">  262</span>        Log(<span class="stringliteral">&quot;Failed to Parse file : &quot;</span> + path);</div>
+<div class="line"><span class="lineno">  262</span>        tmp = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(sdata);</div>
 <div class="line"><span class="lineno">  263</span>    }</div>
 <div class="line"><span class="lineno">  264</span> </div>
-<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">if</span> (path != appState-&gt;globals.currentOpenFilePath)</div>
+<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">catch</span> (...)</div>
 <div class="line"><span class="lineno">  266</span>    {</div>
-<div class="line"><span class="lineno">  267</span>        appState-&gt;globals.currentOpenFilePath = path;</div>
+<div class="line"><span class="lineno">  267</span>        Log(<span class="stringliteral">&quot;Failed to Parse file : &quot;</span> + path);</div>
 <div class="line"><span class="lineno">  268</span>    }</div>
 <div class="line"><span class="lineno">  269</span> </div>
-<div class="line"><span class="lineno">  270</span>    Deserialize(tmp);</div>
-<div class="line"><span class="lineno">  271</span>}</div>
+<div class="line"><span class="lineno">  270</span>    <span class="keywordflow">if</span> (path != appState-&gt;globals.currentOpenFilePath)</div>
+<div class="line"><span class="lineno">  271</span>    {</div>
+<div class="line"><span class="lineno">  272</span>        appState-&gt;globals.currentOpenFilePath = path;</div>
+<div class="line"><span class="lineno">  273</span>    }</div>
+<div class="line"><span class="lineno">  274</span> </div>
+<div class="line"><span class="lineno">  275</span>    Deserialize(tmp);</div>
+<div class="line"><span class="lineno">  276</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->

@@ -120,26 +120,26 @@ $(document).ready(function(){initNavTree('d3/dac/class_sea_manager_ac4a25122931a
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00082">82</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   83</span>{</div>
-<div class="line"><span class="lineno">   84</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
-<div class="line"><span class="lineno">   85</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;Sea Settings&quot;</span>;</div>
-<div class="line"><span class="lineno">   86</span>    data[<span class="stringliteral">&quot;alpha&quot;</span>] = alpha;</div>
-<div class="line"><span class="lineno">   87</span>    data[<span class="stringliteral">&quot;distrotionStrength&quot;</span>] = distrotionStrength;</div>
-<div class="line"><span class="lineno">   88</span>    data[<span class="stringliteral">&quot;distrotionScale&quot;</span>] = distrotionScale;</div>
-<div class="line"><span class="lineno">   89</span>    data[<span class="stringliteral">&quot;reflectivity&quot;</span>] = reflectivity;</div>
-<div class="line"><span class="lineno">   90</span>    data[<span class="stringliteral">&quot;level&quot;</span>] = level;</div>
-<div class="line"><span class="lineno">   91</span>    data[<span class="stringliteral">&quot;waveSpeed&quot;</span>] = waveSpeed;</div>
-<div class="line"><span class="lineno">   92</span>    data[<span class="stringliteral">&quot;enabled&quot;</span>] = enabled;</div>
-<div class="line"><span class="lineno">   93</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> jcolor;</div>
-<div class="line"><span class="lineno">   94</span>    jcolor[<span class="stringliteral">&quot;r&quot;</span>] = color[0];</div>
-<div class="line"><span class="lineno">   95</span>    jcolor[<span class="stringliteral">&quot;g&quot;</span>] = color[1];</div>
-<div class="line"><span class="lineno">   96</span>    jcolor[<span class="stringliteral">&quot;b&quot;</span>] = color[2];</div>
-<div class="line"><span class="lineno">   97</span>    data[<span class="stringliteral">&quot;color&quot;</span>] = jcolor;</div>
-<div class="line"><span class="lineno">   98</span>    data[<span class="stringliteral">&quot;dudvMap&quot;</span>] = appState-&gt;projectManager-&gt;SaveTexture(dudvMap);</div>
-<div class="line"><span class="lineno">   99</span>    data[<span class="stringliteral">&quot;normalMap&quot;</span>] = appState-&gt;projectManager-&gt;SaveTexture(normalMap);</div>
-<div class="line"><span class="lineno">  100</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><span class="lineno">  101</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00084">84</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   85</span>{</div>
+<div class="line"><span class="lineno">   86</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><span class="lineno">   87</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;Sea Settings&quot;</span>;</div>
+<div class="line"><span class="lineno">   88</span>    data[<span class="stringliteral">&quot;alpha&quot;</span>] = alpha;</div>
+<div class="line"><span class="lineno">   89</span>    data[<span class="stringliteral">&quot;distrotionStrength&quot;</span>] = distrotionStrength;</div>
+<div class="line"><span class="lineno">   90</span>    data[<span class="stringliteral">&quot;distrotionScale&quot;</span>] = distrotionScale;</div>
+<div class="line"><span class="lineno">   91</span>    data[<span class="stringliteral">&quot;reflectivity&quot;</span>] = reflectivity;</div>
+<div class="line"><span class="lineno">   92</span>    data[<span class="stringliteral">&quot;level&quot;</span>] = level;</div>
+<div class="line"><span class="lineno">   93</span>    data[<span class="stringliteral">&quot;waveSpeed&quot;</span>] = waveSpeed;</div>
+<div class="line"><span class="lineno">   94</span>    data[<span class="stringliteral">&quot;enabled&quot;</span>] = enabled;</div>
+<div class="line"><span class="lineno">   95</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> jcolor;</div>
+<div class="line"><span class="lineno">   96</span>    jcolor[<span class="stringliteral">&quot;r&quot;</span>] = color[0];</div>
+<div class="line"><span class="lineno">   97</span>    jcolor[<span class="stringliteral">&quot;g&quot;</span>] = color[1];</div>
+<div class="line"><span class="lineno">   98</span>    jcolor[<span class="stringliteral">&quot;b&quot;</span>] = color[2];</div>
+<div class="line"><span class="lineno">   99</span>    data[<span class="stringliteral">&quot;color&quot;</span>] = jcolor;</div>
+<div class="line"><span class="lineno">  100</span>    data[<span class="stringliteral">&quot;dudvMap&quot;</span>] = appState-&gt;projectManager-&gt;SaveTexture(dudvMap);</div>
+<div class="line"><span class="lineno">  101</span>    data[<span class="stringliteral">&quot;normalMap&quot;</span>] = appState-&gt;projectManager-&gt;SaveTexture(normalMap);</div>
+<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><span class="lineno">  103</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->
 </div>

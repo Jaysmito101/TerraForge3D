@@ -134,7 +134,7 @@ $(document).ready(function(){initNavTree('dd/d5b/class_curve_node_a1d2e4429fe52b
 <p class="definition">Definition at line <a class="el" href="../../de/de4/_curve_node_8cpp_source.html#l00059">59</a> of file <a class="el" href="../../de/de4/_curve_node_8cpp_source.html">CurveNode.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   60</span>{</div>
 <div class="line"><span class="lineno">   61</span>    maxPoints = data[<span class="stringliteral">&quot;maxPoints&quot;</span>];</div>
-<div class="line"><span class="lineno">   62</span>    ReserveVector(curve, (maxPoints &gt; data[<span class="stringliteral">&quot;curveSize&quot;</span>] ? maxPoints : data[<span class="stringliteral">&quot;curveSize&quot;</span>]));</div>
+<div class="line"><span class="lineno">   62</span>    ReserveVector(curve, (maxPoints &gt; data[<span class="stringliteral">&quot;curveSize&quot;</span>].get&lt;int&gt;() ? maxPoints : data[<span class="stringliteral">&quot;curveSize&quot;</span>].get&lt;int&gt;()));</div>
 <div class="line"><span class="lineno">   63</span> </div>
 <div class="line"><span class="lineno">   64</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp : data[<span class="stringliteral">&quot;curve&quot;</span>])</div>
 <div class="line"><span class="lineno">   65</span>    {</div>

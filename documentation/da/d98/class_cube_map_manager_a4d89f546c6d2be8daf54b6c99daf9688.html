@@ -173,44 +173,44 @@ $(document).ready(function(){initNavTree('da/d98/class_cube_map_manager_a4d89f54
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html#l00125">125</a> of file <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html">CubeMap.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  126</span>{</div>
-<div class="line"><span class="lineno">  127</span>    glDisable(GL_DEPTH_TEST);</div>
-<div class="line"><span class="lineno">  128</span>    glDepthMask(GL_FALSE);</div>
-<div class="line"><span class="lineno">  129</span>    glBindVertexArray(vao);</div>
-<div class="line"><span class="lineno">  130</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *shd = skyboxShader;</div>
-<div class="line"><span class="lineno">  131</span> </div>
-<div class="line"><span class="lineno">  132</span>    <span class="keywordflow">if</span>(useProcedural)</div>
-<div class="line"><span class="lineno">  133</span>    {</div>
-<div class="line"><span class="lineno">  134</span>        shd = skyproShader;</div>
-<div class="line"><span class="lineno">  135</span>    }</div>
-<div class="line"><span class="lineno">  136</span> </div>
-<div class="line"><span class="lineno">  137</span>    shd-&gt;Bind();</div>
-<div class="line"><span class="lineno">  138</span>    cubemap-&gt;Bind(0);</div>
-<div class="line"><span class="lineno">  139</span>    view = glm::mat4(glm::mat3(view));</div>
-<div class="line"><span class="lineno">  140</span>    shd-&gt;SetUniformMat4(<span class="stringliteral">&quot;_P&quot;</span>, proj);</div>
-<div class="line"><span class="lineno">  141</span>    shd-&gt;SetUniformMat4(<span class="stringliteral">&quot;_V&quot;</span>, view);</div>
-<div class="line"><span class="lineno">  142</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;time&quot;</span>, time);</div>
-<div class="line"><span class="lineno">  143</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;cirrus&quot;</span>, cirrus);</div>
-<div class="line"><span class="lineno">  144</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;upf&quot;</span>, upf);</div>
-<div class="line"><span class="lineno">  145</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;cumulus&quot;</span>, cumulus);</div>
-<div class="line"><span class="lineno">  146</span>    shd-&gt;SetUniform3f(<span class="stringliteral">&quot;fsun&quot;</span>, fsun);</div>
-<div class="line"><span class="lineno">  147</span>    glUniform1i(glGetUniformLocation(shd-&gt;m_Shader, <span class="stringliteral">&quot;skybox&quot;</span>), 0);</div>
-<div class="line"><span class="lineno">  148</span> </div>
-<div class="line"><span class="lineno">  149</span>    <span class="keywordflow">if</span>(useBox)</div>
-<div class="line"><span class="lineno">  150</span>    {</div>
-<div class="line"><span class="lineno">  151</span>        glDrawArrays(GL_TRIANGLES, 0, 36);</div>
-<div class="line"><span class="lineno">  152</span>    }</div>
-<div class="line"><span class="lineno">  153</span> </div>
-<div class="line"><span class="lineno">  154</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  155</span>    {</div>
-<div class="line"><span class="lineno">  156</span>        skySphere-&gt;Update();</div>
-<div class="line"><span class="lineno">  157</span>        skySphere-&gt;Render();</div>
-<div class="line"><span class="lineno">  158</span>    }</div>
-<div class="line"><span class="lineno">  159</span> </div>
-<div class="line"><span class="lineno">  160</span>    glDepthMask(GL_TRUE);</div>
-<div class="line"><span class="lineno">  161</span>    glEnable(GL_DEPTH_TEST);</div>
-<div class="line"><span class="lineno">  162</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html#l00126">126</a> of file <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html">CubeMap.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  127</span>{</div>
+<div class="line"><span class="lineno">  128</span>    glDisable(GL_DEPTH_TEST);</div>
+<div class="line"><span class="lineno">  129</span>    glDepthMask(GL_FALSE);</div>
+<div class="line"><span class="lineno">  130</span>    glBindVertexArray(vao);</div>
+<div class="line"><span class="lineno">  131</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *shd = skyboxShader;</div>
+<div class="line"><span class="lineno">  132</span> </div>
+<div class="line"><span class="lineno">  133</span>    <span class="keywordflow">if</span>(useProcedural)</div>
+<div class="line"><span class="lineno">  134</span>    {</div>
+<div class="line"><span class="lineno">  135</span>        shd = skyproShader;</div>
+<div class="line"><span class="lineno">  136</span>    }</div>
+<div class="line"><span class="lineno">  137</span> </div>
+<div class="line"><span class="lineno">  138</span>    shd-&gt;Bind();</div>
+<div class="line"><span class="lineno">  139</span>    cubemap-&gt;Bind(0);</div>
+<div class="line"><span class="lineno">  140</span>    view = glm::mat4(glm::mat3(view));</div>
+<div class="line"><span class="lineno">  141</span>    shd-&gt;SetUniformMat4(<span class="stringliteral">&quot;_P&quot;</span>, proj);</div>
+<div class="line"><span class="lineno">  142</span>    shd-&gt;SetUniformMat4(<span class="stringliteral">&quot;_V&quot;</span>, view);</div>
+<div class="line"><span class="lineno">  143</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;time&quot;</span>, time);</div>
+<div class="line"><span class="lineno">  144</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;cirrus&quot;</span>, cirrus);</div>
+<div class="line"><span class="lineno">  145</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;upf&quot;</span>, upf);</div>
+<div class="line"><span class="lineno">  146</span>    shd-&gt;SetUniformf(<span class="stringliteral">&quot;cumulus&quot;</span>, cumulus);</div>
+<div class="line"><span class="lineno">  147</span>    shd-&gt;SetUniform3f(<span class="stringliteral">&quot;fsun&quot;</span>, fsun);</div>
+<div class="line"><span class="lineno">  148</span>    glUniform1i(glGetUniformLocation(shd-&gt;m_Shader, <span class="stringliteral">&quot;skybox&quot;</span>), 0);</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>    <span class="keywordflow">if</span>(useBox)</div>
+<div class="line"><span class="lineno">  151</span>    {</div>
+<div class="line"><span class="lineno">  152</span>        glDrawArrays(GL_TRIANGLES, 0, 36);</div>
+<div class="line"><span class="lineno">  153</span>    }</div>
+<div class="line"><span class="lineno">  154</span> </div>
+<div class="line"><span class="lineno">  155</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  156</span>    {</div>
+<div class="line"><span class="lineno">  157</span>        skySphere-&gt;Update();</div>
+<div class="line"><span class="lineno">  158</span>        skySphere-&gt;Render();</div>
+<div class="line"><span class="lineno">  159</span>    }</div>
+<div class="line"><span class="lineno">  160</span> </div>
+<div class="line"><span class="lineno">  161</span>    glDepthMask(GL_TRUE);</div>
+<div class="line"><span class="lineno">  162</span>    glEnable(GL_DEPTH_TEST);</div>
+<div class="line"><span class="lineno">  163</span>}</div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
 </div><!-- fragment -->
 </div>

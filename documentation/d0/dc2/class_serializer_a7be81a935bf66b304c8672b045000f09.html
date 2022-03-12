@@ -121,99 +121,99 @@ $(document).ready(function(){initNavTree('d0/dc2/class_serializer_a7be81a935bf66
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00273">273</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  274</span>{</div>
-<div class="line"><span class="lineno">  275</span>    data = d;</div>
-<div class="line"><span class="lineno">  276</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Wating for remesh cycle to finish ...\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  277</span> </div>
-<div class="line"><span class="lineno">  278</span>    <span class="keywordflow">while</span> (appState-&gt;states.remeshing);</div>
-<div class="line"><span class="lineno">  279</span> </div>
-<div class="line"><span class="lineno">  280</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Finished remesing.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">  281</span>    TRY_CATCH_ERR_DESERIALIZE(</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html#l00278">278</a> of file <a class="el" href="../../d0/dcf/_serializer_8cpp_source.html">Serializer.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  279</span>{</div>
+<div class="line"><span class="lineno">  280</span>    data = d;</div>
+<div class="line"><span class="lineno">  281</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Wating for remesh cycle to finish ...\n&quot;</span>;</div>
 <div class="line"><span class="lineno">  282</span> </div>
-<div class="line"><span class="lineno">  283</span>        <span class="keywordflow">if</span> (data[<span class="stringliteral">&quot;versionHash&quot;</span>] != MD5File(GetExecutablePath()).ToString())</div>
-<div class="line"><span class="lineno">  284</span>{</div>
-<div class="line"><span class="lineno">  285</span>    onError(<span class="stringliteral">&quot;The file you are tryng to open was made with a different version of TerraForge3D!\nTrying to check Serializer compatibility&quot;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  286</span>    }</div>
-<div class="line"><span class="lineno">  287</span>    , <span class="stringliteral">&quot;Failed to verify file version.&quot;</span></div>
-<div class="line"><span class="lineno">  288</span>    );</div>
-<div class="line"><span class="lineno">  289</span>    TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(</div>
-<div class="line"><span class="lineno">  290</span>        <span class="keywordtype">int</span> serializerVersion = data[<span class="stringliteral">&quot;serailizerVersion&quot;</span>];</div>
-<div class="line"><span class="lineno">  291</span> </div>
-<div class="line"><span class="lineno">  292</span>        <span class="keywordflow">if</span> (serializerVersion &lt; TERR3D_MIN_SERIALIZER_VERSION)</div>
-<div class="line"><span class="lineno">  293</span>{</div>
-<div class="line"><span class="lineno">  294</span>    onError(<span class="stringliteral">&quot;This file cannot be opened as it was serialized using serializer V&quot;</span> + std::to_string(serializerVersion) + <span class="stringliteral">&quot; but the minimum serializer version required is V&quot;</span> + std::to_string(TERR3D_MIN_SERIALIZER_VERSION), <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  295</span>        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  296</span>    }</div>
-<div class="line"><span class="lineno">  297</span> </div>
-<div class="line"><span class="lineno">  298</span>    <span class="keywordflow">if</span> (serializerVersion &gt; TERR3D_MAX_SERIALIZER_VERSION)</div>
-<div class="line"><span class="lineno">  299</span>{</div>
-<div class="line"><span class="lineno">  300</span>    onError(<span class="stringliteral">&quot;This file cannot be opened as it was serialized using serializer V&quot;</span> + std::to_string(serializerVersion) + <span class="stringliteral">&quot; but the maximum serializer version supported is V&quot;</span> + std::to_string(TERR3D_MAX_SERIALIZER_VERSION), <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  301</span>        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  302</span>    }</div>
-<div class="line"><span class="lineno">  303</span>    , <span class="stringliteral">&quot;Failed to verify Serializer&quot;</span>,</div>
-<div class="line"><span class="lineno">  304</span>    <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  305</span>    );</div>
-<div class="line"><span class="lineno">  306</span> </div>
-<div class="line"><span class="lineno">  307</span>    <span class="keywordflow">if</span> (data[<span class="stringliteral">&quot;type&quot;</span>] != <span class="stringliteral">&quot;SAVEFILE&quot;</span>)</div>
-<div class="line"><span class="lineno">  308</span>    {</div>
-<div class="line"><span class="lineno">  309</span>        onError(<span class="stringliteral">&quot;This file is not a savefile.&quot;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  310</span>        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  311</span>    }</div>
-<div class="line"><span class="lineno">  312</span> </div>
-<div class="line"><span class="lineno">  313</span>    TRY_CATCH_ERR_DESERIALIZE(LoadThemeFromStr(data[<span class="stringliteral">&quot;styleData&quot;</span>]);, <span class="stringliteral">&quot;Failed to load theme.&quot;</span>);</div>
-<div class="line"><span class="lineno">  314</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;globals.appData = data[<span class="stringliteral">&quot;appData&quot;</span>];, <span class="stringliteral">&quot;Failed to app data.&quot;</span>);</div>
-<div class="line"><span class="lineno">  315</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;globals.appData = data[<span class="stringliteral">&quot;appData&quot;</span>];, <span class="stringliteral">&quot;Failed to app data.&quot;</span>);</div>
-<div class="line"><span class="lineno">  316</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;mode = data[<span class="stringliteral">&quot;mode&quot;</span>];, <span class="stringliteral">&quot;Failed to app mode.&quot;</span>);</div>
-<div class="line"><span class="lineno">  317</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;projectManager-&gt;SetId(data[<span class="stringliteral">&quot;projectID&quot;</span>]);, <span class="stringliteral">&quot;Failed to load Project ID.&quot;</span>);</div>
-<div class="line"><span class="lineno">  318</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;projectManager-&gt;SetDatabase(data[<span class="stringliteral">&quot;projectDatabase&quot;</span>]);, <span class="stringliteral">&quot;Failed to load project database.&quot;</span>);</div>
-<div class="line"><span class="lineno">  319</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Loaded Project ID : &quot;</span> &lt;&lt; appState-&gt;projectManager-&gt;GetId() &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">  320</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;cameras.Load(data[<span class="stringliteral">&quot;camera&quot;</span>]);, <span class="stringliteral">&quot;Failed to load camera.&quot;</span>);</div>
-<div class="line"><span class="lineno">  321</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;windows.Load(data[<span class="stringliteral">&quot;windows&quot;</span>]);, <span class="stringliteral">&quot;Failed to load windows.&quot;</span>);</div>
-<div class="line"><span class="lineno">  322</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;states.Load(data[<span class="stringliteral">&quot;states&quot;</span>]);, <span class="stringliteral">&quot;Failed to load states.&quot;</span>);</div>
-<div class="line"><span class="lineno">  323</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;globals.Load(data[<span class="stringliteral">&quot;globals&quot;</span>]);, <span class="stringliteral">&quot;Failed to load globals.&quot;</span>);</div>
-<div class="line"><span class="lineno">  324</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;seaManager-&gt;Load(data[<span class="stringliteral">&quot;sea&quot;</span>]);, <span class="stringliteral">&quot;Failed to load sea.&quot;</span>);</div>
-<div class="line"><span class="lineno">  325</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;foliageManager-&gt;Load(data[<span class="stringliteral">&quot;foliage&quot;</span>]);, <span class="stringliteral">&quot;Failed to load foliage.&quot;</span>);</div>
-<div class="line"><span class="lineno">  326</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;lightManager-&gt;Load(data[<span class="stringliteral">&quot;lighting&quot;</span>]);, <span class="stringliteral">&quot;Failed to load lighting.&quot;</span>);</div>
-<div class="line"><span class="lineno">  327</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;meshGenerator-&gt;Load(data[<span class="stringliteral">&quot;generators&quot;</span>]);, <span class="stringliteral">&quot;Failed to load generators.&quot;</span>);</div>
-<div class="line"><span class="lineno">  328</span>    TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(</div>
-<div class="line"><span class="lineno">  329</span> </div>
-<div class="line"><span class="lineno">  330</span>        <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
-<div class="line"><span class="lineno">  331</span>{</div>
-<div class="line"><span class="lineno">  332</span>    std::string baseHash = data[<span class="stringliteral">&quot;baseid&quot;</span>];</div>
-<div class="line"><span class="lineno">  333</span>        std::string projectAsset = appState-&gt;projectManager-&gt;GetAsset(baseHash);</div>
+<div class="line"><span class="lineno">  283</span>    <span class="keywordflow">while</span> (appState-&gt;states.remeshing);</div>
+<div class="line"><span class="lineno">  284</span> </div>
+<div class="line"><span class="lineno">  285</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Finished remesing.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  286</span>    TRY_CATCH_ERR_DESERIALIZE(</div>
+<div class="line"><span class="lineno">  287</span> </div>
+<div class="line"><span class="lineno">  288</span>        <span class="keywordflow">if</span> (data[<span class="stringliteral">&quot;versionHash&quot;</span>] != MD5File(GetExecutablePath()).ToString())</div>
+<div class="line"><span class="lineno">  289</span>{</div>
+<div class="line"><span class="lineno">  290</span>    onError(<span class="stringliteral">&quot;The file you are tryng to open was made with a different version of TerraForge3D!\nTrying to check Serializer compatibility&quot;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  291</span>    }</div>
+<div class="line"><span class="lineno">  292</span>    , <span class="stringliteral">&quot;Failed to verify file version.&quot;</span></div>
+<div class="line"><span class="lineno">  293</span>    );</div>
+<div class="line"><span class="lineno">  294</span>    TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(</div>
+<div class="line"><span class="lineno">  295</span>        <span class="keywordtype">int</span> serializerVersion = data[<span class="stringliteral">&quot;serailizerVersion&quot;</span>];</div>
+<div class="line"><span class="lineno">  296</span> </div>
+<div class="line"><span class="lineno">  297</span>        <span class="keywordflow">if</span> (serializerVersion &lt; TERR3D_MIN_SERIALIZER_VERSION)</div>
+<div class="line"><span class="lineno">  298</span>{</div>
+<div class="line"><span class="lineno">  299</span>    onError(<span class="stringliteral">&quot;This file cannot be opened as it was serialized using serializer V&quot;</span> + std::to_string(serializerVersion) + <span class="stringliteral">&quot; but the minimum serializer version required is V&quot;</span> + std::to_string(TERR3D_MIN_SERIALIZER_VERSION), <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  300</span>        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  301</span>    }</div>
+<div class="line"><span class="lineno">  302</span> </div>
+<div class="line"><span class="lineno">  303</span>    <span class="keywordflow">if</span> (serializerVersion &gt; TERR3D_MAX_SERIALIZER_VERSION)</div>
+<div class="line"><span class="lineno">  304</span>{</div>
+<div class="line"><span class="lineno">  305</span>    onError(<span class="stringliteral">&quot;This file cannot be opened as it was serialized using serializer V&quot;</span> + std::to_string(serializerVersion) + <span class="stringliteral">&quot; but the maximum serializer version supported is V&quot;</span> + std::to_string(TERR3D_MAX_SERIALIZER_VERSION), <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  306</span>        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  307</span>    }</div>
+<div class="line"><span class="lineno">  308</span>    , <span class="stringliteral">&quot;Failed to verify Serializer&quot;</span>,</div>
+<div class="line"><span class="lineno">  309</span>    <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  310</span>    );</div>
+<div class="line"><span class="lineno">  311</span> </div>
+<div class="line"><span class="lineno">  312</span>    <span class="keywordflow">if</span> (data[<span class="stringliteral">&quot;type&quot;</span>] != <span class="stringliteral">&quot;SAVEFILE&quot;</span>)</div>
+<div class="line"><span class="lineno">  313</span>    {</div>
+<div class="line"><span class="lineno">  314</span>        onError(<span class="stringliteral">&quot;This file is not a savefile.&quot;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  315</span>        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  316</span>    }</div>
+<div class="line"><span class="lineno">  317</span> </div>
+<div class="line"><span class="lineno">  318</span>    TRY_CATCH_ERR_DESERIALIZE(LoadThemeFromStr(data[<span class="stringliteral">&quot;styleData&quot;</span>]);, <span class="stringliteral">&quot;Failed to load theme.&quot;</span>);</div>
+<div class="line"><span class="lineno">  319</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;globals.appData = data[<span class="stringliteral">&quot;appData&quot;</span>];, <span class="stringliteral">&quot;Failed to app data.&quot;</span>);</div>
+<div class="line"><span class="lineno">  320</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;globals.appData = data[<span class="stringliteral">&quot;appData&quot;</span>];, <span class="stringliteral">&quot;Failed to app data.&quot;</span>);</div>
+<div class="line"><span class="lineno">  321</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;mode = data[<span class="stringliteral">&quot;mode&quot;</span>];, <span class="stringliteral">&quot;Failed to app mode.&quot;</span>);</div>
+<div class="line"><span class="lineno">  322</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;projectManager-&gt;SetId(data[<span class="stringliteral">&quot;projectID&quot;</span>]);, <span class="stringliteral">&quot;Failed to load Project ID.&quot;</span>);</div>
+<div class="line"><span class="lineno">  323</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;projectManager-&gt;SetDatabase(data[<span class="stringliteral">&quot;projectDatabase&quot;</span>]);, <span class="stringliteral">&quot;Failed to load project database.&quot;</span>);</div>
+<div class="line"><span class="lineno">  324</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Loaded Project ID : &quot;</span> &lt;&lt; appState-&gt;projectManager-&gt;GetId() &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  325</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;cameras.Load(data[<span class="stringliteral">&quot;camera&quot;</span>]);, <span class="stringliteral">&quot;Failed to load camera.&quot;</span>);</div>
+<div class="line"><span class="lineno">  326</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;windows.Load(data[<span class="stringliteral">&quot;windows&quot;</span>]);, <span class="stringliteral">&quot;Failed to load windows.&quot;</span>);</div>
+<div class="line"><span class="lineno">  327</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;states.Load(data[<span class="stringliteral">&quot;states&quot;</span>]);, <span class="stringliteral">&quot;Failed to load states.&quot;</span>);</div>
+<div class="line"><span class="lineno">  328</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;globals.Load(data[<span class="stringliteral">&quot;globals&quot;</span>]);, <span class="stringliteral">&quot;Failed to load globals.&quot;</span>);</div>
+<div class="line"><span class="lineno">  329</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;seaManager-&gt;Load(data[<span class="stringliteral">&quot;sea&quot;</span>]);, <span class="stringliteral">&quot;Failed to load sea.&quot;</span>);</div>
+<div class="line"><span class="lineno">  330</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;foliageManager-&gt;Load(data[<span class="stringliteral">&quot;foliage&quot;</span>]);, <span class="stringliteral">&quot;Failed to load foliage.&quot;</span>);</div>
+<div class="line"><span class="lineno">  331</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;lightManager-&gt;Load(data[<span class="stringliteral">&quot;lighting&quot;</span>]);, <span class="stringliteral">&quot;Failed to load lighting.&quot;</span>);</div>
+<div class="line"><span class="lineno">  332</span>    TRY_CATCH_ERR_DESERIALIZE(appState-&gt;meshGenerator-&gt;Load(data[<span class="stringliteral">&quot;generators&quot;</span>]);, <span class="stringliteral">&quot;Failed to load generators.&quot;</span>);</div>
+<div class="line"><span class="lineno">  333</span>    TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(</div>
 <div class="line"><span class="lineno">  334</span> </div>
-<div class="line"><span class="lineno">  335</span>        if (projectAsset == <span class="stringliteral">&quot;&quot;</span>)</div>
-<div class="line"><span class="lineno">  336</span>        {</div>
-<div class="line"><span class="lineno">  337</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;Failed to load base model from save file!\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  338</span>            appState-&gt;states.usingBase = true;</div>
-<div class="line"><span class="lineno">  339</span>        }</div>
-<div class="line"><span class="lineno">  340</span> </div>
-<div class="line"><span class="lineno">  341</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  342</span>        {</div>
-<div class="line"><span class="lineno">  343</span>            if (!appState-&gt;models.customBase)</div>
-<div class="line"><span class="lineno">  344</span>            {</div>
-<div class="line"><span class="lineno">  345</span>                delete appState-&gt;models.customBase;</div>
-<div class="line"><span class="lineno">  346</span>                delete appState-&gt;models.customBaseCopy;</div>
-<div class="line"><span class="lineno">  347</span>            }</div>
-<div class="line"><span class="lineno">  348</span> </div>
-<div class="line"><span class="lineno">  349</span>            appState-&gt;globals.currentBaseModelPath = appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\&quot;</span> + projectAsset;</div>
-<div class="line"><span class="lineno">  350</span>            appState-&gt;models.customBase = LoadModel(appState-&gt;globals.currentBaseModelPath);</div>
-<div class="line"><span class="lineno">  351</span>            appState-&gt;models.customBaseCopy = LoadModel(appState-&gt;globals.currentBaseModelPath);</div>
-<div class="line"><span class="lineno">  352</span>            appState-&gt;states.usingBase = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  353</span>        }</div>
-<div class="line"><span class="lineno">  354</span>    }</div>
-<div class="line"><span class="lineno">  355</span>    , <span class="stringliteral">&quot;Failed to load custom base model. Falling back to plane.&quot;</span>,</div>
-<div class="line"><span class="lineno">  356</span> </div>
-<div class="line"><span class="lineno">  357</span>    <span class="keywordflow">if</span> (!appState-&gt;models.customBase)</div>
-<div class="line"><span class="lineno">  358</span>{</div>
-<div class="line"><span class="lineno">  359</span>    delete appState-&gt;models.customBase;</div>
-<div class="line"><span class="lineno">  360</span>    delete appState-&gt;models.customBaseCopy;</div>
-<div class="line"><span class="lineno">  361</span>}</div>
-<div class="line"><span class="lineno">  362</span>appState-&gt;states.usingBase = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  363</span>);</div>
-<div class="line"><span class="lineno">  364</span>    <span class="keywordflow">return</span> appState;</div>
-<div class="line"><span class="lineno">  365</span>}</div>
+<div class="line"><span class="lineno">  335</span>        <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">  336</span>{</div>
+<div class="line"><span class="lineno">  337</span>    std::string baseHash = data[<span class="stringliteral">&quot;baseid&quot;</span>];</div>
+<div class="line"><span class="lineno">  338</span>        std::string projectAsset = appState-&gt;projectManager-&gt;GetAsset(baseHash);</div>
+<div class="line"><span class="lineno">  339</span> </div>
+<div class="line"><span class="lineno">  340</span>        if (projectAsset == <span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><span class="lineno">  341</span>        {</div>
+<div class="line"><span class="lineno">  342</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;Failed to load base model from save file!\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  343</span>            appState-&gt;states.usingBase = true;</div>
+<div class="line"><span class="lineno">  344</span>        }</div>
+<div class="line"><span class="lineno">  345</span> </div>
+<div class="line"><span class="lineno">  346</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  347</span>        {</div>
+<div class="line"><span class="lineno">  348</span>            if (!appState-&gt;models.customBase)</div>
+<div class="line"><span class="lineno">  349</span>            {</div>
+<div class="line"><span class="lineno">  350</span>                delete appState-&gt;models.customBase;</div>
+<div class="line"><span class="lineno">  351</span>                delete appState-&gt;models.customBaseCopy;</div>
+<div class="line"><span class="lineno">  352</span>            }</div>
+<div class="line"><span class="lineno">  353</span> </div>
+<div class="line"><span class="lineno">  354</span>            appState-&gt;globals.currentBaseModelPath = appState-&gt;projectManager-&gt;GetResourcePath() + <span class="stringliteral">&quot;\\&quot;</span> + projectAsset;</div>
+<div class="line"><span class="lineno">  355</span>            appState-&gt;models.customBase = LoadModel(appState-&gt;globals.currentBaseModelPath);</div>
+<div class="line"><span class="lineno">  356</span>            appState-&gt;models.customBaseCopy = LoadModel(appState-&gt;globals.currentBaseModelPath);</div>
+<div class="line"><span class="lineno">  357</span>            appState-&gt;states.usingBase = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  358</span>        }</div>
+<div class="line"><span class="lineno">  359</span>    }</div>
+<div class="line"><span class="lineno">  360</span>    , <span class="stringliteral">&quot;Failed to load custom base model. Falling back to plane.&quot;</span>,</div>
+<div class="line"><span class="lineno">  361</span> </div>
+<div class="line"><span class="lineno">  362</span>    <span class="keywordflow">if</span> (!appState-&gt;models.customBase)</div>
+<div class="line"><span class="lineno">  363</span>{</div>
+<div class="line"><span class="lineno">  364</span>    delete appState-&gt;models.customBase;</div>
+<div class="line"><span class="lineno">  365</span>    delete appState-&gt;models.customBaseCopy;</div>
+<div class="line"><span class="lineno">  366</span>}</div>
+<div class="line"><span class="lineno">  367</span>appState-&gt;states.usingBase = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  368</span>);</div>
+<div class="line"><span class="lineno">  369</span>    <span class="keywordflow">return</span> appState;</div>
+<div class="line"><span class="lineno">  370</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

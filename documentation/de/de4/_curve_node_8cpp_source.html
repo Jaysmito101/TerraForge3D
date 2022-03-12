@@ -169,7 +169,7 @@ $(document).ready(function(){initNavTree('de/de4/_curve_node_8cpp_source.html','
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keywordtype">void</span> CurveNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>{</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    maxPoints = data[<span class="stringliteral">&quot;maxPoints&quot;</span>];</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    ReserveVector(curve, (maxPoints &gt; data[<span class="stringliteral">&quot;curveSize&quot;</span>] ? maxPoints : data[<span class="stringliteral">&quot;curveSize&quot;</span>]));</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    ReserveVector(curve, (maxPoints &gt; data[<span class="stringliteral">&quot;curveSize&quot;</span>].get&lt;int&gt;() ? maxPoints : data[<span class="stringliteral">&quot;curveSize&quot;</span>].get&lt;int&gt;()));</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp : data[<span class="stringliteral">&quot;curve&quot;</span>])</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    {</div>

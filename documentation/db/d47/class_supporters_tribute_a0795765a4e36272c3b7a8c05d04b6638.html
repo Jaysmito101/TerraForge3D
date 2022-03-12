@@ -120,62 +120,66 @@ $(document).ready(function(){initNavTree('db/d47/class_supporters_tribute_a07957
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html#l00067">67</a> of file <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html">SupportersTribute.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   68</span>{</div>
-<div class="line"><span class="lineno">   69</span>    <span class="keywordflow">if</span> (IsNetWorkConnected() &amp;&amp; (!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>) || rand() % 5 == 0))</div>
-<div class="line"><span class="lineno">   70</span>    {</div>
-<div class="line"><span class="lineno">   71</span>        Log(<span class="stringliteral">&quot;Internet Connection is Live!\nFetching Latest Supporters data.&quot;</span>);</div>
-<div class="line"><span class="lineno">   72</span>        {</div>
-<div class="line"><span class="lineno">   73</span>            std::string repoDataStr = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D&quot;</span>);</div>
-<div class="line"><span class="lineno">   74</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> repoData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(repoDataStr);</div>
-<div class="line"><span class="lineno">   75</span>            <span class="keywordtype">int</span> stargazerCount = repoData[<span class="stringliteral">&quot;stargazers_count&quot;</span>];</div>
-<div class="line"><span class="lineno">   76</span>            <span class="keywordtype">int</span> perPage = 30;</div>
-<div class="line"><span class="lineno">   77</span>            <span class="keywordtype">int</span> lastPage = stargazerCount / perPage;</div>
-<div class="line"><span class="lineno">   78</span>            std::string stargazersRawData = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&amp;page=&quot;</span> + std::to_string(lastPage));</div>
-<div class="line"><span class="lineno">   79</span>            SaveToFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>, stargazersRawData);</div>
-<div class="line"><span class="lineno">   80</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> stargazersData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(stargazersRawData);</div>
-<div class="line"><span class="lineno">   81</span>            LoadstargazersData(stargazersData);</div>
-<div class="line"><span class="lineno">   82</span>        }</div>
-<div class="line"><span class="lineno">   83</span>        {</div>
-<div class="line"><span class="lineno">   84</span>            std::string contributorsRawData = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D/contributors&quot;</span>);</div>
-<div class="line"><span class="lineno">   85</span>            SaveToFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>, contributorsRawData);</div>
-<div class="line"><span class="lineno">   86</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> contributorsData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(contributorsRawData);</div>
-<div class="line"><span class="lineno">   87</span>            LoadcontributorsData(contributorsData);</div>
+<p class="definition">Definition at line <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html#l00069">69</a> of file <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html">SupportersTribute.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   70</span>{</div>
+<div class="line"><span class="lineno">   71</span>    <span class="comment">// Temporary for running on linux</span></div>
+<div class="line"><span class="lineno">   72</span><span class="preprocessor">    #ifndef TERR3D_WIN32</span></div>
+<div class="line"><span class="lineno">   73</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   74</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   75</span>    <span class="keywordflow">if</span> (IsNetWorkConnected() &amp;&amp; (!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>) || rand() % 5 == 0))</div>
+<div class="line"><span class="lineno">   76</span>    {</div>
+<div class="line"><span class="lineno">   77</span>        Log(<span class="stringliteral">&quot;Internet Connection is Live!\nFetching Latest Supporters data.&quot;</span>);</div>
+<div class="line"><span class="lineno">   78</span>        {</div>
+<div class="line"><span class="lineno">   79</span>            std::string repoDataStr = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D&quot;</span>);</div>
+<div class="line"><span class="lineno">   80</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> repoData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(repoDataStr);</div>
+<div class="line"><span class="lineno">   81</span>            <span class="keywordtype">int</span> stargazerCount = repoData[<span class="stringliteral">&quot;stargazers_count&quot;</span>];</div>
+<div class="line"><span class="lineno">   82</span>            <span class="keywordtype">int</span> perPage = 30;</div>
+<div class="line"><span class="lineno">   83</span>            <span class="keywordtype">int</span> lastPage = stargazerCount / perPage;</div>
+<div class="line"><span class="lineno">   84</span>            std::string stargazersRawData = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&amp;page=&quot;</span> + std::to_string(lastPage));</div>
+<div class="line"><span class="lineno">   85</span>            SaveToFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>, stargazersRawData);</div>
+<div class="line"><span class="lineno">   86</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> stargazersData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(stargazersRawData);</div>
+<div class="line"><span class="lineno">   87</span>            LoadstargazersData(stargazersData);</div>
 <div class="line"><span class="lineno">   88</span>        }</div>
-<div class="line"><span class="lineno">   89</span>    }</div>
-<div class="line"><span class="lineno">   90</span> </div>
-<div class="line"><span class="lineno">   91</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   92</span>    {</div>
-<div class="line"><span class="lineno">   93</span>        <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   94</span>        Log(<span class="stringliteral">&quot;Trying to load cached data.&quot;</span>);</div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>        <span class="keywordflow">if</span> (FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>))</div>
-<div class="line"><span class="lineno">   97</span>        {</div>
-<div class="line"><span class="lineno">   98</span>            Log(<span class="stringliteral">&quot;Found Stargazers Cached Data!&quot;</span>);</div>
-<div class="line"><span class="lineno">   99</span>            std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">  100</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> stargazersData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(stargazersRawData);</div>
-<div class="line"><span class="lineno">  101</span>            LoadstargazersData(stargazersData);</div>
-<div class="line"><span class="lineno">  102</span>        }</div>
-<div class="line"><span class="lineno">  103</span> </div>
-<div class="line"><span class="lineno">  104</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  105</span>        {</div>
-<div class="line"><span class="lineno">  106</span>            Log(<span class="stringliteral">&quot;Stargazers Cached Data not found!&quot;</span>);</div>
-<div class="line"><span class="lineno">  107</span>        }</div>
-<div class="line"><span class="lineno">  108</span> </div>
-<div class="line"><span class="lineno">  109</span>        <span class="keywordflow">if</span> (FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>))</div>
-<div class="line"><span class="lineno">  110</span>        {</div>
-<div class="line"><span class="lineno">  111</span>            Log(<span class="stringliteral">&quot;Found Contributors Cached Data!&quot;</span>);</div>
-<div class="line"><span class="lineno">  112</span>            std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">  113</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> contributorsData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(contributorsRawData);</div>
-<div class="line"><span class="lineno">  114</span>            LoadcontributorsData(contributorsData);</div>
-<div class="line"><span class="lineno">  115</span>        }</div>
-<div class="line"><span class="lineno">  116</span> </div>
-<div class="line"><span class="lineno">  117</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  118</span>        {</div>
-<div class="line"><span class="lineno">  119</span>            Log(<span class="stringliteral">&quot;Contributors Cached Data not found!&quot;</span>);</div>
-<div class="line"><span class="lineno">  120</span>        }</div>
-<div class="line"><span class="lineno">  121</span>    }</div>
-<div class="line"><span class="lineno">  122</span>}</div>
+<div class="line"><span class="lineno">   89</span>        {</div>
+<div class="line"><span class="lineno">   90</span>            std::string contributorsRawData = FetchURL(<span class="stringliteral">&quot;https://api.github.com&quot;</span>, <span class="stringliteral">&quot;/repos/Jaysmito101/TerraForge3D/contributors&quot;</span>);</div>
+<div class="line"><span class="lineno">   91</span>            SaveToFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>, contributorsRawData);</div>
+<div class="line"><span class="lineno">   92</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> contributorsData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(contributorsRawData);</div>
+<div class="line"><span class="lineno">   93</span>            LoadcontributorsData(contributorsData);</div>
+<div class="line"><span class="lineno">   94</span>        }</div>
+<div class="line"><span class="lineno">   95</span>    }</div>
+<div class="line"><span class="lineno">   96</span> </div>
+<div class="line"><span class="lineno">   97</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   98</span>    {</div>
+<div class="line"><span class="lineno">   99</span>        <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  100</span>        Log(<span class="stringliteral">&quot;Trying to load cached data.&quot;</span>);</div>
+<div class="line"><span class="lineno">  101</span> </div>
+<div class="line"><span class="lineno">  102</span>        <span class="keywordflow">if</span> (FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>))</div>
+<div class="line"><span class="lineno">  103</span>        {</div>
+<div class="line"><span class="lineno">  104</span>            Log(<span class="stringliteral">&quot;Found Stargazers Cached Data!&quot;</span>);</div>
+<div class="line"><span class="lineno">  105</span>            std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\stargazers.terr3dcache&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">  106</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> stargazersData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(stargazersRawData);</div>
+<div class="line"><span class="lineno">  107</span>            LoadstargazersData(stargazersData);</div>
+<div class="line"><span class="lineno">  108</span>        }</div>
+<div class="line"><span class="lineno">  109</span> </div>
+<div class="line"><span class="lineno">  110</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  111</span>        {</div>
+<div class="line"><span class="lineno">  112</span>            Log(<span class="stringliteral">&quot;Stargazers Cached Data not found!&quot;</span>);</div>
+<div class="line"><span class="lineno">  113</span>        }</div>
+<div class="line"><span class="lineno">  114</span> </div>
+<div class="line"><span class="lineno">  115</span>        <span class="keywordflow">if</span> (FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>))</div>
+<div class="line"><span class="lineno">  116</span>        {</div>
+<div class="line"><span class="lineno">  117</span>            Log(<span class="stringliteral">&quot;Found Contributors Cached Data!&quot;</span>);</div>
+<div class="line"><span class="lineno">  118</span>            std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\contributors.terr3dcache&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">  119</span>            <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> contributorsData = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(contributorsRawData);</div>
+<div class="line"><span class="lineno">  120</span>            LoadcontributorsData(contributorsData);</div>
+<div class="line"><span class="lineno">  121</span>        }</div>
+<div class="line"><span class="lineno">  122</span> </div>
+<div class="line"><span class="lineno">  123</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  124</span>        {</div>
+<div class="line"><span class="lineno">  125</span>            Log(<span class="stringliteral">&quot;Contributors Cached Data not found!&quot;</span>);</div>
+<div class="line"><span class="lineno">  126</span>        }</div>
+<div class="line"><span class="lineno">  127</span>    }</div>
+<div class="line"><span class="lineno">  128</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->

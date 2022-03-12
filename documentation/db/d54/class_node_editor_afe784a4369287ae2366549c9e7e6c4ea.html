@@ -127,30 +127,32 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_afe784a436928
 <div class="line"><span class="lineno">  573</span> </div>
 <div class="line"><span class="lineno">  574</span>    <span class="keywordflow">if</span> (nodes.find(node-&gt;_id.Get()) != nodes.end())</div>
 <div class="line"><span class="lineno">  575</span>    {</div>
-<div class="line"><span class="lineno">  576</span>        <span class="keyword">using namespace </span>std::chrono_literals; <span class="comment">// This Line is temporary</span></div>
-<div class="line"><span class="lineno">  577</span>        std::this_thread::sleep_for(500ms); <span class="comment">// This Line is temporary</span></div>
-<div class="line"><span class="lineno">  578</span>        node-&gt;OnDelete();</div>
-<div class="line"><span class="lineno">  579</span>        std::vector&lt;NodeEditorPin *&gt; mPins = node-&gt;GetPins();</div>
-<div class="line"><span class="lineno">  580</span> </div>
-<div class="line"><span class="lineno">  581</span>        <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin : mPins)</div>
-<div class="line"><span class="lineno">  582</span>        {</div>
-<div class="line"><span class="lineno">  583</span>            <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">  584</span>            {</div>
-<div class="line"><span class="lineno">  585</span>                links.erase(links.find(pin-&gt;link-&gt;_id.Get()));</div>
-<div class="line"><span class="lineno">  586</span>                pin-&gt;other-&gt;Unlink();</div>
-<div class="line"><span class="lineno">  587</span>                <span class="keyword">delete</span> pin-&gt;link;</div>
-<div class="line"><span class="lineno">  588</span>            }</div>
-<div class="line"><span class="lineno">  589</span> </div>
-<div class="line"><span class="lineno">  590</span>            pins.erase(pins.find(pin-&gt;_id.Get()));</div>
-<div class="line"><span class="lineno">  591</span>            <span class="keyword">delete</span> pin;</div>
-<div class="line"><span class="lineno">  592</span>        }</div>
-<div class="line"><span class="lineno">  593</span> </div>
-<div class="line"><span class="lineno">  594</span>        nodes.erase(nodes.find(node-&gt;_id.Get()));</div>
-<div class="line"><span class="lineno">  595</span>        <span class="keyword">delete</span> node;</div>
-<div class="line"><span class="lineno">  596</span>    }</div>
-<div class="line"><span class="lineno">  597</span> </div>
-<div class="line"><span class="lineno">  598</span>    mutex.unlock();</div>
-<div class="line"><span class="lineno">  599</span>}</div>
+<div class="line"><span class="lineno">  576</span><span class="preprocessor">        #ifdef TERR3D_WIN32</span></div>
+<div class="line"><span class="lineno">  577</span>        <span class="keyword">using namespace </span>std::chrono_literals; <span class="comment">// This Line is temporary</span></div>
+<div class="line"><span class="lineno">  578</span>        std::this_thread::sleep_for(500ms); <span class="comment">// This Line is temporary</span></div>
+<div class="line"><span class="lineno">  579</span><span class="preprocessor">        #endif</span></div>
+<div class="line"><span class="lineno">  580</span>        node-&gt;OnDelete();</div>
+<div class="line"><span class="lineno">  581</span>        std::vector&lt;NodeEditorPin *&gt; mPins = node-&gt;GetPins();</div>
+<div class="line"><span class="lineno">  582</span> </div>
+<div class="line"><span class="lineno">  583</span>        <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin : mPins)</div>
+<div class="line"><span class="lineno">  584</span>        {</div>
+<div class="line"><span class="lineno">  585</span>            <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">  586</span>            {</div>
+<div class="line"><span class="lineno">  587</span>                links.erase(links.find(pin-&gt;link-&gt;_id.Get()));</div>
+<div class="line"><span class="lineno">  588</span>                pin-&gt;other-&gt;Unlink();</div>
+<div class="line"><span class="lineno">  589</span>                <span class="keyword">delete</span> pin-&gt;link;</div>
+<div class="line"><span class="lineno">  590</span>            }</div>
+<div class="line"><span class="lineno">  591</span> </div>
+<div class="line"><span class="lineno">  592</span>            pins.erase(pins.find(pin-&gt;_id.Get()));</div>
+<div class="line"><span class="lineno">  593</span>            <span class="keyword">delete</span> pin;</div>
+<div class="line"><span class="lineno">  594</span>        }</div>
+<div class="line"><span class="lineno">  595</span> </div>
+<div class="line"><span class="lineno">  596</span>        nodes.erase(nodes.find(node-&gt;_id.Get()));</div>
+<div class="line"><span class="lineno">  597</span>        <span class="keyword">delete</span> node;</div>
+<div class="line"><span class="lineno">  598</span>    }</div>
+<div class="line"><span class="lineno">  599</span> </div>
+<div class="line"><span class="lineno">  600</span>    mutex.unlock();</div>
+<div class="line"><span class="lineno">  601</span>}</div>
 <div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
 </div><!-- fragment -->
 </div>

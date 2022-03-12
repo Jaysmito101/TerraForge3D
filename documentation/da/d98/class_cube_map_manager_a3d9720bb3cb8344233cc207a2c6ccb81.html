@@ -121,36 +121,36 @@ $(document).ready(function(){initNavTree('da/d98/class_cube_map_manager_a3d9720b
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html#l00093">93</a> of file <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html">CubeMap.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   94</span>{</div>
-<div class="line"><span class="lineno">   95</span>    appState = as;</div>
-<div class="line"><span class="lineno">   96</span>    <span class="keyword">static</span> std::vector&lt;std::string&gt; faces =</div>
-<div class="line"><span class="lineno">   97</span>    {</div>
-<div class="line"><span class="lineno">   98</span>        appState-&gt;constants.skyboxDir + <span class="stringliteral">&quot;\\px.jpg&quot;</span>,</div>
-<div class="line"><span class="lineno">   99</span>        appState-&gt;constants.skyboxDir + <span class="stringliteral">&quot;\\nx.jpg&quot;</span>,</div>
-<div class="line"><span class="lineno">  100</span>        appState-&gt;constants.skyboxDir + <span class="stringliteral">&quot;\\py.jpg&quot;</span>,</div>
-<div class="line"><span class="lineno">  101</span>        appState-&gt;constants.skyboxDir + <span class="stringliteral">&quot;\\ny.jpg&quot;</span>,</div>
-<div class="line"><span class="lineno">  102</span>        appState-&gt;constants.skyboxDir + <span class="stringliteral">&quot;\\pz.jpg&quot;</span>,</div>
-<div class="line"><span class="lineno">  103</span>        appState-&gt;constants.skyboxDir + <span class="stringliteral">&quot;\\nz.jpg&quot;</span></div>
-<div class="line"><span class="lineno">  104</span>    };</div>
-<div class="line"><span class="lineno">  105</span>    cubemap = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a>();</div>
-<div class="line"><span class="lineno">  106</span>    cubemap-&gt;SetUpOnGPU();</div>
-<div class="line"><span class="lineno">  107</span>    cubemap-&gt;LoadFaces(faces);</div>
-<div class="line"><span class="lineno">  108</span>    cubemap-&gt;UploadDataToGPU();</div>
-<div class="line"><span class="lineno">  109</span>    skyboxShader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertShader, fragShader);</div>
-<div class="line"><span class="lineno">  110</span>    skyproShader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertShader, fragProShader);</div>
-<div class="line"><span class="lineno">  111</span>    glGenVertexArrays(1, &amp;vao);</div>
-<div class="line"><span class="lineno">  112</span>    glBindVertexArray(vao);</div>
-<div class="line"><span class="lineno">  113</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> VBO;</div>
-<div class="line"><span class="lineno">  114</span>    glGenBuffers(1, &amp;VBO);</div>
-<div class="line"><span class="lineno">  115</span>    glBindBuffer(GL_ARRAY_BUFFER, VBO);</div>
-<div class="line"><span class="lineno">  116</span>    glBufferData(GL_ARRAY_BUFFER, <span class="keyword">sizeof</span>(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);</div>
-<div class="line"><span class="lineno">  117</span>    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), (<span class="keywordtype">void</span> *)0);</div>
-<div class="line"><span class="lineno">  118</span>    glEnableVertexAttribArray(0);</div>
-<div class="line"><span class="lineno">  119</span>    skySphere = LoadModel(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\models\\icosphere.obj&quot;</span>);</div>
-<div class="line"><span class="lineno">  120</span>    skySphere-&gt;SetupMeshOnGPU();</div>
-<div class="line"><span class="lineno">  121</span>    skySphere-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno">  122</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html#l00094">94</a> of file <a class="el" href="../../d2/dd6/_cube_map_8cpp_source.html">CubeMap.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   95</span>{</div>
+<div class="line"><span class="lineno">   96</span>    appState = as;</div>
+<div class="line"><span class="lineno">   97</span>    <span class="keyword">static</span> std::vector&lt;std::string&gt; faces =</div>
+<div class="line"><span class="lineno">   98</span>    {</div>
+<div class="line"><span class="lineno">   99</span>        appState-&gt;constants.skyboxDir + PATH_SEPERATOR <span class="stringliteral">&quot;px.jpg&quot;</span>,</div>
+<div class="line"><span class="lineno">  100</span>        appState-&gt;constants.skyboxDir + PATH_SEPERATOR <span class="stringliteral">&quot;nx.jpg&quot;</span>,</div>
+<div class="line"><span class="lineno">  101</span>        appState-&gt;constants.skyboxDir + PATH_SEPERATOR <span class="stringliteral">&quot;py.jpg&quot;</span>,</div>
+<div class="line"><span class="lineno">  102</span>        appState-&gt;constants.skyboxDir + PATH_SEPERATOR <span class="stringliteral">&quot;ny.jpg&quot;</span>,</div>
+<div class="line"><span class="lineno">  103</span>        appState-&gt;constants.skyboxDir + PATH_SEPERATOR <span class="stringliteral">&quot;pz.jpg&quot;</span>,</div>
+<div class="line"><span class="lineno">  104</span>        appState-&gt;constants.skyboxDir + PATH_SEPERATOR <span class="stringliteral">&quot;nz.jpg&quot;</span></div>
+<div class="line"><span class="lineno">  105</span>    };</div>
+<div class="line"><span class="lineno">  106</span>    cubemap = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a>();</div>
+<div class="line"><span class="lineno">  107</span>    cubemap-&gt;SetUpOnGPU();</div>
+<div class="line"><span class="lineno">  108</span>    cubemap-&gt;LoadFaces(faces);</div>
+<div class="line"><span class="lineno">  109</span>    cubemap-&gt;UploadDataToGPU();</div>
+<div class="line"><span class="lineno">  110</span>    skyboxShader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertShader, fragShader);</div>
+<div class="line"><span class="lineno">  111</span>    skyproShader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertShader, fragProShader);</div>
+<div class="line"><span class="lineno">  112</span>    glGenVertexArrays(1, &amp;vao);</div>
+<div class="line"><span class="lineno">  113</span>    glBindVertexArray(vao);</div>
+<div class="line"><span class="lineno">  114</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> VBO;</div>
+<div class="line"><span class="lineno">  115</span>    glGenBuffers(1, &amp;VBO);</div>
+<div class="line"><span class="lineno">  116</span>    glBindBuffer(GL_ARRAY_BUFFER, VBO);</div>
+<div class="line"><span class="lineno">  117</span>    glBufferData(GL_ARRAY_BUFFER, <span class="keyword">sizeof</span>(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);</div>
+<div class="line"><span class="lineno">  118</span>    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), (<span class="keywordtype">void</span> *)0);</div>
+<div class="line"><span class="lineno">  119</span>    glEnableVertexAttribArray(0);</div>
+<div class="line"><span class="lineno">  120</span>    skySphere = LoadModel(GetExecutableDir() + PATH_SEPERATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;models&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;icosphere.obj&quot;</span>);</div>
+<div class="line"><span class="lineno">  121</span>    skySphere-&gt;SetupMeshOnGPU();</div>
+<div class="line"><span class="lineno">  122</span>    skySphere-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno">  123</span>}</div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
 <div class="ttc" id="aclass_texture_cubemap_html"><div class="ttname"><a href="../../d7/df9/class_texture_cubemap.html">TextureCubemap</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d33/_texture_cubemap_8h_source.html#l00016">TextureCubemap.h:17</a></div></div>
 </div><!-- fragment -->
