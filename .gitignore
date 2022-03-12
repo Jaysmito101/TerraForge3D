@@ -19,6 +19,7 @@ ghpages
 **.aps
 **.ini
 **.orig
+**.make
 
 TerraForge3D/**.exe
 TerraForge3D/**.obj
@@ -27,3 +28,6 @@ TerraForge3D/**.pdb
 
 Docs/html
 Docs/latex
+
+Makefile
+**/Makefile
