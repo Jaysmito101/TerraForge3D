@@ -48,8 +48,8 @@ project "TerraForge3DLib"
 	kind "StaticLib"
 	cppdialect "C++17"
 	language "C++"
-	staticruntime "on"
-        atl "Static"
+	staticruntime "On"
+    atl "Static"
 	vectorextensions "SSE4.1"
 	inlining "Auto"
 
@@ -85,9 +85,6 @@ project "TerraForge3DLib"
 		"%{IncludeDir.ImGuiNodeEditor}"
 	}
 
-	libdirs {
-		"./libs/win32/x64"
-	}
 
 	links {
 		"Urlmon.lib",
@@ -113,14 +110,35 @@ project "TerraForge3DLib"
 		"./TerraForge3D/src/Main.cpp",
 		"./TerraForge3D/src/Base/EntryPoint.cpp"
 	}
-	
-	filter "system:not windows"
+
+	filter "system:linux"
 		defines {
 			"NULL=0"
 		}
 
+		defines {
+			"TERR3D_LINUX"
+		}
+
+		libdirs {
+			"./libs/linux"
+		}
+
+		links {
+			"dl",
+			"pthread",
+			"ssl",
+			"crypto"
+		}
+	
+	filter "configurations:Debug"
+		defines "TERR3D_DEBUG"
+		symbols "on"
+	
+	filter "configurations:Release"
+		defines "TERR3D_RELEASE"
+	
 	filter "system:windows"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines {
@@ -129,30 +147,22 @@ project "TerraForge3DLib"
 			"_CRT_SECURE_NO_WARNINGS"
 		}
 
-	filter "configurations:Debug"
-		defines "TERR3D_DEBUG"
-		symbols "on"
-
-		links {
-			"libcryptoMTd.lib",
-			"libsslMTd.lib"
+		libdirs {
+			"./libs/win32/x64"
 		}
 
-	filter "configurations:Release"
-		defines "TERR3D_RELEASE"
+		filter "configurations:Debug"
+			links {
+				"libcryptoMTd.lib",
+				"libsslMTd.lib"
+			}
 		
-		optimize "Full"	
+		filter "configurations:Release"
+			links {
+				"libcryptoMT.lib",
+				"libsslMT.lib"
+			}
 
-		buildoptions{
-			"/Qpar",
-			"/fp:fast"
-		}
-	
-
-		links {
-			"libcryptoMT.lib",
-			"libsslMT.lib"
-		}
 
 project "TerraForge3D"
 	openmp "On"
@@ -161,7 +171,7 @@ project "TerraForge3D"
 	cppdialect "C++17"
 	language "C++"
 	staticruntime "on"
-        atl "Static"
+    atl "Static"
 	vectorextensions "SSE4.1"
 	inlining "Auto"
 
@@ -173,7 +183,6 @@ project "TerraForge3D"
 		"./TerraForge3D/src/Main.cpp",
 		"./TerraForge3D/src/Base/EntryPoint.cpp"
 	}
-
 
 	includedirs {
 		"./TerraForge3D/vendor/assimp/include",
@@ -193,35 +202,40 @@ project "TerraForge3D"
 
 	links {
 		"TerraForge3DLib"
-	}
-		
-
-	postbuildcommands  {
-		"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
-		"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
-	}
+	}		
 
 	filter "system:windows"
-		staticruntime "On"
 		systemversion "latest"
-
 		defines {
 			"TERR3D_WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS"
 		}
-
 		files {
 			"./TerraForge3D/src/TerraForge3D.rc"
 		}
 
-	filter "system:not windows"
+		postbuildcommands  {
+			"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y",
+			"xcopy \"$(SolutionDir)Binaries\\VCRuntime\" \"$(TargetDir)VCRuntime\\\" /e /r /y"
+		}
+
+	filter "system:linux"
 		defines {
 			"NULL=0" 
 		}
 
+		defines {
+			"TERR3D_LINUX"
+		}
+
 		libdirs	{
 			"./libs/linux"
+		}
+
+		postbuildcommands {
+			"cp \"$(SolutionDir)Binaries/Data\" \"$(TargetDir)Data\"",
+			"cp \"$(SolutionDir)Binaries/VCRuntime\" \"$(TargetDir)VCRuntime\""
 		}
 
 		links {
@@ -248,17 +262,6 @@ project "TerraForge3D"
 		defines "TERR3D_DEBUG"
 		symbols "on"
 
-
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
-		
 		optimize "Full"	
-
-		buildoptions{
-			"/Qpar",
-			"/fp:fast"
-		}
-	
-
-filter "system:windows"
-	include "Tools/ModuleMaker"
