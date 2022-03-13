@@ -26,7 +26,7 @@
 # include <openssl/bio.h>
 # include <openssl/asn1.h>
 # include <openssl/err.h>
-# include "internal/nelem.h"
+# include "nelem.h"
 
 #ifdef NDEBUG
 # define ossl_assert(x) ((x) != 0)

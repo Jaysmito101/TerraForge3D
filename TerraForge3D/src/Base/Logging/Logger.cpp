@@ -1,4 +1,5 @@
 #include "Base/Logging/Logger.h"
+#include "Platform.h"
 
 #include <ctime>
 #include <iostream>
@@ -13,7 +14,7 @@ Logger::Logger(std::string logsDir)
 	strftime(buffer, sizeof(buffer), "%A %d-%m-%Y %I-%M-%S %p", timeinfo);
 	std::string str(buffer);
 	str += ".txt";
-	mLogHandler = new LoggingOutputStreambuf(std::cout, logsDir + "\\" + str);
+	mLogHandler = new LoggingOutputStreambuf(std::cout, logsDir + PATH_SEPERATOR + str);
 }
 
 Logger::~Logger()

@@ -1,5 +1,6 @@
 #include "Sea/SeaManager.h"
 
+#include "Platform.h"
 #include "Utils/Utils.h"
 #include "Base/Base.h"
 #include "Data/ProjectData.h"
@@ -26,8 +27,8 @@ SeaManager::SeaManager(ApplicationState *as)
 	std::string fragmentShaderSource = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &tmp);
 	std::string geometryShaderSource = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &tmp);
 	shader = new Shader(vertexShaderSource, fragmentShaderSource, geometryShaderSource);
-	dudvMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_dudv.png");
-	normalMap = new Texture2D(GetExecutableDir() + "\\Data\\textures\\water_normal.png");
+	dudvMap = new Texture2D(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "textures" PATH_SEPERATOR "water_dudv.png");
+	normalMap = new Texture2D(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "textures" PATH_SEPERATOR "water_normal.png");
 }
 
 SeaManager::~SeaManager()
