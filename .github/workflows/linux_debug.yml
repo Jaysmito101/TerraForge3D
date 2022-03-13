@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Requied Libraries
         run: |
-          apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+          sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
 
       # Runs a single command using the runners shell
       - name: Build
