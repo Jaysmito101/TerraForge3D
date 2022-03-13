@@ -364,7 +364,7 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)sphere->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "sphere.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "Sphere.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -378,7 +378,7 @@ static void ShowChooseBaseModelPopup()
 
 		if (ImGui::ImageButton((ImTextureID)torus->GetRendererID(), ImVec2(200, 200)))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "torus.obj");
+			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPERATOR "Torus.obj");
 			ImGui::CloseCurrentPopup();
 		}
 
