@@ -39,7 +39,9 @@ static void InitImGui(std::string &configPath)
 	io.IniFilename = configPath.c_str();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+#ifdef TERR3D_WIN32 // Multiviewport is not supported stable on linux
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+#endif
 	io.ConfigViewportsNoTaskBarIcon = false;
 	io.ConfigViewportsNoAutoMerge = true;
 	ImGui::StyleColorsDark();

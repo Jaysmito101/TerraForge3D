@@ -234,8 +234,6 @@ project "TerraForge3D"
 		}
 
 		postbuildcommands {
-			"cp \"$(SolutionDir)Binaries/Data\" \"$(TargetDir)Data\"",
-			"cp \"$(SolutionDir)Binaries/VCRuntime\" \"$(TargetDir)VCRuntime\""
 		}
 
 		links {
