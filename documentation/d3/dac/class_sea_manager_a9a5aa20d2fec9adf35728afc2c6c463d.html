@@ -121,28 +121,28 @@ $(document).ready(function(){initNavTree('d3/dac/class_sea_manager_a9a5aa20d2fec
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00010">10</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   11</span>{</div>
-<div class="line"><span class="lineno">   12</span>    appState = as;</div>
-<div class="line"><span class="lineno">   13</span>    model = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Sea&quot;</span>);</div>
-<div class="line"><span class="lineno">   14</span>    model-&gt;SetupMeshOnGPU();</div>
-<div class="line"><span class="lineno">   15</span>    model-&gt;mesh-&gt;GeneratePlane(256, 120);</div>
-<div class="line"><span class="lineno">   16</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno">   17</span>    model-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno">   18</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   19</span>    enabled = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   20</span>    color[0] = 0;</div>
-<div class="line"><span class="lineno">   21</span>    color[1] = 0;</div>
-<div class="line"><span class="lineno">   22</span>    color[2] = 0.7f;</div>
-<div class="line"><span class="lineno">   23</span>    color[3] = 0;</div>
-<div class="line"><span class="lineno">   24</span>    scale = 100;</div>
-<div class="line"><span class="lineno">   25</span>    std::string vertexShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\vert.glsl&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">   26</span>    std::string fragmentShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\frag.glsl&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">   27</span>    std::string geometryShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\geom.glsl&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">   28</span>    shader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertexShaderSource, fragmentShaderSource, geometryShaderSource);</div>
-<div class="line"><span class="lineno">   29</span>    dudvMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\water_dudv.png&quot;</span>);</div>
-<div class="line"><span class="lineno">   30</span>    normalMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\water_normal.png&quot;</span>);</div>
-<div class="line"><span class="lineno">   31</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html#l00011">11</a> of file <a class="el" href="../../dc/d78/_sea_manager_8cpp_source.html">SeaManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   12</span>{</div>
+<div class="line"><span class="lineno">   13</span>    appState = as;</div>
+<div class="line"><span class="lineno">   14</span>    model = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a>(<span class="stringliteral">&quot;Sea&quot;</span>);</div>
+<div class="line"><span class="lineno">   15</span>    model-&gt;SetupMeshOnGPU();</div>
+<div class="line"><span class="lineno">   16</span>    model-&gt;mesh-&gt;GeneratePlane(256, 120);</div>
+<div class="line"><span class="lineno">   17</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno">   18</span>    model-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno">   19</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   20</span>    enabled = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   21</span>    color[0] = 0;</div>
+<div class="line"><span class="lineno">   22</span>    color[1] = 0;</div>
+<div class="line"><span class="lineno">   23</span>    color[2] = 0.7f;</div>
+<div class="line"><span class="lineno">   24</span>    color[3] = 0;</div>
+<div class="line"><span class="lineno">   25</span>    scale = 100;</div>
+<div class="line"><span class="lineno">   26</span>    std::string vertexShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\vert.glsl&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">   27</span>    std::string fragmentShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\frag.glsl&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">   28</span>    std::string geometryShaderSource = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\shaders\\water\\geom.glsl&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">   29</span>    shader = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a>(vertexShaderSource, fragmentShaderSource, geometryShaderSource);</div>
+<div class="line"><span class="lineno">   30</span>    dudvMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + PATH_SEPERATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;water_dudv.png&quot;</span>);</div>
+<div class="line"><span class="lineno">   31</span>    normalMap = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + PATH_SEPERATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;water_normal.png&quot;</span>);</div>
+<div class="line"><span class="lineno">   32</span>}</div>
 <div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
