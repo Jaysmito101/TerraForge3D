@@ -8,7 +8,7 @@ class PythonConfiguration:
         if not cls.__ValidatePython():
             return # cannot validate further
 
-        for packageName in ["requests"]:
+        for packageName in ["requests", "tarfile"]:
             if not cls.__ValidatePackage(packageName):
                 return # cannot validate further
 

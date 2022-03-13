@@ -2,17 +2,14 @@
 import os
 import subprocess
 import platform
+import sys
 import Utils
 
 from SetupPython import PythonConfiguration as PythonRequirements
 
-# Make sure everything we need for the setup is installed
-PythonRequirements.Validate()
 
 from SetupPremake import PremakeConfiguration as PremakeRequirements
-os.chdir('./../') # Change from devtools/scripts directory to root
 
-premakeInstalled = PremakeRequirements.Validate()
 
 # Download Libs
 
@@ -21,16 +18,36 @@ def FixLibDep(url, path):
         print("Downloading " + path + "...")
         Utils.DownloadFile(url, path)
 
-print("\nUpdating submodules...")
-subprocess.call(["git", "submodule", "update", "--remote", "--recursive", "--merge"])
-
-if (premakeInstalled):
-    if platform.system() == "Windows":
-        print("\nRunning premake...")
-        subprocess.call([os.path.abspath("./scripts/GenProjects.bat"), "nopause"])
+def GenerateProjects():
+    # Call Premake to generate projects for windows(vs2022) and linux (gmake2)
+    if sys.platform == "win32":
+        subprocess.call(["vendor\\premake\\premake5.exe", "vs2022"])
+    elif sys.platform == "linux":
+        subprocess.call(["./vendor/premake/premake5", "gmake2"])
     else:
-        print("TerraGen3D is only supported on Windows!")
+        print("Unsupported platform")
+        exit(1)
+    
 
-    print("\nSetup completed!")
-else:
-    print("TerraGen3D requires Premake to generate project files.")
+def main():
+    workingDir = os.getcwd()
+    # If working dir is scripts dir, go up one level
+    if os.path.basename(workingDir) == "scripts":
+        print(workingDir)
+        print(os.path.basename(workingDir))
+        os.chdir("..")
+    
+    # Make sure everything we need for the setup is installed
+    PythonRequirements.Validate()
+
+    premakeInstalled = PremakeRequirements.Validate()
+
+    if premakeInstalled:
+        GenerateProjects()
+    else:
+        print("Premake not installed")
+        exit(1)
+
+if __name__ == "__main__":
+    
+    main()

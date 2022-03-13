@@ -35,9 +35,13 @@ jobs:
       - name: Generate Solution
         run: premake5 gmake2
 
+      - name: Install Requied Libraries
+        run: |
+          apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+
       # Runs a single command using the runners shell
       - name: Build
-        run: make || true
+        run: make -j8
         
       - uses: actions/upload-artifact@v2
         with:
