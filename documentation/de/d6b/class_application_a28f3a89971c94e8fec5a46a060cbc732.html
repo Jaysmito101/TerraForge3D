@@ -121,32 +121,32 @@ $(document).ready(function(){initNavTree('de/d6b/class_application_a28f3a89971c9
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/d42/_application_8cpp_source.html#l00143">143</a> of file <a class="el" href="../../d0/d42/_application_8cpp_source.html">Application.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  144</span>{</div>
-<div class="line"><span class="lineno">  145</span>    m_Window-&gt;SetVisible(<span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  146</span>    <span class="keywordtype">float</span> oneSecCounter = 0;</div>
-<div class="line"><span class="lineno">  147</span> </div>
-<div class="line"><span class="lineno">  148</span>    <span class="keywordflow">while</span> (isActive)</div>
-<div class="line"><span class="lineno">  149</span>    {</div>
-<div class="line"><span class="lineno">  150</span>        <span class="keywordtype">float</span> currentTime = glfwGetTime();</div>
-<div class="line"><span class="lineno">  151</span>        <span class="keywordtype">float</span> deltaTime = currentTime - previousTime;</div>
-<div class="line"><span class="lineno">  152</span>        previousTime = currentTime;</div>
-<div class="line"><span class="lineno">  153</span>        oneSecCounter += deltaTime;</div>
-<div class="line"><span class="lineno">  154</span>        OnUpdate(deltaTime);</div>
-<div class="line"><span class="lineno">  155</span> </div>
-<div class="line"><span class="lineno">  156</span>        <span class="keywordflow">if</span> (oneSecCounter &gt;= 1)</div>
-<div class="line"><span class="lineno">  157</span>        {</div>
-<div class="line"><span class="lineno">  158</span>            OnOneSecondTick();</div>
-<div class="line"><span class="lineno">  159</span>            oneSecCounter = 0;</div>
-<div class="line"><span class="lineno">  160</span>        }</div>
-<div class="line"><span class="lineno">  161</span> </div>
-<div class="line"><span class="lineno">  162</span>        Render();</div>
-<div class="line"><span class="lineno">  163</span>        m_Window-&gt;Update();</div>
-<div class="line"><span class="lineno">  164</span>    }</div>
-<div class="line"><span class="lineno">  165</span> </div>
-<div class="line"><span class="lineno">  166</span>    OnEnd();</div>
-<div class="line"><span class="lineno">  167</span>    ImGuiShutdown();</div>
-<div class="line"><span class="lineno">  168</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/d42/_application_8cpp_source.html#l00145">145</a> of file <a class="el" href="../../d0/d42/_application_8cpp_source.html">Application.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  146</span>{</div>
+<div class="line"><span class="lineno">  147</span>    m_Window-&gt;SetVisible(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  148</span>    <span class="keywordtype">float</span> oneSecCounter = 0;</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>    <span class="keywordflow">while</span> (isActive)</div>
+<div class="line"><span class="lineno">  151</span>    {</div>
+<div class="line"><span class="lineno">  152</span>        <span class="keywordtype">float</span> currentTime = glfwGetTime();</div>
+<div class="line"><span class="lineno">  153</span>        <span class="keywordtype">float</span> deltaTime = currentTime - previousTime;</div>
+<div class="line"><span class="lineno">  154</span>        previousTime = currentTime;</div>
+<div class="line"><span class="lineno">  155</span>        oneSecCounter += deltaTime;</div>
+<div class="line"><span class="lineno">  156</span>        OnUpdate(deltaTime);</div>
+<div class="line"><span class="lineno">  157</span> </div>
+<div class="line"><span class="lineno">  158</span>        <span class="keywordflow">if</span> (oneSecCounter &gt;= 1)</div>
+<div class="line"><span class="lineno">  159</span>        {</div>
+<div class="line"><span class="lineno">  160</span>            OnOneSecondTick();</div>
+<div class="line"><span class="lineno">  161</span>            oneSecCounter = 0;</div>
+<div class="line"><span class="lineno">  162</span>        }</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>        Render();</div>
+<div class="line"><span class="lineno">  165</span>        m_Window-&gt;Update();</div>
+<div class="line"><span class="lineno">  166</span>    }</div>
+<div class="line"><span class="lineno">  167</span> </div>
+<div class="line"><span class="lineno">  168</span>    OnEnd();</div>
+<div class="line"><span class="lineno">  169</span>    ImGuiShutdown();</div>
+<div class="line"><span class="lineno">  170</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

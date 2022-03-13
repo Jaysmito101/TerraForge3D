@@ -120,21 +120,21 @@ $(document).ready(function(){initNavTree('de/d6b/class_application_a2ead90b47589
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/d42/_application_8cpp_source.html#l00113">113</a> of file <a class="el" href="../../d0/d42/_application_8cpp_source.html">Application.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  114</span>{</div>
-<div class="line"><span class="lineno">  115</span>    ImGui::EndFrame();</div>
-<div class="line"><span class="lineno">  116</span>    ImGui::Render();</div>
-<div class="line"><span class="lineno">  117</span>    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());</div>
-<div class="line"><span class="lineno">  118</span>    ImGuiIO &amp;io = ImGui::GetIO();</div>
-<div class="line"><span class="lineno">  119</span> </div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">if</span> (io.ConfigFlags &amp; ImGuiConfigFlags_ViewportsEnable)</div>
-<div class="line"><span class="lineno">  121</span>    {</div>
-<div class="line"><span class="lineno">  122</span>        GLFWwindow *backup_current_context = glfwGetCurrentContext();</div>
-<div class="line"><span class="lineno">  123</span>        ImGui::UpdatePlatformWindows();</div>
-<div class="line"><span class="lineno">  124</span>        ImGui::RenderPlatformWindowsDefault();</div>
-<div class="line"><span class="lineno">  125</span>        glfwMakeContextCurrent(backup_current_context);</div>
-<div class="line"><span class="lineno">  126</span>    }</div>
-<div class="line"><span class="lineno">  127</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/d42/_application_8cpp_source.html#l00115">115</a> of file <a class="el" href="../../d0/d42/_application_8cpp_source.html">Application.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  116</span>{</div>
+<div class="line"><span class="lineno">  117</span>    ImGui::EndFrame();</div>
+<div class="line"><span class="lineno">  118</span>    ImGui::Render();</div>
+<div class="line"><span class="lineno">  119</span>    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());</div>
+<div class="line"><span class="lineno">  120</span>    ImGuiIO &amp;io = ImGui::GetIO();</div>
+<div class="line"><span class="lineno">  121</span> </div>
+<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">if</span> (io.ConfigFlags &amp; ImGuiConfigFlags_ViewportsEnable)</div>
+<div class="line"><span class="lineno">  123</span>    {</div>
+<div class="line"><span class="lineno">  124</span>        GLFWwindow *backup_current_context = glfwGetCurrentContext();</div>
+<div class="line"><span class="lineno">  125</span>        ImGui::UpdatePlatformWindows();</div>
+<div class="line"><span class="lineno">  126</span>        ImGui::RenderPlatformWindowsDefault();</div>
+<div class="line"><span class="lineno">  127</span>        glfwMakeContextCurrent(backup_current_context);</div>
+<div class="line"><span class="lineno">  128</span>    }</div>
+<div class="line"><span class="lineno">  129</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
