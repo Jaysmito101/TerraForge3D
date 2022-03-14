@@ -159,23 +159,21 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		{
 		    tmp[0] = 1024;
 		    tmp[1] = 1024;
-	    }
+		}
 		tmp[2] = 1;
-		Camera cam(false);
-		float CameraR[3] = { 5185.0f, 0.0f, 0.0f };
-		cam.cFar = 1000;
-		cam.aspect = 1;
-		cam.position[0] = 0.0f;
-		cam.position[1] = 0.0f;
-		cam.position[2] = appState->cameras.main.position[2];
-		cam.rotation[0] = 0.0f;
-		cam.rotation[1] = 0.0f;
-		cam.rotation[2] = 0.0f;
-		cam.UpdateCamera(tmp[0], tmp[1]);
-		shader = appState->shaders.textureBake;
+		Camera cam;
+		cam = appState->cameras.main;
+		cam.aspect = 1.0f;
+		cam.position[0] = cam.position[1] = cam.position[2] = 0.0f;
+		cam.position[2] = 1.0f;
+		cam.rotation[0] = cam.rotation[1] = cam.rotation[2] = 0.0f;
+		cam.perspective = false;
+		cam.UpdateCamera();
+		shader = appState->shaders.terrain;
 		shader->Bind();
 		shader->SetTime(&time);
 		shader->SetMPV(cam.pv);
+		shader->SetUniformf("_TextureBake", 1.0f);
 		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
 		shader->SetLightCol(appState->lightManager->color);
 		shader->SetLightPos(appState->lightManager->position);
@@ -183,6 +181,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
 		shader->SetUniform3f("_HMapMinMax", appState->globals.hMapC);
 		shader->SetUniformf("_SeaLevel", appState->seaManager->level);
+		shader->SetUniformf("_Scale", appState->globals.scale);
 		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		shader->SetUniformf("_Mode", appState->globals.textureBakeMode);
@@ -210,6 +209,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		{
 			shader = appState->shaders.terrain;
 		}
+		shader->SetUniformf("_TextureBake", 0.0f);
 
 		shader->Bind();
 		shader->SetTime(&time);
@@ -987,7 +987,7 @@ public:
 			ImGui::End();
 		}
 
-		if (appState->states.autoAspectCalcRatio)
+		if (appState->states.autoAspectCalcRatio && (appState->globals.viewportSize[1] != 0 && appState->globals.viewportSize[0] != 0))
 		{
 			appState->cameras.main.aspect = appState->globals.viewportSize[0] / appState->globals.viewportSize[1];
 		}

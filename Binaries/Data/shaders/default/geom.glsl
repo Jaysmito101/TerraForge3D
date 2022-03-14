@@ -49,7 +49,7 @@ void main()
 	height = data_in[0].height;
 	Distance = data_in[0].distance;
 	TexCoord = data_in[0].TexCoord;
-	FragPos = gl_in[0].gl_Position;
+	FragPos = vec4(data_in[0].FragPos, 1.0f);
 	EmitVertex();
 
 	gl_Position = _PV * gl_in[1].gl_Position;
@@ -61,7 +61,7 @@ void main()
 	else
 		Normal = data_in[1].Normal;
 	TexCoord = data_in[1].TexCoord;
-	FragPos = gl_in[1].gl_Position;
+	FragPos = vec4(data_in[1].FragPos, 1.0f);
 	EmitVertex();
 
 	gl_Position =  _PV * gl_in[2].gl_Position;
@@ -73,7 +73,7 @@ void main()
 	else
 		Normal = data_in[1].Normal;
 	TexCoord = data_in[2].TexCoord;
-	FragPos = gl_in[2].gl_Position;
+	FragPos = vec4(data_in[2].FragPos, 1.0f);
 	EmitVertex();
 
 	EndPrimitive();

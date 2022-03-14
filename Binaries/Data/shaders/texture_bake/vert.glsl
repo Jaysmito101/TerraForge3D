@@ -20,7 +20,7 @@ out DATA
 
 void main()
 {
-    gl_Position =  vec4(0, aPos.x, aPos.z, 1.0);
+	gl_Position =  vec4(0, aPos.x, aPos.z, 1.0);
 	data_out.height = aExtras1.x;
 	data_out.FragPos = vec3(aPos.x, aPos.y, aPos.z);
 	data_out.Normal = vec3(aNorm.x, aNorm.y, aNorm.z);

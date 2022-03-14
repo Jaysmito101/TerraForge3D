@@ -23,7 +23,7 @@ Camera::Camera(bool ps)
 	pitch = yaw = roll = 0;
 	view = glm::mat4(1.0f);
 	pv = glm::mat4(1.0f);
-	pers = glm::perspective(fov, aspect, cNear, cFar);
+	pers = glm::perspective(fov, 16.0f / 9.0f, cNear, cFar);
 	mposition = glm::vec3(0.0f, 0.0f, 3.0f);
 	mrotation = glm::vec3(1.0f);
 	position[0] = 0.0f;
@@ -93,7 +93,7 @@ void Camera::UpdateCamera(float xmax, float ymax)
     if(perspective)
 	    pers = glm::perspective(fov, aspect, cNear, cFar);
     else
-	    pers = glm::ortho(0.0f, xmax, 0.0f, ymax, cNear, cFar);
+	    pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
 	pv = pers * view;
 }
 

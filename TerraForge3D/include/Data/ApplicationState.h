@@ -111,7 +111,7 @@ struct ApplicationStateStates
 	bool iExploreMode = false;
 	bool showFoliage = true;
 	bool textureBake = false;
-	bool useGPUForNormals = true;
+	bool useGPUForNormals = false;
 	bool postProcess = false;
 	bool autoAspectCalcRatio = true;
 	std::atomic<bool> ruinning = true;

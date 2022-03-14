@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Linu Debug Build
+name: Linux Debug Build
 
 # Controls when the workflow will run
 on:
@@ -38,6 +38,9 @@ jobs:
       - name: Install Requied Libraries
         run: |
           sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+          sudo apt-get install libxmu-dev libxi-dev
+          sudo apt-get install mesa-utils
+          sudo apt-get install freeglut3-dev
 
       # Runs a single command using the runners shell
       - name: Build

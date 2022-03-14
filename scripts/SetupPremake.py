@@ -21,7 +21,7 @@ class PremakeConfiguration:
     premakeZipURLExtension = "zip" if premakeOS == "windows" else "tar.gz"
     premakeZipUrls = f"https://github.com/premake/premake-core/releases/download/v{premakeVersion}/premake-{premakeVersion}-{premakeOS}.{premakeZipURLExtension}"
     premakeLicenseUrl = "https://raw.githubusercontent.com/premake/premake-core/master/LICENSE.txt"
-    premakeDirectory = f"./vendor/premake"
+    premakeDirectory = os.path.join("vendor", "premake")
     premakeFileName = f"premake" + ( ".exe" if sys.platform == 'win32' else "" )
 
     @classmethod
@@ -30,7 +30,7 @@ class PremakeConfiguration:
             print("Premake is not installed.\nInstalling Premake ...")
             if not os.path.exists(cls.premakeDirectory):
                 print("Creating Premake directory : " + cls.premakeDirectory)
-                os.mkdir(cls.premakeDirectory)
+                os.makedirs(cls.premakeDirectory)
             return  cls.InstallPremake()
             
 
