@@ -120,22 +120,26 @@ $(document).ready(function(){initNavTree('db/d01/struct_g_l_s_l_function_aca9cac
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/ded/_g_l_s_l_handler_8cpp_source.html#l00089">89</a> of file <a class="el" href="../../d2/ded/_g_l_s_l_handler_8cpp_source.html">GLSLHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   90</span>{</div>
-<div class="line"><span class="lineno">   91</span>    std::stringstream c;</div>
-<div class="line"><span class="lineno">   92</span>    <span class="keywordflow">if</span>(comment.size() &gt; 0)</div>
-<div class="line"><span class="lineno">   93</span>    {</div>
-<div class="line"><span class="lineno">   94</span>        c &lt;&lt; comment &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">   95</span>    }</div>
-<div class="line"><span class="lineno">   96</span>    c &lt;&lt; returnType &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; name &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; params &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">   97</span>    c &lt;&lt; <span class="stringliteral">&quot;{\n&quot;</span>;</div>
-<div class="line"><span class="lineno">   98</span>    <span class="keywordflow">for</span>(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>&amp; line : lines)</div>
-<div class="line"><span class="lineno">   99</span>    {</div>
-<div class="line"><span class="lineno">  100</span>        c &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; line.GenerateGLSL() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  101</span>    }</div>
-<div class="line"><span class="lineno">  102</span>    c &lt;&lt; <span class="stringliteral">&quot;}&quot;</span>;</div>
-<div class="line"><span class="lineno">  103</span>    <span class="keywordflow">return</span> c.str();</div>
-<div class="line"><span class="lineno">  104</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d2/ded/_g_l_s_l_handler_8cpp_source.html#l00097">97</a> of file <a class="el" href="../../d2/ded/_g_l_s_l_handler_8cpp_source.html">GLSLHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   98</span>{</div>
+<div class="line"><span class="lineno">   99</span>    std::stringstream c;</div>
+<div class="line"><span class="lineno">  100</span> </div>
+<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">if</span>(comment.size() &gt; 0)</div>
+<div class="line"><span class="lineno">  102</span>    {</div>
+<div class="line"><span class="lineno">  103</span>        c &lt;&lt; comment &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  104</span>    }</div>
+<div class="line"><span class="lineno">  105</span> </div>
+<div class="line"><span class="lineno">  106</span>    c &lt;&lt; returnType &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; name &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; params &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  107</span>    c &lt;&lt; <span class="stringliteral">&quot;{\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  108</span> </div>
+<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">for</span>(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> &amp;line : lines)</div>
+<div class="line"><span class="lineno">  110</span>    {</div>
+<div class="line"><span class="lineno">  111</span>        c &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; line.GenerateGLSL() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  112</span>    }</div>
+<div class="line"><span class="lineno">  113</span> </div>
+<div class="line"><span class="lineno">  114</span>    c &lt;&lt; <span class="stringliteral">&quot;}&quot;</span>;</div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">return</span> c.str();</div>
+<div class="line"><span class="lineno">  116</span>}</div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
 </div><!-- fragment -->
 </div>

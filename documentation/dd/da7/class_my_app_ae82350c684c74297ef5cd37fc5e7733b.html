@@ -130,31 +130,31 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_ae82350c684c74297e
 
 <p>Reimplemented from <a class="el" href="../../de/d6b/class_application.html">Application</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d5/d12/_main_8cpp_source.html#l00950">950</a> of file <a class="el" href="../../d5/d12/_main_8cpp_source.html">Main.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  951</span>    {</div>
-<div class="line"><span class="lineno">  952</span>        <span class="keywordflow">if</span> (!appState-&gt;states.ruinning)</div>
-<div class="line"><span class="lineno">  953</span>        {</div>
-<div class="line"><span class="lineno">  954</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  955</span>        }</div>
-<div class="line"><span class="lineno">  956</span> </div>
-<div class="line"><span class="lineno">  957</span>        appState-&gt;globals.secondCounter++;</div>
-<div class="line"><span class="lineno">  958</span> </div>
-<div class="line"><span class="lineno">  959</span>        <span class="keywordflow">if</span> (appState-&gt;globals.secondCounter % 5 == 0)</div>
-<div class="line"><span class="lineno">  960</span>        {</div>
-<div class="line"><span class="lineno">  961</span>            <span class="keywordflow">if</span> (appState-&gt;states.autoSave)</div>
-<div class="line"><span class="lineno">  962</span>            {</div>
-<div class="line"><span class="lineno">  963</span>                SaveFile(appState-&gt;constants.cacheDir + PATH_SEPERATOR <span class="stringliteral">&quot;autosave&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;autosave.terr3d&quot;</span>);</div>
-<div class="line"><span class="lineno">  964</span> </div>
-<div class="line"><span class="lineno">  965</span>                <span class="keywordflow">if</span> (appState-&gt;globals.currentOpenFilePath.size() &gt; 3)</div>
-<div class="line"><span class="lineno">  966</span>                {</div>
-<div class="line"><span class="lineno">  967</span>                    SaveFile(appState-&gt;globals.currentOpenFilePath);</div>
-<div class="line"><span class="lineno">  968</span>                }</div>
-<div class="line"><span class="lineno">  969</span>            }</div>
-<div class="line"><span class="lineno">  970</span>        }</div>
-<div class="line"><span class="lineno">  971</span> </div>
-<div class="line"><span class="lineno">  972</span>        GetWindow()-&gt;SetVSync(appState-&gt;states.vSync);</div>
-<div class="line"><span class="lineno">  973</span>        appState-&gt;stats.frameRate = 1 / appState-&gt;stats.deltatime;</div>
-<div class="line"><span class="lineno">  974</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="../../d5/d12/_main_8cpp_source.html#l00953">953</a> of file <a class="el" href="../../d5/d12/_main_8cpp_source.html">Main.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  954</span>    {</div>
+<div class="line"><span class="lineno">  955</span>        <span class="keywordflow">if</span> (!appState-&gt;states.ruinning)</div>
+<div class="line"><span class="lineno">  956</span>        {</div>
+<div class="line"><span class="lineno">  957</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  958</span>        }</div>
+<div class="line"><span class="lineno">  959</span> </div>
+<div class="line"><span class="lineno">  960</span>        appState-&gt;globals.secondCounter++;</div>
+<div class="line"><span class="lineno">  961</span> </div>
+<div class="line"><span class="lineno">  962</span>        <span class="keywordflow">if</span> (appState-&gt;globals.secondCounter % 5 == 0)</div>
+<div class="line"><span class="lineno">  963</span>        {</div>
+<div class="line"><span class="lineno">  964</span>            <span class="keywordflow">if</span> (appState-&gt;states.autoSave)</div>
+<div class="line"><span class="lineno">  965</span>            {</div>
+<div class="line"><span class="lineno">  966</span>                SaveFile(appState-&gt;constants.cacheDir + PATH_SEPERATOR <span class="stringliteral">&quot;autosave&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;autosave.terr3d&quot;</span>);</div>
+<div class="line"><span class="lineno">  967</span> </div>
+<div class="line"><span class="lineno">  968</span>                <span class="keywordflow">if</span> (appState-&gt;globals.currentOpenFilePath.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  969</span>                {</div>
+<div class="line"><span class="lineno">  970</span>                    SaveFile(appState-&gt;globals.currentOpenFilePath);</div>
+<div class="line"><span class="lineno">  971</span>                }</div>
+<div class="line"><span class="lineno">  972</span>            }</div>
+<div class="line"><span class="lineno">  973</span>        }</div>
+<div class="line"><span class="lineno">  974</span> </div>
+<div class="line"><span class="lineno">  975</span>        GetWindow()-&gt;SetVSync(appState-&gt;states.vSync);</div>
+<div class="line"><span class="lineno">  976</span>        appState-&gt;stats.frameRate = 1 / appState-&gt;stats.deltatime;</div>
+<div class="line"><span class="lineno">  977</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>

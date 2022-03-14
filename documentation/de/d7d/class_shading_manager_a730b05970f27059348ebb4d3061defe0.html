@@ -121,17 +121,20 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_a730b0597
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00031">31</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   32</span>{</div>
-<div class="line"><span class="lineno">   33</span>    ImGui::Begin(<span class="stringliteral">&quot;Shading##ShadingManager&quot;</span>, pOpen);</div>
-<div class="line"><span class="lineno">   34</span> </div>
-<div class="line"><span class="lineno">   35</span>    <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Compile Shaders&quot;</span>))</div>
-<div class="line"><span class="lineno">   36</span>        ReCompileShaders();</div>
-<div class="line"><span class="lineno">   37</span> </div>
-<div class="line"><span class="lineno">   38</span>    ImGui::Text(<span class="stringliteral">&quot;VS : \n%s&quot;</span>, vetexSource.data());</div>
-<div class="line"><span class="lineno">   39</span> </div>
-<div class="line"><span class="lineno">   40</span>    ImGui::End();</div>
-<div class="line"><span class="lineno">   41</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00035">35</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   36</span>{</div>
+<div class="line"><span class="lineno">   37</span>    ImGui::Begin(<span class="stringliteral">&quot;Shading##ShadingManager&quot;</span>, pOpen);</div>
+<div class="line"><span class="lineno">   38</span> </div>
+<div class="line"><span class="lineno">   39</span>    <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Compile Shaders&quot;</span>))</div>
+<div class="line"><span class="lineno">   40</span>    {</div>
+<div class="line"><span class="lineno">   41</span>        ReCompileShaders();</div>
+<div class="line"><span class="lineno">   42</span>    }</div>
+<div class="line"><span class="lineno">   43</span> </div>
+<div class="line"><span class="lineno">   44</span>    ImGui::Text(<span class="stringliteral">&quot;VS: \n%s&quot;</span>, vertexSource.data());</div>
+<div class="line"><span class="lineno">   45</span>    ImGui::Text(<span class="stringliteral">&quot;GS: \n%s&quot;</span>, geometrySource.data());</div>
+<div class="line"><span class="lineno">   46</span>    ImGui::Text(<span class="stringliteral">&quot;FS: \n%s&quot;</span>, fragmentSource.data());</div>
+<div class="line"><span class="lineno">   47</span>    ImGui::End();</div>
+<div class="line"><span class="lineno">   48</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

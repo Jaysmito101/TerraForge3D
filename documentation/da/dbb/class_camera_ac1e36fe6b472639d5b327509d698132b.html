@@ -131,36 +131,36 @@ $(document).ready(function(){initNavTree('da/dbb/class_camera_ac1e36fe6b472639d5
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d1/d33/_camera_8cpp_source.html#l00100">100</a> of file <a class="el" href="../../d1/d33/_camera_8cpp_source.html">Camera.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  101</span>{</div>
-<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">if</span>(pOpen == <span class="keyword">nullptr</span> || *pOpen)</div>
-<div class="line"><span class="lineno">  103</span>    {</div>
-<div class="line"><span class="lineno">  104</span>        <span class="keywordflow">if</span> (renderWindow)</div>
-<div class="line"><span class="lineno">  105</span>        {</div>
-<div class="line"><span class="lineno">  106</span>            ImGui::Begin((<span class="stringliteral">&quot;Camera Controls##&quot;</span> + std::to_string(camID)).c_str(), pOpen);</div>
-<div class="line"><span class="lineno">  107</span>        }</div>
-<div class="line"><span class="lineno">  108</span> </div>
-<div class="line"><span class="lineno">  109</span>        ImGui::Text(<span class="stringliteral">&quot;Camera Position&quot;</span>);</div>
-<div class="line"><span class="lineno">  110</span>        ImGui::DragFloat3(<span class="stringliteral">&quot;##cameraPosition&quot;</span>, position, 0.1f);</div>
-<div class="line"><span class="lineno">  111</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  112</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  113</span>        ImGui::Text(<span class="stringliteral">&quot;Camera Rotation&quot;</span>);</div>
-<div class="line"><span class="lineno">  114</span>        ImGui::DragFloat3(<span class="stringliteral">&quot;##cameraRotation&quot;</span>, rotation, 10);</div>
-<div class="line"><span class="lineno">  115</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  116</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  117</span>        ImGui::Text(<span class="stringliteral">&quot;Projection Settings&quot;</span>);</div>
+<p class="definition">Definition at line <a class="el" href="../../d1/d33/_camera_8cpp_source.html#l00107">107</a> of file <a class="el" href="../../d1/d33/_camera_8cpp_source.html">Camera.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  108</span>{</div>
+<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">if</span>(pOpen == <span class="keyword">nullptr</span> || *pOpen)</div>
+<div class="line"><span class="lineno">  110</span>    {</div>
+<div class="line"><span class="lineno">  111</span>        <span class="keywordflow">if</span> (renderWindow)</div>
+<div class="line"><span class="lineno">  112</span>        {</div>
+<div class="line"><span class="lineno">  113</span>            ImGui::Begin((<span class="stringliteral">&quot;Camera Controls##&quot;</span> + std::to_string(camID)).c_str(), pOpen);</div>
+<div class="line"><span class="lineno">  114</span>        }</div>
+<div class="line"><span class="lineno">  115</span> </div>
+<div class="line"><span class="lineno">  116</span>        ImGui::Text(<span class="stringliteral">&quot;Camera Position&quot;</span>);</div>
+<div class="line"><span class="lineno">  117</span>        ImGui::DragFloat3(<span class="stringliteral">&quot;##cameraPosition&quot;</span>, position, 0.1f);</div>
 <div class="line"><span class="lineno">  118</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  119</span>        ImGui::DragFloat(<span class="stringliteral">&quot;FOV&quot;</span>, &amp;fov, 0.01f);</div>
-<div class="line"><span class="lineno">  120</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Aspect Ratio&quot;</span>, &amp;aspect, 0.01f);</div>
-<div class="line"><span class="lineno">  121</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Near Clipping&quot;</span>, &amp;cNear, 0.01f);</div>
-<div class="line"><span class="lineno">  122</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Far Clipping&quot;</span>, &amp;cFar, 0.01f);</div>
-<div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>        <span class="keywordflow">if</span> (renderWindow)</div>
-<div class="line"><span class="lineno">  125</span>        {</div>
-<div class="line"><span class="lineno">  126</span>            ImGui::End();</div>
-<div class="line"><span class="lineno">  127</span>        }</div>
-<div class="line"><span class="lineno">  128</span>    }</div>
-<div class="line"><span class="lineno">  129</span>}</div>
+<div class="line"><span class="lineno">  119</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  120</span>        ImGui::Text(<span class="stringliteral">&quot;Camera Rotation&quot;</span>);</div>
+<div class="line"><span class="lineno">  121</span>        ImGui::DragFloat3(<span class="stringliteral">&quot;##cameraRotation&quot;</span>, rotation, 10);</div>
+<div class="line"><span class="lineno">  122</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  123</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  124</span>        ImGui::Text(<span class="stringliteral">&quot;Projection Settings&quot;</span>);</div>
+<div class="line"><span class="lineno">  125</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  126</span>        ImGui::DragFloat(<span class="stringliteral">&quot;FOV&quot;</span>, &amp;fov, 0.01f);</div>
+<div class="line"><span class="lineno">  127</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Aspect Ratio&quot;</span>, &amp;aspect, 0.01f);</div>
+<div class="line"><span class="lineno">  128</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Near Clipping&quot;</span>, &amp;cNear, 0.01f);</div>
+<div class="line"><span class="lineno">  129</span>        ImGui::DragFloat(<span class="stringliteral">&quot;Far Clipping&quot;</span>, &amp;cFar, 0.01f);</div>
+<div class="line"><span class="lineno">  130</span> </div>
+<div class="line"><span class="lineno">  131</span>        <span class="keywordflow">if</span> (renderWindow)</div>
+<div class="line"><span class="lineno">  132</span>        {</div>
+<div class="line"><span class="lineno">  133</span>            ImGui::End();</div>
+<div class="line"><span class="lineno">  134</span>        }</div>
+<div class="line"><span class="lineno">  135</span>    }</div>
+<div class="line"><span class="lineno">  136</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

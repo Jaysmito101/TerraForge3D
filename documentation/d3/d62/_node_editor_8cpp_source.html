@@ -683,10 +683,10 @@ $(document).ready(function(){initNavTree('d3/d62/_node_editor_8cpp_source.html',
 <div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span> </div>
 <div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    <span class="keywordflow">if</span> (nodes.find(node-&gt;_id.Get()) != nodes.end())</div>
 <div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>    {</div>
-<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span><span class="preprocessor">        #ifdef TERR3D_WIN32</span></div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
 <div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span>        <span class="keyword">using namespace </span>std::chrono_literals; <span class="comment">// This Line is temporary</span></div>
 <div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>        std::this_thread::sleep_for(500ms); <span class="comment">// This Line is temporary</span></div>
-<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span><span class="preprocessor">        #endif</span></div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>        node-&gt;OnDelete();</div>
 <div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>        std::vector&lt;NodeEditorPin *&gt; mPins = node-&gt;GetPins();</div>
 <div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span> </div>
