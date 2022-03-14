@@ -125,215 +125,217 @@ $(document).ready(function(){initNavTree('dd/d9b/_application_state_8h_source.ht
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;Foliage/FoliagePlacement.h&quot;</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;Sky/SkySettings.h&quot;</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &quot;Misc/OSLiscences.h&quot;</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;json/json.hpp&quot;</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="../../d5/d75/struct_application_state_models.html">   21</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>{</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *coreTerrain;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *grid; <span class="comment">// For future use</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *screenQuad;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *customBase;</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *customBaseCopy;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a>();</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">~ApplicationStateModels</a>();</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>};</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="../../da/d16/struct_application_state_frame_buffers.html">   34</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../da/d16/struct_application_state_frame_buffers.html">ApplicationStateFrameBuffers</a></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>{</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *reflection;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *textureExport;</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *postProcess;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *main;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *texBakeMain = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>};</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="../../d4/d38/struct_application_state_shaders.html">   43</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d4/d38/struct_application_state_shaders.html">ApplicationStateShaders</a></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>{</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *terrain = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *wireframe = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *textureBake = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *foliage = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *postProcess = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="comment">// For future use</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *meshNormals = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>};</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="../../df/d5e/struct_application_state_cameras.html">   55</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../df/d5e/struct_application_state_cameras.html">ApplicationStateCameras</a></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>{</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> main;</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> postPorcess;</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>};</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="../../db/dbd/struct_application_state_statistics.html">   64</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../db/dbd/struct_application_state_statistics.html">ApplicationStateStatistics</a></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>{</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">double</span> deltatime = 1;</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordtype">double</span> frameRate = 1;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordtype">double</span> meshGenerationTime = 0;</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">int</span> triangles = 0;</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">int</span> vertexCount = 0;</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>};</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="../../da/dcc/struct_application_state_windows.html">   73</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../da/dcc/struct_application_state_windows.html">ApplicationStateWindows</a></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>{</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keywordtype">bool</span> styleEditor = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordtype">bool</span> statsWindow = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordtype">bool</span> shaderEditorWindow = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keywordtype">bool</span> texturEditorWindow = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordtype">bool</span> seaEditor = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keywordtype">bool</span> textureStore = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="keywordtype">bool</span> osLisc = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordtype">bool</span> filtersManager = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keywordtype">bool</span> foliageManager = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordtype">bool</span> supportersTribute = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordtype">bool</span> skySettings = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordtype">bool</span> modulesManager = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordtype">bool</span> lightControls = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keywordtype">bool</span> cameraControls = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>};</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="../../d8/d67/struct_application_state_modules.html">   95</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d8/d67/struct_application_state_modules.html">ApplicationStateModules</a></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>{</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <a class="code hl_class" href="../../d8/d79/class_module_manager.html">ModuleManager</a> *manager;</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>};</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno"><a class="line" href="../../d6/d20/struct_application_state_states.html">  100</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d6/d20/struct_application_state_states.html">ApplicationStateStates</a></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>{</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keywordtype">bool</span> usingBase = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keywordtype">bool</span> skyboxEnabled = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordtype">bool</span> vSync = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keywordtype">bool</span> autoUpdate = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <span class="keywordtype">bool</span> mouseButton1, mouseButton2, mouseButton3;</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keywordtype">bool</span> wireFrameMode = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordtype">bool</span> reqTexRfrsh = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <span class="keywordtype">bool</span> autoSave = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">bool</span> exploreMode = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordtype">bool</span> iExploreMode = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordtype">bool</span> showFoliage = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordtype">bool</span> textureBake = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordtype">bool</span> useGPUForNormals = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordtype">bool</span> postProcess = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <span class="keywordtype">bool</span> autoAspectCalcRatio = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    std::atomic&lt;bool&gt; ruinning = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    std::atomic&lt;bool&gt; remeshing = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>};</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="../../d0/da1/struct_application_state_textures.html">  124</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d0/da1/struct_application_state_textures.html">ApplicationStateTextures</a></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>{</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *grid;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>};</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="../../d2/d98/struct_application_state_globals.html">  129</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d2/d98/struct_application_state_globals.html">ApplicationStateGlobals</a></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>{</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <span class="keywordtype">float</span> mouseSpeed = 25;</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keywordtype">float</span> scrollSpeed = 0.5f;</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    <span class="keywordtype">float</span> mouseScrollAmount = 0;</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keywordtype">float</span> viewportMousePosX = 0;</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    <span class="keywordtype">float</span> viewportMousePosY = 0;</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    <span class="keywordtype">float</span> scale = 1.0f;</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keywordtype">float</span> offset[3];</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &quot;Shading/ShadingManager.h&quot;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &quot;json/json.hpp&quot;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="../../d5/d75/struct_application_state_models.html">   22</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>{</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *coreTerrain;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *grid; <span class="comment">// For future use</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *screenQuad;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *customBase;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_class" href="../../d0/de3/class_model.html">Model</a> *customBaseCopy;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a>();</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">~ApplicationStateModels</a>();</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>};</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="../../da/d16/struct_application_state_frame_buffers.html">   35</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../da/d16/struct_application_state_frame_buffers.html">ApplicationStateFrameBuffers</a></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>{</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *reflection;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *textureExport;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *postProcess;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *main;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_class" href="../../d8/d23/class_frame_buffer.html">FrameBuffer</a> *texBakeMain = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>};</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="../../d4/d38/struct_application_state_shaders.html">   44</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d4/d38/struct_application_state_shaders.html">ApplicationStateShaders</a></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>{</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *terrain = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *wireframe = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *textureBake = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *foliage = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *postProcess = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="comment">// For future use</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *meshNormals = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>};</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="../../df/d5e/struct_application_state_cameras.html">   56</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../df/d5e/struct_application_state_cameras.html">ApplicationStateCameras</a></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>{</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> main;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <a class="code hl_class" href="../../da/dbb/class_camera.html">Camera</a> postPorcess;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>};</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="../../db/dbd/struct_application_state_statistics.html">   65</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../db/dbd/struct_application_state_statistics.html">ApplicationStateStatistics</a></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>{</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordtype">double</span> deltatime = 1;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordtype">double</span> frameRate = 1;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">double</span> meshGenerationTime = 0;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">int</span> triangles = 0;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keywordtype">int</span> vertexCount = 0;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>};</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="../../da/dcc/struct_application_state_windows.html">   74</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../da/dcc/struct_application_state_windows.html">ApplicationStateWindows</a></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>{</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordtype">bool</span> styleEditor = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordtype">bool</span> statsWindow = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keywordtype">bool</span> shaderEditorWindow = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordtype">bool</span> texturEditorWindow = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keywordtype">bool</span> seaEditor = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="keywordtype">bool</span> textureStore = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordtype">bool</span> osLisc = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keywordtype">bool</span> filtersManager = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordtype">bool</span> foliageManager = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordtype">bool</span> supportersTribute = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordtype">bool</span> skySettings = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordtype">bool</span> modulesManager = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keywordtype">bool</span> lightControls = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordtype">bool</span> cameraControls = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    <span class="keywordtype">bool</span> shadingManager = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>};</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="../../d8/d67/struct_application_state_modules.html">   96</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d8/d67/struct_application_state_modules.html">ApplicationStateModules</a></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>{</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <a class="code hl_class" href="../../d8/d79/class_module_manager.html">ModuleManager</a> *manager;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>};</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="../../d6/d20/struct_application_state_states.html">  101</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d6/d20/struct_application_state_states.html">ApplicationStateStates</a></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>{</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keywordtype">bool</span> usingBase = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordtype">bool</span> skyboxEnabled = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keywordtype">bool</span> vSync = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <span class="keywordtype">bool</span> autoUpdate = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keywordtype">bool</span> mouseButton1, mouseButton2, mouseButton3;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordtype">bool</span> wireFrameMode = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <span class="keywordtype">bool</span> reqTexRfrsh = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">bool</span> autoSave = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordtype">bool</span> exploreMode = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordtype">bool</span> iExploreMode = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordtype">bool</span> showFoliage = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordtype">bool</span> textureBake = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordtype">bool</span> useGPUForNormals = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <span class="keywordtype">bool</span> postProcess = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordtype">bool</span> autoAspectCalcRatio = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    std::atomic&lt;bool&gt; ruinning = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    std::atomic&lt;bool&gt; remeshing = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>};</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="../../d0/da1/struct_application_state_textures.html">  125</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d0/da1/struct_application_state_textures.html">ApplicationStateTextures</a></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>{</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *grid;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>};</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="../../d2/d98/struct_application_state_globals.html">  130</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d2/d98/struct_application_state_globals.html">ApplicationStateGlobals</a></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>{</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keywordtype">float</span> mouseSpeed = 25;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    <span class="keywordtype">float</span> scrollSpeed = 0.5f;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keywordtype">float</span> mouseScrollAmount = 0;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    <span class="keywordtype">float</span> viewportMousePosX = 0;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    <span class="keywordtype">float</span> viewportMousePosY = 0;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keywordtype">float</span> scale = 1.0f;</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    <span class="keywordtype">float</span> offset[3];</div>
 <div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <span class="keywordtype">int</span> resolution = 256;</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <span class="keywordtype">int</span> numberOfNoiseTypes = 3;</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <span class="keywordtype">int</span> secondCounter = 0;</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    <span class="keywordtype">int</span> textureBakeMode = 0;</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordtype">int</span> texBakeRes = 1024;</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span> </div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> appData;</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    std::string currentOpenFilePath = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    std::string currentBaseModelPath = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    std::string kernelsIncludeDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    <span class="keywordtype">float</span> viewportSize[4];</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    <span class="keywordtype">float</span> hMapC[4];</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>};</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="../../d7/dee/struct_application_state_constants.html">  159</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d7/dee/struct_application_state_constants.html">ApplicationStateConstants</a></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>{</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    glm::vec3 UP             = glm::vec3(0.0f, 1.0f, 0.0f);</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    glm::vec3 DOWN           = glm::vec3(0.0f, -1.0f, 0.0f);</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    glm::vec3 FRONT          = glm::vec3(0.0f, 0.0f, -1.0f);</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    glm::vec3 BACK           = glm::vec3(0.0f, 1.0f, 1.0f);</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    std::string executableDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    std::string dataDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    std::string cacheDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    std::string texturesDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    std::string projectsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    std::string tempDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    std::string shadersDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    std::string kernelsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    std::string fontsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    std::string liscensesDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    std::string skyboxDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    std::string modulesDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    std::string modelsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    std::string configsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    std::string logsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> </div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>};</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="keyword">enum</span> ApplicationMode</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>{</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    TERRAIN = 0,</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    CUSTOM_BASE,</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    CUBE_MARCHED</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>};</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno"><a class="line" href="../../da/d59/struct_application_state.html">  191</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a></div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>{</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    <a class="code hl_class" href="../../de/d6b/class_application.html">Application</a> *mainApp;</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a> models;</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <a class="code hl_struct" href="../../da/d16/struct_application_state_frame_buffers.html">ApplicationStateFrameBuffers</a> frameBuffers;</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    <a class="code hl_struct" href="../../d4/d38/struct_application_state_shaders.html">ApplicationStateShaders</a> shaders;</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <a class="code hl_struct" href="../../df/d5e/struct_application_state_cameras.html">ApplicationStateCameras</a> cameras;</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <a class="code hl_struct" href="../../db/dbd/struct_application_state_statistics.html">ApplicationStateStatistics</a> stats;</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <a class="code hl_struct" href="../../da/dcc/struct_application_state_windows.html">ApplicationStateWindows</a> windows;</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <a class="code hl_struct" href="../../d8/d67/struct_application_state_modules.html">ApplicationStateModules</a> modules;</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <a class="code hl_struct" href="../../d6/d20/struct_application_state_states.html">ApplicationStateStates</a> states;</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    <a class="code hl_struct" href="../../d0/da1/struct_application_state_textures.html">ApplicationStateTextures</a> textures;</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    <a class="code hl_struct" href="../../d2/d98/struct_application_state_globals.html">ApplicationStateGlobals</a> globals;</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    <a class="code hl_struct" href="../../d7/dee/struct_application_state_constants.html">ApplicationStateConstants</a> constants;</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    <a class="code hl_class" href="../../d3/dac/class_sea_manager.html">SeaManager</a> *seaManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    <a class="code hl_class" href="../../d1/d3e/class_light_manager.html">LightManager</a> *lightManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <a class="code hl_class" href="../../d0/dc2/class_serializer.html">Serializer</a> *serailizer = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <a class="code hl_class" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a> *meshGenerator = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    <a class="code hl_class" href="../../d4/d04/class_main_menu.html">MainMenu</a> *mainMenu = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    <a class="code hl_class" href="../../d0/d8a/class_texture_store.html">TextureStore</a> *textureStore = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    <a class="code hl_class" href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a> *supportersTribute = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a> *filtersManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    <a class="code hl_class" href="../../db/d15/class_sky_manager.html">SkyManager</a> *skyManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <a class="code hl_class" href="../../da/dfe/class_o_s_liscences.html">OSLiscences</a> *osLiscences = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <a class="code hl_class" href="../../d7/d93/class_project_manager.html">ProjectManager</a> *projectManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    <a class="code hl_class" href="../../d5/da2/class_foliage_manager.html">FoliageManager</a> *foliageManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span> </div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    ApplicationMode mode = ApplicationMode::TERRAIN;</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <span class="keywordtype">int</span> resolution = 256;</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <span class="keywordtype">int</span> numberOfNoiseTypes = 3;</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    <span class="keywordtype">int</span> secondCounter = 0;</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordtype">int</span> textureBakeMode = 0;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    <span class="keywordtype">int</span> texBakeRes = 1024;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> appData;</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    std::string currentOpenFilePath = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    std::string currentBaseModelPath = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    std::string kernelsIncludeDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span> </div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    <span class="keywordtype">float</span> viewportSize[4];</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="keywordtype">float</span> hMapC[4];</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>};</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno"><a class="line" href="../../d7/dee/struct_application_state_constants.html">  160</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../d7/dee/struct_application_state_constants.html">ApplicationStateConstants</a></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>{</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    glm::vec3 UP             = glm::vec3(0.0f, 1.0f, 0.0f);</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    glm::vec3 DOWN           = glm::vec3(0.0f, -1.0f, 0.0f);</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    glm::vec3 FRONT          = glm::vec3(0.0f, 0.0f, -1.0f);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    glm::vec3 BACK           = glm::vec3(0.0f, 1.0f, 1.0f);</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    std::string executableDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    std::string dataDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    std::string cacheDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    std::string texturesDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    std::string projectsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    std::string tempDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    std::string shadersDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    std::string kernelsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    std::string fontsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    std::string liscensesDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    std::string skyboxDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    std::string modulesDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    std::string modelsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    std::string configsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    std::string logsDir = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>};</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span> </div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="keyword">enum</span> ApplicationMode</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>{</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    TERRAIN = 0,</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    CUSTOM_BASE,</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    CUBE_MARCHED</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>};</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno"><a class="line" href="../../da/d59/struct_application_state.html">  192</a></span><span class="keyword">struct </span><a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>{</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <a class="code hl_class" href="../../de/d6b/class_application.html">Application</a> *mainApp;</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span> </div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <a class="code hl_struct" href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a> models;</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    <a class="code hl_struct" href="../../da/d16/struct_application_state_frame_buffers.html">ApplicationStateFrameBuffers</a> frameBuffers;</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <a class="code hl_struct" href="../../d4/d38/struct_application_state_shaders.html">ApplicationStateShaders</a> shaders;</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <a class="code hl_struct" href="../../df/d5e/struct_application_state_cameras.html">ApplicationStateCameras</a> cameras;</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <a class="code hl_struct" href="../../db/dbd/struct_application_state_statistics.html">ApplicationStateStatistics</a> stats;</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <a class="code hl_struct" href="../../da/dcc/struct_application_state_windows.html">ApplicationStateWindows</a> windows;</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <a class="code hl_struct" href="../../d8/d67/struct_application_state_modules.html">ApplicationStateModules</a> modules;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    <a class="code hl_struct" href="../../d6/d20/struct_application_state_states.html">ApplicationStateStates</a> states;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    <a class="code hl_struct" href="../../d0/da1/struct_application_state_textures.html">ApplicationStateTextures</a> textures;</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    <a class="code hl_struct" href="../../d2/d98/struct_application_state_globals.html">ApplicationStateGlobals</a> globals;</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <a class="code hl_struct" href="../../d7/dee/struct_application_state_constants.html">ApplicationStateConstants</a> constants;</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    <a class="code hl_class" href="../../d3/dac/class_sea_manager.html">SeaManager</a> *seaManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <a class="code hl_class" href="../../d1/d3e/class_light_manager.html">LightManager</a> *lightManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <a class="code hl_class" href="../../d0/dc2/class_serializer.html">Serializer</a> *serailizer = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    <a class="code hl_class" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a> *meshGenerator = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    <a class="code hl_class" href="../../d4/d04/class_main_menu.html">MainMenu</a> *mainMenu = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    <a class="code hl_class" href="../../d0/d8a/class_texture_store.html">TextureStore</a> *textureStore = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <a class="code hl_class" href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a> *supportersTribute = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    <a class="code hl_class" href="../../da/d39/class_filters_manager.html">FiltersManager</a> *filtersManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <a class="code hl_class" href="../../db/d15/class_sky_manager.html">SkyManager</a> *skyManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <a class="code hl_class" href="../../da/dfe/class_o_s_liscences.html">OSLiscences</a> *osLiscences = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    <a class="code hl_class" href="../../d7/d93/class_project_manager.html">ProjectManager</a> *projectManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    <a class="code hl_class" href="../../d5/da2/class_foliage_manager.html">FoliageManager</a> *foliageManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    <a class="code hl_class" href="../../de/d7d/class_shading_manager.html">ShadingManager</a>* shadingManager = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a>();</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    ApplicationMode mode = ApplicationMode::TERRAIN;</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span> </div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">~ApplicationState</a>();</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>};</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a>();</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">~ApplicationState</a>();</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>};</div>
 <div class="ttc" id="aclass_application_html"><div class="ttname"><a href="../../de/d6b/class_application.html">Application</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d9/da3/_application_8h_source.html#l00007">Application.h:8</a></div></div>
 <div class="ttc" id="aclass_camera_html"><div class="ttname"><a href="../../da/dbb/class_camera.html">Camera</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d91/_camera_8h_source.html#l00008">Camera.h:9</a></div></div>
 <div class="ttc" id="aclass_filters_manager_html"><div class="ttname"><a href="../../da/d39/class_filters_manager.html">FiltersManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/ddf/_filters_manager_8h_source.html#l00011">FiltersManager.h:12</a></div></div>
@@ -349,23 +351,24 @@ $(document).ready(function(){initNavTree('dd/d9b/_application_state_8h_source.ht
 <div class="ttc" id="aclass_sea_manager_html"><div class="ttname"><a href="../../d3/dac/class_sea_manager.html">SeaManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d0a/_sea_manager_8h_source.html#l00011">SeaManager.h:12</a></div></div>
 <div class="ttc" id="aclass_serializer_html"><div class="ttname"><a href="../../d0/dc2/class_serializer.html">Serializer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de0/_serializer_8h_source.html#l00009">Serializer.h:10</a></div></div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
+<div class="ttc" id="aclass_shading_manager_html"><div class="ttname"><a href="../../de/d7d/class_shading_manager.html">ShadingManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../df/dad/_shading_manager_8h_source.html#l00007">ShadingManager.h:8</a></div></div>
 <div class="ttc" id="aclass_sky_manager_html"><div class="ttname"><a href="../../db/d15/class_sky_manager.html">SkyManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/da4/_sky_settings_8h_source.html#l00010">SkySettings.h:11</a></div></div>
 <div class="ttc" id="aclass_supporters_tribute_html"><div class="ttname"><a href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00017">SupportersTribute.h:18</a></div></div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 <div class="ttc" id="aclass_texture_store_html"><div class="ttname"><a href="../../d0/d8a/class_texture_store.html">TextureStore</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d2b/_texture_store_8h_source.html#l00034">TextureStore.h:35</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
-<div class="ttc" id="astruct_application_state_cameras_html"><div class="ttname"><a href="../../df/d5e/struct_application_state_cameras.html">ApplicationStateCameras</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00055">ApplicationState.h:56</a></div></div>
-<div class="ttc" id="astruct_application_state_constants_html"><div class="ttname"><a href="../../d7/dee/struct_application_state_constants.html">ApplicationStateConstants</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00159">ApplicationState.h:160</a></div></div>
-<div class="ttc" id="astruct_application_state_frame_buffers_html"><div class="ttname"><a href="../../da/d16/struct_application_state_frame_buffers.html">ApplicationStateFrameBuffers</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00034">ApplicationState.h:35</a></div></div>
-<div class="ttc" id="astruct_application_state_globals_html"><div class="ttname"><a href="../../d2/d98/struct_application_state_globals.html">ApplicationStateGlobals</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00129">ApplicationState.h:130</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00191">ApplicationState.h:192</a></div></div>
-<div class="ttc" id="astruct_application_state_models_html"><div class="ttname"><a href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00021">ApplicationState.h:22</a></div></div>
-<div class="ttc" id="astruct_application_state_modules_html"><div class="ttname"><a href="../../d8/d67/struct_application_state_modules.html">ApplicationStateModules</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00095">ApplicationState.h:96</a></div></div>
-<div class="ttc" id="astruct_application_state_shaders_html"><div class="ttname"><a href="../../d4/d38/struct_application_state_shaders.html">ApplicationStateShaders</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00043">ApplicationState.h:44</a></div></div>
-<div class="ttc" id="astruct_application_state_states_html"><div class="ttname"><a href="../../d6/d20/struct_application_state_states.html">ApplicationStateStates</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00100">ApplicationState.h:101</a></div></div>
-<div class="ttc" id="astruct_application_state_statistics_html"><div class="ttname"><a href="../../db/dbd/struct_application_state_statistics.html">ApplicationStateStatistics</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00064">ApplicationState.h:65</a></div></div>
-<div class="ttc" id="astruct_application_state_textures_html"><div class="ttname"><a href="../../d0/da1/struct_application_state_textures.html">ApplicationStateTextures</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00124">ApplicationState.h:125</a></div></div>
-<div class="ttc" id="astruct_application_state_windows_html"><div class="ttname"><a href="../../da/dcc/struct_application_state_windows.html">ApplicationStateWindows</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00073">ApplicationState.h:74</a></div></div>
+<div class="ttc" id="astruct_application_state_cameras_html"><div class="ttname"><a href="../../df/d5e/struct_application_state_cameras.html">ApplicationStateCameras</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00056">ApplicationState.h:57</a></div></div>
+<div class="ttc" id="astruct_application_state_constants_html"><div class="ttname"><a href="../../d7/dee/struct_application_state_constants.html">ApplicationStateConstants</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00160">ApplicationState.h:161</a></div></div>
+<div class="ttc" id="astruct_application_state_frame_buffers_html"><div class="ttname"><a href="../../da/d16/struct_application_state_frame_buffers.html">ApplicationStateFrameBuffers</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00035">ApplicationState.h:36</a></div></div>
+<div class="ttc" id="astruct_application_state_globals_html"><div class="ttname"><a href="../../d2/d98/struct_application_state_globals.html">ApplicationStateGlobals</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00130">ApplicationState.h:131</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00192">ApplicationState.h:193</a></div></div>
+<div class="ttc" id="astruct_application_state_models_html"><div class="ttname"><a href="../../d5/d75/struct_application_state_models.html">ApplicationStateModels</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00022">ApplicationState.h:23</a></div></div>
+<div class="ttc" id="astruct_application_state_modules_html"><div class="ttname"><a href="../../d8/d67/struct_application_state_modules.html">ApplicationStateModules</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00096">ApplicationState.h:97</a></div></div>
+<div class="ttc" id="astruct_application_state_shaders_html"><div class="ttname"><a href="../../d4/d38/struct_application_state_shaders.html">ApplicationStateShaders</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00044">ApplicationState.h:45</a></div></div>
+<div class="ttc" id="astruct_application_state_states_html"><div class="ttname"><a href="../../d6/d20/struct_application_state_states.html">ApplicationStateStates</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00101">ApplicationState.h:102</a></div></div>
+<div class="ttc" id="astruct_application_state_statistics_html"><div class="ttname"><a href="../../db/dbd/struct_application_state_statistics.html">ApplicationStateStatistics</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00065">ApplicationState.h:66</a></div></div>
+<div class="ttc" id="astruct_application_state_textures_html"><div class="ttname"><a href="../../d0/da1/struct_application_state_textures.html">ApplicationStateTextures</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00125">ApplicationState.h:126</a></div></div>
+<div class="ttc" id="astruct_application_state_windows_html"><div class="ttname"><a href="../../da/dcc/struct_application_state_windows.html">ApplicationStateWindows</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00074">ApplicationState.h:75</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

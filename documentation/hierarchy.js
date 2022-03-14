@@ -42,6 +42,11 @@ var hierarchy =
     [ "GeneratorMask", "da/d74/struct_generator_mask.html", null ],
     [ "GeneratorMaskManager", "d6/d68/class_generator_mask_manager.html", null ],
     [ "GitHubData", "dd/d8c/struct_git_hub_data.html", null ],
+    [ "GLSLFunction", "db/d01/struct_g_l_s_l_function.html", null ],
+    [ "GLSLHandler", "d9/dab/class_g_l_s_l_handler.html", null ],
+    [ "GLSLLine", "da/d76/struct_g_l_s_l_line.html", null ],
+    [ "GLSLMacro", "df/df1/struct_g_l_s_l_macro.html", null ],
+    [ "GLSLUniform", "dd/d69/struct_g_l_s_l_uniform.html", null ],
     [ "GPUNoiseLayer", "df/d26/struct_g_p_u_noise_layer.html", null ],
     [ "GPUNoiseLayerGenerator", "da/ded/class_g_p_u_noise_layer_generator.html", null ],
     [ "Hash", "d2/d7a/struct_hash.html", null ],
@@ -203,6 +208,7 @@ var hierarchy =
     [ "Serializer", "d0/dc2/class_serializer.html", null ],
     [ "Shader", "d1/d51/class_shader.html", null ],
     [ "ShaderStorageBuffer", "d4/dc3/class_shader_storage_buffer.html", null ],
+    [ "ShadingManager", "de/d7d/class_shading_manager.html", null ],
     [ "SkyManager", "db/d15/class_sky_manager.html", null ],
     [ "std::conditional::type", null, [
       [ "nlohmann::detail::conjunction< B1, Bn... >", "df/d9c/structnlohmann_1_1detail_1_1conjunction_3_01_b1_00_01_bn_8_8_8_01_4.html", null ]

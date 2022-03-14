@@ -11,6 +11,7 @@ var dir_f91755bd714974cebdea8f52266e36fd =
     [ "Modules", "dir_946ce40c848b6ccaeb31b9e83de43a51.html", "dir_946ce40c848b6ccaeb31b9e83de43a51" ],
     [ "NoiseLayers", "dir_222158b2193a05cfb78d3992730e8527.html", "dir_222158b2193a05cfb78d3992730e8527" ],
     [ "Sea", "dir_8b257b06697506d86023675222d24574.html", "dir_8b257b06697506d86023675222d24574" ],
+    [ "Shading", "dir_d27bbd195b0a8cc417cceb10b4212cdd.html", "dir_d27bbd195b0a8cc417cceb10b4212cdd" ],
     [ "Sky", "dir_b741f07817011f278075e52bfb4afaa9.html", "dir_b741f07817011f278075e52bfb4afaa9" ],
     [ "TextureStore", "dir_f70f23200573989b235bf632cf04bccc.html", "dir_f70f23200573989b235bf632cf04bccc" ],
     [ "Utils", "dir_ad33a13611b612c5f5b594e4fe578d38.html", "dir_ad33a13611b612c5f5b594e4fe578d38" ],

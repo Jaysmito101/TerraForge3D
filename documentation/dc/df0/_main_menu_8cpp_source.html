@@ -350,46 +350,47 @@ $(document).ready(function(){initNavTree('dc/df0/_main_menu_8cpp_source.html','.
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Camera Settings&quot;</span>, &amp;appState-&gt;windows.cameraControls);</div>
 <div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Mesh Generators Settings&quot;</span>, &amp;appState-&gt;meshGenerator-&gt;windowStat);</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Sky Settings&quot;</span>, &amp;appState-&gt;windows.skySettings);</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Filters Manager&quot;</span>, &amp;appState-&gt;windows.filtersManager);</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Module Manager&quot;</span>, &amp;appState-&gt;windows.modulesManager);</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Supporters&quot;</span>, &amp;appState-&gt;windows.supportersTribute);</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Open Source Liscenses&quot;</span>, &amp;appState-&gt;windows.osLisc);</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>}</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="keywordtype">void</span> MainMenu::ShowHelpMenu()</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>{</div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Tutorial&quot;</span>))</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    {</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        OpenURL(<span class="stringliteral">&quot;https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ&quot;</span>);</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    }</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span> </div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Social Handle&quot;</span>))</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    {</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        OpenURL(<span class="stringliteral">&quot;https://twitter.com/jaysmito101&quot;</span>);</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    }</div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Discord Server&quot;</span>))</div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    {</div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>        OpenURL(<span class="stringliteral">&quot;https://discord.gg/AcgRafSfyB&quot;</span>);</div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    }</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;GitHub Page&quot;</span>))</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    {</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>        OpenURL(<span class="stringliteral">&quot;https://github.com/Jaysmito101/TerraForge3D&quot;</span>);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    }</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Documentation&quot;</span>))</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    {</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        OpenURL(<span class="stringliteral">&quot;https://github.com/Jaysmito101/TerraForge3D/wiki&quot;</span>);</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    }</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Open Source Liscenses&quot;</span>))</div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    {</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        appState-&gt;windows.osLisc = !appState-&gt;windows.osLisc;</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    }</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>}</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Shading&quot;</span>, &amp;appState-&gt;windows.shadingManager);</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Filters Manager&quot;</span>, &amp;appState-&gt;windows.filtersManager);</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Module Manager&quot;</span>, &amp;appState-&gt;windows.modulesManager);</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Supporters&quot;</span>, &amp;appState-&gt;windows.supportersTribute);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    ShowWindowMenuItem(<span class="stringliteral">&quot;Open Source Liscenses&quot;</span>, &amp;appState-&gt;windows.osLisc);</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>}</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="keywordtype">void</span> MainMenu::ShowHelpMenu()</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>{</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Tutorial&quot;</span>))</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    {</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>        OpenURL(<span class="stringliteral">&quot;https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ&quot;</span>);</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    }</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span> </div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Social Handle&quot;</span>))</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    {</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        OpenURL(<span class="stringliteral">&quot;https://twitter.com/jaysmito101&quot;</span>);</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>    }</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span> </div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Discord Server&quot;</span>))</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    {</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        OpenURL(<span class="stringliteral">&quot;https://discord.gg/AcgRafSfyB&quot;</span>);</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    }</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;GitHub Page&quot;</span>))</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    {</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>        OpenURL(<span class="stringliteral">&quot;https://github.com/Jaysmito101/TerraForge3D&quot;</span>);</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    }</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Documentation&quot;</span>))</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    {</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        OpenURL(<span class="stringliteral">&quot;https://github.com/Jaysmito101/TerraForge3D/wiki&quot;</span>);</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    }</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <span class="keywordflow">if</span> (ImGui::MenuItem(<span class="stringliteral">&quot;Open Source Liscenses&quot;</span>))</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    {</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        appState-&gt;windows.osLisc = !appState-&gt;windows.osLisc;</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    }</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>}</div>
 <div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00191">ApplicationState.h:192</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00192">ApplicationState.h:193</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
