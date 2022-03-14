@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TerraForge3D: MyApp::OnEnd</title>
+<title>TerraForge3D: Camera::UpdateCamera</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
 <script type="text/javascript" src="../../jquery.js"></script>
@@ -86,7 +86,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('dd/da7/class_my_app_a5f0524ae619342e1aff464b8381223b2.html','../../'); initResizable(); });
+$(document).ready(function(){initNavTree('da/dbb/class_camera_ae582446d8daa8354499f5f3ee6c9cc0a.html','../../'); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -105,58 +105,57 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a5f0524ae619342e1a
 </div>
 
 <div class="contents">
-<a id="a5f0524ae619342e1aff464b8381223b2" name="a5f0524ae619342e1aff464b8381223b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f0524ae619342e1aff464b8381223b2">&#9670;&nbsp;</a></span>OnEnd()</h2>
+<a id="ae582446d8daa8354499f5f3ee6c9cc0a" name="ae582446d8daa8354499f5f3ee6c9cc0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae582446d8daa8354499f5f3ee6c9cc0a">&#9670;&nbsp;</a></span>UpdateCamera()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void MyApp::OnEnd </td>
+          <td class="memname">void Camera::UpdateCamera </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>xmax</em> = <code>800.0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>ymax</em> = <code>600.0f</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Reimplemented from <a class="el" href="../../de/d6b/class_application.html">Application</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="../../d5/d12/_main_8cpp_source.html#l01164">1164</a> of file <a class="el" href="../../d5/d12/_main_8cpp_source.html">Main.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1165</span>    {</div>
-<div class="line"><span class="lineno"> 1166</span>        <span class="keywordflow">while</span> (appState-&gt;states.remeshing);</div>
-<div class="line"><span class="lineno"> 1167</span> </div>
-<div class="line"><span class="lineno"> 1168</span>        <span class="keyword">using namespace </span>std::chrono_literals;</div>
-<div class="line"><span class="lineno"> 1169</span>        std::this_thread::sleep_for(500ms);</div>
-<div class="line"><span class="lineno"> 1170</span>        <span class="keyword">delete</span> appState-&gt;shaders.terrain;</div>
-<div class="line"><span class="lineno"> 1171</span>        <span class="keyword">delete</span> appState-&gt;shaders.foliage;</div>
-<div class="line"><span class="lineno"> 1172</span>        <span class="keyword">delete</span> appState-&gt;shaders.textureBake;</div>
-<div class="line"><span class="lineno"> 1173</span>        <span class="keyword">delete</span> appState-&gt;shaders.wireframe;</div>
-<div class="line"><span class="lineno"> 1174</span>        <span class="keyword">delete</span> appState-&gt;shaders.postProcess;</div>
-<div class="line"><span class="lineno"> 1175</span>        <span class="keyword">delete</span> appState-&gt;supportersTribute;</div>
-<div class="line"><span class="lineno"> 1176</span>        <span class="keyword">delete</span> appState-&gt;mainMenu;</div>
-<div class="line"><span class="lineno"> 1177</span>        <span class="keyword">delete</span> appState-&gt;skyManager;</div>
-<div class="line"><span class="lineno"> 1178</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.main;</div>
-<div class="line"><span class="lineno"> 1179</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.postProcess;</div>
-<div class="line"><span class="lineno"> 1180</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.reflection;</div>
-<div class="line"><span class="lineno"> 1181</span>        <span class="keyword">delete</span> appState-&gt;frameBuffers.textureExport;</div>
-<div class="line"><span class="lineno"> 1182</span>        <span class="keyword">delete</span> appState-&gt;filtersManager;</div>
-<div class="line"><span class="lineno"> 1183</span>        <span class="keyword">delete</span> appState-&gt;osLiscences;</div>
-<div class="line"><span class="lineno"> 1184</span>        <span class="keyword">delete</span> appState-&gt;projectManager;</div>
-<div class="line"><span class="lineno"> 1185</span>        <span class="keyword">delete</span> appState-&gt;foliageManager;</div>
-<div class="line"><span class="lineno"> 1186</span><span class="comment">//      delete appState-&gt;seaManager;</span></div>
-<div class="line"><span class="lineno"> 1187</span>        <span class="keyword">delete</span> appState-&gt;lightManager;</div>
-<div class="line"><span class="lineno"> 1188</span>        <span class="keyword">delete</span> appState-&gt;serailizer;</div>
-<div class="line"><span class="lineno"> 1189</span>        <span class="keyword">delete</span> appState;</div>
-<div class="line"><span class="lineno"> 1190</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="../../d1/d33/_camera_8cpp_source.html#l00074">74</a> of file <a class="el" href="../../d1/d33/_camera_8cpp_source.html">Camera.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   75</span>{</div>
+<div class="line"><span class="lineno">   76</span>    mposition.x = position[0];</div>
+<div class="line"><span class="lineno">   77</span>    mposition.y = position[1];</div>
+<div class="line"><span class="lineno">   78</span>    mposition.z = position[2];</div>
+<div class="line"><span class="lineno">   79</span>    mrotation.x = glm::radians(rotation[0]);</div>
+<div class="line"><span class="lineno">   80</span>    mrotation.y = glm::radians(rotation[1]);</div>
+<div class="line"><span class="lineno">   81</span>    mrotation.z = glm::radians(rotation[2]);</div>
+<div class="line"><span class="lineno">   82</span>    pitch = mrotation.x;</div>
+<div class="line"><span class="lineno">   83</span>    yaw = mrotation.y;</div>
+<div class="line"><span class="lineno">   84</span>    roll = mrotation.z;</div>
+<div class="line"><span class="lineno">   85</span>    view = glm::lookAt(mposition, mposition + cameraFront, cameraUp);</div>
+<div class="line"><span class="lineno">   86</span>    view = glm::rotate(view, glm::radians(mrotation.y), glm::vec3(1.0f, 0.0f, 0.0f));</div>
+<div class="line"><span class="lineno">   87</span>    view = glm::rotate(view, glm::radians(mrotation.x), glm::vec3(0.0f, 1.0f, 0.0f));</div>
+<div class="line"><span class="lineno">   88</span> </div>
+<div class="line"><span class="lineno">   89</span>    <span class="keywordflow">if</span> (aspect &gt; 200 || aspect &lt; -200)</div>
+<div class="line"><span class="lineno">   90</span>    {</div>
+<div class="line"><span class="lineno">   91</span>        aspect = 16.0 / 9.0f;</div>
+<div class="line"><span class="lineno">   92</span>    }</div>
+<div class="line"><span class="lineno">   93</span>    <span class="keywordflow">if</span>(perspective)</div>
+<div class="line"><span class="lineno">   94</span>        pers = glm::perspective(fov, aspect, cNear, cFar);</div>
+<div class="line"><span class="lineno">   95</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   96</span>        pers = glm::ortho(0.0f, xmax, 0.0f, ymax, cNear, cFar);</div>
+<div class="line"><span class="lineno">   97</span>    pv = pers * view;</div>
+<div class="line"><span class="lineno">   98</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -165,7 +164,7 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a5f0524ae619342e1a
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="../../dd/da7/class_my_app.html">MyApp</a></li>
+    <li class="navelem"><a class="el" href="../../da/dbb/class_camera.html">Camera</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>

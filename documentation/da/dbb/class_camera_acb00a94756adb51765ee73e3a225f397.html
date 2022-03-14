@@ -120,26 +120,26 @@ $(document).ready(function(){initNavTree('da/dbb/class_camera_acb00a94756adb5176
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d1/d33/_camera_8cpp_source.html#l00037">37</a> of file <a class="el" href="../../d1/d33/_camera_8cpp_source.html">Camera.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   38</span>{</div>
-<div class="line"><span class="lineno">   39</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
-<div class="line"><span class="lineno">   40</span>    data[<span class="stringliteral">&quot;cNear&quot;</span>] = cNear;</div>
-<div class="line"><span class="lineno">   41</span>    data[<span class="stringliteral">&quot;cFar&quot;</span>] = cFar;</div>
-<div class="line"><span class="lineno">   42</span>    data[<span class="stringliteral">&quot;aspect&quot;</span>] = aspect;</div>
-<div class="line"><span class="lineno">   43</span>    data[<span class="stringliteral">&quot;fov&quot;</span>] = fov;</div>
-<div class="line"><span class="lineno">   44</span>    data[<span class="stringliteral">&quot;ID&quot;</span>] = camID;</div>
-<div class="line"><span class="lineno">   45</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
-<div class="line"><span class="lineno">   46</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = position[0];</div>
-<div class="line"><span class="lineno">   47</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = position[1];</div>
-<div class="line"><span class="lineno">   48</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = position[2];</div>
-<div class="line"><span class="lineno">   49</span>    data[<span class="stringliteral">&quot;position&quot;</span>] = tmp;</div>
-<div class="line"><span class="lineno">   50</span>    tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
-<div class="line"><span class="lineno">   51</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = rotation[0];</div>
-<div class="line"><span class="lineno">   52</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = rotation[1];</div>
-<div class="line"><span class="lineno">   53</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = rotation[2];</div>
-<div class="line"><span class="lineno">   54</span>    data[<span class="stringliteral">&quot;rotation&quot;</span>] = tmp;</div>
-<div class="line"><span class="lineno">   55</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><span class="lineno">   56</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d1/d33/_camera_8cpp_source.html#l00038">38</a> of file <a class="el" href="../../d1/d33/_camera_8cpp_source.html">Camera.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   39</span>{</div>
+<div class="line"><span class="lineno">   40</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><span class="lineno">   41</span>    data[<span class="stringliteral">&quot;cNear&quot;</span>] = cNear;</div>
+<div class="line"><span class="lineno">   42</span>    data[<span class="stringliteral">&quot;cFar&quot;</span>] = cFar;</div>
+<div class="line"><span class="lineno">   43</span>    data[<span class="stringliteral">&quot;aspect&quot;</span>] = aspect;</div>
+<div class="line"><span class="lineno">   44</span>    data[<span class="stringliteral">&quot;fov&quot;</span>] = fov;</div>
+<div class="line"><span class="lineno">   45</span>    data[<span class="stringliteral">&quot;ID&quot;</span>] = camID;</div>
+<div class="line"><span class="lineno">   46</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
+<div class="line"><span class="lineno">   47</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = position[0];</div>
+<div class="line"><span class="lineno">   48</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = position[1];</div>
+<div class="line"><span class="lineno">   49</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = position[2];</div>
+<div class="line"><span class="lineno">   50</span>    data[<span class="stringliteral">&quot;position&quot;</span>] = tmp;</div>
+<div class="line"><span class="lineno">   51</span>    tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
+<div class="line"><span class="lineno">   52</span>    tmp[<span class="stringliteral">&quot;x&quot;</span>] = rotation[0];</div>
+<div class="line"><span class="lineno">   53</span>    tmp[<span class="stringliteral">&quot;y&quot;</span>] = rotation[1];</div>
+<div class="line"><span class="lineno">   54</span>    tmp[<span class="stringliteral">&quot;z&quot;</span>] = rotation[2];</div>
+<div class="line"><span class="lineno">   55</span>    data[<span class="stringliteral">&quot;rotation&quot;</span>] = tmp;</div>
+<div class="line"><span class="lineno">   56</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><span class="lineno">   57</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 <div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
 </div><!-- fragment -->
