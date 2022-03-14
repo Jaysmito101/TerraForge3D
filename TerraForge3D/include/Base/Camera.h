@@ -30,7 +30,9 @@ public:
 	float position[3];
 	float rotation[3];
 
-	Camera();
+	bool perspective;
+
+	Camera(bool perspective = true);
 
 	nlohmann::json  Save();
 
@@ -38,5 +40,5 @@ public:
 
 	void ShowSettings(bool renderWindow = false, bool *pOpen = nullptr);
 
-	void UpdateCamera();
+	void UpdateCamera(float xmax = 800.0f, float ymax=600.0f);
 };

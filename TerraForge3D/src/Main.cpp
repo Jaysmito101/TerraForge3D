@@ -139,7 +139,7 @@ static void RegenerateMesh()
 }
 
 
-static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bakeTexture = false)
+static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bakeTexture = false, bool bakeTextureFinal = false)
 {
 	static float time;
 	time += deltaTime;
@@ -149,17 +149,29 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	// Texture Bake
 	if (appState->states.textureBake)
 	{
-		Camera cam;
+		float tmp[3];
+		if(bakeTextureFinal)
+		{
+			tmp[0] = appState->globals.texBakeRes;
+			tmp[1] = appState->globals.texBakeRes;
+		}
+		else
+		{
+		    tmp[0] = 1024;
+		    tmp[1] = 1024;
+	    }
+		tmp[2] = 1;
+		Camera cam(false);
 		float CameraR[3] = { 5185.0f, 0.0f, 0.0f };
 		cam.cFar = 1000;
 		cam.aspect = 1;
 		cam.position[0] = 0.0f;
 		cam.position[1] = 0.0f;
 		cam.position[2] = appState->cameras.main.position[2];
-		cam.rotation[0] = 5185.0f;
+		cam.rotation[0] = 0.0f;
 		cam.rotation[1] = 0.0f;
 		cam.rotation[2] = 0.0f;
-		cam.UpdateCamera();
+		cam.UpdateCamera(tmp[0], tmp[1]);
 		shader = appState->shaders.textureBake;
 		shader->Bind();
 		shader->SetTime(&time);
@@ -167,10 +179,6 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
 		shader->SetLightCol(appState->lightManager->color);
 		shader->SetLightPos(appState->lightManager->position);
-		float tmp[3];
-		tmp[0] = 1024;
-		tmp[1] = 1024;
-		tmp[2] = 1;
 		shader->SetUniform3f("_Resolution", tmp);
 		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
 		shader->SetUniform3f("_HMapMinMax", appState->globals.hMapC);
@@ -555,7 +563,7 @@ static void ShowTerrainControls()
 			appState->frameBuffers.texBakeMain->Begin();
 			glViewport(0, 0, appState->globals.texBakeRes, appState->globals.texBakeRes);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			DoTheRederThing(appState->stats.deltatime, false, true);
+			DoTheRederThing(appState->stats.deltatime, false, true, true);
 			ExportTexture(appState->frameBuffers.texBakeMain->GetRendererID(), ShowSaveFileDialog(".png"), appState->globals.texBakeRes, appState->globals.texBakeRes);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			delete appState->frameBuffers.texBakeMain;

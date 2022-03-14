@@ -13,8 +13,9 @@
 
 static int ID = 0;
 
-Camera::Camera()
+Camera::Camera(bool ps)
 {
+	perspective = ps;
 	fov = 45;
 	cNear = 0.01f;
 	cFar = 200.0f;
@@ -70,7 +71,7 @@ void Camera::Load(nlohmann::json data)
 	rotation[2] = data["rotation"]["z"];
 }
 
-void Camera::UpdateCamera()
+void Camera::UpdateCamera(float xmax, float ymax)
 {
 	mposition.x = position[0];
 	mposition.y = position[1];
@@ -89,8 +90,10 @@ void Camera::UpdateCamera()
 	{
 		aspect = 16.0 / 9.0f;
 	}
-
-	pers = glm::perspective(fov, aspect, cNear, cFar);
+    if(perspective)
+	    pers = glm::perspective(fov, aspect, cNear, cFar);
+    else
+	    pers = glm::ortho(0.0f, xmax, 0.0f, ymax, cNear, cFar);
 	pv = pers * view;
 }
 
