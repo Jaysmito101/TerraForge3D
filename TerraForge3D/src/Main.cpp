@@ -1031,6 +1031,11 @@ public:
 			appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		}
 
+		if(appState->windows.shadingManager)
+		{
+			appState->shadingManager->ShowSettings(&appState->windows.shadingManager);
+		}
+
 		if (appState->windows.filtersManager)
 		{
 			appState->filtersManager->ShowSettings(&appState->windows.filtersManager);
@@ -1104,6 +1109,7 @@ public:
 		appState->serailizer = new Serializer(appState);
 		appState->osLiscences = new OSLiscences(appState);
 		appState->textureStore = new TextureStore(appState);
+		appState->shadingManager = new ShadingManager(appState);
 		ResetShader();
 		appState->meshGenerator->GenerateSync();
 		appState->models.coreTerrain->SetupMeshOnGPU();
@@ -1158,6 +1164,8 @@ public:
 			}
 		}
 
+		appState->windows.shadingManager = true; // TEMPORARY FOR DEBUG ONLY
+
 		Log("Started Up App!");
 	}
 
@@ -1183,6 +1191,7 @@ public:
 		delete appState->osLiscences;
 		delete appState->projectManager;
 		delete appState->foliageManager;
+		delete appState->shadingManager;
 //		delete appState->seaManager;
 		delete appState->lightManager;
 		delete appState->serailizer;

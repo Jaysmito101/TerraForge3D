@@ -240,6 +240,7 @@ void MainMenu::ShowWindowsMenu()
 	ShowWindowMenuItem("Camera Settings", &appState->windows.cameraControls);
 	ShowWindowMenuItem("Mesh Generators Settings", &appState->meshGenerator->windowStat);
 	ShowWindowMenuItem("Sky Settings", &appState->windows.skySettings);
+	ShowWindowMenuItem("Shading", &appState->windows.shadingManager);
 	ShowWindowMenuItem("Filters Manager", &appState->windows.filtersManager);
 	ShowWindowMenuItem("Module Manager", &appState->windows.modulesManager);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);

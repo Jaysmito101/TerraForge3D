@@ -15,6 +15,7 @@
 #include "Foliage/FoliagePlacement.h"
 #include "Sky/SkySettings.h"
 #include "Misc/OSLiscences.h"
+#include "Shading/ShadingManager.h"
 
 #include "json/json.hpp"
 
@@ -86,7 +87,7 @@ struct ApplicationStateWindows
 	bool modulesManager = false;
 	bool lightControls = true;
 	bool cameraControls = true;
-
+	bool shadingManager = false;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
@@ -216,6 +217,7 @@ struct ApplicationState
 	OSLiscences *osLiscences = nullptr;
 	ProjectManager *projectManager = nullptr;
 	FoliageManager *foliageManager = nullptr;
+	ShadingManager* shadingManager = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

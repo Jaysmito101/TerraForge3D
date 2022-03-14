@@ -65,6 +65,7 @@ nlohmann::json ApplicationStateWindows::Save()
 	data["modulesManager"] = modulesManager;
 	data["lightControls"] = lightControls;
 	data["cameraControls"] = cameraControls;
+	data["shadingManager"] = shadingManager;
 	return data;
 }
 
@@ -84,6 +85,7 @@ void ApplicationStateWindows::Load(nlohmann::json data)
 	modulesManager = data["modulesManager"];
 	lightControls = data["lightControls"];
 	cameraControls = data["cameraControls"];
+	shadingManager = data["shadingManager"];
 }
 
 nlohmann::json ApplicationStateStates::Save()
