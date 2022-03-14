@@ -133,7 +133,7 @@ $(document).ready(function(){initNavTree('d1/d33/_camera_8cpp_source.html','../.
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    pitch = yaw = roll = 0;</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    view = glm::mat4(1.0f);</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    pv = glm::mat4(1.0f);</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    pers = glm::perspective(fov, aspect, cNear, cFar);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    pers = glm::perspective(fov, 16.0f / 9.0f, cNear, cFar);</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    mposition = glm::vec3(0.0f, 0.0f, 3.0f);</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    mrotation = glm::vec3(1.0f);</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    position[0] = 0.0f;</div>
@@ -203,7 +203,7 @@ $(document).ready(function(){initNavTree('d1/d33/_camera_8cpp_source.html','../.
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="keywordflow">if</span>(perspective)</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        pers = glm::perspective(fov, aspect, cNear, cFar);</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        pers = glm::ortho(0.0f, xmax, 0.0f, ymax, cNear, cFar);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    pv = pers * view;</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>}</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>

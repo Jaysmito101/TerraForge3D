@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('da/dbb/class_camera_a794bbef7ef51b45c2
 <div class="line"><span class="lineno">   23</span>    pitch = yaw = roll = 0;</div>
 <div class="line"><span class="lineno">   24</span>    view = glm::mat4(1.0f);</div>
 <div class="line"><span class="lineno">   25</span>    pv = glm::mat4(1.0f);</div>
-<div class="line"><span class="lineno">   26</span>    pers = glm::perspective(fov, aspect, cNear, cFar);</div>
+<div class="line"><span class="lineno">   26</span>    pers = glm::perspective(fov, 16.0f / 9.0f, cNear, cFar);</div>
 <div class="line"><span class="lineno">   27</span>    mposition = glm::vec3(0.0f, 0.0f, 3.0f);</div>
 <div class="line"><span class="lineno">   28</span>    mrotation = glm::vec3(1.0f);</div>
 <div class="line"><span class="lineno">   29</span>    position[0] = 0.0f;</div>

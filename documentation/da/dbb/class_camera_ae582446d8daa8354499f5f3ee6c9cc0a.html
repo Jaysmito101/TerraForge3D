@@ -153,7 +153,7 @@ $(document).ready(function(){initNavTree('da/dbb/class_camera_ae582446d8daa83544
 <div class="line"><span class="lineno">   93</span>    <span class="keywordflow">if</span>(perspective)</div>
 <div class="line"><span class="lineno">   94</span>        pers = glm::perspective(fov, aspect, cNear, cFar);</div>
 <div class="line"><span class="lineno">   95</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   96</span>        pers = glm::ortho(0.0f, xmax, 0.0f, ymax, cNear, cFar);</div>
+<div class="line"><span class="lineno">   96</span>        pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);</div>
 <div class="line"><span class="lineno">   97</span>    pv = pers * view;</div>
 <div class="line"><span class="lineno">   98</span>}</div>
 </div><!-- fragment -->

@@ -144,7 +144,7 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_a3843cc5a66512a809
 <div class="line"><span class="lineno">  987</span>            ImGui::End();</div>
 <div class="line"><span class="lineno">  988</span>        }</div>
 <div class="line"><span class="lineno">  989</span> </div>
-<div class="line"><span class="lineno">  990</span>        <span class="keywordflow">if</span> (appState-&gt;states.autoAspectCalcRatio)</div>
+<div class="line"><span class="lineno">  990</span>        <span class="keywordflow">if</span> (appState-&gt;states.autoAspectCalcRatio &amp;&amp; (appState-&gt;globals.viewportSize[1] != 0 &amp;&amp; appState-&gt;globals.viewportSize[0] != 0))</div>
 <div class="line"><span class="lineno">  991</span>        {</div>
 <div class="line"><span class="lineno">  992</span>            appState-&gt;cameras.main.aspect = appState-&gt;globals.viewportSize[0] / appState-&gt;globals.viewportSize[1];</div>
 <div class="line"><span class="lineno">  993</span>        }</div>
