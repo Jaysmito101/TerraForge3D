@@ -20,17 +20,17 @@ struct GLSLUniform
 struct GLSLMacro
 {
 	GLSLMacro(std::string name, std::string value, std::string comment = "");
-	~GLSLMacro();	
+	~GLSLMacro();
 
 	std::string GenerateGLSL();
 
 	std::string name = "";
 	std::string value = "";
-	std::string comment = "";	
+	std::string comment = "";
 };
 
 struct GLSLLine
-{	
+{
 	GLSLLine(std::string line, std::string comment = "");
 	~GLSLLine();
 

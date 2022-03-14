@@ -573,10 +573,10 @@ void NodeEditor::DeleteNode(NodeEditorNode *node)
 
 	if (nodes.find(node->_id.Get()) != nodes.end())
 	{
-		#ifdef TERR3D_WIN32
+#ifdef TERR3D_WIN32
 		using namespace std::chrono_literals; // This Line is temporary
 		std::this_thread::sleep_for(500ms); // This Line is temporary
-		#endif
+#endif
 		node->OnDelete();
 		std::vector<NodeEditorPin *> mPins = node->GetPins();
 

@@ -217,7 +217,7 @@ struct ApplicationState
 	OSLiscences *osLiscences = nullptr;
 	ProjectManager *projectManager = nullptr;
 	FoliageManager *foliageManager = nullptr;
-	ShadingManager* shadingManager = nullptr;
+	ShadingManager *shadingManager = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

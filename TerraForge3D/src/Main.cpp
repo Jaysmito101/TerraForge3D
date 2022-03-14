@@ -150,16 +150,19 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	if (appState->states.textureBake)
 	{
 		float tmp[3];
+
 		if(bakeTextureFinal)
 		{
 			tmp[0] = appState->globals.texBakeRes;
 			tmp[1] = appState->globals.texBakeRes;
 		}
+
 		else
 		{
-		    tmp[0] = 1024;
-		    tmp[1] = 1024;
+			tmp[0] = 1024;
+			tmp[1] = 1024;
 		}
+
 		tmp[2] = 1;
 		Camera cam;
 		cam = appState->cameras.main;
@@ -209,8 +212,8 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		{
 			shader = appState->shaders.terrain;
 		}
-		shader->SetUniformf("_TextureBake", 0.0f);
 
+		shader->SetUniformf("_TextureBake", 0.0f);
 		shader->Bind();
 		shader->SetTime(&time);
 		shader->SetMPV(appState->cameras.main.pv);
@@ -1165,7 +1168,6 @@ public:
 		}
 
 		appState->windows.shadingManager = true; // TEMPORARY FOR DEBUG ONLY
-
 		Log("Started Up App!");
 	}
 

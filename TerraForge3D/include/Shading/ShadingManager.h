@@ -7,21 +7,26 @@ struct ApplicationState;
 class ShadingManager
 {
 public:
-	ShadingManager(ApplicationState* appState);
+	ShadingManager(ApplicationState *appState);
 	~ShadingManager();
 
 
-	void ShowSettings(bool* pOpen);
+	void ShowSettings(bool *pOpen);
 
 private:
 	void PrepVertShader();
+	void PrepGeomShader();
+	void PrepFragShader();
+
 	void ReCompileShaders();
 
 public:
-	ApplicationState* appState = nullptr;
-	GLSLHandler* vsh = nullptr;
-	GLSLHandler* gsh = nullptr;
-	GLSLHandler* fsh = nullptr;
+	ApplicationState *appState = nullptr;
+	GLSLHandler *vsh = nullptr;
+	GLSLHandler *gsh = nullptr;
+	GLSLHandler *fsh = nullptr;
 
-	std::string vetexSource = "";
+	std::string vertexSource = "";
+	std::string geometrySource = "";
+	std::string fragmentSource = "";
 };

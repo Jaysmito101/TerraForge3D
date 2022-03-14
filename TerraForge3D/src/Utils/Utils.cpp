@@ -11,19 +11,19 @@
 #include  <cstdio>
 #include  <cstdlib>
 #ifdef _WIN32
-    #include <io.h>
+#include <io.h>
 #elif __linux__
-    #include <inttypes.h>
-    #include <unistd.h>
-    #define __int64 int64_t
-    #define _close close
-    #define _read read
-    #define _lseek64 lseek64
-    #define _O_RDONLY O_RDONLY
-    #define _open open
-    #define _lseeki64 lseek64
-    #define _lseek lseek
-    #define stricmp strcasecmp
+#include <inttypes.h>
+#include <unistd.h>
+#define __int64 int64_t
+#define _close close
+#define _read read
+#define _lseek64 lseek64
+#define _O_RDONLY O_RDONLY
+#define _open open
+#define _lseeki64 lseek64
+#define _lseek lseek
+#define stricmp strcasecmp
 #endif
 //SAF_Handle.cpp line:458 old line:INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
 #ifdef __linux__
@@ -287,6 +287,7 @@ char *UChar2Char(unsigned char *data, int length)
 bool FileExists(std::string path, bool writeAccess)
 {
 #ifdef TERR3D_WIN32
+
 	if ((_access(path.c_str(), 0)) != -1)
 	{
 		if (!writeAccess)
@@ -299,10 +300,11 @@ bool FileExists(std::string path, bool writeAccess)
 			return true;
 		}
 	}
+
 	return false;
 #else
-	struct stat buffer;   
-  	return (stat (path.c_str(), &buffer) == 0); 
+	struct stat buffer;
+	return (stat (path.c_str(), &buffer) == 0);
 #endif
 }
 
@@ -523,7 +525,7 @@ void CopyFileData(std::string source, std::string destination)
 	int srcsize = get_file_size(source.data());
 	char *data = (char *)malloc(srcsize);
 	int fsource = open(source.c_str(), O_RDONLY);
-	int fdest = open(destination.c_str(), O_WRONLY | O_CREAT , 0777);
+	int fdest = open(destination.c_str(), O_WRONLY | O_CREAT, 0777);
 	read(fsource, data, srcsize);
 	write(fdest, data, srcsize);
 	close(fsource);

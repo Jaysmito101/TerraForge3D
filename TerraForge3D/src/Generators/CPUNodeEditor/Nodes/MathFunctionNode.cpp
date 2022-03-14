@@ -158,11 +158,11 @@ void MathFunctionNode::OnRender()
 
 			try
 			{
-				#ifdef TERR3D_WIN32
+#ifdef TERR3D_WIN32
 				parser->SetExpr(wide);
-				#else
+#else
 				parser->SetExpr(std::string(inputExpression));
-				#endif
+#endif
 				compiled = true;
 			}
 
@@ -195,5 +195,4 @@ MathFunctionNode::MathFunctionNode()
 	parser->DefineVar("y", &y);
 	parser->DefineVar("z", &z);
 #endif
-
 }

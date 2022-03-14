@@ -90,10 +90,17 @@ void Camera::UpdateCamera(float xmax, float ymax)
 	{
 		aspect = 16.0 / 9.0f;
 	}
-    if(perspective)
-	    pers = glm::perspective(fov, aspect, cNear, cFar);
-    else
-	    pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
+
+	if(perspective)
+	{
+		pers = glm::perspective(fov, aspect, cNear, cFar);
+	}
+
+	else
+	{
+		pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
+	}
+
 	pv = pers * view;
 }
 

@@ -4887,7 +4887,7 @@ void to_json(BasicJsonType &j, typename BasicJsonType::array_t &&arr)
 }
 
 template < typename BasicJsonType, typename CompatibleObjectType,
-           enable_if_t < is_compatible_object_type<BasicJsonType, CompatibleObjectType>::value && !is_basic_json<CompatibleObjectType>::value, int > = 0 >
+           enable_if_t < is_compatible_object_type<BasicJsonType, CompatibleObjectType>::value&& !is_basic_json<CompatibleObjectType>::value, int > = 0 >
 void to_json(BasicJsonType &j, const CompatibleObjectType &obj)
 {
 	external_constructor<value_t::object>::construct(j, obj);
@@ -19294,7 +19294,7 @@ public:
 	*/
 	template < typename BasicJsonType,
 	           detail::enable_if_t <
-	               detail::is_basic_json<BasicJsonType>::value && !std::is_same<basic_json, BasicJsonType>::value, int > = 0 >
+	               detail::is_basic_json<BasicJsonType>::value&& !std::is_same<basic_json, BasicJsonType>::value, int > = 0 >
 	basic_json(const BasicJsonType &val)
 	{
 		using other_boolean_t = typename BasicJsonType::boolean_t;
