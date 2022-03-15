@@ -120,12 +120,14 @@ $(document).ready(function(){initNavTree('da/d6c/class_node_editor_node_a75ba14a
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00199">199</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  200</span>{</div>
-<div class="line"><span class="lineno">  201</span>    ImGuiNodeEditor::BeginNode(<span class="keywordtype">id</span>);</div>
-<div class="line"><span class="lineno">  202</span>    OnRender();</div>
-<div class="line"><span class="lineno">  203</span>    ImGuiNodeEditor::EndNode();</div>
-<div class="line"><span class="lineno">  204</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00201">201</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  202</span>{</div>
+<div class="line"><span class="lineno">  203</span>    ImGui::PushID(<span class="keywordtype">id</span>);</div>
+<div class="line"><span class="lineno">  204</span>    ImGuiNodeEditor::BeginNode(<span class="keywordtype">id</span>);</div>
+<div class="line"><span class="lineno">  205</span>    OnRender();</div>
+<div class="line"><span class="lineno">  206</span>    ImGuiNodeEditor::EndNode();</div>
+<div class="line"><span class="lineno">  207</span>    ImGui::PopID();</div>
+<div class="line"><span class="lineno">  208</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -135,7 +137,7 @@ $(document).ready(function(){initNavTree('da/d6c/class_node_editor_node_a75ba14a
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

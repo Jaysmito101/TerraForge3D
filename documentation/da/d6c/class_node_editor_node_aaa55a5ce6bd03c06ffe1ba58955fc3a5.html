@@ -120,36 +120,36 @@ $(document).ready(function(){initNavTree('da/d6c/class_node_editor_node_aaa55a5c
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00262">262</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  263</span>{</div>
-<div class="line"><span class="lineno">  264</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data = Save();</div>
-<div class="line"><span class="lineno">  265</span>    data[<span class="stringliteral">&quot;name&quot;</span>] = name;</div>
-<div class="line"><span class="lineno">  266</span>    data[<span class="stringliteral">&quot;headerColor&quot;</span>] = headerColor;</div>
-<div class="line"><span class="lineno">  267</span>    data[<span class="stringliteral">&quot;id&quot;</span>] = id;</div>
-<div class="line"><span class="lineno">  268</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp, tmp2;</div>
-<div class="line"><span class="lineno">  269</span> </div>
-<div class="line"><span class="lineno">  270</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; inputPins.size(); i++)</div>
-<div class="line"><span class="lineno">  271</span>    {</div>
-<div class="line"><span class="lineno">  272</span>        tmp2 = inputPins[i]-&gt;Save();</div>
-<div class="line"><span class="lineno">  273</span>        tmp2[<span class="stringliteral">&quot;index&quot;</span>] = i;</div>
-<div class="line"><span class="lineno">  274</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(tmp2);</div>
-<div class="line"><span class="lineno">  275</span>    }</div>
-<div class="line"><span class="lineno">  276</span> </div>
-<div class="line"><span class="lineno">  277</span>    data[<span class="stringliteral">&quot;inputPins&quot;</span>] = tmp;</div>
-<div class="line"><span class="lineno">  278</span>    tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a946cc8f30d8b1d6609b57387b647fe53.html#a946cc8f30d8b1d6609b57387b647fe53">clear</a>();</div>
-<div class="line"><span class="lineno">  279</span> </div>
-<div class="line"><span class="lineno">  280</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; outputPins.size(); i++)</div>
-<div class="line"><span class="lineno">  281</span>    {</div>
-<div class="line"><span class="lineno">  282</span>        tmp2 = outputPins[i]-&gt;Save();</div>
-<div class="line"><span class="lineno">  283</span>        tmp2[<span class="stringliteral">&quot;index&quot;</span>] = i;</div>
-<div class="line"><span class="lineno">  284</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(tmp2);</div>
-<div class="line"><span class="lineno">  285</span>    }</div>
-<div class="line"><span class="lineno">  286</span> </div>
-<div class="line"><span class="lineno">  287</span>    data[<span class="stringliteral">&quot;posX&quot;</span>] = nodePosition.x;</div>
-<div class="line"><span class="lineno">  288</span>    data[<span class="stringliteral">&quot;posY&quot;</span>] = nodePosition.y;</div>
-<div class="line"><span class="lineno">  289</span>    data[<span class="stringliteral">&quot;outputPins&quot;</span>] = tmp;</div>
-<div class="line"><span class="lineno">  290</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><span class="lineno">  291</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00266">266</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  267</span>{</div>
+<div class="line"><span class="lineno">  268</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data = Save();</div>
+<div class="line"><span class="lineno">  269</span>    data[<span class="stringliteral">&quot;name&quot;</span>] = name;</div>
+<div class="line"><span class="lineno">  270</span>    data[<span class="stringliteral">&quot;headerColor&quot;</span>] = headerColor;</div>
+<div class="line"><span class="lineno">  271</span>    data[<span class="stringliteral">&quot;id&quot;</span>] = id;</div>
+<div class="line"><span class="lineno">  272</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp, tmp2;</div>
+<div class="line"><span class="lineno">  273</span> </div>
+<div class="line"><span class="lineno">  274</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; inputPins.size(); i++)</div>
+<div class="line"><span class="lineno">  275</span>    {</div>
+<div class="line"><span class="lineno">  276</span>        tmp2 = inputPins[i]-&gt;Save();</div>
+<div class="line"><span class="lineno">  277</span>        tmp2[<span class="stringliteral">&quot;index&quot;</span>] = i;</div>
+<div class="line"><span class="lineno">  278</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(tmp2);</div>
+<div class="line"><span class="lineno">  279</span>    }</div>
+<div class="line"><span class="lineno">  280</span> </div>
+<div class="line"><span class="lineno">  281</span>    data[<span class="stringliteral">&quot;inputPins&quot;</span>] = tmp;</div>
+<div class="line"><span class="lineno">  282</span>    tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a946cc8f30d8b1d6609b57387b647fe53.html#a946cc8f30d8b1d6609b57387b647fe53">clear</a>();</div>
+<div class="line"><span class="lineno">  283</span> </div>
+<div class="line"><span class="lineno">  284</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; outputPins.size(); i++)</div>
+<div class="line"><span class="lineno">  285</span>    {</div>
+<div class="line"><span class="lineno">  286</span>        tmp2 = outputPins[i]-&gt;Save();</div>
+<div class="line"><span class="lineno">  287</span>        tmp2[<span class="stringliteral">&quot;index&quot;</span>] = i;</div>
+<div class="line"><span class="lineno">  288</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(tmp2);</div>
+<div class="line"><span class="lineno">  289</span>    }</div>
+<div class="line"><span class="lineno">  290</span> </div>
+<div class="line"><span class="lineno">  291</span>    data[<span class="stringliteral">&quot;posX&quot;</span>] = nodePosition.x;</div>
+<div class="line"><span class="lineno">  292</span>    data[<span class="stringliteral">&quot;posY&quot;</span>] = nodePosition.y;</div>
+<div class="line"><span class="lineno">  293</span>    data[<span class="stringliteral">&quot;outputPins&quot;</span>] = tmp;</div>
+<div class="line"><span class="lineno">  294</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><span class="lineno">  295</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a946cc8f30d8b1d6609b57387b647fe53_html_a946cc8f30d8b1d6609b57387b647fe53"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a946cc8f30d8b1d6609b57387b647fe53.html#a946cc8f30d8b1d6609b57387b647fe53">nlohmann::basic_json::clear</a></div><div class="ttdeci">void clear() noexcept</div><div class="ttdoc">clears the contents</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l23069">json.hpp:23069</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4_html_ab9e0253c92736db021840105d374c4c4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">nlohmann::basic_json::push_back</a></div><div class="ttdeci">void push_back(basic_json &amp;&amp;val)</div><div class="ttdoc">add an object to an array</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l23148">json.hpp:23148</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
@@ -162,7 +162,7 @@ $(document).ready(function(){initNavTree('da/d6c/class_node_editor_node_aaa55a5c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

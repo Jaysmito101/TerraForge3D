@@ -120,33 +120,33 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_aee1c480fa91d
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00306">306</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  307</span>{</div>
-<div class="line"><span class="lineno">  308</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
-<div class="line"><span class="lineno">  309</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;NodeEditorData&quot;</span>;</div>
-<div class="line"><span class="lineno">  310</span>    data[<span class="stringliteral">&quot;serializer&quot;</span>] = <span class="stringliteral">&quot;Node Serializer v2.0&quot;</span>;</div>
-<div class="line"><span class="lineno">  311</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
-<div class="line"><span class="lineno">  312</span> </div>
-<div class="line"><span class="lineno">  313</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : nodes)</div>
-<div class="line"><span class="lineno">  314</span>    {</div>
-<div class="line"><span class="lineno">  315</span>        <span class="keywordflow">if</span>(it.second-&gt;name != <span class="stringliteral">&quot;Output&quot;</span>)</div>
-<div class="line"><span class="lineno">  316</span>        {</div>
-<div class="line"><span class="lineno">  317</span>            tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(it.second-&gt;SaveInternal());</div>
-<div class="line"><span class="lineno">  318</span>        }</div>
-<div class="line"><span class="lineno">  319</span>    }</div>
-<div class="line"><span class="lineno">  320</span> </div>
-<div class="line"><span class="lineno">  321</span>    data[<span class="stringliteral">&quot;nodes&quot;</span>] = tmp;</div>
-<div class="line"><span class="lineno">  322</span>    tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
-<div class="line"><span class="lineno">  323</span> </div>
-<div class="line"><span class="lineno">  324</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : links)</div>
-<div class="line"><span class="lineno">  325</span>    {</div>
-<div class="line"><span class="lineno">  326</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(it.second-&gt;Save());</div>
-<div class="line"><span class="lineno">  327</span>    }</div>
-<div class="line"><span class="lineno">  328</span> </div>
-<div class="line"><span class="lineno">  329</span>    data[<span class="stringliteral">&quot;links&quot;</span>] = tmp;</div>
-<div class="line"><span class="lineno">  330</span>    data[<span class="stringliteral">&quot;uidSeed&quot;</span>] = GenerateUID();</div>
-<div class="line"><span class="lineno">  331</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><span class="lineno">  332</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00310">310</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  311</span>{</div>
+<div class="line"><span class="lineno">  312</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><span class="lineno">  313</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;NodeEditorData&quot;</span>;</div>
+<div class="line"><span class="lineno">  314</span>    data[<span class="stringliteral">&quot;serializer&quot;</span>] = <span class="stringliteral">&quot;Node Serializer v2.0&quot;</span>;</div>
+<div class="line"><span class="lineno">  315</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmp;</div>
+<div class="line"><span class="lineno">  316</span> </div>
+<div class="line"><span class="lineno">  317</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : nodes)</div>
+<div class="line"><span class="lineno">  318</span>    {</div>
+<div class="line"><span class="lineno">  319</span>        <span class="keywordflow">if</span>(it.second-&gt;name != <span class="stringliteral">&quot;Output&quot;</span>)</div>
+<div class="line"><span class="lineno">  320</span>        {</div>
+<div class="line"><span class="lineno">  321</span>            tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(it.second-&gt;SaveInternal());</div>
+<div class="line"><span class="lineno">  322</span>        }</div>
+<div class="line"><span class="lineno">  323</span>    }</div>
+<div class="line"><span class="lineno">  324</span> </div>
+<div class="line"><span class="lineno">  325</span>    data[<span class="stringliteral">&quot;nodes&quot;</span>] = tmp;</div>
+<div class="line"><span class="lineno">  326</span>    tmp = <a class="code hl_typedef" href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a>();</div>
+<div class="line"><span class="lineno">  327</span> </div>
+<div class="line"><span class="lineno">  328</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : links)</div>
+<div class="line"><span class="lineno">  329</span>    {</div>
+<div class="line"><span class="lineno">  330</span>        tmp.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">push_back</a>(it.second-&gt;Save());</div>
+<div class="line"><span class="lineno">  331</span>    }</div>
+<div class="line"><span class="lineno">  332</span> </div>
+<div class="line"><span class="lineno">  333</span>    data[<span class="stringliteral">&quot;links&quot;</span>] = tmp;</div>
+<div class="line"><span class="lineno">  334</span>    data[<span class="stringliteral">&quot;uidSeed&quot;</span>] = GenerateUID();</div>
+<div class="line"><span class="lineno">  335</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><span class="lineno">  336</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4_html_ab9e0253c92736db021840105d374c4c4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_ab9e0253c92736db021840105d374c4c4.html#ab9e0253c92736db021840105d374c4c4">nlohmann::basic_json::push_back</a></div><div class="ttdeci">void push_back(basic_json &amp;&amp;val)</div><div class="ttdoc">add an object to an array</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l23148">json.hpp:23148</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 <div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
@@ -159,7 +159,7 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_aee1c480fa91d
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/d54/class_node_editor.html">NodeEditor</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

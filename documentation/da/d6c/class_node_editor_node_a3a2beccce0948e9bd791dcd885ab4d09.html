@@ -121,36 +121,36 @@ $(document).ready(function(){initNavTree('da/d6c/class_node_editor_node_a3a2becc
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00230">230</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  231</span>{</div>
-<div class="line"><span class="lineno">  232</span>    Load(data);</div>
-<div class="line"><span class="lineno">  233</span>    name = data[<span class="stringliteral">&quot;name&quot;</span>];</div>
-<div class="line"><span class="lineno">  234</span>    headerColor = data[<span class="stringliteral">&quot;headerColor&quot;</span>];</div>
-<div class="line"><span class="lineno">  235</span>    <span class="keywordtype">id</span> = data[<span class="stringliteral">&quot;id&quot;</span>];</div>
-<div class="line"><span class="lineno">  236</span>    _id = id;</div>
-<div class="line"><span class="lineno">  237</span> </div>
-<div class="line"><span class="lineno">  238</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> pns : data[<span class="stringliteral">&quot;inputPins&quot;</span>])</div>
-<div class="line"><span class="lineno">  239</span>    {</div>
-<div class="line"><span class="lineno">  240</span>        inputPins[pns[<span class="stringliteral">&quot;index&quot;</span>]]-&gt;Load(pns);</div>
-<div class="line"><span class="lineno">  241</span>    }</div>
-<div class="line"><span class="lineno">  242</span> </div>
-<div class="line"><span class="lineno">  243</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> pns : data[<span class="stringliteral">&quot;outputPins&quot;</span>])</div>
-<div class="line"><span class="lineno">  244</span>    {</div>
-<div class="line"><span class="lineno">  245</span>        outputPins[pns[<span class="stringliteral">&quot;index&quot;</span>]]-&gt;Load(pns);</div>
-<div class="line"><span class="lineno">  246</span>    }</div>
-<div class="line"><span class="lineno">  247</span> </div>
-<div class="line"><span class="lineno">  248</span>    <span class="keywordflow">try</span>  <span class="comment">// For Backward Ckompitabilaty</span></div>
-<div class="line"><span class="lineno">  249</span>    {</div>
-<div class="line"><span class="lineno">  250</span>        nodePosition = ImVec2(data[<span class="stringliteral">&quot;posX&quot;</span>], data[<span class="stringliteral">&quot;posY&quot;</span>]);</div>
-<div class="line"><span class="lineno">  251</span>    }</div>
-<div class="line"><span class="lineno">  252</span> </div>
-<div class="line"><span class="lineno">  253</span>    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><span class="lineno">  254</span>    {</div>
-<div class="line"><span class="lineno">  255</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Failed to load node position!\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  256</span>    }</div>
-<div class="line"><span class="lineno">  257</span> </div>
-<div class="line"><span class="lineno">  258</span>    reqNodePosLoad = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  259</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00234">234</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  235</span>{</div>
+<div class="line"><span class="lineno">  236</span>    Load(data);</div>
+<div class="line"><span class="lineno">  237</span>    name = data[<span class="stringliteral">&quot;name&quot;</span>];</div>
+<div class="line"><span class="lineno">  238</span>    headerColor = data[<span class="stringliteral">&quot;headerColor&quot;</span>];</div>
+<div class="line"><span class="lineno">  239</span>    <span class="keywordtype">id</span> = data[<span class="stringliteral">&quot;id&quot;</span>];</div>
+<div class="line"><span class="lineno">  240</span>    _id = id;</div>
+<div class="line"><span class="lineno">  241</span> </div>
+<div class="line"><span class="lineno">  242</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> pns : data[<span class="stringliteral">&quot;inputPins&quot;</span>])</div>
+<div class="line"><span class="lineno">  243</span>    {</div>
+<div class="line"><span class="lineno">  244</span>        inputPins[pns[<span class="stringliteral">&quot;index&quot;</span>]]-&gt;Load(pns);</div>
+<div class="line"><span class="lineno">  245</span>    }</div>
+<div class="line"><span class="lineno">  246</span> </div>
+<div class="line"><span class="lineno">  247</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> pns : data[<span class="stringliteral">&quot;outputPins&quot;</span>])</div>
+<div class="line"><span class="lineno">  248</span>    {</div>
+<div class="line"><span class="lineno">  249</span>        outputPins[pns[<span class="stringliteral">&quot;index&quot;</span>]]-&gt;Load(pns);</div>
+<div class="line"><span class="lineno">  250</span>    }</div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>    <span class="keywordflow">try</span>  <span class="comment">// For Backward Ckompitabilaty</span></div>
+<div class="line"><span class="lineno">  253</span>    {</div>
+<div class="line"><span class="lineno">  254</span>        nodePosition = ImVec2(data[<span class="stringliteral">&quot;posX&quot;</span>], data[<span class="stringliteral">&quot;posY&quot;</span>]);</div>
+<div class="line"><span class="lineno">  255</span>    }</div>
+<div class="line"><span class="lineno">  256</span> </div>
+<div class="line"><span class="lineno">  257</span>    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><span class="lineno">  258</span>    {</div>
+<div class="line"><span class="lineno">  259</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Failed to load node position!\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  260</span>    }</div>
+<div class="line"><span class="lineno">  261</span> </div>
+<div class="line"><span class="lineno">  262</span>    reqNodePosLoad = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  263</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('da/d6c/class_node_editor_node_a3a2becc
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

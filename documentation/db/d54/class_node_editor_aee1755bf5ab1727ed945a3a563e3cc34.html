@@ -120,176 +120,176 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_aee1755bf5ab1
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00366">366</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  367</span>{</div>
-<div class="line"><span class="lineno">  368</span>    <span class="keywordtype">bool</span> windowFocused = ImGui::IsWindowFocused();</div>
-<div class="line"><span class="lineno">  369</span>    ImGuiNodeEditor::SetCurrentEditor(context);</div>
-<div class="line"><span class="lineno">  370</span>    ImGuiNodeEditor::Begin(name.c_str());</div>
-<div class="line"><span class="lineno">  371</span>    ImGuiNodeEditor::EnableShortcuts(windowFocused);</div>
-<div class="line"><span class="lineno">  372</span> </div>
-<div class="line"><span class="lineno">  373</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : nodes)</div>
-<div class="line"><span class="lineno">  374</span>    {</div>
-<div class="line"><span class="lineno">  375</span>        it.second-&gt;Render();</div>
-<div class="line"><span class="lineno">  376</span>    }</div>
-<div class="line"><span class="lineno">  377</span> </div>
-<div class="line"><span class="lineno">  378</span>    outputNode-&gt;Render();</div>
-<div class="line"><span class="lineno">  379</span> </div>
-<div class="line"><span class="lineno">  380</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : links)</div>
-<div class="line"><span class="lineno">  381</span>    {</div>
-<div class="line"><span class="lineno">  382</span>        ImGuiNodeEditor::Link(it.second-&gt;id, it.second-&gt;from-&gt;id, it.second-&gt;to-&gt;id, it.second-&gt;color, it.second-&gt;thickness);</div>
-<div class="line"><span class="lineno">  383</span>    }</div>
-<div class="line"><span class="lineno">  384</span> </div>
-<div class="line"><span class="lineno">  385</span>    <span class="keywordflow">if</span> (ImGuiNodeEditor::BeginCreate())</div>
-<div class="line"><span class="lineno">  386</span>    {</div>
-<div class="line"><span class="lineno">  387</span>        ImGuiNodeEditor::PinId iPid, oPid;</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00370">370</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  371</span>{</div>
+<div class="line"><span class="lineno">  372</span>    <span class="keywordtype">bool</span> windowFocused = ImGui::IsWindowFocused();</div>
+<div class="line"><span class="lineno">  373</span>    ImGuiNodeEditor::SetCurrentEditor(context);</div>
+<div class="line"><span class="lineno">  374</span>    ImGuiNodeEditor::Begin(name.c_str());</div>
+<div class="line"><span class="lineno">  375</span>    ImGuiNodeEditor::EnableShortcuts(windowFocused);</div>
+<div class="line"><span class="lineno">  376</span> </div>
+<div class="line"><span class="lineno">  377</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : nodes)</div>
+<div class="line"><span class="lineno">  378</span>    {</div>
+<div class="line"><span class="lineno">  379</span>        it.second-&gt;Render();</div>
+<div class="line"><span class="lineno">  380</span>    }</div>
+<div class="line"><span class="lineno">  381</span> </div>
+<div class="line"><span class="lineno">  382</span>    outputNode-&gt;Render();</div>
+<div class="line"><span class="lineno">  383</span> </div>
+<div class="line"><span class="lineno">  384</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : links)</div>
+<div class="line"><span class="lineno">  385</span>    {</div>
+<div class="line"><span class="lineno">  386</span>        ImGuiNodeEditor::Link(it.second-&gt;id, it.second-&gt;from-&gt;id, it.second-&gt;to-&gt;id, it.second-&gt;color, it.second-&gt;thickness);</div>
+<div class="line"><span class="lineno">  387</span>    }</div>
 <div class="line"><span class="lineno">  388</span> </div>
-<div class="line"><span class="lineno">  389</span>        <span class="keywordflow">if</span> (ImGuiNodeEditor::QueryNewLink(&amp;iPid, &amp;oPid))</div>
-<div class="line"><span class="lineno">  390</span>        {</div>
-<div class="line"><span class="lineno">  391</span>            <span class="keywordflow">if</span> (iPid &amp;&amp; oPid)</div>
-<div class="line"><span class="lineno">  392</span>            {</div>
-<div class="line"><span class="lineno">  393</span>                <span class="keywordflow">if</span> (ImGuiNodeEditor::AcceptNewItem())</div>
-<div class="line"><span class="lineno">  394</span>                {</div>
-<div class="line"><span class="lineno">  395</span>                    <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link = <span class="keyword">new</span> <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a>();</div>
-<div class="line"><span class="lineno">  396</span>                    link-&gt;from = pins[iPid.Get()];</div>
-<div class="line"><span class="lineno">  397</span>                    link-&gt;to = pins[oPid.Get()];</div>
-<div class="line"><span class="lineno">  398</span>                    <span class="keywordtype">bool</span> lnkFrm = link-&gt;from-&gt;ValidateLink(link);</div>
-<div class="line"><span class="lineno">  399</span>                    <span class="keywordtype">bool</span> lnkTo = link-&gt;to-&gt;ValidateLink(link);</div>
-<div class="line"><span class="lineno">  400</span> </div>
-<div class="line"><span class="lineno">  401</span>                    <span class="keywordflow">if</span> (lnkFrm &amp;&amp; lnkTo)</div>
-<div class="line"><span class="lineno">  402</span>                    {</div>
-<div class="line"><span class="lineno">  403</span>                        link-&gt;from-&gt;Link(link);</div>
-<div class="line"><span class="lineno">  404</span>                        link-&gt;to-&gt;Link(link);</div>
-<div class="line"><span class="lineno">  405</span>                        links[link-&gt;_id.Get()] = link;</div>
-<div class="line"><span class="lineno">  406</span>                        ImGuiNodeEditor::Link(link-&gt;id, link-&gt;from-&gt;id, link-&gt;to-&gt;id);</div>
-<div class="line"><span class="lineno">  407</span>                    }</div>
-<div class="line"><span class="lineno">  408</span>                }</div>
-<div class="line"><span class="lineno">  409</span>            }</div>
-<div class="line"><span class="lineno">  410</span> </div>
-<div class="line"><span class="lineno">  411</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(iPid)</div>
-<div class="line"><span class="lineno">  412</span>            {</div>
-<div class="line"><span class="lineno">  413</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[iPid.Get()];</div>
+<div class="line"><span class="lineno">  389</span>    <span class="keywordflow">if</span> (ImGuiNodeEditor::BeginCreate())</div>
+<div class="line"><span class="lineno">  390</span>    {</div>
+<div class="line"><span class="lineno">  391</span>        ImGuiNodeEditor::PinId iPid, oPid;</div>
+<div class="line"><span class="lineno">  392</span> </div>
+<div class="line"><span class="lineno">  393</span>        <span class="keywordflow">if</span> (ImGuiNodeEditor::QueryNewLink(&amp;iPid, &amp;oPid))</div>
+<div class="line"><span class="lineno">  394</span>        {</div>
+<div class="line"><span class="lineno">  395</span>            <span class="keywordflow">if</span> (iPid &amp;&amp; oPid)</div>
+<div class="line"><span class="lineno">  396</span>            {</div>
+<div class="line"><span class="lineno">  397</span>                <span class="keywordflow">if</span> (ImGuiNodeEditor::AcceptNewItem())</div>
+<div class="line"><span class="lineno">  398</span>                {</div>
+<div class="line"><span class="lineno">  399</span>                    <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link = <span class="keyword">new</span> <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a>();</div>
+<div class="line"><span class="lineno">  400</span>                    link-&gt;from = pins[iPid.Get()];</div>
+<div class="line"><span class="lineno">  401</span>                    link-&gt;to = pins[oPid.Get()];</div>
+<div class="line"><span class="lineno">  402</span>                    <span class="keywordtype">bool</span> lnkFrm = link-&gt;from-&gt;ValidateLink(link);</div>
+<div class="line"><span class="lineno">  403</span>                    <span class="keywordtype">bool</span> lnkTo = link-&gt;to-&gt;ValidateLink(link);</div>
+<div class="line"><span class="lineno">  404</span> </div>
+<div class="line"><span class="lineno">  405</span>                    <span class="keywordflow">if</span> (lnkFrm &amp;&amp; lnkTo)</div>
+<div class="line"><span class="lineno">  406</span>                    {</div>
+<div class="line"><span class="lineno">  407</span>                        link-&gt;from-&gt;Link(link);</div>
+<div class="line"><span class="lineno">  408</span>                        link-&gt;to-&gt;Link(link);</div>
+<div class="line"><span class="lineno">  409</span>                        links[link-&gt;_id.Get()] = link;</div>
+<div class="line"><span class="lineno">  410</span>                        ImGuiNodeEditor::Link(link-&gt;id, link-&gt;from-&gt;id, link-&gt;to-&gt;id);</div>
+<div class="line"><span class="lineno">  411</span>                    }</div>
+<div class="line"><span class="lineno">  412</span>                }</div>
+<div class="line"><span class="lineno">  413</span>            }</div>
 <div class="line"><span class="lineno">  414</span> </div>
-<div class="line"><span class="lineno">  415</span>                <span class="keywordflow">if</span>(pin-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">  416</span>                {</div>
-<div class="line"><span class="lineno">  417</span>                    DeleteLink(pin-&gt;link);</div>
-<div class="line"><span class="lineno">  418</span>                }</div>
-<div class="line"><span class="lineno">  419</span>            }</div>
-<div class="line"><span class="lineno">  420</span> </div>
-<div class="line"><span class="lineno">  421</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (oPid)</div>
-<div class="line"><span class="lineno">  422</span>            {</div>
-<div class="line"><span class="lineno">  423</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[oPid.Get()];</div>
+<div class="line"><span class="lineno">  415</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(iPid)</div>
+<div class="line"><span class="lineno">  416</span>            {</div>
+<div class="line"><span class="lineno">  417</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[iPid.Get()];</div>
+<div class="line"><span class="lineno">  418</span> </div>
+<div class="line"><span class="lineno">  419</span>                <span class="keywordflow">if</span>(pin-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">  420</span>                {</div>
+<div class="line"><span class="lineno">  421</span>                    DeleteLink(pin-&gt;link);</div>
+<div class="line"><span class="lineno">  422</span>                }</div>
+<div class="line"><span class="lineno">  423</span>            }</div>
 <div class="line"><span class="lineno">  424</span> </div>
-<div class="line"><span class="lineno">  425</span>                <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">  426</span>                {</div>
-<div class="line"><span class="lineno">  427</span>                    DeleteLink(pin-&gt;link);</div>
-<div class="line"><span class="lineno">  428</span>                }</div>
-<div class="line"><span class="lineno">  429</span>            }</div>
-<div class="line"><span class="lineno">  430</span>        }</div>
-<div class="line"><span class="lineno">  431</span> </div>
-<div class="line"><span class="lineno">  432</span>        ImGuiNodeEditor::PinId nPid;</div>
-<div class="line"><span class="lineno">  433</span> </div>
-<div class="line"><span class="lineno">  434</span>        <span class="keywordflow">if</span> (config.makeNodeFunc &amp;&amp; ImGuiNodeEditor::QueryNewNode(&amp;nPid))</div>
-<div class="line"><span class="lineno">  435</span>        {</div>
-<div class="line"><span class="lineno">  436</span>            <span class="keywordflow">if</span> (ImGuiNodeEditor::AcceptNewItem())</div>
-<div class="line"><span class="lineno">  437</span>            {</div>
-<div class="line"><span class="lineno">  438</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[nPid.Get()];</div>
-<div class="line"><span class="lineno">  439</span> </div>
-<div class="line"><span class="lineno">  440</span>                <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">  441</span>                {</div>
-<div class="line"><span class="lineno">  442</span>                    DeleteLink(pin-&gt;link);</div>
-<div class="line"><span class="lineno">  443</span>                }</div>
-<div class="line"><span class="lineno">  444</span> </div>
-<div class="line"><span class="lineno">  445</span>                <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  446</span>                {</div>
-<div class="line"><span class="lineno">  447</span>                    config.makeNodeFunc();</div>
-<div class="line"><span class="lineno">  448</span>                }</div>
-<div class="line"><span class="lineno">  449</span>            }</div>
-<div class="line"><span class="lineno">  450</span>        }</div>
-<div class="line"><span class="lineno">  451</span>    }</div>
-<div class="line"><span class="lineno">  452</span> </div>
-<div class="line"><span class="lineno">  453</span>    ImGuiNodeEditor::EndCreate();</div>
-<div class="line"><span class="lineno">  454</span> </div>
-<div class="line"><span class="lineno">  455</span>    <span class="keywordflow">if</span> (ImGuiNodeEditor::BeginDelete())</div>
-<div class="line"><span class="lineno">  456</span>    {</div>
-<div class="line"><span class="lineno">  457</span>        ImGuiNodeEditor::NodeId nId;</div>
+<div class="line"><span class="lineno">  425</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (oPid)</div>
+<div class="line"><span class="lineno">  426</span>            {</div>
+<div class="line"><span class="lineno">  427</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[oPid.Get()];</div>
+<div class="line"><span class="lineno">  428</span> </div>
+<div class="line"><span class="lineno">  429</span>                <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">  430</span>                {</div>
+<div class="line"><span class="lineno">  431</span>                    DeleteLink(pin-&gt;link);</div>
+<div class="line"><span class="lineno">  432</span>                }</div>
+<div class="line"><span class="lineno">  433</span>            }</div>
+<div class="line"><span class="lineno">  434</span>        }</div>
+<div class="line"><span class="lineno">  435</span> </div>
+<div class="line"><span class="lineno">  436</span>        ImGuiNodeEditor::PinId nPid;</div>
+<div class="line"><span class="lineno">  437</span> </div>
+<div class="line"><span class="lineno">  438</span>        <span class="keywordflow">if</span> (config.makeNodeFunc &amp;&amp; ImGuiNodeEditor::QueryNewNode(&amp;nPid))</div>
+<div class="line"><span class="lineno">  439</span>        {</div>
+<div class="line"><span class="lineno">  440</span>            <span class="keywordflow">if</span> (ImGuiNodeEditor::AcceptNewItem())</div>
+<div class="line"><span class="lineno">  441</span>            {</div>
+<div class="line"><span class="lineno">  442</span>                <a class="code hl_class" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin = pins[nPid.Get()];</div>
+<div class="line"><span class="lineno">  443</span> </div>
+<div class="line"><span class="lineno">  444</span>                <span class="keywordflow">if</span> (pin-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">  445</span>                {</div>
+<div class="line"><span class="lineno">  446</span>                    DeleteLink(pin-&gt;link);</div>
+<div class="line"><span class="lineno">  447</span>                }</div>
+<div class="line"><span class="lineno">  448</span> </div>
+<div class="line"><span class="lineno">  449</span>                <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  450</span>                {</div>
+<div class="line"><span class="lineno">  451</span>                    config.makeNodeFunc();</div>
+<div class="line"><span class="lineno">  452</span>                }</div>
+<div class="line"><span class="lineno">  453</span>            }</div>
+<div class="line"><span class="lineno">  454</span>        }</div>
+<div class="line"><span class="lineno">  455</span>    }</div>
+<div class="line"><span class="lineno">  456</span> </div>
+<div class="line"><span class="lineno">  457</span>    ImGuiNodeEditor::EndCreate();</div>
 <div class="line"><span class="lineno">  458</span> </div>
-<div class="line"><span class="lineno">  459</span>        <span class="keywordflow">if</span> (ImGuiNodeEditor::QueryDeletedNode(&amp;nId))</div>
-<div class="line"><span class="lineno">  460</span>        {</div>
-<div class="line"><span class="lineno">  461</span>            <span class="keywordflow">if</span> (nId &amp;&amp; ImGuiNodeEditor::AcceptDeletedItem())</div>
-<div class="line"><span class="lineno">  462</span>            {</div>
-<div class="line"><span class="lineno">  463</span>                <span class="keywordflow">if</span> (!(outputNode &amp;&amp; nId == outputNode-&gt;_id))</div>
-<div class="line"><span class="lineno">  464</span>                {</div>
-<div class="line"><span class="lineno">  465</span>                    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = nodes[nId.Get()];</div>
-<div class="line"><span class="lineno">  466</span>                    DeleteNode(node);</div>
-<div class="line"><span class="lineno">  467</span>                }</div>
-<div class="line"><span class="lineno">  468</span>            }</div>
-<div class="line"><span class="lineno">  469</span>        }</div>
-<div class="line"><span class="lineno">  470</span> </div>
-<div class="line"><span class="lineno">  471</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  472</span>        {</div>
-<div class="line"><span class="lineno">  473</span>            ImGuiNodeEditor::LinkId lId;</div>
+<div class="line"><span class="lineno">  459</span>    <span class="keywordflow">if</span> (ImGuiNodeEditor::BeginDelete())</div>
+<div class="line"><span class="lineno">  460</span>    {</div>
+<div class="line"><span class="lineno">  461</span>        ImGuiNodeEditor::NodeId nId;</div>
+<div class="line"><span class="lineno">  462</span> </div>
+<div class="line"><span class="lineno">  463</span>        <span class="keywordflow">if</span> (ImGuiNodeEditor::QueryDeletedNode(&amp;nId))</div>
+<div class="line"><span class="lineno">  464</span>        {</div>
+<div class="line"><span class="lineno">  465</span>            <span class="keywordflow">if</span> (nId &amp;&amp; ImGuiNodeEditor::AcceptDeletedItem())</div>
+<div class="line"><span class="lineno">  466</span>            {</div>
+<div class="line"><span class="lineno">  467</span>                <span class="keywordflow">if</span> (!(outputNode &amp;&amp; nId == outputNode-&gt;_id))</div>
+<div class="line"><span class="lineno">  468</span>                {</div>
+<div class="line"><span class="lineno">  469</span>                    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = nodes[nId.Get()];</div>
+<div class="line"><span class="lineno">  470</span>                    DeleteNode(node);</div>
+<div class="line"><span class="lineno">  471</span>                }</div>
+<div class="line"><span class="lineno">  472</span>            }</div>
+<div class="line"><span class="lineno">  473</span>        }</div>
 <div class="line"><span class="lineno">  474</span> </div>
-<div class="line"><span class="lineno">  475</span>            <span class="keywordflow">if</span> (ImGuiNodeEditor::QueryDeletedLink(&amp;lId))</div>
-<div class="line"><span class="lineno">  476</span>            {</div>
-<div class="line"><span class="lineno">  477</span>                <span class="keywordflow">if</span> (lId &amp;&amp; ImGuiNodeEditor::AcceptDeletedItem())</div>
-<div class="line"><span class="lineno">  478</span>                {</div>
-<div class="line"><span class="lineno">  479</span>                    <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link = links[lId.Get()];</div>
-<div class="line"><span class="lineno">  480</span>                    DeleteLink(link);</div>
-<div class="line"><span class="lineno">  481</span>                }</div>
-<div class="line"><span class="lineno">  482</span>            }</div>
-<div class="line"><span class="lineno">  483</span>        }</div>
-<div class="line"><span class="lineno">  484</span>    }</div>
-<div class="line"><span class="lineno">  485</span> </div>
-<div class="line"><span class="lineno">  486</span>    ImGuiNodeEditor::EndDelete();</div>
-<div class="line"><span class="lineno">  487</span>    ImGuiNodeEditor::NodeId sNode;</div>
-<div class="line"><span class="lineno">  488</span>    ImGuiNodeEditor::GetSelectedNodes(&amp;sNode, 1);</div>
+<div class="line"><span class="lineno">  475</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  476</span>        {</div>
+<div class="line"><span class="lineno">  477</span>            ImGuiNodeEditor::LinkId lId;</div>
+<div class="line"><span class="lineno">  478</span> </div>
+<div class="line"><span class="lineno">  479</span>            <span class="keywordflow">if</span> (ImGuiNodeEditor::QueryDeletedLink(&amp;lId))</div>
+<div class="line"><span class="lineno">  480</span>            {</div>
+<div class="line"><span class="lineno">  481</span>                <span class="keywordflow">if</span> (lId &amp;&amp; ImGuiNodeEditor::AcceptDeletedItem())</div>
+<div class="line"><span class="lineno">  482</span>                {</div>
+<div class="line"><span class="lineno">  483</span>                    <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link = links[lId.Get()];</div>
+<div class="line"><span class="lineno">  484</span>                    DeleteLink(link);</div>
+<div class="line"><span class="lineno">  485</span>                }</div>
+<div class="line"><span class="lineno">  486</span>            }</div>
+<div class="line"><span class="lineno">  487</span>        }</div>
+<div class="line"><span class="lineno">  488</span>    }</div>
 <div class="line"><span class="lineno">  489</span> </div>
-<div class="line"><span class="lineno">  490</span>    <span class="keywordflow">if</span> (ImGui::IsWindowFocused())</div>
-<div class="line"><span class="lineno">  491</span>    {</div>
-<div class="line"><span class="lineno">  492</span>        GLFWwindow *wind = Application::Get()-&gt;GetWindow()-&gt;GetNativeWindow();</div>
+<div class="line"><span class="lineno">  490</span>    ImGuiNodeEditor::EndDelete();</div>
+<div class="line"><span class="lineno">  491</span>    ImGuiNodeEditor::NodeId sNode;</div>
+<div class="line"><span class="lineno">  492</span>    ImGuiNodeEditor::GetSelectedNodes(&amp;sNode, 1);</div>
 <div class="line"><span class="lineno">  493</span> </div>
-<div class="line"><span class="lineno">  494</span>        <span class="keywordflow">if</span> (glfwGetKey(wind, GLFW_KEY_RIGHT_SHIFT) || glfwGetKey(wind, GLFW_KEY_LEFT_SHIFT))</div>
-<div class="line"><span class="lineno">  495</span>        {</div>
-<div class="line"><span class="lineno">  496</span>            <span class="keywordflow">if</span> (glfwGetKey(wind, GLFW_KEY_D) &amp;&amp; sNode)</div>
-<div class="line"><span class="lineno">  497</span>            {</div>
-<div class="line"><span class="lineno">  498</span>                <span class="keywordflow">if</span> (!(sNode.Get() == outputNode-&gt;_id.Get()))</div>
-<div class="line"><span class="lineno">  499</span>                {</div>
-<div class="line"><span class="lineno">  500</span>                    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = (config.insNodeFunc(nodes[sNode.Get()]-&gt;Save()));</div>
-<div class="line"><span class="lineno">  501</span>                    ImVec2 prePos = ImGuiNodeEditor::GetNodePosition(sNode);</div>
-<div class="line"><span class="lineno">  502</span>                    ImGuiNodeEditor::SetNodePosition(node-&gt;_id, ImVec2(prePos.x + 10, prePos.y + 10));</div>
-<div class="line"><span class="lineno">  503</span>                    ImGuiNodeEditor::DeselectNode(sNode);</div>
-<div class="line"><span class="lineno">  504</span>                    <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>(node);</div>
-<div class="line"><span class="lineno">  505</span>                }</div>
-<div class="line"><span class="lineno">  506</span>            }</div>
-<div class="line"><span class="lineno">  507</span>        }</div>
-<div class="line"><span class="lineno">  508</span>    }</div>
-<div class="line"><span class="lineno">  509</span> </div>
-<div class="line"><span class="lineno">  510</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : nodes)</div>
-<div class="line"><span class="lineno">  511</span>    {</div>
-<div class="line"><span class="lineno">  512</span>        <span class="keywordflow">if</span>(it.second-&gt;reqNodePosLoad)</div>
-<div class="line"><span class="lineno">  513</span>        {</div>
-<div class="line"><span class="lineno">  514</span>            ImGuiNodeEditor::SetNodePosition(it.second-&gt;_id, it.second-&gt;nodePosition);</div>
-<div class="line"><span class="lineno">  515</span>            it.second-&gt;reqNodePosLoad = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  516</span>        }</div>
-<div class="line"><span class="lineno">  517</span> </div>
-<div class="line"><span class="lineno">  518</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  519</span>        {</div>
-<div class="line"><span class="lineno">  520</span>            it.second-&gt;nodePosition = ImGuiNodeEditor::GetNodePosition(it.second-&gt;_id);</div>
-<div class="line"><span class="lineno">  521</span>        }</div>
-<div class="line"><span class="lineno">  522</span>    }</div>
-<div class="line"><span class="lineno">  523</span> </div>
-<div class="line"><span class="lineno">  524</span>    <span class="keywordflow">if</span> (config.updateFunc)</div>
-<div class="line"><span class="lineno">  525</span>    {</div>
-<div class="line"><span class="lineno">  526</span>        config.updateFunc();</div>
-<div class="line"><span class="lineno">  527</span>    }</div>
-<div class="line"><span class="lineno">  528</span> </div>
-<div class="line"><span class="lineno">  529</span>    ImGuiNodeEditor::End();</div>
-<div class="line"><span class="lineno">  530</span>    ImGuiNodeEditor::SetCurrentEditor(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  531</span>}</div>
+<div class="line"><span class="lineno">  494</span>    <span class="keywordflow">if</span> (ImGui::IsWindowFocused())</div>
+<div class="line"><span class="lineno">  495</span>    {</div>
+<div class="line"><span class="lineno">  496</span>        GLFWwindow *wind = Application::Get()-&gt;GetWindow()-&gt;GetNativeWindow();</div>
+<div class="line"><span class="lineno">  497</span> </div>
+<div class="line"><span class="lineno">  498</span>        <span class="keywordflow">if</span> (glfwGetKey(wind, GLFW_KEY_RIGHT_SHIFT) || glfwGetKey(wind, GLFW_KEY_LEFT_SHIFT))</div>
+<div class="line"><span class="lineno">  499</span>        {</div>
+<div class="line"><span class="lineno">  500</span>            <span class="keywordflow">if</span> (glfwGetKey(wind, GLFW_KEY_D) &amp;&amp; sNode)</div>
+<div class="line"><span class="lineno">  501</span>            {</div>
+<div class="line"><span class="lineno">  502</span>                <span class="keywordflow">if</span> (!(sNode.Get() == outputNode-&gt;_id.Get()))</div>
+<div class="line"><span class="lineno">  503</span>                {</div>
+<div class="line"><span class="lineno">  504</span>                    <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node = (config.insNodeFunc(nodes[sNode.Get()]-&gt;Save()));</div>
+<div class="line"><span class="lineno">  505</span>                    ImVec2 prePos = ImGuiNodeEditor::GetNodePosition(sNode);</div>
+<div class="line"><span class="lineno">  506</span>                    ImGuiNodeEditor::SetNodePosition(node-&gt;_id, ImVec2(prePos.x + 10, prePos.y + 10));</div>
+<div class="line"><span class="lineno">  507</span>                    ImGuiNodeEditor::DeselectNode(sNode);</div>
+<div class="line"><span class="lineno">  508</span>                    <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>(node);</div>
+<div class="line"><span class="lineno">  509</span>                }</div>
+<div class="line"><span class="lineno">  510</span>            }</div>
+<div class="line"><span class="lineno">  511</span>        }</div>
+<div class="line"><span class="lineno">  512</span>    }</div>
+<div class="line"><span class="lineno">  513</span> </div>
+<div class="line"><span class="lineno">  514</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : nodes)</div>
+<div class="line"><span class="lineno">  515</span>    {</div>
+<div class="line"><span class="lineno">  516</span>        <span class="keywordflow">if</span>(it.second-&gt;reqNodePosLoad)</div>
+<div class="line"><span class="lineno">  517</span>        {</div>
+<div class="line"><span class="lineno">  518</span>            ImGuiNodeEditor::SetNodePosition(it.second-&gt;_id, it.second-&gt;nodePosition);</div>
+<div class="line"><span class="lineno">  519</span>            it.second-&gt;reqNodePosLoad = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  520</span>        }</div>
+<div class="line"><span class="lineno">  521</span> </div>
+<div class="line"><span class="lineno">  522</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  523</span>        {</div>
+<div class="line"><span class="lineno">  524</span>            it.second-&gt;nodePosition = ImGuiNodeEditor::GetNodePosition(it.second-&gt;_id);</div>
+<div class="line"><span class="lineno">  525</span>        }</div>
+<div class="line"><span class="lineno">  526</span>    }</div>
+<div class="line"><span class="lineno">  527</span> </div>
+<div class="line"><span class="lineno">  528</span>    <span class="keywordflow">if</span> (config.updateFunc)</div>
+<div class="line"><span class="lineno">  529</span>    {</div>
+<div class="line"><span class="lineno">  530</span>        config.updateFunc();</div>
+<div class="line"><span class="lineno">  531</span>    }</div>
+<div class="line"><span class="lineno">  532</span> </div>
+<div class="line"><span class="lineno">  533</span>    ImGuiNodeEditor::End();</div>
+<div class="line"><span class="lineno">  534</span>    ImGuiNodeEditor::SetCurrentEditor(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  535</span>}</div>
 <div class="ttc" id="aclass_add_node_html"><div class="ttname"><a href="../../dc/d48/class_add_node.html">AddNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d46/_add_node_8h_source.html#l00006">AddNode.h:7</a></div></div>
-<div class="ttc" id="aclass_node_editor_link_html"><div class="ttname"><a href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00068">NodeEditor.h:69</a></div></div>
-<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00113">NodeEditor.h:114</a></div></div>
-<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00084">NodeEditor.h:85</a></div></div>
+<div class="ttc" id="aclass_node_editor_link_html"><div class="ttname"><a href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00072">NodeEditor.h:73</a></div></div>
+<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00117">NodeEditor.h:118</a></div></div>
+<div class="ttc" id="aclass_node_editor_pin_html"><div class="ttname"><a href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00088">NodeEditor.h:89</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -299,7 +299,7 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_aee1755bf5ab1
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/d54/class_node_editor.html">NodeEditor</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

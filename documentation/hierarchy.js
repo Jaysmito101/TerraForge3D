@@ -188,6 +188,9 @@ var hierarchy =
       [ "OutputNode", "df/df6/class_output_node.html", null ],
       [ "PixelateNode", "dc/d9e/class_pixelate_node.html", null ],
       [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
+      [ "SNENode", "df/d7c/class_s_n_e_node.html", [
+        [ "ShaderOutputNode", "d1/db6/class_shader_output_node.html", null ]
+      ] ],
       [ "SinNode", "db/dba/class_sin_node.html", null ],
       [ "SquareNode", "d8/de1/class_square_node.html", null ],
       [ "SubNode", "d4/da1/class_sub_node.html", null ],
@@ -197,7 +200,9 @@ var hierarchy =
       [ "TimeBasedSeedNode", "d5/d1f/class_time_based_seed_node.html", null ],
       [ "VisualizerNode", "df/d97/class_visualizer_node.html", null ]
     ] ],
-    [ "NodeEditorPin", "d2/d45/class_node_editor_pin.html", null ],
+    [ "NodeEditorPin", "d2/d45/class_node_editor_pin.html", [
+      [ "SNEPin", "d8/d44/class_s_n_e_pin.html", null ]
+    ] ],
     [ "NodeInputParam", "d5/dd0/struct_node_input_param.html", null ],
     [ "NodeOutput", "d6/d3b/struct_node_output.html", null ],
     [ "NoiseLayer", "d7/dc4/class_noise_layer.html", null ],

@@ -121,27 +121,27 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_a2dc19261cc70
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00541">541</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  542</span>{</div>
-<div class="line"><span class="lineno">  543</span>    nodes[node-&gt;_id.Get()] = node;</div>
-<div class="line"><span class="lineno">  544</span> </div>
-<div class="line"><span class="lineno">  545</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : node-&gt;GetPins())</div>
-<div class="line"><span class="lineno">  546</span>    {</div>
-<div class="line"><span class="lineno">  547</span>        pins[it-&gt;_id.Get()] = it;</div>
-<div class="line"><span class="lineno">  548</span>    }</div>
-<div class="line"><span class="lineno">  549</span> </div>
-<div class="line"><span class="lineno">  550</span>    node-&gt;Setup();</div>
-<div class="line"><span class="lineno">  551</span> </div>
-<div class="line"><span class="lineno">  552</span>    <span class="keywordflow">if</span> (nodes.size() &gt; 2 &amp;&amp; nodes.find(lastNodeId.Get()) != nodes.end() &amp;&amp; !node-&gt;reqNodePosLoad)</div>
-<div class="line"><span class="lineno">  553</span>    {</div>
-<div class="line"><span class="lineno">  554</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *lastNode = nodes[lastNodeId.Get()];</div>
-<div class="line"><span class="lineno">  555</span>        node-&gt;nodePosition = lastNode-&gt;nodePosition;</div>
-<div class="line"><span class="lineno">  556</span>        node-&gt;reqNodePosLoad = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  557</span>    }</div>
-<div class="line"><span class="lineno">  558</span> </div>
-<div class="line"><span class="lineno">  559</span>    lastNodeId = node-&gt;_id;</div>
-<div class="line"><span class="lineno">  560</span>}</div>
-<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00113">NodeEditor.h:114</a></div></div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00545">545</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  546</span>{</div>
+<div class="line"><span class="lineno">  547</span>    nodes[node-&gt;_id.Get()] = node;</div>
+<div class="line"><span class="lineno">  548</span> </div>
+<div class="line"><span class="lineno">  549</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;it : node-&gt;GetPins())</div>
+<div class="line"><span class="lineno">  550</span>    {</div>
+<div class="line"><span class="lineno">  551</span>        pins[it-&gt;_id.Get()] = it;</div>
+<div class="line"><span class="lineno">  552</span>    }</div>
+<div class="line"><span class="lineno">  553</span> </div>
+<div class="line"><span class="lineno">  554</span>    node-&gt;Setup();</div>
+<div class="line"><span class="lineno">  555</span> </div>
+<div class="line"><span class="lineno">  556</span>    <span class="keywordflow">if</span> (nodes.size() &gt; 2 &amp;&amp; nodes.find(lastNodeId.Get()) != nodes.end() &amp;&amp; !node-&gt;reqNodePosLoad)</div>
+<div class="line"><span class="lineno">  557</span>    {</div>
+<div class="line"><span class="lineno">  558</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *lastNode = nodes[lastNodeId.Get()];</div>
+<div class="line"><span class="lineno">  559</span>        node-&gt;nodePosition = lastNode-&gt;nodePosition;</div>
+<div class="line"><span class="lineno">  560</span>        node-&gt;reqNodePosLoad = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  561</span>    }</div>
+<div class="line"><span class="lineno">  562</span> </div>
+<div class="line"><span class="lineno">  563</span>    lastNodeId = node-&gt;_id;</div>
+<div class="line"><span class="lineno">  564</span>}</div>
+<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00117">NodeEditor.h:118</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -151,7 +151,7 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_a2dc19261cc70
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/d54/class_node_editor.html">NodeEditor</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

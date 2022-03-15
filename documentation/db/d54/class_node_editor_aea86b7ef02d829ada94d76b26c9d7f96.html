@@ -121,40 +121,40 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_aea86b7ef02d8
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00334">334</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  335</span>{</div>
-<div class="line"><span class="lineno">  336</span>    <span class="keywordflow">if</span> (!config.insNodeFunc)</div>
-<div class="line"><span class="lineno">  337</span>    {</div>
-<div class="line"><span class="lineno">  338</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Node Instantiate Function Not Found!&quot;</span>);</div>
-<div class="line"><span class="lineno">  339</span>    }</div>
-<div class="line"><span class="lineno">  340</span> </div>
-<div class="line"><span class="lineno">  341</span>    Reset();</div>
-<div class="line"><span class="lineno">  342</span>    SeUIDSeed(data[<span class="stringliteral">&quot;uidSeed&quot;</span>]);</div>
-<div class="line"><span class="lineno">  343</span> </div>
-<div class="line"><span class="lineno">  344</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ndata : data[<span class="stringliteral">&quot;nodes&quot;</span>])</div>
-<div class="line"><span class="lineno">  345</span>    {</div>
-<div class="line"><span class="lineno">  346</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *nd = (config.insNodeFunc(ndata));</div>
-<div class="line"><span class="lineno">  347</span>        nd-&gt;LoadInternal(ndata);</div>
-<div class="line"><span class="lineno">  348</span>        <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>(nd);</div>
-<div class="line"><span class="lineno">  349</span>    }</div>
-<div class="line"><span class="lineno">  350</span> </div>
-<div class="line"><span class="lineno">  351</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ldata : data[<span class="stringliteral">&quot;links&quot;</span>])</div>
-<div class="line"><span class="lineno">  352</span>    {</div>
-<div class="line"><span class="lineno">  353</span>        <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *lnk = <span class="keyword">new</span> <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a>();</div>
-<div class="line"><span class="lineno">  354</span>        lnk-&gt;Load(ldata);</div>
-<div class="line"><span class="lineno">  355</span>        ImGuiNodeEditor::PinId fromId, toId;</div>
-<div class="line"><span class="lineno">  356</span>        fromId = (int)ldata[<span class="stringliteral">&quot;from&quot;</span>];</div>
-<div class="line"><span class="lineno">  357</span>        toId = (int)ldata[<span class="stringliteral">&quot;to&quot;</span>];</div>
-<div class="line"><span class="lineno">  358</span>        lnk-&gt;from = pins[fromId.Get()];</div>
-<div class="line"><span class="lineno">  359</span>        lnk-&gt;to = pins[toId.Get()];</div>
-<div class="line"><span class="lineno">  360</span>        lnk-&gt;from-&gt;Link(lnk);</div>
-<div class="line"><span class="lineno">  361</span>        lnk-&gt;to-&gt;Link(lnk);</div>
-<div class="line"><span class="lineno">  362</span>        links[lnk-&gt;_id.Get()] = lnk;</div>
-<div class="line"><span class="lineno">  363</span>    }</div>
-<div class="line"><span class="lineno">  364</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html#l00338">338</a> of file <a class="el" href="../../d3/d62/_node_editor_8cpp_source.html">NodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  339</span>{</div>
+<div class="line"><span class="lineno">  340</span>    <span class="keywordflow">if</span> (!config.insNodeFunc)</div>
+<div class="line"><span class="lineno">  341</span>    {</div>
+<div class="line"><span class="lineno">  342</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Node Instantiate Function Not Found!&quot;</span>);</div>
+<div class="line"><span class="lineno">  343</span>    }</div>
+<div class="line"><span class="lineno">  344</span> </div>
+<div class="line"><span class="lineno">  345</span>    Reset();</div>
+<div class="line"><span class="lineno">  346</span>    SeUIDSeed(data[<span class="stringliteral">&quot;uidSeed&quot;</span>]);</div>
+<div class="line"><span class="lineno">  347</span> </div>
+<div class="line"><span class="lineno">  348</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ndata : data[<span class="stringliteral">&quot;nodes&quot;</span>])</div>
+<div class="line"><span class="lineno">  349</span>    {</div>
+<div class="line"><span class="lineno">  350</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *nd = (config.insNodeFunc(ndata));</div>
+<div class="line"><span class="lineno">  351</span>        nd-&gt;LoadInternal(ndata);</div>
+<div class="line"><span class="lineno">  352</span>        <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>(nd);</div>
+<div class="line"><span class="lineno">  353</span>    }</div>
+<div class="line"><span class="lineno">  354</span> </div>
+<div class="line"><span class="lineno">  355</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ldata : data[<span class="stringliteral">&quot;links&quot;</span>])</div>
+<div class="line"><span class="lineno">  356</span>    {</div>
+<div class="line"><span class="lineno">  357</span>        <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *lnk = <span class="keyword">new</span> <a class="code hl_class" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a>();</div>
+<div class="line"><span class="lineno">  358</span>        lnk-&gt;Load(ldata);</div>
+<div class="line"><span class="lineno">  359</span>        ImGuiNodeEditor::PinId fromId, toId;</div>
+<div class="line"><span class="lineno">  360</span>        fromId = (int)ldata[<span class="stringliteral">&quot;from&quot;</span>];</div>
+<div class="line"><span class="lineno">  361</span>        toId = (int)ldata[<span class="stringliteral">&quot;to&quot;</span>];</div>
+<div class="line"><span class="lineno">  362</span>        lnk-&gt;from = pins[fromId.Get()];</div>
+<div class="line"><span class="lineno">  363</span>        lnk-&gt;to = pins[toId.Get()];</div>
+<div class="line"><span class="lineno">  364</span>        lnk-&gt;from-&gt;Link(lnk);</div>
+<div class="line"><span class="lineno">  365</span>        lnk-&gt;to-&gt;Link(lnk);</div>
+<div class="line"><span class="lineno">  366</span>        links[lnk-&gt;_id.Get()] = lnk;</div>
+<div class="line"><span class="lineno">  367</span>    }</div>
+<div class="line"><span class="lineno">  368</span>}</div>
 <div class="ttc" id="aclass_add_node_html"><div class="ttname"><a href="../../dc/d48/class_add_node.html">AddNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d46/_add_node_8h_source.html#l00006">AddNode.h:7</a></div></div>
-<div class="ttc" id="aclass_node_editor_link_html"><div class="ttname"><a href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00068">NodeEditor.h:69</a></div></div>
-<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00113">NodeEditor.h:114</a></div></div>
+<div class="ttc" id="aclass_node_editor_link_html"><div class="ttname"><a href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00072">NodeEditor.h:73</a></div></div>
+<div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00117">NodeEditor.h:118</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -165,7 +165,7 @@ $(document).ready(function(){initNavTree('db/d54/class_node_editor_aea86b7ef02d8
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/d54/class_node_editor.html">NodeEditor</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 07:26:43 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 10:37:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
