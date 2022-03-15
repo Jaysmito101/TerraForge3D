@@ -2,11 +2,11 @@
 
 #include "Shading/ShaderNodeEditor.h"
 
-class ShaderOutputNode : public SNENode
+class Float3Node : public SNENode
 {
 public:
-	ShaderOutputNode(GLSLHandler* handler);
-	~ShaderOutputNode();
+	Float3Node(GLSLHandler* handler);
+	~Float3Node();
 
 	virtual void OnEvaluate(GLSLFunction* function, GLSLLine* line) override;
 	virtual void Load(nlohmann::json data) override;
@@ -14,5 +14,5 @@ public:
 	virtual void OnRender() override;
 	virtual void UpdateShaders() override;
 
-	float color[4];
+	float x, y, z;
 };

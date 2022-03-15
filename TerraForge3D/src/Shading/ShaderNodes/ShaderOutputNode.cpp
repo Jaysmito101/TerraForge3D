@@ -6,16 +6,20 @@ void ShaderOutputNode::OnEvaluate(GLSLFunction* function, GLSLLine* line)
 {
 	if (inputPins[0]->IsLinked())
 	{
-		function->AddLine(GLSLLine("", "Not yet Implemented"));
+		GLSLLine ln("");
+		inputPins[0]->other->Evaluate(GetParams(function, &ln));
+		line->line = ln.line;	
 	}
 	else
 	{
-		function->AddLine(GLSLLine("vec3 norm" + STR(id) + " = normalize(Normal);"));
-		function->AddLine(GLSLLine("vec3 lightDir" + STR(id) + " = normalize(_LightPosition - FragPos.xyz );"));
-		function->AddLine(GLSLLine("float diff" + STR(id) + " = max(dot(norm" + STR(id) + ", lightDir" + STR(id) + "), 0.0f);"));
-		function->AddLine(GLSLLine("vec3 diffuse" + STR(id) + " = diff" + STR(id) + " * _LightColor;"));
-		function->AddLine(GLSLLine("vec3 result" + STR(id) + " = (vec3(0.2, 0.2, 0.2) + diffuse" + STR(id) + ") * vec3(" + STR(color[0]) + ", " + STR(color[1]) + ", " + STR(color[2]) + ");"));
-		line->line = "result" + STR(id);
+		function->AddLine(GLSLLine("vec3 " + VAR("norm") + " = normalize(Normal);"));
+		function->AddLine(GLSLLine("vec3 " + VAR("lightDir") + " = normalize(_LightPosition - FragPos.xyz );"));
+		function->AddLine(GLSLLine("float " + VAR("diff") + " = max(dot(" + VAR("norm") + ", " + VAR("lightDir") + "), 0.0f);"));
+		function->AddLine(GLSLLine("vec3 " + VAR("diffuse") + " = " + VAR("diff") + " * _LightColor;"));
+		function->AddLine(GLSLLine("vec3 " + VAR("result") + " = (vec3(0.2, 0.2, 0.2) + " + VAR("diffuse") + ")" + \
+			 " * vec3(" + SDATA(0) + ", " + SDATA(1) + ", " + SDATA(2) + ");"));
+
+		line->line = VAR("result");
 	}
 }
 
@@ -38,6 +42,13 @@ nlohmann::json ShaderOutputNode::Save()
 	return data;
 }
 
+void ShaderOutputNode::UpdateShaders()
+{
+	sharedData->d0 = color[0];
+	sharedData->d1 = color[1];
+	sharedData->d2 = color[2];
+}
+
 void ShaderOutputNode::OnRender()
 {
 	DrawHeader("Output");
@@ -45,9 +56,13 @@ void ShaderOutputNode::OnRender()
 
 	if (!inputPins[0]->IsLinked())
 	{
-		ImGui::ColorPicker4("Object Color", color);
+		if(ImGui::ColorPicker4("Object Color", color))
+		{
+			sharedData->d0 = color[0];
+			sharedData->d1 = color[1];
+			sharedData->d2 = color[2];
+		}
 	}
-
 	else
 	{
 		ImGui::Dummy(ImVec2(100, 40));

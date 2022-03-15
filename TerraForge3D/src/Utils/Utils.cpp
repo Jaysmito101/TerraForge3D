@@ -566,6 +566,11 @@ bool LoadTexture(Texture2D *texture, bool loadToAssets, bool preserveData, bool 
 
 		texture = new Texture2D(fileName, preserveData, readAlpha);
 
+		if(projectManager == nullptr)
+		{
+			projectManager = ProjectManager::Get();
+		}
+
 		if (loadToAssets)
 		{
 			projectManager->SaveTexture(texture);

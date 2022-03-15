@@ -5,6 +5,70 @@
 #include "imgui/imgui.h"
 
 #include "Shading/ShaderNodes/ShaderOutputNode.h"
+#include "Shading/ShaderNodes/ShaderTextureNode.h"
+#include "Shading/ShaderNodes/Float3Node.h"
+
+static char *stristr4(const char *str, const char *pattern)
+{
+	size_t i;
+
+	if (!*pattern)
+	{
+		return (char *)str;
+	}
+
+	for (; *str; str++)
+	{
+		if (toupper((unsigned char)*str) == toupper((unsigned char)*pattern))
+		{
+			for (i = 1;; i++)
+			{
+				if (!pattern[i])
+				{
+					return (char *)str;
+				}
+
+				if (toupper((unsigned char)str[i]) != toupper((unsigned char)pattern[i]))
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	return NULL;
+}
+
+
+#define NODE_MAKER_COND(x) length == 0 || stristr4(x, data)
+#define NODE_MAKER_SHOW(x, y, z) if (NODE_MAKER_COND(y)) {if (ImGui::Button((y + std::string("##SHADERNODEMAKER")).c_str())) { editor->AddNode(new x(handler)); z = z || true; ImGui::CloseCurrentPopup(); } }
+
+
+static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler* handler, ShaderTextureManager* shaderTextureManager)
+{
+	static char data[1000];
+	static bool didMake = false;
+	didMake = false;
+	ImGui::InputTextWithHint("##SearchShaderNodes", "Search ...", data, sizeof(data));
+	int length = strlen(data);
+	ImGui::BeginChild("##ShaderNodesMaker", ImVec2(200, 250));
+	NODE_MAKER_SHOW(Float3Node, "Float3", didMake);
+
+	if (NODE_MAKER_COND("Texture"))
+	{
+		if (ImGui::Button(("Texture" + std::string("##SHADERNODEMAKER")).c_str())) 
+		{
+			editor->AddNode(new ShaderTextureNode(handler, shaderTextureManager));
+			didMake = didMake || true; 
+			ImGui::CloseCurrentPopup(); 
+		}
+	}
+
+	ImGui::EndChild();
+
+	return didMake;
+}
+
 
 ShadingManager::ShadingManager(ApplicationState *as)
 {
@@ -15,25 +79,38 @@ ShadingManager::ShadingManager(ApplicationState *as)
 	fsh = new GLSLHandler("Primary Fragment Shader");
 
 	sharedMemoryManager = new SharedMemoryManager();
-	sharedMemoryManager->AddItem();
+	
+	shaderTextureManager = new ShaderTextureManager();
 
 	NodeEditorConfig config;
 	config.makeNodeFunc = [&]()
 	{
-
+		ImGuiNodeEditor::Suspend();
+		ImGui::OpenPopup("NodeMakerDropped");
+		ImGuiNodeEditor::Resume();
 	};
 	config.insNodeFunc = [&](nlohmann::json data) -> NodeEditorNode*
 	{
 		SNENode* node = nullptr;
-		if(data["type"] = "ShaderOutput")
+		if(data["type"] == "ShaderOutput")
 		{
 			node = new ShaderOutputNode(fsh);
+		}
+		else if(data["type"] == "Float3")
+		{
+			node = new Float3Node(fsh);
+		}
+		else if(data["type"] == "ShaderTexture")
+		{
+			node = new ShaderTextureNode(fsh, shaderTextureManager);
 		}
 		return node;
 	};
 	shaderNodeEditor = new NodeEditor(config);
 	shaderNodeEditor->name = "Shader Nodes";
 	shaderNodeEditor->SetOutputNode(new ShaderOutputNode(fsh));
+
+	ReCompileShaders();
 }
 
 ShadingManager::~ShadingManager()
@@ -46,13 +123,47 @@ ShadingManager::~ShadingManager()
 
 void ShadingManager::UpdateShaders()
 {
+	// SNENode* outputNode = static_cast<SNENode*>(shaderNodeEditor->outputNode);
+	// outputNode->UpdateShaders();
+	// for(auto& it : shaderNodeEditor->nodes)
+	// {
+	// 	SNENode* node = static_cast<SNENode*>(it.second);
+	// 	node->UpdateShaders();
+	// }
+	
+
 	sharedMemoryManager->UpdateShader(appState->shaders.terrain);
+
+	shaderTextureManager->Bind(7);
+	appState->shaders.terrain->SetUniformi("_Textures", 7);
 }
 
 void ShadingManager::ReCompileShaders()
 {
 	logs.clear();
 	START_PROFILER();
+
+	sharedMemoryManager->Clear();
+
+	SNENode* outputNode = static_cast<SNENode*>(shaderNodeEditor->outputNode);
+	outputNode->dataBlobOffset = sharedMemoryManager->AddItem();
+	for(auto& it : shaderNodeEditor->nodes)
+	{
+		SNENode* node = static_cast<SNENode*>(it.second);
+		node->dataBlobOffset = sharedMemoryManager->AddItem();
+	}
+
+	outputNode->sharedData = sharedMemoryManager->At(outputNode->dataBlobOffset);
+	outputNode->UpdateShaders();
+	for(auto& it : shaderNodeEditor->nodes)
+	{
+		SNENode* node = static_cast<SNENode*>(it.second);
+		node->sharedData = sharedMemoryManager->At(node->dataBlobOffset);
+		node->UpdateShaders();
+	}
+
+	shaderTextureManager->UpdateShaders();
+
 	PrepVertShader();
 	vertexSource = vsh->GenerateGLSL();
 	PrepGeomShader();
@@ -74,6 +185,7 @@ void ShadingManager::ShowSettings(bool *pOpen)
 		ReCompileShaders();
 	}
 
+
 	ImGui::SameLine();
 
 	if(ImGui::Button("Export GLSL"))
@@ -84,6 +196,9 @@ void ShadingManager::ShowSettings(bool *pOpen)
 			SaveToFile(path, fragmentSource);
 		}
 	}
+
+	//ImGui::Text("SMM Size : %d", sharedMemoryManager->sharedMemoryBlobs.size());
+	//ImGui::Text("SMM : %f, %f, %f", sharedMemoryManager->sharedMemoryBlobs[0].d0, sharedMemoryManager->sharedMemoryBlobs[0].d1, sharedMemoryManager->sharedMemoryBlobs[0].d2);
 
 	if(ImGui::CollapsingHeader("Logs"))
 	{
@@ -101,7 +216,77 @@ void ShadingManager::ShowSettings(bool *pOpen)
 
 	if(ImGui::CollapsingHeader("Shader Nodes"))
 	{
+
+		if (ImGui::Button("Add Node##ShaderNodeMaker"))
+		{
+			ImGui::OpenPopup("NodeMakerDropped");
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Reset##ShaderNodeMaker"))
+		{
+			shaderNodeEditor->Reset();
+			ReCompileShaders();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Export##ShaderNodeMaker"))
+		{
+			std::string file = ShowSaveFileDialog("*.terr3d");
+
+			if (file.size() > 3)
+			{
+				if (file.find(".terr3d") == std::string::npos)
+				{
+					file += ".terr3d";
+				}
+
+				SaveToFile(file, shaderNodeEditor->Save().dump(4));
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Import##CPUNE"))
+		{
+			std::string file = ShowOpenFileDialog("*.terr3d");
+
+			if (file.size() > 3)
+			{
+				bool tmp = false;
+				shaderNodeEditor->Reset();
+				shaderNodeEditor->Load(nlohmann::json::parse(ReadShaderSourceFile(file, &tmp)));
+				ReCompileShaders();
+			}
+		}
+
+		int nC = shaderNodeEditor->nodes.size();
 		shaderNodeEditor->Render();
+		if (nC != shaderNodeEditor->nodes.size())
+		{
+			ReCompileShaders();
+		}
+	}
+
+	if (ImGui::IsWindowFocused() && (((IsKeyDown(TERR3D_KEY_RIGHT_SHIFT) || IsKeyDown(TERR3D_KEY_LEFT_SHIFT)) && IsKeyDown(TERR3D_KEY_A)) || IsMouseButtonDown(TERR3D_MOUSE_BUTTON_MIDDLE)))
+	{
+		ImGui::OpenPopup("NodeMakerDropped");
+	}
+
+	if(ImGui::BeginPopup("NodeMakerDropped"))
+	{
+		if(ShowNodeMaker(shaderNodeEditor, fsh, shaderTextureManager))
+		{
+			ReCompileShaders();
+		}
+
+		if (ImGui::Button("Close##ShaderNodeMaker"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 
 	ImGui::End();
@@ -242,6 +427,8 @@ void ShadingManager::PrepFragShader()
 	fsh->AddUniform(GLSLUniform("_HMapMinMax", "vec3"));
 	fsh->AddUniform(GLSLUniform("_TextureBake", "float", "0.0f"));
 	fsh->AddUniform(GLSLUniform("_Mode", "float", "0.0f"));
+	fsh->AddUniform(GLSLUniform("_Textures", "sampler2DArray"));
+
 	GLSLSSBO dataBlobs("dataBlobs", std::to_string(sharedMemoryManager->ssboBinding), "These are small data blobs which may be used for nodes, etc.");
 	dataBlobs.AddLine(GLSLLine("DataBlob data[];"));
 	fsh->AddSSBO(dataBlobs);
