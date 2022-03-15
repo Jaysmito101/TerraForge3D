@@ -1,5 +1,5 @@
 #pragma once
-#include "json.hpp"
+#include "json/json.hpp"
 #include "imgui-node-editor/imgui_node_editor.h"
 
 #include <vector>
@@ -43,6 +43,10 @@ struct NodeInputParam
 	float maxX;
 	float maxY;
 	float maxZ;
+
+	void* userData1;
+	void* userData2;
+	void* userData3;
 
 	NodeInputParam();
 	NodeInputParam(float *pos, float *texCoord, float *minPos, float *maxPos);
@@ -92,7 +96,7 @@ public:
 	NodeEditorPinType type;
 	std::mutex mutex;
 	ImU32 color = ImColor(94, 95, 191);
-	char userData[128];
+	uint32_t userData = 0;
 
 	virtual nlohmann::json Save();
 	virtual void Load(nlohmann::json data);

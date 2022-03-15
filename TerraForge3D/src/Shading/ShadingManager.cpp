@@ -4,14 +4,36 @@
 #include "Profiler.h"
 #include "imgui/imgui.h"
 
+#include "Shading/ShaderNodes/ShaderOutputNode.h"
+
 ShadingManager::ShadingManager(ApplicationState *as)
 {
 	appState = as;
+	
 	vsh = new GLSLHandler("Primary Vertex Shader");
 	gsh = new GLSLHandler("Primary Geometry Shader");
 	fsh = new GLSLHandler("Primary Fragment Shader");
+
 	sharedMemoryManager = new SharedMemoryManager();
 	sharedMemoryManager->AddItem();
+
+	NodeEditorConfig config;
+	config.makeNodeFunc = [&]()
+	{
+
+	};
+	config.insNodeFunc = [&](nlohmann::json data) -> NodeEditorNode*
+	{
+		SNENode* node = nullptr;
+		if(data["type"] = "ShaderOutput")
+		{
+			node = new ShaderOutputNode(fsh);
+		}
+		return node;
+	};
+	shaderNodeEditor = new NodeEditor(config);
+	shaderNodeEditor->name = "Shader Nodes";
+	shaderNodeEditor->SetOutputNode(new ShaderOutputNode(fsh));
 }
 
 ShadingManager::~ShadingManager()
@@ -52,20 +74,36 @@ void ShadingManager::ShowSettings(bool *pOpen)
 		ReCompileShaders();
 	}
 
-	if(logs.size() > 0)
-	{
-		ImGui::Text("Logs:");
+	ImGui::SameLine();
 
-		for(std::string &s : logs)
+	if(ImGui::Button("Export GLSL"))
+	{
+		std::string path = ShowSaveFileDialog("*.glsl\0");
+		if(path.size() > 3)
 		{
-			ImGui::Text(s.data());
+			SaveToFile(path, fragmentSource);
 		}
 	}
 
-	ImGui::DragFloat("Temp#ssdaas", &sharedMemoryManager->At(0)->d0, 0.01f, 0.0f, 1.0f);
-	ImGui::Text("VS: \n%s", vertexSource.data());
-	ImGui::Text("GS: \n%s", geometrySource.data());
-	ImGui::Text("FS: \n%s", fragmentSource.data());
+	if(ImGui::CollapsingHeader("Logs"))
+	{
+		if(logs.size() > 0)
+		{
+			ImGui::Text("Logs:");
+
+			for(std::string &s : logs)
+			{
+				ImGui::Text(s.data());
+			}
+		}
+	}
+
+
+	if(ImGui::CollapsingHeader("Shader Nodes"))
+	{
+		shaderNodeEditor->Render();
+	}
+
 	ImGui::End();
 }
 
@@ -224,13 +262,12 @@ void ShadingManager::PrepFragShader()
 	}	
 	)"));
 	main.AddLine(GLSLLine(""));
-	main.AddLine(GLSLLine("vec3 norm = normalize(Normal);"));
-	main.AddLine(GLSLLine("vec3 lightDir = normalize(_LightPosition - FragPos.xyz );"));
-	main.AddLine(GLSLLine("float diff = max(dot(norm, lightDir), 0.0f);"));
-	main.AddLine(GLSLLine("vec3 diffuse = diff * _LightColor;"));
-	main.AddLine(GLSLLine("vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;"));
-	main.AddLine(GLSLLine("result.x = data[0].d[0];"));
-	main.AddLine(GLSLLine("FragColor = vec4(result, 1.0f);"));
+	GLSLLine tmp("", "");
+	NodeInputParam param;
+	param.userData1 = &main;
+	param.userData2 = &tmp;
+	shaderNodeEditor->outputNode->Evaluate(param, nullptr);
+	main.AddLine(GLSLLine("FragColor = vec4(" + tmp.line + ", 1.0f);"));
 	fsh->AddFunction(main);
 }
 

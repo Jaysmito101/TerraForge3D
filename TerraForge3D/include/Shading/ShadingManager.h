@@ -7,6 +7,7 @@ struct ApplicationState;
 
 #include "Shading/GLSLHandler.h"
 #include "Shading/SharedMemoryManager.h"
+#include "Shading/ShaderNodeEditor.h"
 
 class ShadingManager
 {
@@ -31,6 +32,7 @@ public:
 	GLSLHandler *gsh = nullptr;
 	GLSLHandler *fsh = nullptr;
 	SharedMemoryManager *sharedMemoryManager = nullptr;
+	NodeEditor *shaderNodeEditor = nullptr;
 
 	std::string vertexSource = "";
 	std::string geometrySource = "";

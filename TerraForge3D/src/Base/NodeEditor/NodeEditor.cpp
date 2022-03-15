@@ -57,6 +57,7 @@ nlohmann::json NodeEditorPin::Save()
 	nlohmann::json data;
 	data["id"] = id;
 	data["type"] = type;
+	data["userData"] = static_cast<uint32_t>(userData); // Temporary
 	data["color"] = color;
 	return data;
 }
@@ -67,6 +68,7 @@ void NodeEditorPin::Load(nlohmann::json data)
 	_id = id;
 	type = data["type"];
 	color = data["color"];
+	userData = data["userData"].get<uint32_t>(); // Temporary
 }
 
 void NodeEditorPin::Begin()
@@ -198,9 +200,11 @@ void NodeEditorNode::OnDelete()
 
 void NodeEditorNode::Render()
 {
+	ImGui::PushID(id);
 	ImGuiNodeEditor::BeginNode(id);
 	OnRender();
 	ImGuiNodeEditor::EndNode();
+	ImGui::PopID();
 }
 
 NodeEditorNode::NodeEditorNode(int id)
