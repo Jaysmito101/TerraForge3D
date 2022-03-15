@@ -145,18 +145,22 @@ $(document).ready(function(){initNavTree('d1/db6/class_shader_output_node_a739cb
 <div class="fragment"><div class="line"><span class="lineno">    6</span>{</div>
 <div class="line"><span class="lineno">    7</span>    <span class="keywordflow">if</span> (inputPins[0]-&gt;IsLinked())</div>
 <div class="line"><span class="lineno">    8</span>    {</div>
-<div class="line"><span class="lineno">    9</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;Not yet Implemented&quot;</span>));</div>
-<div class="line"><span class="lineno">   10</span>    }</div>
-<div class="line"><span class="lineno">   11</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   12</span>    {</div>
-<div class="line"><span class="lineno">   13</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 norm&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = normalize(Normal);&quot;</span>));</div>
-<div class="line"><span class="lineno">   14</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 lightDir&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = normalize(_LightPosition - FragPos.xyz );&quot;</span>));</div>
-<div class="line"><span class="lineno">   15</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float diff&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = max(dot(norm&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot;, lightDir&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot;), 0.0f);&quot;</span>));</div>
-<div class="line"><span class="lineno">   16</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 diffuse&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = diff&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; * _LightColor;&quot;</span>));</div>
-<div class="line"><span class="lineno">   17</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 result&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = (vec3(0.2, 0.2, 0.2) + diffuse&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot;) * vec3(&quot;</span> + STR(color[0]) + <span class="stringliteral">&quot;, &quot;</span> + STR(color[1]) + <span class="stringliteral">&quot;, &quot;</span> + STR(color[2]) + <span class="stringliteral">&quot;);&quot;</span>));</div>
-<div class="line"><span class="lineno">   18</span>        line-&gt;line = <span class="stringliteral">&quot;result&quot;</span> + STR(<span class="keywordtype">id</span>);</div>
-<div class="line"><span class="lineno">   19</span>    }</div>
-<div class="line"><span class="lineno">   20</span>}</div>
+<div class="line"><span class="lineno">    9</span>        <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> ln(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">   10</span>        inputPins[0]-&gt;other-&gt;Evaluate(GetParams(function, &amp;ln));</div>
+<div class="line"><span class="lineno">   11</span>        line-&gt;line = ln.line;   </div>
+<div class="line"><span class="lineno">   12</span>    }</div>
+<div class="line"><span class="lineno">   13</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   14</span>    {</div>
+<div class="line"><span class="lineno">   15</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot; = normalize(Normal);&quot;</span>));</div>
+<div class="line"><span class="lineno">   16</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot; = normalize(_LightPosition - FragPos.xyz );&quot;</span>));</div>
+<div class="line"><span class="lineno">   17</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; = max(dot(&quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot;, &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot;), 0.0f);&quot;</span>));</div>
+<div class="line"><span class="lineno">   18</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot; = &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; * _LightColor;&quot;</span>));</div>
+<div class="line"><span class="lineno">   19</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;result&quot;</span>) + <span class="stringliteral">&quot; = (vec3(0.2, 0.2, 0.2) + &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot;)&quot;</span> + \</div>
+<div class="line"><span class="lineno">   20</span>             <span class="stringliteral">&quot; * vec3(&quot;</span> + SDATA(0) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(1) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(2) + <span class="stringliteral">&quot;);&quot;</span>));</div>
+<div class="line"><span class="lineno">   21</span> </div>
+<div class="line"><span class="lineno">   22</span>        line-&gt;line = VAR(<span class="stringliteral">&quot;result&quot;</span>);</div>
+<div class="line"><span class="lineno">   23</span>    }</div>
+<div class="line"><span class="lineno">   24</span>}</div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -167,7 +171,7 @@ $(document).ready(function(){initNavTree('d1/db6/class_shader_output_node_a739cb
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d1/db6/class_shader_output_node.html">ShaderOutputNode</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:44 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

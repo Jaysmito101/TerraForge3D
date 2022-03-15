@@ -116,70 +116,85 @@ $(document).ready(function(){initNavTree('dd/d46/_shader_output_node_8cpp_source
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>{</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>    <span class="keywordflow">if</span> (inputPins[0]-&gt;IsLinked())</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    {</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;Not yet Implemented&quot;</span>));</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    }</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    {</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 norm&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = normalize(Normal);&quot;</span>));</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 lightDir&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = normalize(_LightPosition - FragPos.xyz );&quot;</span>));</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float diff&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = max(dot(norm&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot;, lightDir&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot;), 0.0f);&quot;</span>));</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 diffuse&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = diff&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; * _LightColor;&quot;</span>));</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 result&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot; = (vec3(0.2, 0.2, 0.2) + diffuse&quot;</span> + STR(<span class="keywordtype">id</span>) + <span class="stringliteral">&quot;) * vec3(&quot;</span> + STR(color[0]) + <span class="stringliteral">&quot;, &quot;</span> + STR(color[1]) + <span class="stringliteral">&quot;, &quot;</span> + STR(color[2]) + <span class="stringliteral">&quot;);&quot;</span>));</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        line-&gt;line = <span class="stringliteral">&quot;result&quot;</span> + STR(<span class="keywordtype">id</span>);</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    }</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>}</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>        <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> ln(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>        inputPins[0]-&gt;other-&gt;Evaluate(GetParams(function, &amp;ln));</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        line-&gt;line = ln.line;   </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    }</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot; = normalize(Normal);&quot;</span>));</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot; = normalize(_LightPosition - FragPos.xyz );&quot;</span>));</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; = max(dot(&quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot;, &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot;), 0.0f);&quot;</span>));</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot; = &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; * _LightColor;&quot;</span>));</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;result&quot;</span>) + <span class="stringliteral">&quot; = (vec3(0.2, 0.2, 0.2) + &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot;)&quot;</span> + \</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>             <span class="stringliteral">&quot; * vec3(&quot;</span> + SDATA(0) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(1) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(2) + <span class="stringliteral">&quot;);&quot;</span>));</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keywordtype">void</span> ShaderOutputNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>{</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    color[0] = data[<span class="stringliteral">&quot;color.r&quot;</span>];</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    color[1] = data[<span class="stringliteral">&quot;color.g&quot;</span>];</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    color[2] = data[<span class="stringliteral">&quot;color.b&quot;</span>];</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    color[3] = data[<span class="stringliteral">&quot;color.a&quot;</span>];</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>}</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ShaderOutputNode::Save()</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>{</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;ShaderOutput&quot;</span>;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    data[<span class="stringliteral">&quot;color.r&quot;</span>] = color[0];</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    data[<span class="stringliteral">&quot;color.g&quot;</span>] = color[1];</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    data[<span class="stringliteral">&quot;color.b&quot;</span>] = color[2];</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    data[<span class="stringliteral">&quot;color.a&quot;</span>] = color[3];</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>}</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="keywordtype">void</span> ShaderOutputNode::OnRender()</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>{</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    DrawHeader(<span class="stringliteral">&quot;Output&quot;</span>);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    inputPins[0]-&gt;Render();</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordflow">if</span> (!inputPins[0]-&gt;IsLinked())</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    {</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        ImGui::ColorPicker4(<span class="stringliteral">&quot;Object Color&quot;</span>, color);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    }</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    {</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        ImGui::Dummy(ImVec2(100, 40));</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    }</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>}</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        line-&gt;line = VAR(<span class="stringliteral">&quot;result&quot;</span>);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    }</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>}</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keywordtype">void</span> ShaderOutputNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>{</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    color[0] = data[<span class="stringliteral">&quot;color.r&quot;</span>];</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    color[1] = data[<span class="stringliteral">&quot;color.g&quot;</span>];</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    color[2] = data[<span class="stringliteral">&quot;color.b&quot;</span>];</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    color[3] = data[<span class="stringliteral">&quot;color.a&quot;</span>];</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>}</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> ShaderOutputNode::Save()</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>{</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;ShaderOutput&quot;</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    data[<span class="stringliteral">&quot;color.r&quot;</span>] = color[0];</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    data[<span class="stringliteral">&quot;color.g&quot;</span>] = color[1];</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    data[<span class="stringliteral">&quot;color.b&quot;</span>] = color[2];</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    data[<span class="stringliteral">&quot;color.a&quot;</span>] = color[3];</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>}</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keywordtype">void</span> ShaderOutputNode::UpdateShaders()</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>{</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    sharedData-&gt;d0 = color[0];</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    sharedData-&gt;d1 = color[1];</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    sharedData-&gt;d2 = color[2];</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keywordtype">void</span> ShaderOutputNode::OnRender()</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>{</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    DrawHeader(<span class="stringliteral">&quot;Output&quot;</span>);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    inputPins[0]-&gt;Render();</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>ShaderOutputNode::ShaderOutputNode(<a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>* handler)</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    :<a class="code hl_class" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>(handler)</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>{</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    name = <span class="stringliteral">&quot;Output&quot;</span>;</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    color[0] = color[1] = color[2] = color[3] = 0.0f;</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    headerColor = ImColor(SHADER_OUTPUT_NODE_COLOR);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>}</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>ShaderOutputNode::~ShaderOutputNode()</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>{</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>}</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordflow">if</span> (!inputPins[0]-&gt;IsLinked())</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="keywordflow">if</span>(ImGui::ColorPicker4(<span class="stringliteral">&quot;Object Color&quot;</span>, color))</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>            sharedData-&gt;d0 = color[0];</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>            sharedData-&gt;d1 = color[1];</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            sharedData-&gt;d2 = color[2];</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        }</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    }</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    {</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        ImGui::Dummy(ImVec2(100, 40));</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    }</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>}</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>ShaderOutputNode::ShaderOutputNode(<a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>* handler)</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    :<a class="code hl_class" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>(handler)</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>{</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    name = <span class="stringliteral">&quot;Output&quot;</span>;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    color[0] = color[1] = color[2] = color[3] = 0.0f;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    headerColor = ImColor(SHADER_OUTPUT_NODE_COLOR);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>}</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>ShaderOutputNode::~ShaderOutputNode()</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>{</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>}</div>
 <div class="ttc" id="aclass_g_l_s_l_handler_html"><div class="ttname"><a href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00074">GLSLHandler.h:75</a></div></div>
-<div class="ttc" id="aclass_s_n_e_node_html"><div class="ttname"><a href="../../df/d7c/class_s_n_e_node.html">SNENode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00034">ShaderNodeEditor.h:35</a></div></div>
-<div class="ttc" id="aclass_s_n_e_pin_html"><div class="ttname"><a href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00023">ShaderNodeEditor.h:24</a></div></div>
+<div class="ttc" id="aclass_s_n_e_node_html"><div class="ttname"><a href="../../df/d7c/class_s_n_e_node.html">SNENode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00051">ShaderNodeEditor.h:52</a></div></div>
+<div class="ttc" id="aclass_s_n_e_pin_html"><div class="ttname"><a href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00040">ShaderNodeEditor.h:41</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_function_html"><div class="ttname"><a href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00058">GLSLHandler.h:59</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
@@ -189,7 +204,7 @@ $(document).ready(function(){initNavTree('dd/d46/_shader_output_node_8cpp_source
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_12a69fe99e721ec7657514453a97b980.html">Shading</a></li><li class="navelem"><a class="el" href="../../dir_df14e04e9cabc0328aadfe45b4e48990.html">ShaderNodes</a></li><li class="navelem"><b>ShaderOutputNode.cpp</b></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:11 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:41 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

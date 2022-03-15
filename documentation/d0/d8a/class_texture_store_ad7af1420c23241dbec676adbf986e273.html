@@ -121,45 +121,45 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_ad7af1420c2
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00408">408</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  409</span>{</div>
-<div class="line"><span class="lineno">  410</span>    ImGui::Begin(<span class="stringliteral">&quot;Textute Store Settings&quot;</span>, pOpen);</div>
-<div class="line"><span class="lineno">  411</span>    ImGui::InputTextWithHint(<span class="stringliteral">&quot;##TextureStorePolyHavenSearch&quot;</span>, <span class="stringliteral">&quot;Search ...&quot;</span>, searchStr, 4096);</div>
-<div class="line"><span class="lineno">  412</span>    ImGui::Separator();</div>
-<div class="line"><span class="lineno">  413</span> </div>
-<div class="line"><span class="lineno">  414</span>    <span class="keywordflow">if</span> (ImGui::BeginTabBar(<span class="stringliteral">&quot;##textureStoreTabBar&quot;</span>))</div>
-<div class="line"><span class="lineno">  415</span>    {</div>
-<div class="line"><span class="lineno">  416</span>        <span class="keywordflow">if</span> (ImGui::BeginTabItem(<span class="stringliteral">&quot;All Textures&quot;</span>))</div>
-<div class="line"><span class="lineno">  417</span>        {</div>
-<div class="line"><span class="lineno">  418</span>            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12);</div>
-<div class="line"><span class="lineno">  419</span>            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));</div>
-<div class="line"><span class="lineno">  420</span>            ShowAllTexturesSettings();</div>
-<div class="line"><span class="lineno">  421</span>            ImGui::PopStyleVar();</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00409">409</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  410</span>{</div>
+<div class="line"><span class="lineno">  411</span>    ImGui::Begin(<span class="stringliteral">&quot;Textute Store Settings&quot;</span>, pOpen);</div>
+<div class="line"><span class="lineno">  412</span>    ImGui::InputTextWithHint(<span class="stringliteral">&quot;##TextureStorePolyHavenSearch&quot;</span>, <span class="stringliteral">&quot;Search ...&quot;</span>, searchStr, 4096);</div>
+<div class="line"><span class="lineno">  413</span>    ImGui::Separator();</div>
+<div class="line"><span class="lineno">  414</span> </div>
+<div class="line"><span class="lineno">  415</span>    <span class="keywordflow">if</span> (ImGui::BeginTabBar(<span class="stringliteral">&quot;##textureStoreTabBar&quot;</span>))</div>
+<div class="line"><span class="lineno">  416</span>    {</div>
+<div class="line"><span class="lineno">  417</span>        <span class="keywordflow">if</span> (ImGui::BeginTabItem(<span class="stringliteral">&quot;All Textures&quot;</span>))</div>
+<div class="line"><span class="lineno">  418</span>        {</div>
+<div class="line"><span class="lineno">  419</span>            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12);</div>
+<div class="line"><span class="lineno">  420</span>            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));</div>
+<div class="line"><span class="lineno">  421</span>            ShowAllTexturesSettings();</div>
 <div class="line"><span class="lineno">  422</span>            ImGui::PopStyleVar();</div>
-<div class="line"><span class="lineno">  423</span>            ImGui::EndTabItem();</div>
-<div class="line"><span class="lineno">  424</span>        }</div>
-<div class="line"><span class="lineno">  425</span> </div>
-<div class="line"><span class="lineno">  426</span>        <span class="keywordflow">if</span> (ImGui::BeginTabItem(<span class="stringliteral">&quot;Downloaded Textures&quot;</span>))</div>
-<div class="line"><span class="lineno">  427</span>        {</div>
-<div class="line"><span class="lineno">  428</span>            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12);</div>
-<div class="line"><span class="lineno">  429</span>            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));</div>
-<div class="line"><span class="lineno">  430</span>            ShowDownloadedTexturesSettings();</div>
-<div class="line"><span class="lineno">  431</span>            ImGui::PopStyleVar();</div>
+<div class="line"><span class="lineno">  423</span>            ImGui::PopStyleVar();</div>
+<div class="line"><span class="lineno">  424</span>            ImGui::EndTabItem();</div>
+<div class="line"><span class="lineno">  425</span>        }</div>
+<div class="line"><span class="lineno">  426</span> </div>
+<div class="line"><span class="lineno">  427</span>        <span class="keywordflow">if</span> (ImGui::BeginTabItem(<span class="stringliteral">&quot;Downloaded Textures&quot;</span>))</div>
+<div class="line"><span class="lineno">  428</span>        {</div>
+<div class="line"><span class="lineno">  429</span>            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12);</div>
+<div class="line"><span class="lineno">  430</span>            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));</div>
+<div class="line"><span class="lineno">  431</span>            ShowDownloadedTexturesSettings();</div>
 <div class="line"><span class="lineno">  432</span>            ImGui::PopStyleVar();</div>
-<div class="line"><span class="lineno">  433</span>            ImGui::EndTabItem();</div>
-<div class="line"><span class="lineno">  434</span>        }</div>
-<div class="line"><span class="lineno">  435</span> </div>
-<div class="line"><span class="lineno">  436</span>        <span class="keywordflow">if</span> (ImGui::BeginTabItem(<span class="stringliteral">&quot;About&quot;</span>))</div>
-<div class="line"><span class="lineno">  437</span>        {</div>
-<div class="line"><span class="lineno">  438</span>            ImGui::Text(<span class="stringliteral">&quot;This texture store provides collection of free PBR textures.\nThis is powered by Polyhaven.&quot;</span>);</div>
-<div class="line"><span class="lineno">  439</span>            ImGui::EndTabItem();</div>
-<div class="line"><span class="lineno">  440</span>        }</div>
-<div class="line"><span class="lineno">  441</span> </div>
-<div class="line"><span class="lineno">  442</span>        ImGui::EndTabBar();</div>
-<div class="line"><span class="lineno">  443</span>    }</div>
-<div class="line"><span class="lineno">  444</span> </div>
-<div class="line"><span class="lineno">  445</span>    ImGui::End();</div>
-<div class="line"><span class="lineno">  446</span>}</div>
+<div class="line"><span class="lineno">  433</span>            ImGui::PopStyleVar();</div>
+<div class="line"><span class="lineno">  434</span>            ImGui::EndTabItem();</div>
+<div class="line"><span class="lineno">  435</span>        }</div>
+<div class="line"><span class="lineno">  436</span> </div>
+<div class="line"><span class="lineno">  437</span>        <span class="keywordflow">if</span> (ImGui::BeginTabItem(<span class="stringliteral">&quot;About&quot;</span>))</div>
+<div class="line"><span class="lineno">  438</span>        {</div>
+<div class="line"><span class="lineno">  439</span>            ImGui::Text(<span class="stringliteral">&quot;This texture store provides collection of free PBR textures.\nThis is powered by Polyhaven.&quot;</span>);</div>
+<div class="line"><span class="lineno">  440</span>            ImGui::EndTabItem();</div>
+<div class="line"><span class="lineno">  441</span>        }</div>
+<div class="line"><span class="lineno">  442</span> </div>
+<div class="line"><span class="lineno">  443</span>        ImGui::EndTabBar();</div>
+<div class="line"><span class="lineno">  444</span>    }</div>
+<div class="line"><span class="lineno">  445</span> </div>
+<div class="line"><span class="lineno">  446</span>    ImGui::End();</div>
+<div class="line"><span class="lineno">  447</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -169,7 +169,7 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_ad7af1420c2
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d8a/class_texture_store.html">TextureStore</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:15 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:45 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

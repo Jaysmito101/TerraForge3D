@@ -130,21 +130,25 @@ $(document).ready(function(){initNavTree('d1/db6/class_shader_output_node_ad632d
 
 <p>Implements <a class="el" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d46/_shader_output_node_8cpp_source.html#l00041">41</a> of file <a class="el" href="../../dd/d46/_shader_output_node_8cpp_source.html">ShaderOutputNode.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   42</span>{</div>
-<div class="line"><span class="lineno">   43</span>    DrawHeader(<span class="stringliteral">&quot;Output&quot;</span>);</div>
-<div class="line"><span class="lineno">   44</span>    inputPins[0]-&gt;Render();</div>
-<div class="line"><span class="lineno">   45</span> </div>
-<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">if</span> (!inputPins[0]-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">   47</span>    {</div>
-<div class="line"><span class="lineno">   48</span>        ImGui::ColorPicker4(<span class="stringliteral">&quot;Object Color&quot;</span>, color);</div>
-<div class="line"><span class="lineno">   49</span>    }</div>
-<div class="line"><span class="lineno">   50</span> </div>
-<div class="line"><span class="lineno">   51</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   52</span>    {</div>
-<div class="line"><span class="lineno">   53</span>        ImGui::Dummy(ImVec2(100, 40));</div>
-<div class="line"><span class="lineno">   54</span>    }</div>
-<div class="line"><span class="lineno">   55</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../dd/d46/_shader_output_node_8cpp_source.html#l00052">52</a> of file <a class="el" href="../../dd/d46/_shader_output_node_8cpp_source.html">ShaderOutputNode.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   53</span>{</div>
+<div class="line"><span class="lineno">   54</span>    DrawHeader(<span class="stringliteral">&quot;Output&quot;</span>);</div>
+<div class="line"><span class="lineno">   55</span>    inputPins[0]-&gt;Render();</div>
+<div class="line"><span class="lineno">   56</span> </div>
+<div class="line"><span class="lineno">   57</span>    <span class="keywordflow">if</span> (!inputPins[0]-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">   58</span>    {</div>
+<div class="line"><span class="lineno">   59</span>        <span class="keywordflow">if</span>(ImGui::ColorPicker4(<span class="stringliteral">&quot;Object Color&quot;</span>, color))</div>
+<div class="line"><span class="lineno">   60</span>        {</div>
+<div class="line"><span class="lineno">   61</span>            sharedData-&gt;d0 = color[0];</div>
+<div class="line"><span class="lineno">   62</span>            sharedData-&gt;d1 = color[1];</div>
+<div class="line"><span class="lineno">   63</span>            sharedData-&gt;d2 = color[2];</div>
+<div class="line"><span class="lineno">   64</span>        }</div>
+<div class="line"><span class="lineno">   65</span>    }</div>
+<div class="line"><span class="lineno">   66</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   67</span>    {</div>
+<div class="line"><span class="lineno">   68</span>        ImGui::Dummy(ImVec2(100, 40));</div>
+<div class="line"><span class="lineno">   69</span>    }</div>
+<div class="line"><span class="lineno">   70</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -154,7 +158,7 @@ $(document).ready(function(){initNavTree('d1/db6/class_shader_output_node_ad632d
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d1/db6/class_shader_output_node.html">ShaderOutputNode</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:44 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

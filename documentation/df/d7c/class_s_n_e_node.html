@@ -118,8 +118,10 @@ Inheritance diagram for SNENode:</div>
  <div class="center">
   <img src="../../df/d7c/class_s_n_e_node.png" usemap="#SNENode_map" alt=""/>
   <map id="SNENode_map" name="SNENode_map">
-<area href="../../da/d6c/class_node_editor_node.html" alt="NodeEditorNode" shape="rect" coords="0,0,120,24"/>
-<area href="../../d1/db6/class_shader_output_node.html" alt="ShaderOutputNode" shape="rect" coords="0,112,120,136"/>
+<area href="../../da/d6c/class_node_editor_node.html" alt="NodeEditorNode" shape="rect" coords="135,0,260,24"/>
+<area href="../../d9/d1c/class_float3_node.html" alt="Float3Node" shape="rect" coords="0,112,125,136"/>
+<area href="../../d1/db6/class_shader_output_node.html" alt="ShaderOutputNode" shape="rect" coords="135,112,260,136"/>
+<area href="../../d0/d32/class_shader_texture_node.html" alt="ShaderTextureNode" shape="rect" coords="270,112,395,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -131,6 +133,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:accd8a62da947603b74ba63e284048033"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e7296efc59098dd241ab97e5c326b61"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d7c/class_s_n_e_node_a9e7296efc59098dd241ab97e5c326b61.html#a9e7296efc59098dd241ab97e5c326b61">OnLink</a> (<a class="el" href="../../d2/d45/class_node_editor_pin.html">NodeEditorPin</a> *pin, <a class="el" href="../../db/db1/class_node_editor_link.html">NodeEditorLink</a> *link)</td></tr>
 <tr class="separator:a9e7296efc59098dd241ab97e5c326b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a523fcc642960b0a5717603435ebebfdb"><td class="memItemLeft" align="right" valign="top"><a id="a523fcc642960b0a5717603435ebebfdb" name="a523fcc642960b0a5717603435ebebfdb"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateShaders</b> ()=0</td></tr>
+<tr class="separator:a523fcc642960b0a5717603435ebebfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b8e9a691e957ae023016a8fc240b05f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d7c/class_s_n_e_node_a4b8e9a691e957ae023016a8fc240b05f.html#a4b8e9a691e957ae023016a8fc240b05f">OnRender</a> ()=0</td></tr>
 <tr class="separator:a4b8e9a691e957ae023016a8fc240b05f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fbdcbfdff968b439ec261bc3d40f52e"><td class="memItemLeft" align="right" valign="top"><a id="a2fbdcbfdff968b439ec261bc3d40f52e" name="a2fbdcbfdff968b439ec261bc3d40f52e"></a>
@@ -174,6 +179,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>OnRender</b> 
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:ac0636cc93b2496066fb830ea6486c783"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../df/d81/struct_shared_memory_item.html">SharedMemoryItem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d7c/class_s_n_e_node_ac0636cc93b2496066fb830ea6486c783.html#ac0636cc93b2496066fb830ea6486c783">sharedData</a> = nullptr</td></tr>
+<tr class="separator:ac0636cc93b2496066fb830ea6486c783"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcdea5572376aa4dd572945d9cc43e29"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d7c/class_s_n_e_node_afcdea5572376aa4dd572945d9cc43e29.html#afcdea5572376aa4dd572945d9cc43e29">dataBlobOffset</a> = 0</td></tr>
 <tr class="separator:afcdea5572376aa4dd572945d9cc43e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e576384e08914da7f2f863bbd52837a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d7c/class_s_n_e_node_a1e576384e08914da7f2f863bbd52837a.html#a1e576384e08914da7f2f863bbd52837a">handler</a></td></tr>
@@ -202,7 +209,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="../../d8/d11/_shader_node_editor_8h_source.html#l00034">34</a> of file <a class="el" href="../../d8/d11/_shader_node_editor_8h_source.html">ShaderNodeEditor.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d8/d11/_shader_node_editor_8h_source.html#l00051">51</a> of file <a class="el" href="../../d8/d11/_shader_node_editor_8h_source.html">ShaderNodeEditor.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>TerraForge3D/include/Shading/<a class="el" href="../../d8/d11/_shader_node_editor_8h_source.html">ShaderNodeEditor.h</a></li>
 <li>TerraForge3D/src/Shading/<a class="el" href="../../d4/d3f/_shader_node_editor_8cpp_source.html">ShaderNodeEditor.cpp</a></li>
@@ -213,7 +220,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../df/d7c/class_s_n_e_node.html">SNENode</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:45 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

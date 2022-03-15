@@ -189,7 +189,9 @@ var hierarchy =
       [ "PixelateNode", "dc/d9e/class_pixelate_node.html", null ],
       [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
       [ "SNENode", "df/d7c/class_s_n_e_node.html", [
-        [ "ShaderOutputNode", "d1/db6/class_shader_output_node.html", null ]
+        [ "Float3Node", "d9/d1c/class_float3_node.html", null ],
+        [ "ShaderOutputNode", "d1/db6/class_shader_output_node.html", null ],
+        [ "ShaderTextureNode", "d0/d32/class_shader_texture_node.html", null ]
       ] ],
       [ "SinNode", "db/dba/class_sin_node.html", null ],
       [ "SquareNode", "d8/de1/class_square_node.html", null ],
@@ -214,6 +216,7 @@ var hierarchy =
     [ "Serializer", "d0/dc2/class_serializer.html", null ],
     [ "Shader", "d1/d51/class_shader.html", null ],
     [ "ShaderStorageBuffer", "d4/dc3/class_shader_storage_buffer.html", null ],
+    [ "ShaderTextureManager", "d4/da6/class_shader_texture_manager.html", null ],
     [ "ShadingManager", "de/d7d/class_shading_manager.html", null ],
     [ "SharedMemoryItem", "df/d81/struct_shared_memory_item.html", null ],
     [ "SharedMemoryManager", "d9/d9f/class_shared_memory_manager.html", null ],

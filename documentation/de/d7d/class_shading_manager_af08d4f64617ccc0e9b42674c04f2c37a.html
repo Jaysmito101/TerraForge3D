@@ -128,55 +128,57 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_af08d4f64
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00224">224</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  225</span>{</div>
-<div class="line"><span class="lineno">  226</span>    fsh-&gt;Clear();</div>
-<div class="line"><span class="lineno">  227</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec4 FragColor;&quot;</span>, <span class="stringliteral">&quot;The result of the fragment shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  228</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  229</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in float height;&quot;</span>, <span class="stringliteral">&quot;Take the height passed in fromt the Geometry Shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  230</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in vec4 FragPos;&quot;</span>, <span class="stringliteral">&quot;Take the world position passed in fromt the Geometry Shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  231</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in vec3 Normal;&quot;</span>, <span class="stringliteral">&quot;Take the normal passed in fromt the Geometry Shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  232</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in vec2 TexCoord;&quot;</span>, <span class="stringliteral">&quot;Take the texture coordinates passed in fromt the Geometry Shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  233</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  234</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
-<div class="line"><span class="lineno">  235</span><span class="stringliteral">    struct DataBlob</span></div>
-<div class="line"><span class="lineno">  236</span><span class="stringliteral">    {</span></div>
-<div class="line"><span class="lineno">  237</span><span class="stringliteral">        float d[32];</span></div>
-<div class="line"><span class="lineno">  238</span><span class="stringliteral">    };</span></div>
-<div class="line"><span class="lineno">  239</span><span class="stringliteral">    )&quot;));</span></div>
-<div class="line"><span class="lineno">  240</span><span class="stringliteral">    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(</span><span class="stringliteral">&quot;_LightPosition&quot;</span>, <span class="stringliteral">&quot;vec3&quot;</span>));</div>
-<div class="line"><span class="lineno">  241</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_LightColor&quot;</span>, <span class="stringliteral">&quot;vec3&quot;</span>));</div>
-<div class="line"><span class="lineno">  242</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_HMapMinMax&quot;</span>, <span class="stringliteral">&quot;vec3&quot;</span>));</div>
-<div class="line"><span class="lineno">  243</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_TextureBake&quot;</span>, <span class="stringliteral">&quot;float&quot;</span>, <span class="stringliteral">&quot;0.0f&quot;</span>));</div>
-<div class="line"><span class="lineno">  244</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_Mode&quot;</span>, <span class="stringliteral">&quot;float&quot;</span>, <span class="stringliteral">&quot;0.0f&quot;</span>));</div>
-<div class="line"><span class="lineno">  245</span>    <a class="code hl_struct" href="../../d5/ddc/struct_g_l_s_l_s_s_b_o.html">GLSLSSBO</a> dataBlobs(<span class="stringliteral">&quot;dataBlobs&quot;</span>, std::to_string(sharedMemoryManager-&gt;ssboBinding), <span class="stringliteral">&quot;These are small data blobs which may be used for nodes, etc.&quot;</span>);</div>
-<div class="line"><span class="lineno">  246</span>    dataBlobs.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;DataBlob data[];&quot;</span>));</div>
-<div class="line"><span class="lineno">  247</span>    fsh-&gt;AddSSBO(dataBlobs);</div>
-<div class="line"><span class="lineno">  248</span>    <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> main(<span class="stringliteral">&quot;main&quot;</span>);</div>
-<div class="line"><span class="lineno">  249</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 objectColor = vec3(1.0f);&quot;</span>));</div>
-<div class="line"><span class="lineno">  250</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  251</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
-<div class="line"><span class="lineno">  252</span><span class="stringliteral">    if(_TextureBake == 1.0f)</span></div>
-<div class="line"><span class="lineno">  253</span><span class="stringliteral">    {</span></div>
-<div class="line"><span class="lineno">  254</span><span class="stringliteral">        if(_Mode == 0.0f)</span></div>
-<div class="line"><span class="lineno">  255</span><span class="stringliteral">            objectColor = vec3(1.0);</span></div>
-<div class="line"><span class="lineno">  256</span><span class="stringliteral">        else if(_Mode == 1.0f)</span></div>
-<div class="line"><span class="lineno">  257</span><span class="stringliteral">            objectColor = vec3( (height - _HMapMinMax.x) / (_HMapMinMax.y - _HMapMinMax.x) );</span></div>
-<div class="line"><span class="lineno">  258</span><span class="stringliteral">        else if(_Mode == 2.0f)</span></div>
-<div class="line"><span class="lineno">  259</span><span class="stringliteral">            objectColor = Normal;</span></div>
-<div class="line"><span class="lineno">  260</span><span class="stringliteral">        FragColor = vec4(objectColor, 1.0f);</span></div>
-<div class="line"><span class="lineno">  261</span><span class="stringliteral">        return;</span></div>
-<div class="line"><span class="lineno">  262</span><span class="stringliteral">    }   </span></div>
-<div class="line"><span class="lineno">  263</span><span class="stringliteral">    )&quot;));</span></div>
-<div class="line"><span class="lineno">  264</span><span class="stringliteral">    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(</span><span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  265</span>    <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> tmp(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno">  266</span>    <a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> param;</div>
-<div class="line"><span class="lineno">  267</span>    param.userData1 = &amp;main;</div>
-<div class="line"><span class="lineno">  268</span>    param.userData2 = &amp;tmp;</div>
-<div class="line"><span class="lineno">  269</span>    shaderNodeEditor-&gt;outputNode-&gt;Evaluate(param, <span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  270</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;FragColor = vec4(&quot;</span> + tmp.line + <span class="stringliteral">&quot;, 1.0f);&quot;</span>));</div>
-<div class="line"><span class="lineno">  271</span>    fsh-&gt;AddFunction(main);</div>
-<div class="line"><span class="lineno">  272</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00409">409</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  410</span>{</div>
+<div class="line"><span class="lineno">  411</span>    fsh-&gt;Clear();</div>
+<div class="line"><span class="lineno">  412</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec4 FragColor;&quot;</span>, <span class="stringliteral">&quot;The result of the fragment shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  413</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  414</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in float height;&quot;</span>, <span class="stringliteral">&quot;Take the height passed in fromt the Geometry Shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  415</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in vec4 FragPos;&quot;</span>, <span class="stringliteral">&quot;Take the world position passed in fromt the Geometry Shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  416</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in vec3 Normal;&quot;</span>, <span class="stringliteral">&quot;Take the normal passed in fromt the Geometry Shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  417</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;in vec2 TexCoord;&quot;</span>, <span class="stringliteral">&quot;Take the texture coordinates passed in fromt the Geometry Shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  418</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  419</span>    fsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
+<div class="line"><span class="lineno">  420</span><span class="stringliteral">    struct DataBlob</span></div>
+<div class="line"><span class="lineno">  421</span><span class="stringliteral">    {</span></div>
+<div class="line"><span class="lineno">  422</span><span class="stringliteral">        float d[32];</span></div>
+<div class="line"><span class="lineno">  423</span><span class="stringliteral">    };</span></div>
+<div class="line"><span class="lineno">  424</span><span class="stringliteral">    )&quot;));</span></div>
+<div class="line"><span class="lineno">  425</span><span class="stringliteral">    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(</span><span class="stringliteral">&quot;_LightPosition&quot;</span>, <span class="stringliteral">&quot;vec3&quot;</span>));</div>
+<div class="line"><span class="lineno">  426</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_LightColor&quot;</span>, <span class="stringliteral">&quot;vec3&quot;</span>));</div>
+<div class="line"><span class="lineno">  427</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_HMapMinMax&quot;</span>, <span class="stringliteral">&quot;vec3&quot;</span>));</div>
+<div class="line"><span class="lineno">  428</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_TextureBake&quot;</span>, <span class="stringliteral">&quot;float&quot;</span>, <span class="stringliteral">&quot;0.0f&quot;</span>));</div>
+<div class="line"><span class="lineno">  429</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_Mode&quot;</span>, <span class="stringliteral">&quot;float&quot;</span>, <span class="stringliteral">&quot;0.0f&quot;</span>));</div>
+<div class="line"><span class="lineno">  430</span>    fsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_Textures&quot;</span>, <span class="stringliteral">&quot;sampler2DArray&quot;</span>));</div>
+<div class="line"><span class="lineno">  431</span> </div>
+<div class="line"><span class="lineno">  432</span>    <a class="code hl_struct" href="../../d5/ddc/struct_g_l_s_l_s_s_b_o.html">GLSLSSBO</a> dataBlobs(<span class="stringliteral">&quot;dataBlobs&quot;</span>, std::to_string(sharedMemoryManager-&gt;ssboBinding), <span class="stringliteral">&quot;These are small data blobs which may be used for nodes, etc.&quot;</span>);</div>
+<div class="line"><span class="lineno">  433</span>    dataBlobs.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;DataBlob data[];&quot;</span>));</div>
+<div class="line"><span class="lineno">  434</span>    fsh-&gt;AddSSBO(dataBlobs);</div>
+<div class="line"><span class="lineno">  435</span>    <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> main(<span class="stringliteral">&quot;main&quot;</span>);</div>
+<div class="line"><span class="lineno">  436</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 objectColor = vec3(1.0f);&quot;</span>));</div>
+<div class="line"><span class="lineno">  437</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  438</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
+<div class="line"><span class="lineno">  439</span><span class="stringliteral">    if(_TextureBake == 1.0f)</span></div>
+<div class="line"><span class="lineno">  440</span><span class="stringliteral">    {</span></div>
+<div class="line"><span class="lineno">  441</span><span class="stringliteral">        if(_Mode == 0.0f)</span></div>
+<div class="line"><span class="lineno">  442</span><span class="stringliteral">            objectColor = vec3(1.0);</span></div>
+<div class="line"><span class="lineno">  443</span><span class="stringliteral">        else if(_Mode == 1.0f)</span></div>
+<div class="line"><span class="lineno">  444</span><span class="stringliteral">            objectColor = vec3( (height - _HMapMinMax.x) / (_HMapMinMax.y - _HMapMinMax.x) );</span></div>
+<div class="line"><span class="lineno">  445</span><span class="stringliteral">        else if(_Mode == 2.0f)</span></div>
+<div class="line"><span class="lineno">  446</span><span class="stringliteral">            objectColor = Normal;</span></div>
+<div class="line"><span class="lineno">  447</span><span class="stringliteral">        FragColor = vec4(objectColor, 1.0f);</span></div>
+<div class="line"><span class="lineno">  448</span><span class="stringliteral">        return;</span></div>
+<div class="line"><span class="lineno">  449</span><span class="stringliteral">    }   </span></div>
+<div class="line"><span class="lineno">  450</span><span class="stringliteral">    )&quot;));</span></div>
+<div class="line"><span class="lineno">  451</span><span class="stringliteral">    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(</span><span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  452</span>    <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> tmp(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  453</span>    <a class="code hl_struct" href="../../d5/dd0/struct_node_input_param.html">NodeInputParam</a> param;</div>
+<div class="line"><span class="lineno">  454</span>    param.userData1 = &amp;main;</div>
+<div class="line"><span class="lineno">  455</span>    param.userData2 = &amp;tmp;</div>
+<div class="line"><span class="lineno">  456</span>    shaderNodeEditor-&gt;outputNode-&gt;Evaluate(param, <span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  457</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;FragColor = vec4(&quot;</span> + tmp.line + <span class="stringliteral">&quot;, 1.0f);&quot;</span>));</div>
+<div class="line"><span class="lineno">  458</span>    fsh-&gt;AddFunction(main);</div>
+<div class="line"><span class="lineno">  459</span>}</div>
 <div class="ttc" id="astruct_g_l_s_l_function_html"><div class="ttname"><a href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00058">GLSLHandler.h:59</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_s_s_b_o_html"><div class="ttname"><a href="../../d5/ddc/struct_g_l_s_l_s_s_b_o.html">GLSLSSBO</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00043">GLSLHandler.h:44</a></div></div>
@@ -191,7 +193,7 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_af08d4f64
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../de/d7d/class_shading_manager.html">ShadingManager</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:45 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

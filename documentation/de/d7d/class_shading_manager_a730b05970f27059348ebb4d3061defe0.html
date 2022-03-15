@@ -121,47 +121,123 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_a730b0597
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00068">68</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   69</span>{</div>
-<div class="line"><span class="lineno">   70</span>    ImGui::Begin(<span class="stringliteral">&quot;Shading##ShadingManager&quot;</span>, pOpen);</div>
-<div class="line"><span class="lineno">   71</span> </div>
-<div class="line"><span class="lineno">   72</span>    <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Compile Shaders&quot;</span>))</div>
-<div class="line"><span class="lineno">   73</span>    {</div>
-<div class="line"><span class="lineno">   74</span>        ReCompileShaders();</div>
-<div class="line"><span class="lineno">   75</span>    }</div>
-<div class="line"><span class="lineno">   76</span> </div>
-<div class="line"><span class="lineno">   77</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">   78</span> </div>
-<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Export GLSL&quot;</span>))</div>
-<div class="line"><span class="lineno">   80</span>    {</div>
-<div class="line"><span class="lineno">   81</span>        std::string path = ShowSaveFileDialog(<span class="stringliteral">&quot;*.glsl\0&quot;</span>);</div>
-<div class="line"><span class="lineno">   82</span>        <span class="keywordflow">if</span>(path.size() &gt; 3)</div>
-<div class="line"><span class="lineno">   83</span>        {</div>
-<div class="line"><span class="lineno">   84</span>            SaveToFile(path, fragmentSource);</div>
-<div class="line"><span class="lineno">   85</span>        }</div>
-<div class="line"><span class="lineno">   86</span>    }</div>
-<div class="line"><span class="lineno">   87</span> </div>
-<div class="line"><span class="lineno">   88</span>    <span class="keywordflow">if</span>(ImGui::CollapsingHeader(<span class="stringliteral">&quot;Logs&quot;</span>))</div>
-<div class="line"><span class="lineno">   89</span>    {</div>
-<div class="line"><span class="lineno">   90</span>        <span class="keywordflow">if</span>(logs.size() &gt; 0)</div>
-<div class="line"><span class="lineno">   91</span>        {</div>
-<div class="line"><span class="lineno">   92</span>            ImGui::Text(<span class="stringliteral">&quot;Logs:&quot;</span>);</div>
-<div class="line"><span class="lineno">   93</span> </div>
-<div class="line"><span class="lineno">   94</span>            <span class="keywordflow">for</span>(std::string &amp;s : logs)</div>
-<div class="line"><span class="lineno">   95</span>            {</div>
-<div class="line"><span class="lineno">   96</span>                ImGui::Text(s.data());</div>
-<div class="line"><span class="lineno">   97</span>            }</div>
-<div class="line"><span class="lineno">   98</span>        }</div>
-<div class="line"><span class="lineno">   99</span>    }</div>
-<div class="line"><span class="lineno">  100</span> </div>
-<div class="line"><span class="lineno">  101</span> </div>
-<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">if</span>(ImGui::CollapsingHeader(<span class="stringliteral">&quot;Shader Nodes&quot;</span>))</div>
-<div class="line"><span class="lineno">  103</span>    {</div>
-<div class="line"><span class="lineno">  104</span>        shaderNodeEditor-&gt;Render();</div>
-<div class="line"><span class="lineno">  105</span>    }</div>
-<div class="line"><span class="lineno">  106</span> </div>
-<div class="line"><span class="lineno">  107</span>    ImGui::End();</div>
-<div class="line"><span class="lineno">  108</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00179">179</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  180</span>{</div>
+<div class="line"><span class="lineno">  181</span>    ImGui::Begin(<span class="stringliteral">&quot;Shading##ShadingManager&quot;</span>, pOpen);</div>
+<div class="line"><span class="lineno">  182</span> </div>
+<div class="line"><span class="lineno">  183</span>    <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Compile Shaders&quot;</span>))</div>
+<div class="line"><span class="lineno">  184</span>    {</div>
+<div class="line"><span class="lineno">  185</span>        ReCompileShaders();</div>
+<div class="line"><span class="lineno">  186</span>    }</div>
+<div class="line"><span class="lineno">  187</span> </div>
+<div class="line"><span class="lineno">  188</span> </div>
+<div class="line"><span class="lineno">  189</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  190</span> </div>
+<div class="line"><span class="lineno">  191</span>    <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Export GLSL&quot;</span>))</div>
+<div class="line"><span class="lineno">  192</span>    {</div>
+<div class="line"><span class="lineno">  193</span>        std::string path = ShowSaveFileDialog(<span class="stringliteral">&quot;*.glsl\0&quot;</span>);</div>
+<div class="line"><span class="lineno">  194</span>        <span class="keywordflow">if</span>(path.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  195</span>        {</div>
+<div class="line"><span class="lineno">  196</span>            SaveToFile(path, fragmentSource);</div>
+<div class="line"><span class="lineno">  197</span>        }</div>
+<div class="line"><span class="lineno">  198</span>    }</div>
+<div class="line"><span class="lineno">  199</span> </div>
+<div class="line"><span class="lineno">  200</span>    <span class="comment">//ImGui::Text(&quot;SMM Size : %d&quot;, sharedMemoryManager-&gt;sharedMemoryBlobs.size());</span></div>
+<div class="line"><span class="lineno">  201</span>    <span class="comment">//ImGui::Text(&quot;SMM : %f, %f, %f&quot;, sharedMemoryManager-&gt;sharedMemoryBlobs[0].d0, sharedMemoryManager-&gt;sharedMemoryBlobs[0].d1, sharedMemoryManager-&gt;sharedMemoryBlobs[0].d2);</span></div>
+<div class="line"><span class="lineno">  202</span> </div>
+<div class="line"><span class="lineno">  203</span>    <span class="keywordflow">if</span>(ImGui::CollapsingHeader(<span class="stringliteral">&quot;Logs&quot;</span>))</div>
+<div class="line"><span class="lineno">  204</span>    {</div>
+<div class="line"><span class="lineno">  205</span>        <span class="keywordflow">if</span>(logs.size() &gt; 0)</div>
+<div class="line"><span class="lineno">  206</span>        {</div>
+<div class="line"><span class="lineno">  207</span>            ImGui::Text(<span class="stringliteral">&quot;Logs:&quot;</span>);</div>
+<div class="line"><span class="lineno">  208</span> </div>
+<div class="line"><span class="lineno">  209</span>            <span class="keywordflow">for</span>(std::string &amp;s : logs)</div>
+<div class="line"><span class="lineno">  210</span>            {</div>
+<div class="line"><span class="lineno">  211</span>                ImGui::Text(s.data());</div>
+<div class="line"><span class="lineno">  212</span>            }</div>
+<div class="line"><span class="lineno">  213</span>        }</div>
+<div class="line"><span class="lineno">  214</span>    }</div>
+<div class="line"><span class="lineno">  215</span> </div>
+<div class="line"><span class="lineno">  216</span> </div>
+<div class="line"><span class="lineno">  217</span>    <span class="keywordflow">if</span>(ImGui::CollapsingHeader(<span class="stringliteral">&quot;Shader Nodes&quot;</span>))</div>
+<div class="line"><span class="lineno">  218</span>    {</div>
+<div class="line"><span class="lineno">  219</span> </div>
+<div class="line"><span class="lineno">  220</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add Node##ShaderNodeMaker&quot;</span>))</div>
+<div class="line"><span class="lineno">  221</span>        {</div>
+<div class="line"><span class="lineno">  222</span>            ImGui::OpenPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>);</div>
+<div class="line"><span class="lineno">  223</span>        }</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>        ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  226</span> </div>
+<div class="line"><span class="lineno">  227</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Reset##ShaderNodeMaker&quot;</span>))</div>
+<div class="line"><span class="lineno">  228</span>        {</div>
+<div class="line"><span class="lineno">  229</span>            shaderNodeEditor-&gt;Reset();</div>
+<div class="line"><span class="lineno">  230</span>            ReCompileShaders();</div>
+<div class="line"><span class="lineno">  231</span>        }</div>
+<div class="line"><span class="lineno">  232</span> </div>
+<div class="line"><span class="lineno">  233</span>        ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  234</span> </div>
+<div class="line"><span class="lineno">  235</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Export##ShaderNodeMaker&quot;</span>))</div>
+<div class="line"><span class="lineno">  236</span>        {</div>
+<div class="line"><span class="lineno">  237</span>            std::string file = ShowSaveFileDialog(<span class="stringliteral">&quot;*.terr3d&quot;</span>);</div>
+<div class="line"><span class="lineno">  238</span> </div>
+<div class="line"><span class="lineno">  239</span>            <span class="keywordflow">if</span> (file.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  240</span>            {</div>
+<div class="line"><span class="lineno">  241</span>                <span class="keywordflow">if</span> (file.find(<span class="stringliteral">&quot;.terr3d&quot;</span>) == std::string::npos)</div>
+<div class="line"><span class="lineno">  242</span>                {</div>
+<div class="line"><span class="lineno">  243</span>                    file += <span class="stringliteral">&quot;.terr3d&quot;</span>;</div>
+<div class="line"><span class="lineno">  244</span>                }</div>
+<div class="line"><span class="lineno">  245</span> </div>
+<div class="line"><span class="lineno">  246</span>                SaveToFile(file, shaderNodeEditor-&gt;Save().<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>(4));</div>
+<div class="line"><span class="lineno">  247</span>            }</div>
+<div class="line"><span class="lineno">  248</span>        }</div>
+<div class="line"><span class="lineno">  249</span> </div>
+<div class="line"><span class="lineno">  250</span>        ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Import##CPUNE&quot;</span>))</div>
+<div class="line"><span class="lineno">  253</span>        {</div>
+<div class="line"><span class="lineno">  254</span>            std::string file = ShowOpenFileDialog(<span class="stringliteral">&quot;*.terr3d&quot;</span>);</div>
+<div class="line"><span class="lineno">  255</span> </div>
+<div class="line"><span class="lineno">  256</span>            <span class="keywordflow">if</span> (file.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  257</span>            {</div>
+<div class="line"><span class="lineno">  258</span>                <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  259</span>                shaderNodeEditor-&gt;Reset();</div>
+<div class="line"><span class="lineno">  260</span>                shaderNodeEditor-&gt;Load(<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(ReadShaderSourceFile(file, &amp;tmp)));</div>
+<div class="line"><span class="lineno">  261</span>                ReCompileShaders();</div>
+<div class="line"><span class="lineno">  262</span>            }</div>
+<div class="line"><span class="lineno">  263</span>        }</div>
+<div class="line"><span class="lineno">  264</span> </div>
+<div class="line"><span class="lineno">  265</span>        <span class="keywordtype">int</span> nC = shaderNodeEditor-&gt;nodes.size();</div>
+<div class="line"><span class="lineno">  266</span>        shaderNodeEditor-&gt;Render();</div>
+<div class="line"><span class="lineno">  267</span>        <span class="keywordflow">if</span> (nC != shaderNodeEditor-&gt;nodes.size())</div>
+<div class="line"><span class="lineno">  268</span>        {</div>
+<div class="line"><span class="lineno">  269</span>            ReCompileShaders();</div>
+<div class="line"><span class="lineno">  270</span>        }</div>
+<div class="line"><span class="lineno">  271</span>    }</div>
+<div class="line"><span class="lineno">  272</span> </div>
+<div class="line"><span class="lineno">  273</span>    <span class="keywordflow">if</span> (ImGui::IsWindowFocused() &amp;&amp; (((IsKeyDown(TERR3D_KEY_RIGHT_SHIFT) || IsKeyDown(TERR3D_KEY_LEFT_SHIFT)) &amp;&amp; IsKeyDown(TERR3D_KEY_A)) || IsMouseButtonDown(TERR3D_MOUSE_BUTTON_MIDDLE)))</div>
+<div class="line"><span class="lineno">  274</span>    {</div>
+<div class="line"><span class="lineno">  275</span>        ImGui::OpenPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>);</div>
+<div class="line"><span class="lineno">  276</span>    }</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>    <span class="keywordflow">if</span>(ImGui::BeginPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>))</div>
+<div class="line"><span class="lineno">  279</span>    {</div>
+<div class="line"><span class="lineno">  280</span>        <span class="keywordflow">if</span>(ShowNodeMaker(shaderNodeEditor, fsh, shaderTextureManager))</div>
+<div class="line"><span class="lineno">  281</span>        {</div>
+<div class="line"><span class="lineno">  282</span>            ReCompileShaders();</div>
+<div class="line"><span class="lineno">  283</span>        }</div>
+<div class="line"><span class="lineno">  284</span> </div>
+<div class="line"><span class="lineno">  285</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Close##ShaderNodeMaker&quot;</span>))</div>
+<div class="line"><span class="lineno">  286</span>        {</div>
+<div class="line"><span class="lineno">  287</span>            ImGui::CloseCurrentPopup();</div>
+<div class="line"><span class="lineno">  288</span>        }</div>
+<div class="line"><span class="lineno">  289</span>        ImGui::EndPopup();</div>
+<div class="line"><span class="lineno">  290</span>    }</div>
+<div class="line"><span class="lineno">  291</span> </div>
+<div class="line"><span class="lineno">  292</span>    ImGui::End();</div>
+<div class="line"><span class="lineno">  293</span>}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4_html_a476756fb08e7f2416aad116d137977f4"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">nlohmann::basic_json::dump</a></div><div class="ttdeci">string_t dump(const int indent=-1, const char indent_char=' ', const bool ensure_ascii=false, const error_handler_t error_handler=error_handler_t::strict) const</div><div class="ttdoc">serialization</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l20117">json.hpp:20117</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -171,7 +247,7 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_a730b0597
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../de/d7d/class_shading_manager.html">ShadingManager</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:45 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

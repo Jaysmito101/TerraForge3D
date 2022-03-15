@@ -128,88 +128,88 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_ab0af19c745
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00285">285</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  286</span>{</div>
-<div class="line"><span class="lineno">  287</span>    <span class="keywordtype">int</span> searchLength = strlen(searchStr);</div>
-<div class="line"><span class="lineno">  288</span>    ImGui::Columns(4, NULL);</div>
-<div class="line"><span class="lineno">  289</span>    <span class="keywordtype">float</span> width = ImGui::GetContentRegionAvail().x;</div>
-<div class="line"><span class="lineno">  290</span> </div>
-<div class="line"><span class="lineno">  291</span>    <span class="keywordflow">if</span>(width &lt;= 5)</div>
-<div class="line"><span class="lineno">  292</span>    {</div>
-<div class="line"><span class="lineno">  293</span>        width = 50;</div>
-<div class="line"><span class="lineno">  294</span>    }</div>
-<div class="line"><span class="lineno">  295</span> </div>
-<div class="line"><span class="lineno">  296</span>    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.3f, 0.3f, 0.3f, 0.7f));</div>
-<div class="line"><span class="lineno">  297</span> </div>
-<div class="line"><span class="lineno">  298</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;textureStoreItems.size(); i++)</div>
-<div class="line"><span class="lineno">  299</span>    {</div>
-<div class="line"><span class="lineno">  300</span>        <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  301</span>        <a class="code hl_struct" href="../../d8/d09/struct_texture_store_item.html">TextureStoreItem</a> &amp;item = textureStoreItems[i];</div>
-<div class="line"><span class="lineno">  302</span> </div>
-<div class="line"><span class="lineno">  303</span>        <span class="keywordflow">if</span>(searchLength == 0 || strcasestr(item.name.c_str(), searchStr) != NULL)</div>
-<div class="line"><span class="lineno">  304</span>        {</div>
-<div class="line"><span class="lineno">  305</span>            tmp = item.downloaded;</div>
-<div class="line"><span class="lineno">  306</span> </div>
-<div class="line"><span class="lineno">  307</span>            <span class="keywordflow">if</span>(item.downloaded)</div>
-<div class="line"><span class="lineno">  308</span>            {</div>
-<div class="line"><span class="lineno">  309</span>                ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.5f, 0.5f, 0.7f));</div>
-<div class="line"><span class="lineno">  310</span>            }</div>
-<div class="line"><span class="lineno">  311</span> </div>
-<div class="line"><span class="lineno">  312</span>            ImGui::PushID(i);</div>
-<div class="line"><span class="lineno">  313</span>            ImGui::BeginChild(<span class="stringliteral">&quot;##texture_thumb&quot;</span>, ImVec2(width, 300), <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  314</span>            ImGui::Image((ImTextureID)item.texThumbnail-&gt;GetRendererID(), ImVec2(width, 150));</div>
-<div class="line"><span class="lineno">  315</span>            ImGui::Text(item.name.c_str());</div>
-<div class="line"><span class="lineno">  316</span> </div>
-<div class="line"><span class="lineno">  317</span>            <span class="keywordflow">if</span>(!item.downloaded)</div>
-<div class="line"><span class="lineno">  318</span>            {</div>
-<div class="line"><span class="lineno">  319</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Download 1K&quot;</span>))</div>
-<div class="line"><span class="lineno">  320</span>                {</div>
-<div class="line"><span class="lineno">  321</span>                    DownloadTexture(i, 1);</div>
-<div class="line"><span class="lineno">  322</span>                    tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  323</span>                }</div>
-<div class="line"><span class="lineno">  324</span> </div>
-<div class="line"><span class="lineno">  325</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Download 2K&quot;</span>))</div>
-<div class="line"><span class="lineno">  326</span>                {</div>
-<div class="line"><span class="lineno">  327</span>                    DownloadTexture(i, 2);</div>
-<div class="line"><span class="lineno">  328</span>                    tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  329</span>                }</div>
-<div class="line"><span class="lineno">  330</span> </div>
-<div class="line"><span class="lineno">  331</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Download 4K&quot;</span>))</div>
-<div class="line"><span class="lineno">  332</span>                {</div>
-<div class="line"><span class="lineno">  333</span>                    DownloadTexture(i, 4);</div>
-<div class="line"><span class="lineno">  334</span>                    tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  335</span>                }</div>
-<div class="line"><span class="lineno">  336</span>            }</div>
-<div class="line"><span class="lineno">  337</span> </div>
-<div class="line"><span class="lineno">  338</span>            <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  339</span>            {</div>
-<div class="line"><span class="lineno">  340</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Delete&quot;</span>))</div>
-<div class="line"><span class="lineno">  341</span>                {</div>
-<div class="line"><span class="lineno">  342</span>                    DeleteTexture(i);</div>
-<div class="line"><span class="lineno">  343</span>                }</div>
-<div class="line"><span class="lineno">  344</span>            }</div>
-<div class="line"><span class="lineno">  345</span> </div>
-<div class="line"><span class="lineno">  346</span>            <span class="comment">//ImGui::Text(&quot;Downloads : %d&quot;, item.download_count);</span></div>
-<div class="line"><span class="lineno">  347</span>            <span class="comment">//ImGui::Text(&quot;Authors :&quot;);</span></div>
-<div class="line"><span class="lineno">  348</span>            <span class="comment">//for(auto author : item.authours)</span></div>
-<div class="line"><span class="lineno">  349</span>            <span class="comment">//{</span></div>
-<div class="line"><span class="lineno">  350</span>            <span class="comment">//    ImGui::BulletText(author.c_str());</span></div>
-<div class="line"><span class="lineno">  351</span>            <span class="comment">//}</span></div>
-<div class="line"><span class="lineno">  352</span>            ImGui::EndChild();</div>
-<div class="line"><span class="lineno">  353</span>            ImGui::PopID();</div>
-<div class="line"><span class="lineno">  354</span> </div>
-<div class="line"><span class="lineno">  355</span>            <span class="keywordflow">if</span>(tmp)</div>
-<div class="line"><span class="lineno">  356</span>            {</div>
-<div class="line"><span class="lineno">  357</span>                ImGui::PopStyleColor();</div>
-<div class="line"><span class="lineno">  358</span>            }</div>
-<div class="line"><span class="lineno">  359</span> </div>
-<div class="line"><span class="lineno">  360</span>            ImGui::NextColumn();</div>
-<div class="line"><span class="lineno">  361</span>        }</div>
-<div class="line"><span class="lineno">  362</span>    }</div>
-<div class="line"><span class="lineno">  363</span> </div>
-<div class="line"><span class="lineno">  364</span>    ImGui::PopStyleColor();</div>
-<div class="line"><span class="lineno">  365</span>    ImGui::Columns(1);</div>
-<div class="line"><span class="lineno">  366</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00286">286</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  287</span>{</div>
+<div class="line"><span class="lineno">  288</span>    <span class="keywordtype">int</span> searchLength = strlen(searchStr);</div>
+<div class="line"><span class="lineno">  289</span>    ImGui::Columns(4, NULL);</div>
+<div class="line"><span class="lineno">  290</span>    <span class="keywordtype">float</span> width = ImGui::GetContentRegionAvail().x;</div>
+<div class="line"><span class="lineno">  291</span> </div>
+<div class="line"><span class="lineno">  292</span>    <span class="keywordflow">if</span>(width &lt;= 5)</div>
+<div class="line"><span class="lineno">  293</span>    {</div>
+<div class="line"><span class="lineno">  294</span>        width = 50;</div>
+<div class="line"><span class="lineno">  295</span>    }</div>
+<div class="line"><span class="lineno">  296</span> </div>
+<div class="line"><span class="lineno">  297</span>    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.3f, 0.3f, 0.3f, 0.7f));</div>
+<div class="line"><span class="lineno">  298</span> </div>
+<div class="line"><span class="lineno">  299</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;textureStoreItems.size(); i++)</div>
+<div class="line"><span class="lineno">  300</span>    {</div>
+<div class="line"><span class="lineno">  301</span>        <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  302</span>        <a class="code hl_struct" href="../../d8/d09/struct_texture_store_item.html">TextureStoreItem</a> &amp;item = textureStoreItems[i];</div>
+<div class="line"><span class="lineno">  303</span> </div>
+<div class="line"><span class="lineno">  304</span>        <span class="keywordflow">if</span>(searchLength == 0 || strcasestr(item.name.c_str(), searchStr) != NULL)</div>
+<div class="line"><span class="lineno">  305</span>        {</div>
+<div class="line"><span class="lineno">  306</span>            tmp = item.downloaded;</div>
+<div class="line"><span class="lineno">  307</span> </div>
+<div class="line"><span class="lineno">  308</span>            <span class="keywordflow">if</span>(item.downloaded)</div>
+<div class="line"><span class="lineno">  309</span>            {</div>
+<div class="line"><span class="lineno">  310</span>                ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.5f, 0.5f, 0.7f));</div>
+<div class="line"><span class="lineno">  311</span>            }</div>
+<div class="line"><span class="lineno">  312</span> </div>
+<div class="line"><span class="lineno">  313</span>            ImGui::PushID(i);</div>
+<div class="line"><span class="lineno">  314</span>            ImGui::BeginChild(<span class="stringliteral">&quot;##texture_thumb&quot;</span>, ImVec2(width, 300), <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  315</span>            ImGui::Image((ImTextureID)item.texThumbnail-&gt;GetRendererID(), ImVec2(width, 150));</div>
+<div class="line"><span class="lineno">  316</span>            ImGui::Text(item.name.c_str());</div>
+<div class="line"><span class="lineno">  317</span> </div>
+<div class="line"><span class="lineno">  318</span>            <span class="keywordflow">if</span>(!item.downloaded)</div>
+<div class="line"><span class="lineno">  319</span>            {</div>
+<div class="line"><span class="lineno">  320</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Download 1K&quot;</span>))</div>
+<div class="line"><span class="lineno">  321</span>                {</div>
+<div class="line"><span class="lineno">  322</span>                    DownloadTexture(i, 1);</div>
+<div class="line"><span class="lineno">  323</span>                    tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  324</span>                }</div>
+<div class="line"><span class="lineno">  325</span> </div>
+<div class="line"><span class="lineno">  326</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Download 2K&quot;</span>))</div>
+<div class="line"><span class="lineno">  327</span>                {</div>
+<div class="line"><span class="lineno">  328</span>                    DownloadTexture(i, 2);</div>
+<div class="line"><span class="lineno">  329</span>                    tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  330</span>                }</div>
+<div class="line"><span class="lineno">  331</span> </div>
+<div class="line"><span class="lineno">  332</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Download 4K&quot;</span>))</div>
+<div class="line"><span class="lineno">  333</span>                {</div>
+<div class="line"><span class="lineno">  334</span>                    DownloadTexture(i, 4);</div>
+<div class="line"><span class="lineno">  335</span>                    tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  336</span>                }</div>
+<div class="line"><span class="lineno">  337</span>            }</div>
+<div class="line"><span class="lineno">  338</span> </div>
+<div class="line"><span class="lineno">  339</span>            <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  340</span>            {</div>
+<div class="line"><span class="lineno">  341</span>                <span class="keywordflow">if</span>(ImGui::Button(<span class="stringliteral">&quot;Delete&quot;</span>))</div>
+<div class="line"><span class="lineno">  342</span>                {</div>
+<div class="line"><span class="lineno">  343</span>                    DeleteTexture(i);</div>
+<div class="line"><span class="lineno">  344</span>                }</div>
+<div class="line"><span class="lineno">  345</span>            }</div>
+<div class="line"><span class="lineno">  346</span> </div>
+<div class="line"><span class="lineno">  347</span>            <span class="comment">//ImGui::Text(&quot;Downloads : %d&quot;, item.download_count);</span></div>
+<div class="line"><span class="lineno">  348</span>            <span class="comment">//ImGui::Text(&quot;Authors :&quot;);</span></div>
+<div class="line"><span class="lineno">  349</span>            <span class="comment">//for(auto author : item.authours)</span></div>
+<div class="line"><span class="lineno">  350</span>            <span class="comment">//{</span></div>
+<div class="line"><span class="lineno">  351</span>            <span class="comment">//    ImGui::BulletText(author.c_str());</span></div>
+<div class="line"><span class="lineno">  352</span>            <span class="comment">//}</span></div>
+<div class="line"><span class="lineno">  353</span>            ImGui::EndChild();</div>
+<div class="line"><span class="lineno">  354</span>            ImGui::PopID();</div>
+<div class="line"><span class="lineno">  355</span> </div>
+<div class="line"><span class="lineno">  356</span>            <span class="keywordflow">if</span>(tmp)</div>
+<div class="line"><span class="lineno">  357</span>            {</div>
+<div class="line"><span class="lineno">  358</span>                ImGui::PopStyleColor();</div>
+<div class="line"><span class="lineno">  359</span>            }</div>
+<div class="line"><span class="lineno">  360</span> </div>
+<div class="line"><span class="lineno">  361</span>            ImGui::NextColumn();</div>
+<div class="line"><span class="lineno">  362</span>        }</div>
+<div class="line"><span class="lineno">  363</span>    }</div>
+<div class="line"><span class="lineno">  364</span> </div>
+<div class="line"><span class="lineno">  365</span>    ImGui::PopStyleColor();</div>
+<div class="line"><span class="lineno">  366</span>    ImGui::Columns(1);</div>
+<div class="line"><span class="lineno">  367</span>}</div>
 <div class="ttc" id="astruct_texture_store_item_html"><div class="ttname"><a href="../../d8/d09/struct_texture_store_item.html">TextureStoreItem</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d2b/_texture_store_8h_source.html#l00012">TextureStore.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -220,7 +220,7 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_ab0af19c745
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d8a/class_texture_store.html">TextureStore</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 10:37:15 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 18:33:45 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
