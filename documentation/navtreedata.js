@@ -41,6 +41,18 @@ var NAVTREE =
       [ "Docs : https://terraforge3d.gitbook.io/docs", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md50", null ],
       [ "Supporters & Sponsers", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md51", null ]
     ] ],
+    [ "Developers' Guide", "d5/d38/md__docs_markdowns_index.html", [
+      [ "Requirements", "d5/d38/md__docs_markdowns_index.html#autotoc_md53", null ],
+      [ "Setting Up The Code", "d5/d38/md__docs_markdowns_index.html#autotoc_md54", null ],
+      [ "Building the code", "d5/d38/md__docs_markdowns_index.html#autotoc_md55", [
+        [ "With Visual Studio GUI", "d5/d38/md__docs_markdowns_index.html#autotoc_md56", null ],
+        [ "<strong>From Command Line</strong>", "d5/d38/md__docs_markdowns_index.html#autotoc_md57", null ]
+      ] ],
+      [ "Coding Conventions", "d5/d38/md__docs_markdowns_index.html#autotoc_md58", null ],
+      [ "Submitting A  Pull Request", "d5/d38/md__docs_markdowns_index.html#autotoc_md59", null ],
+      [ "Don'ts", "d5/d38/md__docs_markdowns_index.html#autotoc_md60", null ],
+      [ "Help", "d5/d38/md__docs_markdowns_index.html#autotoc_md61", null ]
+    ] ],
     [ "Deprecated List", "da/d58/deprecated.html", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
@@ -74,12 +86,12 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "d4/d04/class_main_menu.html",
-"d6/d69/classnlohmann_1_1detail_1_1json__sax__dom__callback__parser_ac50b40b49d2c4afa67a36c7d8793877e.html#ac50b40b49d2c4afa67a36c7d8793877e",
-"d9/dcc/classnlohmann_1_1basic__json_a2544582412088703c778e882e2531af3.html#a2544582412088703c778e882e2531af3",
-"d9/dcc/classnlohmann_1_1basic__json_aa242e339ebc7583e114f2167a83f8c90.html#aa242e339ebc7583e114f2167a83f8c90",
-"da/de8/classnlohmann_1_1json__pointer_acb02aa1a38d79b5d4b602a4cfd014883.html#acb02aa1a38d79b5d4b602a4cfd014883",
-"de/d74/classnlohmann_1_1detail_1_1json__reverse__iterator.html",
-"functions_func.html"
+"d6/d69/classnlohmann_1_1detail_1_1json__sax__dom__callback__parser_a46a72dffd5be4a25602af00f0033c126.html#a46a72dffd5be4a25602af00f0033c126",
+"d9/dcc/classnlohmann_1_1basic__json_a239e942da82f2597d0cf5ec806f5bc0d.html#a239e942da82f2597d0cf5ec806f5bc0d",
+"d9/dcc/classnlohmann_1_1basic__json_a9c5b9de8a4a759861cb600b38a6c81b1.html#a9c5b9de8a4a759861cb600b38a6c81b1",
+"da/de8/classnlohmann_1_1json__pointer_a90d38e45e2d3add52d824bc55da8f772.html#a90d38e45e2d3add52d824bc55da8f772",
+"dd/df9/class_module_ace2cc7d54de2c06c90ffc00f92c57be2.html#ace2cc7d54de2c06c90ffc00f92c57be2",
+"dir_f70f23200573989b235bf632cf04bccc.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

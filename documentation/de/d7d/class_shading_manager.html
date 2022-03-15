@@ -118,6 +118,8 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager.html','..
 Public Member Functions</h2></td></tr>
 <tr class="memitem:afd060113e2a99f7a80987050d589af26"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_afd060113e2a99f7a80987050d589af26.html#afd060113e2a99f7a80987050d589af26">ShadingManager</a> (<a class="el" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState)</td></tr>
 <tr class="separator:afd060113e2a99f7a80987050d589af26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64026bf5eb2521f3c62d145f7c774fb8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_a64026bf5eb2521f3c62d145f7c774fb8.html#a64026bf5eb2521f3c62d145f7c774fb8">UpdateShaders</a> ()</td></tr>
+<tr class="separator:a64026bf5eb2521f3c62d145f7c774fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a730b05970f27059348ebb4d3061defe0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_a730b05970f27059348ebb4d3061defe0.html#a730b05970f27059348ebb4d3061defe0">ShowSettings</a> (bool *pOpen)</td></tr>
 <tr class="separator:a730b05970f27059348ebb4d3061defe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -131,12 +133,16 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ae49dd7ce3e3403ec33fa0a88fb3fd4fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef84915a7a52a90cf0414a21648ae91f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_aef84915a7a52a90cf0414a21648ae91f.html#aef84915a7a52a90cf0414a21648ae91f">fsh</a> = nullptr</td></tr>
 <tr class="separator:aef84915a7a52a90cf0414a21648ae91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad42b96ad93034952a0273854ae52468b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_ad42b96ad93034952a0273854ae52468b.html#ad42b96ad93034952a0273854ae52468b">sharedMemoryManager</a> = nullptr</td></tr>
+<tr class="separator:ad42b96ad93034952a0273854ae52468b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa31df63169e5ed1f58da8677a018fbe7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_aa31df63169e5ed1f58da8677a018fbe7.html#aa31df63169e5ed1f58da8677a018fbe7">vertexSource</a> = &quot;&quot;</td></tr>
 <tr class="separator:aa31df63169e5ed1f58da8677a018fbe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c72d3eb2cab78bf14685db092f7dbda"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_a6c72d3eb2cab78bf14685db092f7dbda.html#a6c72d3eb2cab78bf14685db092f7dbda">geometrySource</a> = &quot;&quot;</td></tr>
 <tr class="separator:a6c72d3eb2cab78bf14685db092f7dbda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48dab5044c57b17f49242b116e51c28b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_a48dab5044c57b17f49242b116e51c28b.html#a48dab5044c57b17f49242b116e51c28b">fragmentSource</a> = &quot;&quot;</td></tr>
 <tr class="separator:a48dab5044c57b17f49242b116e51c28b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c58b4fc31eedd3b2cc631d3ecd6d0b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d7d/class_shading_manager_a2c58b4fc31eedd3b2cc631d3ecd6d0b3.html#a2c58b4fc31eedd3b2cc631d3ecd6d0b3">logs</a></td></tr>
+<tr class="separator:a2c58b4fc31eedd3b2cc631d3ecd6d0b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -151,7 +157,7 @@ Private Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="../../df/dad/_shading_manager_8h_source.html#l00007">7</a> of file <a class="el" href="../../df/dad/_shading_manager_8h_source.html">ShadingManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../df/dad/_shading_manager_8h_source.html#l00011">11</a> of file <a class="el" href="../../df/dad/_shading_manager_8h_source.html">ShadingManager.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>TerraForge3D/include/Shading/<a class="el" href="../../df/dad/_shading_manager_8h_source.html">ShadingManager.h</a></li>
 <li>TerraForge3D/src/Shading/<a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a></li>
@@ -162,7 +168,7 @@ Private Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../de/d7d/class_shading_manager.html">ShadingManager</a></li>
-    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 07:26:44 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

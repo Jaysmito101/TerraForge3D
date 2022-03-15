@@ -298,7 +298,7 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        shader-&gt;SetUniformf(<span class="stringliteral">&quot;_CameraNear&quot;</span>, appState-&gt;cameras.main.cNear);</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        shader-&gt;SetUniformf(<span class="stringliteral">&quot;_CameraFar&quot;</span>, appState-&gt;cameras.main.cFar);</div>
 <div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        shader-&gt;SetUniformf(<span class="stringliteral">&quot;_Mode&quot;</span>, appState-&gt;globals.textureBakeMode);</div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        <span class="comment">//UpdateDiffuseTexturesUBO(shader-&gt;GetNativeShader(), &quot;_DiffuseTextures&quot;);</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        appState-&gt;shadingManager-&gt;UpdateShaders();</div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        appState-&gt;models.coreTerrain-&gt;Render();</div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    }</div>
 <div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
@@ -346,8 +346,8 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>        shader-&gt;SetUniformf(<span class="stringliteral">&quot;_CameraNear&quot;</span>, appState-&gt;cameras.main.cNear);</div>
 <div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>        shader-&gt;SetUniformf(<span class="stringliteral">&quot;_CameraFar&quot;</span>, appState-&gt;cameras.main.cFar);</div>
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>        shader-&gt;SetUniformf(<span class="stringliteral">&quot;_FlatShade&quot;</span>, appState-&gt;states.useGPUForNormals ? 1.0f : 0.0f);</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span> </div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        <span class="comment">//UpdateDiffuseTexturesUBO(shader-&gt;GetNativeShader(), &quot;_DiffuseTextures&quot;);</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        appState-&gt;shadingManager-&gt;UpdateShaders();</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span> </div>
 <div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        <span class="keywordflow">if</span>(appState-&gt;mode == ApplicationMode::TERRAIN)</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        {</div>
 <div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>            appState-&gt;models.coreTerrain-&gt;Render();</div>
@@ -1332,7 +1332,7 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div class="ttc" id="aclass_sea_manager_html"><div class="ttname"><a href="../../d3/dac/class_sea_manager.html">SeaManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d0a/_sea_manager_8h_source.html#l00011">SeaManager.h:12</a></div></div>
 <div class="ttc" id="aclass_serializer_html"><div class="ttname"><a href="../../d0/dc2/class_serializer.html">Serializer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de0/_serializer_8h_source.html#l00009">Serializer.h:10</a></div></div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
-<div class="ttc" id="aclass_shading_manager_html"><div class="ttname"><a href="../../de/d7d/class_shading_manager.html">ShadingManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../df/dad/_shading_manager_8h_source.html#l00007">ShadingManager.h:8</a></div></div>
+<div class="ttc" id="aclass_shading_manager_html"><div class="ttname"><a href="../../de/d7d/class_shading_manager.html">ShadingManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../df/dad/_shading_manager_8h_source.html#l00011">ShadingManager.h:12</a></div></div>
 <div class="ttc" id="aclass_sky_manager_html"><div class="ttname"><a href="../../db/d15/class_sky_manager.html">SkyManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/da4/_sky_settings_8h_source.html#l00010">SkySettings.h:11</a></div></div>
 <div class="ttc" id="aclass_supporters_tribute_html"><div class="ttname"><a href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00017">SupportersTribute.h:18</a></div></div>
 <div class="ttc" id="aclass_texture_store_html"><div class="ttname"><a href="../../d0/d8a/class_texture_store.html">TextureStore</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d1/d2b/_texture_store_8h_source.html#l00034">TextureStore.h:35</a></div></div>
@@ -1343,7 +1343,7 @@ $(document).ready(function(){initNavTree('d5/d12/_main_8cpp_source.html','../../
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><b>Main.cpp</b></li>
-    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Tue Mar 15 2022 07:26:41 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
