@@ -188,7 +188,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		shader->SetUniformf("_Mode", appState->globals.textureBakeMode);
-		//UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
+		appState->shadingManager->UpdateShaders();
 		appState->models.coreTerrain->Render();
 	}
 
@@ -236,8 +236,8 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
 		shader->SetUniformf("_FlatShade", appState->states.useGPUForNormals ? 1.0f : 0.0f);
+		appState->shadingManager->UpdateShaders();
 
-		//UpdateDiffuseTexturesUBO(shader->GetNativeShader(), "_DiffuseTextures");
 		if(appState->mode == ApplicationMode::TERRAIN)
 		{
 			appState->models.coreTerrain->Render();

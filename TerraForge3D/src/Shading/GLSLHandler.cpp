@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iostream>
 #include <unordered_map>
 #include <algorithm>
 
@@ -84,6 +85,42 @@ std::string GLSLLine::GenerateGLSL()
 	return c.str();
 }
 
+GLSLSSBO::GLSLSSBO(std::string name, std::string binding, std::string comment)
+	:name(name), binding(binding), comment(comment)
+{
+	lines.clear();
+}
+
+GLSLSSBO::~GLSLSSBO()
+{
+}
+
+void GLSLSSBO::AddLine(GLSLLine line)
+{
+	lines.push_back(line);
+}
+
+std::string GLSLSSBO::GenerateGLSL()
+{
+	std::stringstream c;
+
+	if(comment.size() > 0)
+	{
+		c << "// " << comment << "\n";
+	}
+
+	c << "layout(std430, binding = " << binding << ") buffer " << name << "\n";
+	c << "{\n";
+
+	for(GLSLLine line : lines)
+	{
+		c << "\t" << line.GenerateGLSL() << "\n";
+	}
+
+	c << "};\n";
+	return c.str();
+}
+
 GLSLFunction::GLSLFunction(std::string name, std::string params, std::string returnType)
 	: name(name), returnType(returnType), params(params), comment("")
 {
@@ -162,6 +199,18 @@ std::string GLSLHandler::GenerateGLSL()
 		c << "\n\n";
 	}
 
+	if(ssbos.size() > 0)
+	{
+		c << "// " << DASHIT("SSBOS") << "\n";
+
+		for(GLSLSSBO ssbo : ssbos)
+		{
+			c << ssbo.GenerateGLSL() << "\n";
+		}
+
+		c << "\n\n";
+	}
+
 	if(uniforms.size() > 0)
 	{
 		c << "//" << DASHIT("UNIFORMS") << "\n";
@@ -204,6 +253,11 @@ void GLSLHandler::AddMacro(GLSLMacro macro)
 	macros.push_back(macro);
 }
 
+void GLSLHandler::AddSSBO(GLSLSSBO ssbo)
+{
+	ssbos.push_back(ssbo);
+}
+
 void GLSLHandler::AddFunction(GLSLFunction function)
 {
 	if(!HasFunction(function.name))
@@ -224,6 +278,7 @@ void GLSLHandler::Clear()
 	functions.clear();
 	functionNames.clear();
 	macros.clear();
+	ssbos.clear();
 	topLines.clear();
 	code = "";
 }

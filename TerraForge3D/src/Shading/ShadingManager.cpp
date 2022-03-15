@@ -1,7 +1,7 @@
 #include "Shading/ShadingManager.h"
 #include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
-
+#include "Profiler.h"
 #include "imgui/imgui.h"
 
 ShadingManager::ShadingManager(ApplicationState *as)
@@ -10,7 +10,8 @@ ShadingManager::ShadingManager(ApplicationState *as)
 	vsh = new GLSLHandler("Primary Vertex Shader");
 	gsh = new GLSLHandler("Primary Geometry Shader");
 	fsh = new GLSLHandler("Primary Fragment Shader");
-	PrepVertShader();
+	sharedMemoryManager = new SharedMemoryManager();
+	sharedMemoryManager->AddItem();
 }
 
 ShadingManager::~ShadingManager()
@@ -18,11 +19,18 @@ ShadingManager::~ShadingManager()
 	delete vsh;
 	delete gsh;
 	delete fsh;
+	delete sharedMemoryManager;
 }
 
+void ShadingManager::UpdateShaders()
+{
+	sharedMemoryManager->UpdateShader(appState->shaders.terrain);
+}
 
 void ShadingManager::ReCompileShaders()
 {
+	logs.clear();
+	START_PROFILER();
 	PrepVertShader();
 	vertexSource = vsh->GenerateGLSL();
 	PrepGeomShader();
@@ -30,6 +38,9 @@ void ShadingManager::ReCompileShaders()
 	PrepFragShader();
 	fragmentSource = fsh->GenerateGLSL();
 	appState->shaders.terrain = new Shader(vertexSource, fragmentSource, geometrySource);
+	double time = 0.0f;
+	END_PROFILER(time);
+	logs.push_back("Generated & Compiled Shaders in " + std::to_string(time) + "ms");
 }
 
 void ShadingManager::ShowSettings(bool *pOpen)
@@ -41,6 +52,17 @@ void ShadingManager::ShowSettings(bool *pOpen)
 		ReCompileShaders();
 	}
 
+	if(logs.size() > 0)
+	{
+		ImGui::Text("Logs:");
+
+		for(std::string &s : logs)
+		{
+			ImGui::Text(s.data());
+		}
+	}
+
+	ImGui::DragFloat("Temp#ssdaas", &sharedMemoryManager->At(0)->d0, 0.01f, 0.0f, 1.0f);
 	ImGui::Text("VS: \n%s", vertexSource.data());
 	ImGui::Text("GS: \n%s", geometrySource.data());
 	ImGui::Text("FS: \n%s", fragmentSource.data());
@@ -171,11 +193,20 @@ void ShadingManager::PrepFragShader()
 	fsh->AddTopLine(GLSLLine("in vec3 Normal;", "Take the normal passed in fromt the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in vec2 TexCoord;", "Take the texture coordinates passed in fromt the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine(""));
+	fsh->AddTopLine(GLSLLine(R"(
+	struct DataBlob
+	{
+		float d[32];
+	};
+	)"));
 	fsh->AddUniform(GLSLUniform("_LightPosition", "vec3"));
 	fsh->AddUniform(GLSLUniform("_LightColor", "vec3"));
 	fsh->AddUniform(GLSLUniform("_HMapMinMax", "vec3"));
 	fsh->AddUniform(GLSLUniform("_TextureBake", "float", "0.0f"));
 	fsh->AddUniform(GLSLUniform("_Mode", "float", "0.0f"));
+	GLSLSSBO dataBlobs("dataBlobs", std::to_string(sharedMemoryManager->ssboBinding), "These are small data blobs which may be used for nodes, etc.");
+	dataBlobs.AddLine(GLSLLine("DataBlob data[];"));
+	fsh->AddSSBO(dataBlobs);
 	GLSLFunction main("main");
 	main.AddLine(GLSLLine("vec3 objectColor = vec3(1.0f);"));
 	main.AddLine(GLSLLine(""));
@@ -198,7 +229,7 @@ void ShadingManager::PrepFragShader()
 	main.AddLine(GLSLLine("float diff = max(dot(norm, lightDir), 0.0f);"));
 	main.AddLine(GLSLLine("vec3 diffuse = diff * _LightColor;"));
 	main.AddLine(GLSLLine("vec3 result = (vec3(0.2, 0.2, 0.2) + diffuse) * objectColor;"));
-	main.AddLine(GLSLLine(""));
+	main.AddLine(GLSLLine("result.x = data[0].d[0];"));
 	main.AddLine(GLSLLine("FragColor = vec4(result, 1.0f);"));
 	fsh->AddFunction(main);
 }

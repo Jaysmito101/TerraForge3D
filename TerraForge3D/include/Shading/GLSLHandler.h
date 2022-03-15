@@ -40,6 +40,21 @@ struct GLSLLine
 	std::string comment = "";
 };
 
+struct GLSLSSBO
+{
+	GLSLSSBO(std::string name, std::string binding = "1", std::string comment = "");
+	~GLSLSSBO();
+
+	std::string GenerateGLSL();
+
+	void AddLine(GLSLLine line);
+
+	std::vector<GLSLLine> lines;
+	std::string name = "";
+	std::string binding = "";
+	std::string comment = "";
+};
+
 struct GLSLFunction
 {
 	GLSLFunction(std::string name, std::string params = "", std::string returnType = "void");
@@ -67,6 +82,7 @@ public:
 	void AddTopLine(GLSLLine line);
 	void AddUniform(GLSLUniform uniform);
 	void AddMacro(GLSLMacro macro);
+	void AddSSBO(GLSLSSBO ssbo);
 	void AddFunction(GLSLFunction function);
 
 	bool HasFunction(std::string name);
@@ -81,5 +97,6 @@ public:
 	std::vector<GLSLFunction> functions;
 	std::vector<std::string> functionNames;
 	std::vector<GLSLMacro> macros;
+	std::vector<GLSLSSBO> ssbos;
 	std::vector<GLSLLine> topLines;
 };
