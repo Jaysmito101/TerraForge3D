@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef TERR3d_WIN32
+#ifdef TERR3D_WIN32
 
 #define PATH_SEPERATOR "\\"
 

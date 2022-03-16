@@ -23,4 +23,5 @@ public:
 	float offsetY = 0.0f;
 	float rotation = 0.0f;
 	uint32_t zCoord = 0;
+	bool isTriplanar = false;
 };

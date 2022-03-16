@@ -7,6 +7,7 @@
 #include "Shading/ShaderNodes/ShaderOutputNode.h"
 #include "Shading/ShaderNodes/ShaderTextureNode.h"
 #include "Shading/ShaderNodes/Float3Node.h"
+#include "Shading/ShaderNodes/PBRMaterialNode.h"
 
 static char *stristr4(const char *str, const char *pattern)
 {
@@ -64,6 +65,8 @@ static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler* handler, ShaderTextur
 		}
 	}
 
+	NODE_MAKER_SHOW(PBRMaterialNode, "PBR Material", didMake);
+
 	ImGui::EndChild();
 
 	return didMake;
@@ -103,6 +106,10 @@ ShadingManager::ShadingManager(ApplicationState *as)
 		else if(data["type"] == "ShaderTexture")
 		{
 			node = new ShaderTextureNode(fsh, shaderTextureManager);
+		}
+		else if(data["type"] == "PBRMaterial")
+		{
+			node = new PBRMaterialNode(fsh);
 		}
 		return node;
 	};
@@ -263,8 +270,10 @@ void ShadingManager::ShowSettings(bool *pOpen)
 		}
 
 		int nC = shaderNodeEditor->nodes.size();
+		int lC = shaderNodeEditor->links.size();
+		int pC = shaderNodeEditor->pins.size();
 		shaderNodeEditor->Render();
-		if (nC != shaderNodeEditor->nodes.size())
+		if ((nC != shaderNodeEditor->nodes.size()) || (lC != shaderNodeEditor->links.size()) || (pC != shaderNodeEditor->pins.size()))
 		{
 			ReCompileShaders();
 		}
@@ -279,7 +288,7 @@ void ShadingManager::ShowSettings(bool *pOpen)
 	{
 		if(ShowNodeMaker(shaderNodeEditor, fsh, shaderTextureManager))
 		{
-			ReCompileShaders();
+			// ReCompileShaders();
 		}
 
 		if (ImGui::Button("Close##ShaderNodeMaker"))
@@ -377,7 +386,7 @@ in DATA
 	main.AddLine(GLSLLine(""));
 	main.AddLine(GLSLLine("vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));"));
 	main.AddLine(GLSLLine("vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));"));
-	main.AddLine(GLSLLine("vec3 N = normalize(vec3(model * vec4(cross(edge1, edge0), 0.0f)));"));
+	main.AddLine(GLSLLine("vec3 N = normalize(vec3(model * vec4(-1.0f*cross(edge1, edge0), 0.0f)));"));
 	main.AddLine(GLSLLine(""));
 	main.AddLine(GLSLLine("TBN = mat3(T, B, N);"));
 	main.AddLine(GLSLLine(""));
@@ -411,10 +420,11 @@ void ShadingManager::PrepFragShader()
 	fsh->Clear();
 	fsh->AddTopLine(GLSLLine("out vec4 FragColor;", "The result of the fragment shader"));
 	fsh->AddTopLine(GLSLLine(""));
-	fsh->AddTopLine(GLSLLine("in float height;", "Take the height passed in fromt the Geometry Shader"));
-	fsh->AddTopLine(GLSLLine("in vec4 FragPos;", "Take the world position passed in fromt the Geometry Shader"));
-	fsh->AddTopLine(GLSLLine("in vec3 Normal;", "Take the normal passed in fromt the Geometry Shader"));
-	fsh->AddTopLine(GLSLLine("in vec2 TexCoord;", "Take the texture coordinates passed in fromt the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine("in float height;", "Take the height passed in from the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine("in vec4 FragPos;", "Take the world position passed in from the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine("in vec3 Normal;", "Take the normal passed in from the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine("in vec2 TexCoord;", "Take the texture coordinates passed in from the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine("in mat3 TBN;", "Take the tangent bitangent normal matrix in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine(""));
 	fsh->AddTopLine(GLSLLine(R"(
 	struct DataBlob
@@ -422,8 +432,13 @@ void ShadingManager::PrepFragShader()
 		float d[32];
 	};
 	)"));
+	fsh->AddTopLine(GLSLLine("const float PI = 3.14159265359;"));
+	fsh->AddTopLine(GLSLLine("const float gamma = 2.2f;"));
+
 	fsh->AddUniform(GLSLUniform("_LightPosition", "vec3"));
 	fsh->AddUniform(GLSLUniform("_LightColor", "vec3"));
+	fsh->AddUniform(GLSLUniform("_LightStrength", "float"));
+	fsh->AddUniform(GLSLUniform("_CameraPos", "vec3"));
 	fsh->AddUniform(GLSLUniform("_HMapMinMax", "vec3"));
 	fsh->AddUniform(GLSLUniform("_TextureBake", "float", "0.0f"));
 	fsh->AddUniform(GLSLUniform("_Mode", "float", "0.0f"));
@@ -434,6 +449,12 @@ void ShadingManager::PrepFragShader()
 	fsh->AddSSBO(dataBlobs);
 	GLSLFunction main("main");
 	main.AddLine(GLSLLine("vec3 objectColor = vec3(1.0f);"));
+	main.AddLine(GLSLLine(""));
+	GLSLLine tmp("", "");
+	NodeInputParam param;
+	param.userData1 = &main;
+	param.userData2 = &tmp;
+	shaderNodeEditor->outputNode->Evaluate(param, nullptr);
 	main.AddLine(GLSLLine(""));
 	main.AddLine(GLSLLine(R"(
 	if(_TextureBake == 1.0f)
@@ -449,11 +470,6 @@ void ShadingManager::PrepFragShader()
 	}	
 	)"));
 	main.AddLine(GLSLLine(""));
-	GLSLLine tmp("", "");
-	NodeInputParam param;
-	param.userData1 = &main;
-	param.userData2 = &tmp;
-	shaderNodeEditor->outputNode->Evaluate(param, nullptr);
 	main.AddLine(GLSLLine("FragColor = vec4(" + tmp.line + ", 1.0f);"));
 	fsh->AddFunction(main);
 }

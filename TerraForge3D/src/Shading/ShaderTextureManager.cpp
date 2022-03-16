@@ -11,9 +11,10 @@ ShaderTextureManager::ShaderTextureManager()
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 
@@ -47,14 +48,22 @@ void ShaderTextureManager::Unregister(ShaderTextureNode* node)
 void ShaderTextureManager::UpdateShaders()
 {
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, 512, 512, textureNodes.size());
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB8, resolution, resolution, textureNodes.size(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
     for(int i = 0; i < textureNodes.size(); i++)
     {
-        textureNodes[i]->texture->Resize(512, 512);
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 512, 512, 1, GL_RGB, GL_UNSIGNED_BYTE, textureNodes[i]->texture->GetData());
+        textureNodes[i]->texture->Resize(resolution, resolution);
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, resolution, resolution, 1, GL_RGB, GL_UNSIGNED_BYTE, textureNodes[i]->texture->GetData());
     }
 
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+}
+
+void ShaderTextureManager::UploadToGPU(int id)
+{
+    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
+    textureNodes[id]->texture->Resize(resolution, resolution);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, id, resolution, resolution, 1, GL_RGB, GL_UNSIGNED_BYTE, textureNodes[id]->texture->GetData());
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 

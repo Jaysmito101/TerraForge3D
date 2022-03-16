@@ -15,6 +15,7 @@
 #define SHADER_OUTPUT_NODE_COLOR 152, 54, 12
 #define SHADER_VALUE_NODE_COLOR 144, 124, 255
 #define SHADER_TEXTURE_NODE_COLOR 145, 32, 123
+#define SHADER_MATERIAL_NODE_COLOR 251, 123, 144
 
 #define STR(x) std::to_string(x)
 #define VAR(x) std::string(x) + STR(id)

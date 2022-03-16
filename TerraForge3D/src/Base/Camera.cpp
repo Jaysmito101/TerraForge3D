@@ -93,7 +93,7 @@ void Camera::UpdateCamera(float xmax, float ymax)
 
 	if(perspective)
 	{
-		pers = glm::perspective(fov, aspect, cNear, cFar);
+		pers = glm::perspective(fov, fabs(aspect) < 100 ? fabs(aspect) : 1.0f, cNear, cFar);
 	}
 
 	else
