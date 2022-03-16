@@ -10,19 +10,19 @@ class ShaderTextureNode;
 class ShaderTextureManager
 {
 public:
-    ShaderTextureManager();
-    ~ShaderTextureManager();
+	ShaderTextureManager();
+	~ShaderTextureManager();
 
-    void Register(ShaderTextureNode* node);
-    void Unregister(ShaderTextureNode* node);
+	void Register(ShaderTextureNode *node);
+	void Unregister(ShaderTextureNode *node);
 
-    void UploadToGPU(int id);
-    void UpdateShaders();
+	void UploadToGPU(int id);
+	void UpdateShaders();
 
-    void Bind(uint32_t slot);
+	void Bind(uint32_t slot);
 
 public:
-    uint32_t resolution = 512;
-    uint32_t textureArray;
-    std::vector<ShaderTextureNode*> textureNodes;
+	uint32_t resolution = 512;
+	uint32_t textureArray;
+	std::vector<ShaderTextureNode *> textureNodes;
 };

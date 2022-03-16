@@ -29,11 +29,11 @@ enum SNEPinType
 	SNEPinType_Bool
 };
 
-static NodeInputParam GetParams(GLSLFunction* function, GLSLLine* line)
+static NodeInputParam GetParams(GLSLFunction *function, GLSLLine *line)
 {
 	NodeInputParam param;
-	param.userData1 = static_cast<void*>(function);
-	param.userData2 = static_cast<void*>(line);
+	param.userData1 = static_cast<void *>(function);
+	param.userData2 = static_cast<void *>(line);
 	return param;
 }
 
@@ -52,22 +52,22 @@ public:
 class SNENode : public NodeEditorNode
 {
 public:
-	SNENode(GLSLHandler* handler);
+	SNENode(GLSLHandler *handler);
 	~SNENode();
 
-	NodeOutput Evaluate(NodeInputParam input, NodeEditorPin* pin);
-	
-	virtual bool OnLink(NodeEditorPin* pin, NodeEditorLink* link);
+	NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin);
+
+	virtual bool OnLink(NodeEditorPin *pin, NodeEditorLink *link);
 
 	virtual void UpdateShaders() = 0;
 	virtual void OnRender() = 0;
-	virtual void OnEvaluate(GLSLFunction* function, GLSLLine* line) = 0;
+	virtual void OnEvaluate(GLSLFunction *function, GLSLLine *line) = 0;
 	virtual void Load(nlohmann::json data) = 0;
 	virtual nlohmann::json Save() = 0;
 
 public:
-	SharedMemoryItem* sharedData = nullptr;
+	SharedMemoryItem *sharedData = nullptr;
 	int dataBlobOffset = 0;
-	GLSLHandler* handler;
+	GLSLHandler *handler;
 };
 

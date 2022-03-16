@@ -2,14 +2,15 @@
 
 #include <iostream>
 
-void ShaderOutputNode::OnEvaluate(GLSLFunction* function, GLSLLine* line)
+void ShaderOutputNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 {
 	if (inputPins[0]->IsLinked())
 	{
 		GLSLLine ln("");
 		inputPins[0]->other->Evaluate(GetParams(function, &ln));
-		line->line = ln.line;	
+		line->line = ln.line;
 	}
+
 	else
 	{
 		function->AddLine(GLSLLine("vec3 " + VAR("norm") + " = normalize(Normal);"));
@@ -17,8 +18,7 @@ void ShaderOutputNode::OnEvaluate(GLSLFunction* function, GLSLLine* line)
 		function->AddLine(GLSLLine("float " + VAR("diff") + " = max(dot(" + VAR("norm") + ", " + VAR("lightDir") + "), 0.0f);"));
 		function->AddLine(GLSLLine("vec3 " + VAR("diffuse") + " = " + VAR("diff") + " * _LightColor;"));
 		function->AddLine(GLSLLine("vec3 " + VAR("result") + " = (vec3(0.2, 0.2, 0.2) + " + VAR("diffuse") + ")" + \
-			 " * vec3(" + SDATA(0) + ", " + SDATA(1) + ", " + SDATA(2) + ");"));
-
+		                           " * vec3(" + SDATA(0) + ", " + SDATA(1) + ", " + SDATA(2) + ");"));
 		line->line = VAR("result");
 	}
 }
@@ -63,13 +63,14 @@ void ShaderOutputNode::OnRender()
 			sharedData->d2 = color[2];
 		}
 	}
+
 	else
 	{
 		ImGui::Dummy(ImVec2(100, 40));
 	}
 }
 
-ShaderOutputNode::ShaderOutputNode(GLSLHandler* handler)
+ShaderOutputNode::ShaderOutputNode(GLSLHandler *handler)
 	:SNENode(handler)
 {
 	name = "Output";

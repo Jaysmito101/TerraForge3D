@@ -12,7 +12,7 @@ struct ApplicationState;
 
 struct DefaultCustomNode
 {
-	std::string name = "";		
+	std::string name = "";
 	std::string content = "";
 };
 

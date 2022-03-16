@@ -44,9 +44,9 @@ struct NodeInputParam
 	float maxY;
 	float maxZ;
 
-	void* userData1;
-	void* userData2;
-	void* userData3;
+	void *userData1;
+	void *userData2;
+	void *userData3;
 
 	NodeInputParam();
 	NodeInputParam(float *pos, float *texCoord, float *minPos, float *maxPos);

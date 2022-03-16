@@ -46,10 +46,10 @@ struct SharedMemoryItem
 	float d31 = 0;
 
 	// override [] operator for SharedMemoryItem
-	float& operator[](int i);
+	float &operator[](int i);
 };
 
-void SetSharedMemoryItem(SharedMemoryItem* mi, int i, float val);
+void SetSharedMemoryItem(SharedMemoryItem *mi, int i, float val);
 
 
 

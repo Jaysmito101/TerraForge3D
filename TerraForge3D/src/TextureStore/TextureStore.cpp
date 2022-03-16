@@ -98,6 +98,7 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 void TextureStore::VerifyTextureThumbs()
 {
 	MkDir(GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\");
+
 	for(auto it = textureDatabaseJ.begin() ; it != textureDatabaseJ.end() ; it++)
 	{
 		if(!FileExists(GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\" + it.key() + ".png"))

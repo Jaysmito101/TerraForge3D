@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void Float3Node::OnEvaluate(GLSLFunction* function, GLSLLine* line)
+void Float3Node::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 {
 	line->line = "vec3(" + SDATA(0) + ", " + SDATA(1) + ", " + SDATA(2) + ")";
 }
@@ -10,8 +10,8 @@ void Float3Node::OnEvaluate(GLSLFunction* function, GLSLLine* line)
 void Float3Node::Load(nlohmann::json data)
 {
 	x = data["x"];
-    y = data["y"];
-    z = data["z"];
+	y = data["y"];
+	z = data["z"];
 }
 
 nlohmann::json Float3Node::Save()
@@ -19,40 +19,45 @@ nlohmann::json Float3Node::Save()
 	nlohmann::json data;
 	data["type"] = "Float3";
 	data["x"] = x;
-    data["y"] = y;
-    data["z"] = z;
+	data["y"] = y;
+	data["z"] = z;
 	return data;
 }
 
 void Float3Node::UpdateShaders()
 {
-    sharedData->d0 = x;
-    sharedData->d1 = y;
-    sharedData->d2 = z;
+	sharedData->d0 = x;
+	sharedData->d1 = y;
+	sharedData->d2 = z;
 }
 
 void Float3Node::OnRender()
 {
 	DrawHeader("Float 3");
-    ImGui::PushItemWidth(100);
-    if(ImGui::DragFloat("X", &x, 0.01f))
-    {
-        sharedData->d0 = x;
-    }
-    ImGui::SameLine();
-    outputPins[0]->Render();
-    if(ImGui::DragFloat("Y", &y, 0.01f))
-    {
-        sharedData->d1 = y;
-    }
-    if(ImGui::DragFloat("Z", &z, 0.01f))
-    {
-        sharedData->d2 = z;
-    }
-    ImGui::PopItemWidth();
+	ImGui::PushItemWidth(100);
+
+	if(ImGui::DragFloat("X", &x, 0.01f))
+	{
+		sharedData->d0 = x;
+	}
+
+	ImGui::SameLine();
+	outputPins[0]->Render();
+
+	if(ImGui::DragFloat("Y", &y, 0.01f))
+	{
+		sharedData->d1 = y;
+	}
+
+	if(ImGui::DragFloat("Z", &z, 0.01f))
+	{
+		sharedData->d2 = z;
+	}
+
+	ImGui::PopItemWidth();
 }
 
-Float3Node::Float3Node(GLSLHandler* handler)
+Float3Node::Float3Node(GLSLHandler *handler)
 	:SNENode(handler)
 {
 	name = "Float 3";
