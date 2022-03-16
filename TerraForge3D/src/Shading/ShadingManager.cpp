@@ -2,12 +2,17 @@
 #include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
+#include "Platform.h"
 #include "imgui/imgui.h"
 
 #include "Shading/ShaderNodes/ShaderOutputNode.h"
 #include "Shading/ShaderNodes/ShaderTextureNode.h"
 #include "Shading/ShaderNodes/Float3Node.h"
 #include "Shading/ShaderNodes/PBRMaterialNode.h"
+#include "Shading/ShaderNodes/CustomShaderNode.h"
+
+#include <filesystem>
+namespace fs = std::filesystem;
 
 static char *stristr4(const char *str, const char *pattern)
 {
@@ -45,7 +50,7 @@ static char *stristr4(const char *str, const char *pattern)
 #define NODE_MAKER_SHOW(x, y, z) if (NODE_MAKER_COND(y)) {if (ImGui::Button((y + std::string("##SHADERNODEMAKER")).c_str())) { editor->AddNode(new x(handler)); z = z || true; ImGui::CloseCurrentPopup(); } }
 
 
-static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler* handler, ShaderTextureManager* shaderTextureManager)
+static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler* handler, ShaderTextureManager* shaderTextureManager, std::vector<DefaultCustomNode>& defaultCustomNodes)
 {
 	static char data[1000];
 	static bool didMake = false;
@@ -66,6 +71,34 @@ static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler* handler, ShaderTextur
 	}
 
 	NODE_MAKER_SHOW(PBRMaterialNode, "PBR Material", didMake);
+
+	for (auto& node : defaultCustomNodes)
+	{
+		if (NODE_MAKER_COND(node.name.data()))
+		{
+			if (ImGui::Button((node.name + std::string("##SHADERNODEMAKER")).c_str())) 
+			{
+				editor->AddNode(new CustomShaderNode(handler, node.content));
+				didMake = didMake || true; 
+				ImGui::CloseCurrentPopup(); 
+			}
+		}
+	}
+
+	if (NODE_MAKER_COND("Custom Shader"))
+	{
+		if (ImGui::Button(("Custom Shader" + std::string("##SHADERNODEMAKER")).c_str())) 
+		{
+			std::string path = ShowOpenFileDialog("*.json\0");
+			if(path.size() > 3)
+			{
+				bool tmp = false;
+				editor->AddNode(new CustomShaderNode(handler, ReadShaderSourceFile(path, &tmp)));
+				didMake = didMake || true; 
+				ImGui::CloseCurrentPopup(); 
+			}
+		}
+	}
 
 	ImGui::EndChild();
 
@@ -111,11 +144,18 @@ ShadingManager::ShadingManager(ApplicationState *as)
 		{
 			node = new PBRMaterialNode(fsh);
 		}
+		else if(data["type"] == "CustomShader")
+		{
+			node = new CustomShaderNode(fsh, data["shader"]);
+		}
 		return node;
 	};
+	config.saveFile = GetExecutableDir() + PATH_SEPERATOR + "Data" + PATH_SEPERATOR + "configs" + PATH_SEPERATOR + "ShaderNodes.json";
 	shaderNodeEditor = new NodeEditor(config);
 	shaderNodeEditor->name = "Shader Nodes";
 	shaderNodeEditor->SetOutputNode(new ShaderOutputNode(fsh));
+
+	LoadDefaultCustomNodes();
 
 	ReCompileShaders();
 }
@@ -143,6 +183,21 @@ void ShadingManager::UpdateShaders()
 
 	shaderTextureManager->Bind(7);
 	appState->shaders.terrain->SetUniformi("_Textures", 7);
+}
+
+void ShadingManager::LoadDefaultCustomNodes()
+{
+	std::string nodesDir = GetExecutableDir() + PATH_SEPERATOR + "Data" + PATH_SEPERATOR + "shader_nodes";
+	defaultCustomNodes.clear();
+	bool tmp = false;
+	for (const auto & entry : fs::directory_iterator(nodesDir))
+        {
+		DefaultCustomNode n;
+		n.name = entry.path().filename().string();
+		n.name = n.name.substr(0, n.name.find_last_of("."));
+		n.content = ReadShaderSourceFile(entry.path().string(), &tmp);
+		defaultCustomNodes.push_back(n);
+	}
 }
 
 void ShadingManager::ReCompileShaders()
@@ -286,9 +341,9 @@ void ShadingManager::ShowSettings(bool *pOpen)
 
 	if(ImGui::BeginPopup("NodeMakerDropped"))
 	{
-		if(ShowNodeMaker(shaderNodeEditor, fsh, shaderTextureManager))
+		if(ShowNodeMaker(shaderNodeEditor, fsh, shaderTextureManager, defaultCustomNodes))
 		{
-			// ReCompileShaders();
+			ReCompileShaders();
 		}
 
 		if (ImGui::Button("Close##ShaderNodeMaker"))

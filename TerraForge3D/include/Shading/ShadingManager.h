@@ -10,6 +10,12 @@ struct ApplicationState;
 #include "Shading/ShaderNodeEditor.h"
 #include "Shading/ShaderTextureManager.h"
 
+struct DefaultCustomNode
+{
+	std::string name = "";		
+	std::string content = "";
+};
+
 class ShadingManager
 {
 public:
@@ -27,6 +33,8 @@ private:
 
 	void ReCompileShaders();
 
+	void LoadDefaultCustomNodes();
+
 public:
 	ApplicationState *appState = nullptr;
 	GLSLHandler *vsh = nullptr;
@@ -41,4 +49,5 @@ public:
 	std::string fragmentSource = "";
 
 	std::vector<std::string> logs;
+	std::vector<DefaultCustomNode> defaultCustomNodes;
 };

@@ -1,0 +1,16 @@
+[META]
+{
+    "name": "Float 3 Multiply",
+    "description": "",
+    "fname": "float3Multiply",
+    "returns": "vec3",
+    "params": ["vec3:x", "vec3:y"],
+    "type": "method",
+    "color" : {"r":144, "g":74, "b":49},
+    "sharedData": { }
+}
+[/META]
+
+[CODE]
+return x * y;
+[/CODE]

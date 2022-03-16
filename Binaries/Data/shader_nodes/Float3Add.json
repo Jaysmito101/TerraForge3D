@@ -1,0 +1,19 @@
+[META]
+{
+    "name": "Float 3 Add",
+    "description": "",
+    "fname": "float3Add",
+    "returns": "vec3",
+    "params": ["vec3:x", "vec3:y"],
+    "type": "method",
+    "color" : {"r":144, "g":74, "b":49},
+    "sharedData": { 
+		"x Factor" : {"type":"float", "default":0.0}
+		"y Factor" : {"type":"float", "default":0.0}
+	}
+}
+[/META]
+
+[CODE]
+return x * data[{OFFSET}].d[0] + y * data[{OFFSET}].d[1];
+[/CODE]

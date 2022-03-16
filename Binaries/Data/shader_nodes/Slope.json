@@ -1,0 +1,37 @@
+[META]
+{
+    "name": "Slope",
+    "description": "Slope at that fragment",
+    "fname": "getSlope",
+# Valid Return types are : float, vec3
+    "returns": "float",
+# Params can be like ["type:name"] for example ["float:ab"]
+# Parmas can have data types : float, vec3
+    "params": [],
+    "color" : { "r" : 24, "g" : 13, "b" : 112},
+    "type": "method",
+    "sharedData": {
+# Valid data types are float, bool
+#        "Up X": { "type": "float", "default" : 0.0 },
+#        "Up Y": { "type": "float", "default" : 1.0 },
+#        "Up Z": { "type": "float", "default" : 0.0 }
+    }
+}
+[/META]
+
+[CODE]
+vec3 Up = vec3(0.0f, 1.0f, 0.0f);
+float slope = 0.0f;
+slope = acos(dot(Normal, Up) / (length(Normal) * length(Up)));
+return slope;
+[/CODE]
+
+# This will be transformed into : 
+#
+#  float getSlope()
+#  {
+#     vec3 Up = vec3(0.0f, 1.0f, 0.0f);
+#     float slope = 0.0f;
+#     slope = acos(dot(Normal, Up) / (length(Normal) * length(Up)));
+#     return slope;
+#  }

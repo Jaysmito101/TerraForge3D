@@ -1,0 +1,23 @@
+[META]
+{
+    "name": "Float 3 Combine",
+    "description": "Combind 3 floats to a Float3",
+    "fname": "float3Combine",
+    "returns": "vec3",
+    "params": ["float:x", "float:y", "float:z"],
+    "type": "method",
+    "color" : { "r" : 122, "g" : 132, "b" : 122},
+    "sharedData": {  }
+}
+[/META]
+
+[CODE]
+return vec3(x, y, z);
+[/CODE]
+
+# This will be transformed into : 
+#
+#  float float3Combine(float x, float y, float z)
+#  {
+#     return vec3(x, y, z);
+#  }
