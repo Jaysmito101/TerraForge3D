@@ -131,15 +131,16 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_a3d42ffa857
 <p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00098">98</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   99</span>{</div>
 <div class="line"><span class="lineno">  100</span>    MkDir(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span>);</div>
-<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7.html#a23b495b4c282e4afacf382f5b49af7c7">begin</a>() ; it != textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">end</a>() ; it++)</div>
-<div class="line"><span class="lineno">  102</span>    {</div>
-<div class="line"><span class="lineno">  103</span>        <span class="keywordflow">if</span>(!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + it.key() + <span class="stringliteral">&quot;.png&quot;</span>))</div>
-<div class="line"><span class="lineno">  104</span>        {</div>
-<div class="line"><span class="lineno">  105</span>            Log(<span class="stringliteral">&quot;Downloading thumbnail for texture: &quot;</span> + it.key());</div>
-<div class="line"><span class="lineno">  106</span>            DownloadFile(<span class="stringliteral">&quot;https://cdn.polyhaven.com&quot;</span>, <span class="stringliteral">&quot;/asset_img/thumbs/&quot;</span> + it.key() + <span class="stringliteral">&quot;.png?width=100&amp;height=100&quot;</span>, GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + it.key() + <span class="stringliteral">&quot;.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  107</span>        }</div>
-<div class="line"><span class="lineno">  108</span>    }</div>
-<div class="line"><span class="lineno">  109</span>}</div>
+<div class="line"><span class="lineno">  101</span> </div>
+<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7.html#a23b495b4c282e4afacf382f5b49af7c7">begin</a>() ; it != textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">end</a>() ; it++)</div>
+<div class="line"><span class="lineno">  103</span>    {</div>
+<div class="line"><span class="lineno">  104</span>        <span class="keywordflow">if</span>(!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + it.key() + <span class="stringliteral">&quot;.png&quot;</span>))</div>
+<div class="line"><span class="lineno">  105</span>        {</div>
+<div class="line"><span class="lineno">  106</span>            Log(<span class="stringliteral">&quot;Downloading thumbnail for texture: &quot;</span> + it.key());</div>
+<div class="line"><span class="lineno">  107</span>            DownloadFile(<span class="stringliteral">&quot;https://cdn.polyhaven.com&quot;</span>, <span class="stringliteral">&quot;/asset_img/thumbs/&quot;</span> + it.key() + <span class="stringliteral">&quot;.png?width=100&amp;height=100&quot;</span>, GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + it.key() + <span class="stringliteral">&quot;.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  108</span>        }</div>
+<div class="line"><span class="lineno">  109</span>    }</div>
+<div class="line"><span class="lineno">  110</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7_html_a23b495b4c282e4afacf382f5b49af7c7"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7.html#a23b495b4c282e4afacf382f5b49af7c7">nlohmann::basic_json::begin</a></div><div class="ttdeci">iterator begin() noexcept</div><div class="ttdoc">returns an iterator to the first element</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22377">json.hpp:22377</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc_html_a931267ec3f09eb67e4382f321b2c52bc"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">nlohmann::basic_json::end</a></div><div class="ttdeci">iterator end() noexcept</div><div class="ttdoc">returns an iterator to one past the last element</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22448">json.hpp:22448</a></div></div>
 </div><!-- fragment -->
@@ -151,7 +152,7 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_a3d42ffa857
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d8a/class_texture_store.html">TextureStore</a></li>
-    <li class="footer">Generated on Wed Mar 16 2022 12:42:17 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 19:47:08 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

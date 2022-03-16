@@ -128,79 +128,79 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_adab3b3ec
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00344">344</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  345</span>{</div>
-<div class="line"><span class="lineno">  346</span>    gsh-&gt;Clear();</div>
-<div class="line"><span class="lineno">  347</span> </div>
-<div class="line"><span class="lineno">  348</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;layout(triangles) in;&quot;</span>, <span class="stringliteral">&quot;Take 3 vertices of a triangles as input&quot;</span>));</div>
-<div class="line"><span class="lineno">  349</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;layout(triangle_strip, max_vertices = 3) out;&quot;</span>));</div>
-<div class="line"><span class="lineno">  350</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;The data passed in from the vertex shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  351</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
-<div class="line"><span class="lineno">  352</span><span class="stringliteral">in DATA</span></div>
-<div class="line"><span class="lineno">  353</span><span class="stringliteral">{</span></div>
-<div class="line"><span class="lineno">  354</span><span class="stringliteral">    float height;</span></div>
-<div class="line"><span class="lineno">  355</span><span class="stringliteral">    vec3 FragPos;</span></div>
-<div class="line"><span class="lineno">  356</span><span class="stringliteral">    vec3 Normal;</span></div>
-<div class="line"><span class="lineno">  357</span><span class="stringliteral">    vec2 TexCoord;</span></div>
-<div class="line"><span class="lineno">  358</span><span class="stringliteral">} data_in[];</span></div>
-<div class="line"><span class="lineno">  359</span><span class="stringliteral">)&quot;));</span></div>
-<div class="line"><span class="lineno">  360</span><span class="stringliteral">    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(</span><span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  361</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out float height;&quot;</span>, <span class="stringliteral">&quot;Pass the height to the fragment shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  362</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec4 FragPos;&quot;</span>, <span class="stringliteral">&quot;Pass the position to the fragment shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  363</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec3 Normal;&quot;</span>, <span class="stringliteral">&quot;Pass the normal to the fragment shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  364</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec2 TexCoord;&quot;</span>, <span class="stringliteral">&quot;Pass the texture coordinates to the fragment shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  365</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out mat3 TBN;&quot;</span>, <span class="stringliteral">&quot;Pass the Tangent Bitangent Normal matrix to the fragment shader&quot;</span>));</div>
-<div class="line"><span class="lineno">  366</span> </div>
-<div class="line"><span class="lineno">  367</span>    gsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_PV&quot;</span>, <span class="stringliteral">&quot;mat4&quot;</span>));</div>
-<div class="line"><span class="lineno">  368</span>    gsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_FlatShade&quot;</span>, <span class="stringliteral">&quot;float&quot;</span>));</div>
-<div class="line"><span class="lineno">  369</span>    </div>
-<div class="line"><span class="lineno">  370</span>    <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> main(<span class="stringliteral">&quot;main&quot;</span>);</div>
-<div class="line"><span class="lineno">  371</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 a  = (_PV * gl_in[0].gl_Position).xyz;&quot;</span>, <span class="stringliteral">&quot;Vertex a of triangle&quot;</span>));</div>
-<div class="line"><span class="lineno">  372</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 b  = (_PV * gl_in[1].gl_Position).xyz;&quot;</span>, <span class="stringliteral">&quot;Vertex b of triangle&quot;</span>));</div>
-<div class="line"><span class="lineno">  373</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 c  = (_PV * gl_in[2].gl_Position).xyz;&quot;</span>, <span class="stringliteral">&quot;Vertex c of triangle&quot;</span>));</div>
-<div class="line"><span class="lineno">  374</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  375</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 edge0 = b - c;&quot;</span>));</div>
-<div class="line"><span class="lineno">  376</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 edge1 = c - a;&quot;</span>));</div>
-<div class="line"><span class="lineno">  377</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  378</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec2 deltaUV0 = data_in[1].TexCoord - data_in[0].TexCoord;&quot;</span>));</div>
-<div class="line"><span class="lineno">  379</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec2 deltaUV1 = data_in[2].TexCoord - data_in[0].TexCoord;&quot;</span>));</div>
-<div class="line"><span class="lineno">  380</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  381</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float invDet = 1.0f / (deltaUV0.x * deltaUV1.y - deltaUV1.x * deltaUV0.y);&quot;</span>, <span class="stringliteral">&quot;One over the determinant&quot;</span>));</div>
-<div class="line"><span class="lineno">  382</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  383</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 tangent = vec3(invDet * (deltaUV1.y * edge0 - deltaUV0.y * edge1));&quot;</span>));</div>
-<div class="line"><span class="lineno">  384</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 bitangent = vec3(invDet * (-deltaUV1.x * edge0 + deltaUV0.x * edge1));&quot;</span>));</div>
-<div class="line"><span class="lineno">  385</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;mat4 model = mat4(1);&quot;</span>, <span class="stringliteral">&quot;A default model matrix&quot;</span>));</div>
-<div class="line"><span class="lineno">  386</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  387</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));&quot;</span>));</div>
-<div class="line"><span class="lineno">  388</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));&quot;</span>));</div>
-<div class="line"><span class="lineno">  389</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 N = normalize(vec3(model * vec4(-1.0f*cross(edge1, edge0), 0.0f)));&quot;</span>));</div>
-<div class="line"><span class="lineno">  390</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  391</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;TBN = mat3(T, B, N);&quot;</span>));</div>
-<div class="line"><span class="lineno">  392</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  393</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 n = normalize(cross(edge1, edge0));&quot;</span>, <span class="stringliteral">&quot;Calculate face normal for flat shading&quot;</span>));</div>
-<div class="line"><span class="lineno">  394</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
-<div class="line"><span class="lineno">  395</span> </div>
-<div class="line"><span class="lineno">  396</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;3;i++)</div>
-<div class="line"><span class="lineno">  397</span>    {</div>
-<div class="line"><span class="lineno">  398</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;gl_Position = _PV * gl_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].gl_Position;&quot;</span>));</div>
-<div class="line"><span class="lineno">  399</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;height = data_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].height;&quot;</span>));</div>
-<div class="line"><span class="lineno">  400</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;TexCoord = data_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].TexCoord;&quot;</span>));</div>
-<div class="line"><span class="lineno">  401</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;FragPos = vec4(data_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].FragPos, 1.0f);&quot;</span>));</div>
-<div class="line"><span class="lineno">  402</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
-<div class="line"><span class="lineno">  403</span><span class="stringliteral">        if(_FlatShade &gt; 0.5f)</span></div>
-<div class="line"><span class="lineno">  404</span><span class="stringliteral">            Normal = n;</span></div>
-<div class="line"><span class="lineno">  405</span><span class="stringliteral">        else</span></div>
-<div class="line"><span class="lineno">  406</span><span class="stringliteral">            Normal = data_in[)&quot; + std::to_string(i) + R</span><span class="stringliteral">&quot;(].Normal;</span></div>
-<div class="line"><span class="lineno">  407</span><span class="stringliteral">        )&quot;));</span></div>
-<div class="line"><span class="lineno">  408</span><span class="stringliteral">    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(</span><span class="stringliteral">&quot;EmitVertex();&quot;</span>, <span class="stringliteral">&quot;Emit the vertex&quot;</span>));</div>
-<div class="line"><span class="lineno">  409</span>}</div>
-<div class="line"><span class="lineno">  410</span> </div>
-<div class="line"><span class="lineno">  411</span>main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;EndPrimitive();&quot;</span>, <span class="stringliteral">&quot;Emit the triangle&quot;</span>));</div>
-<div class="line"><span class="lineno">  412</span> </div>
-<div class="line"><span class="lineno">  413</span> </div>
-<div class="line"><span class="lineno">  414</span>gsh-&gt;AddFunction(main);</div>
-<div class="line"><span class="lineno">  415</span> </div>
-<div class="line"><span class="lineno">  416</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00396">396</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  397</span>{</div>
+<div class="line"><span class="lineno">  398</span>    gsh-&gt;Clear();</div>
+<div class="line"><span class="lineno">  399</span> </div>
+<div class="line"><span class="lineno">  400</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;layout(triangles) in;&quot;</span>, <span class="stringliteral">&quot;Take 3 vertices of a triangles as input&quot;</span>));</div>
+<div class="line"><span class="lineno">  401</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;layout(triangle_strip, max_vertices = 3) out;&quot;</span>));</div>
+<div class="line"><span class="lineno">  402</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;The data passed in from the vertex shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  403</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
+<div class="line"><span class="lineno">  404</span><span class="stringliteral">in DATA</span></div>
+<div class="line"><span class="lineno">  405</span><span class="stringliteral">{</span></div>
+<div class="line"><span class="lineno">  406</span><span class="stringliteral">    float height;</span></div>
+<div class="line"><span class="lineno">  407</span><span class="stringliteral">    vec3 FragPos;</span></div>
+<div class="line"><span class="lineno">  408</span><span class="stringliteral">    vec3 Normal;</span></div>
+<div class="line"><span class="lineno">  409</span><span class="stringliteral">    vec2 TexCoord;</span></div>
+<div class="line"><span class="lineno">  410</span><span class="stringliteral">} data_in[];</span></div>
+<div class="line"><span class="lineno">  411</span><span class="stringliteral">)&quot;));</span></div>
+<div class="line"><span class="lineno">  412</span><span class="stringliteral">    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(</span><span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  413</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out float height;&quot;</span>, <span class="stringliteral">&quot;Pass the height to the fragment shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  414</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec4 FragPos;&quot;</span>, <span class="stringliteral">&quot;Pass the position to the fragment shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  415</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec3 Normal;&quot;</span>, <span class="stringliteral">&quot;Pass the normal to the fragment shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  416</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out vec2 TexCoord;&quot;</span>, <span class="stringliteral">&quot;Pass the texture coordinates to the fragment shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  417</span>    gsh-&gt;AddTopLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;out mat3 TBN;&quot;</span>, <span class="stringliteral">&quot;Pass the Tangent Bitangent Normal matrix to the fragment shader&quot;</span>));</div>
+<div class="line"><span class="lineno">  418</span> </div>
+<div class="line"><span class="lineno">  419</span>    gsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_PV&quot;</span>, <span class="stringliteral">&quot;mat4&quot;</span>));</div>
+<div class="line"><span class="lineno">  420</span>    gsh-&gt;AddUniform(<a class="code hl_struct" href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a>(<span class="stringliteral">&quot;_FlatShade&quot;</span>, <span class="stringliteral">&quot;float&quot;</span>));</div>
+<div class="line"><span class="lineno">  421</span>    </div>
+<div class="line"><span class="lineno">  422</span>    <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> main(<span class="stringliteral">&quot;main&quot;</span>);</div>
+<div class="line"><span class="lineno">  423</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 a  = (_PV * gl_in[0].gl_Position).xyz;&quot;</span>, <span class="stringliteral">&quot;Vertex a of triangle&quot;</span>));</div>
+<div class="line"><span class="lineno">  424</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 b  = (_PV * gl_in[1].gl_Position).xyz;&quot;</span>, <span class="stringliteral">&quot;Vertex b of triangle&quot;</span>));</div>
+<div class="line"><span class="lineno">  425</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 c  = (_PV * gl_in[2].gl_Position).xyz;&quot;</span>, <span class="stringliteral">&quot;Vertex c of triangle&quot;</span>));</div>
+<div class="line"><span class="lineno">  426</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  427</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 edge0 = b - c;&quot;</span>));</div>
+<div class="line"><span class="lineno">  428</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 edge1 = c - a;&quot;</span>));</div>
+<div class="line"><span class="lineno">  429</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  430</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec2 deltaUV0 = data_in[1].TexCoord - data_in[0].TexCoord;&quot;</span>));</div>
+<div class="line"><span class="lineno">  431</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec2 deltaUV1 = data_in[2].TexCoord - data_in[0].TexCoord;&quot;</span>));</div>
+<div class="line"><span class="lineno">  432</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  433</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float invDet = 1.0f / (deltaUV0.x * deltaUV1.y - deltaUV1.x * deltaUV0.y);&quot;</span>, <span class="stringliteral">&quot;One over the determinant&quot;</span>));</div>
+<div class="line"><span class="lineno">  434</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  435</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 tangent = vec3(invDet * (deltaUV1.y * edge0 - deltaUV0.y * edge1));&quot;</span>));</div>
+<div class="line"><span class="lineno">  436</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 bitangent = vec3(invDet * (-deltaUV1.x * edge0 + deltaUV0.x * edge1));&quot;</span>));</div>
+<div class="line"><span class="lineno">  437</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;mat4 model = mat4(1);&quot;</span>, <span class="stringliteral">&quot;A default model matrix&quot;</span>));</div>
+<div class="line"><span class="lineno">  438</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  439</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));&quot;</span>));</div>
+<div class="line"><span class="lineno">  440</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));&quot;</span>));</div>
+<div class="line"><span class="lineno">  441</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 N = normalize(vec3(model * vec4(-1.0f*cross(edge1, edge0), 0.0f)));&quot;</span>));</div>
+<div class="line"><span class="lineno">  442</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  443</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;TBN = mat3(T, B, N);&quot;</span>));</div>
+<div class="line"><span class="lineno">  444</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  445</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 n = normalize(cross(edge1, edge0));&quot;</span>, <span class="stringliteral">&quot;Calculate face normal for flat shading&quot;</span>));</div>
+<div class="line"><span class="lineno">  446</span>    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;&quot;</span>));</div>
+<div class="line"><span class="lineno">  447</span> </div>
+<div class="line"><span class="lineno">  448</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;3;i++)</div>
+<div class="line"><span class="lineno">  449</span>    {</div>
+<div class="line"><span class="lineno">  450</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;gl_Position = _PV * gl_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].gl_Position;&quot;</span>));</div>
+<div class="line"><span class="lineno">  451</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;height = data_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].height;&quot;</span>));</div>
+<div class="line"><span class="lineno">  452</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;TexCoord = data_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].TexCoord;&quot;</span>));</div>
+<div class="line"><span class="lineno">  453</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;FragPos = vec4(data_in[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;].FragPos, 1.0f);&quot;</span>));</div>
+<div class="line"><span class="lineno">  454</span>        main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(R<span class="stringliteral">&quot;(</span></div>
+<div class="line"><span class="lineno">  455</span><span class="stringliteral">        if(_FlatShade &gt; 0.5f)</span></div>
+<div class="line"><span class="lineno">  456</span><span class="stringliteral">            Normal = n;</span></div>
+<div class="line"><span class="lineno">  457</span><span class="stringliteral">        else</span></div>
+<div class="line"><span class="lineno">  458</span><span class="stringliteral">            Normal = data_in[)&quot; + std::to_string(i) + R</span><span class="stringliteral">&quot;(].Normal;</span></div>
+<div class="line"><span class="lineno">  459</span><span class="stringliteral">        )&quot;));</span></div>
+<div class="line"><span class="lineno">  460</span><span class="stringliteral">    main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(</span><span class="stringliteral">&quot;EmitVertex();&quot;</span>, <span class="stringliteral">&quot;Emit the vertex&quot;</span>));</div>
+<div class="line"><span class="lineno">  461</span>}</div>
+<div class="line"><span class="lineno">  462</span> </div>
+<div class="line"><span class="lineno">  463</span>main.AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;EndPrimitive();&quot;</span>, <span class="stringliteral">&quot;Emit the triangle&quot;</span>));</div>
+<div class="line"><span class="lineno">  464</span> </div>
+<div class="line"><span class="lineno">  465</span> </div>
+<div class="line"><span class="lineno">  466</span>gsh-&gt;AddFunction(main);</div>
+<div class="line"><span class="lineno">  467</span> </div>
+<div class="line"><span class="lineno">  468</span>}</div>
 <div class="ttc" id="astruct_g_l_s_l_function_html"><div class="ttname"><a href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00058">GLSLHandler.h:59</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_uniform_html"><div class="ttname"><a href="../../dd/d69/struct_g_l_s_l_uniform.html">GLSLUniform</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00007">GLSLHandler.h:8</a></div></div>
@@ -213,7 +213,7 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_adab3b3ec
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../de/d7d/class_shading_manager.html">ShadingManager</a></li>
-    <li class="footer">Generated on Wed Mar 16 2022 12:42:16 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 19:47:08 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

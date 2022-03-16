@@ -29,6 +29,7 @@ var hierarchy =
     [ "CPUNodeEditor", "d5/dcc/class_c_p_u_node_editor.html", null ],
     [ "CPUNoiseLayersGenerator", "d8/d4a/class_c_p_u_noise_layers_generator.html", null ],
     [ "CubeMapManager", "da/d98/class_cube_map_manager.html", null ],
+    [ "DefaultCustomNode", "d3/d89/struct_default_custom_node.html", null ],
     [ "Filter", "d2/d70/class_filter.html", [
       [ "AdvancedErosionFilter", "d5/deb/class_advanced_erosion_filter.html", null ],
       [ "DrawFilter", "d5/dd6/class_draw_filter.html", null ],
@@ -189,6 +190,7 @@ var hierarchy =
       [ "PixelateNode", "dc/d9e/class_pixelate_node.html", null ],
       [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
       [ "SNENode", "df/d7c/class_s_n_e_node.html", [
+        [ "CustomShaderNode", "db/da0/class_custom_shader_node.html", null ],
         [ "Float3Node", "d9/d1c/class_float3_node.html", null ],
         [ "PBRMaterialNode", "d3/da4/class_p_b_r_material_node.html", null ],
         [ "ShaderOutputNode", "d1/db6/class_shader_output_node.html", null ],

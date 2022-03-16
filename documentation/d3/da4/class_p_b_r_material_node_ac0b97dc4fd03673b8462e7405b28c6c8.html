@@ -130,47 +130,40 @@ $(document).ready(function(){initNavTree('d3/da4/class_p_b_r_material_node_ac0b9
 
 <p>Implements <a class="el" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d8/d32/_p_b_r_material_node_8cpp_source.html#l00186">186</a> of file <a class="el" href="../../d8/d32/_p_b_r_material_node_8cpp_source.html">PBRMaterialNode.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  187</span>{</div>
-<div class="line"><span class="lineno">  188</span>    DrawHeader(<span class="stringliteral">&quot;PBR Material&quot;</span>);</div>
-<div class="line"><span class="lineno">  189</span> </div>
+<p class="definition">Definition at line <a class="el" href="../../d8/d32/_p_b_r_material_node_8cpp_source.html#l00187">187</a> of file <a class="el" href="../../d8/d32/_p_b_r_material_node_8cpp_source.html">PBRMaterialNode.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  188</span>{</div>
+<div class="line"><span class="lineno">  189</span>    DrawHeader(<span class="stringliteral">&quot;PBR Material&quot;</span>);</div>
 <div class="line"><span class="lineno">  190</span>    inputPins[0]-&gt;Render();</div>
 <div class="line"><span class="lineno">  191</span>    ImGui::SameLine();</div>
 <div class="line"><span class="lineno">  192</span>    ImGui::Text(<span class="stringliteral">&quot;Albedo&quot;</span>);</div>
 <div class="line"><span class="lineno">  193</span>    ImGui::SameLine();</div>
 <div class="line"><span class="lineno">  194</span>    outputPins[0]-&gt;Render();</div>
-<div class="line"><span class="lineno">  195</span> </div>
-<div class="line"><span class="lineno">  196</span>    inputPins[1]-&gt;Render();</div>
-<div class="line"><span class="lineno">  197</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  198</span>    ImGui::Text(<span class="stringliteral">&quot;Normal&quot;</span>);</div>
-<div class="line"><span class="lineno">  199</span> </div>
-<div class="line"><span class="lineno">  200</span>    inputPins[2]-&gt;Render();</div>
-<div class="line"><span class="lineno">  201</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  202</span>    ImGui::Text(<span class="stringliteral">&quot;Metallic&quot;</span>);</div>
-<div class="line"><span class="lineno">  203</span> </div>
-<div class="line"><span class="lineno">  204</span>    inputPins[3]-&gt;Render();</div>
+<div class="line"><span class="lineno">  195</span>    inputPins[1]-&gt;Render();</div>
+<div class="line"><span class="lineno">  196</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  197</span>    ImGui::Text(<span class="stringliteral">&quot;Normal&quot;</span>);</div>
+<div class="line"><span class="lineno">  198</span>    inputPins[2]-&gt;Render();</div>
+<div class="line"><span class="lineno">  199</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  200</span>    ImGui::Text(<span class="stringliteral">&quot;Metallic&quot;</span>);</div>
+<div class="line"><span class="lineno">  201</span>    inputPins[3]-&gt;Render();</div>
+<div class="line"><span class="lineno">  202</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  203</span>    ImGui::Text(<span class="stringliteral">&quot;Roughness&quot;</span>);</div>
+<div class="line"><span class="lineno">  204</span>    inputPins[4]-&gt;Render();</div>
 <div class="line"><span class="lineno">  205</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  206</span>    ImGui::Text(<span class="stringliteral">&quot;Roughness&quot;</span>);</div>
-<div class="line"><span class="lineno">  207</span> </div>
-<div class="line"><span class="lineno">  208</span>    inputPins[4]-&gt;Render();</div>
-<div class="line"><span class="lineno">  209</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  210</span>    ImGui::Text(<span class="stringliteral">&quot;AO&quot;</span>);</div>
-<div class="line"><span class="lineno">  211</span> </div>
-<div class="line"><span class="lineno">  212</span>    inputPins[5]-&gt;Render();</div>
-<div class="line"><span class="lineno">  213</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  214</span>    ImGui::Text(<span class="stringliteral">&quot;ARM&quot;</span>);</div>
+<div class="line"><span class="lineno">  206</span>    ImGui::Text(<span class="stringliteral">&quot;AO&quot;</span>);</div>
+<div class="line"><span class="lineno">  207</span>    inputPins[5]-&gt;Render();</div>
+<div class="line"><span class="lineno">  208</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  209</span>    ImGui::Text(<span class="stringliteral">&quot;ARM&quot;</span>);</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>    <span class="keywordflow">if</span> (ImGui::Checkbox(<span class="stringliteral">&quot;Gamma Correction&quot;</span>, &amp;gammaCorrection))</div>
+<div class="line"><span class="lineno">  212</span>    {</div>
+<div class="line"><span class="lineno">  213</span>        sharedData-&gt;d0 = gammaCorrection ? 1.0f : 0.0f;</div>
+<div class="line"><span class="lineno">  214</span>    }</div>
 <div class="line"><span class="lineno">  215</span> </div>
-<div class="line"><span class="lineno">  216</span> </div>
-<div class="line"><span class="lineno">  217</span>    <span class="keywordflow">if</span> (ImGui::Checkbox(<span class="stringliteral">&quot;Gamma Correction&quot;</span>, &amp;gammaCorrection))</div>
-<div class="line"><span class="lineno">  218</span>    {</div>
-<div class="line"><span class="lineno">  219</span>        sharedData-&gt;d0 = gammaCorrection ? 1.0f : 0.0f;</div>
-<div class="line"><span class="lineno">  220</span>    }</div>
-<div class="line"><span class="lineno">  221</span> </div>
-<div class="line"><span class="lineno">  222</span>    <span class="keywordflow">if</span> (ImGui::Checkbox(<span class="stringliteral">&quot;HDR Tonemapping&quot;</span>, &amp;hdrTonemapping))</div>
-<div class="line"><span class="lineno">  223</span>    {</div>
-<div class="line"><span class="lineno">  224</span>        sharedData-&gt;d1 = hdrTonemapping ? 1.0f : 0.0f;</div>
-<div class="line"><span class="lineno">  225</span>    }</div>
-<div class="line"><span class="lineno">  226</span>}</div>
+<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">if</span> (ImGui::Checkbox(<span class="stringliteral">&quot;HDR Tonemapping&quot;</span>, &amp;hdrTonemapping))</div>
+<div class="line"><span class="lineno">  217</span>    {</div>
+<div class="line"><span class="lineno">  218</span>        sharedData-&gt;d1 = hdrTonemapping ? 1.0f : 0.0f;</div>
+<div class="line"><span class="lineno">  219</span>    }</div>
+<div class="line"><span class="lineno">  220</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -180,7 +173,7 @@ $(document).ready(function(){initNavTree('d3/da4/class_p_b_r_material_node_ac0b9
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d3/da4/class_p_b_r_material_node.html">PBRMaterialNode</a></li>
-    <li class="footer">Generated on Wed Mar 16 2022 12:42:16 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 19:47:07 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

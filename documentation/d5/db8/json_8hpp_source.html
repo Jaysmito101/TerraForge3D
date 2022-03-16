@@ -4603,7 +4603,7 @@ $(document).ready(function(){initNavTree('d5/db8/json_8hpp_source.html','../../'
 <div class="line"><a id="l04887" name="l04887"></a><span class="lineno"> 4887</span>}</div>
 <div class="line"><a id="l04888" name="l04888"></a><span class="lineno"> 4888</span> </div>
 <div class="line"><a id="l04889" name="l04889"></a><span class="lineno"> 4889</span><span class="keyword">template</span> &lt; <span class="keyword">typename</span> BasicJsonType, <span class="keyword">typename</span> CompatibleObjectType,</div>
-<div class="line"><a id="l04890" name="l04890"></a><span class="lineno"> 4890</span>           enable_if_t &lt; is_compatible_object_type&lt;BasicJsonType, CompatibleObjectType&gt;::value &amp;&amp; !is_basic_json&lt;CompatibleObjectType&gt;::value, <span class="keywordtype">int</span> &gt; = 0 &gt;</div>
+<div class="line"><a id="l04890" name="l04890"></a><span class="lineno"> 4890</span>           enable_if_t &lt; is_compatible_object_type&lt;BasicJsonType, CompatibleObjectType&gt;::value&amp;&amp; !is_basic_json&lt;CompatibleObjectType&gt;::value, <span class="keywordtype">int</span> &gt; = 0 &gt;</div>
 <div class="line"><a id="l04891" name="l04891"></a><span class="lineno"> 4891</span><span class="keywordtype">void</span> to_json(BasicJsonType &amp;j, <span class="keyword">const</span> CompatibleObjectType &amp;obj)</div>
 <div class="line"><a id="l04892" name="l04892"></a><span class="lineno"> 4892</span>{</div>
 <div class="line"><a id="l04893" name="l04893"></a><span class="lineno"> 4893</span>    external_constructor&lt;value_t::object&gt;::construct(j, obj);</div>
@@ -16527,7 +16527,7 @@ $(document).ready(function(){initNavTree('d5/db8/json_8hpp_source.html','../../'
 <div class="line"><a id="l19268" name="l19268"></a><span class="lineno">19268</span> </div>
 <div class="line"><a id="l19295" name="l19295"></a><span class="lineno">19295</span>    <span class="keyword">template</span> &lt; <span class="keyword">typename</span> BasicJsonType,</div>
 <div class="line"><a id="l19296" name="l19296"></a><span class="lineno">19296</span>               detail::enable_if_t &lt;</div>
-<div class="line"><a id="l19297" name="l19297"></a><span class="lineno">19297</span>                   <a class="code hl_struct" href="../../d4/df6/structnlohmann_1_1detail_1_1is__basic__json.html">detail::is_basic_json&lt;BasicJsonType&gt;::value</a> &amp;&amp; !std::is_same&lt;basic_json, BasicJsonType&gt;::value, <span class="keywordtype">int</span> &gt; = 0 &gt;</div>
+<div class="line"><a id="l19297" name="l19297"></a><span class="lineno">19297</span>                   <a class="code hl_struct" href="../../d4/df6/structnlohmann_1_1detail_1_1is__basic__json.html">detail::is_basic_json&lt;BasicJsonType&gt;::value</a>&amp;&amp; !std::is_same&lt;basic_json, BasicJsonType&gt;::value, <span class="keywordtype">int</span> &gt; = 0 &gt;</div>
 <div class="line"><a id="l19298" name="l19298"></a><span class="lineno"><a class="line" href="../../d9/dcc/classnlohmann_1_1basic__json_a40738eb9cb8c5a9ca14ae4b697c29f8e.html#a40738eb9cb8c5a9ca14ae4b697c29f8e">19298</a></span>    <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a40738eb9cb8c5a9ca14ae4b697c29f8e.html#a40738eb9cb8c5a9ca14ae4b697c29f8e">basic_json</a>(<span class="keyword">const</span> BasicJsonType &amp;val)</div>
 <div class="line"><a id="l19299" name="l19299"></a><span class="lineno">19299</span>    {</div>
 <div class="line"><a id="l19300" name="l19300"></a><span class="lineno">19300</span>        <span class="keyword">using</span> other_boolean_t = <span class="keyword">typename</span> BasicJsonType::boolean_t;</div>
@@ -20657,7 +20657,7 @@ $(document).ready(function(){initNavTree('d5/db8/json_8hpp_source.html','../../'
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f91755bd714974cebdea8f52266e36fd.html">include</a></li><li class="navelem"><a class="el" href="../../dir_94fc3ba8ef563541333bc38d3f3a045b.html">Base</a></li><li class="navelem"><b>json.hpp</b></li>
-    <li class="footer">Generated on Wed Mar 16 2022 12:42:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 19:47:05 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

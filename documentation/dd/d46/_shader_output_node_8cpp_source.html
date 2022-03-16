@@ -112,23 +112,23 @@ $(document).ready(function(){initNavTree('dd/d46/_shader_output_node_8cpp_source
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keywordtype">void</span> ShaderOutputNode::OnEvaluate(<a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a>* function, <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>* line)</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keywordtype">void</span> ShaderOutputNode::OnEvaluate(<a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> *function, <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> *line)</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>{</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>    <span class="keywordflow">if</span> (inputPins[0]-&gt;IsLinked())</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    {</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>        <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> ln(<span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>        inputPins[0]-&gt;other-&gt;Evaluate(GetParams(function, &amp;ln));</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        line-&gt;line = ln.line;   </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        line-&gt;line = ln.line;</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    }</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    {</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot; = normalize(Normal);&quot;</span>));</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot; = normalize(_LightPosition - FragPos.xyz );&quot;</span>));</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; = max(dot(&quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot;, &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot;), 0.0f);&quot;</span>));</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot; = &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; * _LightColor;&quot;</span>));</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;result&quot;</span>) + <span class="stringliteral">&quot; = (vec3(0.2, 0.2, 0.2) + &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot;)&quot;</span> + \</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>             <span class="stringliteral">&quot; * vec3(&quot;</span> + SDATA(0) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(1) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(2) + <span class="stringliteral">&quot;);&quot;</span>));</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot; = normalize(Normal);&quot;</span>));</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot; = normalize(_LightPosition - FragPos.xyz );&quot;</span>));</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;float &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; = max(dot(&quot;</span> + VAR(<span class="stringliteral">&quot;norm&quot;</span>) + <span class="stringliteral">&quot;, &quot;</span> + VAR(<span class="stringliteral">&quot;lightDir&quot;</span>) + <span class="stringliteral">&quot;), 0.0f);&quot;</span>));</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot; = &quot;</span> + VAR(<span class="stringliteral">&quot;diff&quot;</span>) + <span class="stringliteral">&quot; * _LightColor;&quot;</span>));</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(<span class="stringliteral">&quot;vec3 &quot;</span> + VAR(<span class="stringliteral">&quot;result&quot;</span>) + <span class="stringliteral">&quot; = (vec3(0.2, 0.2, 0.2) + &quot;</span> + VAR(<span class="stringliteral">&quot;diffuse&quot;</span>) + <span class="stringliteral">&quot;)&quot;</span> + \</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>                                   <span class="stringliteral">&quot; * vec3(&quot;</span> + SDATA(0) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(1) + <span class="stringliteral">&quot;, &quot;</span> + SDATA(2) + <span class="stringliteral">&quot;);&quot;</span>));</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        line-&gt;line = VAR(<span class="stringliteral">&quot;result&quot;</span>);</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    }</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>}</div>
@@ -173,25 +173,26 @@ $(document).ready(function(){initNavTree('dd/d46/_shader_output_node_8cpp_source
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            sharedData-&gt;d2 = color[2];</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        }</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    }</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    {</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        ImGui::Dummy(ImVec2(100, 40));</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    }</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>}</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>ShaderOutputNode::ShaderOutputNode(<a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>* handler)</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    :<a class="code hl_class" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>(handler)</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>{</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    name = <span class="stringliteral">&quot;Output&quot;</span>;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    color[0] = color[1] = color[2] = color[3] = 0.0f;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    headerColor = ImColor(SHADER_OUTPUT_NODE_COLOR);</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>}</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        ImGui::Dummy(ImVec2(100, 40));</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    }</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>}</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>ShaderOutputNode::ShaderOutputNode(<a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *handler)</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    :<a class="code hl_class" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>(handler)</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>{</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    name = <span class="stringliteral">&quot;Output&quot;</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    color[0] = color[1] = color[2] = color[3] = 0.0f;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    headerColor = ImColor(SHADER_OUTPUT_NODE_COLOR);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>}</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>ShaderOutputNode::~ShaderOutputNode()</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>{</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>}</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>ShaderOutputNode::~ShaderOutputNode()</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>{</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>}</div>
 <div class="ttc" id="aclass_g_l_s_l_handler_html"><div class="ttname"><a href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00074">GLSLHandler.h:75</a></div></div>
 <div class="ttc" id="aclass_s_n_e_node_html"><div class="ttname"><a href="../../df/d7c/class_s_n_e_node.html">SNENode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00052">ShaderNodeEditor.h:53</a></div></div>
 <div class="ttc" id="aclass_s_n_e_pin_html"><div class="ttname"><a href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00041">ShaderNodeEditor.h:42</a></div></div>
@@ -204,7 +205,7 @@ $(document).ready(function(){initNavTree('dd/d46/_shader_output_node_8cpp_source
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_12a69fe99e721ec7657514453a97b980.html">Shading</a></li><li class="navelem"><a class="el" href="../../dir_df14e04e9cabc0328aadfe45b4e48990.html">ShaderNodes</a></li><li class="navelem"><b>ShaderOutputNode.cpp</b></li>
-    <li class="footer">Generated on Wed Mar 16 2022 12:42:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 19:47:05 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

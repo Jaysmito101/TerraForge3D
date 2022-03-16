@@ -150,30 +150,37 @@ $(document).ready(function(){initNavTree('db/df0/_shared_memory_manager_8h_sourc
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordtype">float</span> d29 = 0;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keywordtype">float</span> d30 = 0;</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">float</span> d31 = 0;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>};</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="../../d9/d9f/class_shared_memory_manager.html">   49</a></span><span class="keyword">class </span><a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>{</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a>();</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">~SharedMemoryManager</a>();</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="comment">// override [] operator for SharedMemoryItem</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keywordtype">float</span> &amp;operator[](<span class="keywordtype">int</span> i);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>};</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keywordtype">void</span> SetSharedMemoryItem(<a class="code hl_struct" href="../../df/d81/struct_shared_memory_item.html">SharedMemoryItem</a> *mi, <span class="keywordtype">int</span> i, <span class="keywordtype">float</span> val);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">void</span> Clear();</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordtype">int</span> AddItem();</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keywordtype">void</span> UpdateShader(<a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *shader);</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <a class="code hl_struct" href="../../df/d81/struct_shared_memory_item.html">SharedMemoryItem</a> *At(<span class="keywordtype">int</span> <span class="keywordtype">id</span>);</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    uint32_t ssbo;</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    uint32_t ssboBinding;</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">int</span> currentID;</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    std::vector&lt;SharedMemoryItem&gt; sharedMemoryBlobs;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>};</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="../../d9/d9f/class_shared_memory_manager.html">   56</a></span><span class="keyword">class </span><a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>{</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a>();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">~SharedMemoryManager</a>();</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordtype">void</span> Clear();</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordtype">int</span> AddItem();</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">void</span> UpdateShader(<a class="code hl_class" href="../../d1/d51/class_shader.html">Shader</a> *shader);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <a class="code hl_struct" href="../../df/d81/struct_shared_memory_item.html">SharedMemoryItem</a> *At(<span class="keywordtype">int</span> <span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    uint32_t ssbo;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    uint32_t ssboBinding;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordtype">int</span> currentID;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    std::vector&lt;SharedMemoryItem&gt; sharedMemoryBlobs;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>};</div>
 <div class="ttc" id="aclass_shader_html"><div class="ttname"><a href="../../d1/d51/class_shader.html">Shader</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d34/_shader_8h_source.html#l00006">Shader.h:7</a></div></div>
-<div class="ttc" id="aclass_shared_memory_manager_html"><div class="ttname"><a href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../db/df0/_shared_memory_manager_8h_source.html#l00049">SharedMemoryManager.h:50</a></div></div>
+<div class="ttc" id="aclass_shared_memory_manager_html"><div class="ttname"><a href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../db/df0/_shared_memory_manager_8h_source.html#l00056">SharedMemoryManager.h:57</a></div></div>
 <div class="ttc" id="astruct_shared_memory_item_html"><div class="ttname"><a href="../../df/d81/struct_shared_memory_item.html">SharedMemoryItem</a></div><div class="ttdoc">SharedMemoryItem ! A data structure to be passed to the GPU.</div><div class="ttdef"><b>Definition:</b> <a href="../../db/df0/_shared_memory_manager_8h_source.html#l00013">SharedMemoryManager.h:14</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -181,7 +188,7 @@ $(document).ready(function(){initNavTree('db/df0/_shared_memory_manager_8h_sourc
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f91755bd714974cebdea8f52266e36fd.html">include</a></li><li class="navelem"><a class="el" href="../../dir_d27bbd195b0a8cc417cceb10b4212cdd.html">Shading</a></li><li class="navelem"><b>SharedMemoryManager.h</b></li>
-    <li class="footer">Generated on Wed Mar 16 2022 12:42:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 19:47:05 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
