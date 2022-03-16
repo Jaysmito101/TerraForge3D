@@ -190,6 +190,7 @@ var hierarchy =
       [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
       [ "SNENode", "df/d7c/class_s_n_e_node.html", [
         [ "Float3Node", "d9/d1c/class_float3_node.html", null ],
+        [ "PBRMaterialNode", "d3/da4/class_p_b_r_material_node.html", null ],
         [ "ShaderOutputNode", "d1/db6/class_shader_output_node.html", null ],
         [ "ShaderTextureNode", "d0/d32/class_shader_texture_node.html", null ]
       ] ],

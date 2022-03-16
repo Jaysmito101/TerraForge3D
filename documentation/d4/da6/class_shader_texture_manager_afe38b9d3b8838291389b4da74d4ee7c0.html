@@ -120,19 +120,19 @@ $(document).ready(function(){initNavTree('d4/da6/class_shader_texture_manager_af
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d8/dca/_shader_texture_manager_8cpp_source.html#l00047">47</a> of file <a class="el" href="../../d8/dca/_shader_texture_manager_8cpp_source.html">ShaderTextureManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   48</span>{</div>
-<div class="line"><span class="lineno">   49</span>    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);</div>
-<div class="line"><span class="lineno">   50</span>    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, 512, 512, textureNodes.size());</div>
-<div class="line"><span class="lineno">   51</span> </div>
-<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; textureNodes.size(); i++)</div>
-<div class="line"><span class="lineno">   53</span>    {</div>
-<div class="line"><span class="lineno">   54</span>        textureNodes[i]-&gt;texture-&gt;Resize(512, 512);</div>
-<div class="line"><span class="lineno">   55</span>        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 512, 512, 1, GL_RGB, GL_UNSIGNED_BYTE, textureNodes[i]-&gt;texture-&gt;GetData());</div>
-<div class="line"><span class="lineno">   56</span>    }</div>
-<div class="line"><span class="lineno">   57</span> </div>
-<div class="line"><span class="lineno">   58</span>    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);</div>
-<div class="line"><span class="lineno">   59</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d8/dca/_shader_texture_manager_8cpp_source.html#l00048">48</a> of file <a class="el" href="../../d8/dca/_shader_texture_manager_8cpp_source.html">ShaderTextureManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   49</span>{</div>
+<div class="line"><span class="lineno">   50</span>    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);</div>
+<div class="line"><span class="lineno">   51</span>    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB8, resolution, resolution, textureNodes.size(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);</div>
+<div class="line"><span class="lineno">   52</span> </div>
+<div class="line"><span class="lineno">   53</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; textureNodes.size(); i++)</div>
+<div class="line"><span class="lineno">   54</span>    {</div>
+<div class="line"><span class="lineno">   55</span>        textureNodes[i]-&gt;texture-&gt;Resize(resolution, resolution);</div>
+<div class="line"><span class="lineno">   56</span>        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, resolution, resolution, 1, GL_RGB, GL_UNSIGNED_BYTE, textureNodes[i]-&gt;texture-&gt;GetData());</div>
+<div class="line"><span class="lineno">   57</span>    }</div>
+<div class="line"><span class="lineno">   58</span> </div>
+<div class="line"><span class="lineno">   59</span>    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);</div>
+<div class="line"><span class="lineno">   60</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -142,7 +142,7 @@ $(document).ready(function(){initNavTree('d4/da6/class_shader_texture_manager_af
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a></li>
-    <li class="footer">Generated on Tue Mar 15 2022 18:33:44 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 12:42:16 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

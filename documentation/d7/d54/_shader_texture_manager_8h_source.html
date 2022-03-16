@@ -126,14 +126,16 @@ $(document).ready(function(){initNavTree('d7/d54/_shader_texture_manager_8h_sour
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordtype">void</span> Register(<a class="code hl_class" href="../../d0/d32/class_shader_texture_node.html">ShaderTextureNode</a>* node);</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keywordtype">void</span> Unregister(<a class="code hl_class" href="../../d0/d32/class_shader_texture_node.html">ShaderTextureNode</a>* node);</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">void</span> UpdateShaders();</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">void</span> Bind(uint32_t slot);</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    uint32_t textureArray;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    std::vector&lt;ShaderTextureNode*&gt; textureNodes;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>};</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">void</span> UploadToGPU(<span class="keywordtype">int</span> <span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keywordtype">void</span> UpdateShaders();</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">void</span> Bind(uint32_t slot);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    uint32_t resolution = 512;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    uint32_t textureArray;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    std::vector&lt;ShaderTextureNode*&gt; textureNodes;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>};</div>
 <div class="ttc" id="aclass_shader_texture_manager_html"><div class="ttname"><a href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/d54/_shader_texture_manager_8h_source.html#l00010">ShaderTextureManager.h:11</a></div></div>
 <div class="ttc" id="aclass_shader_texture_node_html"><div class="ttname"><a href="../../d0/d32/class_shader_texture_node.html">ShaderTextureNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d5/da9/_shader_texture_node_8h_source.html#l00007">ShaderTextureNode.h:8</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -142,7 +144,7 @@ $(document).ready(function(){initNavTree('d7/d54/_shader_texture_manager_8h_sour
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f91755bd714974cebdea8f52266e36fd.html">include</a></li><li class="navelem"><a class="el" href="../../dir_d27bbd195b0a8cc417cceb10b4212cdd.html">Shading</a></li><li class="navelem"><b>ShaderTextureManager.h</b></li>
-    <li class="footer">Generated on Tue Mar 15 2022 18:33:40 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Wed Mar 16 2022 12:42:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

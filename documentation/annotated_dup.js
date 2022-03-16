@@ -247,6 +247,7 @@ var annotated_dup =
     [ "OpenCLBuffer", "d6/da2/struct_open_c_l_buffer.html", null ],
     [ "OSLiscences", "da/dfe/class_o_s_liscences.html", null ],
     [ "OutputNode", "df/df6/class_output_node.html", null ],
+    [ "PBRMaterialNode", "d3/da4/class_p_b_r_material_node.html", null ],
     [ "PixelateNode", "dc/d9e/class_pixelate_node.html", null ],
     [ "ProjectManager", "d7/d93/class_project_manager.html", null ],
     [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
