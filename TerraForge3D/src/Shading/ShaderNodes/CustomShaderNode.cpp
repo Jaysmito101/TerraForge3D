@@ -102,12 +102,12 @@ void CustomShaderNode::Load(nlohmann::json data)
 	{
 		if(it.type == "float")
 		{
-			fData[i] = data[it.second].get<float>();
+			fData[i] = data[it.alias].get<float>();
 		}
 
 		else if(it.type == "bool")
 		{
-			bData[i] = data[it.second].get<bool>();
+			bData[i] = data[it.alias].get<bool>();
 		}
 
 		i++;
@@ -124,12 +124,12 @@ nlohmann::json CustomShaderNode::Save()
 	{
 		if(it.type == "float")
 		{
-			data[it.second] = fData[i];
+			data[it.alias] = fData[i];
 		}
 
 		else if(it.type == "bool")
 		{
-			data[it.second] = bData[i];
+			data[it.alias] = bData[i];
 		}
 
 		i++;
