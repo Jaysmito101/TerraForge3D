@@ -25,6 +25,12 @@ void CustomShaderNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 	// Add code symbols
 	cline = ReplaceString(cline, "{ID}", STR(id));
 	cline = ReplaceString(cline, "{OFFSET}", STR(dataBlobOffset));
+	int did = 0;
+	for(auto it : sharedDataTemplate)
+	{
+		cline = ReplaceString(cline, it.alias, SDATA(did));
+		did++;
+	}
 	ft.AddLine(GLSLLine(cline));
 	handler->AddFunction(ft);
 	int i = 0;
@@ -94,12 +100,12 @@ void CustomShaderNode::Load(nlohmann::json data)
 
 	for(auto &it : sharedDataTemplate)
 	{
-		if(it.first == "float")
+		if(it.type == "float")
 		{
 			fData[i] = data[it.second].get<float>();
 		}
 
-		else if(it.first == "bool")
+		else if(it.type == "bool")
 		{
 			bData[i] = data[it.second].get<bool>();
 		}
@@ -116,12 +122,12 @@ nlohmann::json CustomShaderNode::Save()
 
 	for(auto &it : sharedDataTemplate)
 	{
-		if(it.first == "float")
+		if(it.type == "float")
 		{
 			data[it.second] = fData[i];
 		}
 
-		else if(it.first == "bool")
+		else if(it.type == "bool")
 		{
 			data[it.second] = bData[i];
 		}
@@ -144,12 +150,12 @@ void CustomShaderNode::UpdateShaders()
 			break;
 		}
 
-		if(it.second == "float")
+		if(it.type == "float")
 		{
 			SetSharedMemoryItem(sharedData, i, fData[i]);
 		}
 
-		else if(it.second == "bool")
+		else if(it.type == "bool")
 		{
 			SetSharedMemoryItem(sharedData, i, bData[i] ? 1.0f : 0.0f);
 		}
@@ -202,17 +208,17 @@ void CustomShaderNode::OnRender()
 
 		ImGui::PushID(i);
 
-		if(it.second == "float")
+		if(it.type == "float")
 		{
-			if(ImGui::DragFloat(it.first.c_str(), &fData[i], 0.01f))
+			if(ImGui::DragFloat(it.text.data(), &fData[i], 0.01f))
 			{
 				SetSharedMemoryItem(sharedData, i, fData[i]);
 			}
 		}
 
-		else if(it.second == "bool")
+		else if(it.type == "bool")
 		{
-			if(ImGui::Checkbox(it.first.c_str(), &bData[i]))
+			if(ImGui::Checkbox(it.text.data(), &bData[i]))
 			{
 				SetSharedMemoryItem(sharedData, i, bData[i] ? 1.0f : 0.0f);
 			}
@@ -335,7 +341,10 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 
 	for(auto it = meta["sharedData"].begin() ; it != meta["sharedData"].end() ; it++)
 	{
-		sharedDataTemplate.push_back(std::make_pair(it.key(), it.value()["type"]));
+		std::string alias = ReplaceString(it.key(), " ", "");
+		if(it.value().find("alias") != it.value().end())
+		    alias = it.value()["alias"];
+		sharedDataTemplate.push_back(SharedDataRep(it.key(), it.value()["type"], alias));
 
 		if(it.value()["type"] == "float")
 		{

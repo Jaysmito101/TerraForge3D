@@ -4,7 +4,7 @@
 #include "Profiler.h"
 #include "Platform.h"
 #include "imgui/imgui.h"
-#include "glsl_optimizer.h"
+// #include "glsl_optimizer.h"
 
 #include "Shading/ShaderNodes/ShaderOutputNode.h"
 #include "Shading/ShaderNodes/ShaderTextureNode.h"

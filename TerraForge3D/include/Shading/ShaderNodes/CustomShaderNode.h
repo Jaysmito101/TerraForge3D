@@ -1,6 +1,16 @@
 #pragma once
 
 #include "Shading/ShaderNodeEditor.h"
+struct SharedDataRep {
+	std::string text;
+	std::string type;
+	std::string alias;
+
+	SharedDataRep(std::string t, std::string b, std::string c)
+	:text(t), type(b), alias(c) {}
+
+	SharedDataRep(){}
+}
 
 class CustomShaderNode : public SNENode
 {
@@ -24,5 +34,5 @@ public:
 	nlohmann::json meta;
 	GLSLFunction *func;
 	std::vector<std::pair<std::string, std::string>> params;
-	std::vector<std::pair<std::string, std::string>> sharedDataTemplate;
+	std::vector<SharedDataRep> sharedDataTemplate;
 };
