@@ -209,7 +209,7 @@ $(document).ready(function(){initNavTree('d9/da3/_custom_shader_node_8cpp_source
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        }</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    }</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    line-&gt;line += <span class="stringliteral">&quot;, &quot;</span> + STR(callerPin) + <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    line-&gt;line += (params.size() == 0 ? <span class="stringliteral">&quot;&quot;</span> : <span class="stringliteral">&quot;, &quot;</span>) + STR(callerPin) + <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>}</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="keywordtype">void</span> CustomShaderNode::Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data)</div>
@@ -466,9 +466,9 @@ $(document).ready(function(){initNavTree('d9/da3/_custom_shader_node_8cpp_source
 <div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        j++;</div>
 <div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    }</div>
 <div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span> </div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    paramsStr += <span class="stringliteral">&quot;, int callerPin&quot;</span>;</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    paramsStr += (params.size() == 0 ? <span class="stringliteral">&quot;&quot;</span> : <span class="stringliteral">&quot;, &quot;</span>) + std::string(<span class="stringliteral">&quot;int callerPin&quot;</span>);</div>
 <div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span> </div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    func = <span class="keyword">new</span> <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a>(meta[<span class="stringliteral">&quot;fname&quot;</span>], paramsStr, meta[<span class="stringliteral">&quot;returns&quot;</span>]);</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    func = <span class="keyword">new</span> <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a>(meta[<span class="stringliteral">&quot;fname&quot;</span>] + STR(<span class="keywordtype">id</span>), paramsStr, meta[<span class="stringliteral">&quot;returns&quot;</span>]);</div>
 <div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    sharedDataTemplate.clear();</div>
 <div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    <span class="keywordtype">int</span> i = 0;</div>
 <div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span> </div>
@@ -569,7 +569,7 @@ $(document).ready(function(){initNavTree('d9/da3/_custom_shader_node_8cpp_source
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_12a69fe99e721ec7657514453a97b980.html">Shading</a></li><li class="navelem"><a class="el" href="../../dir_df14e04e9cabc0328aadfe45b4e48990.html">ShaderNodes</a></li><li class="navelem"><b>CustomShaderNode.cpp</b></li>
-    <li class="footer">Generated on Thu Mar 17 2022 13:40:55 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 17:57:13 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

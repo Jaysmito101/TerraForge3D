@@ -235,9 +235,9 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a5d82f
 <div class="line"><span class="lineno">  356</span>        j++;</div>
 <div class="line"><span class="lineno">  357</span>    }</div>
 <div class="line"><span class="lineno">  358</span> </div>
-<div class="line"><span class="lineno">  359</span>    paramsStr += <span class="stringliteral">&quot;, int callerPin&quot;</span>;</div>
+<div class="line"><span class="lineno">  359</span>    paramsStr += (params.size() == 0 ? <span class="stringliteral">&quot;&quot;</span> : <span class="stringliteral">&quot;, &quot;</span>) + std::string(<span class="stringliteral">&quot;int callerPin&quot;</span>);</div>
 <div class="line"><span class="lineno">  360</span> </div>
-<div class="line"><span class="lineno">  361</span>    func = <span class="keyword">new</span> <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a>(meta[<span class="stringliteral">&quot;fname&quot;</span>], paramsStr, meta[<span class="stringliteral">&quot;returns&quot;</span>]);</div>
+<div class="line"><span class="lineno">  361</span>    func = <span class="keyword">new</span> <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a>(meta[<span class="stringliteral">&quot;fname&quot;</span>] + STR(<span class="keywordtype">id</span>), paramsStr, meta[<span class="stringliteral">&quot;returns&quot;</span>]);</div>
 <div class="line"><span class="lineno">  362</span>    sharedDataTemplate.clear();</div>
 <div class="line"><span class="lineno">  363</span>    <span class="keywordtype">int</span> i = 0;</div>
 <div class="line"><span class="lineno">  364</span> </div>
@@ -334,7 +334,7 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a5d82f
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></li>
-    <li class="footer">Generated on Thu Mar 17 2022 13:40:56 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 17:57:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
