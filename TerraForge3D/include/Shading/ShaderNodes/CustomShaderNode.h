@@ -10,7 +10,7 @@ struct SharedDataRep {
 	:text(t), type(b), alias(c) {}
 
 	SharedDataRep(){}
-}
+};
 
 class CustomShaderNode : public SNENode
 {
