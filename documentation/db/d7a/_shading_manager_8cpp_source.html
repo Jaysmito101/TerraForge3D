@@ -194,7 +194,7 @@ $(document).ready(function(){initNavTree('db/d7a/_shading_manager_8cpp_source.ht
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        {</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            <span class="keywordflow">if</span> (ImGui::Button((node.name + std::string(<span class="stringliteral">&quot;##SHADERNODEMAKER&quot;</span>)).c_str()))</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            {</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                editor-&gt;AddNode(<span class="keyword">new</span> CustomShaderNode(handler, node.content));</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                editor-&gt;AddNode(<span class="keyword">new</span> <a class="code hl_class" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a>(handler, node.content));</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                didMake = didMake || <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                ImGui::CloseCurrentPopup();</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>            }</div>
@@ -210,7 +210,7 @@ $(document).ready(function(){initNavTree('db/d7a/_shading_manager_8cpp_source.ht
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>            <span class="keywordflow">if</span>(path.size() &gt; 3)</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>            {</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>                <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>                editor-&gt;AddNode(<span class="keyword">new</span> CustomShaderNode(handler, ReadShaderSourceFile(path, &amp;tmp)));</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>                editor-&gt;AddNode(<span class="keyword">new</span> <a class="code hl_class" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a>(handler, ReadShaderSourceFile(path, &amp;tmp)));</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>                didMake = didMake || <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                ImGui::CloseCurrentPopup();</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            }</div>
@@ -268,7 +268,7 @@ $(document).ready(function(){initNavTree('db/d7a/_shading_manager_8cpp_source.ht
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;CustomShader&quot;</span>)</div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        {</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>            node = <span class="keyword">new</span> CustomShaderNode(fsh, data[<span class="stringliteral">&quot;shader&quot;</span>]);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a>(fsh, data[<span class="stringliteral">&quot;shader&quot;</span>]);</div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        }</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        <span class="keywordflow">return</span> node;</div>
@@ -690,6 +690,7 @@ $(document).ready(function(){initNavTree('db/d7a/_shading_manager_8cpp_source.ht
 <div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>    fsh-&gt;AddFunction(main);</div>
 <div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>}</div>
 <div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span> </div>
+<div class="ttc" id="aclass_custom_shader_node_html"><div class="ttname"><a href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/dc0/_custom_shader_node_8h_source.html#l00015">CustomShaderNode.h:16</a></div></div>
 <div class="ttc" id="aclass_float3_node_html"><div class="ttname"><a href="../../d9/d1c/class_float3_node.html">Float3Node</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/d93/_float3_node_8h_source.html#l00005">Float3Node.h:6</a></div></div>
 <div class="ttc" id="aclass_float_node_html"><div class="ttname"><a href="../../d5/dc7/class_float_node.html">FloatNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d36/_float_node_8h_source.html#l00005">FloatNode.h:6</a></div></div>
 <div class="ttc" id="aclass_g_l_s_l_handler_html"><div class="ttname"><a href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00074">GLSLHandler.h:75</a></div></div>
@@ -719,7 +720,7 @@ $(document).ready(function(){initNavTree('db/d7a/_shading_manager_8cpp_source.ht
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_12a69fe99e721ec7657514453a97b980.html">Shading</a></li><li class="navelem"><b>ShadingManager.cpp</b></li>
-    <li class="footer">Generated on Thu Mar 17 2022 10:15:36 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 10:32:14 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

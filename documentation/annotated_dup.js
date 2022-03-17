@@ -184,6 +184,7 @@ var annotated_dup =
     [ "CPUNoiseLayersGenerator", "d8/d4a/class_c_p_u_noise_layers_generator.html", null ],
     [ "CubeMapManager", "da/d98/class_cube_map_manager.html", null ],
     [ "CurveNode", "dd/d5b/class_curve_node.html", null ],
+    [ "CustomShaderNode", "db/da0/class_custom_shader_node.html", null ],
     [ "DefaultCustomNode", "d3/d89/struct_default_custom_node.html", null ],
     [ "DivNode", "de/d68/class_div_node.html", null ],
     [ "DrawFilter", "d5/dd6/class_draw_filter.html", null ],
