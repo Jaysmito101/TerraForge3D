@@ -358,7 +358,8 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 
 	paramsStr += (params.size() == 0 ? "" : ", ") + std::string("int callerPin");
 
-	func = new GLSLFunction(meta["fname"] + STR(id), paramsStr, meta["returns"]);
+	func = new GLSLFunction(meta["fname"], paramsStr, meta["returns"]);
+	func->name += STR(id);
 	sharedDataTemplate.clear();
 	int i = 0;
 
