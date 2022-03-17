@@ -68,6 +68,7 @@ public:
 public:
 	SharedMemoryItem *sharedData = nullptr;
 	int dataBlobOffset = 0;
+	int callerPinId = 0;
 	GLSLHandler *handler;
 };
 

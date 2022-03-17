@@ -54,6 +54,7 @@ SNENode::~SNENode()
 
 NodeOutput SNENode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 {
+	callerPinId = pin->id;
 	GLSLFunction *function = static_cast<GLSLFunction *>(input.userData1);
 	GLSLLine *line = static_cast<GLSLLine *>(input.userData2);
 	OnEvaluate(function, line);

@@ -31,8 +31,10 @@ public:
 	std::string shader = "";
 	int paramCount = 0;
 	bool useArrayParams = false;
+	bool useMultipleOpins = false;
 	nlohmann::json meta;
 	GLSLFunction *func;
 	std::vector<std::pair<std::string, std::string>> params;
 	std::vector<SharedDataRep> sharedDataTemplate;
+	std::vector<std::string>> oPinStrs;
 };

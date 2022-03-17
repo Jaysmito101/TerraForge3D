@@ -147,10 +147,18 @@ void ErosionFilter::Apply()
 
 	// END
 	float *map = new float[model->mesh->vertexCount];
-
+	float minHeightT = 100000000000000;
+	float maxHeightT = -100000000000000;
 	for (int i = 0; i < model->mesh->vertexCount; i++)
 	{
-		map[i] = (model->mesh->vert[i].position.y - model->mesh->minHeight) / model->mesh->maxHeight;
+		if(model->mesh->vert[i].position.y > maxHeightT)
+			maxHeightT = model->mesh->vert[i].position.y;
+		if(model->mesh->vert[i].position.y < minHeightT)
+			minHeightT = model->mesh->vert[i].position.y;
+	}
+	for (int i = 0; i < model->mesh->vertexCount; i++)
+	{
+		map[i] = (model->mesh->vert[i].position.y - minHeightT) / (maxHeightT - minHeightT);
 	}
 
 	currentErosionRadius = erosionRadius;
@@ -252,7 +260,7 @@ void ErosionFilter::Apply()
 			water *= (1 - evaporateSpeed);
 		}
 
-		if(iteration % 10000 == 0)
+		if(iteration % 100000 == 0)
 		{
 			std::cout << "Processed " + std::to_string(iteration) << " particles.\r";
 		}
@@ -262,7 +270,9 @@ void ErosionFilter::Apply()
 
 	for (int i = 0; i < model->mesh->vertexCount; i++)
 	{
-		model->mesh->vert[i].position.y = (map[i] * model->mesh->maxHeight) + model->mesh->minHeight;
+		float newHeight = (map[i] * (maxHeightT - minHeightT)) + minHeightT;
+		model->mesh->vert[i].extras1.z = model->mesh->vert[i].position.y - newHeight;
+		model->mesh->vert[i].position.y = newHeight;
 	}
 
 	// Deletion

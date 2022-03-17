@@ -90,8 +90,16 @@ void CustomShaderNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 
 		i++;
 	}
-
-	line->line += ")";
+	int callerPin = 0;
+	for(int i = 0;i<outputPins.size();i++)
+	{
+		if(outputPins[i].id == callerPinId)
+		{
+			callerPin = i;
+			break;
+		}
+	}
+	line->line += ", " + STR(callerPin) + ")";
 }
 
 void CustomShaderNode::Load(nlohmann::json data)
@@ -167,10 +175,23 @@ void CustomShaderNode::UpdateShaders()
 void CustomShaderNode::OnRender()
 {
 	DrawHeader(name);
-	ImGui::Dummy(ImVec2(120, 10));
-	ImGui::SameLine();
-	outputPins[0]->Render();
-	ImGui::NewLine();
+
+	if(!useMultipleOpins)
+	{
+		ImGui::Text("Output");
+		outputPins[0]->Render();
+		ImGui::NewLine();
+	}
+	else
+	{
+		for(int i = 0 ; i < oPinStrs.size() ; i++)
+		{
+			ImGui::Text(oPinStrs[i].data());
+			outputPins[i]->Render();
+			ImGui::NewLine();
+		}
+	}
+
 	int j = 0;
 
 	if(!useArrayParams)
@@ -335,6 +356,8 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 		j++;
 	}
 
+	paramsStr += ", int callerPin";
+
 	func = new GLSLFunction(meta["fname"], paramsStr, meta["returns"]);
 	sharedDataTemplate.clear();
 	int i = 0;
@@ -359,19 +382,37 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 		i++;
 	}
 
-	if(meta["returns"] == "float")
+	if(meta.find("output_pins") != meta.end())
 	{
-		outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float));
+		std::string returns = meta["returns"];
+		useMultipleOpins = true;
+		for(std::string oPin : meta["output_pins"])
+		{
+			oPinStrs.push_back(oPin);
+			if(meta["returns"] == "float")
+			{
+				outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float));
+			}
+			else if(meta["returns"] == "vec3")
+			{
+				outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float3));
+			}
+		}
 	}
-
-	else if(meta["returns"] == "vec3")
-	{
-		outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float3));
-	}
-
 	else
 	{
-		throw std::runtime_error("Custom shader node does not support return type " + meta["returns"]);
+		if(meta["returns"] == "float")
+		{
+			outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float));
+		}
+		else if(meta["returns"] == "vec3")
+		{
+			outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float3));
+		}
+		else
+		{
+			throw std::runtime_error("Custom shader node does not support return type " + meta["returns"]);
+		}
 	}
 
 
