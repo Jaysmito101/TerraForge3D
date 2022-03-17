@@ -130,30 +130,30 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a00038
 
 <p>Implements <a class="el" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html">CustomShaderNode.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  143</span>{</div>
-<div class="line"><span class="lineno">  144</span>    <span class="keywordtype">int</span> i = 0;</div>
-<div class="line"><span class="lineno">  145</span> </div>
-<div class="line"><span class="lineno">  146</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : sharedDataTemplate)</div>
-<div class="line"><span class="lineno">  147</span>    {</div>
-<div class="line"><span class="lineno">  148</span>        <span class="keywordflow">if</span>(i &gt; 31)</div>
-<div class="line"><span class="lineno">  149</span>        {</div>
-<div class="line"><span class="lineno">  150</span>            <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  151</span>        }</div>
-<div class="line"><span class="lineno">  152</span> </div>
-<div class="line"><span class="lineno">  153</span>        <span class="keywordflow">if</span>(it.type == <span class="stringliteral">&quot;float&quot;</span>)</div>
-<div class="line"><span class="lineno">  154</span>        {</div>
-<div class="line"><span class="lineno">  155</span>            SetSharedMemoryItem(sharedData, i, fData[i]);</div>
-<div class="line"><span class="lineno">  156</span>        }</div>
-<div class="line"><span class="lineno">  157</span> </div>
-<div class="line"><span class="lineno">  158</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it.type == <span class="stringliteral">&quot;bool&quot;</span>)</div>
-<div class="line"><span class="lineno">  159</span>        {</div>
-<div class="line"><span class="lineno">  160</span>            SetSharedMemoryItem(sharedData, i, bData[i] ? 1.0f : 0.0f);</div>
-<div class="line"><span class="lineno">  161</span>        }</div>
-<div class="line"><span class="lineno">  162</span> </div>
-<div class="line"><span class="lineno">  163</span>        i++;</div>
-<div class="line"><span class="lineno">  164</span>    }</div>
-<div class="line"><span class="lineno">  165</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html#l00150">150</a> of file <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html">CustomShaderNode.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  151</span>{</div>
+<div class="line"><span class="lineno">  152</span>    <span class="keywordtype">int</span> i = 0;</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : sharedDataTemplate)</div>
+<div class="line"><span class="lineno">  155</span>    {</div>
+<div class="line"><span class="lineno">  156</span>        <span class="keywordflow">if</span>(i &gt; 31)</div>
+<div class="line"><span class="lineno">  157</span>        {</div>
+<div class="line"><span class="lineno">  158</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  159</span>        }</div>
+<div class="line"><span class="lineno">  160</span> </div>
+<div class="line"><span class="lineno">  161</span>        <span class="keywordflow">if</span>(it.type == <span class="stringliteral">&quot;float&quot;</span>)</div>
+<div class="line"><span class="lineno">  162</span>        {</div>
+<div class="line"><span class="lineno">  163</span>            SetSharedMemoryItem(sharedData, i, fData[i]);</div>
+<div class="line"><span class="lineno">  164</span>        }</div>
+<div class="line"><span class="lineno">  165</span> </div>
+<div class="line"><span class="lineno">  166</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it.type == <span class="stringliteral">&quot;bool&quot;</span>)</div>
+<div class="line"><span class="lineno">  167</span>        {</div>
+<div class="line"><span class="lineno">  168</span>            SetSharedMemoryItem(sharedData, i, bData[i] ? 1.0f : 0.0f);</div>
+<div class="line"><span class="lineno">  169</span>        }</div>
+<div class="line"><span class="lineno">  170</span> </div>
+<div class="line"><span class="lineno">  171</span>        i++;</div>
+<div class="line"><span class="lineno">  172</span>    }</div>
+<div class="line"><span class="lineno">  173</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -163,7 +163,7 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a00038
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></li>
-    <li class="footer">Generated on Thu Mar 17 2022 10:45:04 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 12:37:21 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

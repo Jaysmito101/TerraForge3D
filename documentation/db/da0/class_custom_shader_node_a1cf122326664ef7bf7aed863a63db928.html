@@ -213,9 +213,17 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a1cf12
 <div class="line"><span class="lineno">   90</span> </div>
 <div class="line"><span class="lineno">   91</span>        i++;</div>
 <div class="line"><span class="lineno">   92</span>    }</div>
-<div class="line"><span class="lineno">   93</span> </div>
-<div class="line"><span class="lineno">   94</span>    line-&gt;line += <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><span class="lineno">   95</span>}</div>
+<div class="line"><span class="lineno">   93</span>    <span class="keywordtype">int</span> callerPin = 0;</div>
+<div class="line"><span class="lineno">   94</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0;i&lt;outputPins.size();i++)</div>
+<div class="line"><span class="lineno">   95</span>    {</div>
+<div class="line"><span class="lineno">   96</span>        <span class="keywordflow">if</span>(outputPins[i].<span class="keywordtype">id</span> == callerPinId)</div>
+<div class="line"><span class="lineno">   97</span>        {</div>
+<div class="line"><span class="lineno">   98</span>            callerPin = i;</div>
+<div class="line"><span class="lineno">   99</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  100</span>        }</div>
+<div class="line"><span class="lineno">  101</span>    }</div>
+<div class="line"><span class="lineno">  102</span>    line-&gt;line += <span class="stringliteral">&quot;, &quot;</span> + STR(callerPin) + <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">  103</span>}</div>
 <div class="ttc" id="astruct_g_l_s_l_function_html"><div class="ttname"><a href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00058">GLSLHandler.h:59</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
 </div><!-- fragment -->
@@ -227,7 +235,7 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a1cf12
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></li>
-    <li class="footer">Generated on Thu Mar 17 2022 10:45:04 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 12:37:21 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

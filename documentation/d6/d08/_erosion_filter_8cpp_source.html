@@ -257,148 +257,158 @@ $(document).ready(function(){initNavTree('d6/d08/_erosion_filter_8cpp_source.htm
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    <span class="comment">// END</span></div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <span class="keywordtype">float</span> *map = <span class="keyword">new</span> <span class="keywordtype">float</span>[model-&gt;mesh-&gt;vertexCount];</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; model-&gt;mesh-&gt;vertexCount; i++)</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    {</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        map[i] = (model-&gt;mesh-&gt;vert[i].position.y - model-&gt;mesh-&gt;minHeight) / model-&gt;mesh-&gt;maxHeight;</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    }</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    currentErosionRadius = erosionRadius;</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    currentMapSize = mapSize;</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Starting processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iteration = 0; iteration &lt; numIterations; iteration++)</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    {</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="comment">// Create water droplet at random point on map</span></div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        <span class="keywordtype">float</span> posX = (int)(((<span class="keywordtype">double</span>)rand() / (RAND_MAX)) * mapSize-1);</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        <span class="keywordtype">float</span> posY = (int)(((<span class="keywordtype">double</span>)rand() / (RAND_MAX)) * mapSize - 1);</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>        <span class="keywordflow">if</span> (posX &lt; 2)</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        {</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>            posX = 2;</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>        }</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        <span class="keywordflow">if</span> (posY &lt; 2)</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        {</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>            posY = 2;</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        }</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        <span class="keywordtype">float</span> dirX = 0;</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <span class="keywordtype">float</span> dirY = 0;</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        <span class="keywordtype">float</span> speed = initialSpeed;</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="keywordtype">float</span> water = initialWaterVolume;</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <span class="keywordtype">float</span> sediment = 0;</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> </div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> lifetime = 0; lifetime &lt; maxDropletLifetime; lifetime++)</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        {</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>            <span class="keywordtype">int</span> nodeX = (int)posX;</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>            <span class="keywordtype">int</span> nodeY = (int)posY;</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>            <span class="keywordtype">int</span> dropletIndex = nodeY * mapSize + nodeX;</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>            <span class="comment">// Calculate droplet&#39;s offset inside the cell (0,0) = at NW node, (1,1) = at SE node</span></div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>            <span class="keywordtype">float</span> cellOffsetX = posX - nodeX;</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>            <span class="keywordtype">float</span> cellOffsetY = posY - nodeY;</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>            <span class="comment">// Calculate droplet&#39;s height and direction of flow with bilinear interpolation of surrounding heights</span></div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>            <a class="code hl_struct" href="../../d8/df5/struct_height_and_gradient.html">HeightAndGradient</a> heightAndGradient = CalculateHeightAndGradient(map, mapSize, posX, posY);</div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>            <span class="comment">// Update the droplet&#39;s direction and position (move position 1 unit regardless of speed)</span></div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>            dirX = (dirX * inertia - heightAndGradient.gradientX * (1 - inertia));</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>            dirY = (dirY * inertia - heightAndGradient.gradientY * (1 - inertia));</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            <span class="comment">// Normalize direction</span></div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>            <span class="keywordtype">float</span> len = sqrt(dirX * dirX + dirY * dirY);</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>            <span class="keywordflow">if</span> (len != 0)</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>            {</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>                dirX /= len;</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>                dirY /= len;</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>            }</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>            posX += dirX;</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>            posY += dirY;</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>            <span class="comment">// Stop simulating droplet if it&#39;s not moving or has flowed over edge of map</span></div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>            <span class="keywordflow">if</span> ((dirX == 0 &amp;&amp; dirY == 0) || posX &lt; 0 || posX &gt;= mapSize - 1 || posY &lt; 0 || posY &gt;= mapSize - 1)</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>            {</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>            }</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>            <span class="comment">// Find the droplet&#39;s new height and calculate the deltaHeight</span></div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>            <span class="keywordtype">float</span> newHeight = CalculateHeightAndGradient(map, mapSize, posX, posY).height;</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>            <span class="keywordtype">float</span> deltaHeight = newHeight - heightAndGradient.height;</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>            <span class="comment">// Calculate the droplet&#39;s sediment capacity (higher when moving fast down a slope and contains lots of water)</span></div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>            <span class="keywordtype">float</span> sedimentCapacity = MAX(-deltaHeight * speed * water * sedimentCapacityFactor, minSedimentCapacity);</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>            <span class="comment">// If carrying more sediment than capacity, or if flowing uphill:</span></div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>            <span class="keywordflow">if</span> (sediment &gt; sedimentCapacity || deltaHeight &gt; 0)</div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>            {</div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>                <span class="comment">// If moving uphill (deltaHeight &gt; 0) try fill up to the current height, otherwise deposit a fraction of the excess sediment</span></div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>                <span class="keywordtype">float</span> amountToDeposit = (deltaHeight &gt; 0) ? MIN(deltaHeight, sediment) : (sediment - sedimentCapacity) * depositSpeed;</div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>                sediment -= amountToDeposit;</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>                <span class="comment">// Add the sediment to the four nodes of the current cell using bilinear interpolation</span></div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>                <span class="comment">// Deposition is not distributed over a radius (like erosion) so that it can fill small pits</span></div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                map[dropletIndex] += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY);</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>                map[dropletIndex + 1] += amountToDeposit * cellOffsetX * (1 - cellOffsetY);</div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>                map[dropletIndex + mapSize] += amountToDeposit * (1 - cellOffsetX) * cellOffsetY;</div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>                map[dropletIndex + mapSize + 1] += amountToDeposit * cellOffsetX * cellOffsetY;</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>            }</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span> </div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>            <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>            {</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>                <span class="comment">// Erode a fraction of the droplet&#39;s current carry capacity.</span></div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>                <span class="comment">// Clamp the erosion to the change in height so that it doesn&#39;t dig a hole in the terrain behind the droplet</span></div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>                <span class="keywordtype">float</span> amountToErode = MIN((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span> </div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                <span class="comment">// Use erosion brush to erode from all nodes inside the droplet&#39;s erosion radius</span></div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> brushPointIndex = 0; brushPointIndex &lt; erosionBrushIndicesSizes[dropletIndex]; brushPointIndex++)</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>                {</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>                    <span class="keywordtype">int</span> nodeIndex = erosionBrushIndices[dropletIndex][brushPointIndex];</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>                    <span class="keywordtype">float</span> weighedErodeAmount = amountToErode * erosionBrushWeights[dropletIndex][brushPointIndex];</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>                    <span class="keywordtype">float</span> deltaSediment = (map[nodeIndex] &lt; weighedErodeAmount) ? map[nodeIndex] : weighedErodeAmount;</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>                    map[nodeIndex] -= deltaSediment;</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>                    sediment += deltaSediment;</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>                }</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>            }</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>            <span class="comment">// Update droplet&#39;s speed and water content</span></div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>            speed = sqrt(speed * speed + deltaHeight * gravity);</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            water *= (1 - evaporateSpeed);</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        }</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        <span class="keywordflow">if</span>(iteration % 10000 == 0)</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        {</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;Processed &quot;</span> + std::to_string(iteration) &lt;&lt; <span class="stringliteral">&quot; particles.\r&quot;</span>;</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        }</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    }</div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Finished Terrain Erosion Simulation\n&quot;</span>;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    <span class="keywordtype">float</span> minHeightT = 100000000000000;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    <span class="keywordtype">float</span> maxHeightT = -100000000000000;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; model-&gt;mesh-&gt;vertexCount; i++)</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    {</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        <span class="keywordflow">if</span>(model-&gt;mesh-&gt;vert[i].position.y &gt; maxHeightT)</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>            maxHeightT = model-&gt;mesh-&gt;vert[i].position.y;</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        <span class="keywordflow">if</span>(model-&gt;mesh-&gt;vert[i].position.y &lt; minHeightT)</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>            minHeightT = model-&gt;mesh-&gt;vert[i].position.y;</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    }</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; model-&gt;mesh-&gt;vertexCount; i++)</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    {</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        map[i] = (model-&gt;mesh-&gt;vert[i].position.y - minHeightT) / (maxHeightT - minHeightT);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    }</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    currentErosionRadius = erosionRadius;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    currentMapSize = mapSize;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    std::cout &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Starting processing erosion.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iteration = 0; iteration &lt; numIterations; iteration++)</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    {</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        <span class="comment">// Create water droplet at random point on map</span></div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        <span class="keywordtype">float</span> posX = (int)(((<span class="keywordtype">double</span>)rand() / (RAND_MAX)) * mapSize-1);</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        <span class="keywordtype">float</span> posY = (int)(((<span class="keywordtype">double</span>)rand() / (RAND_MAX)) * mapSize - 1);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="keywordflow">if</span> (posX &lt; 2)</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        {</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>            posX = 2;</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        }</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="keywordflow">if</span> (posY &lt; 2)</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        {</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>            posY = 2;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        }</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        <span class="keywordtype">float</span> dirX = 0;</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>        <span class="keywordtype">float</span> dirY = 0;</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        <span class="keywordtype">float</span> speed = initialSpeed;</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        <span class="keywordtype">float</span> water = initialWaterVolume;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        <span class="keywordtype">float</span> sediment = 0;</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> lifetime = 0; lifetime &lt; maxDropletLifetime; lifetime++)</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        {</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>            <span class="keywordtype">int</span> nodeX = (int)posX;</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>            <span class="keywordtype">int</span> nodeY = (int)posY;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>            <span class="keywordtype">int</span> dropletIndex = nodeY * mapSize + nodeX;</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            <span class="comment">// Calculate droplet&#39;s offset inside the cell (0,0) = at NW node, (1,1) = at SE node</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>            <span class="keywordtype">float</span> cellOffsetX = posX - nodeX;</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            <span class="keywordtype">float</span> cellOffsetY = posY - nodeY;</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>            <span class="comment">// Calculate droplet&#39;s height and direction of flow with bilinear interpolation of surrounding heights</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>            <a class="code hl_struct" href="../../d8/df5/struct_height_and_gradient.html">HeightAndGradient</a> heightAndGradient = CalculateHeightAndGradient(map, mapSize, posX, posY);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>            <span class="comment">// Update the droplet&#39;s direction and position (move position 1 unit regardless of speed)</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>            dirX = (dirX * inertia - heightAndGradient.gradientX * (1 - inertia));</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>            dirY = (dirY * inertia - heightAndGradient.gradientY * (1 - inertia));</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>            <span class="comment">// Normalize direction</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>            <span class="keywordtype">float</span> len = sqrt(dirX * dirX + dirY * dirY);</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span> </div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>            <span class="keywordflow">if</span> (len != 0)</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>            {</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>                dirX /= len;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>                dirY /= len;</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>            }</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>            posX += dirX;</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>            posY += dirY;</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>            <span class="comment">// Stop simulating droplet if it&#39;s not moving or has flowed over edge of map</span></div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>            <span class="keywordflow">if</span> ((dirX == 0 &amp;&amp; dirY == 0) || posX &lt; 0 || posX &gt;= mapSize - 1 || posY &lt; 0 || posY &gt;= mapSize - 1)</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>            {</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>            }</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>            <span class="comment">// Find the droplet&#39;s new height and calculate the deltaHeight</span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>            <span class="keywordtype">float</span> newHeight = CalculateHeightAndGradient(map, mapSize, posX, posY).height;</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>            <span class="keywordtype">float</span> deltaHeight = newHeight - heightAndGradient.height;</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>            <span class="comment">// Calculate the droplet&#39;s sediment capacity (higher when moving fast down a slope and contains lots of water)</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>            <span class="keywordtype">float</span> sedimentCapacity = MAX(-deltaHeight * speed * water * sedimentCapacityFactor, minSedimentCapacity);</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>            <span class="comment">// If carrying more sediment than capacity, or if flowing uphill:</span></div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>            <span class="keywordflow">if</span> (sediment &gt; sedimentCapacity || deltaHeight &gt; 0)</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>            {</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>                <span class="comment">// If moving uphill (deltaHeight &gt; 0) try fill up to the current height, otherwise deposit a fraction of the excess sediment</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>                <span class="keywordtype">float</span> amountToDeposit = (deltaHeight &gt; 0) ? MIN(deltaHeight, sediment) : (sediment - sedimentCapacity) * depositSpeed;</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>                sediment -= amountToDeposit;</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>                <span class="comment">// Add the sediment to the four nodes of the current cell using bilinear interpolation</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>                <span class="comment">// Deposition is not distributed over a radius (like erosion) so that it can fill small pits</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>                map[dropletIndex] += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY);</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>                map[dropletIndex + 1] += amountToDeposit * cellOffsetX * (1 - cellOffsetY);</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>                map[dropletIndex + mapSize] += amountToDeposit * (1 - cellOffsetX) * cellOffsetY;</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>                map[dropletIndex + mapSize + 1] += amountToDeposit * cellOffsetX * cellOffsetY;</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>            }</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span> </div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>            <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>            {</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>                <span class="comment">// Erode a fraction of the droplet&#39;s current carry capacity.</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>                <span class="comment">// Clamp the erosion to the change in height so that it doesn&#39;t dig a hole in the terrain behind the droplet</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>                <span class="keywordtype">float</span> amountToErode = MIN((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span> </div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>                <span class="comment">// Use erosion brush to erode from all nodes inside the droplet&#39;s erosion radius</span></div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> brushPointIndex = 0; brushPointIndex &lt; erosionBrushIndicesSizes[dropletIndex]; brushPointIndex++)</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>                {</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>                    <span class="keywordtype">int</span> nodeIndex = erosionBrushIndices[dropletIndex][brushPointIndex];</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>                    <span class="keywordtype">float</span> weighedErodeAmount = amountToErode * erosionBrushWeights[dropletIndex][brushPointIndex];</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>                    <span class="keywordtype">float</span> deltaSediment = (map[nodeIndex] &lt; weighedErodeAmount) ? map[nodeIndex] : weighedErodeAmount;</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>                    map[nodeIndex] -= deltaSediment;</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>                    sediment += deltaSediment;</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>                }</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>            }</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>            <span class="comment">// Update droplet&#39;s speed and water content</span></div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>            speed = sqrt(speed * speed + deltaHeight * gravity);</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>            water *= (1 - evaporateSpeed);</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        }</div>
 <div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span> </div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; model-&gt;mesh-&gt;vertexCount; i++)</div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    {</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>        model-&gt;mesh-&gt;vert[i].position.y = (map[i] * model-&gt;mesh-&gt;maxHeight) + model-&gt;mesh-&gt;minHeight;</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    }</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    <span class="comment">// Deletion</span></div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; mapSize * mapSize; i++)</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    {</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>        <span class="keywordflow">if</span> (erosionBrushIndices[i])</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        {</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            <span class="keyword">delete</span>[] erosionBrushIndices[i];</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        }</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>        <span class="keywordflow">if</span> (erosionBrushWeights[i])</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        {</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>            <span class="keyword">delete</span>[] erosionBrushWeights[i];</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        }</div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    }</div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span> </div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <span class="keyword">delete</span>[] erosionBrushIndices;</div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>    <span class="keyword">delete</span>[] erosionBrushWeights;</div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>    <span class="keyword">delete</span>[] xOffsets;</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <span class="keyword">delete</span>[] yOffsets;</div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    <span class="keyword">delete</span>[] weights;</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    <span class="keyword">delete</span>[] map;</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    model-&gt;UploadToGPU();</div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>}</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>        <span class="keywordflow">if</span>(iteration % 100000 == 0)</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        {</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;Processed &quot;</span> + std::to_string(iteration) &lt;&lt; <span class="stringliteral">&quot; particles.\r&quot;</span>;</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        }</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    }</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Finished Terrain Erosion Simulation\n&quot;</span>;</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; model-&gt;mesh-&gt;vertexCount; i++)</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    {</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        <span class="keywordtype">float</span> newHeight = (map[i] * (maxHeightT - minHeightT)) + minHeightT;</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        model-&gt;mesh-&gt;vert[i].extras1.z = model-&gt;mesh-&gt;vert[i].position.y - newHeight;</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        model-&gt;mesh-&gt;vert[i].position.y = newHeight;</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    }</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <span class="comment">// Deletion</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span> </div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; mapSize * mapSize; i++)</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    {</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>        <span class="keywordflow">if</span> (erosionBrushIndices[i])</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        {</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>            <span class="keyword">delete</span>[] erosionBrushIndices[i];</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>        }</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span> </div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        <span class="keywordflow">if</span> (erosionBrushWeights[i])</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>        {</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>            <span class="keyword">delete</span>[] erosionBrushWeights[i];</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        }</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    }</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    <span class="keyword">delete</span>[] erosionBrushIndices;</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    <span class="keyword">delete</span>[] erosionBrushWeights;</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    <span class="keyword">delete</span>[] xOffsets;</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <span class="keyword">delete</span>[] yOffsets;</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    <span class="keyword">delete</span>[] weights;</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    <span class="keyword">delete</span>[] map;</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>    model-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    model-&gt;UploadToGPU();</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>}</div>
 <div class="ttc" id="aclass_model_html"><div class="ttname"><a href="../../d0/de3/class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/ded/_model_8h_source.html#l00008">Model.h:9</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 <div class="ttc" id="anamespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="../../d3/d9b/namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l03411">json.hpp:3411</a></div></div>
@@ -409,7 +419,7 @@ $(document).ready(function(){initNavTree('d6/d08/_erosion_filter_8cpp_source.htm
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_3835d3f6da79530f97219a89d738d0ed.html">Filters</a></li><li class="navelem"><b>ErosionFilter.cpp</b></li>
-    <li class="footer">Generated on Thu Mar 17 2022 10:45:02 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 12:37:20 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
