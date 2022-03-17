@@ -194,6 +194,7 @@ var annotated_dup =
     [ "Filter", "d2/d70/class_filter.html", null ],
     [ "FiltersManager", "da/d39/class_filters_manager.html", null ],
     [ "Float3Node", "d9/d1c/class_float3_node.html", null ],
+    [ "FloatNode", "d5/dc7/class_float_node.html", null ],
     [ "FoliageItem", "d2/de8/struct_foliage_item.html", null ],
     [ "FoliageManager", "d5/da2/class_foliage_manager.html", null ],
     [ "FrameBuffer", "d8/d23/class_frame_buffer.html", null ],

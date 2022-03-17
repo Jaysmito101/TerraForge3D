@@ -129,11 +129,13 @@ $(document).ready(function(){initNavTree('d4/dc0/_custom_shader_node_8h_source.h
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">bool</span> bData[32];</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    std::string code = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    std::string shader = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> meta;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> *func;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; params;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; sharedDataTemplate;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>};</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">int</span> paramCount = 0;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordtype">bool</span> useArrayParams = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> meta;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_struct" href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a> *func;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; params;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; sharedDataTemplate;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>};</div>
 <div class="ttc" id="aclass_custom_shader_node_html"><div class="ttname"><a href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/dc0/_custom_shader_node_8h_source.html#l00005">CustomShaderNode.h:6</a></div></div>
 <div class="ttc" id="aclass_g_l_s_l_handler_html"><div class="ttname"><a href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00074">GLSLHandler.h:75</a></div></div>
 <div class="ttc" id="aclass_s_n_e_node_html"><div class="ttname"><a href="../../df/d7c/class_s_n_e_node.html">SNENode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00052">ShaderNodeEditor.h:53</a></div></div>
@@ -146,7 +148,7 @@ $(document).ready(function(){initNavTree('d4/dc0/_custom_shader_node_8h_source.h
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f91755bd714974cebdea8f52266e36fd.html">include</a></li><li class="navelem"><a class="el" href="../../dir_d27bbd195b0a8cc417cceb10b4212cdd.html">Shading</a></li><li class="navelem"><a class="el" href="../../dir_ed73b209d170d17458ae2d0f21ada3bb.html">ShaderNodes</a></li><li class="navelem"><b>CustomShaderNode.h</b></li>
-    <li class="footer">Generated on Wed Mar 16 2022 19:47:05 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 06:17:35 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

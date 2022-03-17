@@ -152,38 +152,64 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a1cf12
 <div class="line"><span class="lineno">   29</span>    handler-&gt;AddFunction(ft);</div>
 <div class="line"><span class="lineno">   30</span>    <span class="keywordtype">int</span> i = 0;</div>
 <div class="line"><span class="lineno">   31</span> </div>
-<div class="line"><span class="lineno">   32</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;param : params)</div>
+<div class="line"><span class="lineno">   32</span>    <span class="keywordflow">if</span>(!useArrayParams)</div>
 <div class="line"><span class="lineno">   33</span>    {</div>
-<div class="line"><span class="lineno">   34</span>        function-&gt;AddLine(param.first + <span class="stringliteral">&quot; &quot;</span> + VAR(param.second + STR(i)) + <span class="stringliteral">&quot;;&quot;</span>);</div>
-<div class="line"><span class="lineno">   35</span> </div>
-<div class="line"><span class="lineno">   36</span>        <span class="keywordflow">if</span>(inputPins[i]-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">   37</span>        {</div>
-<div class="line"><span class="lineno">   38</span>            <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> tmp(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno">   39</span>            inputPins[i]-&gt;other-&gt;Evaluate(GetParams(function, &amp;tmp));</div>
-<div class="line"><span class="lineno">   40</span>            function-&gt;AddLine(VAR(param.second + STR(i)) + <span class="stringliteral">&quot; = &quot;</span> + tmp.line + <span class="stringliteral">&quot;;&quot;</span>);</div>
-<div class="line"><span class="lineno">   41</span>        }</div>
-<div class="line"><span class="lineno">   42</span> </div>
-<div class="line"><span class="lineno">   43</span>        i++;</div>
-<div class="line"><span class="lineno">   44</span>    }</div>
-<div class="line"><span class="lineno">   45</span> </div>
-<div class="line"><span class="lineno">   46</span>    line-&gt;line = func-&gt;name + <span class="stringliteral">&quot;(&quot;</span>;</div>
-<div class="line"><span class="lineno">   47</span>    i = 0;</div>
-<div class="line"><span class="lineno">   48</span>    <span class="keywordtype">int</span> n = params.size();</div>
-<div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;param : params)</div>
-<div class="line"><span class="lineno">   51</span>    {</div>
-<div class="line"><span class="lineno">   52</span>        line-&gt;line += VAR(param.second + STR(i));</div>
-<div class="line"><span class="lineno">   53</span> </div>
-<div class="line"><span class="lineno">   54</span>        <span class="keywordflow">if</span>(i &lt; n - 1)</div>
-<div class="line"><span class="lineno">   55</span>        {</div>
-<div class="line"><span class="lineno">   56</span>            line-&gt;line += <span class="stringliteral">&quot;, &quot;</span>;</div>
-<div class="line"><span class="lineno">   57</span>        }</div>
-<div class="line"><span class="lineno">   58</span> </div>
-<div class="line"><span class="lineno">   59</span>        i++;</div>
-<div class="line"><span class="lineno">   60</span>    }</div>
-<div class="line"><span class="lineno">   61</span> </div>
-<div class="line"><span class="lineno">   62</span>    line-&gt;line += <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><span class="lineno">   63</span>}</div>
+<div class="line"><span class="lineno">   34</span>        i = 0;</div>
+<div class="line"><span class="lineno">   35</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;param : params)</div>
+<div class="line"><span class="lineno">   36</span>        {</div>
+<div class="line"><span class="lineno">   37</span>            function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(param.first + <span class="stringliteral">&quot; &quot;</span> + VAR(param.second + STR(i)) + <span class="stringliteral">&quot; = &quot;</span> + param.first + <span class="stringliteral">&quot;(0.0f);&quot;</span>));</div>
+<div class="line"><span class="lineno">   38</span>    </div>
+<div class="line"><span class="lineno">   39</span>            <span class="keywordflow">if</span>(inputPins[i]-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">   40</span>            {</div>
+<div class="line"><span class="lineno">   41</span>                <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> tmp(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">   42</span>                inputPins[i]-&gt;other-&gt;Evaluate(GetParams(function, &amp;tmp));</div>
+<div class="line"><span class="lineno">   43</span>                function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(VAR(param.second + STR(i)) + <span class="stringliteral">&quot; = &quot;</span> + tmp.line + <span class="stringliteral">&quot;;&quot;</span>));</div>
+<div class="line"><span class="lineno">   44</span>            }</div>
+<div class="line"><span class="lineno">   45</span>    </div>
+<div class="line"><span class="lineno">   46</span>            i++;</div>
+<div class="line"><span class="lineno">   47</span>        }</div>
+<div class="line"><span class="lineno">   48</span>    }</div>
+<div class="line"><span class="lineno">   49</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   50</span>    {   </div>
+<div class="line"><span class="lineno">   51</span>        i = 0;</div>
+<div class="line"><span class="lineno">   52</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;param: params)</div>
+<div class="line"><span class="lineno">   53</span>        {</div>
+<div class="line"><span class="lineno">   54</span>            function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(param.first + <span class="stringliteral">&quot; &quot;</span> + VAR(param.second + STR(i)) + <span class="stringliteral">&quot;[&quot;</span> + STR(paramCount) + <span class="stringliteral">&quot;];&quot;</span>));</div>
+<div class="line"><span class="lineno">   55</span>            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k = 0 ; k &lt; paramCount ; k++)       </div>
+<div class="line"><span class="lineno">   56</span>            {</div>
+<div class="line"><span class="lineno">   57</span>                <span class="keywordflow">if</span> (inputPins[k * params.size() + i]-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">   58</span>                {</div>
+<div class="line"><span class="lineno">   59</span>                    <a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a> tmp(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">   60</span>                    inputPins[k * params.size() + i]-&gt;other-&gt;Evaluate(GetParams(function, &amp;tmp));</div>
+<div class="line"><span class="lineno">   61</span>                    function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(VAR(param.second + STR(i)) + <span class="stringliteral">&quot;[&quot;</span> + STR(k) + <span class="stringliteral">&quot;]&quot;</span> + <span class="stringliteral">&quot; = &quot;</span> + tmp.line + <span class="stringliteral">&quot;;&quot;</span>));</div>
+<div class="line"><span class="lineno">   62</span>                }</div>
+<div class="line"><span class="lineno">   63</span>                <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   64</span>                {</div>
+<div class="line"><span class="lineno">   65</span>                    function-&gt;AddLine(<a class="code hl_struct" href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a>(VAR(param.second + STR(i)) + <span class="stringliteral">&quot;[&quot;</span> + STR(k) + <span class="stringliteral">&quot;]&quot;</span> + <span class="stringliteral">&quot; = &quot;</span> + param.first + <span class="stringliteral">&quot;(0.0f);&quot;</span>));</div>
+<div class="line"><span class="lineno">   66</span>                }</div>
+<div class="line"><span class="lineno">   67</span>            }</div>
+<div class="line"><span class="lineno">   68</span>        }</div>
+<div class="line"><span class="lineno">   69</span>        i++;</div>
+<div class="line"><span class="lineno">   70</span>    }</div>
+<div class="line"><span class="lineno">   71</span> </div>
+<div class="line"><span class="lineno">   72</span>    line-&gt;line = func-&gt;name + <span class="stringliteral">&quot;(&quot;</span>;</div>
+<div class="line"><span class="lineno">   73</span>    i = 0;</div>
+<div class="line"><span class="lineno">   74</span>    <span class="keywordtype">int</span> n = params.size();</div>
+<div class="line"><span class="lineno">   75</span> </div>
+<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;param : params)</div>
+<div class="line"><span class="lineno">   77</span>    {</div>
+<div class="line"><span class="lineno">   78</span>        line-&gt;line += VAR(param.second + STR(i));</div>
+<div class="line"><span class="lineno">   79</span> </div>
+<div class="line"><span class="lineno">   80</span>        <span class="keywordflow">if</span>(i &lt; n - 1)</div>
+<div class="line"><span class="lineno">   81</span>        {</div>
+<div class="line"><span class="lineno">   82</span>            line-&gt;line += <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><span class="lineno">   83</span>        }</div>
+<div class="line"><span class="lineno">   84</span> </div>
+<div class="line"><span class="lineno">   85</span>        i++;</div>
+<div class="line"><span class="lineno">   86</span>    }</div>
+<div class="line"><span class="lineno">   87</span> </div>
+<div class="line"><span class="lineno">   88</span>    line-&gt;line += <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">   89</span>}</div>
 <div class="ttc" id="astruct_g_l_s_l_function_html"><div class="ttname"><a href="../../db/d01/struct_g_l_s_l_function.html">GLSLFunction</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00058">GLSLHandler.h:59</a></div></div>
 <div class="ttc" id="astruct_g_l_s_l_line_html"><div class="ttname"><a href="../../da/d76/struct_g_l_s_l_line.html">GLSLLine</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00032">GLSLHandler.h:33</a></div></div>
 </div><!-- fragment -->
@@ -195,7 +221,7 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a1cf12
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></li>
-    <li class="footer">Generated on Wed Mar 16 2022 19:47:06 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 06:17:36 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

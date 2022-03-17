@@ -121,61 +121,67 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_afd060113
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00109">109</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  110</span>{</div>
-<div class="line"><span class="lineno">  111</span>    appState = as;</div>
-<div class="line"><span class="lineno">  112</span>    vsh = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>(<span class="stringliteral">&quot;Primary Vertex Shader&quot;</span>);</div>
-<div class="line"><span class="lineno">  113</span>    gsh = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>(<span class="stringliteral">&quot;Primary Geometry Shader&quot;</span>);</div>
-<div class="line"><span class="lineno">  114</span>    fsh = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>(<span class="stringliteral">&quot;Primary Fragment Shader&quot;</span>);</div>
-<div class="line"><span class="lineno">  115</span>    sharedMemoryManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a>();</div>
-<div class="line"><span class="lineno">  116</span>    shaderTextureManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a>();</div>
-<div class="line"><span class="lineno">  117</span>    <a class="code hl_struct" href="../../d2/d48/struct_node_editor_config.html">NodeEditorConfig</a> config;</div>
-<div class="line"><span class="lineno">  118</span>    config.makeNodeFunc = [&amp;]()</div>
-<div class="line"><span class="lineno">  119</span>    {</div>
-<div class="line"><span class="lineno">  120</span>        ImGuiNodeEditor::Suspend();</div>
-<div class="line"><span class="lineno">  121</span>        ImGui::OpenPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>);</div>
-<div class="line"><span class="lineno">  122</span>        ImGuiNodeEditor::Resume();</div>
-<div class="line"><span class="lineno">  123</span>    };</div>
-<div class="line"><span class="lineno">  124</span>    config.insNodeFunc = [&amp;](<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data) -&gt; <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a>*</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00115">115</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  116</span>{</div>
+<div class="line"><span class="lineno">  117</span>    appState = as;</div>
+<div class="line"><span class="lineno">  118</span>    vsh = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>(<span class="stringliteral">&quot;Primary Vertex Shader&quot;</span>);</div>
+<div class="line"><span class="lineno">  119</span>    gsh = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>(<span class="stringliteral">&quot;Primary Geometry Shader&quot;</span>);</div>
+<div class="line"><span class="lineno">  120</span>    fsh = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a>(<span class="stringliteral">&quot;Primary Fragment Shader&quot;</span>);</div>
+<div class="line"><span class="lineno">  121</span>    sharedMemoryManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a>();</div>
+<div class="line"><span class="lineno">  122</span>    shaderTextureManager = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a>();</div>
+<div class="line"><span class="lineno">  123</span>    <a class="code hl_struct" href="../../d2/d48/struct_node_editor_config.html">NodeEditorConfig</a> config;</div>
+<div class="line"><span class="lineno">  124</span>    config.makeNodeFunc = [&amp;]()</div>
 <div class="line"><span class="lineno">  125</span>    {</div>
-<div class="line"><span class="lineno">  126</span>        <a class="code hl_class" href="../../df/d7c/class_s_n_e_node.html">SNENode</a> *node = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  127</span> </div>
-<div class="line"><span class="lineno">  128</span>        <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;ShaderOutput&quot;</span>)</div>
-<div class="line"><span class="lineno">  129</span>        {</div>
-<div class="line"><span class="lineno">  130</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/db6/class_shader_output_node.html">ShaderOutputNode</a>(fsh);</div>
-<div class="line"><span class="lineno">  131</span>        }</div>
-<div class="line"><span class="lineno">  132</span> </div>
-<div class="line"><span class="lineno">  133</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;Float3&quot;</span>)</div>
-<div class="line"><span class="lineno">  134</span>        {</div>
-<div class="line"><span class="lineno">  135</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/d1c/class_float3_node.html">Float3Node</a>(fsh);</div>
-<div class="line"><span class="lineno">  136</span>        }</div>
-<div class="line"><span class="lineno">  137</span> </div>
-<div class="line"><span class="lineno">  138</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;ShaderTexture&quot;</span>)</div>
-<div class="line"><span class="lineno">  139</span>        {</div>
-<div class="line"><span class="lineno">  140</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d32/class_shader_texture_node.html">ShaderTextureNode</a>(fsh, shaderTextureManager);</div>
-<div class="line"><span class="lineno">  141</span>        }</div>
-<div class="line"><span class="lineno">  142</span> </div>
-<div class="line"><span class="lineno">  143</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;PBRMaterial&quot;</span>)</div>
-<div class="line"><span class="lineno">  144</span>        {</div>
-<div class="line"><span class="lineno">  145</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d3/da4/class_p_b_r_material_node.html">PBRMaterialNode</a>(fsh);</div>
-<div class="line"><span class="lineno">  146</span>        }</div>
-<div class="line"><span class="lineno">  147</span> </div>
-<div class="line"><span class="lineno">  148</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;CustomShader&quot;</span>)</div>
-<div class="line"><span class="lineno">  149</span>        {</div>
-<div class="line"><span class="lineno">  150</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a>(fsh, data[<span class="stringliteral">&quot;shader&quot;</span>]);</div>
-<div class="line"><span class="lineno">  151</span>        }</div>
-<div class="line"><span class="lineno">  152</span> </div>
-<div class="line"><span class="lineno">  153</span>        <span class="keywordflow">return</span> node;</div>
-<div class="line"><span class="lineno">  154</span>    };</div>
-<div class="line"><span class="lineno">  155</span>    config.saveFile = GetExecutableDir() + PATH_SEPERATOR + <span class="stringliteral">&quot;Data&quot;</span> + PATH_SEPERATOR + <span class="stringliteral">&quot;configs&quot;</span> + PATH_SEPERATOR + <span class="stringliteral">&quot;ShaderNodes.json&quot;</span>;</div>
-<div class="line"><span class="lineno">  156</span>    shaderNodeEditor = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d54/class_node_editor.html">NodeEditor</a>(config);</div>
-<div class="line"><span class="lineno">  157</span>    shaderNodeEditor-&gt;name = <span class="stringliteral">&quot;Shader Nodes&quot;</span>;</div>
-<div class="line"><span class="lineno">  158</span>    shaderNodeEditor-&gt;SetOutputNode(<span class="keyword">new</span> <a class="code hl_class" href="../../d1/db6/class_shader_output_node.html">ShaderOutputNode</a>(fsh));</div>
-<div class="line"><span class="lineno">  159</span>    LoadDefaultCustomNodes();</div>
-<div class="line"><span class="lineno">  160</span>    ReCompileShaders();</div>
-<div class="line"><span class="lineno">  161</span>}</div>
+<div class="line"><span class="lineno">  126</span>        ImGuiNodeEditor::Suspend();</div>
+<div class="line"><span class="lineno">  127</span>        ImGui::OpenPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>);</div>
+<div class="line"><span class="lineno">  128</span>        ImGuiNodeEditor::Resume();</div>
+<div class="line"><span class="lineno">  129</span>    };</div>
+<div class="line"><span class="lineno">  130</span>    config.insNodeFunc = [&amp;](<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data) -&gt; <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a>*</div>
+<div class="line"><span class="lineno">  131</span>    {</div>
+<div class="line"><span class="lineno">  132</span>        <a class="code hl_class" href="../../df/d7c/class_s_n_e_node.html">SNENode</a> *node = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  133</span> </div>
+<div class="line"><span class="lineno">  134</span>        <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;ShaderOutput&quot;</span>)</div>
+<div class="line"><span class="lineno">  135</span>        {</div>
+<div class="line"><span class="lineno">  136</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/db6/class_shader_output_node.html">ShaderOutputNode</a>(fsh);</div>
+<div class="line"><span class="lineno">  137</span>        }</div>
+<div class="line"><span class="lineno">  138</span> </div>
+<div class="line"><span class="lineno">  139</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;Float3&quot;</span>)</div>
+<div class="line"><span class="lineno">  140</span>        {</div>
+<div class="line"><span class="lineno">  141</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/d1c/class_float3_node.html">Float3Node</a>(fsh);</div>
+<div class="line"><span class="lineno">  142</span>        }</div>
+<div class="line"><span class="lineno">  143</span> </div>
+<div class="line"><span class="lineno">  144</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;Float&quot;</span>)</div>
+<div class="line"><span class="lineno">  145</span>        {</div>
+<div class="line"><span class="lineno">  146</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/dc7/class_float_node.html">FloatNode</a>(fsh);</div>
+<div class="line"><span class="lineno">  147</span>        }</div>
+<div class="line"><span class="lineno">  148</span> </div>
+<div class="line"><span class="lineno">  149</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;ShaderTexture&quot;</span>)</div>
+<div class="line"><span class="lineno">  150</span>        {</div>
+<div class="line"><span class="lineno">  151</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d32/class_shader_texture_node.html">ShaderTextureNode</a>(fsh, shaderTextureManager);</div>
+<div class="line"><span class="lineno">  152</span>        }</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;PBRMaterial&quot;</span>)</div>
+<div class="line"><span class="lineno">  155</span>        {</div>
+<div class="line"><span class="lineno">  156</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../d3/da4/class_p_b_r_material_node.html">PBRMaterialNode</a>(fsh);</div>
+<div class="line"><span class="lineno">  157</span>        }</div>
+<div class="line"><span class="lineno">  158</span> </div>
+<div class="line"><span class="lineno">  159</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(data[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;CustomShader&quot;</span>)</div>
+<div class="line"><span class="lineno">  160</span>        {</div>
+<div class="line"><span class="lineno">  161</span>            node = <span class="keyword">new</span> <a class="code hl_class" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a>(fsh, data[<span class="stringliteral">&quot;shader&quot;</span>]);</div>
+<div class="line"><span class="lineno">  162</span>        }</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>        <span class="keywordflow">return</span> node;</div>
+<div class="line"><span class="lineno">  165</span>    };</div>
+<div class="line"><span class="lineno">  166</span>    config.saveFile = GetExecutableDir() + PATH_SEPERATOR + <span class="stringliteral">&quot;Data&quot;</span> + PATH_SEPERATOR + <span class="stringliteral">&quot;configs&quot;</span> + PATH_SEPERATOR + <span class="stringliteral">&quot;ShaderNodes.json&quot;</span>;</div>
+<div class="line"><span class="lineno">  167</span>    shaderNodeEditor = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d54/class_node_editor.html">NodeEditor</a>(config);</div>
+<div class="line"><span class="lineno">  168</span>    shaderNodeEditor-&gt;name = <span class="stringliteral">&quot;Shader Nodes&quot;</span>;</div>
+<div class="line"><span class="lineno">  169</span>    shaderNodeEditor-&gt;SetOutputNode(<span class="keyword">new</span> <a class="code hl_class" href="../../d1/db6/class_shader_output_node.html">ShaderOutputNode</a>(fsh));</div>
+<div class="line"><span class="lineno">  170</span>    LoadDefaultCustomNodes();</div>
+<div class="line"><span class="lineno">  171</span>    ReCompileShaders();</div>
+<div class="line"><span class="lineno">  172</span>}</div>
 <div class="ttc" id="aclass_custom_shader_node_html"><div class="ttname"><a href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/dc0/_custom_shader_node_8h_source.html#l00005">CustomShaderNode.h:6</a></div></div>
 <div class="ttc" id="aclass_float3_node_html"><div class="ttname"><a href="../../d9/d1c/class_float3_node.html">Float3Node</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/d93/_float3_node_8h_source.html#l00005">Float3Node.h:6</a></div></div>
+<div class="ttc" id="aclass_float_node_html"><div class="ttname"><a href="../../d5/dc7/class_float_node.html">FloatNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dc/d36/_float_node_8h_source.html#l00005">FloatNode.h:6</a></div></div>
 <div class="ttc" id="aclass_g_l_s_l_handler_html"><div class="ttname"><a href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00074">GLSLHandler.h:75</a></div></div>
 <div class="ttc" id="aclass_node_editor_html"><div class="ttname"><a href="../../db/d54/class_node_editor.html">NodeEditor</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00151">NodeEditor.h:152</a></div></div>
 <div class="ttc" id="aclass_node_editor_node_html"><div class="ttname"><a href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00117">NodeEditor.h:118</a></div></div>
@@ -196,7 +202,7 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_afd060113
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../de/d7d/class_shading_manager.html">ShadingManager</a></li>
-    <li class="footer">Generated on Wed Mar 16 2022 19:47:08 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 06:17:38 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

@@ -130,30 +130,30 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a1af71
 
 <p>Implements <a class="el" href="../../df/d7c/class_s_n_e_node.html">SNENode</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html#l00085">85</a> of file <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html">CustomShaderNode.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   86</span>{</div>
-<div class="line"><span class="lineno">   87</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
-<div class="line"><span class="lineno">   88</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;CustomShader&quot;</span>;</div>
-<div class="line"><span class="lineno">   89</span>    <span class="keywordtype">int</span> i = 0;</div>
-<div class="line"><span class="lineno">   90</span> </div>
-<div class="line"><span class="lineno">   91</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : sharedDataTemplate)</div>
-<div class="line"><span class="lineno">   92</span>    {</div>
-<div class="line"><span class="lineno">   93</span>        <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;float&quot;</span>)</div>
-<div class="line"><span class="lineno">   94</span>        {</div>
-<div class="line"><span class="lineno">   95</span>            data[it.second] = fData[i];</div>
-<div class="line"><span class="lineno">   96</span>        }</div>
-<div class="line"><span class="lineno">   97</span> </div>
-<div class="line"><span class="lineno">   98</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;bool&quot;</span>)</div>
-<div class="line"><span class="lineno">   99</span>        {</div>
-<div class="line"><span class="lineno">  100</span>            data[it.second] = bData[i];</div>
-<div class="line"><span class="lineno">  101</span>        }</div>
-<div class="line"><span class="lineno">  102</span> </div>
-<div class="line"><span class="lineno">  103</span>        i++;</div>
-<div class="line"><span class="lineno">  104</span>    }</div>
-<div class="line"><span class="lineno">  105</span> </div>
-<div class="line"><span class="lineno">  106</span>    data[<span class="stringliteral">&quot;shader&quot;</span>] = shader;</div>
-<div class="line"><span class="lineno">  107</span>    <span class="keywordflow">return</span> data;</div>
-<div class="line"><span class="lineno">  108</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html#l00111">111</a> of file <a class="el" href="../../d9/da3/_custom_shader_node_8cpp_source.html">CustomShaderNode.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  112</span>{</div>
+<div class="line"><span class="lineno">  113</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data;</div>
+<div class="line"><span class="lineno">  114</span>    data[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;CustomShader&quot;</span>;</div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordtype">int</span> i = 0;</div>
+<div class="line"><span class="lineno">  116</span> </div>
+<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : sharedDataTemplate)</div>
+<div class="line"><span class="lineno">  118</span>    {</div>
+<div class="line"><span class="lineno">  119</span>        <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;float&quot;</span>)</div>
+<div class="line"><span class="lineno">  120</span>        {</div>
+<div class="line"><span class="lineno">  121</span>            data[it.second] = fData[i];</div>
+<div class="line"><span class="lineno">  122</span>        }</div>
+<div class="line"><span class="lineno">  123</span> </div>
+<div class="line"><span class="lineno">  124</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;bool&quot;</span>)</div>
+<div class="line"><span class="lineno">  125</span>        {</div>
+<div class="line"><span class="lineno">  126</span>            data[it.second] = bData[i];</div>
+<div class="line"><span class="lineno">  127</span>        }</div>
+<div class="line"><span class="lineno">  128</span> </div>
+<div class="line"><span class="lineno">  129</span>        i++;</div>
+<div class="line"><span class="lineno">  130</span>    }</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>    data[<span class="stringliteral">&quot;shader&quot;</span>] = shader;</div>
+<div class="line"><span class="lineno">  133</span>    <span class="keywordflow">return</span> data;</div>
+<div class="line"><span class="lineno">  134</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -164,7 +164,7 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a1af71
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></li>
-    <li class="footer">Generated on Wed Mar 16 2022 19:47:06 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 17 2022 06:17:36 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
