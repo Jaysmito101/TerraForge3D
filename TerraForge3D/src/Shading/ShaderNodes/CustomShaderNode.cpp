@@ -29,17 +29,43 @@ void CustomShaderNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 	handler->AddFunction(ft);
 	int i = 0;
 
-	for(auto &param : params)
+	if(!useArrayParams)
 	{
-		function->AddLine(param.first + " " + VAR(param.second + STR(i)) + ";");
-
-		if(inputPins[i]->IsLinked())
+		i = 0;
+		for(auto &param : params)
 		{
-			GLSLLine tmp("");
-			inputPins[i]->other->Evaluate(GetParams(function, &tmp));
-			function->AddLine(VAR(param.second + STR(i)) + " = " + tmp.line + ";");
+			function->AddLine(GLSLLine(param.first + " " + VAR(param.second + STR(i)) + " = " + param.first + "(0.0f);"));
+	
+			if(inputPins[i]->IsLinked())
+			{
+				GLSLLine tmp("");
+				inputPins[i]->other->Evaluate(GetParams(function, &tmp));
+				function->AddLine(GLSLLine(VAR(param.second + STR(i)) + " = " + tmp.line + ";"));
+			}
+	
+			i++;
 		}
-
+	}
+	else
+	{	
+		i = 0;
+		for(auto &param: params)
+		{
+			function->AddLine(GLSLLine(param.first + " " + VAR(param.second + STR(i)) + "[" + STR(paramCount) + "];"));
+			for(int k = 0 ; k < paramCount ; k++)		
+			{
+				if (inputPins[k * params.size() + i]->IsLinked())
+				{
+					GLSLLine tmp("");
+					inputPins[k * params.size() + i]->other->Evaluate(GetParams(function, &tmp));
+					function->AddLine(GLSLLine(VAR(param.second + STR(i)) + "[" + STR(k) + "]" + " = " + tmp.line + ";"));
+				}
+				else
+				{
+					function->AddLine(GLSLLine(VAR(param.second + STR(i)) + "[" + STR(k) + "]" + " = " + param.first + "(0.0f);"));
+				}
+			}
+		}
 		i++;
 	}
 
@@ -141,13 +167,29 @@ void CustomShaderNode::OnRender()
 	ImGui::NewLine();
 	int j = 0;
 
-	for(auto &params: params)
+	if(!useArrayParams)
 	{
-		inputPins[j]->Render();
-		ImGui::Text(params.second.c_str());
-		j++;
+		for(auto &params: params)
+		{
+			inputPins[j]->Render();
+			ImGui::Text(params.second.c_str());
+			j++;
+		}
 	}
-
+	else
+	{
+		for(int k = 0 ; k < paramCount ; k++)	
+		{
+			j = 0;
+			for(auto &param: params)
+			{
+				inputPins[k + j]->Render();
+				ImGui::Text((param.second + " #" + STR(k)).c_str());
+				j++;
+			}
+		}
+	}
+	
 	ImGui::PushItemWidth(100);
 	int i = 0;
 
@@ -262,6 +304,17 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 	std::cout << "Loading Node : " << name << "\n";
 	std::string paramsStr = "";
 	int j = 0;
+	
+	if(meta.find("param_count") != meta.end())
+	{
+		paramCount = meta["param_count"];
+		useArrayParams = true;
+	}
+	else
+	{
+		paramCount = 1;
+		useArrayParams = false;	
+	}
 	int pss = meta["params"].size();
 
 	for(std::string param : meta["params"])
@@ -269,7 +322,10 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 		std::string pType = param.substr(0, param.find(":"));
 		std::string pName = param.substr(param.find(":") + 1);
 		params.push_back(std::make_pair(pType, pName));
-		paramsStr += pType + " " + pName + (j < pss - 1 ? ", " : "");
+		if(useArrayParams)
+			paramsStr += pType + " " + pName + "[" + STR(paramCount) + "]" + (j < pss - 1 ? ", " : "");
+		else
+			paramsStr += pType + " " + pName + (j < pss - 1 ? ", " : "");
 		j++;
 	}
 
@@ -309,24 +365,27 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 		throw std::runtime_error("Custom shader node does not support return type " + meta["returns"]);
 	}
 
-	for(auto &it : params)
+
+	for(int k = 0 ; k < paramCount ; k++)	
 	{
-		if(it.first == "float")
+		for(auto &it : params)
 		{
-			inputPins.push_back(new SNEPin(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float));
-		}
-
-		else if(it.first == "vec3")
-		{
-			inputPins.push_back(new SNEPin(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));
-		}
-
-		else
-		{
-			throw std::runtime_error("Custom shader node does not support parameter type " + it.first);
+			if(it.first == "float")
+			{
+				inputPins.push_back(new SNEPin(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float));
+			}
+	
+			else if(it.first == "vec3")
+			{
+				inputPins.push_back(new SNEPin(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));
+			}
+	
+			else
+			{
+				throw std::runtime_error("Custom shader node does not support parameter type " + it.first);
+			}
 		}
 	}
-
 	headerColor = ImColor(meta["color"]["r"].get<int>(), meta["color"]["r"].get<int>(), meta["color"]["b"].get<int>());
 }
 

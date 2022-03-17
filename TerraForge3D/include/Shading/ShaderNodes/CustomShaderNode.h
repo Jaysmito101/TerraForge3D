@@ -19,6 +19,8 @@ public:
 	bool bData[32];
 	std::string code = "";
 	std::string shader = "";
+	int paramCount = 0;
+	bool useArrayParams = false;
 	nlohmann::json meta;
 	GLSLFunction *func;
 	std::vector<std::pair<std::string, std::string>> params;

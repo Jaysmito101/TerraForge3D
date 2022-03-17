@@ -167,9 +167,9 @@ void NodeEditorPin::Unlink()
 
 NodeOutput NodeEditorPin::Evaluate(NodeInputParam input)
 {
-	mutex.lock();
+//	mutex.lock();
 	NodeOutput o = parent->Evaluate(input, this);
-	mutex.unlock();
+//	mutex.unlock();
 	return o;
 }
 

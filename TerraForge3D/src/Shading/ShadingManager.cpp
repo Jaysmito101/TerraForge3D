@@ -4,12 +4,15 @@
 #include "Profiler.h"
 #include "Platform.h"
 #include "imgui/imgui.h"
+#include "glsl_optimizer.h"
 
 #include "Shading/ShaderNodes/ShaderOutputNode.h"
 #include "Shading/ShaderNodes/ShaderTextureNode.h"
 #include "Shading/ShaderNodes/Float3Node.h"
+#include "Shading/ShaderNodes/FloatNode.h"
 #include "Shading/ShaderNodes/PBRMaterialNode.h"
 #include "Shading/ShaderNodes/CustomShaderNode.h"
+
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -58,7 +61,10 @@ static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler *handler, ShaderTextur
 	ImGui::InputTextWithHint("##SearchShaderNodes", "Search ...", data, sizeof(data));
 	int length = strlen(data);
 	ImGui::BeginChild("##ShaderNodesMaker", ImVec2(200, 250));
+
 	NODE_MAKER_SHOW(Float3Node, "Float3", didMake);
+
+	NODE_MAKER_SHOW(FloatNode, "Float Value", didMake);
 
 	if (NODE_MAKER_COND("Texture"))
 	{
@@ -135,6 +141,11 @@ ShadingManager::ShadingManager(ApplicationState *as)
 			node = new Float3Node(fsh);
 		}
 
+		else if(data["type"] == "Float")
+		{
+			node = new FloatNode(fsh);
+		}
+
 		else if(data["type"] == "ShaderTexture")
 		{
 			node = new ShaderTextureNode(fsh, shaderTextureManager);
@@ -190,12 +201,17 @@ void ShadingManager::LoadDefaultCustomNodes()
 
 	for (const auto &entry : fs::directory_iterator(nodesDir))
 	{
+		if(entry.path().extension().string() != ".json")	
+			continue;
 		DefaultCustomNode n;
 		n.name = entry.path().filename().string();
 		n.name = n.name.substr(0, n.name.find_last_of("."));
 		n.content = ReadShaderSourceFile(entry.path().string(), &tmp);
 		defaultCustomNodes.push_back(n);
 	}
+
+	extraSource = ReadShaderSourceFile(nodesDir + PATH_SEPERATOR + "extras.glsl", &tmp);
+	
 }
 
 void ShadingManager::ReCompileShaders()
@@ -229,6 +245,23 @@ void ShadingManager::ReCompileShaders()
 	geometrySource = gsh->GenerateGLSL();
 	PrepFragShader();
 	fragmentSource = fsh->GenerateGLSL();
+
+	if(optimizeGLSL)
+	{
+		// glslopt_ctx* ctx = glslopt_initialize(glslopt_target::kGlslTargetOpenGL);
+		// glslopt_shader* shader = glslopt_optimize(ctx, glslopt_shader_type::kGlslOptShaderFragment, fragmentSource.data(), 0);
+		// if (glslopt_get_status (shader)) 
+		// {
+		// 	fragmentSource = std::string(glslopt_get_output(shader));
+		// }
+		// else
+		// {
+		// 	logs.push_back(std::string(glslopt_get_log (shader)));
+		// }
+		// glslopt_shader_delete (shader);
+		// glslopt_cleanup (ctx);
+	}
+
 	appState->shaders.terrain = new Shader(vertexSource, fragmentSource, geometrySource);
 	double time = 0.0f;
 	END_PROFILER(time);
@@ -254,6 +287,20 @@ void ShadingManager::ShowSettings(bool *pOpen)
 		{
 			SaveToFile(path, fragmentSource);
 		}
+	}
+
+	if(ImGui::Button("Print GLSL"))
+	{
+		std::cout << fragmentSource << std::endl;
+	}
+
+	ImGui::SameLine();
+
+	ImGui::SameLine();
+
+	if(ImGui::Checkbox("Optimize GLSL", &optimizeGLSL))
+	{
+		ReCompileShaders();
 	}
 
 	//ImGui::Text("SMM Size : %d", sharedMemoryManager->sharedMemoryBlobs.size());
@@ -317,6 +364,13 @@ void ShadingManager::ShowSettings(bool *pOpen)
 				shaderNodeEditor->Load(nlohmann::json::parse(ReadShaderSourceFile(file, &tmp)));
 				ReCompileShaders();
 			}
+		}
+
+		ImGui::SameLine();
+
+		if(ImGui::Button("Reload Nodes"))
+		{
+			LoadDefaultCustomNodes();
 		}
 
 		int nC = shaderNodeEditor->nodes.size();
@@ -477,6 +531,8 @@ void ShadingManager::PrepFragShader()
 	fsh->AddTopLine(GLSLLine("in vec3 Normal;", "Take the normal passed in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in vec2 TexCoord;", "Take the texture coordinates passed in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in mat3 TBN;", "Take the tangent bitangent normal matrix in from the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine(""));
+	fsh->AddTopLine(GLSLLine(extraSource));
 	fsh->AddTopLine(GLSLLine(""));
 	fsh->AddTopLine(GLSLLine(R"(
 	struct DataBlob

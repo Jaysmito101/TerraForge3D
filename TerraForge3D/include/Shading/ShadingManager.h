@@ -48,6 +48,10 @@ public:
 	std::string geometrySource = "";
 	std::string fragmentSource = "";
 
+	std::string extraSource = "";
+
+	bool optimizeGLSL;
+
 	std::vector<std::string> logs;
 	std::vector<DefaultCustomNode> defaultCustomNodes;
 };
