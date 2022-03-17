@@ -4,7 +4,7 @@
     "description": "Combind 3 floats to a Float3",
     "fname": "scalarFloar3Multiply",
     "returns": "vec3",
-    "params": ["vec3:x"],
+    "params": ["vec3:x", "float:y"],
     "type": "method",
     "color" : { "r" : 12, "g" : 32, "b" : 212},
     "sharedData": { 
@@ -14,5 +14,5 @@
 [/META]
 
 [CODE]
-return x * data[{OFFSET}].d[0];
+return x * y * data[{OFFSET}].d[0];
 [/CODE]

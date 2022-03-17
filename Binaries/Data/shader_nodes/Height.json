@@ -1,0 +1,16 @@
+[META]
+{
+    "name": "Height",
+    "fname": "getHeight",
+    "returns": "float",
+    "params": [],
+    "color" : { "r" : 224, "g" : 48, "b" : 79},
+    "type": "method",
+    "sharedData": {
+    }
+}
+[/META]
+
+[CODE]
+return height;
+[/CODE]
