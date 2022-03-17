@@ -99,7 +99,7 @@ void CustomShaderNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 			break;
 		}
 	}
-	line->line += ", " + STR(callerPin) + ")";
+	line->line += (params.size() == 0 ? "" : ", ") + STR(callerPin) + ")";
 }
 
 void CustomShaderNode::Load(nlohmann::json data)
@@ -356,7 +356,7 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 		j++;
 	}
 
-	paramsStr += ", int callerPin";
+	paramsStr += (params.size() == 0 ? "" : ", ") + std::string("int callerPin");
 
 	func = new GLSLFunction(meta["fname"], paramsStr, meta["returns"]);
 	sharedDataTemplate.clear();
