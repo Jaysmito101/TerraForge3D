@@ -190,7 +190,6 @@ var hierarchy =
       [ "PixelateNode", "dc/d9e/class_pixelate_node.html", null ],
       [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
       [ "SNENode", "df/d7c/class_s_n_e_node.html", [
-        [ "CustomShaderNode", "db/da0/class_custom_shader_node.html", null ],
         [ "Float3Node", "d9/d1c/class_float3_node.html", null ],
         [ "FloatNode", "d5/dc7/class_float_node.html", null ],
         [ "PBRMaterialNode", "d3/da4/class_p_b_r_material_node.html", null ],
@@ -222,6 +221,7 @@ var hierarchy =
     [ "ShaderStorageBuffer", "d4/dc3/class_shader_storage_buffer.html", null ],
     [ "ShaderTextureManager", "d4/da6/class_shader_texture_manager.html", null ],
     [ "ShadingManager", "de/d7d/class_shading_manager.html", null ],
+    [ "SharedDataRep", "d5/d6b/struct_shared_data_rep.html", null ],
     [ "SharedMemoryItem", "df/d81/struct_shared_memory_item.html", null ],
     [ "SharedMemoryManager", "d9/d9f/class_shared_memory_manager.html", null ],
     [ "SkyManager", "db/d15/class_sky_manager.html", null ],
