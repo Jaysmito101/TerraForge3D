@@ -93,7 +93,7 @@ void CustomShaderNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 	int callerPin = 0;
 	for(int i = 0;i<outputPins.size();i++)
 	{
-		if(outputPins[i].id == callerPinId)
+		if(outputPins[i]->id == callerPinId)
 		{
 			callerPin = i;
 			break;
