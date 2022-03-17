@@ -36,5 +36,5 @@ public:
 	GLSLFunction *func;
 	std::vector<std::pair<std::string, std::string>> params;
 	std::vector<SharedDataRep> sharedDataTemplate;
-	std::vector<std::string>> oPinStrs;
+	std::vector<std::string> oPinStrs;
 };
