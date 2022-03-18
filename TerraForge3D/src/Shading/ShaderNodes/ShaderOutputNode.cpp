@@ -74,7 +74,7 @@ ShaderOutputNode::ShaderOutputNode(GLSLHandler *handler)
 	:SNENode(handler)
 {
 	name = "Output";
-	color[0] = color[1] = color[2] = color[3] = 0.0f;
+	color[0] = color[1] = color[2] = color[3] = 1.0f;
 	headerColor = ImColor(SHADER_OUTPUT_NODE_COLOR);
 	inputPins.push_back(new SNEPin(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));
 }

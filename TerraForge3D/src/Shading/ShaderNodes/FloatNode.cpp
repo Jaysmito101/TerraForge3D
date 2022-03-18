@@ -45,7 +45,7 @@ FloatNode::FloatNode(GLSLHandler *handler)
 	:SNENode(handler)
 {
 	name = "Float Value";
-	x = y = z = 0.0f;
+	x = 0.0f;
 	headerColor = ImColor(SHADER_VALUE_NODE_COLOR);
 	outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float));
 }

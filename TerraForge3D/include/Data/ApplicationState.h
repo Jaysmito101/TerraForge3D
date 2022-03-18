@@ -16,6 +16,7 @@
 #include "Sky/SkySettings.h"
 #include "Misc/OSLiscences.h"
 #include "Shading/ShadingManager.h"
+#include "Exporters/TextureBaker.h"
 
 #include "json/json.hpp"
 
@@ -34,18 +35,15 @@ struct ApplicationStateModels
 
 struct ApplicationStateFrameBuffers
 {
-	FrameBuffer *reflection;
-	FrameBuffer *textureExport;
-	FrameBuffer *postProcess;
-	FrameBuffer *main;
-	FrameBuffer *texBakeMain = nullptr;
+	FrameBuffer *reflection = nullptr;
+	FrameBuffer *postProcess = nullptr;
+	FrameBuffer *main = nullptr;
 };
 
 struct ApplicationStateShaders
 {
 	Shader *terrain = nullptr;
 	Shader *wireframe = nullptr;
-	Shader *textureBake = nullptr;
 	Shader *foliage = nullptr;
 	Shader *postProcess = nullptr;
 
@@ -88,6 +86,7 @@ struct ApplicationStateWindows
 	bool lightControls = true;
 	bool cameraControls = true;
 	bool shadingManager = false;
+	bool textureBaker = false;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
@@ -218,6 +217,7 @@ struct ApplicationState
 	ProjectManager *projectManager = nullptr;
 	FoliageManager *foliageManager = nullptr;
 	ShadingManager *shadingManager = nullptr;
+	TextureBaker* textureBaker = nullptr;
 
 	ApplicationMode mode = ApplicationMode::TERRAIN;
 

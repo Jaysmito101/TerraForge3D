@@ -2,11 +2,11 @@
 
 #include "Shading/ShaderNodeEditor.h"
 
-class FloatNode : public SNENode
+class BakeToSlotNode : public SNENode
 {
 public:
-	FloatNode(GLSLHandler *handler);
-	~FloatNode();
+	BakeToSlotNode(GLSLHandler *handler);
+	~BakeToSlotNode();
 
 	virtual void OnEvaluate(GLSLFunction *function, GLSLLine *line) override;
 	virtual void Load(nlohmann::json data) override;
@@ -14,5 +14,6 @@ public:
 	virtual void OnRender() override;
 	virtual void UpdateShaders() override;
 
-	float x = 0.0f;
+public:
+    int slot = 1;
 };

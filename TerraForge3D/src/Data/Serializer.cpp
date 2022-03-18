@@ -5,6 +5,7 @@
 #include "Data/VersionInfo.h"
 #include "Data/ApplicationState.h"
 #include "Misc/AppStyles.h"
+#include "Shading/ShadingManager.h"
 
 #ifdef TERR3D_WIN32
 #include "dirent/dirent.h"
@@ -100,8 +101,10 @@ nlohmann::json Serializer::Serialize()
 	TRY_CATCH_ERR_SERIALIZE(data["sea"] = appState->seaManager->Save();, "Failed to save Sea.");
 	TRY_CATCH_ERR_SERIALIZE(data["foliage"] = appState->foliageManager->Save();, "Failed to save foliage manager.");
 	TRY_CATCH_ERR_SERIALIZE(data["projectID"] = appState->projectManager->GetId();, "Failed to save project id.");
+	TRY_CATCH_ERR_SERIALIZE(data["textureBaker"] = appState->textureBaker->Save();, "Failed to save texture baker settings.");
 	TRY_CATCH_ERR_SERIALIZE(appState->projectManager->SaveDatabase(); data["projectDatabase"] = appState->projectManager->GetDatabase();, "Failed to save project database.");
 	TRY_CATCH_ERR_SERIALIZE(data["lighting"] = appState->lightManager->Save();, "Failed to save lighting data.");
+	TRY_CATCH_ERR_SERIALIZE(data["shading"] = appState->shadingManager->Save();, "Failed to save shading data.");
 	TRY_CATCH_ERR_SERIALIZE(data["generators"] = appState->meshGenerator->Save();, "Failed to save generators.");
 	TRY_CATCH_ERR_SERIALIZE(
 
@@ -326,10 +329,12 @@ ApplicationState *Serializer::Deserialize(nlohmann::json d)
 	TRY_CATCH_ERR_DESERIALIZE(appState->windows.Load(data["windows"]);, "Failed to load windows.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->states.Load(data["states"]);, "Failed to load states.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->globals.Load(data["globals"]);, "Failed to load globals.");
+	TRY_CATCH_ERR_DESERIALIZE(appState->textureBaker->Load(data["textureBaker"]);, "Failed to load texture baker settings.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->seaManager->Load(data["sea"]);, "Failed to load sea.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->foliageManager->Load(data["foliage"]);, "Failed to load foliage.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->lightManager->Load(data["lighting"]);, "Failed to load lighting.");
 	TRY_CATCH_ERR_DESERIALIZE(appState->meshGenerator->Load(data["generators"]);, "Failed to load generators.");
+	TRY_CATCH_ERR_DESERIALIZE(appState->shadingManager->Load(data["shading"]);, "Failed to load shading data.");
 	TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(
 
 	    if (appState->mode == ApplicationMode::CUSTOM_BASE)

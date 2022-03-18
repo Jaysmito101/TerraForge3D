@@ -58,11 +58,6 @@ static ApplicationState *appState;
 static Application *mainApp;
 
 
-static LayeredNoiseManager *noiseGen;
-
-
-
-
 void OnAppClose(int x, int y)
 {
 	Log("Close App");
@@ -100,16 +95,6 @@ static void ResetShader()
 {
 	bool res = false;
 
-	if (appState->shaders.terrain)
-	{
-		delete appState->shaders.terrain;
-	}
-
-	if (appState->shaders.textureBake)
-	{
-		delete appState->shaders.textureBake;
-	}
-
 	if(appState->shaders.foliage)
 	{
 		delete appState->shaders.foliage;
@@ -122,12 +107,14 @@ static void ResetShader()
 		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "geom.glsl", &res));
 	}
 
-	appState->shaders.textureBake = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "vert.glsl", &res),
-	        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "frag.glsl", &res),
-	        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "geom.glsl", &res));
-	appState->shaders.terrain = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "vert.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "frag.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "geom.glsl", &res));
+	// appState->shaders.textureBake = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "vert.glsl", &res),
+	//        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "frag.glsl", &res),
+	//        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "texture_bake" PATH_SEPERATOR "geom.glsl", &res));
+
+	// appState->shaders.terrain = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "vert.glsl", &res),
+	//                                     ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "frag.glsl", &res),
+	//                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "default" PATH_SEPERATOR "geom.glsl", &res));
+
 	appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "foliage" PATH_SEPERATOR "vert.glsl", &res),
 	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "foliage" PATH_SEPERATOR "frag.glsl", &res),
 	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPERATOR "foliage" PATH_SEPERATOR "geom.glsl", &res));
@@ -149,47 +136,7 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	// Texture Bake
 	if (appState->states.textureBake)
 	{
-		float tmp[3];
-
-		if(bakeTextureFinal)
-		{
-			tmp[0] = appState->globals.texBakeRes;
-			tmp[1] = appState->globals.texBakeRes;
-		}
-
-		else
-		{
-			tmp[0] = 1024;
-			tmp[1] = 1024;
-		}
-
-		tmp[2] = 1;
-		Camera cam;
-		cam = appState->cameras.main;
-		cam.aspect = 1.0f;
-		cam.position[0] = cam.position[1] = cam.position[2] = 0.0f;
-		cam.position[2] = 1.0f;
-		cam.rotation[0] = cam.rotation[1] = cam.rotation[2] = 0.0f;
-		cam.perspective = false;
-		cam.UpdateCamera();
-		shader = appState->shaders.terrain;
-		shader->Bind();
-		shader->SetTime(&time);
-		shader->SetMPV(cam.pv);
-		shader->SetUniformf("_TextureBake", 1.0f);
-		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
-		shader->SetLightCol(appState->lightManager->color);
-		shader->SetLightPos(appState->lightManager->position);
-		shader->SetUniform3f("_Resolution", tmp);
-		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
-		shader->SetUniform3f("_HMapMinMax", appState->globals.hMapC);
-		shader->SetUniformf("_SeaLevel", appState->seaManager->level);
-		shader->SetUniformf("_Scale", appState->globals.scale);
-		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
-		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
-		shader->SetUniformf("_Mode", appState->globals.textureBakeMode);
-		appState->shadingManager->UpdateShaders();
-		appState->models.coreTerrain->Render();
+		
 	}
 
 	else
@@ -460,34 +407,6 @@ static void ShowTerrainControls()
 		ImGui::DragFloat("Mesh Scale", &appState->globals.scale, 0.1f, 1.0f, 5000.0f);
 	}
 
-	static const char *tbmi[] = {"Diffuse Map", "Heigt Map", "Normal Map"};
-
-	if (ImGui::BeginCombo("Texture Bake Mode##combo", tbmi[appState->globals.textureBakeMode]))
-	{
-		for (int n = 0; n < IM_ARRAYSIZE(tbmi); n++)
-		{
-			bool is_selected = (appState->globals.textureBakeMode == n);
-
-			if (ImGui::Selectable(tbmi[n], is_selected))
-			{
-				appState->globals.textureBakeMode = n;
-			}
-
-			if (is_selected)
-			{
-				ImGui::SetItemDefaultFocus();    // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-			}
-		}
-
-		ImGui::EndCombo();
-	}
-
-	if(appState->globals.textureBakeMode == 1)
-	{
-		ImGui::DragFloat2("Height Map Min Max", appState->globals.hMapC, 0.01f);
-	}
-
-	ImGui::DragInt("Texture Export Resolution", &appState->globals.texBakeRes, 4);
 	ImGui::NewLine();
 	ImGui::Checkbox("Auto Update", &appState->states.autoUpdate);
 	ImGui::Checkbox("Post Processing", &appState->states.postProcess);
@@ -555,28 +474,7 @@ static void ShowTerrainControls()
 
 	if (ImGui::Button("Export Frame"))
 	{
-		if(appState->states.textureBake)
-		{
-			if(appState->frameBuffers.texBakeMain)
-			{
-				delete appState->frameBuffers.texBakeMain;
-			}
-
-			appState->frameBuffers.texBakeMain = new FrameBuffer(appState->globals.texBakeRes, appState->globals.texBakeRes);
-			appState->frameBuffers.texBakeMain->Begin();
-			glViewport(0, 0, appState->globals.texBakeRes, appState->globals.texBakeRes);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			DoTheRederThing(appState->stats.deltatime, false, true, true);
-			ExportTexture(appState->frameBuffers.texBakeMain->GetRendererID(), ShowSaveFileDialog(".png"), appState->globals.texBakeRes, appState->globals.texBakeRes);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			delete appState->frameBuffers.texBakeMain;
-			appState->frameBuffers.texBakeMain = nullptr;
-		}
-
-		else
-		{
-			ExportTexture(appState->frameBuffers.main->GetRendererID(), ShowSaveFileDialog(".png"), 800, 600);
-		}
+		ExportTexture(appState->frameBuffers.main->GetRendererID(), ShowSaveFileDialog(".png"), appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
 	}
 
 	ImGui::Separator();
@@ -659,12 +557,8 @@ static void ShowMainScene()
 		appState->globals.viewportSize[0] = wsize.x;
 		appState->globals.viewportSize[1] = wsize.y;
 
-		if (appState->states.textureBake)
-		{
-			ImGui::Image((ImTextureID)appState->frameBuffers.textureExport->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		}
 
-		else if (appState->states.postProcess)
+		if (appState->states.postProcess)
 		{
 			ImGui::Image((ImTextureID)appState->frameBuffers.postProcess->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		}
@@ -870,16 +764,7 @@ public:
 			}
 
 			appState->stats.deltatime = deltatime;
-
-			if (appState->states.textureBake)
-			{
-				appState->frameBuffers.textureExport->Begin();
-				glViewport(0, 0, 1024, 1024);
-				GetWindow()->Clear();
-				DoTheRederThing(deltatime, false, true);
-			}
-
-			else
+			
 			{
 				appState->frameBuffers.reflection->Begin();
 				glViewport(0, 0, appState->frameBuffers.reflection->GetWidth(), appState->frameBuffers.reflection->GetHeight());
@@ -1007,8 +892,6 @@ public:
 			ShowStats();
 		}
 
-		//if (appState->windows.texturEditorWindow)
-		//ShowTextureSettings(&appState->windows.texturEditorWindow);
 		appState->seaManager->ShowSettings(&appState->windows.seaEditor);
 
 		if (appState->windows.modulesManager)
@@ -1025,9 +908,6 @@ public:
 		{
 			appState->foliageManager->ShowSettings(&appState->windows.foliageManager);
 		}
-
-		//if (appState->windows.shaderEditorWindow)
-		//	ShowShaderEditor(&appState->windows.shaderEditorWindow);
 
 		if(appState->windows.textureStore)
 		{
@@ -1057,6 +937,11 @@ public:
 		if (appState->windows.skySettings)
 		{
 			appState->skyManager->ShowSettings(&appState->windows.skySettings);
+		}
+
+		if(appState->windows.textureBaker)
+		{
+			appState->textureBaker->ShowSettings(&appState->windows.textureBaker);
 		}
 
 		OnImGuiRenderEnd();
@@ -1113,6 +998,7 @@ public:
 		appState->osLiscences = new OSLiscences(appState);
 		appState->textureStore = new TextureStore(appState);
 		appState->shadingManager = new ShadingManager(appState);
+		appState->textureBaker = new TextureBaker(appState);
 		ResetShader();
 		appState->meshGenerator->GenerateSync();
 		appState->models.coreTerrain->SetupMeshOnGPU();
@@ -1138,8 +1024,6 @@ public:
 		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + PATH_SEPERATOR "OpenSans-Bold.ttf");
 		// The framebuffer used for reflections in the sea
 		appState->frameBuffers.reflection = new FrameBuffer();
-		// This is the framebuffer for previewing the texture to export
-		appState->frameBuffers.textureExport = new FrameBuffer(1024, 1024);
 		// The main frame buffer
 		appState->frameBuffers.main = new FrameBuffer(1280, 720);
 		// The Framebuffer used for post processing
@@ -1179,7 +1063,6 @@ public:
 		std::this_thread::sleep_for(500ms);
 		delete appState->shaders.terrain;
 		delete appState->shaders.foliage;
-		delete appState->shaders.textureBake;
 		delete appState->shaders.wireframe;
 		delete appState->shaders.postProcess;
 		delete appState->supportersTribute;
@@ -1188,9 +1071,9 @@ public:
 		delete appState->frameBuffers.main;
 		delete appState->frameBuffers.postProcess;
 		delete appState->frameBuffers.reflection;
-		delete appState->frameBuffers.textureExport;
 		delete appState->filtersManager;
 		delete appState->osLiscences;
+		delete appState->textureBaker;
 		delete appState->projectManager;
 		delete appState->foliageManager;
 		delete appState->shadingManager;

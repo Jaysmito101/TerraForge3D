@@ -12,6 +12,7 @@
 #include "Shading/ShaderNodes/FloatNode.h"
 #include "Shading/ShaderNodes/PBRMaterialNode.h"
 #include "Shading/ShaderNodes/CustomShaderNode.h"
+#include "Shading/ShaderNodes/BakeToSlotNode.h"
 
 
 #include <filesystem>
@@ -65,6 +66,9 @@ static bool ShowNodeMaker(NodeEditor *editor, GLSLHandler *handler, ShaderTextur
 	NODE_MAKER_SHOW(Float3Node, "Float3", didMake);
 
 	NODE_MAKER_SHOW(FloatNode, "Float Value", didMake);
+	
+	NODE_MAKER_SHOW(BakeToSlotNode, "Bake To Slot", didMake);
+
 
 	if (NODE_MAKER_COND("Texture"))
 	{
@@ -156,6 +160,11 @@ ShadingManager::ShadingManager(ApplicationState *as)
 			node = new PBRMaterialNode(fsh);
 		}
 
+		else if(data["type"] == "BakeToSlot")
+		{
+			node = new BakeToSlotNode(fsh);
+		}
+
 		else if(data["type"] == "CustomShader")
 		{
 			node = new CustomShaderNode(fsh, data["shader"]);
@@ -177,6 +186,18 @@ ShadingManager::~ShadingManager()
 	delete gsh;
 	delete fsh;
 	delete sharedMemoryManager;
+}
+
+nlohmann::json ShadingManager::Save()
+{
+	nlohmann::json data;
+	data["nodeEditor"] = shaderNodeEditor->Save();
+	return data;
+}
+
+void ShadingManager::Load(nlohmann::json data)
+{
+	shaderNodeEditor->Load(data["nodeEditor"]);
 }
 
 void ShadingManager::UpdateShaders()
@@ -429,14 +450,29 @@ out DATA
 	vsh->AddUniform(GLSLUniform("_PV", "mat4"));
 	vsh->AddUniform(GLSLUniform("_TextureBake", "float", "0.0f"));
 	vsh->AddUniform(GLSLUniform("_Scale", "float", "1.0f"));
+	vsh->AddUniform(GLSLUniform("_Tiled", "float", "0.0f"));
+	vsh->AddUniform(GLSLUniform("_NumTiles", "float", "0.0f"));
+	vsh->AddUniform(GLSLUniform("_TileX", "float", "0.0f"));
+	vsh->AddUniform(GLSLUniform("_TileY", "float", "0.0f"));
 	
 	GLSLFunction main("main");
 	main.AddLine(GLSLLine("", "TEMP"));
 	main.AddLine(GLSLLine(R"(
+
 if(_TextureBake == 0.0f)
 	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
 else
-	gl_Position = vec4(aPos.x/_Scale, aPos.z/_Scale, 0.0f, 1.0f);
+{
+	if(_Tiled == 0.0f)
+	{
+		gl_Position = vec4(aPos.x/_Scale, aPos.z/_Scale, 0.0f, 1.0f);
+	}
+	else
+	{
+		float factor = _NumTiles / _Scale;
+		gl_Position = vec4(aPos.x * factor + _TileX, aPos.z * factor + _TileY, 0.0f, 1.0f);
+	}
+}
 )"));
 	main.AddLine(GLSLLine("data_out.height = aExtras1.x;", "The actual generated noise value"));
 	main.AddLine(GLSLLine("data_out.FragPos = vec3(aPos.x, aPos.y, aPos.z);", "The world position"));
@@ -548,14 +584,18 @@ void ShadingManager::PrepFragShader()
 	fsh->AddUniform(GLSLUniform("_CameraPos", "vec3"));
 	fsh->AddUniform(GLSLUniform("_HMapMinMax", "vec3"));
 	fsh->AddUniform(GLSLUniform("_TextureBake", "float", "0.0f"));
-	fsh->AddUniform(GLSLUniform("_Mode", "float", "0.0f"));
+	fsh->AddUniform(GLSLUniform("_Slot", "float", "0.0f"));
+	fsh->AddUniform(GLSLUniform("_Tiled", "float", "0.0f"));
+	fsh->AddUniform(GLSLUniform("_NumTiles", "float", "0.0f"));
+	fsh->AddUniform(GLSLUniform("_TileX", "float", "0.0f"));
+	fsh->AddUniform(GLSLUniform("_TileY", "float", "0.0f"));
 	fsh->AddUniform(GLSLUniform("_Textures", "sampler2DArray"));
 	GLSLSSBO dataBlobs("dataBlobs", std::to_string(sharedMemoryManager->ssboBinding), "These are small data blobs which may be used for nodes, etc.");
 	dataBlobs.AddLine(GLSLLine("DataBlob data[];"));
 	fsh->AddSSBO(dataBlobs);
 	GLSLFunction main("main");
-	main.AddLine(GLSLLine("vec3 objectColor = vec3(1.0f);"));
 	main.AddLine(GLSLLine(""));
+	main.AddLine(GLSLLine("vec3 textureBakeSlots[10];"));
 	GLSLLine tmp("", "");
 	NodeInputParam param;
 	param.userData1 = &main;
@@ -565,13 +605,8 @@ void ShadingManager::PrepFragShader()
 	main.AddLine(GLSLLine(R"(
 	if(_TextureBake == 1.0f)
 	{
-		if(_Mode == 0.0f)
-			objectColor = vec3(1.0);
-		else if(_Mode == 1.0f)
-			objectColor = vec3( (height - _HMapMinMax.x) / (_HMapMinMax.y - _HMapMinMax.x) );
-		else if(_Mode == 2.0f)
-			objectColor = Normal;
-		FragColor = vec4(objectColor, 1.0f);
+		textureBakeSlots[0] =  vec3( (height - _HMapMinMax.x) / (_HMapMinMax.y - _HMapMinMax.x) ); // Slot 0 is reserved for height map
+		FragColor = vec4(textureBakeSlots[int(_Slot)], 1.0f);
 		return;
 	}	
 	)"));

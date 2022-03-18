@@ -24,6 +24,8 @@ public:
 
 	void UpdateShaders();
 
+	void Load(nlohmann::json data);
+	nlohmann::json Save();
 	void ShowSettings(bool *pOpen);
 
 private:

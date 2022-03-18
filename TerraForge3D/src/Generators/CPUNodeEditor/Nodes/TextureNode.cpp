@@ -229,12 +229,12 @@ void TextureNode::OnRender()
 	ImGui::Checkbox(("Inverse Texture##tinv" + std::to_string(id)).c_str(), &inv);
 	ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale);
 
+
+	ImGui::PushItemWidth(100);
 	if(!autoTiled)
 	{
 		ImGui::DragFloat(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f);
 	}
-
-	ImGui::PushItemWidth(100);
 	ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f);
 	ImGui::PopItemWidth();
 	ImGui::DragFloat(("Rotation##rota" + std::to_string(id)).c_str(), &rota, 0.1f);

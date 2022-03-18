@@ -66,6 +66,7 @@ nlohmann::json ApplicationStateWindows::Save()
 	data["lightControls"] = lightControls;
 	data["cameraControls"] = cameraControls;
 	data["shadingManager"] = shadingManager;
+	data["textureBaker"] = textureBaker;
 	return data;
 }
 
@@ -86,6 +87,7 @@ void ApplicationStateWindows::Load(nlohmann::json data)
 	lightControls = data["lightControls"];
 	cameraControls = data["cameraControls"];
 	shadingManager = data["shadingManager"];
+	textureBaker = data["textureBaker"];
 }
 
 nlohmann::json ApplicationStateStates::Save()

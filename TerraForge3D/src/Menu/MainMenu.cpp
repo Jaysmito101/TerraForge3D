@@ -231,9 +231,8 @@ void MainMenu::ShowWindowsMenu()
 {
 	ShowWindowMenuItem("Statistics", &appState->windows.statsWindow);
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
-//	ShowWindowMenuItem("Shader Editor", &appState->windows.shaderEditorWindow);
 	ShowWindowMenuItem("Foliage Manager", &appState->windows.foliageManager);
-//	ShowWindowMenuItem("Texture Settings", &appState->windows.texturEditorWindow);
+	ShowWindowMenuItem("Texture Baker", &appState->windows.textureBaker);
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
 	ShowWindowMenuItem("Sea Settings", &appState->windows.seaEditor);
 	ShowWindowMenuItem("Light Settings", &appState->windows.lightControls);
