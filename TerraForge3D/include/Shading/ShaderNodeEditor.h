@@ -3,6 +3,7 @@
 #include "Base/NodeEditor/NodeEditor.h"
 #include "Shading/SharedMemoryManager.h"
 #include "Shading/GLSLHandler.h"
+#include "Utils/Utils.h"
 
 
 // NOTE : These colors were suggested by GitHub Copilot
@@ -18,7 +19,7 @@
 #define SHADER_MATERIAL_NODE_COLOR 251, 123, 144
 
 #define STR(x) std::to_string(x)
-#define VAR(x) std::string(x) + STR(id)
+#define VAR(x) std::string(x) + STR(id) + GenerateId(5)
 #define SDATA(x) std::string("data[") + STR(dataBlobOffset) + "].d[" + STR(x) + "]"
 
 enum SNEPinType
