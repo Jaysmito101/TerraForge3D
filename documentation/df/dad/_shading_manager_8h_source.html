@@ -134,43 +134,46 @@ $(document).ready(function(){initNavTree('df/dad/_shading_manager_8h_source.html
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keywordtype">void</span> UpdateShaders();</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordtype">void</span> ShowSettings(<span class="keywordtype">bool</span> *pOpen);</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordtype">void</span> PrepVertShader();</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">void</span> PrepGeomShader();</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">void</span> PrepFragShader();</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">void</span> ReCompileShaders();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordtype">void</span> Load(<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> Save();</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">void</span> ShowSettings(<span class="keywordtype">bool</span> *pOpen);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">void</span> PrepVertShader();</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">void</span> PrepGeomShader();</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">void</span> PrepFragShader();</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">void</span> LoadDefaultCustomNodes();</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">void</span> ReCompileShaders();</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *vsh = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *gsh = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *fsh = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a> *sharedMemoryManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_class" href="../../db/d54/class_node_editor.html">NodeEditor</a> *shaderNodeEditor = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_class" href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a> *shaderTextureManager = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    std::string vertexSource = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    std::string geometrySource = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    std::string fragmentSource = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    std::string extraSource = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keywordtype">void</span> LoadDefaultCustomNodes();</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_struct" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *vsh = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *gsh = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_class" href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a> *fsh = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_class" href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a> *sharedMemoryManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <a class="code hl_class" href="../../db/d54/class_node_editor.html">NodeEditor</a> *shaderNodeEditor = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a> *shaderTextureManager = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    std::string vertexSource = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    std::string geometrySource = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    std::string fragmentSource = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordtype">bool</span> optimizeGLSL;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    std::string extraSource = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    std::vector&lt;std::string&gt; logs;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    std::vector&lt;DefaultCustomNode&gt; defaultCustomNodes;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>};</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">bool</span> optimizeGLSL;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    std::vector&lt;std::string&gt; logs;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    std::vector&lt;DefaultCustomNode&gt; defaultCustomNodes;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>};</div>
 <div class="ttc" id="aclass_g_l_s_l_handler_html"><div class="ttname"><a href="../../d9/dab/class_g_l_s_l_handler.html">GLSLHandler</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/da2/_g_l_s_l_handler_8h_source.html#l00074">GLSLHandler.h:75</a></div></div>
 <div class="ttc" id="aclass_node_editor_html"><div class="ttname"><a href="../../db/d54/class_node_editor.html">NodeEditor</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d6/df8/_node_editor_8h_source.html#l00151">NodeEditor.h:152</a></div></div>
 <div class="ttc" id="aclass_shader_texture_manager_html"><div class="ttname"><a href="../../d4/da6/class_shader_texture_manager.html">ShaderTextureManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/d54/_shader_texture_manager_8h_source.html#l00010">ShaderTextureManager.h:11</a></div></div>
 <div class="ttc" id="aclass_shading_manager_html"><div class="ttname"><a href="../../de/d7d/class_shading_manager.html">ShadingManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../df/dad/_shading_manager_8h_source.html#l00019">ShadingManager.h:20</a></div></div>
 <div class="ttc" id="aclass_shared_memory_manager_html"><div class="ttname"><a href="../../d9/d9f/class_shared_memory_manager.html">SharedMemoryManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../db/df0/_shared_memory_manager_8h_source.html#l00056">SharedMemoryManager.h:57</a></div></div>
-<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00192">ApplicationState.h:193</a></div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
+<div class="ttc" id="astruct_application_state_html"><div class="ttname"><a href="../../da/d59/struct_application_state.html">ApplicationState</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d9b/_application_state_8h_source.html#l00191">ApplicationState.h:192</a></div></div>
 <div class="ttc" id="astruct_default_custom_node_html"><div class="ttname"><a href="../../d3/d89/struct_default_custom_node.html">DefaultCustomNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../df/dad/_shading_manager_8h_source.html#l00013">ShadingManager.h:14</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -178,7 +181,7 @@ $(document).ready(function(){initNavTree('df/dad/_shading_manager_8h_source.html
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f91755bd714974cebdea8f52266e36fd.html">include</a></li><li class="navelem"><a class="el" href="../../dir_d27bbd195b0a8cc417cceb10b4212cdd.html">Shading</a></li><li class="navelem"><b>ShadingManager.h</b></li>
-    <li class="footer">Generated on Fri Mar 18 2022 04:11:05 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Fri Mar 18 2022 14:34:56 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

@@ -1,5 +1,6 @@
 var dir_df14e04e9cabc0328aadfe45b4e48990 =
 [
+    [ "BakeToSlotNode.cpp", "dc/d55/_bake_to_slot_node_8cpp_source.html", null ],
     [ "CustomShaderNode.cpp", "d9/da3/_custom_shader_node_8cpp_source.html", null ],
     [ "Float3Node.cpp", "dd/dbf/_float3_node_8cpp_source.html", null ],
     [ "FloatNode.cpp", "d0/dfe/_float_node_8cpp_source.html", null ],

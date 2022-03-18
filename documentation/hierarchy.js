@@ -190,6 +190,7 @@ var hierarchy =
       [ "PixelateNode", "dc/d9e/class_pixelate_node.html", null ],
       [ "RandomNumberNode", "dc/d4b/class_random_number_node.html", null ],
       [ "SNENode", "df/d7c/class_s_n_e_node.html", [
+        [ "BakeToSlotNode", "d0/d78/class_bake_to_slot_node.html", null ],
         [ "CustomShaderNode", "db/da0/class_custom_shader_node.html", null ],
         [ "Float3Node", "d9/d1c/class_float3_node.html", null ],
         [ "FloatNode", "d5/dc7/class_float_node.html", null ],
@@ -323,6 +324,7 @@ var hierarchy =
     ] ],
     [ "SupportersTribute", "db/d47/class_supporters_tribute.html", null ],
     [ "Texture2D", "de/dd0/class_texture2_d.html", null ],
+    [ "TextureBaker", "d3/d2a/class_texture_baker.html", null ],
     [ "TextureCubemap", "d7/df9/class_texture_cubemap.html", null ],
     [ "TextureStore", "d0/d8a/class_texture_store.html", null ],
     [ "TextureStoreItem", "d8/d09/struct_texture_store_item.html", null ],

@@ -128,26 +128,26 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_aaadf3d23
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00196">196</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  197</span>{</div>
-<div class="line"><span class="lineno">  198</span>    std::string nodesDir = GetExecutableDir() + PATH_SEPERATOR + <span class="stringliteral">&quot;Data&quot;</span> + PATH_SEPERATOR + <span class="stringliteral">&quot;shader_nodes&quot;</span>;</div>
-<div class="line"><span class="lineno">  199</span>    defaultCustomNodes.clear();</div>
-<div class="line"><span class="lineno">  200</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  201</span> </div>
-<div class="line"><span class="lineno">  202</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;entry : fs::directory_iterator(nodesDir))</div>
-<div class="line"><span class="lineno">  203</span>    {</div>
-<div class="line"><span class="lineno">  204</span>        <span class="keywordflow">if</span>(entry.path().extension().string() != <span class="stringliteral">&quot;.json&quot;</span>)    </div>
-<div class="line"><span class="lineno">  205</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  206</span>        <a class="code hl_struct" href="../../d3/d89/struct_default_custom_node.html">DefaultCustomNode</a> n;</div>
-<div class="line"><span class="lineno">  207</span>        n.name = entry.path().filename().string();</div>
-<div class="line"><span class="lineno">  208</span>        n.name = n.name.substr(0, n.name.find_last_of(<span class="stringliteral">&quot;.&quot;</span>));</div>
-<div class="line"><span class="lineno">  209</span>        n.content = ReadShaderSourceFile(entry.path().string(), &amp;tmp);</div>
-<div class="line"><span class="lineno">  210</span>        defaultCustomNodes.push_back(n);</div>
-<div class="line"><span class="lineno">  211</span>    }</div>
-<div class="line"><span class="lineno">  212</span> </div>
-<div class="line"><span class="lineno">  213</span>    extraSource = ReadShaderSourceFile(nodesDir + PATH_SEPERATOR + <span class="stringliteral">&quot;extras.glsl&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">  214</span>    </div>
-<div class="line"><span class="lineno">  215</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html#l00217">217</a> of file <a class="el" href="../../db/d7a/_shading_manager_8cpp_source.html">ShadingManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  218</span>{</div>
+<div class="line"><span class="lineno">  219</span>    std::string nodesDir = GetExecutableDir() + PATH_SEPERATOR + <span class="stringliteral">&quot;Data&quot;</span> + PATH_SEPERATOR + <span class="stringliteral">&quot;shader_nodes&quot;</span>;</div>
+<div class="line"><span class="lineno">  220</span>    defaultCustomNodes.clear();</div>
+<div class="line"><span class="lineno">  221</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  222</span> </div>
+<div class="line"><span class="lineno">  223</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;entry : fs::directory_iterator(nodesDir))</div>
+<div class="line"><span class="lineno">  224</span>    {</div>
+<div class="line"><span class="lineno">  225</span>        <span class="keywordflow">if</span>(entry.path().extension().string() != <span class="stringliteral">&quot;.json&quot;</span>)    </div>
+<div class="line"><span class="lineno">  226</span>            <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  227</span>        <a class="code hl_struct" href="../../d3/d89/struct_default_custom_node.html">DefaultCustomNode</a> n;</div>
+<div class="line"><span class="lineno">  228</span>        n.name = entry.path().filename().string();</div>
+<div class="line"><span class="lineno">  229</span>        n.name = n.name.substr(0, n.name.find_last_of(<span class="stringliteral">&quot;.&quot;</span>));</div>
+<div class="line"><span class="lineno">  230</span>        n.content = ReadShaderSourceFile(entry.path().string(), &amp;tmp);</div>
+<div class="line"><span class="lineno">  231</span>        defaultCustomNodes.push_back(n);</div>
+<div class="line"><span class="lineno">  232</span>    }</div>
+<div class="line"><span class="lineno">  233</span> </div>
+<div class="line"><span class="lineno">  234</span>    extraSource = ReadShaderSourceFile(nodesDir + PATH_SEPERATOR + <span class="stringliteral">&quot;extras.glsl&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">  235</span>    </div>
+<div class="line"><span class="lineno">  236</span>}</div>
 <div class="ttc" id="astruct_default_custom_node_html"><div class="ttname"><a href="../../d3/d89/struct_default_custom_node.html">DefaultCustomNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../df/dad/_shading_manager_8h_source.html#l00013">ShadingManager.h:14</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -158,7 +158,7 @@ $(document).ready(function(){initNavTree('de/d7d/class_shading_manager_aaadf3d23
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../de/d7d/class_shading_manager.html">ShadingManager</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 04:11:09 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Fri Mar 18 2022 14:35:00 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
