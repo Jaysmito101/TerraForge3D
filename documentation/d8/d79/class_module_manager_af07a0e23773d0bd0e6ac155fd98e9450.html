@@ -121,38 +121,39 @@ $(document).ready(function(){initNavTree('d8/d79/class_module_manager_af07a0e237
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html#l00047">47</a> of file <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html">ModuleManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   48</span>{</div>
-<div class="line"><span class="lineno">   49</span>    ImGui::Begin(<span class="stringliteral">&quot;Module Manager##TerraForge3DModuleManager&quot;</span>, pOpen);</div>
-<div class="line"><span class="lineno">   50</span>    ImGui::Text(<span class="stringliteral">&quot;Currently Installed Modules : %d&quot;</span>, loadedModules.size());</div>
-<div class="line"><span class="lineno">   51</span> </div>
-<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="../../dd/df9/class_module.html">Module</a> *module : loadedModules)</div>
-<div class="line"><span class="lineno">   53</span>    {</div>
-<div class="line"><span class="lineno">   54</span>        ImGui::PushID(module-&gt;uid.data());</div>
-<div class="line"><span class="lineno">   55</span> </div>
-<div class="line"><span class="lineno">   56</span>        <span class="keywordflow">if</span>(ImGui::CollapsingHeader(module-&gt;info.name.data()))</div>
-<div class="line"><span class="lineno">   57</span>        {</div>
-<div class="line"><span class="lineno">   58</span>            ImGui::Text(<span class="stringliteral">&quot;Name    : %s&quot;</span>, module-&gt;info.name.data());</div>
-<div class="line"><span class="lineno">   59</span>            ImGui::Text(<span class="stringliteral">&quot;Author  : %s&quot;</span>, module-&gt;info.authorName.data());</div>
-<div class="line"><span class="lineno">   60</span>            ImGui::Text(<span class="stringliteral">&quot;Version : %s&quot;</span>, module-&gt;info.versionString.data());</div>
-<div class="line"><span class="lineno">   61</span>            ImGui::Text(<span class="stringliteral">&quot;Website : %s&quot;</span>, module-&gt;info.website.data());</div>
-<div class="line"><span class="lineno">   62</span>            ImGui::Text(<span class="stringliteral">&quot;Contact : %s&quot;</span>, module-&gt;info.contact.data());</div>
-<div class="line"><span class="lineno">   63</span>            ImGui::Text(module-&gt;info.description.data());</div>
-<div class="line"><span class="lineno">   64</span>        }</div>
-<div class="line"><span class="lineno">   65</span> </div>
-<div class="line"><span class="lineno">   66</span>        ImGui::PopID();</div>
-<div class="line"><span class="lineno">   67</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">   68</span>    }</div>
-<div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>    ImGui::End();</div>
-<div class="line"><span class="lineno">   71</span>    <span class="keywordtype">void</span> *imguiContext = <span class="keyword">static_cast&lt;</span><span class="keywordtype">void</span> *<span class="keyword">&gt;</span>(ImGui::GetCurrentContext());</div>
-<div class="line"><span class="lineno">   72</span> </div>
-<div class="line"><span class="lineno">   73</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="../../dd/df9/class_module.html">Module</a> *module : loadedModules)</div>
-<div class="line"><span class="lineno">   74</span>    {</div>
-<div class="line"><span class="lineno">   75</span>        module-&gt;RenderImGui(imguiContext);</div>
-<div class="line"><span class="lineno">   76</span>    }</div>
-<div class="line"><span class="lineno">   77</span>}</div>
-<div class="ttc" id="aclass_module_html"><div class="ttname"><a href="../../dd/df9/class_module.html">Module</a></div><div class="ttdoc">Module Info.</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d7a/_module_8h_source.html#l00038">Module.h:39</a></div></div>
+<p class="definition">Definition at line <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html#l00140">140</a> of file <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html">ModuleManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  141</span>{</div>
+<div class="line"><span class="lineno">  142</span>    ImGui::Begin(<span class="stringliteral">&quot;Module Manager##TerraForge3DModuleManager&quot;</span>, pOpen);</div>
+<div class="line"><span class="lineno">  143</span>    ImGui::Text(<span class="stringliteral">&quot;Currently Installed Modules : %d&quot;</span>, loadedModules.size());</div>
+<div class="line"><span class="lineno">  144</span> </div>
+<div class="line"><span class="lineno">  145</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="../../dd/df9/class_module.html">Module</a> *module : loadedModules)</div>
+<div class="line"><span class="lineno">  146</span>    {</div>
+<div class="line"><span class="lineno">  147</span>        ImGui::PushID(module-&gt;uid.data());</div>
+<div class="line"><span class="lineno">  148</span> </div>
+<div class="line"><span class="lineno">  149</span>        <span class="keywordflow">if</span>(ImGui::CollapsingHeader(module-&gt;info.name.data()))</div>
+<div class="line"><span class="lineno">  150</span>        {</div>
+<div class="line"><span class="lineno">  151</span>            ImGui::Text(<span class="stringliteral">&quot;Name    : %s&quot;</span>, module-&gt;info.name.data());</div>
+<div class="line"><span class="lineno">  152</span>            ImGui::Text(<span class="stringliteral">&quot;Author  : %s&quot;</span>, module-&gt;info.authorName.data());</div>
+<div class="line"><span class="lineno">  153</span>            ImGui::Text(<span class="stringliteral">&quot;Version : %s&quot;</span>, module-&gt;info.versionString.data());</div>
+<div class="line"><span class="lineno">  154</span>            ImGui::Text(<span class="stringliteral">&quot;Website : %s&quot;</span>, module-&gt;info.website.data());</div>
+<div class="line"><span class="lineno">  155</span>            ImGui::Text(<span class="stringliteral">&quot;Contact : %s&quot;</span>, module-&gt;info.contact.data());</div>
+<div class="line"><span class="lineno">  156</span>            ImGui::Checkbox(<span class="stringliteral">&quot;Enabled&quot;</span>, &amp;module-&gt;isEnabled);</div>
+<div class="line"><span class="lineno">  157</span>            ImGui::Text(module-&gt;info.description.data());</div>
+<div class="line"><span class="lineno">  158</span>        }</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>        ImGui::PopID();</div>
+<div class="line"><span class="lineno">  161</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  162</span>    }</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>    ImGui::End();</div>
+<div class="line"><span class="lineno">  165</span>    <span class="keywordtype">void</span> *imguiContext = <span class="keyword">static_cast&lt;</span><span class="keywordtype">void</span> *<span class="keyword">&gt;</span>(ImGui::GetCurrentContext());</div>
+<div class="line"><span class="lineno">  166</span> </div>
+<div class="line"><span class="lineno">  167</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="../../dd/df9/class_module.html">Module</a> *module : loadedModules)</div>
+<div class="line"><span class="lineno">  168</span>    {</div>
+<div class="line"><span class="lineno">  169</span>        module-&gt;RenderImGui(imguiContext);</div>
+<div class="line"><span class="lineno">  170</span>    }</div>
+<div class="line"><span class="lineno">  171</span>}</div>
+<div class="ttc" id="aclass_module_html"><div class="ttname"><a href="../../dd/df9/class_module.html">Module</a></div><div class="ttdoc">Module Info.</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d7a/_module_8h_source.html#l00039">Module.h:40</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -162,7 +163,7 @@ $(document).ready(function(){initNavTree('d8/d79/class_module_manager_af07a0e237
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d8/d79/class_module_manager.html">ModuleManager</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:59 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

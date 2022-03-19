@@ -137,33 +137,33 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_a56a7eafe1f70871518b
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00329">329</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  330</span>{</div>
-<div class="line"><span class="lineno">  331</span>    <span class="keywordflow">if</span>(!vert)</div>
-<div class="line"><span class="lineno">  332</span>    {</div>
-<div class="line"><span class="lineno">  333</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  334</span>    }</div>
-<div class="line"><span class="lineno">  335</span> </div>
-<div class="line"><span class="lineno">  336</span>    <span class="keywordtype">int</span> i = x + y * res;</div>
-<div class="line"><span class="lineno">  337</span> </div>
-<div class="line"><span class="lineno">  338</span>    <span class="keywordflow">if</span> (i &gt; vertexCount)</div>
-<div class="line"><span class="lineno">  339</span>    {</div>
-<div class="line"><span class="lineno">  340</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  341</span>    }</div>
-<div class="line"><span class="lineno">  342</span> </div>
-<div class="line"><span class="lineno">  343</span>    <span class="keywordflow">if</span> (elevation &gt; maxHeight)</div>
-<div class="line"><span class="lineno">  344</span>    {</div>
-<div class="line"><span class="lineno">  345</span>        maxHeight = elevation;</div>
-<div class="line"><span class="lineno">  346</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00339">339</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  340</span>{</div>
+<div class="line"><span class="lineno">  341</span>    <span class="keywordflow">if</span>(!vert)</div>
+<div class="line"><span class="lineno">  342</span>    {</div>
+<div class="line"><span class="lineno">  343</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  344</span>    }</div>
+<div class="line"><span class="lineno">  345</span> </div>
+<div class="line"><span class="lineno">  346</span>    <span class="keywordtype">int</span> i = x + y * res;</div>
 <div class="line"><span class="lineno">  347</span> </div>
-<div class="line"><span class="lineno">  348</span>    <span class="keywordflow">if</span> (elevation &lt; minHeight)</div>
+<div class="line"><span class="lineno">  348</span>    <span class="keywordflow">if</span> (i &gt; vertexCount)</div>
 <div class="line"><span class="lineno">  349</span>    {</div>
-<div class="line"><span class="lineno">  350</span>        minHeight = elevation;</div>
+<div class="line"><span class="lineno">  350</span>        <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  351</span>    }</div>
 <div class="line"><span class="lineno">  352</span> </div>
-<div class="line"><span class="lineno">  353</span>    vert[i].position.y = elevation;</div>
-<div class="line"><span class="lineno">  354</span>    vert[i].extras1.x = elevation;</div>
-<div class="line"><span class="lineno">  355</span>}</div>
+<div class="line"><span class="lineno">  353</span>    <span class="keywordflow">if</span> (elevation &gt; maxHeight)</div>
+<div class="line"><span class="lineno">  354</span>    {</div>
+<div class="line"><span class="lineno">  355</span>        maxHeight = elevation;</div>
+<div class="line"><span class="lineno">  356</span>    }</div>
+<div class="line"><span class="lineno">  357</span> </div>
+<div class="line"><span class="lineno">  358</span>    <span class="keywordflow">if</span> (elevation &lt; minHeight)</div>
+<div class="line"><span class="lineno">  359</span>    {</div>
+<div class="line"><span class="lineno">  360</span>        minHeight = elevation;</div>
+<div class="line"><span class="lineno">  361</span>    }</div>
+<div class="line"><span class="lineno">  362</span> </div>
+<div class="line"><span class="lineno">  363</span>    vert[i].position.y = elevation;</div>
+<div class="line"><span class="lineno">  364</span>    vert[i].extras1.x = elevation;</div>
+<div class="line"><span class="lineno">  365</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -173,7 +173,7 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_a56a7eafe1f70871518b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dc/dbe/class_mesh.html">Mesh</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:58 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

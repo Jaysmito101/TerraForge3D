@@ -121,42 +121,42 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_afee9b20dd6a19b326c8
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00292">292</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  293</span>{</div>
-<div class="line"><span class="lineno">  294</span>    <span class="keywordflow">if</span> (vert)</div>
-<div class="line"><span class="lineno">  295</span>    {</div>
-<div class="line"><span class="lineno">  296</span>        <span class="keyword">delete</span>[] vert;</div>
-<div class="line"><span class="lineno">  297</span>    }</div>
-<div class="line"><span class="lineno">  298</span> </div>
-<div class="line"><span class="lineno">  299</span>    <span class="keywordflow">if</span> (indices)</div>
-<div class="line"><span class="lineno">  300</span>    {</div>
-<div class="line"><span class="lineno">  301</span>        <span class="keyword">delete</span>[] indices;</div>
-<div class="line"><span class="lineno">  302</span>    }</div>
-<div class="line"><span class="lineno">  303</span> </div>
-<div class="line"><span class="lineno">  304</span>    <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a> v;</div>
-<div class="line"><span class="lineno">  305</span>    vert = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[4];</div>
-<div class="line"><span class="lineno">  306</span>    v.position = glm::vec4(-1, -1, dist, 0);</div>
-<div class="line"><span class="lineno">  307</span>    v.texCoord = glm::vec2(0, 0);</div>
-<div class="line"><span class="lineno">  308</span>    vert[0] = v;</div>
-<div class="line"><span class="lineno">  309</span>    v.position = glm::vec4(-1, 1, dist, 0);</div>
-<div class="line"><span class="lineno">  310</span>    v.texCoord = glm::vec2(0, 1);</div>
-<div class="line"><span class="lineno">  311</span>    vert[1] = v;</div>
-<div class="line"><span class="lineno">  312</span>    v.position = glm::vec4(1, 1, dist, 0);</div>
-<div class="line"><span class="lineno">  313</span>    v.texCoord = glm::vec2(1, 1);</div>
-<div class="line"><span class="lineno">  314</span>    vert[2] = v;</div>
-<div class="line"><span class="lineno">  315</span>    v.position = glm::vec4(1, -1, dist, 0);</div>
-<div class="line"><span class="lineno">  316</span>    v.texCoord = glm::vec2(1, 0);</div>
-<div class="line"><span class="lineno">  317</span>    vert[3] = v;</div>
-<div class="line"><span class="lineno">  318</span>    vertexCount = 4;</div>
-<div class="line"><span class="lineno">  319</span>    indexCount = 6;</div>
-<div class="line"><span class="lineno">  320</span>    indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[6];</div>
-<div class="line"><span class="lineno">  321</span>    indices[0] = 0;</div>
-<div class="line"><span class="lineno">  322</span>    indices[1] = 1;</div>
-<div class="line"><span class="lineno">  323</span>    indices[2] = 2;</div>
-<div class="line"><span class="lineno">  324</span>    indices[3] = 0;</div>
-<div class="line"><span class="lineno">  325</span>    indices[4] = 2;</div>
-<div class="line"><span class="lineno">  326</span>    indices[5] = 3;</div>
-<div class="line"><span class="lineno">  327</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00302">302</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  303</span>{</div>
+<div class="line"><span class="lineno">  304</span>    <span class="keywordflow">if</span> (vert)</div>
+<div class="line"><span class="lineno">  305</span>    {</div>
+<div class="line"><span class="lineno">  306</span>        <span class="keyword">delete</span>[] vert;</div>
+<div class="line"><span class="lineno">  307</span>    }</div>
+<div class="line"><span class="lineno">  308</span> </div>
+<div class="line"><span class="lineno">  309</span>    <span class="keywordflow">if</span> (indices)</div>
+<div class="line"><span class="lineno">  310</span>    {</div>
+<div class="line"><span class="lineno">  311</span>        <span class="keyword">delete</span>[] indices;</div>
+<div class="line"><span class="lineno">  312</span>    }</div>
+<div class="line"><span class="lineno">  313</span> </div>
+<div class="line"><span class="lineno">  314</span>    <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a> v;</div>
+<div class="line"><span class="lineno">  315</span>    vert = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[4];</div>
+<div class="line"><span class="lineno">  316</span>    v.position = glm::vec4(-1, -1, dist, 0);</div>
+<div class="line"><span class="lineno">  317</span>    v.texCoord = glm::vec2(0, 0);</div>
+<div class="line"><span class="lineno">  318</span>    vert[0] = v;</div>
+<div class="line"><span class="lineno">  319</span>    v.position = glm::vec4(-1, 1, dist, 0);</div>
+<div class="line"><span class="lineno">  320</span>    v.texCoord = glm::vec2(0, 1);</div>
+<div class="line"><span class="lineno">  321</span>    vert[1] = v;</div>
+<div class="line"><span class="lineno">  322</span>    v.position = glm::vec4(1, 1, dist, 0);</div>
+<div class="line"><span class="lineno">  323</span>    v.texCoord = glm::vec2(1, 1);</div>
+<div class="line"><span class="lineno">  324</span>    vert[2] = v;</div>
+<div class="line"><span class="lineno">  325</span>    v.position = glm::vec4(1, -1, dist, 0);</div>
+<div class="line"><span class="lineno">  326</span>    v.texCoord = glm::vec2(1, 0);</div>
+<div class="line"><span class="lineno">  327</span>    vert[3] = v;</div>
+<div class="line"><span class="lineno">  328</span>    vertexCount = 4;</div>
+<div class="line"><span class="lineno">  329</span>    indexCount = 6;</div>
+<div class="line"><span class="lineno">  330</span>    indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[6];</div>
+<div class="line"><span class="lineno">  331</span>    indices[0] = 0;</div>
+<div class="line"><span class="lineno">  332</span>    indices[1] = 1;</div>
+<div class="line"><span class="lineno">  333</span>    indices[2] = 2;</div>
+<div class="line"><span class="lineno">  334</span>    indices[3] = 0;</div>
+<div class="line"><span class="lineno">  335</span>    indices[4] = 2;</div>
+<div class="line"><span class="lineno">  336</span>    indices[5] = 3;</div>
+<div class="line"><span class="lineno">  337</span>}</div>
 <div class="ttc" id="astruct_vert_html"><div class="ttname"><a href="../../d1/dea/struct_vert.html">Vert</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/da1/_mesh_8h_source.html#l00012">Mesh.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -167,7 +167,7 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_afee9b20dd6a19b326c8
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dc/dbe/class_mesh.html">Mesh</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:58 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

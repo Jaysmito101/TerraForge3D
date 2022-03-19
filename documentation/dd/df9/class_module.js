@@ -12,5 +12,7 @@ var class_module =
     [ "Update", "dd/df9/class_module_a0264413e8cda8dc98044181d5dac773e.html#a0264413e8cda8dc98044181d5dac773e", null ],
     [ "appState", "dd/df9/class_module_a76affe0fca1cf0dcb092cb6caca9b093.html#a76affe0fca1cf0dcb092cb6caca9b093", null ],
     [ "info", "dd/df9/class_module_ace2cc7d54de2c06c90ffc00f92c57be2.html#ace2cc7d54de2c06c90ffc00f92c57be2", null ],
+    [ "isEnabled", "dd/df9/class_module_a5e1d68c21d7364163514eb733950508e.html#a5e1d68c21d7364163514eb733950508e", null ],
+    [ "nativeHandle", "dd/df9/class_module_a3c40b1ac72acc2d383747c5b49eca368.html#a3c40b1ac72acc2d383747c5b49eca368", null ],
     [ "uid", "dd/df9/class_module_a9c265f4054907d92f24879e895cc09cf.html#a9c265f4054907d92f24879e895cc09cf", null ]
 ];

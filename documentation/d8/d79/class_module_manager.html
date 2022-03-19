@@ -108,6 +108,7 @@ $(document).ready(function(){initNavTree('d8/d79/class_module_manager.html','../
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="../../de/dbb/class_module_manager-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">ModuleManager Class Reference</div></div>
 </div><!--header-->
@@ -115,6 +116,8 @@ $(document).ready(function(){initNavTree('d8/d79/class_module_manager.html','../
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aa48e62d2b55e2ef4615277866a93a084"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_aa48e62d2b55e2ef4615277866a93a084.html#aa48e62d2b55e2ef4615277866a93a084">ModuleManager</a> (<a class="el" href="../../da/d59/struct_application_state.html">ApplicationState</a> *appState)</td></tr>
+<tr class="separator:aa48e62d2b55e2ef4615277866a93a084"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a731d734afca72137dc092cfca838abe8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_a731d734afca72137dc092cfca838abe8.html#a731d734afca72137dc092cfca838abe8">InstallModule</a> (std::string path)</td></tr>
 <tr class="separator:a731d734afca72137dc092cfca838abe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adacf3f7ad55e92209fd24eb4142039b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_adacf3f7ad55e92209fd24eb4142039b8.html#adacf3f7ad55e92209fd24eb4142039b8">UninstallModule</a> (std::string uid)</td></tr>
@@ -126,14 +129,25 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a78bebfa74e4e9119c4b16a563cc10ebf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../da/d59/struct_application_state.html">ApplicationState</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_a78bebfa74e4e9119c4b16a563cc10ebf.html#a78bebfa74e4e9119c4b16a563cc10ebf">appState</a></td></tr>
+<tr class="separator:a78bebfa74e4e9119c4b16a563cc10ebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39022a5c4f450eb923b2531587b78e23"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="../../dd/df9/class_module.html">Module</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_a39022a5c4f450eb923b2531587b78e23.html#a39022a5c4f450eb923b2531587b78e23">loadedModules</a></td></tr>
 <tr class="separator:a39022a5c4f450eb923b2531587b78e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab86f9040b0116edac8ef6ba8fbdc05dd"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; std::string, <a class="el" href="../../dd/df9/class_module.html">Module</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_ab86f9040b0116edac8ef6ba8fbdc05dd.html#ab86f9040b0116edac8ef6ba8fbdc05dd">modules</a></td></tr>
 <tr class="separator:ab86f9040b0116edac8ef6ba8fbdc05dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:ad5150058ad2819b384c212cb298e336d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_ad5150058ad2819b384c212cb298e336d.html#ad5150058ad2819b384c212cb298e336d">LoadModules</a> ()</td></tr>
+<tr class="separator:ad5150058ad2819b384c212cb298e336d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a6e8cdfdba06872e62b6873e6b58ad9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_a3a6e8cdfdba06872e62b6873e6b58ad9.html#a3a6e8cdfdba06872e62b6873e6b58ad9">UnloadModules</a> ()</td></tr>
+<tr class="separator:a3a6e8cdfdba06872e62b6873e6b58ad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2738de15311da8af7ec3582e451f319"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d79/class_module_manager_ab2738de15311da8af7ec3582e451f319.html#ab2738de15311da8af7ec3582e451f319">LoadModule</a> (std::string path)</td></tr>
+<tr class="separator:ab2738de15311da8af7ec3582e451f319"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="../../d7/dd1/_module_manager_8h_source.html#l00009">9</a> of file <a class="el" href="../../d7/dd1/_module_manager_8h_source.html">ModuleManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dd1/_module_manager_8h_source.html#l00011">11</a> of file <a class="el" href="../../d7/dd1/_module_manager_8h_source.html">ModuleManager.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>TerraForge3D/include/Modules/<a class="el" href="../../d7/dd1/_module_manager_8h_source.html">ModuleManager.h</a></li>
 <li>TerraForge3D/src/Modules/<a class="el" href="../../d6/da6/_module_manager_8cpp_source.html">ModuleManager.cpp</a></li>
@@ -144,7 +158,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d8/d79/class_module_manager.html">ModuleManager</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:59 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

@@ -131,150 +131,152 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_afcd9d434f8c1568f6
 
 <p>Reimplemented from <a class="el" href="../../de/d6b/class_application.html">Application</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d5/d12/_main_8cpp_source.html#l00692">692</a> of file <a class="el" href="../../d5/d12/_main_8cpp_source.html">Main.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  693</span>    {</div>
-<div class="line"><span class="lineno">  694</span>        <span class="keywordflow">if</span> (!appState-&gt;states.ruinning)</div>
-<div class="line"><span class="lineno">  695</span>        {</div>
-<div class="line"><span class="lineno">  696</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  697</span>        }</div>
-<div class="line"><span class="lineno">  698</span> </div>
-<div class="line"><span class="lineno">  699</span>        <span class="keywordflow">if</span> (!appState-&gt;states.exploreMode)</div>
-<div class="line"><span class="lineno">  700</span>        {</div>
-<div class="line"><span class="lineno">  701</span>            <span class="comment">// CTRL Shortcuts</span></div>
-<div class="line"><span class="lineno">  702</span>            <span class="keywordflow">if</span> ((glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))</div>
-<div class="line"><span class="lineno">  703</span>            {</div>
-<div class="line"><span class="lineno">  704</span>                <span class="comment">// Open Shortcut</span></div>
-<div class="line"><span class="lineno">  705</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_O))</div>
-<div class="line"><span class="lineno">  706</span>                {</div>
-<div class="line"><span class="lineno">  707</span>                    OpenSaveFile();</div>
-<div class="line"><span class="lineno">  708</span>                }</div>
-<div class="line"><span class="lineno">  709</span> </div>
-<div class="line"><span class="lineno">  710</span>                <span class="comment">// Exit Shortcut</span></div>
-<div class="line"><span class="lineno">  711</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_Q))</div>
-<div class="line"><span class="lineno">  712</span>                {</div>
-<div class="line"><span class="lineno">  713</span>                    exit(0);</div>
-<div class="line"><span class="lineno">  714</span>                }</div>
-<div class="line"><span class="lineno">  715</span> </div>
-<div class="line"><span class="lineno">  716</span>                <span class="comment">// Save Shortcut</span></div>
-<div class="line"><span class="lineno">  717</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_S))</div>
-<div class="line"><span class="lineno">  718</span>                {</div>
-<div class="line"><span class="lineno">  719</span>                    <span class="keywordflow">if</span> (appState-&gt;globals.currentOpenFilePath.size() &gt; 3)</div>
-<div class="line"><span class="lineno">  720</span>                    {</div>
-<div class="line"><span class="lineno">  721</span>                        Log(<span class="stringliteral">&quot;Saved to &quot;</span> + appState-&gt;globals.currentOpenFilePath);</div>
-<div class="line"><span class="lineno">  722</span>                        SaveFile(appState-&gt;globals.currentOpenFilePath);</div>
-<div class="line"><span class="lineno">  723</span>                    }</div>
-<div class="line"><span class="lineno">  724</span> </div>
-<div class="line"><span class="lineno">  725</span>                    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  726</span>                    {</div>
-<div class="line"><span class="lineno">  727</span>                        SaveFile();</div>
-<div class="line"><span class="lineno">  728</span>                    }</div>
-<div class="line"><span class="lineno">  729</span>                }</div>
-<div class="line"><span class="lineno">  730</span> </div>
-<div class="line"><span class="lineno">  731</span>                <span class="comment">// Close Shortcut</span></div>
-<div class="line"><span class="lineno">  732</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_W))</div>
-<div class="line"><span class="lineno">  733</span>                {</div>
-<div class="line"><span class="lineno">  734</span>                    <span class="keywordflow">if</span> (appState-&gt;globals.currentOpenFilePath.size() &gt; 3)</div>
-<div class="line"><span class="lineno">  735</span>                    {</div>
-<div class="line"><span class="lineno">  736</span>                        Log(<span class="stringliteral">&quot;CLosed file &quot;</span> + appState-&gt;globals.currentOpenFilePath);</div>
-<div class="line"><span class="lineno">  737</span>                        appState-&gt;globals.currentOpenFilePath = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  738</span>                    }</div>
-<div class="line"><span class="lineno">  739</span> </div>
-<div class="line"><span class="lineno">  740</span>                    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  741</span>                    {</div>
-<div class="line"><span class="lineno">  742</span>                        Log(<span class="stringliteral">&quot;Shutting Down&quot;</span>);</div>
-<div class="line"><span class="lineno">  743</span>                        exit(0);</div>
-<div class="line"><span class="lineno">  744</span>                    }</div>
-<div class="line"><span class="lineno">  745</span>                }</div>
-<div class="line"><span class="lineno">  746</span> </div>
-<div class="line"><span class="lineno">  747</span>                <span class="comment">// CTRL + SHIFT Shortcuts</span></div>
-<div class="line"><span class="lineno">  748</span>                <span class="keywordflow">if</span> ((glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT)))  <span class="comment">// Save Shortcut</span></div>
-<div class="line"><span class="lineno">  749</span>                {</div>
-<div class="line"><span class="lineno">  750</span>                    <span class="comment">// Save As Shortcuts</span></div>
-<div class="line"><span class="lineno">  751</span>                    <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_S))</div>
-<div class="line"><span class="lineno">  752</span>                    {</div>
-<div class="line"><span class="lineno">  753</span>                        appState-&gt;globals.currentOpenFilePath = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  754</span>                        SaveFile();</div>
-<div class="line"><span class="lineno">  755</span>                    }</div>
-<div class="line"><span class="lineno">  756</span> </div>
-<div class="line"><span class="lineno">  757</span>                    <span class="comment">// Explorer Mode Shortcut</span></div>
-<div class="line"><span class="lineno">  758</span>                    <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_X))</div>
-<div class="line"><span class="lineno">  759</span>                    {</div>
-<div class="line"><span class="lineno">  760</span>                        Log(<span class="stringliteral">&quot;Toggle Explorer Mode&quot;</span>);</div>
-<div class="line"><span class="lineno">  761</span>                        appState-&gt;states.exploreMode = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  762</span>                    }</div>
-<div class="line"><span class="lineno">  763</span>                }</div>
-<div class="line"><span class="lineno">  764</span>            }</div>
-<div class="line"><span class="lineno">  765</span> </div>
-<div class="line"><span class="lineno">  766</span>            appState-&gt;stats.deltatime = deltatime;</div>
-<div class="line"><span class="lineno">  767</span>            </div>
-<div class="line"><span class="lineno">  768</span>            {</div>
-<div class="line"><span class="lineno">  769</span>                appState-&gt;frameBuffers.reflection-&gt;Begin();</div>
-<div class="line"><span class="lineno">  770</span>                glViewport(0, 0, appState-&gt;frameBuffers.reflection-&gt;GetWidth(), appState-&gt;frameBuffers.reflection-&gt;GetHeight());</div>
-<div class="line"><span class="lineno">  771</span>                GetWindow()-&gt;Clear();</div>
-<div class="line"><span class="lineno">  772</span>                DoTheRederThing(deltatime);</div>
-<div class="line"><span class="lineno">  773</span>                glBindFramebuffer(GL_FRAMEBUFFER, appState-&gt;frameBuffers.main-&gt;GetRendererID());</div>
-<div class="line"><span class="lineno">  774</span>                glViewport(0, 0, appState-&gt;frameBuffers.main-&gt;GetWidth(), appState-&gt;frameBuffers.main-&gt;GetHeight());</div>
-<div class="line"><span class="lineno">  775</span>                GetWindow()-&gt;Clear();</div>
-<div class="line"><span class="lineno">  776</span>                DoTheRederThing(deltatime, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  777</span> </div>
-<div class="line"><span class="lineno">  778</span>                <span class="keywordflow">if</span> (appState-&gt;states.postProcess)</div>
-<div class="line"><span class="lineno">  779</span>                {</div>
-<div class="line"><span class="lineno">  780</span>                    appState-&gt;frameBuffers.postProcess-&gt;Begin();</div>
-<div class="line"><span class="lineno">  781</span>                    GetWindow()-&gt;Clear();</div>
-<div class="line"><span class="lineno">  782</span>                    PostProcess(deltatime);</div>
-<div class="line"><span class="lineno">  783</span>                }</div>
-<div class="line"><span class="lineno">  784</span>            }</div>
-<div class="line"><span class="lineno">  785</span> </div>
-<div class="line"><span class="lineno">  786</span>            glBindFramebuffer(GL_FRAMEBUFFER, 0);</div>
-<div class="line"><span class="lineno">  787</span>            RenderImGui();</div>
-<div class="line"><span class="lineno">  788</span>        }</div>
-<div class="line"><span class="lineno">  789</span> </div>
-<div class="line"><span class="lineno">  790</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  791</span>        {</div>
-<div class="line"><span class="lineno">  792</span>            <span class="keyword">static</span> <span class="keywordtype">bool</span> expH = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  793</span> </div>
-<div class="line"><span class="lineno">  794</span>            <span class="keywordflow">if</span> (!expH)</div>
-<div class="line"><span class="lineno">  795</span>            {</div>
-<div class="line"><span class="lineno">  796</span>                GetWindow()-&gt;SetFullScreen(<span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  797</span>                glfwSetInputMode(GetWindow()-&gt;GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);</div>
-<div class="line"><span class="lineno">  798</span>                ExPSaveCamera(appState-&gt;cameras.main.position, appState-&gt;cameras.main.rotation);</div>
-<div class="line"><span class="lineno">  799</span>            }</div>
-<div class="line"><span class="lineno">  800</span> </div>
-<div class="line"><span class="lineno">  801</span>            expH = appState-&gt;states.exploreMode;</div>
-<div class="line"><span class="lineno">  802</span>            appState-&gt;stats.deltatime = deltatime;</div>
-<div class="line"><span class="lineno">  803</span>            appState-&gt;frameBuffers.reflection-&gt;Begin();</div>
-<div class="line"><span class="lineno">  804</span>            glViewport(0, 0, appState-&gt;frameBuffers.reflection-&gt;GetWidth(), appState-&gt;frameBuffers.reflection-&gt;GetHeight());</div>
-<div class="line"><span class="lineno">  805</span>            GetWindow()-&gt;Clear();</div>
-<div class="line"><span class="lineno">  806</span>            DoTheRederThing(deltatime);</div>
-<div class="line"><span class="lineno">  807</span>            appState-&gt;frameBuffers.reflection-&gt;End();</div>
-<div class="line"><span class="lineno">  808</span>            glBindFramebuffer(GL_FRAMEBUFFER, 0);</div>
-<div class="line"><span class="lineno">  809</span>            <span class="keywordtype">int</span> w, h;</div>
-<div class="line"><span class="lineno">  810</span>            glfwGetWindowSize(GetWindow()-&gt;GetNativeWindow(), &amp;w, &amp;h);</div>
-<div class="line"><span class="lineno">  811</span>            glViewport(0, 0, w, h);</div>
-<div class="line"><span class="lineno">  812</span>            GetWindow()-&gt;Clear();</div>
-<div class="line"><span class="lineno">  813</span>            UpdateExplorerControls(appState-&gt;cameras.main.position, appState-&gt;cameras.main.rotation, appState-&gt;states.iExploreMode, &amp;appState-&gt;globals.offset[0], &amp;appState-&gt;globals.offset[1]);</div>
-<div class="line"><span class="lineno">  814</span>            DoTheRederThing(deltatime, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  815</span> </div>
-<div class="line"><span class="lineno">  816</span>            <span class="keywordflow">if</span> (appState-&gt;states.postProcess)</div>
-<div class="line"><span class="lineno">  817</span>            {</div>
-<div class="line"><span class="lineno">  818</span>                appState-&gt;frameBuffers.postProcess-&gt;Begin();</div>
-<div class="line"><span class="lineno">  819</span>                PostProcess(deltatime);</div>
-<div class="line"><span class="lineno">  820</span>            }</div>
-<div class="line"><span class="lineno">  821</span> </div>
-<div class="line"><span class="lineno">  822</span>            <span class="keywordflow">if</span> ((glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_ESCAPE)))</div>
-<div class="line"><span class="lineno">  823</span>            {</div>
-<div class="line"><span class="lineno">  824</span>                appState-&gt;states.exploreMode = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  825</span>                expH = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  826</span>                glfwSetInputMode(GetWindow()-&gt;GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);</div>
-<div class="line"><span class="lineno">  827</span>                GetWindow()-&gt;SetFullScreen(<span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  828</span>                ExPRestoreCamera(appState-&gt;cameras.main.position, appState-&gt;cameras.main.rotation);</div>
-<div class="line"><span class="lineno">  829</span>            }</div>
-<div class="line"><span class="lineno">  830</span>        }</div>
-<div class="line"><span class="lineno">  831</span> </div>
-<div class="line"><span class="lineno">  832</span>        <span class="keywordflow">if</span> (appState-&gt;states.autoUpdate)</div>
-<div class="line"><span class="lineno">  833</span>        {</div>
-<div class="line"><span class="lineno">  834</span>            RegenerateMesh();</div>
-<div class="line"><span class="lineno">  835</span>        }</div>
+<p class="definition">Definition at line <a class="el" href="../../d5/d12/_main_8cpp_source.html#l00690">690</a> of file <a class="el" href="../../d5/d12/_main_8cpp_source.html">Main.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  691</span>    {</div>
+<div class="line"><span class="lineno">  692</span>        <span class="keywordflow">if</span> (!appState-&gt;states.ruinning)</div>
+<div class="line"><span class="lineno">  693</span>        {</div>
+<div class="line"><span class="lineno">  694</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  695</span>        }</div>
+<div class="line"><span class="lineno">  696</span> </div>
+<div class="line"><span class="lineno">  697</span>        <span class="keywordflow">if</span> (!appState-&gt;states.exploreMode)</div>
+<div class="line"><span class="lineno">  698</span>        {</div>
+<div class="line"><span class="lineno">  699</span>            <span class="comment">// CTRL Shortcuts</span></div>
+<div class="line"><span class="lineno">  700</span>            <span class="keywordflow">if</span> ((glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))</div>
+<div class="line"><span class="lineno">  701</span>            {</div>
+<div class="line"><span class="lineno">  702</span>                <span class="comment">// Open Shortcut</span></div>
+<div class="line"><span class="lineno">  703</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_O))</div>
+<div class="line"><span class="lineno">  704</span>                {</div>
+<div class="line"><span class="lineno">  705</span>                    OpenSaveFile();</div>
+<div class="line"><span class="lineno">  706</span>                }</div>
+<div class="line"><span class="lineno">  707</span> </div>
+<div class="line"><span class="lineno">  708</span>                <span class="comment">// Exit Shortcut</span></div>
+<div class="line"><span class="lineno">  709</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_Q))</div>
+<div class="line"><span class="lineno">  710</span>                {</div>
+<div class="line"><span class="lineno">  711</span>                    exit(0);</div>
+<div class="line"><span class="lineno">  712</span>                }</div>
+<div class="line"><span class="lineno">  713</span> </div>
+<div class="line"><span class="lineno">  714</span>                <span class="comment">// Save Shortcut</span></div>
+<div class="line"><span class="lineno">  715</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_S))</div>
+<div class="line"><span class="lineno">  716</span>                {</div>
+<div class="line"><span class="lineno">  717</span>                    <span class="keywordflow">if</span> (appState-&gt;globals.currentOpenFilePath.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  718</span>                    {</div>
+<div class="line"><span class="lineno">  719</span>                        Log(<span class="stringliteral">&quot;Saved to &quot;</span> + appState-&gt;globals.currentOpenFilePath);</div>
+<div class="line"><span class="lineno">  720</span>                        SaveFile(appState-&gt;globals.currentOpenFilePath);</div>
+<div class="line"><span class="lineno">  721</span>                    }</div>
+<div class="line"><span class="lineno">  722</span> </div>
+<div class="line"><span class="lineno">  723</span>                    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  724</span>                    {</div>
+<div class="line"><span class="lineno">  725</span>                        SaveFile();</div>
+<div class="line"><span class="lineno">  726</span>                    }</div>
+<div class="line"><span class="lineno">  727</span>                }</div>
+<div class="line"><span class="lineno">  728</span> </div>
+<div class="line"><span class="lineno">  729</span>                <span class="comment">// Close Shortcut</span></div>
+<div class="line"><span class="lineno">  730</span>                <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_W))</div>
+<div class="line"><span class="lineno">  731</span>                {</div>
+<div class="line"><span class="lineno">  732</span>                    <span class="keywordflow">if</span> (appState-&gt;globals.currentOpenFilePath.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  733</span>                    {</div>
+<div class="line"><span class="lineno">  734</span>                        Log(<span class="stringliteral">&quot;CLosed file &quot;</span> + appState-&gt;globals.currentOpenFilePath);</div>
+<div class="line"><span class="lineno">  735</span>                        appState-&gt;globals.currentOpenFilePath = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  736</span>                    }</div>
+<div class="line"><span class="lineno">  737</span> </div>
+<div class="line"><span class="lineno">  738</span>                    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  739</span>                    {</div>
+<div class="line"><span class="lineno">  740</span>                        Log(<span class="stringliteral">&quot;Shutting Down&quot;</span>);</div>
+<div class="line"><span class="lineno">  741</span>                        exit(0);</div>
+<div class="line"><span class="lineno">  742</span>                    }</div>
+<div class="line"><span class="lineno">  743</span>                }</div>
+<div class="line"><span class="lineno">  744</span> </div>
+<div class="line"><span class="lineno">  745</span>                <span class="comment">// CTRL + SHIFT Shortcuts</span></div>
+<div class="line"><span class="lineno">  746</span>                <span class="keywordflow">if</span> ((glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT)))  <span class="comment">// Save Shortcut</span></div>
+<div class="line"><span class="lineno">  747</span>                {</div>
+<div class="line"><span class="lineno">  748</span>                    <span class="comment">// Save As Shortcuts</span></div>
+<div class="line"><span class="lineno">  749</span>                    <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_S))</div>
+<div class="line"><span class="lineno">  750</span>                    {</div>
+<div class="line"><span class="lineno">  751</span>                        appState-&gt;globals.currentOpenFilePath = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  752</span>                        SaveFile();</div>
+<div class="line"><span class="lineno">  753</span>                    }</div>
+<div class="line"><span class="lineno">  754</span> </div>
+<div class="line"><span class="lineno">  755</span>                    <span class="comment">// Explorer Mode Shortcut</span></div>
+<div class="line"><span class="lineno">  756</span>                    <span class="keywordflow">if</span> (glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_X))</div>
+<div class="line"><span class="lineno">  757</span>                    {</div>
+<div class="line"><span class="lineno">  758</span>                        Log(<span class="stringliteral">&quot;Toggle Explorer Mode&quot;</span>);</div>
+<div class="line"><span class="lineno">  759</span>                        appState-&gt;states.exploreMode = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  760</span>                    }</div>
+<div class="line"><span class="lineno">  761</span>                }</div>
+<div class="line"><span class="lineno">  762</span>            }</div>
+<div class="line"><span class="lineno">  763</span> </div>
+<div class="line"><span class="lineno">  764</span>            appState-&gt;stats.deltatime = deltatime;</div>
+<div class="line"><span class="lineno">  765</span>            </div>
+<div class="line"><span class="lineno">  766</span>            {</div>
+<div class="line"><span class="lineno">  767</span>                appState-&gt;frameBuffers.reflection-&gt;Begin();</div>
+<div class="line"><span class="lineno">  768</span>                glViewport(0, 0, appState-&gt;frameBuffers.reflection-&gt;GetWidth(), appState-&gt;frameBuffers.reflection-&gt;GetHeight());</div>
+<div class="line"><span class="lineno">  769</span>                GetWindow()-&gt;Clear();</div>
+<div class="line"><span class="lineno">  770</span>                DoTheRederThing(deltatime);</div>
+<div class="line"><span class="lineno">  771</span>                glBindFramebuffer(GL_FRAMEBUFFER, appState-&gt;frameBuffers.main-&gt;GetRendererID());</div>
+<div class="line"><span class="lineno">  772</span>                glViewport(0, 0, appState-&gt;frameBuffers.main-&gt;GetWidth(), appState-&gt;frameBuffers.main-&gt;GetHeight());</div>
+<div class="line"><span class="lineno">  773</span>                GetWindow()-&gt;Clear();</div>
+<div class="line"><span class="lineno">  774</span>                DoTheRederThing(deltatime, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  775</span> </div>
+<div class="line"><span class="lineno">  776</span>                <span class="keywordflow">if</span> (appState-&gt;states.postProcess)</div>
+<div class="line"><span class="lineno">  777</span>                {</div>
+<div class="line"><span class="lineno">  778</span>                    appState-&gt;frameBuffers.postProcess-&gt;Begin();</div>
+<div class="line"><span class="lineno">  779</span>                    GetWindow()-&gt;Clear();</div>
+<div class="line"><span class="lineno">  780</span>                    PostProcess(deltatime);</div>
+<div class="line"><span class="lineno">  781</span>                }</div>
+<div class="line"><span class="lineno">  782</span>            }</div>
+<div class="line"><span class="lineno">  783</span> </div>
+<div class="line"><span class="lineno">  784</span>            glBindFramebuffer(GL_FRAMEBUFFER, 0);</div>
+<div class="line"><span class="lineno">  785</span>            RenderImGui();</div>
+<div class="line"><span class="lineno">  786</span>        }</div>
+<div class="line"><span class="lineno">  787</span> </div>
+<div class="line"><span class="lineno">  788</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  789</span>        {</div>
+<div class="line"><span class="lineno">  790</span>            <span class="keyword">static</span> <span class="keywordtype">bool</span> expH = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  791</span> </div>
+<div class="line"><span class="lineno">  792</span>            <span class="keywordflow">if</span> (!expH)</div>
+<div class="line"><span class="lineno">  793</span>            {</div>
+<div class="line"><span class="lineno">  794</span>                GetWindow()-&gt;SetFullScreen(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  795</span>                glfwSetInputMode(GetWindow()-&gt;GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);</div>
+<div class="line"><span class="lineno">  796</span>                ExPSaveCamera(appState-&gt;cameras.main.position, appState-&gt;cameras.main.rotation);</div>
+<div class="line"><span class="lineno">  797</span>            }</div>
+<div class="line"><span class="lineno">  798</span> </div>
+<div class="line"><span class="lineno">  799</span>            expH = appState-&gt;states.exploreMode;</div>
+<div class="line"><span class="lineno">  800</span>            appState-&gt;stats.deltatime = deltatime;</div>
+<div class="line"><span class="lineno">  801</span>            appState-&gt;frameBuffers.reflection-&gt;Begin();</div>
+<div class="line"><span class="lineno">  802</span>            glViewport(0, 0, appState-&gt;frameBuffers.reflection-&gt;GetWidth(), appState-&gt;frameBuffers.reflection-&gt;GetHeight());</div>
+<div class="line"><span class="lineno">  803</span>            GetWindow()-&gt;Clear();</div>
+<div class="line"><span class="lineno">  804</span>            DoTheRederThing(deltatime);</div>
+<div class="line"><span class="lineno">  805</span>            appState-&gt;frameBuffers.reflection-&gt;End();</div>
+<div class="line"><span class="lineno">  806</span>            glBindFramebuffer(GL_FRAMEBUFFER, 0);</div>
+<div class="line"><span class="lineno">  807</span>            <span class="keywordtype">int</span> w, h;</div>
+<div class="line"><span class="lineno">  808</span>            glfwGetWindowSize(GetWindow()-&gt;GetNativeWindow(), &amp;w, &amp;h);</div>
+<div class="line"><span class="lineno">  809</span>            glViewport(0, 0, w, h);</div>
+<div class="line"><span class="lineno">  810</span>            GetWindow()-&gt;Clear();</div>
+<div class="line"><span class="lineno">  811</span>            UpdateExplorerControls(appState-&gt;cameras.main.position, appState-&gt;cameras.main.rotation, appState-&gt;states.iExploreMode, &amp;appState-&gt;globals.offset[0], &amp;appState-&gt;globals.offset[1]);</div>
+<div class="line"><span class="lineno">  812</span>            DoTheRederThing(deltatime, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  813</span> </div>
+<div class="line"><span class="lineno">  814</span>            <span class="keywordflow">if</span> (appState-&gt;states.postProcess)</div>
+<div class="line"><span class="lineno">  815</span>            {</div>
+<div class="line"><span class="lineno">  816</span>                appState-&gt;frameBuffers.postProcess-&gt;Begin();</div>
+<div class="line"><span class="lineno">  817</span>                PostProcess(deltatime);</div>
+<div class="line"><span class="lineno">  818</span>            }</div>
+<div class="line"><span class="lineno">  819</span> </div>
+<div class="line"><span class="lineno">  820</span>            <span class="keywordflow">if</span> ((glfwGetKey(GetWindow()-&gt;GetNativeWindow(), GLFW_KEY_ESCAPE)))</div>
+<div class="line"><span class="lineno">  821</span>            {</div>
+<div class="line"><span class="lineno">  822</span>                appState-&gt;states.exploreMode = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  823</span>                expH = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  824</span>                glfwSetInputMode(GetWindow()-&gt;GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);</div>
+<div class="line"><span class="lineno">  825</span>                GetWindow()-&gt;SetFullScreen(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  826</span>                ExPRestoreCamera(appState-&gt;cameras.main.position, appState-&gt;cameras.main.rotation);</div>
+<div class="line"><span class="lineno">  827</span>            }</div>
+<div class="line"><span class="lineno">  828</span>        }</div>
+<div class="line"><span class="lineno">  829</span> </div>
+<div class="line"><span class="lineno">  830</span>        <span class="keywordflow">if</span> (appState-&gt;states.autoUpdate)</div>
+<div class="line"><span class="lineno">  831</span>        {</div>
+<div class="line"><span class="lineno">  832</span>            RegenerateMesh();</div>
+<div class="line"><span class="lineno">  833</span>        }</div>
+<div class="line"><span class="lineno">  834</span> </div>
+<div class="line"><span class="lineno">  835</span>        appState-&gt;modules.manager-&gt;UpdateModules();</div>
 <div class="line"><span class="lineno">  836</span>    }</div>
 </div><!-- fragment -->
 </div>
@@ -285,7 +287,7 @@ $(document).ready(function(){initNavTree('dd/da7/class_my_app_afcd9d434f8c1568f6
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dd/da7/class_my_app.html">MyApp</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:59 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

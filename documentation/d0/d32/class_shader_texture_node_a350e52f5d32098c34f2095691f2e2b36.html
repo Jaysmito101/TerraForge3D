@@ -150,37 +150,57 @@ $(document).ready(function(){initNavTree('d0/d32/class_shader_texture_node_a350e
 <div class="line"><span class="lineno">   98</span>        }</div>
 <div class="line"><span class="lineno">   99</span>    }</div>
 <div class="line"><span class="lineno">  100</span> </div>
-<div class="line"><span class="lineno">  101</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  102</span>    outputPins[0]-&gt;Render();</div>
-<div class="line"><span class="lineno">  103</span>    ImGui::PushItemWidth(100);</div>
-<div class="line"><span class="lineno">  104</span> </div>
-<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Scale&quot;</span>, &amp;scale, 0.01f))</div>
-<div class="line"><span class="lineno">  106</span>    {</div>
-<div class="line"><span class="lineno">  107</span>        sharedData-&gt;d0 = scale;</div>
-<div class="line"><span class="lineno">  108</span>    }</div>
-<div class="line"><span class="lineno">  109</span> </div>
-<div class="line"><span class="lineno">  110</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Offset X&quot;</span>, &amp;offsetX, 0.01f))</div>
-<div class="line"><span class="lineno">  111</span>    {</div>
-<div class="line"><span class="lineno">  112</span>        sharedData-&gt;d1 = offsetX;</div>
-<div class="line"><span class="lineno">  113</span>    }</div>
-<div class="line"><span class="lineno">  114</span> </div>
-<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Offset Y&quot;</span>, &amp;offsetY, 0.01f))</div>
-<div class="line"><span class="lineno">  116</span>    {</div>
-<div class="line"><span class="lineno">  117</span>        sharedData-&gt;d2 = offsetY;</div>
-<div class="line"><span class="lineno">  118</span>    }</div>
-<div class="line"><span class="lineno">  119</span> </div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Rotation&quot;</span>, &amp;rotation, 0.01f))</div>
-<div class="line"><span class="lineno">  121</span>    {</div>
-<div class="line"><span class="lineno">  122</span>        sharedData-&gt;d3 = rotation;</div>
-<div class="line"><span class="lineno">  123</span>    }</div>
+<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">if</span>(ImGui::BeginDragDropTarget())</div>
+<div class="line"><span class="lineno">  102</span>    {</div>
+<div class="line"><span class="lineno">  103</span>        <span class="keywordflow">if</span>(<span class="keyword">const</span> ImGuiPayload *payload = ImGui::AcceptDragDropPayload(<span class="stringliteral">&quot;TerraForge3D_Texture&quot;</span>))</div>
+<div class="line"><span class="lineno">  104</span>        {</div>
+<div class="line"><span class="lineno">  105</span>            std::string path = std::string((<span class="keywordtype">char</span>*)payload-&gt;Data);</div>
+<div class="line"><span class="lineno">  106</span>            <span class="keywordflow">if</span>(path.size() &gt; 3)</div>
+<div class="line"><span class="lineno">  107</span>            {</div>
+<div class="line"><span class="lineno">  108</span>                <span class="keywordflow">if</span>(texture)</div>
+<div class="line"><span class="lineno">  109</span>                {</div>
+<div class="line"><span class="lineno">  110</span>                    <span class="keyword">delete</span> texture;</div>
+<div class="line"><span class="lineno">  111</span>                }</div>
+<div class="line"><span class="lineno">  112</span> </div>
+<div class="line"><span class="lineno">  113</span>                texture = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(path);</div>
+<div class="line"><span class="lineno">  114</span>                textureManager-&gt;UploadToGPU(zCoord);</div>
+<div class="line"><span class="lineno">  115</span>            }</div>
+<div class="line"><span class="lineno">  116</span>        }</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>        ImGui::EndDragDropTarget();</div>
+<div class="line"><span class="lineno">  119</span>    }</div>
+<div class="line"><span class="lineno">  120</span> </div>
+<div class="line"><span class="lineno">  121</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  122</span>    outputPins[0]-&gt;Render();</div>
+<div class="line"><span class="lineno">  123</span>    ImGui::PushItemWidth(100);</div>
 <div class="line"><span class="lineno">  124</span> </div>
-<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">if</span>(ImGui::Checkbox(<span class="stringliteral">&quot;Triplanar Mapping&quot;</span>, &amp;isTriplanar))</div>
+<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Scale&quot;</span>, &amp;scale, 0.01f))</div>
 <div class="line"><span class="lineno">  126</span>    {</div>
-<div class="line"><span class="lineno">  127</span>        sharedData-&gt;d4 = isTriplanar ? 1.0f : 0.0f;</div>
+<div class="line"><span class="lineno">  127</span>        sharedData-&gt;d0 = scale;</div>
 <div class="line"><span class="lineno">  128</span>    }</div>
 <div class="line"><span class="lineno">  129</span> </div>
-<div class="line"><span class="lineno">  130</span>    ImGui::PopItemWidth();</div>
-<div class="line"><span class="lineno">  131</span>}</div>
+<div class="line"><span class="lineno">  130</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Offset X&quot;</span>, &amp;offsetX, 0.01f))</div>
+<div class="line"><span class="lineno">  131</span>    {</div>
+<div class="line"><span class="lineno">  132</span>        sharedData-&gt;d1 = offsetX;</div>
+<div class="line"><span class="lineno">  133</span>    }</div>
+<div class="line"><span class="lineno">  134</span> </div>
+<div class="line"><span class="lineno">  135</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Offset Y&quot;</span>, &amp;offsetY, 0.01f))</div>
+<div class="line"><span class="lineno">  136</span>    {</div>
+<div class="line"><span class="lineno">  137</span>        sharedData-&gt;d2 = offsetY;</div>
+<div class="line"><span class="lineno">  138</span>    }</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>    <span class="keywordflow">if</span>(ImGui::DragFloat(<span class="stringliteral">&quot;Rotation&quot;</span>, &amp;rotation, 0.01f))</div>
+<div class="line"><span class="lineno">  141</span>    {</div>
+<div class="line"><span class="lineno">  142</span>        sharedData-&gt;d3 = rotation;</div>
+<div class="line"><span class="lineno">  143</span>    }</div>
+<div class="line"><span class="lineno">  144</span> </div>
+<div class="line"><span class="lineno">  145</span>    <span class="keywordflow">if</span>(ImGui::Checkbox(<span class="stringliteral">&quot;Triplanar Mapping&quot;</span>, &amp;isTriplanar))</div>
+<div class="line"><span class="lineno">  146</span>    {</div>
+<div class="line"><span class="lineno">  147</span>        sharedData-&gt;d4 = isTriplanar ? 1.0f : 0.0f;</div>
+<div class="line"><span class="lineno">  148</span>    }</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>    ImGui::PopItemWidth();</div>
+<div class="line"><span class="lineno">  151</span>}</div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -191,7 +211,7 @@ $(document).ready(function(){initNavTree('d0/d32/class_shader_texture_node_a350e
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d32/class_shader_texture_node.html">ShaderTextureNode</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:35:00 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:33 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

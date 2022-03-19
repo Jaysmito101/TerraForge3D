@@ -137,70 +137,70 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_ad81160f57a0bb61af0f
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00227">227</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  228</span>{</div>
-<div class="line"><span class="lineno">  229</span>    currType = MeshType::Plane;</div>
-<div class="line"><span class="lineno">  230</span>    maxHeight = -100;</div>
-<div class="line"><span class="lineno">  231</span>    minHeight = 100;</div>
-<div class="line"><span class="lineno">  232</span>    res = resolution;</div>
-<div class="line"><span class="lineno">  233</span>    sc = scale;</div>
-<div class="line"><span class="lineno">  234</span>    texSc = textureScale;</div>
-<div class="line"><span class="lineno">  235</span>    <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a> *vertices = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[resolution * resolution];</div>
-<div class="line"><span class="lineno">  236</span>    <span class="keywordtype">int</span> *inds = <span class="keyword">new</span> <span class="keywordtype">int</span>[(resolution-1) * (resolution-1) * 6];</div>
-<div class="line"><span class="lineno">  237</span>    <span class="keywordtype">int</span> triIndex = 0;</div>
-<div class="line"><span class="lineno">  238</span> </div>
-<div class="line"><span class="lineno">  239</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> y = 0; y &lt; resolution; y++)</div>
-<div class="line"><span class="lineno">  240</span>    {</div>
-<div class="line"><span class="lineno">  241</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = 0; x &lt; resolution; x++)</div>
-<div class="line"><span class="lineno">  242</span>        {</div>
-<div class="line"><span class="lineno">  243</span>            <span class="keywordtype">int</span> i = x + y * resolution;</div>
-<div class="line"><span class="lineno">  244</span>            glm::vec2 percent = glm::vec2(x, y) / ((float)resolution - 1);</div>
-<div class="line"><span class="lineno">  245</span>            glm::vec3 pointOnPlane = (percent.x - .5f) * 2 * right + (percent.y - .5f) * 2 * front;</div>
-<div class="line"><span class="lineno">  246</span>            pointOnPlane *= scale;</div>
-<div class="line"><span class="lineno">  247</span>            vertices[i] = <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>();</div>
-<div class="line"><span class="lineno">  248</span>            vertices[i].position = glm::vec4(0.0f);</div>
-<div class="line"><span class="lineno">  249</span>            vertices[i].position.x = (float)pointOnPlane.x;</div>
-<div class="line"><span class="lineno">  250</span>            vertices[i].position.y = (<span class="keywordtype">float</span>)pointOnPlane.y;</div>
-<div class="line"><span class="lineno">  251</span>            vertices[i].position.z = (float)pointOnPlane.z;</div>
-<div class="line"><span class="lineno">  252</span>            vertices[i].texCoord = glm::vec2(percent.x, percent.y)*textureScale;</div>
-<div class="line"><span class="lineno">  253</span>            vertices[i].normal = glm::vec4(0.0f);</div>
-<div class="line"><span class="lineno">  254</span> </div>
-<div class="line"><span class="lineno">  255</span>            <span class="keywordflow">if</span> (x != resolution - 1 &amp;&amp; y != resolution - 1)</div>
-<div class="line"><span class="lineno">  256</span>            {</div>
-<div class="line"><span class="lineno">  257</span>                inds[triIndex] = i;</div>
-<div class="line"><span class="lineno">  258</span>                inds[triIndex + 1] = i + resolution + 1;</div>
-<div class="line"><span class="lineno">  259</span>                inds[triIndex + 2] = i + resolution;</div>
-<div class="line"><span class="lineno">  260</span>                inds[triIndex + 3] = i;</div>
-<div class="line"><span class="lineno">  261</span>                inds[triIndex + 4] = i + 1;</div>
-<div class="line"><span class="lineno">  262</span>                inds[triIndex + 5] = i + resolution + 1;</div>
-<div class="line"><span class="lineno">  263</span>                triIndex += 6;</div>
-<div class="line"><span class="lineno">  264</span>            }</div>
-<div class="line"><span class="lineno">  265</span> </div>
-<div class="line"><span class="lineno">  266</span>            vertices[i].extras1 = glm::vec4(0.0f);</div>
-<div class="line"><span class="lineno">  267</span>        }</div>
-<div class="line"><span class="lineno">  268</span>    }</div>
-<div class="line"><span class="lineno">  269</span> </div>
-<div class="line"><span class="lineno">  270</span>    <span class="keywordflow">if</span> (vert)</div>
-<div class="line"><span class="lineno">  271</span>    {</div>
-<div class="line"><span class="lineno">  272</span>        <span class="keyword">delete</span> vert;</div>
-<div class="line"><span class="lineno">  273</span>    }</div>
-<div class="line"><span class="lineno">  274</span> </div>
-<div class="line"><span class="lineno">  275</span>    <span class="keywordflow">if</span> (indices)</div>
-<div class="line"><span class="lineno">  276</span>    {</div>
-<div class="line"><span class="lineno">  277</span>        <span class="keyword">delete</span> indices;</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00237">237</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  238</span>{</div>
+<div class="line"><span class="lineno">  239</span>    currType = MeshType::Plane;</div>
+<div class="line"><span class="lineno">  240</span>    maxHeight = -100;</div>
+<div class="line"><span class="lineno">  241</span>    minHeight = 100;</div>
+<div class="line"><span class="lineno">  242</span>    res = resolution;</div>
+<div class="line"><span class="lineno">  243</span>    sc = scale;</div>
+<div class="line"><span class="lineno">  244</span>    texSc = textureScale;</div>
+<div class="line"><span class="lineno">  245</span>    <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a> *vertices = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[resolution * resolution];</div>
+<div class="line"><span class="lineno">  246</span>    <span class="keywordtype">int</span> *inds = <span class="keyword">new</span> <span class="keywordtype">int</span>[(resolution-1) * (resolution-1) * 6];</div>
+<div class="line"><span class="lineno">  247</span>    <span class="keywordtype">int</span> triIndex = 0;</div>
+<div class="line"><span class="lineno">  248</span> </div>
+<div class="line"><span class="lineno">  249</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> y = 0; y &lt; resolution; y++)</div>
+<div class="line"><span class="lineno">  250</span>    {</div>
+<div class="line"><span class="lineno">  251</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = 0; x &lt; resolution; x++)</div>
+<div class="line"><span class="lineno">  252</span>        {</div>
+<div class="line"><span class="lineno">  253</span>            <span class="keywordtype">int</span> i = x + y * resolution;</div>
+<div class="line"><span class="lineno">  254</span>            glm::vec2 percent = glm::vec2(x, y) / ((float)resolution - 1);</div>
+<div class="line"><span class="lineno">  255</span>            glm::vec3 pointOnPlane = (percent.x - .5f) * 2 * right + (percent.y - .5f) * 2 * front;</div>
+<div class="line"><span class="lineno">  256</span>            pointOnPlane *= scale;</div>
+<div class="line"><span class="lineno">  257</span>            vertices[i] = <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>();</div>
+<div class="line"><span class="lineno">  258</span>            vertices[i].position = glm::vec4(0.0f);</div>
+<div class="line"><span class="lineno">  259</span>            vertices[i].position.x = (float)pointOnPlane.x;</div>
+<div class="line"><span class="lineno">  260</span>            vertices[i].position.y = (<span class="keywordtype">float</span>)pointOnPlane.y;</div>
+<div class="line"><span class="lineno">  261</span>            vertices[i].position.z = (float)pointOnPlane.z;</div>
+<div class="line"><span class="lineno">  262</span>            vertices[i].texCoord = glm::vec2(percent.x, percent.y)*textureScale;</div>
+<div class="line"><span class="lineno">  263</span>            vertices[i].normal = glm::vec4(0.0f);</div>
+<div class="line"><span class="lineno">  264</span> </div>
+<div class="line"><span class="lineno">  265</span>            <span class="keywordflow">if</span> (x != resolution - 1 &amp;&amp; y != resolution - 1)</div>
+<div class="line"><span class="lineno">  266</span>            {</div>
+<div class="line"><span class="lineno">  267</span>                inds[triIndex] = i;</div>
+<div class="line"><span class="lineno">  268</span>                inds[triIndex + 1] = i + resolution + 1;</div>
+<div class="line"><span class="lineno">  269</span>                inds[triIndex + 2] = i + resolution;</div>
+<div class="line"><span class="lineno">  270</span>                inds[triIndex + 3] = i;</div>
+<div class="line"><span class="lineno">  271</span>                inds[triIndex + 4] = i + 1;</div>
+<div class="line"><span class="lineno">  272</span>                inds[triIndex + 5] = i + resolution + 1;</div>
+<div class="line"><span class="lineno">  273</span>                triIndex += 6;</div>
+<div class="line"><span class="lineno">  274</span>            }</div>
+<div class="line"><span class="lineno">  275</span> </div>
+<div class="line"><span class="lineno">  276</span>            vertices[i].extras1 = glm::vec4(0.0f);</div>
+<div class="line"><span class="lineno">  277</span>        }</div>
 <div class="line"><span class="lineno">  278</span>    }</div>
 <div class="line"><span class="lineno">  279</span> </div>
-<div class="line"><span class="lineno">  280</span>    vertexCount = resolution * resolution;</div>
-<div class="line"><span class="lineno">  281</span>    vert = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[resolution * resolution];</div>
-<div class="line"><span class="lineno">  282</span>    memset(vert, 0, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * vertexCount);</div>
-<div class="line"><span class="lineno">  283</span>    memcpy(vert, vertices, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>)*vertexCount);</div>
-<div class="line"><span class="lineno">  284</span>    indexCount = (resolution - 1) * (resolution - 1) * 6;</div>
-<div class="line"><span class="lineno">  285</span>    indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[(resolution - 1) * (resolution - 1) * 6];</div>
-<div class="line"><span class="lineno">  286</span>    memset(indices, 0, indexCount);</div>
-<div class="line"><span class="lineno">  287</span>    memcpy(indices, inds, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * indexCount);</div>
-<div class="line"><span class="lineno">  288</span>    <span class="keyword">delete</span> vertices;</div>
-<div class="line"><span class="lineno">  289</span>    <span class="keyword">delete</span> inds;</div>
-<div class="line"><span class="lineno">  290</span>}</div>
+<div class="line"><span class="lineno">  280</span>    <span class="keywordflow">if</span> (vert)</div>
+<div class="line"><span class="lineno">  281</span>    {</div>
+<div class="line"><span class="lineno">  282</span>        <span class="keyword">delete</span> vert;</div>
+<div class="line"><span class="lineno">  283</span>    }</div>
+<div class="line"><span class="lineno">  284</span> </div>
+<div class="line"><span class="lineno">  285</span>    <span class="keywordflow">if</span> (indices)</div>
+<div class="line"><span class="lineno">  286</span>    {</div>
+<div class="line"><span class="lineno">  287</span>        <span class="keyword">delete</span> indices;</div>
+<div class="line"><span class="lineno">  288</span>    }</div>
+<div class="line"><span class="lineno">  289</span> </div>
+<div class="line"><span class="lineno">  290</span>    vertexCount = resolution * resolution;</div>
+<div class="line"><span class="lineno">  291</span>    vert = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[resolution * resolution];</div>
+<div class="line"><span class="lineno">  292</span>    memset(vert, 0, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * vertexCount);</div>
+<div class="line"><span class="lineno">  293</span>    memcpy(vert, vertices, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>)*vertexCount);</div>
+<div class="line"><span class="lineno">  294</span>    indexCount = (resolution - 1) * (resolution - 1) * 6;</div>
+<div class="line"><span class="lineno">  295</span>    indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[(resolution - 1) * (resolution - 1) * 6];</div>
+<div class="line"><span class="lineno">  296</span>    memset(indices, 0, indexCount);</div>
+<div class="line"><span class="lineno">  297</span>    memcpy(indices, inds, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * indexCount);</div>
+<div class="line"><span class="lineno">  298</span>    <span class="keyword">delete</span> vertices;</div>
+<div class="line"><span class="lineno">  299</span>    <span class="keyword">delete</span> inds;</div>
+<div class="line"><span class="lineno">  300</span>}</div>
 <div class="ttc" id="astruct_vert_html"><div class="ttname"><a href="../../d1/dea/struct_vert.html">Vert</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/da1/_mesh_8h_source.html#l00012">Mesh.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -211,7 +211,7 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_ad81160f57a0bb61af0f
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dc/dbe/class_mesh.html">Mesh</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:58 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

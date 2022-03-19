@@ -137,50 +137,50 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_ad4456a382a6ebc8e694
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00182">182</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  183</span>{</div>
-<div class="line"><span class="lineno">  184</span>    currType = MeshType::Icosphere;</div>
-<div class="line"><span class="lineno">  185</span>    glm::vec3 vertis[] =</div>
-<div class="line"><span class="lineno">  186</span>    {</div>
-<div class="line"><span class="lineno">  187</span>        glm::vec3(0, -1, 0),</div>
-<div class="line"><span class="lineno">  188</span>        glm::vec3(0, 0, 1),</div>
-<div class="line"><span class="lineno">  189</span>        glm::vec3(1, 0, 0),</div>
-<div class="line"><span class="lineno">  190</span>        glm::vec3(0, 0, -1),</div>
-<div class="line"><span class="lineno">  191</span>        glm::vec3(-1, 0, 0),</div>
-<div class="line"><span class="lineno">  192</span>        glm::vec3(0, 1, 0)</div>
-<div class="line"><span class="lineno">  193</span>    };</div>
-<div class="line"><span class="lineno">  194</span>    <span class="keywordtype">int</span> triangles[] =</div>
-<div class="line"><span class="lineno">  195</span>    {</div>
-<div class="line"><span class="lineno">  196</span>        0, 1, 2,</div>
-<div class="line"><span class="lineno">  197</span>        0, 2, 3,</div>
-<div class="line"><span class="lineno">  198</span>        0, 3, 4,</div>
-<div class="line"><span class="lineno">  199</span>        0, 4, 1,</div>
-<div class="line"><span class="lineno">  200</span> </div>
-<div class="line"><span class="lineno">  201</span>        5, 2, 1,</div>
-<div class="line"><span class="lineno">  202</span>        5, 3, 2,</div>
-<div class="line"><span class="lineno">  203</span>        5, 4, 3,</div>
-<div class="line"><span class="lineno">  204</span>        5, 1, 4</div>
-<div class="line"><span class="lineno">  205</span>    };</div>
-<div class="line"><span class="lineno">  206</span> </div>
-<div class="line"><span class="lineno">  207</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <span class="keyword">sizeof</span>(vertis)/<span class="keyword">sizeof</span>(glm::vec3); i++)</div>
-<div class="line"><span class="lineno">  208</span>    {</div>
-<div class="line"><span class="lineno">  209</span>        vertis[i] *= radius;</div>
-<div class="line"><span class="lineno">  210</span>    }</div>
-<div class="line"><span class="lineno">  211</span> </div>
-<div class="line"><span class="lineno">  212</span>    vertexCount = <span class="keyword">sizeof</span>(vertis)/<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>);</div>
-<div class="line"><span class="lineno">  213</span>    vert = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[<span class="keyword">sizeof</span>(vertis) / <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)];</div>
-<div class="line"><span class="lineno">  214</span>    memset(vert, 0, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * vertexCount);</div>
-<div class="line"><span class="lineno">  215</span> </div>
-<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; vertexCount; i++)</div>
-<div class="line"><span class="lineno">  217</span>    {</div>
-<div class="line"><span class="lineno">  218</span>        vert[i] = <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>();</div>
-<div class="line"><span class="lineno">  219</span>        vert[i].position = glm::vec4(vertis[i], 1);</div>
+<p class="definition">Definition at line <a class="el" href="../../db/d06/_mesh_8cpp_source.html#l00192">192</a> of file <a class="el" href="../../db/d06/_mesh_8cpp_source.html">Mesh.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  193</span>{</div>
+<div class="line"><span class="lineno">  194</span>    currType = MeshType::Icosphere;</div>
+<div class="line"><span class="lineno">  195</span>    glm::vec3 vertis[] =</div>
+<div class="line"><span class="lineno">  196</span>    {</div>
+<div class="line"><span class="lineno">  197</span>        glm::vec3(0, -1, 0),</div>
+<div class="line"><span class="lineno">  198</span>        glm::vec3(0, 0, 1),</div>
+<div class="line"><span class="lineno">  199</span>        glm::vec3(1, 0, 0),</div>
+<div class="line"><span class="lineno">  200</span>        glm::vec3(0, 0, -1),</div>
+<div class="line"><span class="lineno">  201</span>        glm::vec3(-1, 0, 0),</div>
+<div class="line"><span class="lineno">  202</span>        glm::vec3(0, 1, 0)</div>
+<div class="line"><span class="lineno">  203</span>    };</div>
+<div class="line"><span class="lineno">  204</span>    <span class="keywordtype">int</span> triangles[] =</div>
+<div class="line"><span class="lineno">  205</span>    {</div>
+<div class="line"><span class="lineno">  206</span>        0, 1, 2,</div>
+<div class="line"><span class="lineno">  207</span>        0, 2, 3,</div>
+<div class="line"><span class="lineno">  208</span>        0, 3, 4,</div>
+<div class="line"><span class="lineno">  209</span>        0, 4, 1,</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>        5, 2, 1,</div>
+<div class="line"><span class="lineno">  212</span>        5, 3, 2,</div>
+<div class="line"><span class="lineno">  213</span>        5, 4, 3,</div>
+<div class="line"><span class="lineno">  214</span>        5, 1, 4</div>
+<div class="line"><span class="lineno">  215</span>    };</div>
+<div class="line"><span class="lineno">  216</span> </div>
+<div class="line"><span class="lineno">  217</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <span class="keyword">sizeof</span>(vertis)/<span class="keyword">sizeof</span>(glm::vec3); i++)</div>
+<div class="line"><span class="lineno">  218</span>    {</div>
+<div class="line"><span class="lineno">  219</span>        vertis[i] *= radius;</div>
 <div class="line"><span class="lineno">  220</span>    }</div>
 <div class="line"><span class="lineno">  221</span> </div>
-<div class="line"><span class="lineno">  222</span>    indexCount = <span class="keyword">sizeof</span>(triangles)/<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>);</div>
-<div class="line"><span class="lineno">  223</span>    indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[indexCount];</div>
-<div class="line"><span class="lineno">  224</span>    memcpy(indices, triangles, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * indexCount);</div>
-<div class="line"><span class="lineno">  225</span>}</div>
+<div class="line"><span class="lineno">  222</span>    vertexCount = <span class="keyword">sizeof</span>(vertis)/<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>);</div>
+<div class="line"><span class="lineno">  223</span>    vert = <span class="keyword">new</span> <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>[<span class="keyword">sizeof</span>(vertis) / <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)];</div>
+<div class="line"><span class="lineno">  224</span>    memset(vert, 0, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>) * vertexCount);</div>
+<div class="line"><span class="lineno">  225</span> </div>
+<div class="line"><span class="lineno">  226</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; vertexCount; i++)</div>
+<div class="line"><span class="lineno">  227</span>    {</div>
+<div class="line"><span class="lineno">  228</span>        vert[i] = <a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>();</div>
+<div class="line"><span class="lineno">  229</span>        vert[i].position = glm::vec4(vertis[i], 1);</div>
+<div class="line"><span class="lineno">  230</span>    }</div>
+<div class="line"><span class="lineno">  231</span> </div>
+<div class="line"><span class="lineno">  232</span>    indexCount = <span class="keyword">sizeof</span>(triangles)/<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>);</div>
+<div class="line"><span class="lineno">  233</span>    indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[indexCount];</div>
+<div class="line"><span class="lineno">  234</span>    memcpy(indices, triangles, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * indexCount);</div>
+<div class="line"><span class="lineno">  235</span>}</div>
 <div class="ttc" id="astruct_vert_html"><div class="ttname"><a href="../../d1/dea/struct_vert.html">Vert</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/da1/_mesh_8h_source.html#l00012">Mesh.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -191,7 +191,7 @@ $(document).ready(function(){initNavTree('dc/dbe/class_mesh_ad4456a382a6ebc8e694
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dc/dbe/class_mesh.html">Mesh</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:58 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

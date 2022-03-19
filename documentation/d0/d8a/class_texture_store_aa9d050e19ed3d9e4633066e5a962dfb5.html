@@ -128,34 +128,34 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_aa9d050e19e
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00182">182</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  183</span>{</div>
-<div class="line"><span class="lineno">  184</span>    Log(<span class="stringliteral">&quot;Loading texture thumbnails&quot;</span>);</div>
-<div class="line"><span class="lineno">  185</span>    <span class="keywordtype">int</span> i=0;</div>
-<div class="line"><span class="lineno">  186</span> </div>
-<div class="line"><span class="lineno">  187</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : textureStoreItems)</div>
-<div class="line"><span class="lineno">  188</span>    {</div>
-<div class="line"><span class="lineno">  189</span>        i++;</div>
-<div class="line"><span class="lineno">  190</span> </div>
-<div class="line"><span class="lineno">  191</span>        <span class="keywordflow">if</span>(!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + it.name + <span class="stringliteral">&quot;.png&quot;</span>))</div>
-<div class="line"><span class="lineno">  192</span>        {</div>
-<div class="line"><span class="lineno">  193</span>            Log(<span class="stringliteral">&quot;Thumbnail for texture: &quot;</span> + it.name + <span class="stringliteral">&quot; not found.&quot;</span>);</div>
-<div class="line"><span class="lineno">  194</span>            it.texThumbnail = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\white.png&quot;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  195</span>        }</div>
-<div class="line"><span class="lineno">  196</span> </div>
-<div class="line"><span class="lineno">  197</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  198</span>        {</div>
-<div class="line"><span class="lineno">  199</span>            it.texThumbnail = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(it.thumbnailPath, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  200</span>        }</div>
-<div class="line"><span class="lineno">  201</span> </div>
-<div class="line"><span class="lineno">  202</span>        <span class="keywordflow">if</span>(i % 20 == 0)</div>
-<div class="line"><span class="lineno">  203</span>        {</div>
-<div class="line"><span class="lineno">  204</span>            std::cout &lt;&lt; (<span class="stringliteral">&quot;Loaded &quot;</span> + std::to_string(i) + <span class="stringliteral">&quot; of &quot;</span> + std::to_string(textureStoreItems.size()) + <span class="stringliteral">&quot; texture thumbnails\r&quot;</span>);</div>
-<div class="line"><span class="lineno">  205</span>        }</div>
-<div class="line"><span class="lineno">  206</span>    }</div>
-<div class="line"><span class="lineno">  207</span> </div>
-<div class="line"><span class="lineno">  208</span>    Log(<span class="stringliteral">&quot;Texture thumbnails loaded&quot;</span>);</div>
-<div class="line"><span class="lineno">  209</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00196">196</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  197</span>{</div>
+<div class="line"><span class="lineno">  198</span>    Log(<span class="stringliteral">&quot;Loading texture thumbnails&quot;</span>);</div>
+<div class="line"><span class="lineno">  199</span>    <span class="keywordtype">int</span> i=0;</div>
+<div class="line"><span class="lineno">  200</span> </div>
+<div class="line"><span class="lineno">  201</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : textureStoreItems)</div>
+<div class="line"><span class="lineno">  202</span>    {</div>
+<div class="line"><span class="lineno">  203</span>        i++;</div>
+<div class="line"><span class="lineno">  204</span> </div>
+<div class="line"><span class="lineno">  205</span>        <span class="keywordflow">if</span>(!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + it.name + <span class="stringliteral">&quot;.png&quot;</span>))</div>
+<div class="line"><span class="lineno">  206</span>        {</div>
+<div class="line"><span class="lineno">  207</span>            Log(<span class="stringliteral">&quot;Thumbnail for texture: &quot;</span> + it.name + <span class="stringliteral">&quot; not found.&quot;</span>);</div>
+<div class="line"><span class="lineno">  208</span>            it.texThumbnail = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\white.png&quot;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  209</span>        }</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  212</span>        {</div>
+<div class="line"><span class="lineno">  213</span>            it.texThumbnail = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(it.thumbnailPath, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  214</span>        }</div>
+<div class="line"><span class="lineno">  215</span> </div>
+<div class="line"><span class="lineno">  216</span>        <span class="keywordflow">if</span>(i % 20 == 0)</div>
+<div class="line"><span class="lineno">  217</span>        {</div>
+<div class="line"><span class="lineno">  218</span>            std::cout &lt;&lt; (<span class="stringliteral">&quot;Loaded &quot;</span> + std::to_string(i) + <span class="stringliteral">&quot; of &quot;</span> + std::to_string(textureStoreItems.size()) + <span class="stringliteral">&quot; texture thumbnails\r&quot;</span>);</div>
+<div class="line"><span class="lineno">  219</span>        }</div>
+<div class="line"><span class="lineno">  220</span>    }</div>
+<div class="line"><span class="lineno">  221</span> </div>
+<div class="line"><span class="lineno">  222</span>    Log(<span class="stringliteral">&quot;Texture thumbnails loaded&quot;</span>);</div>
+<div class="line"><span class="lineno">  223</span>}</div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -166,7 +166,7 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_aa9d050e19e
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d8a/class_texture_store.html">TextureStore</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:35:00 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:34 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

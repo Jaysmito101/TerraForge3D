@@ -121,26 +121,26 @@ $(document).ready(function(){initNavTree('d8/d79/class_module_manager_adacf3f7ad
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html#l00028">28</a> of file <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html">ModuleManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   29</span>{</div>
-<div class="line"><span class="lineno">   30</span>    <span class="keywordflow">if</span>(modules.find(uid) == modules.end())</div>
-<div class="line"><span class="lineno">   31</span>    {</div>
-<div class="line"><span class="lineno">   32</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   33</span>    }</div>
-<div class="line"><span class="lineno">   34</span> </div>
-<div class="line"><span class="lineno">   35</span>    <a class="code hl_class" href="../../dd/df9/class_module.html">Module</a> *module = modules[uid];</div>
-<div class="line"><span class="lineno">   36</span>    modules.erase(modules.find(uid));</div>
-<div class="line"><span class="lineno">   37</span>    loadedModules.erase(std::find(loadedModules.begin(), loadedModules.end(), module));</div>
-<div class="line"><span class="lineno">   38</span> </div>
-<div class="line"><span class="lineno">   39</span>    <span class="keywordflow">if</span>(!module)</div>
-<div class="line"><span class="lineno">   40</span>    {</div>
-<div class="line"><span class="lineno">   41</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   42</span>    }</div>
-<div class="line"><span class="lineno">   43</span> </div>
-<div class="line"><span class="lineno">   44</span>    module-&gt;<a class="code hl_function" href="../../dd/df9/class_module_a9277068762d229962a42b9e4798248f2.html#a9277068762d229962a42b9e4798248f2">OnUninstall</a>();</div>
-<div class="line"><span class="lineno">   45</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html#l00121">121</a> of file <a class="el" href="../../d6/da6/_module_manager_8cpp_source.html">ModuleManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  122</span>{</div>
+<div class="line"><span class="lineno">  123</span>    <span class="keywordflow">if</span>(modules.find(uid) == modules.end())</div>
+<div class="line"><span class="lineno">  124</span>    {</div>
+<div class="line"><span class="lineno">  125</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  126</span>    }</div>
+<div class="line"><span class="lineno">  127</span> </div>
+<div class="line"><span class="lineno">  128</span>    <a class="code hl_class" href="../../dd/df9/class_module.html">Module</a> *module = modules[uid];</div>
+<div class="line"><span class="lineno">  129</span>    modules.erase(modules.find(uid));</div>
+<div class="line"><span class="lineno">  130</span>    loadedModules.erase(std::find(loadedModules.begin(), loadedModules.end(), module));</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>    <span class="keywordflow">if</span>(!module)</div>
+<div class="line"><span class="lineno">  133</span>    {</div>
+<div class="line"><span class="lineno">  134</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  135</span>    }</div>
+<div class="line"><span class="lineno">  136</span> </div>
+<div class="line"><span class="lineno">  137</span>    module-&gt;<a class="code hl_function" href="../../dd/df9/class_module_a9277068762d229962a42b9e4798248f2.html#a9277068762d229962a42b9e4798248f2">OnUninstall</a>();</div>
+<div class="line"><span class="lineno">  138</span>}</div>
 <div class="ttc" id="aclass_module_a9277068762d229962a42b9e4798248f2_html_a9277068762d229962a42b9e4798248f2"><div class="ttname"><a href="../../dd/df9/class_module_a9277068762d229962a42b9e4798248f2.html#a9277068762d229962a42b9e4798248f2">Module::OnUninstall</a></div><div class="ttdeci">virtual void OnUninstall()</div><div class="ttdoc">OnUninstall.</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d13/_module_8cpp_source.html#l00033">Module.cpp:33</a></div></div>
-<div class="ttc" id="aclass_module_html"><div class="ttname"><a href="../../dd/df9/class_module.html">Module</a></div><div class="ttdoc">Module Info.</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d7a/_module_8h_source.html#l00038">Module.h:39</a></div></div>
+<div class="ttc" id="aclass_module_html"><div class="ttname"><a href="../../dd/df9/class_module.html">Module</a></div><div class="ttdoc">Module Info.</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d7a/_module_8h_source.html#l00039">Module.h:40</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -150,7 +150,7 @@ $(document).ready(function(){initNavTree('d8/d79/class_module_manager_adacf3f7ad
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d8/d79/class_module_manager.html">ModuleManager</a></li>
-    <li class="footer">Generated on Fri Mar 18 2022 14:34:59 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
