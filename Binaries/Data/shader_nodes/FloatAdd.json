@@ -1,0 +1,19 @@
+[META]
+{
+    "name": "Float Add",
+    "description": "",
+    "fname": "floatAdd",
+    "returns": "float",
+    "params": ["float:x", "float:y"],
+    "type": "method",
+    "color" : {"r":144, "g":10, "b":62},
+    "sharedData": { 
+		"xFactor" : {"type":"float", "default":0.0},
+		"yFactor" : {"type":"float", "default":0.0}
+	}
+}
+[/META]
+
+[CODE]
+return x * xFactor + y * yFactor;
+[/CODE]

@@ -1,0 +1,17 @@
+[META]
+{
+    "name": "Erosion Delta",
+    "fname": "getErosionDelta",
+    "returns": "float",
+    "params": [],
+    "color" : { "r" : 24, "g" : 181, "b" : 99},
+    "type": "method",
+    "sharedData": {
+	"factor" : {"type":"float", "default":1.0}
+    }
+}
+[/META]
+
+[CODE]
+return Extras1.z * factor;
+[/CODE]

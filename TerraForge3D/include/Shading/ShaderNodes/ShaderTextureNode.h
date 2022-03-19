@@ -4,6 +4,7 @@
 #include "Shading/ShaderTextureManager.h"
 #include "Base/Texture2D.h"
 
+
 class ShaderTextureNode : public SNENode
 {
 public:

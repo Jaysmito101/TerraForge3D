@@ -198,6 +198,7 @@ nlohmann::json ShadingManager::Save()
 void ShadingManager::Load(nlohmann::json data)
 {
 	shaderNodeEditor->Load(data["nodeEditor"]);
+	ReCompileShaders();
 }
 
 void ShadingManager::UpdateShaders()
@@ -443,6 +444,7 @@ out DATA
 	vec3 FragPos;
 	vec3 Normal;
 	vec2 TexCoord;
+	vec4 Extras1;
 } data_out;
 )"));
 
@@ -478,6 +480,7 @@ else
 	main.AddLine(GLSLLine("data_out.FragPos = vec3(aPos.x, aPos.y, aPos.z);", "The world position"));
 	main.AddLine(GLSLLine("data_out.Normal = vec3(aNorm.x, aNorm.y, aNorm.z);", "The vertex normals"));
 	main.AddLine(GLSLLine("data_out.TexCoord = aTexCoord;", "The texture coordinates"));
+	main.AddLine(GLSLLine("data_out.Extras1 = aExtras1;", "The texture coordinates"));
 
 
 	vsh->AddFunction(main);
@@ -497,11 +500,13 @@ in DATA
 	vec3 FragPos;
 	vec3 Normal;
 	vec2 TexCoord;
+	vec4 Extras1;
 } data_in[];
 )"));
 	gsh->AddTopLine(GLSLLine(""));
 	gsh->AddTopLine(GLSLLine("out float height;", "Pass the height to the fragment shader"));
 	gsh->AddTopLine(GLSLLine("out vec4 FragPos;", "Pass the position to the fragment shader"));
+	gsh->AddTopLine(GLSLLine("out vec4 Extras1;", "Pass the extras to the fragment shader"));
 	gsh->AddTopLine(GLSLLine("out vec3 Normal;", "Pass the normal to the fragment shader"));
 	gsh->AddTopLine(GLSLLine("out vec2 TexCoord;", "Pass the texture coordinates to the fragment shader"));
 	gsh->AddTopLine(GLSLLine("out mat3 TBN;", "Pass the Tangent Bitangent Normal matrix to the fragment shader"));
@@ -528,7 +533,7 @@ in DATA
 	main.AddLine(GLSLLine(""));
 	main.AddLine(GLSLLine("vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));"));
 	main.AddLine(GLSLLine("vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));"));
-	main.AddLine(GLSLLine("vec3 N = normalize(vec3(model * vec4(-1.0f*cross(edge1, edge0), 0.0f)));"));
+	main.AddLine(GLSLLine("vec3 N = normalize(vec3(model * vec4(cross(edge1, edge0), 0.0f)));"));
 	main.AddLine(GLSLLine(""));
 	main.AddLine(GLSLLine("TBN = mat3(T, B, N);"));
 	main.AddLine(GLSLLine(""));
@@ -540,6 +545,7 @@ in DATA
 		main.AddLine(GLSLLine("gl_Position = _PV * gl_in[" + std::to_string(i) + "].gl_Position;"));
 		main.AddLine(GLSLLine("height = data_in[" + std::to_string(i) + "].height;"));
 		main.AddLine(GLSLLine("TexCoord = data_in[" + std::to_string(i) + "].TexCoord;"));
+		main.AddLine(GLSLLine("Extras1 = data_in[" + std::to_string(i) + "].Extras1;"));
 		main.AddLine(GLSLLine("FragPos = vec4(data_in[" + std::to_string(i) + "].FragPos, 1.0f);"));
 		main.AddLine(GLSLLine(R"(
 		if(_FlatShade > 0.5f)
@@ -564,6 +570,7 @@ void ShadingManager::PrepFragShader()
 	fsh->AddTopLine(GLSLLine(""));
 	fsh->AddTopLine(GLSLLine("in float height;", "Take the height passed in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in vec4 FragPos;", "Take the world position passed in from the Geometry Shader"));
+	fsh->AddTopLine(GLSLLine("in vec4 Extras1;", "Take the extras 1 passed in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in vec3 Normal;", "Take the normal passed in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in vec2 TexCoord;", "Take the texture coordinates passed in from the Geometry Shader"));
 	fsh->AddTopLine(GLSLLine("in mat3 TBN;", "Take the tangent bitangent normal matrix in from the Geometry Shader"));

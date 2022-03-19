@@ -42,6 +42,8 @@ public:
 
 	glm::vec3 GetNormals(int x, int y);
 
+	void ClearNormals();
+
 	Mesh *Clone();
 
 	bool IsValid();

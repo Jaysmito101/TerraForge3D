@@ -1,0 +1,61 @@
+[META]
+{
+    "name": "Linear Distribution 4",
+    "fname": "getLinearDistribution4",
+    "returns": "vec3",
+    "params": ["vec3:tex0", "vec3:tex1", "vec3:tex2", "vec3:tex3", "float:x"],
+    "color" : { "r" : 154, "g" : 130, "b" : 52},
+    "type": "method",
+    "sharedData": {
+         "0#min": { "type": "float", "default" : 0.0 },
+         "0#max": { "type": "float", "default" : 1.0 },
+         "0#slope": { "type": "float", "default" : 1.0 },
+
+         "1#min": { "type": "float", "default" : 0.0 },
+         "1#max": { "type": "float", "default" : 1.0 },
+         "1#slope": { "type": "float", "default" : 1.0 },
+
+         "2#min": { "type": "float", "default" : 0.0 },
+         "2#max": { "type": "float", "default" : 1.0 },
+         "2#slope": { "type": "float", "default" : 1.0 },
+
+
+         "3#min": { "type": "float", "default" : 0.0 },
+         "3#max": { "type": "float", "default" : 1.0 },
+         "3#slope": { "type": "float", "default" : 1.0 }
+    }
+}
+[/META]
+
+[CODE]
+
+	vec3 tex[2];
+	tex[0] = tex0;
+	tex[1] = tex1;
+	tex[2] = tex2;
+	tex[3] = tex3;
+	vec3 ou = vec3(0.0f); // collector to store the result
+	float influence = 0.0f;
+	float total_influence = 0.0f;
+	for(int i = 0 ; i < 4 ; i++) // loop though all the input textures
+	{
+		float min = data[{OFFSET}].d[3 * i + 0];
+		float max = data[{OFFSET}].d[3 * i + 1];
+		float slope = data[{OFFSET}].d[3 * i + 2];
+		float midval = (max + min) / 2.0f;
+		float p = 0;
+		if(x < midval)
+			p = max - x;
+		else
+			p  = x - min;
+		influence = slope * p;
+		total_influence += influence;
+		ou += tex[i] * influence;
+	}
+	if(total_influence > 0)
+	{
+		ou /= total_influence;
+	}
+	return ou;
+
+[/CODE]

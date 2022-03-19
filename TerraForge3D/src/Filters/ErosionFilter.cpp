@@ -296,6 +296,7 @@ void ErosionFilter::Apply()
 	delete[] yOffsets;
 	delete[] weights;
 	delete[] map;
+	model->mesh->ClearNormals();
 	model->mesh->RecalculateNormals();
 	model->UploadToGPU();
 }

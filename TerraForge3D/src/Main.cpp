@@ -597,9 +597,7 @@ static void LoadPackedProject(std::string path = ShowOpenFileDialog())
 
 static void ShowModuleManager()
 {
-	ImGui::Begin("Module Manager", &appState->windows.modulesManager);
-	//appState->modules.manager->Render();
-	ImGui::End();
+	appState->modules.manager->ShowSettings(&appState->windows.modulesManager);
 }
 
 static void OnBeforeImGuiRender()
@@ -833,6 +831,8 @@ public:
 		{
 			RegenerateMesh();
 		}
+
+		appState->modules.manager->UpdateModules();
 	}
 
 	virtual void OnOneSecondTick() override
@@ -984,9 +984,24 @@ public:
 			ImGuiIO &io = ImGui::GetIO();
 			io.MouseWheel = (float)y;
 		});
+		glfwSetDropCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow *, int count, const char ** paths)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				std::string path = paths[i];
+				if (path.find(".terr3d") != std::string::npos)
+				{
+					appState->serailizer->LoadFile(path);
+				}
+				else if(path.find(".terr3dpack") != std::string::npos)
+				{
+					appState->serailizer->LoadPackedProject(path);
+				}
+			}
+		});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
 		appState->globals.kernelsIncludeDir = "\""+ appState->constants.kernelsDir + "\"";
-		appState->modules.manager = new ModuleManager();
+		appState->modules.manager = new ModuleManager(appState);
 		appState->meshGenerator = new MeshGeneratorManager(appState);
 		appState->mainMenu = new MainMenu(appState);
 		appState->seaManager = new SeaManager(appState);

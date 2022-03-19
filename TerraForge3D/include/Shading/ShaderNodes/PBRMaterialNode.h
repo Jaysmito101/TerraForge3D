@@ -17,4 +17,5 @@ public:
 public:
 	bool gammaCorrection = true;
 	bool hdrTonemapping = true;
+	bool invertNormals = false;
 };

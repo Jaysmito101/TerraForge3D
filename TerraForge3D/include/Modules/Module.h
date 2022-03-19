@@ -28,12 +28,13 @@ struct ModuleInfo
 /*!
    To make a module you are supposed to inherit this class.
    You have to Override 3 methods :
-   * <OnLoad>        -> Called once when module is being loaded
-   * <OnUpdate>      -> Called every Frame
-   * <OnImGuiRender> -> Called for every ImGui Frame
-   * <OnUnload>      -> Called at application shutdown
 
-   You can optionally Override the <OnInstall> and <OnUninstall> methods.
+   * OnLoad        -> Called once when module is being loaded
+   * OnUpdate      -> Called every Frame
+   * OnImGuiRender -> Called for every ImGui Frame
+   * OnUnload      -> Called at application shutdown
+
+   You can optionally Override the OnInstall and OnUninstall methods.
 */
 class Module
 {
@@ -105,4 +106,21 @@ public:
 	std::string uid; /*!< An unique ID assigned to module when it is being loaded */
 	ModuleInfo info; /*!< The details of the module */
 	ApplicationState *appState; /*!< The ApplicationState allows you to control anything in TerraForge3D */
+	void* nativeHandle; /*!< Stores the native DLL/SO handle */
+	bool isEnabled; /*!< If the module is enabled or not */
 };
+
+#ifdef TERR3D_WIN32
+#define TERR3D_MODULE_API __declspec(dllexport)
+#else
+#define TERR3D_MODULE_API
+#endif
+
+#define MAKE_MODULE_ENTRYPOINT(module) \
+	extern "C" { \
+		Module* TERR3D_MODULE_API GetModule(char* uid, ApplicationState* appState) \
+		{ \
+			std::string moduleUID = std::string(uid); \
+			return new module(moduleUID, appState); \
+		} \
+	}

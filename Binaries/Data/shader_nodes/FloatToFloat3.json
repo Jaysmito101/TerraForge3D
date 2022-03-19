@@ -1,0 +1,18 @@
+[META]
+{
+    "name": "Float To Float3",
+    "fname": "floatToFloat3",
+    "returns": "vec3",
+    "params": ["float:x"],
+    "color" : { "r" : 85, "g" : 23, "b" : 45},
+    "type": "method",
+    "sharedData": {
+	"factor" : {"type":"float", "default":1.0}
+    }
+}
+[/META]
+
+[CODE]
+return vec3(x) * factor;
+[/CODE]
+

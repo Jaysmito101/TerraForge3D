@@ -98,6 +98,26 @@ void ShaderTextureNode::OnRender()
 		}
 	}
 
+	if(ImGui::BeginDragDropTarget())
+	{
+		if(const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("TerraForge3D_Texture"))
+		{
+			std::string path = std::string((char*)payload->Data);
+			if(path.size() > 3)
+			{
+				if(texture)
+				{
+					delete texture;
+				}
+
+				texture = new Texture2D(path);
+				textureManager->UploadToGPU(zCoord);
+			}
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
 	ImGui::SameLine();
 	outputPins[0]->Render();
 	ImGui::PushItemWidth(100);

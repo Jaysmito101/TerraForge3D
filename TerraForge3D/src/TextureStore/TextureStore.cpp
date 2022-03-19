@@ -7,6 +7,19 @@
 #include <iostream>
 #include <filesystem>
 
+#define TEXTURE_STORE_ITEM_DND(text, var) \
+				if(item.var.size() > 3) \
+				{ \
+					ImGui::Selectable(text, &tmp); \
+					if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) \
+					{	\
+						ImGui::SetDragDropPayload("TerraForge3D_Texture", item.var.data(), sizeof(char) * item.var.size()); \
+						ImGui::Image((ImTextureID)item.texThumbnail->GetRendererID(), ImVec2(128, 128)); \
+						ImGui::Text("%s", item.name.c_str()); \
+						ImGui::EndDragDropSource(); \
+					} \
+				}
+
 #ifdef TERR3D_WIN32
 inline char *strcasestr(const char *str, const char *pattern)
 {
@@ -40,6 +53,7 @@ inline char *strcasestr(const char *str, const char *pattern)
 }
 #endif
 
+TextureStore* TextureStore::sInstance = nullptr;
 
 nlohmann::json TextureStore::LoadTextureDatabaseJ()
 {
@@ -306,15 +320,16 @@ void TextureStore::ShowAllTexturesSettings()
 		{
 			tmp = item.downloaded;
 
+
 			if(item.downloaded)
 			{
 				ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.5f, 0.5f, 0.7f));
 			}
 
-			ImGui::PushID(i);
+			ImGui::PushID(item.name.data());
 			ImGui::BeginChild("##texture_thumb", ImVec2(width, 300), true);
 			ImGui::Image((ImTextureID)item.texThumbnail->GetRendererID(), ImVec2(width, 150));
-			ImGui::Text(item.name.c_str());
+			ImGui::Text(item.name.data());
 
 			if(!item.downloaded)
 			{
@@ -339,6 +354,17 @@ void TextureStore::ShowAllTexturesSettings()
 
 			else
 			{
+				static bool tmp = false;
+
+
+				TEXTURE_STORE_ITEM_DND("Albedo", abledo)
+				TEXTURE_STORE_ITEM_DND("Normal", normal)
+				TEXTURE_STORE_ITEM_DND("Metallic", metallic)
+				TEXTURE_STORE_ITEM_DND("Roughness", roughness)
+				TEXTURE_STORE_ITEM_DND("AO", ao)
+				TEXTURE_STORE_ITEM_DND("ARM", arm)
+
+				
 				if(ImGui::Button("Delete"))
 				{
 					DeleteTexture(i);
@@ -449,6 +475,7 @@ void TextureStore::ShowSettings(bool *pOpen)
 
 TextureStore::TextureStore(ApplicationState *as)
 {
+	sInstance = this;
 	uid = GenerateId(32);
 	memset(searchStr, 0, sizeof(searchStr) / sizeof(searchStr[0]));
 	appState = as;

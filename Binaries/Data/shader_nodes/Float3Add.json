@@ -8,7 +8,7 @@
     "type": "method",
     "color" : {"r":144, "g":74, "b":49},
     "sharedData": { 
-		"x Factor" : {"type":"float", "default":0.0}
+		"x Factor" : {"type":"float", "default":0.0},
 		"y Factor" : {"type":"float", "default":0.0}
 	}
 }

@@ -6,10 +6,12 @@
 
 #include "Module.h"
 
+struct ApplicationState;
+
 class ModuleManager
 {
 public:
-	ModuleManager();
+	ModuleManager(ApplicationState *appState);
 
 	~ModuleManager();
 
@@ -21,7 +23,13 @@ public:
 
 	void UpdateModules();
 
+private:
+	void LoadModules();
+	void UnloadModules();
+	void LoadModule(std::string path);
+
 public:
+	ApplicationState *appState;
 	std::vector<Module *> loadedModules;
 	std::unordered_map<std::string, Module *> modules;
 };

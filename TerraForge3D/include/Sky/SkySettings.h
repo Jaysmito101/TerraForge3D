@@ -31,5 +31,5 @@ public:
 	float cirrus = 0.4f;
 	float cumulus = 0.8f;
 	float fsun[3] = {0, 0.2, 0.1};
-	ApplicationState *appState;
+	ApplicationState *appState = nullptr;
 };

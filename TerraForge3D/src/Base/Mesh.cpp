@@ -150,6 +150,16 @@ Mesh::~Mesh()
 	}
 }
 
+void Mesh::ClearNormals()
+{
+	for(int i = 0 ; i < vertexCount ; i++)
+	{
+		vert[i].normal.x = 0.0f;
+		vert[i].normal.y = 0.0f;
+		vert[i].normal.z = 0.0f;
+	}
+}
+
 void Mesh::RecalculateNormals()
 {
 	glm::vec3 e1;

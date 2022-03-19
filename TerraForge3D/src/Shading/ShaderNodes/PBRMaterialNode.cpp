@@ -111,7 +111,7 @@ void PBRMaterialNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 	function->AddLine(GLSLLine("", "Calculate per-light radiance"));
 	function->AddLine(GLSLLine("vec3 " + VAR("L") + " = normalize(_LightPosition - FragPos.xyz);", ""));
 	function->AddLine(GLSLLine("vec3 " + VAR("H") + " = normalize(" + VAR("V") + " + " + VAR("L") + ");", ""));
-	function->AddLine(GLSLLine("float " + VAR("distance") + " = length( " + VAR("L") + ");", ""));
+	function->AddLine(GLSLLine("float " + VAR("distance") + " = length( _LightPosition - FragPos.xyz );", ""));
 	function->AddLine(GLSLLine("float " + VAR("attenuation") + " = 1.0f / (" + VAR("distance") + " * " + VAR("distance") + ");", ""));
 	function->AddLine(GLSLLine("vec3  " + VAR("radiance") + " = _LightColor * _LightStrength * " + VAR("attenuation") + ";", ""));
 	function->AddLine(GLSLLine("", ""));
@@ -137,7 +137,7 @@ void PBRMaterialNode::OnEvaluate(GLSLFunction *function, GLSLLine *line)
 	function->AddLine(GLSLLine(VAR("kD") + " *= 1.0 - " + VAR("metallic") + ";", ""));
 	function->AddLine(GLSLLine("", ""));
 	function->AddLine(GLSLLine("", "Scale light by NdotL"));
-	function->AddLine(GLSLLine("float " + VAR("NdotL") + " = max(dot(" + VAR("N") + ", " + VAR("V") + "), 0.0f); ", ""));
+	function->AddLine(GLSLLine("float " + VAR("NdotL") + " = max(dot(" + VAR("N") + ", " + VAR("L") + "), 0.0f); ", ""));
 	function->AddLine(GLSLLine("", ""));
 	function->AddLine(GLSLLine("", "// Add to outgoing radiance Lo"));
 	function->AddLine(GLSLLine(VAR("Lo") + " += (" + VAR("kD") + " * " + VAR("albedo") + " / PI + " + VAR("specular") + ") * " + VAR("radiance") + " * " + VAR("NdotL") + ";", "Note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again"));

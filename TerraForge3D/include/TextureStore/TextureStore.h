@@ -44,6 +44,8 @@ public:
 
 	void SaveDownloadsDatabase();
 
+	inline static TextureStore *Get() { return sInstance; }
+
 private:
 	void LoadTextureThumbs();
 	void VerifyTextureThumbs();
@@ -56,6 +58,7 @@ private:
 
 
 private:
+	static TextureStore* sInstance;
 	nlohmann::json textureDatabaseJ;
 	nlohmann::json downloadedTextureDatabaseJ;
 	std::string uid;
