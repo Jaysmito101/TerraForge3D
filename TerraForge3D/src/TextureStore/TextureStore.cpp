@@ -295,7 +295,7 @@ void TextureStore::DownloadTexture(int id, int res)
 	textureStoreItems[id].abledo = baseDir + PATH_SEPARATOR "albedo.png";
 	tmpStr = tmpJ["nor_gl"][std::to_string(res) + "k"]["png"]["url"];
 	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "normal.png");
-	textureStoreItems[id].normal = baseDir + PATH_SEPARATOR + "normal.png";
+	textureStoreItems[id].normal = baseDir + PATH_SEPARATOR "normal.png";
 	tmpStr = tmpJ["Rough"][std::to_string(res) + "k"]["png"]["url"];
 	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "roughness.png");
 	textureStoreItems[id].roughness = baseDir + PATH_SEPARATOR "roughness.png";

@@ -74,13 +74,13 @@ void AdvancedErosionFilter::Apply()
 		}
 
 		std::string kernelSrc = ReadShaderSourceFile(GetExecutableDir() +
-				PATH_SEPARATOR "Data" PATH_SEPARATOR "kernels" +
+				PATH_SEPARATOR "Data" PATH_SEPARATOR "kernels"
 				PATH_SEPARATOR "advanced_erosion.cl", &tmp);
 		// Some constants
 		kernelSrc = std::regex_replace(kernelSrc, std::regex("LOCAL_WORK_SIZE"), std::to_string(localWorkSize));
 		kernels.Clear();
 		kernels.AddSoruce(kernelSrc);
-		kernels.BuildProgram("-I\"" + GetExecutableDir() + PATH_SEPARATOR +
+		kernels.BuildProgram("-I\"" + GetExecutableDir() + PATH_SEPARATOR
 				"Data" PATH_SEPARATOR "kernels" + "\"");
 		kernels.AddKernel("erode");
 		kernels.CreateBuffer("mesh", CL_MEM_READ_WRITE, sizeof(Vert) * model->mesh->vertexCount);

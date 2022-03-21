@@ -118,8 +118,8 @@ nlohmann::json Serializer::Serialize()
 		if (projectAsset == "")
 		{
 			MkDir(appState->projectManager->GetResourcePath() + PATH_SEPARATOR "models");
-			CopyFileData(appState->globals.currentBaseModelPath, appState->projectManager->GetResourcePath() + PATH_SEPARATOR "models" + PATH_SEPARATOR + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
-			appState->projectManager->RegisterAsset(baseHash, "models" + PATH_SEPARATOR + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
+			CopyFileData(appState->globals.currentBaseModelPath, appState->projectManager->GetResourcePath() + PATH_SEPARATOR "models" PATH_SEPARATOR + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
+			appState->projectManager->RegisterAsset(baseHash, "models" PATH_SEPARATOR + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
 		}
 
 		data["baseid"] = baseHash;
@@ -143,7 +143,7 @@ void Serializer::PackProject(std::string path)
 	outfile.close();
 	MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "temp");
 	std::string uid = GenerateId(64);
-	SaveFile(GetExecutableDir() + "Data" + PATH_SEPARATOR "temp" + PATH_SEPARATOR + uid);
+	SaveFile(GetExecutableDir() + "Data" + PATH_SEPARATOR "temp" PATH_SEPARATOR + uid);
 	zip_t *packed = zip_open(path.c_str(), 9, 'w');
 	zip_walk(packed, appState->projectManager->GetResourcePath().c_str());
 	zip_close(packed);
@@ -157,24 +157,21 @@ void Serializer::LoadPackedProject(std::string path)
 	}
 
 	std::string uid = GenerateId(64);
-	MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" + PATH_SEPARATOR +
-			"temp" PATH_SEPARATOR "pcache_" + uid);
-	zip_extract(path.c_str(), (GetExecutableDir() + PATH_SEPARATOR "Data" +
-				PATH_SEPARATOR "temp" PATH_SEPARATOR "pcache_" +
-				uid).c_str(), [](const char *filename, void *arg)
+	MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "temp"
+			PATH_SEPARATOR "pcache_" + uid);
+	zip_extract(path.c_str(), (GetExecutableDir() + PATH_SEPARATOR "Data"
+				PATH_SEPARATOR "temp" PATH_SEPARATOR "pcache_" + uid).c_str(),
+			[](const char *filename, void *arg)
 	{
 		return 1;
 	}, (void *)0);
 
-	if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" +
-				PATH_SEPARATOR "temp" PATH_SEPARATOR "pcache_" + uid +
-				PATH_SEPARATOR "project.terr3d", true))
+	if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "temp" PATH_SEPARATOR "pcache_" + uid + PATH_SEPARATOR "project.terr3d", true))
 	{
 		bool tmp = false;
 		std::string sdata = ReadShaderSourceFile(GetExecutableDir() +
-				PATH_SEPARATOR "Data" PATH_SEPARATOR "temp" +
-				PATH_SEPARATOR "pcache_" + uid + PATH_SEPARATOR +
-				"project.terr3d", &tmp);
+				PATH_SEPARATOR "Data" PATH_SEPARATOR "temp" PATH_SEPARATOR
+				"pcache_" + uid + PATH_SEPARATOR "project.terr3d", &tmp);
 
 		if (sdata.size() <= 0)
 		{
@@ -197,20 +194,20 @@ void Serializer::LoadPackedProject(std::string path)
 
 		std::string projId = data["projectID"];
 		zip_extract(path.c_str(), (GetExecutableDir() + PATH_SEPARATOR "Data"
-					+ PATH_SEPARATOR "cache" + PATH_SEPARATOR +
-					"project_data" PATH_SEPARATOR "project_" +
-					projId).c_str(), [](const char *filename, void *arg)
+					PATH_SEPARATOR "cache" PATH_SEPARATOR "project_data"
+					PATH_SEPARATOR "project_" + projId).c_str(), [](const char
+						*filename, void *arg)
 		{
 			Log(std::string("Extracted ") + filename);
 			return 1;
 		}, (void *)0);
 		std::string oriDir = path.substr(0, path.rfind(PATH_SEPARATOR));
 		std::string oriName = path.substr(path.rfind(PATH_SEPARATOR) + 1);
-		CopyFileData((GetExecutableDir() + PATH_SEPARATOR "Data" +
-					PATH_SEPARATOR "cache" + PATH_SEPARATOR + +
-					"project_data" PATH_SEPARATOR "project_" + projId +
-					PATH_SEPARATOR "project.terr3d").c_str(), oriDir +
-				PATH_SEPARATOR + oriName + ".terr3d");
+		CopyFileData((GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR
+					"cache" PATH_SEPARATOR "project_data" PATH_SEPARATOR
+					"project_" + projId + PATH_SEPARATOR
+					"project.terr3d").c_str(), oriDir + PATH_SEPARATOR +
+				oriName + ".terr3d");
 		LoadFile(oriDir + PATH_SEPARATOR + oriName + ".terr3d");
 	}
 

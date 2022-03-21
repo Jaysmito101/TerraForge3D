@@ -26,15 +26,15 @@ void SupportersTribute::LoadstargazersData(nlohmann::json &data)
 			MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars");
 		}
 
-		if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
+		if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
 		{
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
-			DownloadFile(baseURL, pathURL, GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"]));
+			DownloadFile(baseURL, pathURL, GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"]));
 		}
 
-		st.avatar = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"]));
+		st.avatar = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"]));
 		stargazers.push_back(st);
 	}
 }
@@ -50,24 +50,23 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
 
 		if (!PathExist(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars"))
 		{
-			MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" + PATH_SEPARATOR
-					+ "cache" PATH_SEPARATOR "github_avatars");
+			MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars");
 		}
 
-		if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
+		if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
 		{
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
 			DownloadFile(baseURL, pathURL, GetExecutableDir() + PATH_SEPARATOR
-					+ "Data" PATH_SEPARATOR "cache" + PATH_SEPARATOR +
-					"github_avatars" + PATH_SEPARATOR + st.name + "_" +
+					"Data" PATH_SEPARATOR "cache" PATH_SEPARATOR
+					"github_avatars" PATH_SEPARATOR + st.name + "_" +
 					std::string(item["node_id"]));
 		}
 
 		st.avatar = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data"
-				+ PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars"
-				+ PATH_SEPARATOR + st.name + "_" +
+				PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars"
+				PATH_SEPARATOR + st.name + "_" +
 				std::string(item["node_id"]));
 		contributors.push_back(st);
 	}
@@ -103,7 +102,7 @@ SupportersTribute::SupportersTribute()
 		bool tmp = false;
 		Log("Trying to load cached data.");
 
-		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data"+ PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache"))
+		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache"))
 		{
 			Log("Found Stargazers Cached Data!");
 			std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", &tmp);
