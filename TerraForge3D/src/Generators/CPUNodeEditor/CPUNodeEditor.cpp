@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
 #include "Utils/Utils.h"
+#include "Platform.h"
 
 #include "imgui.h"
 #include "Base/ImGuiShapes.h"
@@ -134,7 +135,7 @@ CPUNodeEditor::CPUNodeEditor(ApplicationState *as)
 	name.reserve(1024);
 	name = "CPU Node Editor " + std::to_string(count++);
 	NodeEditorConfig config;
-	config.saveFile = GetExecutableDir() + "\\Data\\configs\\CPUNodeEditorconfigs.terr3d";
+	config.saveFile = GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "CPUNodeEditorconfigs.terr3d";
 	config.makeNodeFunc = [&]()
 	{
 		ImGuiNodeEditor::Suspend();

@@ -1,4 +1,5 @@
 #include "TextureStore/TextureStore.h"
+#include "Platform.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
 
@@ -64,7 +65,7 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 		loadFromFile = false;
 	}
 
-	if(!FileExists(GetExecutableDir() + "\\Data\\cache\\texture_database.terr3d"))
+	if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_database.terr3d"))
 	{
 		loadFromFile = false;
 	}
@@ -73,7 +74,7 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 	{
 		Log("Loading texture database from file");
 		bool tmp = false;
-		std::string tmpStr = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\texture_database.terr3d", &tmp);
+		std::string tmpStr = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_database.terr3d", &tmp);
 
 		if(tmp == false)
 		{
@@ -104,35 +105,41 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 			return nlohmann::json();
 		}
 
-		SaveToFile(GetExecutableDir() + "\\Data\\cache\\texture_database.terr3d", tmp);
+		SaveToFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_database.terr3d", tmp);
 		return nlohmann::json::parse(tmp);
 	}
 }
 
 void TextureStore::VerifyTextureThumbs()
 {
-	MkDir(GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\");
+	MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR);
 
 	for(auto it = textureDatabaseJ.begin() ; it != textureDatabaseJ.end() ; it++)
 	{
-		if(!FileExists(GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\" + it.key() + ".png"))
+		if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR + it.key() + ".png"))
 		{
 			Log("Downloading thumbnail for texture: " + it.key());
-			DownloadFile("https://cdn.polyhaven.com", "/asset_img/thumbs/" + it.key() + ".png?width=100&height=100", GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\" + it.key() + ".png");
+			DownloadFile("https://cdn.polyhaven.com", "/asset_img/thumbs/" +
+					it.key() + ".png?width=100&height=100", GetExecutableDir()
+					+ PATH_SEPARATOR "Data" PATH_SEPARATOR "cache "
+					PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR +
+					it.key() + ".png");
 		}
 	}
 }
 
 nlohmann::json TextureStore::LoadDownloadedTextureDatabaseJ()
 {
-	if(!FileExists(GetExecutableDir() + "\\Data\\configs\\texture_database_downloaded.terr3d"))
+	if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "texture_database_downloaded.terr3d"))
 	{
 		Log("No Textures downloaded yet");
 		return nlohmann::json();
 	}
 
 	bool tmp = false;
-	std::string tmpStr = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\configs\\texture_database_downloaded.terr3d", &tmp);
+	std::string tmpStr = ReadShaderSourceFile(GetExecutableDir() +
+			PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR
+			"texture_database_downloaded.terr3d", &tmp);
 
 	if(tmp == false)
 	{
@@ -168,7 +175,9 @@ void TextureStore::LoadTextureDatabase()
 	{
 		TextureStoreItem item;
 		item.name = it.key();
-		item.thumbnailPath = GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\" + item.name + ".png";
+		item.thumbnailPath = GetExecutableDir() + PATH_SEPARATOR "Data"
+			PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails"
+			PATH_SEPARATOR + item.name + ".png";
 		item.download_count = it.value()["download_count"];
 
 		for(auto it2 = it.value()["authors"].begin() ; it2 != it.value()["authors"].end() ; it2++)
@@ -202,10 +211,12 @@ void TextureStore::LoadTextureThumbs()
 	{
 		i++;
 
-		if(!FileExists(GetExecutableDir() + "\\Data\\cache\\texture_thumbnails\\" + it.name + ".png"))
+		if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR + it.name + ".png"))
 		{
 			Log("Thumbnail for texture: " + it.name + " not found.");
-			it.texThumbnail = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png", false);
+			it.texThumbnail = new Texture2D(GetExecutableDir() + PATH_SEPARATOR
+					"Data" PATH_SEPARATOR "textures" PATH_SEPARATOR
+					"white.png", false);
 		}
 
 		else
@@ -239,7 +250,9 @@ void TextureStore::SaveDownloadsDatabase()
 		tmp2[textureStoreItems[id].name] = tmp;
 	}
 
-	SaveToFile(GetExecutableDir() + "\\Data\\configs\\texture_database_downloaded.terr3d", tmp2.dump(4));
+	SaveToFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR
+			"configs" PATH_SEPARATOR "texture_database_downloaded.terr3d",
+			tmp2.dump(4));
 }
 
 void TextureStore::DeleteTexture(int id)
@@ -251,7 +264,7 @@ void TextureStore::DeleteTexture(int id)
 	DeleteFileT(textureStoreItems[id].metallic);
 	DeleteFileT(textureStoreItems[id].roughness);
 	DeleteFileT(textureStoreItems[id].arm);
-	DeleteFileT(textureStoreItems[id].baseDir + "\\displacement.png"); // TEMPORARY
+	DeleteFileT(textureStoreItems[id].baseDir + PATH_SEPARATOR "displacement.png"); // TEMPORARY
 	textureStoreItems[id].downloaded = false;
 	downloadedTextureStoreItems.erase(std::find(downloadedTextureStoreItems.begin(), downloadedTextureStoreItems.end(), id));
 	SaveDownloadsDatabase();
@@ -273,26 +286,27 @@ void TextureStore::DownloadTexture(int id, int res)
 		return;
 	}
 
-	std::string baseDir = GetExecutableDir() + "\\Data\\textures\\" + textureStoreItems[id].name;
+	std::string baseDir = GetExecutableDir() + PATH_SEPARATOR "Data"
+		PATH_SEPARATOR "textures" PATH_SEPARATOR + textureStoreItems[id].name;
 	MkDir(baseDir);
 	textureStoreItems[id].baseDir = baseDir;
 	tmpStr = tmpJ["Diffuse"][std::to_string(res) + "k"]["png"]["url"];
-	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + "\\albedo.png");
-	textureStoreItems[id].abledo = baseDir + "\\albedo.png";
+	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "albedo.png");
+	textureStoreItems[id].abledo = baseDir + PATH_SEPARATOR "albedo.png";
 	tmpStr = tmpJ["nor_gl"][std::to_string(res) + "k"]["png"]["url"];
-	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + "\\normal.png");
-	textureStoreItems[id].normal = baseDir + "\\normal.png";
+	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "normal.png");
+	textureStoreItems[id].normal = baseDir + PATH_SEPARATOR + "normal.png";
 	tmpStr = tmpJ["Rough"][std::to_string(res) + "k"]["png"]["url"];
-	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + "\\roughness.png");
-	textureStoreItems[id].roughness = baseDir + "\\roughness.png";
+	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "roughness.png");
+	textureStoreItems[id].roughness = baseDir + PATH_SEPARATOR "roughness.png";
 	tmpStr = tmpJ["AO"][std::to_string(res) + "k"]["png"]["url"];
-	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + "\\ao.png");
-	textureStoreItems[id].ao = baseDir + "\\ao.png";
+	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "ao.png");
+	textureStoreItems[id].ao = baseDir + PATH_SEPARATOR "ao.png";
 	tmpStr = tmpJ["arm"][std::to_string(res) + "k"]["png"]["url"];
-	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + "\\arm.png");
-	textureStoreItems[id].arm = baseDir + "\\arm.png";
+	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "arm.png");
+	textureStoreItems[id].arm = baseDir + PATH_SEPARATOR "arm.png";
 	tmpStr = tmpJ["Displacement"][std::to_string(res) + "k"]["png"]["url"];
-	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + "\\displacement.png");
+	DownloadFile("https://dl.polyhaven.org", tmpStr.substr(24), baseDir + PATH_SEPARATOR "displacement.png");
 	textureStoreItems[id].downloaded = true;
 	downloadedTextureStoreItems.push_back(id);
 	SaveDownloadsDatabase();

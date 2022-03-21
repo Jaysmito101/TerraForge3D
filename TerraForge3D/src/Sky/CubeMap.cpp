@@ -17,9 +17,9 @@
 #include "Data/ApplicationState.h"
 
 static bool tmpb = false;
-static std::string vertShader = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "shaders" PATH_SEPERATOR "skybox" PATH_SEPERATOR "vert.glsl", &tmpb);
-static std::string fragShader = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "shaders" PATH_SEPERATOR "skybox" PATH_SEPERATOR "frag.glsl", &tmpb);
-static std::string fragProShader = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "shaders" PATH_SEPERATOR "skybox" PATH_SEPERATOR "procedural_clouds.glsl", &tmpb);
+static std::string vertShader = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shaders" PATH_SEPARATOR "skybox" PATH_SEPARATOR "vert.glsl", &tmpb);
+static std::string fragShader = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shaders" PATH_SEPARATOR "skybox" PATH_SEPARATOR "frag.glsl", &tmpb);
+static std::string fragProShader = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shaders" PATH_SEPARATOR "skybox" PATH_SEPARATOR "procedural_clouds.glsl", &tmpb);
 
 
 static float skyboxVertices[] =
@@ -96,12 +96,12 @@ CubeMapManager::CubeMapManager(ApplicationState *as)
 	appState = as;
 	static std::vector<std::string> faces =
 	{
-		appState->constants.skyboxDir + PATH_SEPERATOR "px.jpg",
-		appState->constants.skyboxDir + PATH_SEPERATOR "nx.jpg",
-		appState->constants.skyboxDir + PATH_SEPERATOR "py.jpg",
-		appState->constants.skyboxDir + PATH_SEPERATOR "ny.jpg",
-		appState->constants.skyboxDir + PATH_SEPERATOR "pz.jpg",
-		appState->constants.skyboxDir + PATH_SEPERATOR "nz.jpg"
+		appState->constants.skyboxDir + PATH_SEPARATOR "px.jpg",
+		appState->constants.skyboxDir + PATH_SEPARATOR "nx.jpg",
+		appState->constants.skyboxDir + PATH_SEPARATOR "py.jpg",
+		appState->constants.skyboxDir + PATH_SEPARATOR "ny.jpg",
+		appState->constants.skyboxDir + PATH_SEPARATOR "pz.jpg",
+		appState->constants.skyboxDir + PATH_SEPARATOR "nz.jpg"
 	};
 	cubemap = new TextureCubemap();
 	cubemap->SetUpOnGPU();
@@ -117,7 +117,7 @@ CubeMapManager::CubeMapManager(ApplicationState *as)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
-	skySphere = LoadModel(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "models" PATH_SEPERATOR "icosphere.obj");
+	skySphere = LoadModel(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "models" PATH_SEPARATOR "icosphere.obj");
 	skySphere->SetupMeshOnGPU();
 	skySphere->UploadToGPU();
 }

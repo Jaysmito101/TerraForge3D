@@ -172,7 +172,7 @@ ShadingManager::ShadingManager(ApplicationState *as)
 
 		return node;
 	};
-	config.saveFile = GetExecutableDir() + PATH_SEPERATOR + "Data" + PATH_SEPERATOR + "configs" + PATH_SEPERATOR + "ShaderNodes.json";
+	config.saveFile = GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "ShaderNodes.json";
 	shaderNodeEditor = new NodeEditor(config);
 	shaderNodeEditor->name = "Shader Nodes";
 	shaderNodeEditor->SetOutputNode(new ShaderOutputNode(fsh));
@@ -217,7 +217,7 @@ void ShadingManager::UpdateShaders()
 
 void ShadingManager::LoadDefaultCustomNodes()
 {
-	std::string nodesDir = GetExecutableDir() + PATH_SEPERATOR + "Data" + PATH_SEPERATOR + "shader_nodes";
+	std::string nodesDir = GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shader_nodes";
 	defaultCustomNodes.clear();
 	bool tmp = false;
 
@@ -232,7 +232,7 @@ void ShadingManager::LoadDefaultCustomNodes()
 		defaultCustomNodes.push_back(n);
 	}
 
-	extraSource = ReadShaderSourceFile(nodesDir + PATH_SEPERATOR + "extras.glsl", &tmp);
+	extraSource = ReadShaderSourceFile(nodesDir + PATH_SEPARATOR "extras.glsl", &tmp);
 	
 }
 

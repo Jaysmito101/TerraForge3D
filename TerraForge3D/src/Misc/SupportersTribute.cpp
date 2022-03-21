@@ -3,6 +3,7 @@
 #include "Misc/SupportersTribute.h"
 
 #include "Base/Texture2D.h"
+#include "Platform.h"
 
 #include <Utils.h>
 #include <imgui.h>
@@ -20,20 +21,20 @@ void SupportersTribute::LoadstargazersData(nlohmann::json &data)
 		GitHubData st;
 		st.name = item["login"];
 
-		if (!PathExist(GetExecutableDir() + "\\Data\\cache\\github_avatars"))
+		if (!PathExist(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars"))
 		{
-			MkDir(GetExecutableDir() + "\\Data\\cache\\github_avatars");
+			MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars");
 		}
 
-		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
+		if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
 		{
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
-			DownloadFile(baseURL, pathURL, GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
+			DownloadFile(baseURL, pathURL, GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"]));
 		}
 
-		st.avatar = new Texture2D(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
+		st.avatar = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"]));
 		stargazers.push_back(st);
 	}
 }
@@ -47,20 +48,27 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
 		GitHubData st;
 		st.name = item["login"];
 
-		if (!PathExist(GetExecutableDir() + "\\Data\\cache\\github_avatars"))
+		if (!PathExist(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars"))
 		{
-			MkDir(GetExecutableDir() + "\\Data\\cache\\github_avatars");
+			MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" + PATH_SEPARATOR
+					+ "cache" PATH_SEPARATOR "github_avatars");
 		}
 
-		if (!FileExists(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
+		if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars" + PATH_SEPARATOR + st.name + "_" + std::string(item["node_id"])) && isNetWorkConnected)
 		{
 			std::string urlFull = item["avatar_url"];
 			std::string baseURL = urlFull.substr(0, 37);
 			std::string pathURL = urlFull.substr(38);
-			DownloadFile(baseURL, pathURL, GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
+			DownloadFile(baseURL, pathURL, GetExecutableDir() + PATH_SEPARATOR
+					+ "Data" PATH_SEPARATOR "cache" + PATH_SEPARATOR +
+					"github_avatars" + PATH_SEPARATOR + st.name + "_" +
+					std::string(item["node_id"]));
 		}
 
-		st.avatar = new Texture2D(GetExecutableDir() + "\\Data\\cache\\github_avatars\\" + st.name + "_" + std::string(item["node_id"]));
+		st.avatar = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data"
+				+ PATH_SEPARATOR "cache" PATH_SEPARATOR "github_avatars"
+				+ PATH_SEPARATOR + st.name + "_" +
+				std::string(item["node_id"]));
 		contributors.push_back(st);
 	}
 }
@@ -68,7 +76,7 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
 
 SupportersTribute::SupportersTribute()
 {
-	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache") || rand() % 5 == 0))
+	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache") || rand() % 5 == 0))
 	{
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
 		{
@@ -78,13 +86,13 @@ SupportersTribute::SupportersTribute()
 			int perPage = 30;
 			int lastPage = stargazerCount / perPage;
 			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&page=" + std::to_string(lastPage));
-			SaveToFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", stargazersRawData);
+			SaveToFile(GetExecutableDir() + PATH_SEPARATOR +"Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", stargazersRawData);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
 		}
 		{
 			std::string contributorsRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/contributors");
-			SaveToFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", contributorsRawData);
+			SaveToFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache", contributorsRawData);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
 			LoadcontributorsData(contributorsData);
 		}
@@ -95,10 +103,10 @@ SupportersTribute::SupportersTribute()
 		bool tmp = false;
 		Log("Trying to load cached data.");
 
-		if (FileExists(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache"))
+		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data"+ PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache"))
 		{
 			Log("Found Stargazers Cached Data!");
-			std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\stargazers.terr3dcache", &tmp);
+			std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", &tmp);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
 			LoadstargazersData(stargazersData);
 		}
@@ -108,10 +116,10 @@ SupportersTribute::SupportersTribute()
 			Log("Stargazers Cached Data not found!");
 		}
 
-		if (FileExists(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache"))
+		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache"))
 		{
 			Log("Found Contributors Cached Data!");
-			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\cache\\contributors.terr3dcache", &tmp);
+			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache", &tmp);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
 			LoadcontributorsData(contributorsData);
 		}

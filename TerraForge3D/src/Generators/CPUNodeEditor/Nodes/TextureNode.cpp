@@ -9,6 +9,7 @@
 #include <mutex>
 #include <cmath>
 #include "Base/ImGuiCurveEditor.h"
+#include "Platform.h"
 
 #define CLAMP01(x) x > 1 ? 1 : ( x < 0 ? 0 : x )
 
@@ -130,7 +131,7 @@ void TextureNode::Load(nlohmann::json data)
 	if (isDefault)
 	{
 		delete texture;
-		texture = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png", false, false);
+		texture = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "textures" PATH_SEPARATOR "white.png", false, false);
 	}
 
 	else
@@ -146,7 +147,7 @@ void TextureNode::Load(nlohmann::json data)
 		else
 		{
 			delete texture;
-			texture = new Texture2D(ProjectManager::Get()->GetResourcePath() + "\\" + ProjectManager::Get()->GetAsset(hash));
+			texture = new Texture2D(ProjectManager::Get()->GetResourcePath() + PATH_SEPARATOR + ProjectManager::Get()->GetAsset(hash));
 			Log("Loaded Cached Texture : " + hash);
 		}
 	}
@@ -285,7 +286,7 @@ TextureNode::TextureNode()
 	outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
 	outputPins.push_back(new NodeEditorPin(NodeEditorPinType::Output));
 	headerColor = ImColor(IMAGE_NODE_COLOR);
-	texture = new Texture2D(GetExecutableDir() + "\\Data\\textures\\white.png", false, false);
+	texture = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "textures" PATH_SEPARATOR "white.png", false, false);
 	isDefault = true;
 	scale = 1.0f;
 	inv = false;

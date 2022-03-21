@@ -6,6 +6,7 @@
 #include "Misc/AppStyles.h"
 #include "Misc/ExportManager.h"
 #include "Data/ApplicationState.h"
+#include "Platform.h"
 
 static void ShowWindowMenuItem(const char *title, bool *val)
 {
@@ -151,7 +152,7 @@ void MainMenu::ShowFileMenu()
 
 	if (ImGui::MenuItem("Load Auto Saved Project"))
 	{
-		appState->serailizer->LoadFile(GetExecutableDir() + "\\Data\\cache\\autosave\\autosave.terr3d");
+		appState->serailizer->LoadFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
 	}
 
 	if (ImGui::MenuItem("Exit"))

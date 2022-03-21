@@ -12,6 +12,7 @@
 #include "Base/UIFontManager.h"
 
 #include "Profiler.h"
+#include "Platform.h"
 
 MeshGeneratorManager::MeshGeneratorManager(ApplicationState *as)
 	:appState(as)
@@ -436,7 +437,7 @@ void MeshGeneratorManager::ExecuteCPUGenerators()
 void MeshGeneratorManager::LoadKernels()
 {
 	bool tmp = false;
-	std::string source = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\kernels\\generators\\generators.cl", &tmp);
+	std::string source = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "kernels" PATH_SEPARATOR "generators" PATH_SEPARATOR "generators.cl", &tmp);
 	kernels->AddSoruce(source);
 	kernels->BuildProgram("-I" + appState->globals.kernelsIncludeDir + " -cl-fast-relaxed-math -cl-mad-enable");
 	kernels->AddKernel("clear_mesh_terrain");

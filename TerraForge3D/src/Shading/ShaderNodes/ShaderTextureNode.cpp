@@ -48,7 +48,7 @@ void ShaderTextureNode::Load(nlohmann::json data)
 		texture = nullptr;
 	}
 
-	texture = new Texture2D(ProjectManager::Get()->GetResourcePath() + PATH_SEPERATOR + ProjectManager::Get()->GetAsset(data["texture"]));
+	texture = new Texture2D(ProjectManager::Get()->GetResourcePath() + PATH_SEPARATOR + ProjectManager::Get()->GetAsset(data["texture"]));
 	scale = data["scale"];
 	offsetX = data["offsetX"];
 	offsetY = data["offsetY"];
@@ -156,7 +156,7 @@ ShaderTextureNode::ShaderTextureNode(GLSLHandler *handler, ShaderTextureManager 
 	name = "Texture";
 	headerColor = ImColor(SHADER_TEXTURE_NODE_COLOR);
 	outputPins.push_back(new SNEPin(NodeEditorPinType::Output, SNEPinType::SNEPinType_Float3));
-	texture = new Texture2D(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "textures" PATH_SEPERATOR "white.png");
+	texture = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "textures" PATH_SEPARATOR "white.png");
 	textureManager->Register(this);
 }
 
