@@ -120,130 +120,130 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_a1
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00116">116</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  117</span>{</div>
-<div class="line"><span class="lineno">  118</span>    <span class="keywordflow">if</span> (windowStat)</div>
-<div class="line"><span class="lineno">  119</span>    {</div>
-<div class="line"><span class="lineno">  120</span>        ImGui::Begin(<span class="stringliteral">&quot;Mesh Generators&quot;</span>, &amp;windowStat);</div>
-<div class="line"><span class="lineno">  121</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
-<div class="line"><span class="lineno">  122</span>        ImGui::Text(<span class="stringliteral">&quot;Base Mesh Generators&quot;</span>);</div>
-<div class="line"><span class="lineno">  123</span>        ImGui::PopFont();</div>
-<div class="line"><span class="lineno">  124</span> </div>
-<div class="line"><span class="lineno">  125</span>        <span class="keywordflow">if</span> (ImGui::CollapsingHeader(<span class="stringliteral">&quot;Auto Base Mesh Gen (GPU)&quot;</span>, clearMeshGen-&gt;uiActive))</div>
-<div class="line"><span class="lineno">  126</span>        {</div>
-<div class="line"><span class="lineno">  127</span>            clearMeshGen-&gt;ShowSettings();</div>
-<div class="line"><span class="lineno">  128</span>        }</div>
-<div class="line"><span class="lineno">  129</span> </div>
-<div class="line"><span class="lineno">  130</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  131</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
-<div class="line"><span class="lineno">  132</span>        ImGui::Text(<span class="stringliteral">&quot;CPU Noise Layer Generators&quot;</span>);</div>
-<div class="line"><span class="lineno">  133</span>        ImGui::PopFont();</div>
-<div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  136</span>        {</div>
-<div class="line"><span class="lineno">  137</span>            <span class="keywordflow">if</span> (ImGui::CollapsingHeader((cpuNoiseLayers[i]-&gt;name + <span class="stringliteral">&quot;##CPUNL&quot;</span> + std::to_string(i)).c_str()))</div>
-<div class="line"><span class="lineno">  138</span>            {</div>
-<div class="line"><span class="lineno">  139</span>                cpuNoiseLayers[i]-&gt;ShowSetting(i);</div>
-<div class="line"><span class="lineno">  140</span> </div>
-<div class="line"><span class="lineno">  141</span>                <span class="keywordflow">if</span> (ImGui::Button((<span class="stringliteral">&quot;Delete##CPUNOUSELAYER&quot;</span> + std::to_string(i)).c_str()))</div>
-<div class="line"><span class="lineno">  142</span>                {</div>
-<div class="line"><span class="lineno">  143</span>                    <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  144</span> </div>
-<div class="line"><span class="lineno">  145</span>                    cpuNoiseLayers.erase(cpuNoiseLayers.begin() + i);</div>
-<div class="line"><span class="lineno">  146</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  147</span>                }</div>
-<div class="line"><span class="lineno">  148</span>            }</div>
-<div class="line"><span class="lineno">  149</span> </div>
-<div class="line"><span class="lineno">  150</span>            ImGui::Separator();</div>
-<div class="line"><span class="lineno">  151</span>        }</div>
-<div class="line"><span class="lineno">  152</span> </div>
-<div class="line"><span class="lineno">  153</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add##CPULAYER&quot;</span>))</div>
-<div class="line"><span class="lineno">  154</span>        {</div>
-<div class="line"><span class="lineno">  155</span>            <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  156</span> </div>
-<div class="line"><span class="lineno">  157</span>            cpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d4a/class_c_p_u_noise_layers_generator.html">CPUNoiseLayersGenerator</a>(appState));</div>
-<div class="line"><span class="lineno">  158</span>        }</div>
-<div class="line"><span class="lineno">  159</span> </div>
-<div class="line"><span class="lineno">  160</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  161</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
-<div class="line"><span class="lineno">  162</span>        ImGui::Text(<span class="stringliteral">&quot;GPU Noise Layer Generators&quot;</span>);</div>
-<div class="line"><span class="lineno">  163</span>        ImGui::PopFont();</div>
-<div class="line"><span class="lineno">  164</span> </div>
-<div class="line"><span class="lineno">  165</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  166</span>        {</div>
-<div class="line"><span class="lineno">  167</span>            <span class="keywordflow">if</span> (ImGui::CollapsingHeader((gpuNoiseLayers[i]-&gt;name + <span class="stringliteral">&quot;##GPUNL&quot;</span> + std::to_string(i)).c_str()))</div>
-<div class="line"><span class="lineno">  168</span>            {</div>
-<div class="line"><span class="lineno">  169</span>                gpuNoiseLayers[i]-&gt;ShowSetting(i);</div>
-<div class="line"><span class="lineno">  170</span> </div>
-<div class="line"><span class="lineno">  171</span>                <span class="keywordflow">if</span> (ImGui::Button((<span class="stringliteral">&quot;Delete##GPUNOUSELAYER&quot;</span> + std::to_string(i)).c_str()))</div>
-<div class="line"><span class="lineno">  172</span>                {</div>
-<div class="line"><span class="lineno">  173</span>                    <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  174</span> </div>
-<div class="line"><span class="lineno">  175</span>                    gpuNoiseLayers.erase(gpuNoiseLayers.begin() + i);</div>
-<div class="line"><span class="lineno">  176</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  177</span>                }</div>
-<div class="line"><span class="lineno">  178</span>            }</div>
-<div class="line"><span class="lineno">  179</span> </div>
-<div class="line"><span class="lineno">  180</span>            ImGui::Separator();</div>
-<div class="line"><span class="lineno">  181</span>        }</div>
-<div class="line"><span class="lineno">  182</span> </div>
-<div class="line"><span class="lineno">  183</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add##GPUNL&quot;</span>))</div>
-<div class="line"><span class="lineno">  184</span>        {</div>
-<div class="line"><span class="lineno">  185</span>            <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  186</span> </div>
-<div class="line"><span class="lineno">  187</span>            gpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../da/ded/class_g_p_u_noise_layer_generator.html">GPUNoiseLayerGenerator</a>(appState, kernels));</div>
-<div class="line"><span class="lineno">  188</span>        }</div>
-<div class="line"><span class="lineno">  189</span> </div>
-<div class="line"><span class="lineno">  190</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  191</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
-<div class="line"><span class="lineno">  192</span>        ImGui::Text(<span class="stringliteral">&quot;CPU Node Editor Generators&quot;</span>);</div>
-<div class="line"><span class="lineno">  193</span>        ImGui::PopFont();</div>
-<div class="line"><span class="lineno">  194</span> </div>
-<div class="line"><span class="lineno">  195</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNodeEditors.size(); i++)</div>
-<div class="line"><span class="lineno">  196</span>        {</div>
-<div class="line"><span class="lineno">  197</span>            <span class="keywordflow">if</span> (ImGui::CollapsingHeader((cpuNodeEditors[i]-&gt;name + <span class="stringliteral">&quot;##CPUNE&quot;</span> + std::to_string(i)).c_str()))</div>
-<div class="line"><span class="lineno">  198</span>            {</div>
-<div class="line"><span class="lineno">  199</span>                cpuNodeEditors[i]-&gt;ShowSetting(i);</div>
-<div class="line"><span class="lineno">  200</span> </div>
-<div class="line"><span class="lineno">  201</span>                <span class="keywordflow">if</span> (ImGui::Button((<span class="stringliteral">&quot;Delete##CPNE&quot;</span> + std::to_string(i)).c_str()))</div>
-<div class="line"><span class="lineno">  202</span>                {</div>
-<div class="line"><span class="lineno">  203</span>                    <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  204</span> </div>
-<div class="line"><span class="lineno">  205</span>                    cpuNodeEditors.erase(cpuNodeEditors.begin() + i);</div>
-<div class="line"><span class="lineno">  206</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  207</span>                }</div>
-<div class="line"><span class="lineno">  208</span>            }</div>
-<div class="line"><span class="lineno">  209</span> </div>
-<div class="line"><span class="lineno">  210</span>            ImGui::Separator();</div>
-<div class="line"><span class="lineno">  211</span>        }</div>
-<div class="line"><span class="lineno">  212</span> </div>
-<div class="line"><span class="lineno">  213</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add##CPUNE&quot;</span>))</div>
-<div class="line"><span class="lineno">  214</span>        {</div>
-<div class="line"><span class="lineno">  215</span>            <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  216</span> </div>
-<div class="line"><span class="lineno">  217</span>            cpuNodeEditors.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a>(appState));</div>
-<div class="line"><span class="lineno">  218</span>        }</div>
-<div class="line"><span class="lineno">  219</span> </div>
-<div class="line"><span class="lineno">  220</span>        ImGui::Separator();</div>
-<div class="line"><span class="lineno">  221</span>        ImGui::Text(<span class="stringliteral">&quot;Time : %lf ms&quot;</span>, time);</div>
-<div class="line"><span class="lineno">  222</span>        ImGui::End();</div>
-<div class="line"><span class="lineno">  223</span>    }</div>
-<div class="line"><span class="lineno">  224</span> </div>
-<div class="line"><span class="lineno">  225</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  226</span>    {</div>
-<div class="line"><span class="lineno">  227</span>        cpuNoiseLayers[i]-&gt;Update();</div>
-<div class="line"><span class="lineno">  228</span>    }</div>
-<div class="line"><span class="lineno">  229</span> </div>
-<div class="line"><span class="lineno">  230</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  231</span>    {</div>
-<div class="line"><span class="lineno">  232</span>        gpuNoiseLayers[i]-&gt;Update();</div>
-<div class="line"><span class="lineno">  233</span>    }</div>
-<div class="line"><span class="lineno">  234</span> </div>
-<div class="line"><span class="lineno">  235</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNodeEditors.size(); i++)</div>
-<div class="line"><span class="lineno">  236</span>    {</div>
-<div class="line"><span class="lineno">  237</span>        cpuNodeEditors[i]-&gt;Update();</div>
-<div class="line"><span class="lineno">  238</span>    }</div>
-<div class="line"><span class="lineno">  239</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00117">117</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  118</span>{</div>
+<div class="line"><span class="lineno">  119</span>    <span class="keywordflow">if</span> (windowStat)</div>
+<div class="line"><span class="lineno">  120</span>    {</div>
+<div class="line"><span class="lineno">  121</span>        ImGui::Begin(<span class="stringliteral">&quot;Mesh Generators&quot;</span>, &amp;windowStat);</div>
+<div class="line"><span class="lineno">  122</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
+<div class="line"><span class="lineno">  123</span>        ImGui::Text(<span class="stringliteral">&quot;Base Mesh Generators&quot;</span>);</div>
+<div class="line"><span class="lineno">  124</span>        ImGui::PopFont();</div>
+<div class="line"><span class="lineno">  125</span> </div>
+<div class="line"><span class="lineno">  126</span>        <span class="keywordflow">if</span> (ImGui::CollapsingHeader(<span class="stringliteral">&quot;Auto Base Mesh Gen (GPU)&quot;</span>, clearMeshGen-&gt;uiActive))</div>
+<div class="line"><span class="lineno">  127</span>        {</div>
+<div class="line"><span class="lineno">  128</span>            clearMeshGen-&gt;ShowSettings();</div>
+<div class="line"><span class="lineno">  129</span>        }</div>
+<div class="line"><span class="lineno">  130</span> </div>
+<div class="line"><span class="lineno">  131</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  132</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
+<div class="line"><span class="lineno">  133</span>        ImGui::Text(<span class="stringliteral">&quot;CPU Noise Layer Generators&quot;</span>);</div>
+<div class="line"><span class="lineno">  134</span>        ImGui::PopFont();</div>
+<div class="line"><span class="lineno">  135</span> </div>
+<div class="line"><span class="lineno">  136</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  137</span>        {</div>
+<div class="line"><span class="lineno">  138</span>            <span class="keywordflow">if</span> (ImGui::CollapsingHeader((cpuNoiseLayers[i]-&gt;name + <span class="stringliteral">&quot;##CPUNL&quot;</span> + std::to_string(i)).c_str()))</div>
+<div class="line"><span class="lineno">  139</span>            {</div>
+<div class="line"><span class="lineno">  140</span>                cpuNoiseLayers[i]-&gt;ShowSetting(i);</div>
+<div class="line"><span class="lineno">  141</span> </div>
+<div class="line"><span class="lineno">  142</span>                <span class="keywordflow">if</span> (ImGui::Button((<span class="stringliteral">&quot;Delete##CPUNOUSELAYER&quot;</span> + std::to_string(i)).c_str()))</div>
+<div class="line"><span class="lineno">  143</span>                {</div>
+<div class="line"><span class="lineno">  144</span>                    <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  145</span> </div>
+<div class="line"><span class="lineno">  146</span>                    cpuNoiseLayers.erase(cpuNoiseLayers.begin() + i);</div>
+<div class="line"><span class="lineno">  147</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  148</span>                }</div>
+<div class="line"><span class="lineno">  149</span>            }</div>
+<div class="line"><span class="lineno">  150</span> </div>
+<div class="line"><span class="lineno">  151</span>            ImGui::Separator();</div>
+<div class="line"><span class="lineno">  152</span>        }</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add##CPULAYER&quot;</span>))</div>
+<div class="line"><span class="lineno">  155</span>        {</div>
+<div class="line"><span class="lineno">  156</span>            <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  157</span> </div>
+<div class="line"><span class="lineno">  158</span>            cpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d4a/class_c_p_u_noise_layers_generator.html">CPUNoiseLayersGenerator</a>(appState));</div>
+<div class="line"><span class="lineno">  159</span>        }</div>
+<div class="line"><span class="lineno">  160</span> </div>
+<div class="line"><span class="lineno">  161</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  162</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
+<div class="line"><span class="lineno">  163</span>        ImGui::Text(<span class="stringliteral">&quot;GPU Noise Layer Generators&quot;</span>);</div>
+<div class="line"><span class="lineno">  164</span>        ImGui::PopFont();</div>
+<div class="line"><span class="lineno">  165</span> </div>
+<div class="line"><span class="lineno">  166</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  167</span>        {</div>
+<div class="line"><span class="lineno">  168</span>            <span class="keywordflow">if</span> (ImGui::CollapsingHeader((gpuNoiseLayers[i]-&gt;name + <span class="stringliteral">&quot;##GPUNL&quot;</span> + std::to_string(i)).c_str()))</div>
+<div class="line"><span class="lineno">  169</span>            {</div>
+<div class="line"><span class="lineno">  170</span>                gpuNoiseLayers[i]-&gt;ShowSetting(i);</div>
+<div class="line"><span class="lineno">  171</span> </div>
+<div class="line"><span class="lineno">  172</span>                <span class="keywordflow">if</span> (ImGui::Button((<span class="stringliteral">&quot;Delete##GPUNOUSELAYER&quot;</span> + std::to_string(i)).c_str()))</div>
+<div class="line"><span class="lineno">  173</span>                {</div>
+<div class="line"><span class="lineno">  174</span>                    <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  175</span> </div>
+<div class="line"><span class="lineno">  176</span>                    gpuNoiseLayers.erase(gpuNoiseLayers.begin() + i);</div>
+<div class="line"><span class="lineno">  177</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  178</span>                }</div>
+<div class="line"><span class="lineno">  179</span>            }</div>
+<div class="line"><span class="lineno">  180</span> </div>
+<div class="line"><span class="lineno">  181</span>            ImGui::Separator();</div>
+<div class="line"><span class="lineno">  182</span>        }</div>
+<div class="line"><span class="lineno">  183</span> </div>
+<div class="line"><span class="lineno">  184</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add##GPUNL&quot;</span>))</div>
+<div class="line"><span class="lineno">  185</span>        {</div>
+<div class="line"><span class="lineno">  186</span>            <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  187</span> </div>
+<div class="line"><span class="lineno">  188</span>            gpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../da/ded/class_g_p_u_noise_layer_generator.html">GPUNoiseLayerGenerator</a>(appState, kernels));</div>
+<div class="line"><span class="lineno">  189</span>        }</div>
+<div class="line"><span class="lineno">  190</span> </div>
+<div class="line"><span class="lineno">  191</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  192</span>        ImGui::PushFont(GetUIFont(<span class="stringliteral">&quot;OpenSans-Semi-Bold&quot;</span>));</div>
+<div class="line"><span class="lineno">  193</span>        ImGui::Text(<span class="stringliteral">&quot;CPU Node Editor Generators&quot;</span>);</div>
+<div class="line"><span class="lineno">  194</span>        ImGui::PopFont();</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNodeEditors.size(); i++)</div>
+<div class="line"><span class="lineno">  197</span>        {</div>
+<div class="line"><span class="lineno">  198</span>            <span class="keywordflow">if</span> (ImGui::CollapsingHeader((cpuNodeEditors[i]-&gt;name + <span class="stringliteral">&quot;##CPUNE&quot;</span> + std::to_string(i)).c_str()))</div>
+<div class="line"><span class="lineno">  199</span>            {</div>
+<div class="line"><span class="lineno">  200</span>                cpuNodeEditors[i]-&gt;ShowSetting(i);</div>
+<div class="line"><span class="lineno">  201</span> </div>
+<div class="line"><span class="lineno">  202</span>                <span class="keywordflow">if</span> (ImGui::Button((<span class="stringliteral">&quot;Delete##CPNE&quot;</span> + std::to_string(i)).c_str()))</div>
+<div class="line"><span class="lineno">  203</span>                {</div>
+<div class="line"><span class="lineno">  204</span>                    <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  205</span> </div>
+<div class="line"><span class="lineno">  206</span>                    cpuNodeEditors.erase(cpuNodeEditors.begin() + i);</div>
+<div class="line"><span class="lineno">  207</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  208</span>                }</div>
+<div class="line"><span class="lineno">  209</span>            }</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>            ImGui::Separator();</div>
+<div class="line"><span class="lineno">  212</span>        }</div>
+<div class="line"><span class="lineno">  213</span> </div>
+<div class="line"><span class="lineno">  214</span>        <span class="keywordflow">if</span> (ImGui::Button(<span class="stringliteral">&quot;Add##CPUNE&quot;</span>))</div>
+<div class="line"><span class="lineno">  215</span>        {</div>
+<div class="line"><span class="lineno">  216</span>            <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  217</span> </div>
+<div class="line"><span class="lineno">  218</span>            cpuNodeEditors.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a>(appState));</div>
+<div class="line"><span class="lineno">  219</span>        }</div>
+<div class="line"><span class="lineno">  220</span> </div>
+<div class="line"><span class="lineno">  221</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  222</span>        ImGui::Text(<span class="stringliteral">&quot;Time : %lf ms&quot;</span>, time);</div>
+<div class="line"><span class="lineno">  223</span>        ImGui::End();</div>
+<div class="line"><span class="lineno">  224</span>    }</div>
+<div class="line"><span class="lineno">  225</span> </div>
+<div class="line"><span class="lineno">  226</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  227</span>    {</div>
+<div class="line"><span class="lineno">  228</span>        cpuNoiseLayers[i]-&gt;Update();</div>
+<div class="line"><span class="lineno">  229</span>    }</div>
+<div class="line"><span class="lineno">  230</span> </div>
+<div class="line"><span class="lineno">  231</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  232</span>    {</div>
+<div class="line"><span class="lineno">  233</span>        gpuNoiseLayers[i]-&gt;Update();</div>
+<div class="line"><span class="lineno">  234</span>    }</div>
+<div class="line"><span class="lineno">  235</span> </div>
+<div class="line"><span class="lineno">  236</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNodeEditors.size(); i++)</div>
+<div class="line"><span class="lineno">  237</span>    {</div>
+<div class="line"><span class="lineno">  238</span>        cpuNodeEditors[i]-&gt;Update();</div>
+<div class="line"><span class="lineno">  239</span>    }</div>
+<div class="line"><span class="lineno">  240</span>}</div>
 <div class="ttc" id="aclass_c_p_u_node_editor_html"><div class="ttname"><a href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d85/_c_p_u_node_editor_8h_source.html#l00078">CPUNodeEditor.h:79</a></div></div>
 <div class="ttc" id="aclass_c_p_u_noise_layers_generator_html"><div class="ttname"><a href="../../d8/d4a/class_c_p_u_noise_layers_generator.html">CPUNoiseLayersGenerator</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d0/d5e/_c_p_u_noise_layers_generator_8h_source.html#l00012">CPUNoiseLayersGenerator.h:13</a></div></div>
 <div class="ttc" id="aclass_g_p_u_noise_layer_generator_html"><div class="ttname"><a href="../../da/ded/class_g_p_u_noise_layer_generator.html">GPUNoiseLayerGenerator</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dc9/_g_p_u_noise_layer_generator_8h_source.html#l00029">GPUNoiseLayerGenerator.h:30</a></div></div>
@@ -256,7 +256,7 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_a1
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:40 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

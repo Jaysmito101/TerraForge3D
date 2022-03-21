@@ -120,97 +120,97 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_aa
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00331">331</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  332</span>{</div>
-<div class="line"><span class="lineno">  333</span>    <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::TERRAIN)</div>
-<div class="line"><span class="lineno">  334</span>    {</div>
-<div class="line"><span class="lineno">  335</span>        <span class="keywordflow">if</span> (appState-&gt;models.coreTerrain-&gt;mesh-&gt;res != appState-&gt;globals.resolution || appState-&gt;models.coreTerrain-&gt;mesh-&gt;sc != appState-&gt;globals.scale)</div>
-<div class="line"><span class="lineno">  336</span>        {</div>
-<div class="line"><span class="lineno">  337</span>            appState-&gt;models.coreTerrain-&gt;mesh-&gt;res = appState-&gt;globals.resolution;</div>
-<div class="line"><span class="lineno">  338</span>            appState-&gt;models.coreTerrain-&gt;mesh-&gt;sc = appState-&gt;globals.scale;</div>
-<div class="line"><span class="lineno">  339</span>            appState-&gt;models.coreTerrain-&gt;mesh-&gt;GeneratePlane(appState-&gt;globals.resolution, appState-&gt;globals.scale);</div>
-<div class="line"><span class="lineno">  340</span>        }</div>
-<div class="line"><span class="lineno">  341</span> </div>
-<div class="line"><span class="lineno">  342</span>        kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>));</div>
-<div class="line"><span class="lineno">  343</span>        kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.coreTerrain-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">  344</span> </div>
-<div class="line"><span class="lineno">  345</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPU)</div>
-<div class="line"><span class="lineno">  346</span>        {</div>
-<div class="line"><span class="lineno">  347</span>            clearMeshGen-&gt;Generate(kernels);</div>
-<div class="line"><span class="lineno">  348</span>        }</div>
-<div class="line"><span class="lineno">  349</span> </div>
-<div class="line"><span class="lineno">  350</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  351</span>        {</div>
-<div class="line"><span class="lineno">  352</span>            <span class="keywordflow">if</span> (gpuNoiseLayers[i]-&gt;enabled)</div>
-<div class="line"><span class="lineno">  353</span>            {</div>
-<div class="line"><span class="lineno">  354</span>                gpuNoiseLayers[i]-&gt;Generate(kernels);</div>
-<div class="line"><span class="lineno">  355</span>            }</div>
-<div class="line"><span class="lineno">  356</span>        }</div>
-<div class="line"><span class="lineno">  357</span> </div>
-<div class="line"><span class="lineno">  358</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPUForNormals)</div>
-<div class="line"><span class="lineno">  359</span>        {</div>
-<div class="line"><span class="lineno">  360</span>            kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;indices&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.coreTerrain-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  361</span>            kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;indices&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.coreTerrain-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), appState-&gt;models.coreTerrain-&gt;mesh-&gt;indices);</div>
-<div class="line"><span class="lineno">  362</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
-<div class="line"><span class="lineno">  363</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 1, <span class="stringliteral">&quot;indices&quot;</span>);</div>
-<div class="line"><span class="lineno">  364</span>            <span class="keywordtype">int</span> ls = 512;</div>
-<div class="line"><span class="lineno">  365</span>            <span class="keywordtype">int</span> ic = appState-&gt;models.coreTerrain-&gt;mesh-&gt;indexCount;</div>
-<div class="line"><span class="lineno">  366</span> </div>
-<div class="line"><span class="lineno">  367</span>            <span class="keywordflow">while</span>(ic % ls != 0)</div>
-<div class="line"><span class="lineno">  368</span>            {</div>
-<div class="line"><span class="lineno">  369</span>                ls /= 2;</div>
-<div class="line"><span class="lineno">  370</span>            }</div>
-<div class="line"><span class="lineno">  371</span> </div>
-<div class="line"><span class="lineno">  372</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;gen_normals&quot;</span>, cl::NDRange(ls), cl::NDRange(ic));</div>
-<div class="line"><span class="lineno">  373</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;normalize_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
-<div class="line"><span class="lineno">  374</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;normalize_normals&quot;</span>, cl::NDRange(1), cl::NDRange(appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount));</div>
-<div class="line"><span class="lineno">  375</span>        }</div>
-<div class="line"><span class="lineno">  376</span> </div>
-<div class="line"><span class="lineno">  377</span>        kernels-&gt;ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.coreTerrain-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">  378</span>    }</div>
-<div class="line"><span class="lineno">  379</span> </div>
-<div class="line"><span class="lineno">  380</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
-<div class="line"><span class="lineno">  381</span>    {</div>
-<div class="line"><span class="lineno">  382</span>        kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>));</div>
-<div class="line"><span class="lineno">  383</span>        kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.customBase-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">  384</span>        kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;mesh_copy&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>));</div>
-<div class="line"><span class="lineno">  385</span>        kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;mesh_copy&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.customBaseCopy-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">  386</span> </div>
-<div class="line"><span class="lineno">  387</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPU)</div>
-<div class="line"><span class="lineno">  388</span>        {</div>
-<div class="line"><span class="lineno">  389</span>            clearMeshGen-&gt;Generate(kernels);</div>
-<div class="line"><span class="lineno">  390</span>        }</div>
-<div class="line"><span class="lineno">  391</span> </div>
-<div class="line"><span class="lineno">  392</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  393</span>        {</div>
-<div class="line"><span class="lineno">  394</span>            <span class="keywordflow">if</span> (gpuNoiseLayers[i]-&gt;enabled)</div>
-<div class="line"><span class="lineno">  395</span>            {</div>
-<div class="line"><span class="lineno">  396</span>                gpuNoiseLayers[i]-&gt;Generate(kernels);</div>
-<div class="line"><span class="lineno">  397</span>            }</div>
-<div class="line"><span class="lineno">  398</span>        }</div>
-<div class="line"><span class="lineno">  399</span> </div>
-<div class="line"><span class="lineno">  400</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPUForNormals)</div>
-<div class="line"><span class="lineno">  401</span>        {</div>
-<div class="line"><span class="lineno">  402</span>            kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;indices&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.customBase-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  403</span>            kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;indices&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), appState-&gt;models.customBase-&gt;mesh-&gt;indices);</div>
-<div class="line"><span class="lineno">  404</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
-<div class="line"><span class="lineno">  405</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 1, <span class="stringliteral">&quot;indices&quot;</span>);</div>
-<div class="line"><span class="lineno">  406</span>            <span class="keywordtype">int</span> ls = 512;</div>
-<div class="line"><span class="lineno">  407</span>            <span class="keywordtype">int</span> ic = appState-&gt;models.customBase-&gt;mesh-&gt;indexCount;</div>
-<div class="line"><span class="lineno">  408</span> </div>
-<div class="line"><span class="lineno">  409</span>            <span class="keywordflow">while</span>(ic % ls != 0)</div>
-<div class="line"><span class="lineno">  410</span>            {</div>
-<div class="line"><span class="lineno">  411</span>                ls /= 2;</div>
-<div class="line"><span class="lineno">  412</span>            }</div>
-<div class="line"><span class="lineno">  413</span> </div>
-<div class="line"><span class="lineno">  414</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;gen_normals&quot;</span>, cl::NDRange(ls), cl::NDRange(ic));</div>
-<div class="line"><span class="lineno">  415</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;normalize_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
-<div class="line"><span class="lineno">  416</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;normalize_normals&quot;</span>, cl::NDRange(1), cl::NDRange(appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount));</div>
-<div class="line"><span class="lineno">  417</span>        }</div>
-<div class="line"><span class="lineno">  418</span> </div>
-<div class="line"><span class="lineno">  419</span>        kernels-&gt;ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.customBase-&gt;mesh-&gt;vert);</div>
-<div class="line"><span class="lineno">  420</span>    }</div>
-<div class="line"><span class="lineno">  421</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00332">332</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  333</span>{</div>
+<div class="line"><span class="lineno">  334</span>    <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::TERRAIN)</div>
+<div class="line"><span class="lineno">  335</span>    {</div>
+<div class="line"><span class="lineno">  336</span>        <span class="keywordflow">if</span> (appState-&gt;models.coreTerrain-&gt;mesh-&gt;res != appState-&gt;globals.resolution || appState-&gt;models.coreTerrain-&gt;mesh-&gt;sc != appState-&gt;globals.scale)</div>
+<div class="line"><span class="lineno">  337</span>        {</div>
+<div class="line"><span class="lineno">  338</span>            appState-&gt;models.coreTerrain-&gt;mesh-&gt;res = appState-&gt;globals.resolution;</div>
+<div class="line"><span class="lineno">  339</span>            appState-&gt;models.coreTerrain-&gt;mesh-&gt;sc = appState-&gt;globals.scale;</div>
+<div class="line"><span class="lineno">  340</span>            appState-&gt;models.coreTerrain-&gt;mesh-&gt;GeneratePlane(appState-&gt;globals.resolution, appState-&gt;globals.scale);</div>
+<div class="line"><span class="lineno">  341</span>        }</div>
+<div class="line"><span class="lineno">  342</span> </div>
+<div class="line"><span class="lineno">  343</span>        kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>));</div>
+<div class="line"><span class="lineno">  344</span>        kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.coreTerrain-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">  345</span> </div>
+<div class="line"><span class="lineno">  346</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPU)</div>
+<div class="line"><span class="lineno">  347</span>        {</div>
+<div class="line"><span class="lineno">  348</span>            clearMeshGen-&gt;Generate(kernels);</div>
+<div class="line"><span class="lineno">  349</span>        }</div>
+<div class="line"><span class="lineno">  350</span> </div>
+<div class="line"><span class="lineno">  351</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  352</span>        {</div>
+<div class="line"><span class="lineno">  353</span>            <span class="keywordflow">if</span> (gpuNoiseLayers[i]-&gt;enabled)</div>
+<div class="line"><span class="lineno">  354</span>            {</div>
+<div class="line"><span class="lineno">  355</span>                gpuNoiseLayers[i]-&gt;Generate(kernels);</div>
+<div class="line"><span class="lineno">  356</span>            }</div>
+<div class="line"><span class="lineno">  357</span>        }</div>
+<div class="line"><span class="lineno">  358</span> </div>
+<div class="line"><span class="lineno">  359</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPUForNormals)</div>
+<div class="line"><span class="lineno">  360</span>        {</div>
+<div class="line"><span class="lineno">  361</span>            kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;indices&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.coreTerrain-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  362</span>            kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;indices&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.coreTerrain-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), appState-&gt;models.coreTerrain-&gt;mesh-&gt;indices);</div>
+<div class="line"><span class="lineno">  363</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
+<div class="line"><span class="lineno">  364</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 1, <span class="stringliteral">&quot;indices&quot;</span>);</div>
+<div class="line"><span class="lineno">  365</span>            <span class="keywordtype">int</span> ls = 512;</div>
+<div class="line"><span class="lineno">  366</span>            <span class="keywordtype">int</span> ic = appState-&gt;models.coreTerrain-&gt;mesh-&gt;indexCount;</div>
+<div class="line"><span class="lineno">  367</span> </div>
+<div class="line"><span class="lineno">  368</span>            <span class="keywordflow">while</span>(ic % ls != 0)</div>
+<div class="line"><span class="lineno">  369</span>            {</div>
+<div class="line"><span class="lineno">  370</span>                ls /= 2;</div>
+<div class="line"><span class="lineno">  371</span>            }</div>
+<div class="line"><span class="lineno">  372</span> </div>
+<div class="line"><span class="lineno">  373</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;gen_normals&quot;</span>, cl::NDRange(ls), cl::NDRange(ic));</div>
+<div class="line"><span class="lineno">  374</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;normalize_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
+<div class="line"><span class="lineno">  375</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;normalize_normals&quot;</span>, cl::NDRange(1), cl::NDRange(appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount));</div>
+<div class="line"><span class="lineno">  376</span>        }</div>
+<div class="line"><span class="lineno">  377</span> </div>
+<div class="line"><span class="lineno">  378</span>        kernels-&gt;ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.coreTerrain-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.coreTerrain-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">  379</span>    }</div>
+<div class="line"><span class="lineno">  380</span> </div>
+<div class="line"><span class="lineno">  381</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">  382</span>    {</div>
+<div class="line"><span class="lineno">  383</span>        kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>));</div>
+<div class="line"><span class="lineno">  384</span>        kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.customBase-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">  385</span>        kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;mesh_copy&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>));</div>
+<div class="line"><span class="lineno">  386</span>        kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;mesh_copy&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.customBaseCopy-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">  387</span> </div>
+<div class="line"><span class="lineno">  388</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPU)</div>
+<div class="line"><span class="lineno">  389</span>        {</div>
+<div class="line"><span class="lineno">  390</span>            clearMeshGen-&gt;Generate(kernels);</div>
+<div class="line"><span class="lineno">  391</span>        }</div>
+<div class="line"><span class="lineno">  392</span> </div>
+<div class="line"><span class="lineno">  393</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  394</span>        {</div>
+<div class="line"><span class="lineno">  395</span>            <span class="keywordflow">if</span> (gpuNoiseLayers[i]-&gt;enabled)</div>
+<div class="line"><span class="lineno">  396</span>            {</div>
+<div class="line"><span class="lineno">  397</span>                gpuNoiseLayers[i]-&gt;Generate(kernels);</div>
+<div class="line"><span class="lineno">  398</span>            }</div>
+<div class="line"><span class="lineno">  399</span>        }</div>
+<div class="line"><span class="lineno">  400</span> </div>
+<div class="line"><span class="lineno">  401</span>        <span class="keywordflow">if</span>(clearMeshGen-&gt;useGPUForNormals)</div>
+<div class="line"><span class="lineno">  402</span>        {</div>
+<div class="line"><span class="lineno">  403</span>            kernels-&gt;CreateBuffer(<span class="stringliteral">&quot;indices&quot;</span>, CL_MEM_READ_WRITE, appState-&gt;models.customBase-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  404</span>            kernels-&gt;WriteBuffer(<span class="stringliteral">&quot;indices&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;indexCount * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), appState-&gt;models.customBase-&gt;mesh-&gt;indices);</div>
+<div class="line"><span class="lineno">  405</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
+<div class="line"><span class="lineno">  406</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;gen_normals&quot;</span>, 1, <span class="stringliteral">&quot;indices&quot;</span>);</div>
+<div class="line"><span class="lineno">  407</span>            <span class="keywordtype">int</span> ls = 512;</div>
+<div class="line"><span class="lineno">  408</span>            <span class="keywordtype">int</span> ic = appState-&gt;models.customBase-&gt;mesh-&gt;indexCount;</div>
+<div class="line"><span class="lineno">  409</span> </div>
+<div class="line"><span class="lineno">  410</span>            <span class="keywordflow">while</span>(ic % ls != 0)</div>
+<div class="line"><span class="lineno">  411</span>            {</div>
+<div class="line"><span class="lineno">  412</span>                ls /= 2;</div>
+<div class="line"><span class="lineno">  413</span>            }</div>
+<div class="line"><span class="lineno">  414</span> </div>
+<div class="line"><span class="lineno">  415</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;gen_normals&quot;</span>, cl::NDRange(ls), cl::NDRange(ic));</div>
+<div class="line"><span class="lineno">  416</span>            kernels-&gt;SetKernelArg(<span class="stringliteral">&quot;normalize_normals&quot;</span>, 0, <span class="stringliteral">&quot;mesh&quot;</span>);</div>
+<div class="line"><span class="lineno">  417</span>            kernels-&gt;ExecuteKernel(<span class="stringliteral">&quot;normalize_normals&quot;</span>, cl::NDRange(1), cl::NDRange(appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount));</div>
+<div class="line"><span class="lineno">  418</span>        }</div>
+<div class="line"><span class="lineno">  419</span> </div>
+<div class="line"><span class="lineno">  420</span>        kernels-&gt;ReadBuffer(<span class="stringliteral">&quot;mesh&quot;</span>, <span class="keyword">true</span>, appState-&gt;models.customBase-&gt;mesh-&gt;vertexCount * <span class="keyword">sizeof</span>(<a class="code hl_struct" href="../../d1/dea/struct_vert.html">Vert</a>), appState-&gt;models.customBase-&gt;mesh-&gt;vert);</div>
+<div class="line"><span class="lineno">  421</span>    }</div>
+<div class="line"><span class="lineno">  422</span>}</div>
 <div class="ttc" id="astruct_vert_html"><div class="ttname"><a href="../../d1/dea/struct_vert.html">Vert</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d2/da1/_mesh_8h_source.html#l00012">Mesh.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -221,7 +221,7 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_aa
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:39 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

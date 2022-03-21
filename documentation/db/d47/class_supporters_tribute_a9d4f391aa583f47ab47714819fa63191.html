@@ -129,32 +129,38 @@ $(document).ready(function(){initNavTree('db/d47/class_supporters_tribute_a9d4f3
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html#l00041">41</a> of file <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html">SupportersTribute.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   42</span>{</div>
-<div class="line"><span class="lineno">   43</span>    <span class="keywordtype">bool</span> isNetWorkConnected = IsNetWorkConnected();</div>
-<div class="line"><span class="lineno">   44</span> </div>
-<div class="line"><span class="lineno">   45</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> item : data)</div>
-<div class="line"><span class="lineno">   46</span>    {</div>
-<div class="line"><span class="lineno">   47</span>        <a class="code hl_struct" href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a> st;</div>
-<div class="line"><span class="lineno">   48</span>        st.name = item[<span class="stringliteral">&quot;login&quot;</span>];</div>
-<div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>        <span class="keywordflow">if</span> (!PathExist(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars&quot;</span>))</div>
-<div class="line"><span class="lineno">   51</span>        {</div>
-<div class="line"><span class="lineno">   52</span>            MkDir(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars&quot;</span>);</div>
-<div class="line"><span class="lineno">   53</span>        }</div>
-<div class="line"><span class="lineno">   54</span> </div>
-<div class="line"><span class="lineno">   55</span>        <span class="keywordflow">if</span> (!FileExists(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>])) &amp;&amp; isNetWorkConnected)</div>
-<div class="line"><span class="lineno">   56</span>        {</div>
-<div class="line"><span class="lineno">   57</span>            std::string urlFull = item[<span class="stringliteral">&quot;avatar_url&quot;</span>];</div>
-<div class="line"><span class="lineno">   58</span>            std::string baseURL = urlFull.substr(0, 37);</div>
-<div class="line"><span class="lineno">   59</span>            std::string pathURL = urlFull.substr(38);</div>
-<div class="line"><span class="lineno">   60</span>            DownloadFile(baseURL, pathURL, GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
-<div class="line"><span class="lineno">   61</span>        }</div>
-<div class="line"><span class="lineno">   62</span> </div>
-<div class="line"><span class="lineno">   63</span>        st.avatar = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\github_avatars\\&quot;</span> + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
-<div class="line"><span class="lineno">   64</span>        contributors.push_back(st);</div>
-<div class="line"><span class="lineno">   65</span>    }</div>
-<div class="line"><span class="lineno">   66</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html#l00042">42</a> of file <a class="el" href="../../d2/d4c/_supporters_tribute_8cpp_source.html">SupportersTribute.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   43</span>{</div>
+<div class="line"><span class="lineno">   44</span>    <span class="keywordtype">bool</span> isNetWorkConnected = IsNetWorkConnected();</div>
+<div class="line"><span class="lineno">   45</span> </div>
+<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> item : data)</div>
+<div class="line"><span class="lineno">   47</span>    {</div>
+<div class="line"><span class="lineno">   48</span>        <a class="code hl_struct" href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a> st;</div>
+<div class="line"><span class="lineno">   49</span>        st.name = item[<span class="stringliteral">&quot;login&quot;</span>];</div>
+<div class="line"><span class="lineno">   50</span> </div>
+<div class="line"><span class="lineno">   51</span>        <span class="keywordflow">if</span> (!PathExist(GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;github_avatars&quot;</span>))</div>
+<div class="line"><span class="lineno">   52</span>        {</div>
+<div class="line"><span class="lineno">   53</span>            MkDir(GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;github_avatars&quot;</span>);</div>
+<div class="line"><span class="lineno">   54</span>        }</div>
+<div class="line"><span class="lineno">   55</span> </div>
+<div class="line"><span class="lineno">   56</span>        <span class="keywordflow">if</span> (!FileExists(GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;github_avatars&quot;</span> PATH_SEPARATOR + st.name + <span class="stringliteral">&quot;_&quot;</span> + std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>])) &amp;&amp; isNetWorkConnected)</div>
+<div class="line"><span class="lineno">   57</span>        {</div>
+<div class="line"><span class="lineno">   58</span>            std::string urlFull = item[<span class="stringliteral">&quot;avatar_url&quot;</span>];</div>
+<div class="line"><span class="lineno">   59</span>            std::string baseURL = urlFull.substr(0, 37);</div>
+<div class="line"><span class="lineno">   60</span>            std::string pathURL = urlFull.substr(38);</div>
+<div class="line"><span class="lineno">   61</span>            DownloadFile(baseURL, pathURL, GetExecutableDir() + PATH_SEPARATOR</div>
+<div class="line"><span class="lineno">   62</span>                    <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR</div>
+<div class="line"><span class="lineno">   63</span>                    <span class="stringliteral">&quot;github_avatars&quot;</span> PATH_SEPARATOR + st.name + <span class="stringliteral">&quot;_&quot;</span> +</div>
+<div class="line"><span class="lineno">   64</span>                    std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
+<div class="line"><span class="lineno">   65</span>        }</div>
+<div class="line"><span class="lineno">   66</span> </div>
+<div class="line"><span class="lineno">   67</span>        st.avatar = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span></div>
+<div class="line"><span class="lineno">   68</span>                PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;github_avatars&quot;</span></div>
+<div class="line"><span class="lineno">   69</span>                PATH_SEPARATOR + st.name + <span class="stringliteral">&quot;_&quot;</span> +</div>
+<div class="line"><span class="lineno">   70</span>                std::string(item[<span class="stringliteral">&quot;node_id&quot;</span>]));</div>
+<div class="line"><span class="lineno">   71</span>        contributors.push_back(st);</div>
+<div class="line"><span class="lineno">   72</span>    }</div>
+<div class="line"><span class="lineno">   73</span>}</div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 <div class="ttc" id="astruct_git_hub_data_html"><div class="ttname"><a href="../../dd/d8c/struct_git_hub_data.html">GitHubData</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/db7/_supporters_tribute_8h_source.html#l00011">SupportersTribute.h:12</a></div></div>
@@ -167,7 +173,7 @@ $(document).ready(function(){initNavTree('db/d47/class_supporters_tribute_a9d4f3
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/d47/class_supporters_tribute.html">SupportersTribute</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:34 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:41 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

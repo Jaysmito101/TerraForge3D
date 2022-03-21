@@ -128,41 +128,43 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_a76ba1d6964
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00160">160</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  161</span>{</div>
-<div class="line"><span class="lineno">  162</span>    textureDatabaseJ = LoadTextureDatabaseJ();</div>
-<div class="line"><span class="lineno">  163</span>    downloadedTextureDatabaseJ = LoadDownloadedTextureDatabaseJ();</div>
-<div class="line"><span class="lineno">  164</span>    textureStoreItems.clear();</div>
-<div class="line"><span class="lineno">  165</span>    downloadedTextureStoreItems.clear();</div>
-<div class="line"><span class="lineno">  166</span> </div>
-<div class="line"><span class="lineno">  167</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7.html#a23b495b4c282e4afacf382f5b49af7c7">begin</a>() ; it != textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">end</a>() ; it++)</div>
-<div class="line"><span class="lineno">  168</span>    {</div>
-<div class="line"><span class="lineno">  169</span>        <a class="code hl_struct" href="../../d8/d09/struct_texture_store_item.html">TextureStoreItem</a> item;</div>
-<div class="line"><span class="lineno">  170</span>        item.name = it.key();</div>
-<div class="line"><span class="lineno">  171</span>        item.thumbnailPath = GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\cache\\texture_thumbnails\\&quot;</span> + item.name + <span class="stringliteral">&quot;.png&quot;</span>;</div>
-<div class="line"><span class="lineno">  172</span>        item.download_count = it.value()[<span class="stringliteral">&quot;download_count&quot;</span>];</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00167">167</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  168</span>{</div>
+<div class="line"><span class="lineno">  169</span>    textureDatabaseJ = LoadTextureDatabaseJ();</div>
+<div class="line"><span class="lineno">  170</span>    downloadedTextureDatabaseJ = LoadDownloadedTextureDatabaseJ();</div>
+<div class="line"><span class="lineno">  171</span>    textureStoreItems.clear();</div>
+<div class="line"><span class="lineno">  172</span>    downloadedTextureStoreItems.clear();</div>
 <div class="line"><span class="lineno">  173</span> </div>
-<div class="line"><span class="lineno">  174</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> it2 = it.value()[<span class="stringliteral">&quot;authors&quot;</span>].begin() ; it2 != it.value()[<span class="stringliteral">&quot;authors&quot;</span>].end() ; it2++)</div>
-<div class="line"><span class="lineno">  175</span>        {</div>
-<div class="line"><span class="lineno">  176</span>            item.authours.push_back(it2.key());</div>
-<div class="line"><span class="lineno">  177</span>        }</div>
-<div class="line"><span class="lineno">  178</span> </div>
-<div class="line"><span class="lineno">  179</span>        <span class="keywordflow">if</span>(downloadedTextureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_acdf9b3aab82dcf443dd91ca5ec06b80c.html#acdf9b3aab82dcf443dd91ca5ec06b80c">find</a>(item.name) != downloadedTextureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">end</a>())</div>
-<div class="line"><span class="lineno">  180</span>        {</div>
-<div class="line"><span class="lineno">  181</span>            item.downloaded = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  182</span>            item.abledo = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;abledo&quot;</span>];</div>
-<div class="line"><span class="lineno">  183</span>            item.normal = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;normal&quot;</span>];</div>
-<div class="line"><span class="lineno">  184</span>            item.roughness = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;roughness&quot;</span>];</div>
-<div class="line"><span class="lineno">  185</span>            item.metallic = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;metallic&quot;</span>];</div>
-<div class="line"><span class="lineno">  186</span>            item.ao = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;ao&quot;</span>];</div>
-<div class="line"><span class="lineno">  187</span>            item.arm = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;arm&quot;</span>];</div>
-<div class="line"><span class="lineno">  188</span>            item.baseDir = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;baseDir&quot;</span>];</div>
-<div class="line"><span class="lineno">  189</span>            downloadedTextureStoreItems.push_back(textureStoreItems.size());</div>
-<div class="line"><span class="lineno">  190</span>        }</div>
-<div class="line"><span class="lineno">  191</span> </div>
-<div class="line"><span class="lineno">  192</span>        textureStoreItems.push_back(item);</div>
-<div class="line"><span class="lineno">  193</span>    }</div>
-<div class="line"><span class="lineno">  194</span>}</div>
+<div class="line"><span class="lineno">  174</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7.html#a23b495b4c282e4afacf382f5b49af7c7">begin</a>() ; it != textureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">end</a>() ; it++)</div>
+<div class="line"><span class="lineno">  175</span>    {</div>
+<div class="line"><span class="lineno">  176</span>        <a class="code hl_struct" href="../../d8/d09/struct_texture_store_item.html">TextureStoreItem</a> item;</div>
+<div class="line"><span class="lineno">  177</span>        item.name = it.key();</div>
+<div class="line"><span class="lineno">  178</span>        item.thumbnailPath = GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span></div>
+<div class="line"><span class="lineno">  179</span>            PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;texture_thumbnails&quot;</span></div>
+<div class="line"><span class="lineno">  180</span>            PATH_SEPARATOR + item.name + <span class="stringliteral">&quot;.png&quot;</span>;</div>
+<div class="line"><span class="lineno">  181</span>        item.download_count = it.value()[<span class="stringliteral">&quot;download_count&quot;</span>];</div>
+<div class="line"><span class="lineno">  182</span> </div>
+<div class="line"><span class="lineno">  183</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> it2 = it.value()[<span class="stringliteral">&quot;authors&quot;</span>].begin() ; it2 != it.value()[<span class="stringliteral">&quot;authors&quot;</span>].end() ; it2++)</div>
+<div class="line"><span class="lineno">  184</span>        {</div>
+<div class="line"><span class="lineno">  185</span>            item.authours.push_back(it2.key());</div>
+<div class="line"><span class="lineno">  186</span>        }</div>
+<div class="line"><span class="lineno">  187</span> </div>
+<div class="line"><span class="lineno">  188</span>        <span class="keywordflow">if</span>(downloadedTextureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_acdf9b3aab82dcf443dd91ca5ec06b80c.html#acdf9b3aab82dcf443dd91ca5ec06b80c">find</a>(item.name) != downloadedTextureDatabaseJ.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">end</a>())</div>
+<div class="line"><span class="lineno">  189</span>        {</div>
+<div class="line"><span class="lineno">  190</span>            item.downloaded = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  191</span>            item.abledo = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;abledo&quot;</span>];</div>
+<div class="line"><span class="lineno">  192</span>            item.normal = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;normal&quot;</span>];</div>
+<div class="line"><span class="lineno">  193</span>            item.roughness = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;roughness&quot;</span>];</div>
+<div class="line"><span class="lineno">  194</span>            item.metallic = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;metallic&quot;</span>];</div>
+<div class="line"><span class="lineno">  195</span>            item.ao = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;ao&quot;</span>];</div>
+<div class="line"><span class="lineno">  196</span>            item.arm = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;arm&quot;</span>];</div>
+<div class="line"><span class="lineno">  197</span>            item.baseDir = downloadedTextureDatabaseJ[item.name][<span class="stringliteral">&quot;baseDir&quot;</span>];</div>
+<div class="line"><span class="lineno">  198</span>            downloadedTextureStoreItems.push_back(textureStoreItems.size());</div>
+<div class="line"><span class="lineno">  199</span>        }</div>
+<div class="line"><span class="lineno">  200</span> </div>
+<div class="line"><span class="lineno">  201</span>        textureStoreItems.push_back(item);</div>
+<div class="line"><span class="lineno">  202</span>    }</div>
+<div class="line"><span class="lineno">  203</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7_html_a23b495b4c282e4afacf382f5b49af7c7"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a23b495b4c282e4afacf382f5b49af7c7.html#a23b495b4c282e4afacf382f5b49af7c7">nlohmann::basic_json::begin</a></div><div class="ttdeci">iterator begin() noexcept</div><div class="ttdoc">returns an iterator to the first element</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22377">json.hpp:22377</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc_html_a931267ec3f09eb67e4382f321b2c52bc"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a931267ec3f09eb67e4382f321b2c52bc.html#a931267ec3f09eb67e4382f321b2c52bc">nlohmann::basic_json::end</a></div><div class="ttdeci">iterator end() noexcept</div><div class="ttdoc">returns an iterator to one past the last element</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22448">json.hpp:22448</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_acdf9b3aab82dcf443dd91ca5ec06b80c_html_acdf9b3aab82dcf443dd91ca5ec06b80c"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_acdf9b3aab82dcf443dd91ca5ec06b80c.html#acdf9b3aab82dcf443dd91ca5ec06b80c">nlohmann::basic_json::find</a></div><div class="ttdeci">iterator find(KeyT &amp;&amp;key)</div><div class="ttdoc">find an element in a JSON object</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l22223">json.hpp:22223</a></div></div>
@@ -176,7 +178,7 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_a76ba1d6964
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d8a/class_texture_store.html">TextureStore</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:34 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:41 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

@@ -120,58 +120,58 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_a4
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00031">31</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   32</span>{</div>
-<div class="line"><span class="lineno">   33</span>    <span class="keywordflow">if</span> (*isRemeshing)</div>
-<div class="line"><span class="lineno">   34</span>    {</div>
-<div class="line"><span class="lineno">   35</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   36</span>    }</div>
-<div class="line"><span class="lineno">   37</span> </div>
-<div class="line"><span class="lineno">   38</span>    <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::TERRAIN)</div>
-<div class="line"><span class="lineno">   39</span>    {</div>
-<div class="line"><span class="lineno">   40</span>        appState-&gt;models.coreTerrain-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno">   41</span>    }</div>
-<div class="line"><span class="lineno">   42</span> </div>
-<div class="line"><span class="lineno">   43</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
-<div class="line"><span class="lineno">   44</span>    {</div>
-<div class="line"><span class="lineno">   45</span>        appState-&gt;models.customBase-&gt;UploadToGPU();</div>
-<div class="line"><span class="lineno">   46</span>    }</div>
-<div class="line"><span class="lineno">   47</span> </div>
-<div class="line"><span class="lineno">   48</span>    *isRemeshing = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   49</span>    std::thread worker([<span class="keyword">this</span>]</div>
-<div class="line"><span class="lineno">   50</span>    {</div>
-<div class="line"><span class="lineno">   51</span>        START_PROFILER();</div>
-<div class="line"><span class="lineno">   52</span> </div>
-<div class="line"><span class="lineno">   53</span>        <span class="keywordflow">if</span>(!clearMeshGen-&gt;useGPU)</div>
-<div class="line"><span class="lineno">   54</span>        {</div>
-<div class="line"><span class="lineno">   55</span>            clearMeshGen-&gt;Generate(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">   56</span>            ExecuteCPUGenerators();</div>
-<div class="line"><span class="lineno">   57</span>            ExecuteKernels();</div>
-<div class="line"><span class="lineno">   58</span>        }</div>
-<div class="line"><span class="lineno">   59</span> </div>
-<div class="line"><span class="lineno">   60</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   61</span>        {</div>
-<div class="line"><span class="lineno">   62</span>            ExecuteKernels();</div>
-<div class="line"><span class="lineno">   63</span>            ExecuteCPUGenerators();</div>
-<div class="line"><span class="lineno">   64</span>        }</div>
-<div class="line"><span class="lineno">   65</span> </div>
-<div class="line"><span class="lineno">   66</span>        <span class="keywordflow">if</span>(!appState-&gt;states.useGPUForNormals )</div>
-<div class="line"><span class="lineno">   67</span>        {</div>
-<div class="line"><span class="lineno">   68</span>            <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::TERRAIN)</div>
-<div class="line"><span class="lineno">   69</span>            {</div>
-<div class="line"><span class="lineno">   70</span>                appState-&gt;models.coreTerrain-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno">   71</span>            }</div>
-<div class="line"><span class="lineno">   72</span> </div>
-<div class="line"><span class="lineno">   73</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
-<div class="line"><span class="lineno">   74</span>            {</div>
-<div class="line"><span class="lineno">   75</span>                appState-&gt;models.customBase-&gt;mesh-&gt;RecalculateNormals();</div>
-<div class="line"><span class="lineno">   76</span>            }</div>
-<div class="line"><span class="lineno">   77</span>        }</div>
-<div class="line"><span class="lineno">   78</span>        END_PROFILER(time);</div>
-<div class="line"><span class="lineno">   79</span>        *isRemeshing = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   80</span>    });</div>
-<div class="line"><span class="lineno">   81</span>    worker.detach();</div>
-<div class="line"><span class="lineno">   82</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00032">32</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   33</span>{</div>
+<div class="line"><span class="lineno">   34</span>    <span class="keywordflow">if</span> (*isRemeshing)</div>
+<div class="line"><span class="lineno">   35</span>    {</div>
+<div class="line"><span class="lineno">   36</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   37</span>    }</div>
+<div class="line"><span class="lineno">   38</span> </div>
+<div class="line"><span class="lineno">   39</span>    <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::TERRAIN)</div>
+<div class="line"><span class="lineno">   40</span>    {</div>
+<div class="line"><span class="lineno">   41</span>        appState-&gt;models.coreTerrain-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno">   42</span>    }</div>
+<div class="line"><span class="lineno">   43</span> </div>
+<div class="line"><span class="lineno">   44</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">   45</span>    {</div>
+<div class="line"><span class="lineno">   46</span>        appState-&gt;models.customBase-&gt;UploadToGPU();</div>
+<div class="line"><span class="lineno">   47</span>    }</div>
+<div class="line"><span class="lineno">   48</span> </div>
+<div class="line"><span class="lineno">   49</span>    *isRemeshing = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   50</span>    std::thread worker([<span class="keyword">this</span>]</div>
+<div class="line"><span class="lineno">   51</span>    {</div>
+<div class="line"><span class="lineno">   52</span>        START_PROFILER();</div>
+<div class="line"><span class="lineno">   53</span> </div>
+<div class="line"><span class="lineno">   54</span>        <span class="keywordflow">if</span>(!clearMeshGen-&gt;useGPU)</div>
+<div class="line"><span class="lineno">   55</span>        {</div>
+<div class="line"><span class="lineno">   56</span>            clearMeshGen-&gt;Generate(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">   57</span>            ExecuteCPUGenerators();</div>
+<div class="line"><span class="lineno">   58</span>            ExecuteKernels();</div>
+<div class="line"><span class="lineno">   59</span>        }</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   62</span>        {</div>
+<div class="line"><span class="lineno">   63</span>            ExecuteKernels();</div>
+<div class="line"><span class="lineno">   64</span>            ExecuteCPUGenerators();</div>
+<div class="line"><span class="lineno">   65</span>        }</div>
+<div class="line"><span class="lineno">   66</span> </div>
+<div class="line"><span class="lineno">   67</span>        <span class="keywordflow">if</span>(!appState-&gt;states.useGPUForNormals )</div>
+<div class="line"><span class="lineno">   68</span>        {</div>
+<div class="line"><span class="lineno">   69</span>            <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::TERRAIN)</div>
+<div class="line"><span class="lineno">   70</span>            {</div>
+<div class="line"><span class="lineno">   71</span>                appState-&gt;models.coreTerrain-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno">   72</span>            }</div>
+<div class="line"><span class="lineno">   73</span> </div>
+<div class="line"><span class="lineno">   74</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (appState-&gt;mode == ApplicationMode::CUSTOM_BASE)</div>
+<div class="line"><span class="lineno">   75</span>            {</div>
+<div class="line"><span class="lineno">   76</span>                appState-&gt;models.customBase-&gt;mesh-&gt;RecalculateNormals();</div>
+<div class="line"><span class="lineno">   77</span>            }</div>
+<div class="line"><span class="lineno">   78</span>        }</div>
+<div class="line"><span class="lineno">   79</span>        END_PROFILER(time);</div>
+<div class="line"><span class="lineno">   80</span>        *isRemeshing = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   81</span>    });</div>
+<div class="line"><span class="lineno">   82</span>    worker.detach();</div>
+<div class="line"><span class="lineno">   83</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -181,7 +181,7 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_a4
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:39 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

@@ -111,10 +111,10 @@ $(document).ready(function(){initNavTree('d6/da3/_project_data_8cpp_source.html'
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;Data/ProjectData.h&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Data/ApplicationState.h&quot;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;Utils/Utils.h&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;json/json.hpp&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;Platform.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Platform.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;json/json.hpp&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><a class="code hl_class" href="../../d7/d93/class_project_manager.html">ProjectManager</a> *ProjectManager::s_ProjectManager;</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
@@ -191,12 +191,12 @@ $(document).ready(function(){initNavTree('d6/da3/_project_data_8cpp_source.html'
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        MkDir(GetResourcePath());</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    SaveToFile(GetResourcePath() + PATH_SEPERATOR <span class="stringliteral">&quot;project_database.terr3d&quot;</span>, projectDatase.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>());</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    SaveToFile(GetResourcePath() + PATH_SEPARATOR <span class="stringliteral">&quot;project_database.terr3d&quot;</span>, projectDatase.<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a476756fb08e7f2416aad116d137977f4.html#a476756fb08e7f2416aad116d137977f4">dump</a>());</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>}</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>std::string ProjectManager::GetResourcePath()</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>{</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordflow">return</span> GetExecutableDir() + PATH_SEPERATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;project_data&quot;</span> PATH_SEPERATOR <span class="stringliteral">&quot;project_&quot;</span> + GetId();</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordflow">return</span> GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;cache&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;project_data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;project_&quot;</span> + GetId();</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>}</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>std::string ProjectManager::SaveTexture(<a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *texture)</div>
@@ -212,9 +212,9 @@ $(document).ready(function(){initNavTree('d6/da3/_project_data_8cpp_source.html'
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keywordflow">if</span> (GetAsset(hash).size() &lt;= 0)</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    {</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        MkDir(GetResourcePath() + PATH_SEPERATOR <span class="stringliteral">&quot;textures&quot;</span>);</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        CopyFileData(path, GetResourcePath() + PATH_SEPERATOR <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPERATOR + hash);</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        RegisterAsset(hash, <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPERATOR + hash);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        MkDir(GetResourcePath() + PATH_SEPARATOR <span class="stringliteral">&quot;textures&quot;</span>);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        CopyFileData(path, GetResourcePath() + PATH_SEPARATOR <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPARATOR + hash);</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        RegisterAsset(hash, <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPARATOR + hash);</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    }</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="../../dc/df0/namespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8.html#a679e5e522ac6afa5d5923292fab450b8">hash</a>;</div>
@@ -233,7 +233,7 @@ $(document).ready(function(){initNavTree('d6/da3/_project_data_8cpp_source.html'
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_85442998f3833e6ef8125ef4f77b1e4a.html">Data</a></li><li class="navelem"><b>ProjectData.cpp</b></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:30 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:38 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

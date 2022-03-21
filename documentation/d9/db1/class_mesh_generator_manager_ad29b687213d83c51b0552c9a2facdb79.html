@@ -121,51 +121,51 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_ad
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00480">480</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  481</span>{</div>
-<div class="line"><span class="lineno">  482</span>    <span class="keywordflow">while</span> (*isRemeshing);</div>
-<div class="line"><span class="lineno">  483</span> </div>
-<div class="line"><span class="lineno">  484</span>    clearMeshGen-&gt;Load(data[<span class="stringliteral">&quot;cmg&quot;</span>]);</div>
-<div class="line"><span class="lineno">  485</span> </div>
-<div class="line"><span class="lineno">  486</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  487</span>    {</div>
-<div class="line"><span class="lineno">  488</span>        <span class="keyword">delete</span> cpuNoiseLayers[i];</div>
-<div class="line"><span class="lineno">  489</span>    }</div>
-<div class="line"><span class="lineno">  490</span> </div>
-<div class="line"><span class="lineno">  491</span>    cpuNoiseLayers.clear();</div>
-<div class="line"><span class="lineno">  492</span> </div>
-<div class="line"><span class="lineno">  493</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; data[<span class="stringliteral">&quot;cpunl&quot;</span>].<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>(); i++)</div>
-<div class="line"><span class="lineno">  494</span>    {</div>
-<div class="line"><span class="lineno">  495</span>        cpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d4a/class_c_p_u_noise_layers_generator.html">CPUNoiseLayersGenerator</a>(appState));</div>
-<div class="line"><span class="lineno">  496</span>        cpuNoiseLayers.back()-&gt;Load(data[<span class="stringliteral">&quot;cpunl&quot;</span>][i]);</div>
-<div class="line"><span class="lineno">  497</span>    }</div>
-<div class="line"><span class="lineno">  498</span> </div>
-<div class="line"><span class="lineno">  499</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
-<div class="line"><span class="lineno">  500</span>    {</div>
-<div class="line"><span class="lineno">  501</span>        <span class="keyword">delete</span> gpuNoiseLayers[i];</div>
-<div class="line"><span class="lineno">  502</span>    }</div>
-<div class="line"><span class="lineno">  503</span> </div>
-<div class="line"><span class="lineno">  504</span>    gpuNoiseLayers.clear();</div>
-<div class="line"><span class="lineno">  505</span> </div>
-<div class="line"><span class="lineno">  506</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; data[<span class="stringliteral">&quot;gpunl&quot;</span>].<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>(); i++)</div>
-<div class="line"><span class="lineno">  507</span>    {</div>
-<div class="line"><span class="lineno">  508</span>        gpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../da/ded/class_g_p_u_noise_layer_generator.html">GPUNoiseLayerGenerator</a>(appState, kernels));</div>
-<div class="line"><span class="lineno">  509</span>        gpuNoiseLayers.back()-&gt;Load(data[<span class="stringliteral">&quot;gpunl&quot;</span>][i]);</div>
-<div class="line"><span class="lineno">  510</span>    }</div>
-<div class="line"><span class="lineno">  511</span> </div>
-<div class="line"><span class="lineno">  512</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNodeEditors.size(); i++)</div>
-<div class="line"><span class="lineno">  513</span>    {</div>
-<div class="line"><span class="lineno">  514</span>        <span class="keyword">delete</span> cpuNodeEditors[i];</div>
-<div class="line"><span class="lineno">  515</span>    }</div>
-<div class="line"><span class="lineno">  516</span> </div>
-<div class="line"><span class="lineno">  517</span>    cpuNodeEditors.clear();</div>
-<div class="line"><span class="lineno">  518</span> </div>
-<div class="line"><span class="lineno">  519</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; data[<span class="stringliteral">&quot;cpune&quot;</span>].<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>(); i++)</div>
-<div class="line"><span class="lineno">  520</span>    {</div>
-<div class="line"><span class="lineno">  521</span>        cpuNodeEditors.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a>(appState));</div>
-<div class="line"><span class="lineno">  522</span>        cpuNodeEditors.back()-&gt;Load(data[<span class="stringliteral">&quot;cpune&quot;</span>][i]);</div>
-<div class="line"><span class="lineno">  523</span>    }</div>
-<div class="line"><span class="lineno">  524</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00481">481</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  482</span>{</div>
+<div class="line"><span class="lineno">  483</span>    <span class="keywordflow">while</span> (*isRemeshing);</div>
+<div class="line"><span class="lineno">  484</span> </div>
+<div class="line"><span class="lineno">  485</span>    clearMeshGen-&gt;Load(data[<span class="stringliteral">&quot;cmg&quot;</span>]);</div>
+<div class="line"><span class="lineno">  486</span> </div>
+<div class="line"><span class="lineno">  487</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  488</span>    {</div>
+<div class="line"><span class="lineno">  489</span>        <span class="keyword">delete</span> cpuNoiseLayers[i];</div>
+<div class="line"><span class="lineno">  490</span>    }</div>
+<div class="line"><span class="lineno">  491</span> </div>
+<div class="line"><span class="lineno">  492</span>    cpuNoiseLayers.clear();</div>
+<div class="line"><span class="lineno">  493</span> </div>
+<div class="line"><span class="lineno">  494</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; data[<span class="stringliteral">&quot;cpunl&quot;</span>].<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>(); i++)</div>
+<div class="line"><span class="lineno">  495</span>    {</div>
+<div class="line"><span class="lineno">  496</span>        cpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d4a/class_c_p_u_noise_layers_generator.html">CPUNoiseLayersGenerator</a>(appState));</div>
+<div class="line"><span class="lineno">  497</span>        cpuNoiseLayers.back()-&gt;Load(data[<span class="stringliteral">&quot;cpunl&quot;</span>][i]);</div>
+<div class="line"><span class="lineno">  498</span>    }</div>
+<div class="line"><span class="lineno">  499</span> </div>
+<div class="line"><span class="lineno">  500</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; gpuNoiseLayers.size(); i++)</div>
+<div class="line"><span class="lineno">  501</span>    {</div>
+<div class="line"><span class="lineno">  502</span>        <span class="keyword">delete</span> gpuNoiseLayers[i];</div>
+<div class="line"><span class="lineno">  503</span>    }</div>
+<div class="line"><span class="lineno">  504</span> </div>
+<div class="line"><span class="lineno">  505</span>    gpuNoiseLayers.clear();</div>
+<div class="line"><span class="lineno">  506</span> </div>
+<div class="line"><span class="lineno">  507</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; data[<span class="stringliteral">&quot;gpunl&quot;</span>].<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>(); i++)</div>
+<div class="line"><span class="lineno">  508</span>    {</div>
+<div class="line"><span class="lineno">  509</span>        gpuNoiseLayers.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../da/ded/class_g_p_u_noise_layer_generator.html">GPUNoiseLayerGenerator</a>(appState, kernels));</div>
+<div class="line"><span class="lineno">  510</span>        gpuNoiseLayers.back()-&gt;Load(data[<span class="stringliteral">&quot;gpunl&quot;</span>][i]);</div>
+<div class="line"><span class="lineno">  511</span>    }</div>
+<div class="line"><span class="lineno">  512</span> </div>
+<div class="line"><span class="lineno">  513</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cpuNodeEditors.size(); i++)</div>
+<div class="line"><span class="lineno">  514</span>    {</div>
+<div class="line"><span class="lineno">  515</span>        <span class="keyword">delete</span> cpuNodeEditors[i];</div>
+<div class="line"><span class="lineno">  516</span>    }</div>
+<div class="line"><span class="lineno">  517</span> </div>
+<div class="line"><span class="lineno">  518</span>    cpuNodeEditors.clear();</div>
+<div class="line"><span class="lineno">  519</span> </div>
+<div class="line"><span class="lineno">  520</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; data[<span class="stringliteral">&quot;cpune&quot;</span>].<a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a33c7c8638bb0b12e6d1b69d8106dd2e0.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size</a>(); i++)</div>
+<div class="line"><span class="lineno">  521</span>    {</div>
+<div class="line"><span class="lineno">  522</span>        cpuNodeEditors.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a>(appState));</div>
+<div class="line"><span class="lineno">  523</span>        cpuNodeEditors.back()-&gt;Load(data[<span class="stringliteral">&quot;cpune&quot;</span>][i]);</div>
+<div class="line"><span class="lineno">  524</span>    }</div>
+<div class="line"><span class="lineno">  525</span>}</div>
 <div class="ttc" id="aclass_c_p_u_node_editor_html"><div class="ttname"><a href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d85/_c_p_u_node_editor_8h_source.html#l00078">CPUNodeEditor.h:79</a></div></div>
 <div class="ttc" id="aclass_c_p_u_noise_layers_generator_html"><div class="ttname"><a href="../../d8/d4a/class_c_p_u_noise_layers_generator.html">CPUNoiseLayersGenerator</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d0/d5e/_c_p_u_noise_layers_generator_8h_source.html#l00012">CPUNoiseLayersGenerator.h:13</a></div></div>
 <div class="ttc" id="aclass_g_p_u_noise_layer_generator_html"><div class="ttname"><a href="../../da/ded/class_g_p_u_noise_layer_generator.html">GPUNoiseLayerGenerator</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dc9/_g_p_u_noise_layer_generator_8h_source.html#l00029">GPUNoiseLayerGenerator.h:30</a></div></div>
@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_ad
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:39 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

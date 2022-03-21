@@ -121,171 +121,171 @@ $(document).ready(function(){initNavTree('d5/dcc/class_c_p_u_node_editor_afabbb5
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d0/dff/_c_p_u_node_editor_8cpp_source.html#l00130">130</a> of file <a class="el" href="../../d0/dff/_c_p_u_node_editor_8cpp_source.html">CPUNodeEditor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  131</span>    :appState(as)</div>
-<div class="line"><span class="lineno">  132</span>{</div>
-<div class="line"><span class="lineno">  133</span>    uid = GenerateId(32);</div>
-<div class="line"><span class="lineno">  134</span>    name.reserve(1024);</div>
-<div class="line"><span class="lineno">  135</span>    name = <span class="stringliteral">&quot;CPU Node Editor &quot;</span> + std::to_string(count++);</div>
-<div class="line"><span class="lineno">  136</span>    <a class="code hl_struct" href="../../d2/d48/struct_node_editor_config.html">NodeEditorConfig</a> config;</div>
-<div class="line"><span class="lineno">  137</span>    config.saveFile = GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\configs\\CPUNodeEditorconfigs.terr3d&quot;</span>;</div>
-<div class="line"><span class="lineno">  138</span>    config.makeNodeFunc = [&amp;]()</div>
-<div class="line"><span class="lineno">  139</span>    {</div>
-<div class="line"><span class="lineno">  140</span>        ImGuiNodeEditor::Suspend();</div>
-<div class="line"><span class="lineno">  141</span>        ImGui::OpenPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>);</div>
-<div class="line"><span class="lineno">  142</span>        ImGuiNodeEditor::Resume();</div>
-<div class="line"><span class="lineno">  143</span>    };</div>
-<div class="line"><span class="lineno">  144</span>    config.insNodeFunc = [&amp;](<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data) -&gt; <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a>*</div>
-<div class="line"><span class="lineno">  145</span>    {</div>
-<div class="line"><span class="lineno">  146</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node;</div>
-<div class="line"><span class="lineno">  147</span>        CPUNodeEditorE::CPUNodeType type = (CPUNodeEditorE::CPUNodeType)data[<span class="stringliteral">&quot;type&quot;</span>];</div>
-<div class="line"><span class="lineno">  148</span> </div>
-<div class="line"><span class="lineno">  149</span>        <span class="keywordflow">switch</span> (type)</div>
-<div class="line"><span class="lineno">  150</span>        {</div>
-<div class="line"><span class="lineno">  151</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Dummy:</div>
-<div class="line"><span class="lineno">  152</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d2/d31/class_dummy_node.html">DummyNode</a>();</div>
-<div class="line"><span class="lineno">  153</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  154</span> </div>
-<div class="line"><span class="lineno">  155</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Output:</div>
-<div class="line"><span class="lineno">  156</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../df/df6/class_output_node.html">OutputNode</a>();</div>
-<div class="line"><span class="lineno">  157</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  158</span> </div>
-<div class="line"><span class="lineno">  159</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MeshCoordinates:</div>
-<div class="line"><span class="lineno">  160</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/d0b/class_mesh_coordinates_node.html">MeshCoordinatesNode</a>();</div>
-<div class="line"><span class="lineno">  161</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  162</span> </div>
-<div class="line"><span class="lineno">  163</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MaxMeshCoordinates:</div>
-<div class="line"><span class="lineno">  164</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/dc8/class_max_mesh_coordinates_node.html">MaxMeshCoordinatesNode</a>();</div>
-<div class="line"><span class="lineno">  165</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  166</span> </div>
-<div class="line"><span class="lineno">  167</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MinMeshCoordinates:</div>
-<div class="line"><span class="lineno">  168</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/db6/class_min_mesh_coordinates_node.html">MinMeshCoordinatesNode</a>();</div>
-<div class="line"><span class="lineno">  169</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  170</span> </div>
-<div class="line"><span class="lineno">  171</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::TextureCoordinates:</div>
-<div class="line"><span class="lineno">  172</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/d4e/class_texture_coordinates_node.html">TextureCoordinatesNode</a>();</div>
-<div class="line"><span class="lineno">  173</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  174</span> </div>
-<div class="line"><span class="lineno">  175</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::TimeBasedSeed:</div>
-<div class="line"><span class="lineno">  176</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/d1f/class_time_based_seed_node.html">TimeBasedSeedNode</a>();</div>
-<div class="line"><span class="lineno">  177</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  178</span> </div>
-<div class="line"><span class="lineno">  179</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Duplicate:</div>
-<div class="line"><span class="lineno">  180</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/d21/class_duplicate_node.html">DuplicateNode</a>();</div>
-<div class="line"><span class="lineno">  181</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  182</span> </div>
-<div class="line"><span class="lineno">  183</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Add:</div>
-<div class="line"><span class="lineno">  184</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>();</div>
-<div class="line"><span class="lineno">  185</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  186</span> </div>
-<div class="line"><span class="lineno">  187</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Sub:</div>
-<div class="line"><span class="lineno">  188</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/da1/class_sub_node.html">SubNode</a>();</div>
-<div class="line"><span class="lineno">  189</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  190</span> </div>
-<div class="line"><span class="lineno">  191</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Mul:</div>
-<div class="line"><span class="lineno">  192</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d6/def/class_mul_node.html">MulNode</a>();</div>
-<div class="line"><span class="lineno">  193</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  194</span> </div>
-<div class="line"><span class="lineno">  195</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Div:</div>
-<div class="line"><span class="lineno">  196</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/d68/class_div_node.html">DivNode</a>();</div>
-<div class="line"><span class="lineno">  197</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  198</span> </div>
-<div class="line"><span class="lineno">  199</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Sin:</div>
-<div class="line"><span class="lineno">  200</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../db/dba/class_sin_node.html">SinNode</a>();</div>
-<div class="line"><span class="lineno">  201</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  202</span> </div>
-<div class="line"><span class="lineno">  203</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Cos:</div>
-<div class="line"><span class="lineno">  204</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d47/class_cos_node.html">CosNode</a>();</div>
-<div class="line"><span class="lineno">  205</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  206</span> </div>
-<div class="line"><span class="lineno">  207</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Square:</div>
-<div class="line"><span class="lineno">  208</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/de1/class_square_node.html">SquareNode</a>();</div>
-<div class="line"><span class="lineno">  209</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  210</span> </div>
-<div class="line"><span class="lineno">  211</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Tan:</div>
-<div class="line"><span class="lineno">  212</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d84/class_tan_node.html">TanNode</a>();</div>
-<div class="line"><span class="lineno">  213</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  214</span> </div>
-<div class="line"><span class="lineno">  215</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Abs:</div>
-<div class="line"><span class="lineno">  216</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/d5d/class_abs_node.html">AbsNode</a>();</div>
-<div class="line"><span class="lineno">  217</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  218</span> </div>
-<div class="line"><span class="lineno">  219</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Blend:</div>
-<div class="line"><span class="lineno">  220</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d14/class_blend_node.html">BlendNode</a>();</div>
-<div class="line"><span class="lineno">  221</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  222</span> </div>
-<div class="line"><span class="lineno">  223</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Curve:</div>
-<div class="line"><span class="lineno">  224</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/d5b/class_curve_node.html">CurveNode</a>();</div>
-<div class="line"><span class="lineno">  225</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  226</span> </div>
-<div class="line"><span class="lineno">  227</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::RandomNumber:</div>
-<div class="line"><span class="lineno">  228</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/d4b/class_random_number_node.html">RandomNumberNode</a>();</div>
-<div class="line"><span class="lineno">  229</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  230</span> </div>
-<div class="line"><span class="lineno">  231</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoisePerlin:</div>
-<div class="line"><span class="lineno">  232</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dda/class_noise_perlin_node.html">NoisePerlinNode</a>();</div>
-<div class="line"><span class="lineno">  233</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  234</span> </div>
-<div class="line"><span class="lineno">  235</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseCellular:</div>
-<div class="line"><span class="lineno">  236</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d56/class_noise_cellular_node.html">NoiseCellularNode</a>();</div>
-<div class="line"><span class="lineno">  237</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  238</span> </div>
-<div class="line"><span class="lineno">  239</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseOpenSimplex2:</div>
-<div class="line"><span class="lineno">  240</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../da/db8/class_noise_open_simplex2_node.html">NoiseOpenSimplex2Node</a>();</div>
-<div class="line"><span class="lineno">  241</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  242</span> </div>
-<div class="line"><span class="lineno">  243</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseOpenSimplex2S:</div>
-<div class="line"><span class="lineno">  244</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/d3a/class_noise_open_simplex2_s_node.html">NoiseOpenSimplex2SNode</a>();</div>
-<div class="line"><span class="lineno">  245</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  246</span> </div>
-<div class="line"><span class="lineno">  247</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseValue:</div>
-<div class="line"><span class="lineno">  248</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d32/class_noise_value_node.html">NoiseValueNode</a>();</div>
-<div class="line"><span class="lineno">  249</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  250</span> </div>
-<div class="line"><span class="lineno">  251</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseValueCubic:</div>
-<div class="line"><span class="lineno">  252</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/dfa/class_noise_value_cubic_node.html">NoiseValueCubicNode</a>();</div>
-<div class="line"><span class="lineno">  253</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  254</span> </div>
-<div class="line"><span class="lineno">  255</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MathFunction:</div>
-<div class="line"><span class="lineno">  256</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/dd4/class_math_function_node.html">MathFunctionNode</a>();</div>
-<div class="line"><span class="lineno">  257</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  258</span> </div>
-<div class="line"><span class="lineno">  259</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Texture:</div>
-<div class="line"><span class="lineno">  260</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/d68/class_texture_node.html">TextureNode</a>();</div>
-<div class="line"><span class="lineno">  261</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  262</span> </div>
-<div class="line"><span class="lineno">  263</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Pixelate:</div>
-<div class="line"><span class="lineno">  264</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/d9e/class_pixelate_node.html">PixelateNode</a>();</div>
-<div class="line"><span class="lineno">  265</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  266</span> </div>
-<div class="line"><span class="lineno">  267</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Visualizer:</div>
-<div class="line"><span class="lineno">  268</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../df/d97/class_visualizer_node.html">VisualizerNode</a>();</div>
-<div class="line"><span class="lineno">  269</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  270</span> </div>
-<div class="line"><span class="lineno">  271</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Hill:</div>
-<div class="line"><span class="lineno">  272</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/d15/class_hill_node.html">HillNode</a>();</div>
-<div class="line"><span class="lineno">  273</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  274</span> </div>
-<div class="line"><span class="lineno">  275</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Clamp:</div>
-<div class="line"><span class="lineno">  276</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d1c/class_clamp_node.html">ClampNode</a>();</div>
-<div class="line"><span class="lineno">  277</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  278</span> </div>
-<div class="line"><span class="lineno">  279</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MinVal:</div>
-<div class="line"><span class="lineno">  280</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d2/d46/class_min_val_node.html">MinValNode</a>();</div>
-<div class="line"><span class="lineno">  281</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  282</span> </div>
-<div class="line"><span class="lineno">  283</span>            <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  284</span>                node = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  285</span>                Log(<span class="stringliteral">&quot;Unknown Node Type!&quot;</span>);</div>
-<div class="line"><span class="lineno">  286</span>                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  287</span>        }</div>
-<div class="line"><span class="lineno">  288</span> </div>
-<div class="line"><span class="lineno">  289</span>        <span class="keywordflow">return</span> node;</div>
-<div class="line"><span class="lineno">  290</span>    };</div>
-<div class="line"><span class="lineno">  291</span>    editor = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d54/class_node_editor.html">NodeEditor</a>(config);</div>
-<div class="line"><span class="lineno">  292</span>    editor-&gt;name = name;</div>
-<div class="line"><span class="lineno">  293</span>    editor-&gt;SetOutputNode(<span class="keyword">new</span> <a class="code hl_class" href="../../df/df6/class_output_node.html">OutputNode</a>());</div>
-<div class="line"><span class="lineno">  294</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d0/dff/_c_p_u_node_editor_8cpp_source.html#l00131">131</a> of file <a class="el" href="../../d0/dff/_c_p_u_node_editor_8cpp_source.html">CPUNodeEditor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  132</span>    :appState(as)</div>
+<div class="line"><span class="lineno">  133</span>{</div>
+<div class="line"><span class="lineno">  134</span>    uid = GenerateId(32);</div>
+<div class="line"><span class="lineno">  135</span>    name.reserve(1024);</div>
+<div class="line"><span class="lineno">  136</span>    name = <span class="stringliteral">&quot;CPU Node Editor &quot;</span> + std::to_string(count++);</div>
+<div class="line"><span class="lineno">  137</span>    <a class="code hl_struct" href="../../d2/d48/struct_node_editor_config.html">NodeEditorConfig</a> config;</div>
+<div class="line"><span class="lineno">  138</span>    config.saveFile = GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;configs&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;CPUNodeEditorconfigs.terr3d&quot;</span>;</div>
+<div class="line"><span class="lineno">  139</span>    config.makeNodeFunc = [&amp;]()</div>
+<div class="line"><span class="lineno">  140</span>    {</div>
+<div class="line"><span class="lineno">  141</span>        ImGuiNodeEditor::Suspend();</div>
+<div class="line"><span class="lineno">  142</span>        ImGui::OpenPopup(<span class="stringliteral">&quot;NodeMakerDropped&quot;</span>);</div>
+<div class="line"><span class="lineno">  143</span>        ImGuiNodeEditor::Resume();</div>
+<div class="line"><span class="lineno">  144</span>    };</div>
+<div class="line"><span class="lineno">  145</span>    config.insNodeFunc = [&amp;](<a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> data) -&gt; <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a>*</div>
+<div class="line"><span class="lineno">  146</span>    {</div>
+<div class="line"><span class="lineno">  147</span>        <a class="code hl_class" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a> *node;</div>
+<div class="line"><span class="lineno">  148</span>        CPUNodeEditorE::CPUNodeType type = (CPUNodeEditorE::CPUNodeType)data[<span class="stringliteral">&quot;type&quot;</span>];</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>        <span class="keywordflow">switch</span> (type)</div>
+<div class="line"><span class="lineno">  151</span>        {</div>
+<div class="line"><span class="lineno">  152</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Dummy:</div>
+<div class="line"><span class="lineno">  153</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d2/d31/class_dummy_node.html">DummyNode</a>();</div>
+<div class="line"><span class="lineno">  154</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  155</span> </div>
+<div class="line"><span class="lineno">  156</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Output:</div>
+<div class="line"><span class="lineno">  157</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../df/df6/class_output_node.html">OutputNode</a>();</div>
+<div class="line"><span class="lineno">  158</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MeshCoordinates:</div>
+<div class="line"><span class="lineno">  161</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/d0b/class_mesh_coordinates_node.html">MeshCoordinatesNode</a>();</div>
+<div class="line"><span class="lineno">  162</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MaxMeshCoordinates:</div>
+<div class="line"><span class="lineno">  165</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/dc8/class_max_mesh_coordinates_node.html">MaxMeshCoordinatesNode</a>();</div>
+<div class="line"><span class="lineno">  166</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  167</span> </div>
+<div class="line"><span class="lineno">  168</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MinMeshCoordinates:</div>
+<div class="line"><span class="lineno">  169</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/db6/class_min_mesh_coordinates_node.html">MinMeshCoordinatesNode</a>();</div>
+<div class="line"><span class="lineno">  170</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  171</span> </div>
+<div class="line"><span class="lineno">  172</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::TextureCoordinates:</div>
+<div class="line"><span class="lineno">  173</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/d4e/class_texture_coordinates_node.html">TextureCoordinatesNode</a>();</div>
+<div class="line"><span class="lineno">  174</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  175</span> </div>
+<div class="line"><span class="lineno">  176</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::TimeBasedSeed:</div>
+<div class="line"><span class="lineno">  177</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/d1f/class_time_based_seed_node.html">TimeBasedSeedNode</a>();</div>
+<div class="line"><span class="lineno">  178</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  179</span> </div>
+<div class="line"><span class="lineno">  180</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Duplicate:</div>
+<div class="line"><span class="lineno">  181</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/d21/class_duplicate_node.html">DuplicateNode</a>();</div>
+<div class="line"><span class="lineno">  182</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  183</span> </div>
+<div class="line"><span class="lineno">  184</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Add:</div>
+<div class="line"><span class="lineno">  185</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/d48/class_add_node.html">AddNode</a>();</div>
+<div class="line"><span class="lineno">  186</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  187</span> </div>
+<div class="line"><span class="lineno">  188</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Sub:</div>
+<div class="line"><span class="lineno">  189</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/da1/class_sub_node.html">SubNode</a>();</div>
+<div class="line"><span class="lineno">  190</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  191</span> </div>
+<div class="line"><span class="lineno">  192</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Mul:</div>
+<div class="line"><span class="lineno">  193</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d6/def/class_mul_node.html">MulNode</a>();</div>
+<div class="line"><span class="lineno">  194</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Div:</div>
+<div class="line"><span class="lineno">  197</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/d68/class_div_node.html">DivNode</a>();</div>
+<div class="line"><span class="lineno">  198</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  199</span> </div>
+<div class="line"><span class="lineno">  200</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Sin:</div>
+<div class="line"><span class="lineno">  201</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../db/dba/class_sin_node.html">SinNode</a>();</div>
+<div class="line"><span class="lineno">  202</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  203</span> </div>
+<div class="line"><span class="lineno">  204</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Cos:</div>
+<div class="line"><span class="lineno">  205</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d47/class_cos_node.html">CosNode</a>();</div>
+<div class="line"><span class="lineno">  206</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  207</span> </div>
+<div class="line"><span class="lineno">  208</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Square:</div>
+<div class="line"><span class="lineno">  209</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d8/de1/class_square_node.html">SquareNode</a>();</div>
+<div class="line"><span class="lineno">  210</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  211</span> </div>
+<div class="line"><span class="lineno">  212</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Tan:</div>
+<div class="line"><span class="lineno">  213</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d0/d84/class_tan_node.html">TanNode</a>();</div>
+<div class="line"><span class="lineno">  214</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  215</span> </div>
+<div class="line"><span class="lineno">  216</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Abs:</div>
+<div class="line"><span class="lineno">  217</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d4/d5d/class_abs_node.html">AbsNode</a>();</div>
+<div class="line"><span class="lineno">  218</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  219</span> </div>
+<div class="line"><span class="lineno">  220</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Blend:</div>
+<div class="line"><span class="lineno">  221</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d14/class_blend_node.html">BlendNode</a>();</div>
+<div class="line"><span class="lineno">  222</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  223</span> </div>
+<div class="line"><span class="lineno">  224</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Curve:</div>
+<div class="line"><span class="lineno">  225</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/d5b/class_curve_node.html">CurveNode</a>();</div>
+<div class="line"><span class="lineno">  226</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  227</span> </div>
+<div class="line"><span class="lineno">  228</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::RandomNumber:</div>
+<div class="line"><span class="lineno">  229</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/d4b/class_random_number_node.html">RandomNumberNode</a>();</div>
+<div class="line"><span class="lineno">  230</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  231</span> </div>
+<div class="line"><span class="lineno">  232</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoisePerlin:</div>
+<div class="line"><span class="lineno">  233</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dda/class_noise_perlin_node.html">NoisePerlinNode</a>();</div>
+<div class="line"><span class="lineno">  234</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  235</span> </div>
+<div class="line"><span class="lineno">  236</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseCellular:</div>
+<div class="line"><span class="lineno">  237</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/d56/class_noise_cellular_node.html">NoiseCellularNode</a>();</div>
+<div class="line"><span class="lineno">  238</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  239</span> </div>
+<div class="line"><span class="lineno">  240</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseOpenSimplex2:</div>
+<div class="line"><span class="lineno">  241</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../da/db8/class_noise_open_simplex2_node.html">NoiseOpenSimplex2Node</a>();</div>
+<div class="line"><span class="lineno">  242</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  243</span> </div>
+<div class="line"><span class="lineno">  244</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseOpenSimplex2S:</div>
+<div class="line"><span class="lineno">  245</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d9/d3a/class_noise_open_simplex2_s_node.html">NoiseOpenSimplex2SNode</a>();</div>
+<div class="line"><span class="lineno">  246</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  247</span> </div>
+<div class="line"><span class="lineno">  248</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseValue:</div>
+<div class="line"><span class="lineno">  249</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d1/d32/class_noise_value_node.html">NoiseValueNode</a>();</div>
+<div class="line"><span class="lineno">  250</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::NoiseValueCubic:</div>
+<div class="line"><span class="lineno">  253</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d7/dfa/class_noise_value_cubic_node.html">NoiseValueCubicNode</a>();</div>
+<div class="line"><span class="lineno">  254</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  255</span> </div>
+<div class="line"><span class="lineno">  256</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MathFunction:</div>
+<div class="line"><span class="lineno">  257</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/dd4/class_math_function_node.html">MathFunctionNode</a>();</div>
+<div class="line"><span class="lineno">  258</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  259</span> </div>
+<div class="line"><span class="lineno">  260</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Texture:</div>
+<div class="line"><span class="lineno">  261</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dd/d68/class_texture_node.html">TextureNode</a>();</div>
+<div class="line"><span class="lineno">  262</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  263</span> </div>
+<div class="line"><span class="lineno">  264</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Pixelate:</div>
+<div class="line"><span class="lineno">  265</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../dc/d9e/class_pixelate_node.html">PixelateNode</a>();</div>
+<div class="line"><span class="lineno">  266</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  267</span> </div>
+<div class="line"><span class="lineno">  268</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Visualizer:</div>
+<div class="line"><span class="lineno">  269</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../df/d97/class_visualizer_node.html">VisualizerNode</a>();</div>
+<div class="line"><span class="lineno">  270</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  271</span> </div>
+<div class="line"><span class="lineno">  272</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Hill:</div>
+<div class="line"><span class="lineno">  273</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d5/d15/class_hill_node.html">HillNode</a>();</div>
+<div class="line"><span class="lineno">  274</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  275</span> </div>
+<div class="line"><span class="lineno">  276</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::Clamp:</div>
+<div class="line"><span class="lineno">  277</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../da/d1c/class_clamp_node.html">ClampNode</a>();</div>
+<div class="line"><span class="lineno">  278</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  279</span> </div>
+<div class="line"><span class="lineno">  280</span>            <span class="keywordflow">case</span> CPUNodeEditorE::CPUNodeType::MinVal:</div>
+<div class="line"><span class="lineno">  281</span>                node = <span class="keyword">new</span> <a class="code hl_class" href="../../d2/d46/class_min_val_node.html">MinValNode</a>();</div>
+<div class="line"><span class="lineno">  282</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  283</span> </div>
+<div class="line"><span class="lineno">  284</span>            <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  285</span>                node = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  286</span>                Log(<span class="stringliteral">&quot;Unknown Node Type!&quot;</span>);</div>
+<div class="line"><span class="lineno">  287</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  288</span>        }</div>
+<div class="line"><span class="lineno">  289</span> </div>
+<div class="line"><span class="lineno">  290</span>        <span class="keywordflow">return</span> node;</div>
+<div class="line"><span class="lineno">  291</span>    };</div>
+<div class="line"><span class="lineno">  292</span>    editor = <span class="keyword">new</span> <a class="code hl_class" href="../../db/d54/class_node_editor.html">NodeEditor</a>(config);</div>
+<div class="line"><span class="lineno">  293</span>    editor-&gt;name = name;</div>
+<div class="line"><span class="lineno">  294</span>    editor-&gt;SetOutputNode(<span class="keyword">new</span> <a class="code hl_class" href="../../df/df6/class_output_node.html">OutputNode</a>());</div>
+<div class="line"><span class="lineno">  295</span>}</div>
 <div class="ttc" id="aclass_abs_node_html"><div class="ttname"><a href="../../d4/d5d/class_abs_node.html">AbsNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d85/_abs_node_8h_source.html#l00006">AbsNode.h:7</a></div></div>
 <div class="ttc" id="aclass_add_node_html"><div class="ttname"><a href="../../dc/d48/class_add_node.html">AddNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../da/d46/_add_node_8h_source.html#l00006">AddNode.h:7</a></div></div>
 <div class="ttc" id="aclass_blend_node_html"><div class="ttname"><a href="../../d7/d14/class_blend_node.html">BlendNode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dca/_blend_node_8h_source.html#l00006">BlendNode.h:7</a></div></div>
@@ -332,7 +332,7 @@ $(document).ready(function(){initNavTree('d5/dcc/class_c_p_u_node_editor_afabbb5
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d5/dcc/class_c_p_u_node_editor.html">CPUNodeEditor</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:31 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:39 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

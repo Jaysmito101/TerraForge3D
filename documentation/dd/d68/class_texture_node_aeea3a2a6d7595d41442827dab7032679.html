@@ -130,68 +130,68 @@ $(document).ready(function(){initNavTree('dd/d68/class_texture_node_aeea3a2a6d75
 
 <p>Implements <a class="el" href="../../da/d6c/class_node_editor_node.html">NodeEditorNode</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/df0/_texture_node_8cpp_source.html#l00191">191</a> of file <a class="el" href="../../d7/df0/_texture_node_8cpp_source.html">TextureNode.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  192</span>{</div>
-<div class="line"><span class="lineno">  193</span>    DrawHeader(<span class="stringliteral">&quot;Texture&quot;</span>);</div>
-<div class="line"><span class="lineno">  194</span>    inputPins[0]-&gt;Render();</div>
-<div class="line"><span class="lineno">  195</span>    ImGui::Text(<span class="stringliteral">&quot;X&quot;</span>);</div>
-<div class="line"><span class="lineno">  196</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  197</span>    ImGui::Dummy(ImVec2(150, 10));</div>
-<div class="line"><span class="lineno">  198</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  199</span>    ImGui::Text(<span class="stringliteral">&quot;R&quot;</span>);</div>
-<div class="line"><span class="lineno">  200</span>    outputPins[0]-&gt;Render();</div>
-<div class="line"><span class="lineno">  201</span>    inputPins[1]-&gt;Render();</div>
-<div class="line"><span class="lineno">  202</span>    ImGui::Text(<span class="stringliteral">&quot;Y&quot;</span>);</div>
-<div class="line"><span class="lineno">  203</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  204</span>    ImGui::Dummy(ImVec2(150, 10));</div>
-<div class="line"><span class="lineno">  205</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  206</span>    ImGui::Text(<span class="stringliteral">&quot;G&quot;</span>);</div>
-<div class="line"><span class="lineno">  207</span>    outputPins[1]-&gt;Render();</div>
-<div class="line"><span class="lineno">  208</span>    inputPins[2]-&gt;Render();</div>
-<div class="line"><span class="lineno">  209</span> </div>
-<div class="line"><span class="lineno">  210</span>    <span class="keywordflow">if</span> (inputPins[2]-&gt;IsLinked())</div>
-<div class="line"><span class="lineno">  211</span>    {</div>
-<div class="line"><span class="lineno">  212</span>        ImGui::Text(<span class="stringliteral">&quot;Scale&quot;</span>);</div>
-<div class="line"><span class="lineno">  213</span>    }</div>
-<div class="line"><span class="lineno">  214</span> </div>
-<div class="line"><span class="lineno">  215</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  216</span>    {</div>
-<div class="line"><span class="lineno">  217</span>        ImGui::PushItemWidth(100);</div>
-<div class="line"><span class="lineno">  218</span>        ImGui::DragFloat((<span class="stringliteral">&quot;##&quot;</span> + std::to_string(inputPins[1]-&gt;<span class="keywordtype">id</span>)).c_str(), &amp;scale, 0.01f);</div>
-<div class="line"><span class="lineno">  219</span>        ImGui::PopItemWidth();</div>
-<div class="line"><span class="lineno">  220</span>    }</div>
-<div class="line"><span class="lineno">  221</span> </div>
-<div class="line"><span class="lineno">  222</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  223</span>    ImGui::Dummy(ImVec2(60, 10));</div>
-<div class="line"><span class="lineno">  224</span>    ImGui::SameLine();</div>
-<div class="line"><span class="lineno">  225</span>    ImGui::Text(<span class="stringliteral">&quot;B&quot;</span>);</div>
-<div class="line"><span class="lineno">  226</span>    outputPins[2]-&gt;Render();</div>
-<div class="line"><span class="lineno">  227</span>    ImGui::NewLine();</div>
-<div class="line"><span class="lineno">  228</span>    ImGui::Checkbox((<span class="stringliteral">&quot;Auto Tiled##tild&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;autoTiled);</div>
-<div class="line"><span class="lineno">  229</span>    ImGui::Checkbox((<span class="stringliteral">&quot;Inverse Texture##tinv&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;inv);</div>
-<div class="line"><span class="lineno">  230</span>    ImGui::Checkbox((<span class="stringliteral">&quot;Scale -1 To 1##tnpsc&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;npScale);</div>
-<div class="line"><span class="lineno">  231</span> </div>
+<p class="definition">Definition at line <a class="el" href="../../d7/df0/_texture_node_8cpp_source.html#l00192">192</a> of file <a class="el" href="../../d7/df0/_texture_node_8cpp_source.html">TextureNode.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  193</span>{</div>
+<div class="line"><span class="lineno">  194</span>    DrawHeader(<span class="stringliteral">&quot;Texture&quot;</span>);</div>
+<div class="line"><span class="lineno">  195</span>    inputPins[0]-&gt;Render();</div>
+<div class="line"><span class="lineno">  196</span>    ImGui::Text(<span class="stringliteral">&quot;X&quot;</span>);</div>
+<div class="line"><span class="lineno">  197</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  198</span>    ImGui::Dummy(ImVec2(150, 10));</div>
+<div class="line"><span class="lineno">  199</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  200</span>    ImGui::Text(<span class="stringliteral">&quot;R&quot;</span>);</div>
+<div class="line"><span class="lineno">  201</span>    outputPins[0]-&gt;Render();</div>
+<div class="line"><span class="lineno">  202</span>    inputPins[1]-&gt;Render();</div>
+<div class="line"><span class="lineno">  203</span>    ImGui::Text(<span class="stringliteral">&quot;Y&quot;</span>);</div>
+<div class="line"><span class="lineno">  204</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  205</span>    ImGui::Dummy(ImVec2(150, 10));</div>
+<div class="line"><span class="lineno">  206</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  207</span>    ImGui::Text(<span class="stringliteral">&quot;G&quot;</span>);</div>
+<div class="line"><span class="lineno">  208</span>    outputPins[1]-&gt;Render();</div>
+<div class="line"><span class="lineno">  209</span>    inputPins[2]-&gt;Render();</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>    <span class="keywordflow">if</span> (inputPins[2]-&gt;IsLinked())</div>
+<div class="line"><span class="lineno">  212</span>    {</div>
+<div class="line"><span class="lineno">  213</span>        ImGui::Text(<span class="stringliteral">&quot;Scale&quot;</span>);</div>
+<div class="line"><span class="lineno">  214</span>    }</div>
+<div class="line"><span class="lineno">  215</span> </div>
+<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  217</span>    {</div>
+<div class="line"><span class="lineno">  218</span>        ImGui::PushItemWidth(100);</div>
+<div class="line"><span class="lineno">  219</span>        ImGui::DragFloat((<span class="stringliteral">&quot;##&quot;</span> + std::to_string(inputPins[1]-&gt;<span class="keywordtype">id</span>)).c_str(), &amp;scale, 0.01f);</div>
+<div class="line"><span class="lineno">  220</span>        ImGui::PopItemWidth();</div>
+<div class="line"><span class="lineno">  221</span>    }</div>
+<div class="line"><span class="lineno">  222</span> </div>
+<div class="line"><span class="lineno">  223</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  224</span>    ImGui::Dummy(ImVec2(60, 10));</div>
+<div class="line"><span class="lineno">  225</span>    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  226</span>    ImGui::Text(<span class="stringliteral">&quot;B&quot;</span>);</div>
+<div class="line"><span class="lineno">  227</span>    outputPins[2]-&gt;Render();</div>
+<div class="line"><span class="lineno">  228</span>    ImGui::NewLine();</div>
+<div class="line"><span class="lineno">  229</span>    ImGui::Checkbox((<span class="stringliteral">&quot;Auto Tiled##tild&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;autoTiled);</div>
+<div class="line"><span class="lineno">  230</span>    ImGui::Checkbox((<span class="stringliteral">&quot;Inverse Texture##tinv&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;inv);</div>
+<div class="line"><span class="lineno">  231</span>    ImGui::Checkbox((<span class="stringliteral">&quot;Scale -1 To 1##tnpsc&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;npScale);</div>
 <div class="line"><span class="lineno">  232</span> </div>
-<div class="line"><span class="lineno">  233</span>    ImGui::PushItemWidth(100);</div>
-<div class="line"><span class="lineno">  234</span>    <span class="keywordflow">if</span>(!autoTiled)</div>
-<div class="line"><span class="lineno">  235</span>    {</div>
-<div class="line"><span class="lineno">  236</span>        ImGui::DragFloat((<span class="stringliteral">&quot;Num Tiles##nmtl&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;numTiles, 0.01f);</div>
-<div class="line"><span class="lineno">  237</span>    }</div>
-<div class="line"><span class="lineno">  238</span>    ImGui::DragFloat2((<span class="stringliteral">&quot;Position##posi&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), posi, 0.01f);</div>
-<div class="line"><span class="lineno">  239</span>    ImGui::PopItemWidth();</div>
-<div class="line"><span class="lineno">  240</span>    ImGui::DragFloat((<span class="stringliteral">&quot;Rotation##rota&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;rota, 0.1f);</div>
-<div class="line"><span class="lineno">  241</span>    ImGui::NewLine();</div>
-<div class="line"><span class="lineno">  242</span> </div>
-<div class="line"><span class="lineno">  243</span>    <span class="keywordflow">if</span> (ImGui::ImageButton((ImTextureID)texture-&gt;GetRendererID(), ImVec2(200, 200)))</div>
-<div class="line"><span class="lineno">  244</span>    {</div>
-<div class="line"><span class="lineno">  245</span>        ChangeTexture();</div>
-<div class="line"><span class="lineno">  246</span>    }</div>
-<div class="line"><span class="lineno">  247</span> </div>
-<div class="line"><span class="lineno">  248</span>    <span class="keywordflow">if</span> (ImGui::Button(MAKE_IMGUI_LABEL(<span class="keywordtype">id</span>, <span class="stringliteral">&quot;Change Texture&quot;</span>)))</div>
-<div class="line"><span class="lineno">  249</span>    {</div>
-<div class="line"><span class="lineno">  250</span>        ChangeTexture();</div>
-<div class="line"><span class="lineno">  251</span>    }</div>
-<div class="line"><span class="lineno">  252</span>}</div>
+<div class="line"><span class="lineno">  233</span> </div>
+<div class="line"><span class="lineno">  234</span>    ImGui::PushItemWidth(100);</div>
+<div class="line"><span class="lineno">  235</span>    <span class="keywordflow">if</span>(!autoTiled)</div>
+<div class="line"><span class="lineno">  236</span>    {</div>
+<div class="line"><span class="lineno">  237</span>        ImGui::DragFloat((<span class="stringliteral">&quot;Num Tiles##nmtl&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;numTiles, 0.01f);</div>
+<div class="line"><span class="lineno">  238</span>    }</div>
+<div class="line"><span class="lineno">  239</span>    ImGui::DragFloat2((<span class="stringliteral">&quot;Position##posi&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), posi, 0.01f);</div>
+<div class="line"><span class="lineno">  240</span>    ImGui::PopItemWidth();</div>
+<div class="line"><span class="lineno">  241</span>    ImGui::DragFloat((<span class="stringliteral">&quot;Rotation##rota&quot;</span> + std::to_string(<span class="keywordtype">id</span>)).c_str(), &amp;rota, 0.1f);</div>
+<div class="line"><span class="lineno">  242</span>    ImGui::NewLine();</div>
+<div class="line"><span class="lineno">  243</span> </div>
+<div class="line"><span class="lineno">  244</span>    <span class="keywordflow">if</span> (ImGui::ImageButton((ImTextureID)texture-&gt;GetRendererID(), ImVec2(200, 200)))</div>
+<div class="line"><span class="lineno">  245</span>    {</div>
+<div class="line"><span class="lineno">  246</span>        ChangeTexture();</div>
+<div class="line"><span class="lineno">  247</span>    }</div>
+<div class="line"><span class="lineno">  248</span> </div>
+<div class="line"><span class="lineno">  249</span>    <span class="keywordflow">if</span> (ImGui::Button(MAKE_IMGUI_LABEL(<span class="keywordtype">id</span>, <span class="stringliteral">&quot;Change Texture&quot;</span>)))</div>
+<div class="line"><span class="lineno">  250</span>    {</div>
+<div class="line"><span class="lineno">  251</span>        ChangeTexture();</div>
+<div class="line"><span class="lineno">  252</span>    }</div>
+<div class="line"><span class="lineno">  253</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -201,7 +201,7 @@ $(document).ready(function(){initNavTree('dd/d68/class_texture_node_aeea3a2a6d75
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dd/d68/class_texture_node.html">TextureNode</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:34 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:41 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

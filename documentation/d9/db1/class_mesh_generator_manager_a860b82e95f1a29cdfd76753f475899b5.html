@@ -120,19 +120,19 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_a8
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00436">436</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  437</span>{</div>
-<div class="line"><span class="lineno">  438</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  439</span>    std::string source = ReadShaderSourceFile(GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\kernels\\generators\\generators.cl&quot;</span>, &amp;tmp);</div>
-<div class="line"><span class="lineno">  440</span>    kernels-&gt;AddSoruce(source);</div>
-<div class="line"><span class="lineno">  441</span>    kernels-&gt;BuildProgram(<span class="stringliteral">&quot;-I&quot;</span> + appState-&gt;globals.kernelsIncludeDir + <span class="stringliteral">&quot; -cl-fast-relaxed-math -cl-mad-enable&quot;</span>);</div>
-<div class="line"><span class="lineno">  442</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;clear_mesh_terrain&quot;</span>);</div>
-<div class="line"><span class="lineno">  443</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;clear_mesh_custom_base&quot;</span>);</div>
-<div class="line"><span class="lineno">  444</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;noise_layer_terrain&quot;</span>);</div>
-<div class="line"><span class="lineno">  445</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;noise_layer_custom_base&quot;</span>);</div>
-<div class="line"><span class="lineno">  446</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;gen_normals&quot;</span>);</div>
-<div class="line"><span class="lineno">  447</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;normalize_normals&quot;</span>);</div>
-<div class="line"><span class="lineno">  448</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html#l00437">437</a> of file <a class="el" href="../../d4/d38/_mesh_generator_manager_8cpp_source.html">MeshGeneratorManager.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  438</span>{</div>
+<div class="line"><span class="lineno">  439</span>    <span class="keywordtype">bool</span> tmp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  440</span>    std::string source = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;kernels&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;generators&quot;</span> PATH_SEPARATOR <span class="stringliteral">&quot;generators.cl&quot;</span>, &amp;tmp);</div>
+<div class="line"><span class="lineno">  441</span>    kernels-&gt;AddSoruce(source);</div>
+<div class="line"><span class="lineno">  442</span>    kernels-&gt;BuildProgram(<span class="stringliteral">&quot;-I&quot;</span> + appState-&gt;globals.kernelsIncludeDir + <span class="stringliteral">&quot; -cl-fast-relaxed-math -cl-mad-enable&quot;</span>);</div>
+<div class="line"><span class="lineno">  443</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;clear_mesh_terrain&quot;</span>);</div>
+<div class="line"><span class="lineno">  444</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;clear_mesh_custom_base&quot;</span>);</div>
+<div class="line"><span class="lineno">  445</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;noise_layer_terrain&quot;</span>);</div>
+<div class="line"><span class="lineno">  446</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;noise_layer_custom_base&quot;</span>);</div>
+<div class="line"><span class="lineno">  447</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;gen_normals&quot;</span>);</div>
+<div class="line"><span class="lineno">  448</span>    kernels-&gt;AddKernel(<span class="stringliteral">&quot;normalize_normals&quot;</span>);</div>
+<div class="line"><span class="lineno">  449</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -142,7 +142,7 @@ $(document).ready(function(){initNavTree('d9/db1/class_mesh_generator_manager_a8
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d9/db1/class_mesh_generator_manager.html">MeshGeneratorManager</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:32 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:39 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

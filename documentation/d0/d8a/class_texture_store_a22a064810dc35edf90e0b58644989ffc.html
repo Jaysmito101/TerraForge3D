@@ -131,46 +131,47 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_a22a064810d
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00260">260</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  261</span>{</div>
-<div class="line"><span class="lineno">  262</span>    std::string tmpStr = FetchURL(<span class="stringliteral">&quot;https://api.polyhaven.com&quot;</span>, <span class="stringliteral">&quot;/files/&quot;</span> + textureStoreItems[<span class="keywordtype">id</span>].name);</div>
-<div class="line"><span class="lineno">  263</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmpJ;</div>
-<div class="line"><span class="lineno">  264</span> </div>
-<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">try</span></div>
-<div class="line"><span class="lineno">  266</span>    {</div>
-<div class="line"><span class="lineno">  267</span>        tmpJ = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(tmpStr);</div>
-<div class="line"><span class="lineno">  268</span>    }</div>
-<div class="line"><span class="lineno">  269</span> </div>
-<div class="line"><span class="lineno">  270</span>    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><span class="lineno">  271</span>    {</div>
-<div class="line"><span class="lineno">  272</span>        Log(<span class="stringliteral">&quot;Failed to download texture : &quot;</span>  + textureStoreItems[<span class="keywordtype">id</span>].name);</div>
-<div class="line"><span class="lineno">  273</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  274</span>    }</div>
-<div class="line"><span class="lineno">  275</span> </div>
-<div class="line"><span class="lineno">  276</span>    std::string baseDir = GetExecutableDir() + <span class="stringliteral">&quot;\\Data\\textures\\&quot;</span> + textureStoreItems[id].name;</div>
-<div class="line"><span class="lineno">  277</span>    MkDir(baseDir);</div>
-<div class="line"><span class="lineno">  278</span>    textureStoreItems[id].baseDir = baseDir;</div>
-<div class="line"><span class="lineno">  279</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;Diffuse&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
-<div class="line"><span class="lineno">  280</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + <span class="stringliteral">&quot;\\albedo.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  281</span>    textureStoreItems[id].abledo = baseDir + <span class="stringliteral">&quot;\\albedo.png&quot;</span>;</div>
-<div class="line"><span class="lineno">  282</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;nor_gl&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
-<div class="line"><span class="lineno">  283</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + <span class="stringliteral">&quot;\\normal.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  284</span>    textureStoreItems[id].normal = baseDir + <span class="stringliteral">&quot;\\normal.png&quot;</span>;</div>
-<div class="line"><span class="lineno">  285</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;Rough&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
-<div class="line"><span class="lineno">  286</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + <span class="stringliteral">&quot;\\roughness.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  287</span>    textureStoreItems[id].roughness = baseDir + <span class="stringliteral">&quot;\\roughness.png&quot;</span>;</div>
-<div class="line"><span class="lineno">  288</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;AO&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
-<div class="line"><span class="lineno">  289</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + <span class="stringliteral">&quot;\\ao.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  290</span>    textureStoreItems[id].ao = baseDir + <span class="stringliteral">&quot;\\ao.png&quot;</span>;</div>
-<div class="line"><span class="lineno">  291</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;arm&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
-<div class="line"><span class="lineno">  292</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + <span class="stringliteral">&quot;\\arm.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  293</span>    textureStoreItems[id].arm = baseDir + <span class="stringliteral">&quot;\\arm.png&quot;</span>;</div>
-<div class="line"><span class="lineno">  294</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;Displacement&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
-<div class="line"><span class="lineno">  295</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + <span class="stringliteral">&quot;\\displacement.png&quot;</span>);</div>
-<div class="line"><span class="lineno">  296</span>    textureStoreItems[id].downloaded = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  297</span>    downloadedTextureStoreItems.push_back(<span class="keywordtype">id</span>);</div>
-<div class="line"><span class="lineno">  298</span>    SaveDownloadsDatabase();</div>
-<div class="line"><span class="lineno">  299</span>}</div>
+<p class="definition">Definition at line <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html#l00273">273</a> of file <a class="el" href="../../d9/d58/_texture_store_8cpp_source.html">TextureStore.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  274</span>{</div>
+<div class="line"><span class="lineno">  275</span>    std::string tmpStr = FetchURL(<span class="stringliteral">&quot;https://api.polyhaven.com&quot;</span>, <span class="stringliteral">&quot;/files/&quot;</span> + textureStoreItems[<span class="keywordtype">id</span>].name);</div>
+<div class="line"><span class="lineno">  276</span>    <a class="code hl_class" href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::json</a> tmpJ;</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>    <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">  279</span>    {</div>
+<div class="line"><span class="lineno">  280</span>        tmpJ = <a class="code hl_function" href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::json::parse</a>(tmpStr);</div>
+<div class="line"><span class="lineno">  281</span>    }</div>
+<div class="line"><span class="lineno">  282</span> </div>
+<div class="line"><span class="lineno">  283</span>    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><span class="lineno">  284</span>    {</div>
+<div class="line"><span class="lineno">  285</span>        Log(<span class="stringliteral">&quot;Failed to download texture : &quot;</span>  + textureStoreItems[<span class="keywordtype">id</span>].name);</div>
+<div class="line"><span class="lineno">  286</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  287</span>    }</div>
+<div class="line"><span class="lineno">  288</span> </div>
+<div class="line"><span class="lineno">  289</span>    std::string baseDir = GetExecutableDir() + PATH_SEPARATOR <span class="stringliteral">&quot;Data&quot;</span></div>
+<div class="line"><span class="lineno">  290</span>        PATH_SEPARATOR <span class="stringliteral">&quot;textures&quot;</span> PATH_SEPARATOR + textureStoreItems[id].name;</div>
+<div class="line"><span class="lineno">  291</span>    MkDir(baseDir);</div>
+<div class="line"><span class="lineno">  292</span>    textureStoreItems[id].baseDir = baseDir;</div>
+<div class="line"><span class="lineno">  293</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;Diffuse&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
+<div class="line"><span class="lineno">  294</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;albedo.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  295</span>    textureStoreItems[id].abledo = baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;albedo.png&quot;</span>;</div>
+<div class="line"><span class="lineno">  296</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;nor_gl&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
+<div class="line"><span class="lineno">  297</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;normal.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  298</span>    textureStoreItems[id].normal = baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;normal.png&quot;</span>;</div>
+<div class="line"><span class="lineno">  299</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;Rough&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
+<div class="line"><span class="lineno">  300</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;roughness.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  301</span>    textureStoreItems[id].roughness = baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;roughness.png&quot;</span>;</div>
+<div class="line"><span class="lineno">  302</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;AO&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
+<div class="line"><span class="lineno">  303</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;ao.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  304</span>    textureStoreItems[id].ao = baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;ao.png&quot;</span>;</div>
+<div class="line"><span class="lineno">  305</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;arm&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
+<div class="line"><span class="lineno">  306</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;arm.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  307</span>    textureStoreItems[id].arm = baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;arm.png&quot;</span>;</div>
+<div class="line"><span class="lineno">  308</span>    tmpStr = tmpJ[<span class="stringliteral">&quot;Displacement&quot;</span>][std::to_string(res) + <span class="stringliteral">&quot;k&quot;</span>][<span class="stringliteral">&quot;png&quot;</span>][<span class="stringliteral">&quot;url&quot;</span>];</div>
+<div class="line"><span class="lineno">  309</span>    DownloadFile(<span class="stringliteral">&quot;https://dl.polyhaven.org&quot;</span>, tmpStr.substr(24), baseDir + PATH_SEPARATOR <span class="stringliteral">&quot;displacement.png&quot;</span>);</div>
+<div class="line"><span class="lineno">  310</span>    textureStoreItems[id].downloaded = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  311</span>    downloadedTextureStoreItems.push_back(<span class="keywordtype">id</span>);</div>
+<div class="line"><span class="lineno">  312</span>    SaveDownloadsDatabase();</div>
+<div class="line"><span class="lineno">  313</span>}</div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l17859">json.hpp:17860</a></div></div>
 </div><!-- fragment -->
@@ -182,7 +183,7 @@ $(document).ready(function(){initNavTree('d0/d8a/class_texture_store_a22a064810d
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d0/d8a/class_texture_store.html">TextureStore</a></li>
-    <li class="footer">Generated on Sat Mar 19 2022 19:50:34 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Mar 21 2022 10:51:41 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
