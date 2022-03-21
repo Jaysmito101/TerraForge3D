@@ -35,7 +35,6 @@
 #include "GLFW/glfw3.h"
 #include "Application.h"
 #include "Data/ProjectData.h"
-#include "Platform.h"
 
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
