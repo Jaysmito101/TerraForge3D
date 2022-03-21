@@ -44,13 +44,13 @@ void ModuleManager::LoadModules()
 {
 	UnloadModules();
 	// iterate through all directories in the modules folder
-	std::string modulesFolder = appState->constants.modulesDir + PATH_SEPERATOR;
+	std::string modulesFolder = appState->constants.modulesDir + PATH_SEPARATOR;
 	for (auto &p : std::filesystem::directory_iterator(modulesFolder))
 	{
 		std::string path = p.path().string();
-		if (p.is_directory() && FileExists(path + PATH_SEPERATOR + "module" MODULE_EXT ))
+		if (p.is_directory() && FileExists(path + PATH_SEPARATOR "module" MODULE_EXT ))
 		{
-			LoadModule(path + PATH_SEPERATOR + "module" MODULE_EXT);
+			LoadModule(path + PATH_SEPARATOR "module" MODULE_EXT);
 		}
 	}
 }
@@ -113,9 +113,9 @@ ModuleManager::~ModuleManager()
 void ModuleManager::InstallModule(std::string path)
 {
 	// extract zip file to modules folder
-	zip_extract(path.data(), (appState->constants.modulesDir + PATH_SEPERATOR + GenerateId(32)).data(), [](const char* f, void* arg){return 1;}, 0);
+	zip_extract(path.data(), (appState->constants.modulesDir + PATH_SEPARATOR + GenerateId(32)).data(), [](const char* f, void* arg){return 1;}, 0);
 	// load module
-	LoadModule(appState->constants.modulesDir + PATH_SEPERATOR + GenerateId(32) + PATH_SEPERATOR + "module" MODULE_EXT);
+	LoadModule(appState->constants.modulesDir + PATH_SEPARATOR + GenerateId(32) + PATH_SEPARATOR "module" MODULE_EXT);
 }
 
 void ModuleManager::UninstallModule(std::string uid)

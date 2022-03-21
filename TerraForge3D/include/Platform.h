@@ -2,10 +2,10 @@
 
 #ifdef TERR3D_WIN32
 
-#define PATH_SEPERATOR "\\"
+#define PATH_SEPARATOR "\\"
 
 #else
 
-#define PATH_SEPERATOR "/"
+#define PATH_SEPARATOR "/"
 
 #endif

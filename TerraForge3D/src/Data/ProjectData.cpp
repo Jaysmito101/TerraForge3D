@@ -1,10 +1,10 @@
 #include "Data/ProjectData.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
+#include "Platform.h"
 
 #include <json/json.hpp>
 
-#include "Platform.h"
 
 ProjectManager *ProjectManager::s_ProjectManager;
 
@@ -81,12 +81,12 @@ void ProjectManager::SaveDatabase()
 		MkDir(GetResourcePath());
 	}
 
-	SaveToFile(GetResourcePath() + PATH_SEPERATOR "project_database.terr3d", projectDatase.dump());
+	SaveToFile(GetResourcePath() + PATH_SEPARATOR "project_database.terr3d", projectDatase.dump());
 }
 
 std::string ProjectManager::GetResourcePath()
 {
-	return GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "cache" PATH_SEPERATOR "project_data" PATH_SEPERATOR "project_" + GetId();
+	return GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "project_data" PATH_SEPARATOR "project_" + GetId();
 }
 
 std::string ProjectManager::SaveTexture(Texture2D *texture)
@@ -102,9 +102,9 @@ std::string ProjectManager::SaveTexture(Texture2D *texture)
 
 	if (GetAsset(hash).size() <= 0)
 	{
-		MkDir(GetResourcePath() + PATH_SEPERATOR "textures");
-		CopyFileData(path, GetResourcePath() + PATH_SEPERATOR "textures" PATH_SEPERATOR + hash);
-		RegisterAsset(hash, "textures" PATH_SEPERATOR + hash);
+		MkDir(GetResourcePath() + PATH_SEPARATOR "textures");
+		CopyFileData(path, GetResourcePath() + PATH_SEPARATOR "textures" PATH_SEPARATOR + hash);
+		RegisterAsset(hash, "textures" PATH_SEPARATOR + hash);
 	}
 
 	return hash;

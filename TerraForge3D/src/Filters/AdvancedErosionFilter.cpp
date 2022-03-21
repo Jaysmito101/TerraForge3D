@@ -4,6 +4,7 @@
 #include "Data/ApplicationState.h"
 
 #include "Utils/Utils.h"
+#include "Platform.h"
 
 #include <imgui.h>
 #include <iostream>
@@ -72,12 +73,15 @@ void AdvancedErosionFilter::Apply()
 			localWorkSize = 1;
 		}
 
-		std::string kernelSrc = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\kernels\\advanced_erosion.cl", &tmp);
+		std::string kernelSrc = ReadShaderSourceFile(GetExecutableDir() +
+				PATH_SEPARATOR "Data" PATH_SEPARATOR "kernels"
+				PATH_SEPARATOR "advanced_erosion.cl", &tmp);
 		// Some constants
 		kernelSrc = std::regex_replace(kernelSrc, std::regex("LOCAL_WORK_SIZE"), std::to_string(localWorkSize));
 		kernels.Clear();
 		kernels.AddSoruce(kernelSrc);
-		kernels.BuildProgram("-I\"" + GetExecutableDir() + "\\Data\\kernels" + "\"");
+		kernels.BuildProgram("-I\"" + GetExecutableDir() + PATH_SEPARATOR
+				"Data" PATH_SEPARATOR "kernels" + "\"");
 		kernels.AddKernel("erode");
 		kernels.CreateBuffer("mesh", CL_MEM_READ_WRITE, sizeof(Vert) * model->mesh->vertexCount);
 		kernels.WriteBuffer("mesh", true, sizeof(Vert) * model->mesh->vertexCount, model->mesh->vert);

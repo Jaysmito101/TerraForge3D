@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Data/ApplicationState.h"
+#include "Platform.h"
 
 #include <ComputeShader.h>
 #include <ShaderStorageBuffer.h>
@@ -80,7 +81,7 @@ void GPUErosionFilter::Apply()
 	mapSize = model->mesh->res;
 	mapSize = MAX(0, mapSize - 2 * erosionBrushRadius);
 	bool tmp = false;
-	std::string shaderSrc = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\compute\\erosion.glsl", &tmp);
+	std::string shaderSrc = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "compute" PATH_SEPARATOR "erosion.glsl", &tmp);
 	shaderSrc = std::regex_replace(shaderSrc, std::regex("LAYOUT_SIZE_X"), std::to_string(1024));
 	//shaderSrc = std::regex_replace(shaderSrc, std::regex("LAYOUT_SIZE_X"), std::to_string(1));
 	shaderSrc = std::regex_replace(shaderSrc, std::regex("LAYOUT_SIZE_Y"), std::to_string(1));

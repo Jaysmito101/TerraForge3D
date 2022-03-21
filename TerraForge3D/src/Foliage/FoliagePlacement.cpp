@@ -5,6 +5,7 @@
 #include "Base/Texture2D.h"
 #include "Data/ProjectData.h"
 #include "Data/ApplicationState.h"
+#include "Platform.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
@@ -139,8 +140,8 @@ void FoliageManager::ShowSettings(bool *pOpen)
 
 		if(path.size() > 3)
 		{
-			foliageItems.push_back(new FoliageItem(appState->constants.texturesDir + "\\white.png"));
-			foliageItems.back()->name = path.substr(path.find("\\") + 1);
+			foliageItems.push_back(new FoliageItem(appState->constants.texturesDir + PATH_SEPARATOR "white.png"));
+			foliageItems.back()->name = path.substr(path.find(PATH_SEPARATOR) + 1);
 			foliageItems.back()->model = LoadModel(path);
 			foliageItems.back()->model->SetupMeshOnGPU();
 			foliageItems.back()->model->UploadToGPU();
@@ -156,9 +157,9 @@ void FoliageManager::ShowSettings(bool *pOpen)
 	{
 		delete appState->shaders.foliage;
 		bool res = false;
-		appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\vert.glsl", &res),
-		                                       ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\frag.glsl", &res),
-		                                       ReadShaderSourceFile(appState->constants.shadersDir + "\\foliage\\geom.glsl", &res));
+		appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "vert.glsl", &res),
+		                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "frag.glsl", &res),
+		                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "geom.glsl", &res));
 	}
 
 	ImGui::End();

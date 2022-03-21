@@ -23,12 +23,12 @@ SeaManager::SeaManager(ApplicationState *as)
 	color[2] = 0.7f;
 	color[3] = 0;
 	scale = 100;
-	std::string vertexShaderSource = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\vert.glsl", &tmp);
-	std::string fragmentShaderSource = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\frag.glsl", &tmp);
-	std::string geometryShaderSource = ReadShaderSourceFile(GetExecutableDir() + "\\Data\\shaders\\water\\geom.glsl", &tmp);
+	std::string vertexShaderSource = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shaders" PATH_SEPARATOR "water" PATH_SEPARATOR "vert.glsl", &tmp);
+	std::string fragmentShaderSource = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shaders" PATH_SEPARATOR "water" PATH_SEPARATOR "frag.glsl", &tmp);
+	std::string geometryShaderSource = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "shaders" PATH_SEPARATOR "water" PATH_SEPARATOR "geom.glsl", &tmp);
 	shader = new Shader(vertexShaderSource, fragmentShaderSource, geometryShaderSource);
-	dudvMap = new Texture2D(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "textures" PATH_SEPERATOR "water_dudv.png");
-	normalMap = new Texture2D(GetExecutableDir() + PATH_SEPERATOR "Data" PATH_SEPERATOR "textures" PATH_SEPERATOR "water_normal.png");
+	dudvMap = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "textures" PATH_SEPARATOR "water_dudv.png");
+	normalMap = new Texture2D(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "textures" PATH_SEPARATOR "water_normal.png");
 }
 
 SeaManager::~SeaManager()
@@ -72,14 +72,14 @@ void SeaManager::Load(nlohmann::json data)
 		delete dudvMap;
 	}
 
-	dudvMap = new Texture2D(appState->projectManager->GetResourcePath() + "\\" + appState->projectManager->GetAsset(data["dudvMap"]));
+	dudvMap = new Texture2D(appState->projectManager->GetResourcePath() + PATH_SEPARATOR + appState->projectManager->GetAsset(data["dudvMap"]));
 
 	if (normalMap)
 	{
 		delete normalMap;
 	}
 
-	normalMap = new Texture2D(appState->projectManager->GetResourcePath() + "\\" + appState->projectManager->GetAsset(data["normalMap"]));
+	normalMap = new Texture2D(appState->projectManager->GetResourcePath() + PATH_SEPARATOR + appState->projectManager->GetAsset(data["normalMap"]));
 }
 
 nlohmann::json SeaManager::Save()

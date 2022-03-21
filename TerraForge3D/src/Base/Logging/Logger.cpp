@@ -14,7 +14,7 @@ Logger::Logger(std::string logsDir)
 	strftime(buffer, sizeof(buffer), "%A %d-%m-%Y %I-%M-%S %p", timeinfo);
 	std::string str(buffer);
 	str += ".txt";
-	mLogHandler = new LoggingOutputStreambuf(std::cout, logsDir + PATH_SEPERATOR + str);
+	mLogHandler = new LoggingOutputStreambuf(std::cout, logsDir + PATH_SEPARATOR + str);
 }
 
 Logger::~Logger()
