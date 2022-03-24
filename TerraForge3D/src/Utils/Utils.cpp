@@ -501,7 +501,11 @@ void MkDir(std::string path)
 {
 	if (!PathExist(path))
 	{
+#ifdef TERR3D_WIN32
 		system((std::string("mkdir \"") + path + "\"").c_str());
+#else
+		system((std::string("mkdir -p \"") + path + "\"").c_str());
+#endif
 	}
 }
 

@@ -29,7 +29,3 @@ project "Lua"
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "Full"	
-		buildoptions{
-			"/Qpar",
-			"/fp:fast"
-		}

@@ -412,7 +412,8 @@ CustomShaderNode::CustomShaderNode(GLSLHandler *handler, std::string s)
 		}
 		else
 		{
-			throw std::runtime_error("Custom shader node does not support return type " + meta["returns"]);
+            std::string t = meta["returns"];
+			throw std::runtime_error("Custom shader node does not support return type " + t);
 		}
 	}
 

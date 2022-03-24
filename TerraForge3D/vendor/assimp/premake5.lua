@@ -65,7 +65,3 @@ project "Assimp"
 	filter "configurations:Release"
 		defines "TERR3D_RELEASE"
 		optimize "Full"	
-		buildoptions{
-			"/Qpar",
-			"/fp:fast"
-		}
