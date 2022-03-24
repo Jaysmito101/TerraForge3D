@@ -34,6 +34,9 @@ jobs:
         
       - name: Generate Solution
         run: premake5 gmake2
+        
+      - name: Install Libs
+        run: sudo apt install libxcursor-dev
       
       - name: Setup OpenGL
         uses: openrndr/setup-opengl@v1.1
