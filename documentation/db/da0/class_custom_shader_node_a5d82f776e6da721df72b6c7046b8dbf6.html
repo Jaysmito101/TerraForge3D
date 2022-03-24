@@ -291,33 +291,34 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a5d82f
 <div class="line"><span class="lineno">  412</span>        }</div>
 <div class="line"><span class="lineno">  413</span>        <span class="keywordflow">else</span></div>
 <div class="line"><span class="lineno">  414</span>        {</div>
-<div class="line"><span class="lineno">  415</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Custom shader node does not support return type &quot;</span> + meta[<span class="stringliteral">&quot;returns&quot;</span>]);</div>
-<div class="line"><span class="lineno">  416</span>        }</div>
-<div class="line"><span class="lineno">  417</span>    }</div>
-<div class="line"><span class="lineno">  418</span> </div>
+<div class="line"><span class="lineno">  415</span>            std::string t = meta[<span class="stringliteral">&quot;returns&quot;</span>];</div>
+<div class="line"><span class="lineno">  416</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Custom shader node does not support return type &quot;</span> + t);</div>
+<div class="line"><span class="lineno">  417</span>        }</div>
+<div class="line"><span class="lineno">  418</span>    }</div>
 <div class="line"><span class="lineno">  419</span> </div>
-<div class="line"><span class="lineno">  420</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k = 0 ; k &lt; paramCount ; k++)   </div>
-<div class="line"><span class="lineno">  421</span>    {</div>
-<div class="line"><span class="lineno">  422</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : params)</div>
-<div class="line"><span class="lineno">  423</span>        {</div>
-<div class="line"><span class="lineno">  424</span>            <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;float&quot;</span>)</div>
-<div class="line"><span class="lineno">  425</span>            {</div>
-<div class="line"><span class="lineno">  426</span>                inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float));</div>
-<div class="line"><span class="lineno">  427</span>            }</div>
-<div class="line"><span class="lineno">  428</span>    </div>
-<div class="line"><span class="lineno">  429</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;vec3&quot;</span>)</div>
-<div class="line"><span class="lineno">  430</span>            {</div>
-<div class="line"><span class="lineno">  431</span>                inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));</div>
-<div class="line"><span class="lineno">  432</span>            }</div>
-<div class="line"><span class="lineno">  433</span>    </div>
-<div class="line"><span class="lineno">  434</span>            <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  435</span>            {</div>
-<div class="line"><span class="lineno">  436</span>                <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Custom shader node does not support parameter type &quot;</span> + it.first);</div>
-<div class="line"><span class="lineno">  437</span>            }</div>
-<div class="line"><span class="lineno">  438</span>        }</div>
-<div class="line"><span class="lineno">  439</span>    }</div>
-<div class="line"><span class="lineno">  440</span>    headerColor = ImColor(meta[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;r&quot;</span>].get&lt;int&gt;(), meta[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;r&quot;</span>].get&lt;int&gt;(), meta[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;b&quot;</span>].get&lt;int&gt;());</div>
-<div class="line"><span class="lineno">  441</span>}</div>
+<div class="line"><span class="lineno">  420</span> </div>
+<div class="line"><span class="lineno">  421</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k = 0 ; k &lt; paramCount ; k++)   </div>
+<div class="line"><span class="lineno">  422</span>    {</div>
+<div class="line"><span class="lineno">  423</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;it : params)</div>
+<div class="line"><span class="lineno">  424</span>        {</div>
+<div class="line"><span class="lineno">  425</span>            <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;float&quot;</span>)</div>
+<div class="line"><span class="lineno">  426</span>            {</div>
+<div class="line"><span class="lineno">  427</span>                inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float));</div>
+<div class="line"><span class="lineno">  428</span>            }</div>
+<div class="line"><span class="lineno">  429</span>    </div>
+<div class="line"><span class="lineno">  430</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it.first == <span class="stringliteral">&quot;vec3&quot;</span>)</div>
+<div class="line"><span class="lineno">  431</span>            {</div>
+<div class="line"><span class="lineno">  432</span>                inputPins.push_back(<span class="keyword">new</span> <a class="code hl_class" href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a>(NodeEditorPinType::Input, SNEPinType::SNEPinType_Float3));</div>
+<div class="line"><span class="lineno">  433</span>            }</div>
+<div class="line"><span class="lineno">  434</span>    </div>
+<div class="line"><span class="lineno">  435</span>            <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  436</span>            {</div>
+<div class="line"><span class="lineno">  437</span>                <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Custom shader node does not support parameter type &quot;</span> + it.first);</div>
+<div class="line"><span class="lineno">  438</span>            }</div>
+<div class="line"><span class="lineno">  439</span>        }</div>
+<div class="line"><span class="lineno">  440</span>    }</div>
+<div class="line"><span class="lineno">  441</span>    headerColor = ImColor(meta[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;r&quot;</span>].get&lt;int&gt;(), meta[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;r&quot;</span>].get&lt;int&gt;(), meta[<span class="stringliteral">&quot;color&quot;</span>][<span class="stringliteral">&quot;b&quot;</span>].get&lt;int&gt;());</div>
+<div class="line"><span class="lineno">  442</span>}</div>
 <div class="ttc" id="aclass_s_n_e_node_html"><div class="ttname"><a href="../../df/d7c/class_s_n_e_node.html">SNENode</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00053">ShaderNodeEditor.h:54</a></div></div>
 <div class="ttc" id="aclass_s_n_e_pin_html"><div class="ttname"><a href="../../d8/d44/class_s_n_e_pin.html">SNEPin</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d11/_shader_node_editor_8h_source.html#l00042">ShaderNodeEditor.h:43</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="../../d9/dcc/classnlohmann_1_1basic__json_a15018ade392a844ea32d5188d1a0b9c6.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l24605">json.hpp:24605</a></div></div>
@@ -335,7 +336,7 @@ $(document).ready(function(){initNavTree('db/da0/class_custom_shader_node_a5d82f
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../db/da0/class_custom_shader_node.html">CustomShaderNode</a></li>
-    <li class="footer">Generated on Thu Mar 24 2022 11:59:45 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 24 2022 13:51:26 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>

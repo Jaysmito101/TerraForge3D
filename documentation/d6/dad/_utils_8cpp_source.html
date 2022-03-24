@@ -611,108 +611,112 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span>{</div>
 <div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>    <span class="keywordflow">if</span> (!PathExist(path))</div>
 <div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>    {</div>
-<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>        system((std::string(<span class="stringliteral">&quot;mkdir \&quot;&quot;</span>) + path + <span class="stringliteral">&quot;\&quot;&quot;</span>).c_str());</div>
-<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>    }</div>
-<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>}</div>
-<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span> </div>
-<div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span><span class="preprocessor">#ifndef TERR3D_WIN32</span></div>
-<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span><span class="keywordtype">int</span> get_file_size(<span class="keywordtype">char</span> *source)</div>
-<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span>{</div>
-<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>    FILE *fichier = fopen(source, <span class="stringliteral">&quot;rb&quot;</span>);</div>
-<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>    fseek(fichier, 0, SEEK_END);</div>
-<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>    <span class="keywordtype">int</span> size = ftell(fichier);</div>
-<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>    fseek(fichier, 0, SEEK_SET);</div>
-<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    fclose(fichier);</div>
-<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>    <span class="keywordflow">return</span> size;</div>
-<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>}</div>
-<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span> </div>
-<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span><span class="keywordtype">void</span> CopyFileData(std::string source, std::string destination)</div>
-<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span>{</div>
-<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
-<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>    CopyFileW(CString(source.c_str()), CString(destination.c_str()), <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>    <span class="keywordtype">int</span> srcsize = get_file_size(source.data());</div>
-<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>    <span class="keywordtype">char</span> *data = (<span class="keywordtype">char</span> *)malloc(srcsize);</div>
-<div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span>    <span class="keywordtype">int</span> fsource = open(source.c_str(), O_RDONLY);</div>
-<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span>    <span class="keywordtype">int</span> fdest = open(destination.c_str(), O_WRONLY | O_CREAT, 0777);</div>
-<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span>    read(fsource, data, srcsize);</div>
-<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>    write(fdest, data, srcsize);</div>
-<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>    close(fsource);</div>
-<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>    close(fdest);</div>
-<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>    free(data);</div>
-<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>}</div>
-<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span> </div>
-<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span><span class="keywordtype">bool</span> IsKeyDown(<span class="keywordtype">int</span> key)</div>
-<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>{</div>
-<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>    <span class="keywordflow">return</span> glfwGetKey(Application::Get()-&gt;GetWindow()-&gt;GetNativeWindow(), key) == GLFW_PRESS;</div>
-<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span>}</div>
-<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span> </div>
-<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span><span class="keywordtype">bool</span> IsMouseButtonDown(<span class="keywordtype">int</span> button)</div>
-<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>{</div>
-<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span>    <span class="keywordflow">return</span> glfwGetMouseButton(Application::Get()-&gt;GetWindow()-&gt;GetNativeWindow(), button);</div>
-<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span>}</div>
-<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span> </div>
-<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span><span class="keywordtype">void</span> ShowMessageBox(std::string message, std::string title)</div>
-<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>{</div>
-<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
-<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span>    MessageBox(NULL, s2ws(message).c_str(), s2ws(title).c_str(), 0);</div>
-<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span>    system((<span class="stringliteral">&quot;zenity --info --text=&quot;</span> + message + <span class="stringliteral">&quot; --title=&quot;</span>+title + <span class="stringliteral">&quot;&quot;</span>).c_str());</div>
-<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>}</div>
-<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span> </div>
-<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span><span class="keywordtype">bool</span> LoadTexture(<a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *texture, <span class="keywordtype">bool</span> loadToAssets, <span class="keywordtype">bool</span> preserveData, <span class="keywordtype">bool</span> readAlpha, <a class="code hl_class" href="../../d7/d93/class_project_manager.html">ProjectManager</a> *projectManager)</div>
-<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>{</div>
-<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>    std::string fileName = ShowOpenFileDialog(<span class="stringliteral">&quot;.png&quot;</span>);</div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
+<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>        system((std::string(<span class="stringliteral">&quot;mkdir \&quot;&quot;</span>) + path + <span class="stringliteral">&quot;\&quot;&quot;</span>).c_str());</div>
+<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>        system((std::string(<span class="stringliteral">&quot;mkdir -p \&quot;&quot;</span>) + path + <span class="stringliteral">&quot;\&quot;&quot;</span>).c_str());</div>
+<div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span>    }</div>
+<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span>}</div>
+<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span> </div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span><span class="preprocessor">#ifndef TERR3D_WIN32</span></div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span><span class="keywordtype">int</span> get_file_size(<span class="keywordtype">char</span> *source)</div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>{</div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    FILE *fichier = fopen(source, <span class="stringliteral">&quot;rb&quot;</span>);</div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>    fseek(fichier, 0, SEEK_END);</div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>    <span class="keywordtype">int</span> size = ftell(fichier);</div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span>    fseek(fichier, 0, SEEK_SET);</div>
+<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>    fclose(fichier);</div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span>    <span class="keywordflow">return</span> size;</div>
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span>}</div>
+<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span> </div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span><span class="keywordtype">void</span> CopyFileData(std::string source, std::string destination)</div>
+<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>{</div>
+<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
+<div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span>    CopyFileW(CString(source.c_str()), CString(destination.c_str()), <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span>    <span class="keywordtype">int</span> srcsize = get_file_size(source.data());</div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>    <span class="keywordtype">char</span> *data = (<span class="keywordtype">char</span> *)malloc(srcsize);</div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>    <span class="keywordtype">int</span> fsource = open(source.c_str(), O_RDONLY);</div>
+<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>    <span class="keywordtype">int</span> fdest = open(destination.c_str(), O_WRONLY | O_CREAT, 0777);</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>    read(fsource, data, srcsize);</div>
+<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>    write(fdest, data, srcsize);</div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>    close(fsource);</div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span>    close(fdest);</div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>    free(data);</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>}</div>
+<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span> </div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span><span class="keywordtype">bool</span> IsKeyDown(<span class="keywordtype">int</span> key)</div>
+<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>{</div>
+<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>    <span class="keywordflow">return</span> glfwGetKey(Application::Get()-&gt;GetWindow()-&gt;GetNativeWindow(), key) == GLFW_PRESS;</div>
+<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span>}</div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span> </div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span><span class="keywordtype">bool</span> IsMouseButtonDown(<span class="keywordtype">int</span> button)</div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>{</div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>    <span class="keywordflow">return</span> glfwGetMouseButton(Application::Get()-&gt;GetWindow()-&gt;GetNativeWindow(), button);</div>
+<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span>}</div>
+<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span> </div>
+<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span><span class="keywordtype">void</span> ShowMessageBox(std::string message, std::string title)</div>
+<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span>{</div>
+<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>    MessageBox(NULL, s2ws(message).c_str(), s2ws(title).c_str(), 0);</div>
+<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>    system((<span class="stringliteral">&quot;zenity --info --text=&quot;</span> + message + <span class="stringliteral">&quot; --title=&quot;</span>+title + <span class="stringliteral">&quot;&quot;</span>).c_str());</div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>}</div>
 <div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span> </div>
-<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>    <span class="keywordflow">if</span> (fileName.size() &gt; 3)</div>
-<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>    {</div>
-<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>        <span class="keywordflow">if</span> (texture)</div>
-<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span>        {</div>
-<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>            <span class="keyword">delete</span> texture;</div>
-<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>        }</div>
-<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span> </div>
-<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>        texture = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(fileName, preserveData, readAlpha);</div>
-<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span> </div>
-<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>        <span class="keywordflow">if</span>(projectManager == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>        {</div>
-<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>            projectManager = ProjectManager::Get();</div>
-<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span>        }</div>
-<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span> </div>
-<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>        <span class="keywordflow">if</span> (loadToAssets)</div>
-<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>        {</div>
-<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>            projectManager-&gt;SaveTexture(texture);</div>
-<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span>        }</div>
-<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span> </div>
-<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>    }</div>
-<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span> </div>
-<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>}</div>
-<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span> </div>
-<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span><span class="keywordtype">void</span> ToggleSystemConsole()</div>
-<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span>{</div>
-<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> state = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span>    state = !state;</div>
-<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
-<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>    ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);</div>
-<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Toogle Console Not Supported on Linux!&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>}</div>
-<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span> </div>
-<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span><span class="keywordtype">void</span> OpenURL(std::string url)</div>
-<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>{</div>
-<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span><span class="preprocessor">#ifdef  TERR3D_WIN32</span></div>
-<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>    std::string op = std::string(<span class="stringliteral">&quot;start &quot;</span>).append(url);</div>
-<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>    system(op.c_str());</div>
-<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>    std::string op = std::string(<span class="stringliteral">&quot;xdg-open &quot;</span>).append(url);</div>
-<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>    system(op.c_str());</div>
-<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span><span class="preprocessor">#endif </span><span class="comment">//  TERR3D_WIN32</span></div>
-<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>}</div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span><span class="keywordtype">bool</span> LoadTexture(<a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a> *texture, <span class="keywordtype">bool</span> loadToAssets, <span class="keywordtype">bool</span> preserveData, <span class="keywordtype">bool</span> readAlpha, <a class="code hl_class" href="../../d7/d93/class_project_manager.html">ProjectManager</a> *projectManager)</div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>{</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>    std::string fileName = ShowOpenFileDialog(<span class="stringliteral">&quot;.png&quot;</span>);</div>
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span> </div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>    <span class="keywordflow">if</span> (fileName.size() &gt; 3)</div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>    {</div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>        <span class="keywordflow">if</span> (texture)</div>
+<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>        {</div>
+<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>            <span class="keyword">delete</span> texture;</div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>        }</div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span> </div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>        texture = <span class="keyword">new</span> <a class="code hl_class" href="../../de/dd0/class_texture2_d.html">Texture2D</a>(fileName, preserveData, readAlpha);</div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span> </div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>        <span class="keywordflow">if</span>(projectManager == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>        {</div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>            projectManager = ProjectManager::Get();</div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>        }</div>
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span> </div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>        <span class="keywordflow">if</span> (loadToAssets)</div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>        {</div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>            projectManager-&gt;SaveTexture(texture);</div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>        }</div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span> </div>
+<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span>    }</div>
+<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span> </div>
+<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span>}</div>
+<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span> </div>
+<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span><span class="keywordtype">void</span> ToggleSystemConsole()</div>
+<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>{</div>
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> state = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>    state = !state;</div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span><span class="preprocessor">#ifdef TERR3D_WIN32</span></div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>    ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);</div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Toogle Console Not Supported on Linux!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span>}</div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span> </div>
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span><span class="keywordtype">void</span> OpenURL(std::string url)</div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>{</div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span><span class="preprocessor">#ifdef  TERR3D_WIN32</span></div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>    std::string op = std::string(<span class="stringliteral">&quot;start &quot;</span>).append(url);</div>
+<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span>    system(op.c_str());</div>
+<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span>    std::string op = std::string(<span class="stringliteral">&quot;xdg-open &quot;</span>).append(url);</div>
+<div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span>    system(op.c_str());</div>
+<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span><span class="preprocessor">#endif </span><span class="comment">//  TERR3D_WIN32</span></div>
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span>}</div>
 <div class="ttc" id="aclass_project_manager_html"><div class="ttname"><a href="../../d7/d93/class_project_manager.html">ProjectManager</a></div><div class="ttdef"><b>Definition:</b> <a href="../../dd/dde/_project_data_8h_source.html#l00010">ProjectData.h:11</a></div></div>
 <div class="ttc" id="aclass_texture2_d_html"><div class="ttname"><a href="../../de/dd0/class_texture2_d.html">Texture2D</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d4/de5/_texture2_d_8h_source.html#l00007">Texture2D.h:8</a></div></div>
 <div class="ttc" id="anamespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8_html_a679e5e522ac6afa5d5923292fab450b8"><div class="ttname"><a href="../../dc/df0/namespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8.html#a679e5e522ac6afa5d5923292fab450b8">nlohmann::detail::hash</a></div><div class="ttdeci">std::size_t hash(const BasicJsonType &amp;j)</div><div class="ttdoc">hash a JSON value</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/db8/json_8hpp_source.html#l05240">json.hpp:5240</a></div></div>
@@ -723,7 +727,7 @@ $(document).ready(function(){initNavTree('d6/dad/_utils_8cpp_source.html','../..
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_a31489f0c457bc7d5c5e606d9d4d1fbe.html">TerraForge3D</a></li><li class="navelem"><a class="el" href="../../dir_f8d1dbe68a0bf0af6eebcd276f0daf96.html">src</a></li><li class="navelem"><a class="el" href="../../dir_36d36b6231b0c4e5daf102c9979382d5.html">Utils</a></li><li class="navelem"><b>Utils.cpp</b></li>
-    <li class="footer">Generated on Thu Mar 24 2022 11:59:44 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Thu Mar 24 2022 13:51:25 for TerraForge3D by <a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
