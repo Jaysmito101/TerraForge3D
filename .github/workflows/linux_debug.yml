@@ -34,9 +34,6 @@ jobs:
         
       - name: Generate Solution
         run: premake5 gmake2
-
-      - name: Install Requied Libraries
-      
       
       - name: Setup OpenGL
         uses: openrndr/setup-opengl@v1.1
