@@ -36,10 +36,11 @@ jobs:
         run: premake5 gmake2
 
       - name: Install Requied Libraries
-        run: |
-          sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
-          sudo apt-get install mesa-utils
-          sudo apt-get install freeglut3-dev
+      
+      
+      - name: Setup OpenGL
+        uses: openrndr/setup-opengl@v1.1
+      
 
       # Runs a single command using the runners shell
       - name: Build
