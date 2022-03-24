@@ -41,7 +41,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Build
-        run: make -j8
+        run: make
         
       - uses: actions/upload-artifact@v2
         with:
