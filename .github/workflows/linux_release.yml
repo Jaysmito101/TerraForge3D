@@ -36,7 +36,7 @@ jobs:
         run: premake5 gmake2
         
       - name: Install Libs
-        run: sudo apt install libxcursor-dev
+        run: sudo apt install libxcursor-dev libxrandr-dev libxi-dev libx11-dev
       
       - name: Setup OpenGL
         uses: openrndr/setup-opengl@v1.1
