@@ -121,7 +121,7 @@ void TextureStore::VerifyTextureThumbs()
 			Log("Downloading thumbnail for texture: " + it.key());
 			DownloadFile("https://cdn.polyhaven.com", "/asset_img/thumbs/" +
 					it.key() + ".png?width=100&height=100", GetExecutableDir()
-					+ PATH_SEPARATOR "Data" PATH_SEPARATOR "cache "
+					+ PATH_SEPARATOR "Data" PATH_SEPARATOR "cache"
 					PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR +
 					it.key() + ".png");
 		}
