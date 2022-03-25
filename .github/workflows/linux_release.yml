@@ -36,7 +36,10 @@ jobs:
         run: premake5 gmake2
         
       - name: Install Libs
-        run: sudo apt install mesa-common-dev libxcursor-dev libxrandr-dev libxi-dev libx11-dev libxinerama-dev
+        run: |
+             sudo apt-get clean
+             sudo apt update
+             sudo apt install mesa-common-dev libxcursor-dev libxrandr-dev libxi-dev libx11-dev libxinerama-dev
       
       - name: Setup OpenGL
         uses: openrndr/setup-opengl@v1.1
