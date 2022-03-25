@@ -24,7 +24,7 @@
 
 # TerraForge3D
 
-TerraForge3D is a state of the art professional procedural terrain generation and modelling tool. This is being maintained actively. This has got everything you need to bring your imagination to life.
+TerraForge3D is one of the worlds best procedural terrain generation and modelling tool. This is being maintained actively. This has got everything you need to bring your imagination to life.
 
 A huge benefit is that TerraForge3D is 100% free and opensource. It is the worlds best free terrain generator. TerraForge3D is very easy to get started with. There are also a series of tutorials(on youtube), documentations for your help.
 
@@ -37,20 +37,24 @@ Or you could join out official discord server with a charming community(includin
 
 Here are some of the terrains created with TerraForge3D. (You can send your artwork either via the discord server or https://github.com/Jaysmito101/TerraForge3D/issues/10)
 
-<img width="500" src="./Screenshots/Showcase/Sandy%20Desert%201.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Dry%20Mountains.png" /> <br />
+<img width="500" src="./Screenshots/Showcase/Snowy%20Hills.png" /> <br />
 <img width="500" src="./Screenshots/Showcase/Muddy%20Forest.png" /> <br />
 <img width="500" src="./Screenshots/Showcase/Volcano.png" /> <br />
 <img width="500" src="./Screenshots/Showcase/Desert%20Night.png" /> <br />
+
+For more visit : https://jaysmito101.github.io/TerraForge3D/
 
 # Screenshots
 
 Here are some of the screenshots of the application with all its ui, ...
 
 <img width="500" src="./Screenshots/UI/VC.png" /> <br />
-<img width="500" src="./Screenshots/UI/CB.png" /> <br />
+<img width="500" src="./Screenshots/UI/Screenshot%20(493).png" /> <br />
 <img width="500" src="./Screenshots/UI/NE.png" /> <br />
-<img width="500" src="./Screenshots/UI/QB.png" /> <br />
-<img width="500" src="./Screenshots/UI/NEFE.png" /> <br />
+<img width="500" src="./Screenshots/UI/Screenshot%20(497).png" /> <br />
+<img width="500" src="./Screenshots/UI/Screenshot%20(501).png" /> <br />
+<img width="500" src="./Screenshots/UI/Screenshot%20(490).png" /> <br />
 
 ### A Request
 
@@ -75,6 +79,22 @@ There are somethings which cannot possible be done on a GPU as efficiently(like 
 ### No Limit on Resolution
 
 Most terrain generation applications limit you to a certain maximum resolution or only certain resolutions like (128, 256, ...) but not TerraForge3D! TerraForge3D Allows you to work with any resolution you can imagine of.
+
+### Dedicated Texture Baker
+
+Bake any node output, the heightmap, anything you want to a high quality texture! Bake a huge resulution texture at once or bake it in tiles!
+
+### Shader Nodes
+
+Like Blender, TerraForge3D has a shader node editor which lets you texture your terrain exactly how you want, exactly how you imagined it. You can also export the shader node setup into functional GLSL code for your own project!
+
+### Cross Platform
+
+One of the biggest benefits of Terraforge3D is that its cross platform! Also TerraForge3D is the only high end Procedural generator supported on linux!
+
+### Physically Based Renderer
+
+Preview your terrains in photo realistic quality!
 
 ### Advanced Node Editor
 
@@ -137,11 +157,7 @@ Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8f
 
 Join the Discord Server : https://discord.gg/AcgRafSfyB
 
-# Docs : https://terraforge3d.gitbook.io/docs
-
-# Supporters & Sponsers
-
-* <a href="https://gitbook.com/">GitBook</a>
+# Docs : https://jaysmito101.github.io/TerraForge3D/documentation/index.html
 
 <a href="https://www.producthunt.com/posts/terraforge3d?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terraforge3d" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=323971&theme=dark" alt="TerraForge3D - Free And Opensource Alternative to Gaea And World Machine | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
