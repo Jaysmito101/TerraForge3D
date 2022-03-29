@@ -31,7 +31,7 @@ A huge benefit is that TerraForge3D is 100% free and opensource. It is the world
 Also if you have any question or problem or suggestion you can directly reach out to me via my email jaysmito101@gmail.com . 
 Or you could join out official discord server with a charming community(including me) to help you out with anny issues.
 
-## Discord Server : https://discord.gg/AcgRafSfyB
+## Discord Server : https://discord.gg/9ebyYwSktZ
 
 # Showcase
 
@@ -149,7 +149,7 @@ Any support is highly appretiated!
 Please considering tweeting about this to spread the word and help this project grow.
 You could join my patreon and get early access to TerraForge3D builds, some great terrain files, many more things (<a href="https://patreon.com/jaysmito101">Patreon</a>)
 
-# Download TerraForge3D : https://github.com/Jaysmito101/TerraForge3D/releases/download/v2.2/TerraForge3D.Win32.zip
+## Download TerraForge3D : https://github.com/Jaysmito101/TerraForge3D/releases/tag/v2.3
 
 <a href="https://ctt.ac/MX5_c"><img src="http://clicktotweet.com/img/tweet-graphic-4.png" alt="Tweet: Check out TerraGen3D Free and Open Source Procedural Modelling and Texturing Software : https://github.com/Jaysmito101/TerraGen3D" /></a>
 
