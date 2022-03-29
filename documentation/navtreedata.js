@@ -27,7 +27,7 @@ var NAVTREE =
   [ "TerraForge3D", "index.html", [
     [ "README", "d3/dcc/md__r_e_a_d_m_e.html", [
       [ "TerraForge3D", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md28", [
-        [ "Discord Server : https://discord.gg/AcgRafSfyB", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md29", null ]
+        [ "Discord Server : https://discord.gg/9ebyYwSktZ", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md29", null ]
       ] ],
       [ "Showcase", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md30", null ],
       [ "Screenshots", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md31", [
@@ -36,8 +36,9 @@ var NAVTREE =
       [ "Features", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md34", null ],
       [ "Some Advices", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md50", null ],
       [ "Contributing", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md51", null ],
-      [ "Support", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md52", null ],
-      [ "Download TerraForge3D : https://github.com/Jaysmito101/TerraForge3D/releases/download/v2.2/TerraForge3D.Win32.zip", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md53", null ],
+      [ "Support", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md52", [
+        [ "Download TerraForge3D : https://github.com/Jaysmito101/TerraForge3D/releases/tag/v2.3", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md53", null ]
+      ] ],
       [ "Docs : https://jaysmito101.github.io/TerraForge3D/documentation/index.html", "d3/dcc/md__r_e_a_d_m_e.html#autotoc_md54", null ]
     ] ],
     [ "Developers' Guide", "d5/d38/md__docs_markdowns_index.html", [
