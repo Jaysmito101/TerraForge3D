@@ -60,7 +60,10 @@ Here are some of the screenshots of the application with all its ui, ...
 
 Please consider Giving your valuable feedback : https://github.com/Jaysmito101/TerraForge3D/discussions/6
 
-Also Please consider <b>starring</b> this repository. (Everyone who starred this repository will be credited in the application itself)
+Also Please consider <b>starring</b> this repository.
+
+Also if possible please considering supporting the project through patreon or opencollective it helps a lot.
+
 
 ## Tutorials : <a href="https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ">Youtube</a>
 
