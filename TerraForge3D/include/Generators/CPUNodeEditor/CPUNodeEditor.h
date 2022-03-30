@@ -61,6 +61,7 @@ enum CPUNodeType
 	MathFunction,
 	Pixelate,
 	Texture,
+	Heightmap,
 	RectangleMask,
 	Visualizer,
 	Hill,
