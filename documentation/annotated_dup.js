@@ -213,6 +213,8 @@ var annotated_dup =
     [ "GPUNoiseLayerGenerator", "da/ded/class_g_p_u_noise_layer_generator.html", null ],
     [ "Hash", "d2/d7a/struct_hash.html", null ],
     [ "HeightAndGradient", "d8/df5/struct_height_and_gradient.html", null ],
+    [ "Heightmap", "dc/dcb/class_heightmap.html", null ],
+    [ "HeightmapNode", "d0/d84/class_heightmap_node.html", null ],
     [ "HillNode", "d5/d15/class_hill_node.html", null ],
     [ "IVec2", "dc/d6f/struct_i_vec2.html", null ],
     [ "LayeredNoiseManager", "d8/d05/class_layered_noise_manager.html", null ],

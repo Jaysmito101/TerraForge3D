@@ -53,6 +53,7 @@ var hierarchy =
     [ "GPUNoiseLayerGenerator", "da/ded/class_g_p_u_noise_layer_generator.html", null ],
     [ "Hash", "d2/d7a/struct_hash.html", null ],
     [ "HeightAndGradient", "d8/df5/struct_height_and_gradient.html", null ],
+    [ "Heightmap", "dc/dcb/class_heightmap.html", null ],
     [ "nlohmann::detail::internal_iterator< typename std::remove_const< BasicJsonType >::type >", "dc/df0/namespacenlohmann_1_1detail.html#dc/df0/namespacenlohmann_1_1detail", null ],
     [ "is_detected", null, [
       [ "nlohmann::detail::is_detected_lazy< Op, Args >", "d6/d8c/structnlohmann_1_1detail_1_1is__detected__lazy.html", null ]
@@ -173,6 +174,7 @@ var hierarchy =
       [ "DivNode", "de/d68/class_div_node.html", null ],
       [ "DummyNode", "d2/d31/class_dummy_node.html", null ],
       [ "DuplicateNode", "dd/d21/class_duplicate_node.html", null ],
+      [ "HeightmapNode", "d0/d84/class_heightmap_node.html", null ],
       [ "HillNode", "d5/d15/class_hill_node.html", null ],
       [ "MathFunctionNode", "d5/dd4/class_math_function_node.html", null ],
       [ "MaxMeshCoordinatesNode", "dd/dc8/class_max_mesh_coordinates_node.html", null ],

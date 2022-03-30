@@ -9,5 +9,7 @@ var searchData=
   ['hash_6',['Hash',['../d2/d7a/struct_hash.html',1,'']]],
   ['hash_3c_20nlohmann_3a_3ajson_20_3e_7',['hash&lt; nlohmann::json &gt;',['../dd/d6b/structstd_1_1hash_3_01nlohmann_1_1json_01_4.html',1,'std']]],
   ['heightandgradient_8',['HeightAndGradient',['../d8/df5/struct_height_and_gradient.html',1,'']]],
-  ['hillnode_9',['HillNode',['../d5/d15/class_hill_node.html',1,'']]]
+  ['heightmap_9',['Heightmap',['../dc/dcb/class_heightmap.html',1,'']]],
+  ['heightmapnode_10',['HeightmapNode',['../d0/d84/class_heightmap_node.html',1,'']]],
+  ['hillnode_11',['HillNode',['../d5/d15/class_hill_node.html',1,'']]]
 ];

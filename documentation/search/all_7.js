@@ -12,5 +12,7 @@ var searchData=
   ['hash_9',['hash',['../dc/df0/namespacenlohmann_1_1detail_a679e5e522ac6afa5d5923292fab450b8.html#a679e5e522ac6afa5d5923292fab450b8',1,'nlohmann::detail']]],
   ['hash_3c_20nlohmann_3a_3ajson_20_3e_10',['hash&lt; nlohmann::json &gt;',['../dd/d6b/structstd_1_1hash_3_01nlohmann_1_1json_01_4.html',1,'std']]],
   ['heightandgradient_11',['HeightAndGradient',['../d8/df5/struct_height_and_gradient.html',1,'']]],
-  ['hillnode_12',['HillNode',['../d5/d15/class_hill_node.html',1,'']]]
+  ['heightmap_12',['Heightmap',['../dc/dcb/class_heightmap.html',1,'']]],
+  ['heightmapnode_13',['HeightmapNode',['../d0/d84/class_heightmap_node.html',1,'']]],
+  ['hillnode_14',['HillNode',['../d5/d15/class_hill_node.html',1,'']]]
 ];
