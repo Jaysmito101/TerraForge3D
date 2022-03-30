@@ -134,6 +134,7 @@ std::string ShowSaveFileDialog(std::string ext)
 	FILE *f = popen("zenity --file-selection --save", "r");
 	fgets(filename, PATH_MAX, f);
 	pclose(f);
+	filename[strcspn(filename, "\n")] = 0;
 	return std::string(filename);
 #endif
 }
@@ -199,6 +200,7 @@ std::string ShowOpenFileDialog(std::string ext)
 	FILE *f = popen("zenity --file-selection", "r");
 	fgets(filename, PATH_MAX, f);
 	pclose(f);
+	filename[strcspn(filename, "\n")] = 0;
 	return std::string(filename);
 #endif
 }
