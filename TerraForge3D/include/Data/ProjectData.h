@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Base/Texture2D.h"
+#include "Base/Heightmap.h"
 #include "json/json.hpp"
 
 class ApplicationState;
@@ -32,6 +33,7 @@ public:
 	std::string GetResourcePath();
 
 	std::string SaveTexture(Texture2D *texture);
+	std::string SaveResource(std::string folder, std::string path);
 
 	static ProjectManager *Get();
 

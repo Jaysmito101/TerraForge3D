@@ -91,8 +91,11 @@ std::string ProjectManager::GetResourcePath()
 
 std::string ProjectManager::SaveTexture(Texture2D *texture)
 {
-	std::string path = texture->GetPath();
+	return SaveResource("textures", texture->GetPath());
+}
 
+std::string ProjectManager::SaveResource(std::string folder, std::string path)
+{
 	if (path.size() <= 3)
 	{
 		return "";
@@ -102,9 +105,9 @@ std::string ProjectManager::SaveTexture(Texture2D *texture)
 
 	if (GetAsset(hash).size() <= 0)
 	{
-		MkDir(GetResourcePath() + PATH_SEPARATOR "textures");
-		CopyFileData(path, GetResourcePath() + PATH_SEPARATOR "textures" PATH_SEPARATOR + hash);
-		RegisterAsset(hash, "textures" PATH_SEPARATOR + hash);
+		MkDir(GetResourcePath() + PATH_SEPARATOR + folder);
+		CopyFileData(path, GetResourcePath() + PATH_SEPARATOR + folder + PATH_SEPARATOR + hash);
+		RegisterAsset(hash, folder + PATH_SEPARATOR + hash);
 	}
 
 	return hash;

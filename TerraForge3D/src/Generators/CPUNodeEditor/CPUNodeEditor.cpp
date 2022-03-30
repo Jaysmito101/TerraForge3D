@@ -42,6 +42,7 @@
 #include "Generators/CPUNodeEditor/Nodes/PixelateNode.h"
 #include "Generators/CPUNodeEditor/Nodes/VisualizerNode.h"
 #include "Generators/CPUNodeEditor/Nodes/TextureNode.h"
+#include "Generators/CPUNodeEditor/Nodes/HeightmapNode.h"
 #include "Generators/CPUNodeEditor/Nodes/HillNode.h"
 #include "Generators/CPUNodeEditor/Nodes/MinValNode.h"
 #include "Generators/CPUNodeEditor/Nodes/SquareNode.h"
@@ -101,6 +102,7 @@ static void ShowNodeMaker(std::string &uid, NodeEditor *editor)
 	NODE_MAKER_SHOW(TimeBasedSeedNode, "Time Based Seed");
 	NODE_MAKER_SHOW(PixelateNode, "Pixelate");
 	NODE_MAKER_SHOW(TextureNode, "Texture");
+	NODE_MAKER_SHOW(HeightmapNode, "Heightmap");
 	NODE_MAKER_SHOW(HillNode, "Hill");
 	NODE_MAKER_SHOW(AddNode, "Add");
 	NODE_MAKER_SHOW(SubNode, "Subtract");
@@ -259,6 +261,10 @@ CPUNodeEditor::CPUNodeEditor(ApplicationState *as)
 
 			case CPUNodeEditorE::CPUNodeType::Texture:
 				node = new TextureNode();
+				break;
+
+			case CPUNodeEditorE::CPUNodeType::Heightmap:
+				node = new HeightmapNode();
 				break;
 
 			case CPUNodeEditorE::CPUNodeType::Pixelate:
