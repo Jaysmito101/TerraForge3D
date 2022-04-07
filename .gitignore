@@ -1,33 +1,5 @@
-.vs
-bin
-vendor/premake
-scripts/__pycache__
-TerraForge3D/vendor/glad/bin
-TerraForge3D/vendor/glad/bin-int
-TerraForge3D/vendor/text-editor/bin
-TerraForge3D/vendor/text-editor/bin-int
-TerraForge3D/vendor/lua/bin
-TerraForge3D/vendor/lua/bin-int
-TerraForge3D/vendor/assimp/bin
-TerraForge3D/vendor/assimp/bin-int
-ghpages
+# Diectories
+vendor
 
-**.sln
-**.vcxproj
-**.user
-**.filters
-**.aps
-**.ini
-**.orig
-**.make
-
-TerraForge3D/**.exe
-TerraForge3D/**.obj
-TerraForge3D/**.lib
-TerraForge3D/**.pdb
-
-Docs/html
-Docs/latex
-
-Makefile
-**/Makefile
+# Files
+.helpercache
