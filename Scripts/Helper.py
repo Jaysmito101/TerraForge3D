@@ -18,6 +18,7 @@ import urllib
 import urllib.request
 import zipfile
 import tarfile
+import subprocess
 from pathlib import Path
 
 ##############################################################################
@@ -146,14 +147,50 @@ PREMAKE_LISCENSE_URL = f"https://raw.githubusercontent.com/premake/premake-core/
 
 VULKAN_REQUIRED_VERSION = "1.2.170.0"
 VULKAN_SDK_INSTALLER_EXTENSION = "exe" if GetOS() == "nt" else ( "dmg" if GetOS() == "darwin" else "tar.gz" )
-VULKAN_SDK_PLATFORM_URLS = [
+VULKAN_SDK_INSTALLER_PLATFORM_URLS = [
     f"https://sdk.lunarg.com/sdk/download/{VULKAN_REQUIRED_VERSION}/windows/VulkanSDK-{VULKAN_REQUIRED_VERSION}-Installer.exe",
     f"https://sdk.lunarg.com/sdk/download/{VULKAN_REQUIRED_VERSION}/linux/vulkansdk-linux-x86_64-{VULKAN_REQUIRED_VERSION}.tar.gz",
     f"https://sdk.lunarg.com/sdk/download/{VULKAN_REQUIRED_VERSION}/mac/vulkansdk-macos-{VULKAN_REQUIRED_VERSION}.dmg"
 ]
-VULKAN_SDK_URL = VULKAN_SDK_PLATFORM_URLS[0] if GetOS() == "nt" else ( VULKAN_SDK_PLATFORM_URLS[2] if GetOS() == "darwin" else VULKAN_SDK_PLATFORM_URLS[1] )
+VULKAN_SDK_INSTALLER_URL = VULKAN_SDK_INSTALLER_PLATFORM_URLS[0] if GetOS() == "nt" else ( VULKAN_SDK_INSTALLER_PLATFORM_URLS[2] if GetOS() == "darwin" else VULKAN_SDK_INSTALLER_PLATFORM_URLS[1] )
 VULKAN_SDK_DIRECTORY = f"{GetProjectDirectory()}{PATH_SEPARATOR}vendor{PATH_SEPARATOR}VulkanSDK{PATH_SEPARATOR}"
 
+VC_RUNTIME_INSTALLER_URL = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+
+ASTYLE_DIRECTORY = f"{GetProjectDirectory()}{PATH_SEPARATOR}vendor{PATH_SEPARATOR}astyle{PATH_SEPARATOR}"
+ASTYLE_URL = "https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.1/AStyle_3.1_windows.zip?ts=gAAAAABiUHLIzztXmAjVoFZx_mGeriR1Bk5MMhgocea1Dod-nkmVrVkk5OoHgb_cWuYJZVlVm8mRjTxjjCOgLXKHXXqGAP-nPg%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fastyle%2Ffiles%2Flatest%2Fdownload"
+ASTYLE_EXECUTABLE_PATH = f"{ASTYLE_DIRECTORY}AStyle{PATH_SEPARATOR}bin{PATH_SEPARATOR}AStyle.exe"
+
+BUILD_CONFIGURATIONS = ["DebugVkCompute", "DebugOpenCL", "ReleaseVkCompute", "ReleaseOpenCL"]
+STATE = {}
+
+##############################################################################
+####################### State Handler Functions ##############################
+##############################################################################
+
+# Function to load the state from the file
+# State File Format:
+# KEY=VALUE
+#
+# Note : The content is case insensitive
+def LoadState(filePath):
+    global STATE
+    if not os.path.exists(filePath):
+        return
+    with open(filePath, "r") as file:
+        for line in file:
+            line = line.strip()
+            if line.startswith("#") or line == "":
+                continue
+            key, value = line.split("=")
+            STATE[key.upper()] = value.upper()
+
+# Function to save the state to the file
+def SaveState(filePath):
+    global STATE
+    with open(filePath, "w") as file:
+        for key in STATE:
+            file.write(f"{key}={STATE[key]}\n")
 
 ##############################################################################
 ############################## Setup #########################################
@@ -184,25 +221,45 @@ def SetupPremake():
 
 # Setup AStyle
 def SetupAStyle():
-    print("Not yet implemented")
-    print("You can download AStyle manually from https://sourceforge.net/projects/astyle/ and place it in the vendor/astyle directory")
+    if not GetOS() == "nt":
+        return
+    print("Checking if astyle is installed...")
+    if FileExists(ASTYLE_DIRECTORY + "astyle" + EXECUTABLE_EXTENSION):
+        print("AStyle already installed")
+    else:
+        print("AStyle is not installed")
+        print("Setting up astyle...")
+        # Mak sure the directory exists
+        MakeDirectory(ASTYLE_DIRECTORY)
+        # Download Asytle
+        DownloadFile(ASTYLE_URL, ASTYLE_DIRECTORY + "astyle-archived." + ARCHIVE_EXTENSION)
+        # Extract Asytle
+        ExtractArchive(ASTYLE_DIRECTORY + "astyle-archived." + ARCHIVE_EXTENSION, ASTYLE_DIRECTORY)
+        # Clean Asytle Archive
+        os.remove(ASTYLE_DIRECTORY + "astyle-archived." + ARCHIVE_EXTENSION)
+
 
 # Setup Vulkan SDK
 def SetupVulkanSDK():
+    # Download Vulkan SDK installer
+    DownloadFile(VULKAN_SDK_INSTALLER_URL, VULKAN_SDK_DIRECTORY + "VulkanSDK-Installer." + VULKAN_SDK_INSTALLER_EXTENSION)
     if GetOS() == "nt":
-        # TODO
-        pass
+        print("The Installer will now be launched.\nPlease follow the instructions and install the SDK.\nRun the setup script again after the SDK has been installed.")
+        # Launch the installer
+        os.system(VULKAN_SDK_DIRECTORY + "VulkanSDK-Installer." + VULKAN_SDK_INSTALLER_EXTENSION)
+        # Clean up the installer
+        os.remove(VULKAN_SDK_DIRECTORY + "VulkanSDK-Installer." + VULKAN_SDK_INSTALLER_EXTENSION)
+        exit(0)
     elif GetOS() == "darwin":
-        # TODO
-        pass
+        print("The Required Vulkan SDK Installer has been downloaded to " + VULKAN_SDK_DIRECTORY + "VulkanSDK-Installer." + VULKAN_SDK_INSTALLER_EXTENSION + ".\nPlease manually install it and run this script again.")
+        exit(0)
     elif GetOS() == "linux":
-        print("Please install the Vulkan SDK and then re-run this script")
-        exit(1)
+        print("The Required Vulkan SDK has been downloaded to " + VULKAN_SDK_DIRECTORY + "VulkanSDK-Installer." + VULKAN_SDK_INSTALLER_EXTENSION + ".\nPlease install it yourself and re run this script.")
+        exit(0)
 
 
 # Sets up Vulkan
 def SetupVulkan():
-    
     # Setup Vulkan SDK
     print("Checking for Vulkan SDK...")
     vulkanSDK = os.environ.get("VULKAN_SDK")
@@ -223,19 +280,22 @@ def SetupVulkan():
         print("Vulkan SDK setup complete")
     else:
         print("Vulkan SDK version is correct")
-    
+
     print("Correcting Vulkan SDK path located at " + vulkanSDK)
 
-    # Check if Vulkan Debug Libs Are Present
-    print("Checking if Vulkan debug libraries are present...")
-   # TODO
-        
-        
 
 # Set up doxygen
 def SetupDoxygen():
     print("Not yet implemented")
     print("You Can download Doxygen Manually from http://www.doxygen.nl/ and place doxygen.exe in vendor/doxygen directory")
+
+# Setup Redistributable binaries
+def SetupRedistributableBinaries():
+    # Make sure the directory exists
+    MakeDirectory(f"{GetProjectDirectory()}{PATH_SEPARATOR}Binaries{PATH_SEPARATOR}Data{PATH_SEPARATOR}VCRuntime{PATH_SEPARATOR}")
+    # Download the redistributable binaries is they don't exist
+    if not FileExists(f"{GetProjectDirectory()}{PATH_SEPARATOR}Binaries{PATH_SEPARATOR}Data{PATH_SEPARATOR}VCRuntime{PATH_SEPARATOR}vc_redist.x64.exe"):
+        DownloadFile(VC_RUNTIME_INSTALLER_URL, f"{GetProjectDirectory()}{PATH_SEPARATOR}Binaries{PATH_SEPARATOR}Data{PATH_SEPARATOR}VCRuntime{PATH_SEPARATOR}vc_redist.x64.exe")
 
 # Sets up the environment for TerraForge3D
 def Setup():
@@ -244,6 +304,7 @@ def Setup():
     SetupGitSubmodules()
     SetupPremake()
     SetupVulkan()
+    SetupRedistributableBinaries()
 
     # Optional steps
     SetupDoxygen()
@@ -259,15 +320,58 @@ def Setup():
 
 # Generates the TerraForge3D project files
 def GenerateProjectFiles():
-    pass
+    if not FileExists(PREMAKE_EXECUTABLE_PATH):
+        print("Premake not found")
+        SetupPremake()
+    else:
+        # Select Default project type depending upon OS
+        # Windows - Visual Studio 2022
+        # Linux   - Makefiles
+        # MacOS   - Makefiles
+        premakeProjectType = "vs2022" if GetOS() == "nt" else ("gmake2" if GetOS() == "darwin" else "gmake2")
+        # Take project type from arument if provided [Should not be used]
+        if len(sys.argv) > 2 and sys.argv[1] == "generate":
+            premakeProjectType = sys.argv[2]
+        # Call Premake5 to generate project files
+        subprocess.run([PREMAKE_EXECUTABLE_PATH, premakeProjectType])
 
 ##############################################################################
 ############################## Build #########################################
 ##############################################################################
 
+# Builds TerraForge3D and its dependencies on Windows
+def BuildOnWindows(buildConfiguration):
+    # Setup visual studio developer environment
+    # NOTE : This scripts assumes you have Visual Studio 2022 Community Edition Installed
+    os.system("call \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64")
+    # I dont know why this is required but it doesnt work without this
+    os.system("SET Platform=")
+    # Build TerraForge3D
+    os.system(f"msbuild /m /p:PlatformTarget=x64 /p:Configuration={buildConfiguration} TerraForge3D.sln")
+
+# Builds TerraForge3D and its dependencies on Linux
+def BuildOnLinux(buildConfiguration):
+    os.system(f"make config={buildConfiguration}")
+
+# Builds TerraForge3D and its dependencies on MacOS
+def BuildOnMacOS(buildConfiguration):
+    os.system(f"make config={buildConfiguration}")
+
 # Builds TerraForge3D and its dependencies
 def Build():
-    pass
+    # Default Build Configuration - DebugVkCompute
+    buildConfiguration = BUILD_CONFIGURATIONS[0]
+    # Use Build Configuration passed as argument if its valid
+    if len(sys.argv) > 2 and sys.argv[1] == "build":
+        if sys.argv[2] in BUILD_CONFIGURATIONS:
+            buildConfiguration = sys.argv[2]
+    # Call the dedicated function depending upon OS
+    if GetOS() == "nt":
+        BuildOnWindows(buildConfiguration)
+    elif GetOS() == "darwin":
+        BuildOnMacOS(buildConfiguration)
+    elif GetOS() == "linux":
+        BuildOnLinux(buildConfiguration)
 
 ##############################################################################
 ############################## Clean #########################################
@@ -275,7 +379,10 @@ def Build():
 
 # Cleans the TerraForge3D project files and build files
 def Clean():
-    print("Not implemented yet")
+    if GetOS() == "nt":
+        print("Not implemented yet")
+    else:
+        os.system("make clean")
 
 ##############################################################################
 ############################## Format ########################################
@@ -283,7 +390,14 @@ def Clean():
 
 # Formats the TerraForge3D source files (Windows Only)
 def Format():
-    pass
+    if not FileExists(f"{GetProjectDirectory()}{PATH_SEPARATOR}vendor{PATH_SEPARATOR}astyle{PATH_SEPARATOR}astyle.exe"):
+        print("AStyle not found")
+        SetupAStyle()
+    else:
+        # Call AStyle with the desired arguments
+        subprocess.run([ASTYLE_EXECUTABLE_PATH, "--style=allman", "--indent=tab", "--indent-switches", "--break-blocks=all", "--pad-comma", "--delete-empty-lines", "--align-pointer=name", "--align-reference=name", "--break-closing-braces", "--break-one-line-headers", "--add-braces", "--recursive", f"{GetProjectDirectory()}{PATH_SEPARATOR}TerraForge3D{PATH_SEPARATOR}*.c,*.cpp,*.h,*.hpp"])
+        # Delete backup files generated by AStyle
+        subprocess.run(["del", "/s", "/q", "*.orig"])
     
 
 ##############################################################################
@@ -300,12 +414,19 @@ def Update():
 
 # Generates the TerraForge3D documentation
 def GenerateDocs():
-    pass
+    if not FileExists(f"{GetProjectDirectory()}{PATH_SEPARATOR}vendor{PATH_SEPARATOR}doxygen{PATH_SEPARATOR}doxygen" + EXECUTABLE_EXTENSION):
+        print("Doxygen not found")
+        SetupDoxygen()
+    else:
+        # Call Doxygen
+        subprocess.run([f"{GetProjectDirectory()}{PATH_SEPARATOR}vendor{PATH_SEPARATOR}doxygen{PATH_SEPARATOR}doxygen" + EXECUTABLE_EXTENSION])
+        print("Docs Generated to Docs/html folder")
 
 ##############################################################################
 ######################### Main ###############################################
 ##############################################################################
 
+# Execute a command
 def ExecuteCommand(command):
     if command == "setup":
         Setup()
@@ -342,12 +463,16 @@ def main():
     if not FileExists(".helpercache"):
         print("Setup has not been run yet. Running setup...")
         ExecuteCommand("setup")
+    
+    LoadState(".helpercache")
 
     if command == "all":
         for command in ALL_COMMANDS:
             ExecuteCommand(command)
     else:
         ExecuteCommand(command)
+    
+    SaveState(".helpercache")
     
 
 if __name__ == "__main__":
