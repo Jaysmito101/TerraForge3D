@@ -28,13 +28,14 @@ project "TerraForge3DLib"
 
     includedirs
     {
-        "./Include"
-        -- TODO: Add the dependencies here
+        "./Include",
+        "../Vendor/SPDLog/Include"
+
     }
 
     links
     {
-        
+        "SPDLog"
     }
 
     filter "system:windows"

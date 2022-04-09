@@ -11,6 +11,10 @@
 
 #pragma once
 
+#include "Base/Base.hpp"
+
+TerraForge3D::Application* CreateApplication();
+
 #ifdef TF3D_WINDOWS
 
 #include "Windows.h"

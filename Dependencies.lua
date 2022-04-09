@@ -19,6 +19,7 @@ IncludeDirectories["TerraForge3DLib"] = "./TerraForge3D/TerraForge3DLib"
 IncludeDirectories["TerraForge3D"] = "./TerraForge3D/TerraForge3D"
 IncludeDirectories["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 
+
 -- The list of libraries and other library directories
 LibraryDirectories = {}
 

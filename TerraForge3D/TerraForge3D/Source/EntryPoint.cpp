@@ -72,15 +72,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
     AllocateConsole();
     std::vector<std::string> args = ParseArguments();
-    std::cout << "Arguments: " << std::endl;
-    for (auto st : args)
-    {
-        std::cout << st << std::endl;
-    }
-    while(true)
-    {
-        Sleep(1000);
-    }
+    TerraForge3D::Application* mainApplication = CreateApplication();
+    mainApplication->Run();
+    delete mainApplication;
 }
 
 #else
@@ -107,11 +101,9 @@ static std::vector<std::string> ParseArguments(int argc, char* argv[])
 int main(int argc, char* argv[], char* envp[])
 {
     std::vector<std::string> args = ParseArguments(argc, argv);
-    std::cout << "Arguments: " << std::endl;
-    for (auto st : args)
-    {
-        std::cout << st << std::endl;
-    }
+    TerraForge3D::Application* mainApplication = CreateApplication();
+    mainApplication->Run();
+    delete mainApplication;
 }
 
 #endif

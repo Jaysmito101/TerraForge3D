@@ -26,7 +26,8 @@ project "TerraForge3D"
     includedirs
     {
         "../TerraForge3DLib/Include",
-        "./Include"
+        "./Include",
+        "../Vendor/SPDLog/Include"
     }
 
     links
@@ -47,6 +48,10 @@ project "TerraForge3D"
             "TF3D_WINDOWS",
             "_CRT_SECURE_NO_WARNINGS"
         }
+
+        postbuildcommands  {
+			"xcopy \"$(SolutionDir)Binaries\\Data\" \"$(TargetDir)Data\\\" /e /r /y"
+		}
     
     filter "system:linux"
         defines
@@ -56,7 +61,7 @@ project "TerraForge3D"
 
         links
         {
-            -- TODO: Add required libs here
+            "SPDLog"
         }
 
     filter "system:macosx"
@@ -67,7 +72,7 @@ project "TerraForge3D"
 
         links
         {
-            -- TODO: Add required libs here
+            "SPDLog"
         }
     
     filter "configurations:Debug*"

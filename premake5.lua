@@ -38,5 +38,5 @@ workspace "TerraForge3D"
 
     -- Include the Dependencies
     group "Dependencies"
-    -- TODO: Add the dependencies here
+        include "TerraForge3D/Vendor/SPDLog"
     group ""

@@ -128,11 +128,29 @@ def CheckRegistryKeyExists(key):
     else:
         return False
 
+# Copu a directory recursively
+def CopyDirectory(src, dest, ignore=None):
+    if os.path.isdir(src):
+        if not os.path.isdir(dest):
+            os.makedirs(dest)
+        files = os.listdir(src)
+        if ignore is not None:
+            ignored = ignore(src, files)
+        else:
+            ignored = set()
+        for f in files:
+            if f not in ignored:
+                recursive_overwrite(os.path.join(src, f), 
+                                    os.path.join(dest, f), 
+                                    ignore)
+    else:
+        shutil.copyfile(src, dest)
+
 ##############################################################################
 ############################### Constants ####################################
 ##############################################################################
 
-ALL_COMMANDS = ["setup", "generate", "build", "clean", "format", "update", "docs", "help"]
+ALL_COMMANDS = ["setup", "generate", "build", "clean", "format", "update", "docs", "copydir", "help"]
 PATH_SEPARATOR = os.sep
 EXECUTABLE_EXTENSION = ".exe" if GetOS() == "nt" else ""
 ARCHIVE_EXTENSION = "zip" if GetOS() == "nt" else "tar.gz"

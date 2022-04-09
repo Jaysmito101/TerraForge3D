@@ -2,7 +2,10 @@
 .vscode
 .vs
 bin
-vendor
+vendor/premake
+vendor/astyle
+vendor/doxygen
+vendor/VulkanSDK
 Binaries/VCRuntime
 
 # Files
