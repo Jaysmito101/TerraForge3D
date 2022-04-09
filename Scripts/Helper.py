@@ -343,11 +343,11 @@ def GenerateProjectFiles():
 def BuildOnWindows(buildConfiguration):
     # Setup visual studio developer environment
     # NOTE : This scripts assumes you have Visual Studio 2022 Community Edition Installed
-    os.system("call \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64")
+    os.system("call \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64 && SET Platform=x64 && " + f"msbuild /m /p:PlatformTarget=x64 /p:Configuration={buildConfiguration} TerraForge3D.sln")
     # I dont know why this is required but it doesnt work without this
-    os.system("SET Platform=")
+    # os.system("SET Platform=")
     # Build TerraForge3D
-    os.system(f"msbuild /m /p:PlatformTarget=x64 /p:Configuration={buildConfiguration} TerraForge3D.sln")
+    # os.system(f"msbuild /m /p:PlatformTarget=x64 /p:Configuration={buildConfiguration} TerraForge3D.sln")
 
 # Builds TerraForge3D and its dependencies on Linux
 def BuildOnLinux(buildConfiguration):

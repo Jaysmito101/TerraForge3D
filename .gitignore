@@ -1,6 +1,10 @@
 # Diectories
+.vscode
+.vs
+bin
 vendor
 Binaries/VCRuntime
 
 # Files
 .helpercache
+**.aps
