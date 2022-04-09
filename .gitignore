@@ -8,3 +8,6 @@ Binaries/VCRuntime
 # Files
 .helpercache
 **.aps
+**.sln
+**.vcxproj
+**.user
