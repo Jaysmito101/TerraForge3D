@@ -13,14 +13,34 @@ namespace TerraForge3D
 	public:
 		Application();
 		~Application();
-		
+
+	protected:
+		// Utility Functions for inherited classes
+		// This functions can only bbe called from OnPreload method
+		inline void SetLogFilePath(std::string path) { logFilePath = path; };
+		inline void SetApplicationName(std::string name) { applicationName = name; };
+		inline void SetWindowConfigPath(std::string path) { windowConfigPath = path; };
+
+	public:
+		// Some General Getters/Setters
+		inline UUID& GetUUID() { return applicationUUID; };
+		inline UUID GetUUID() const { return applicationUUID; };
+
 		/*
 		* This is the entire lifecycle of the Application
 		*/
 		void Run();
 
-		// Functions to be overloaded by clients
-		
+		// Functions meant to be overloaded by clients
+
+		/*
+		* This function ic called once before startup.
+		*
+		* NOTE: You are only suppossed to initialize application vaiables in this function.
+		*		Calling any other TerraForge3DLib function will result in unexpected behaviour.
+		*/
+		virtual void OnPreload() = 0;
+
 		/*
 		* Called once on application start
 		*/
@@ -46,6 +66,13 @@ namespace TerraForge3D
 
 		Logger* logger = nullptr;
 		bool isRunning = false;
+
+		UUID applicationUUID;
+
+		// Application Data
+		std::string applicationName = "TerraForge3D";
+		std::string logFilePath = "TerraForge3D.log";
+		std::string windowConfigPath = "WindowConfigs.ini";
 	};
 
 }

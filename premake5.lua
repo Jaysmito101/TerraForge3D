@@ -28,7 +28,8 @@ workspace "TerraForge3D"
     -- Enable Milti-Processor Build
     flags
     {
-        "MultiProcessorCompile"
+        "MultiProcessorCompile",
+        "NoPCH"
     }
     
     -- Include TerraForge3DLib

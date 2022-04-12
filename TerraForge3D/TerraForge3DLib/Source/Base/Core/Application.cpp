@@ -6,9 +6,8 @@ namespace TerraForge3D
 
 	Application::Application()
 	{
-		logger = Logger::Create();
-		TF3D_ASSERT(mainInstance == nullptr, "Application already Initialized!")
 		mainInstance = this;
+		applicationUUID = UUID::Generate();
 	}
 
 	Application::~Application()
@@ -19,6 +18,8 @@ namespace TerraForge3D
 
 	void Application::Run()
 	{
+		OnPreload();
+		logger = Logger::Create(logFilePath);
 		OnStart();
 		isRunning = true;
 		while (isRunning)
