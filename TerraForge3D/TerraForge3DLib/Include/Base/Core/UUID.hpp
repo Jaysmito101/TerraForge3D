@@ -41,14 +41,7 @@ namespace TerraForge3D
 }
 
 
-// For using UUID with cout
-inline std::ostream& operator<<(std::ostream& os, const TerraForge3D::UUID& uuid)
-{
-	os << uuid.ToString();
-	return os;
-}
-
-// The following piece code is for making sure that UUID can be easily logged
+// For using UUID with cout and spdlog
 
 // This ignores all warnings raised inside External headers
 #pragma warning(push, 0)

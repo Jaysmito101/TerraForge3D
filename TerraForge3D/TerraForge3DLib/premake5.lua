@@ -29,13 +29,14 @@ project "TerraForge3DLib"
     includedirs
     {
         "./Include",
-        "../Vendor/SPDLog/Include"
-
+        "../Vendor/SPDLog/Include",
+        "../Vendor/GLFW/Include"
     }
 
     links
     {
-        "SPDLog"
+        "SPDLog",
+	"GLFW"
     }
 
     filter "system:windows"
@@ -68,7 +69,9 @@ project "TerraForge3DLib"
         {
             -- TODO: Add required libs here
         }
-    
+
+    filter "system:*"
+
     filter "configurations:Debug*"
         defines
         {

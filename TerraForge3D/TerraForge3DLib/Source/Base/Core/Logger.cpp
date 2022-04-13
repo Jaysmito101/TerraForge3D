@@ -9,7 +9,7 @@ namespace TerraForge3D
 
 	Logger* Logger::mainInstance = nullptr;
 
-	Logger::Logger(std::string filePath)
+	Logger::Logger(std::string filePath, std::string name)
 	{
 		std::vector<spdlog::sink_ptr> logSinks;
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
@@ -18,7 +18,7 @@ namespace TerraForge3D
 		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-		mainLogger = std::make_shared<spdlog::logger>("TF3D", begin(logSinks), end(logSinks));
+		mainLogger = std::make_shared<spdlog::logger>(name, begin(logSinks), end(logSinks));
 		spdlog::register_logger(mainLogger);
 		mainLogger->set_level(spdlog::level::trace);
 		mainLogger->flush_on(spdlog::level::trace);

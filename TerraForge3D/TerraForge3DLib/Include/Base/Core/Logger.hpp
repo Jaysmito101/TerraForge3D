@@ -1,6 +1,9 @@
 #pragma once
 
+// This ignores all warnings raised inside External headers
+#pragma warning(push, 0)
 #include "spdlog/spdlog.h"
+#pragma warning(pop)
 
 #include <string>
 #include <memory>
@@ -14,7 +17,7 @@ namespace TerraForge3D
 	class Logger
 	{
 	private:
-		Logger(std::string filePath = "TerraForge3D.log");
+		Logger(std::string filePath = "TerraForge3D.log", std::string name = "TerraForge3D");
 
 	public:
 		~Logger();

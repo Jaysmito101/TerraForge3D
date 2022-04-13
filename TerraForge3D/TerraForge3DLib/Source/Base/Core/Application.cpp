@@ -20,13 +20,17 @@ namespace TerraForge3D
 	{
 		OnPreload();
 		logger = Logger::Create(logFilePath);
+		mainWindow = Window::Create();
+		mainWindow->SetTitle(applicationName);
 		OnStart();
 		isRunning = true;
 		while (isRunning)
 		{
 			OnUpdate();
 			OnImGuiRender();
+			mainWindow->Update();
 		}
 		OnEnd();
+		Window::Destroy();
 	}
 }

@@ -54,10 +54,13 @@ static std::vector<std::string> ParseArguments()
     }
     for (int i = 0; i < argCount; i++)
     {
+// This is to ignore warnings due to deprecation of codecvt_utf8
+#pragma warning(push, 0)
         std::wstring ws(szArgList[i]);
         using convertType = std::codecvt_utf8<wchar_t>;
         std::wstring_convert<convertType, wchar_t> converter;
         std::string s(converter.to_bytes(ws));
+#pragma warning(pop)
         args.push_back(s);
     }
     LocalFree(szArgList);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base/Core/Core.hpp"
+#include "Base/Window/Window.hpp"
 
 namespace TerraForge3D
 {
@@ -73,6 +74,9 @@ namespace TerraForge3D
 		std::string applicationName = "TerraForge3D";
 		std::string logFilePath = "TerraForge3D.log";
 		std::string windowConfigPath = "WindowConfigs.ini";
+
+		// Application Window
+		Window* mainWindow = nullptr;
 	};
 
 }

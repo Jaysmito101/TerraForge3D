@@ -40,4 +40,5 @@ workspace "TerraForge3D"
     -- Include the Dependencies
     group "Dependencies"
         include "TerraForge3D/Vendor/SPDLog"
+        include "TerraForge3D/Vendor/GLFW"
     group ""

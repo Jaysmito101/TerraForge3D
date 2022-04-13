@@ -61,7 +61,8 @@ project "TerraForge3D"
 
         links
         {
-            "SPDLog"
+            "SPDLog",
+            "GLFW"
         }
 
     filter "system:macosx"
@@ -72,8 +73,11 @@ project "TerraForge3D"
 
         links
         {
-            "SPDLog"
+            "SPDLog",
+            "GLFW"
         }
+
+    filter "system:*"
     
     filter "configurations:Debug*"
         defines
