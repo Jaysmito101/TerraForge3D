@@ -1,6 +1,8 @@
 #include "Base/Base.hpp"
 #include "EntryPoint.hpp"
 
+
+
 namespace TerraForge3D
 {
 	class MainApplication : public Application
@@ -34,7 +36,25 @@ namespace TerraForge3D
 		virtual void OnStart() override
 		{
 			TF3D_LOG("Started Application!");
-			TF3D_LOG("Application UUID : {0}", GetUUID())
+			TF3D_LOG("Application UUID : {0}", GetUUID());
+
+			// Test Vectors:
+
+			Vector2 a2(58, 6);
+			Vector2 b2 (4, 3.6f);
+
+			TF3D_LOG_TRACE("Vector 2 Tests");
+			TF3D_LOG_TRACE("Size {}", sizeof(Vector2));
+			TF3D_LOG_TRACE("Initial Vector {} and {}", a2, b2);
+			TF3D_LOG_TRACE("Vector Length {} and {}", a2.Length(), b2.Length());
+			TF3D_LOG_TRACE("Vector Add {}", a2 + b2);
+			TF3D_LOG_TRACE("Vector Dot {}", Vector2::Dot(a2, b2));
+			TF3D_LOG_TRACE("Vector Cross {}", Vector2::Cross(a2, b2));
+			TF3D_LOG_TRACE("Normalized Vector {}", a2.Normalize());
+			TF3D_LOG_TRACE("Vector Length {}", a2.Length());
+			TF3D_LOG_TRACE("Vector .YX {}", a2.YX());
+
+
 
 		}
 

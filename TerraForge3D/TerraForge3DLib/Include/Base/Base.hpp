@@ -7,3 +7,5 @@
 #include "Base/Core/Core.hpp"
 #include "Base/Core/Application.hpp"
 
+// Math Includes
+#include "Base/Math/Math.hpp"
