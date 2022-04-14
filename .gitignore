@@ -1,0 +1,20 @@
+# Diectories
+.vscode
+.vs
+bin
+vendor/premake
+vendor/astyle
+vendor/doxygen
+vendor/VulkanSDK
+Binaries/VCRuntime
+
+# Files
+.helpercache
+**.aps
+**.sln
+**.vcxproj
+**.user
+**.filter
+**.filters
+**.hint
+Makefile
