@@ -27,6 +27,11 @@ namespace TerraForge3D
 		inline UUID& GetUUID() { return applicationUUID; };
 		inline UUID GetUUID() const { return applicationUUID; };
 
+		inline void Close() { isRunning = false; }
+
+		inline Window* GetWindow() { return mainWindow; }
+		inline InputEventManager* GetInputEventManager() { return mainWindow->eventManager; }
+
 		/*
 		* This is the entire lifecycle of the Application
 		*/
@@ -61,6 +66,9 @@ namespace TerraForge3D
 		* Called once before shutdown
 		*/
 		virtual void OnEnd() = 0;
+
+		inline static Application* Get() { return mainInstance; }
+
 
 	private:
 		static Application* mainInstance;

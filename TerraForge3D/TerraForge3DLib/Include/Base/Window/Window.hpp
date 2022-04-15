@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base/Core/Core.hpp"
+#include "Base/Window/EventManager.hpp"
 
 #include <string>
 
@@ -33,15 +34,23 @@ namespace TerraForge3D
 		void SetIcon(uint8_t* image, uint32_t width, uint32_t height); // Sets the icon of the window
 		void SetPosition(int32_t x, int32_t y); // Sets the position of the window
 		void SetSize(uint32_t width, uint32_t height); // Sets the size of the window
+		int32_t GetHeight(); // returns the height of the windoe
+		int32_t GetWidth(); // returns the width of the windoe
+		int32_t GetPositionX(); // returns the x position of the windoe
+		int32_t GetPositionY(); // returns the y position of the windoe
 
 		// Static methods
 		static Window* Create(); // Creates a window handle (error if window handle alrady exists)
 		static void Destroy(); // Destroys the main window handle
 		static Window* Get(); // Returns the current window handle (error if Window::Create has not been called before)
 
+	public:
+		InputEventManager* eventManager = nullptr;
 	private:
 		static Window* mainInstance;
 
+		int32_t height = 600, width = 800;
+		int32_t positionX=0, positionY = 0;
 		UUID windowUUID;
 		GLFWwindow* windowHandle = nullptr;
 	};

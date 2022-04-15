@@ -52,11 +52,15 @@ namespace TerraForge3D
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-		windowHandle = glfwCreateWindow(800, 600, "WINDOW", nullptr, nullptr);
+		windowHandle = glfwCreateWindow(width, height, "WINDOW", nullptr, nullptr);
+
+		eventManager = new InputEventManager(windowHandle);
+		eventManager->SetupInternalCallbacks();
 	}
 
 	Window::~Window()
 	{
+		delete eventManager;
 		glfwDestroyWindow(windowHandle);
 		glfwTerminate();
 	}
@@ -73,7 +77,7 @@ namespace TerraForge3D
 
 	void Window::SetIcon(uint8_t* image, uint32_t width, uint32_t height)
 	{
-		GLFWimage images[1];
+		GLFWimage images[1] = {0};
 		TF3D_ASSERT(image != nullptr, "Icon image is null");
 		images[0].pixels = image;
 		images[0].width = width;
@@ -90,5 +94,28 @@ namespace TerraForge3D
 	void Window::SetSize(uint32_t width, uint32_t height)
 	{
 		glfwSetWindowSize(windowHandle, width, height);
+	}
+
+	int32_t Window::GetHeight()
+	{
+		glfwGetWindowSize(windowHandle, &width, &height);
+		return height;
+	}
+
+	int32_t Window::GetWidth()
+	{
+		glfwGetWindowSize(windowHandle, &width, &height);
+		return width;
+	}
+	int32_t Window::GetPositionX()
+	{
+		glfwGetWindowPos(windowHandle, &positionX, &positionY);
+		return positionX;
+	}
+
+	int32_t Window::GetPositionY()
+	{
+		glfwGetWindowPos(windowHandle, &positionX, &positionY);
+		return positionY;
 	}
 }

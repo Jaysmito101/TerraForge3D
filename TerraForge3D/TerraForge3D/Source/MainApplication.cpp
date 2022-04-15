@@ -55,6 +55,20 @@ namespace TerraForge3D
 			TF3D_LOG_TRACE("Vector .YX {}", a2.YX());
 
 
+			exitcb = GetInputEventManager()->RegisterCallback([&](InputEventParams* params) -> bool {
+				TF3D_LOG_INFO("Shutting down applicatyin");
+				Close();
+				return true;
+				}, { InputEventType_WindowClose });
+
+			GetInputEventManager()->RegisterCallback([&](InputEventParams* params) -> bool {
+				TF3D_LOG("Drag and Drop Recieved!");
+				for (auto& item : params->paths)
+				{
+					TF3D_LOG("\t{}", item);
+				}
+				return true;
+				}, { InputEventType_DragNDrop });
 
 		}
 
@@ -68,10 +82,12 @@ namespace TerraForge3D
 
 		virtual void OnEnd() override
 		{
-			TF3D_LOG("Started Shutdown!")
+			TF3D_LOG("Started Shutdown!");
+			GetInputEventManager()->DeregisterCallback(exitcb);
 		}
 
 	private:
+		uint32_t exitcb;
 	};
 }
 

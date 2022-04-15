@@ -17,4 +17,5 @@ Binaries/VCRuntime
 **.filter
 **.filters
 **.hint
+**.log
 Makefile
