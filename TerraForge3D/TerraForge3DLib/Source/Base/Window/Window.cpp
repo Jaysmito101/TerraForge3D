@@ -18,6 +18,7 @@ namespace TerraForge3D
 	{
 		TF3D_ASSERT(mainInstance == nullptr, "Window already created");
 		mainInstance = new Window();
+		mainInstance->Setup();
 		TF3D_LOG("Main Window Created with UUID : {}", mainInstance->GetUUID())
 		return mainInstance;
 	}
@@ -26,12 +27,6 @@ namespace TerraForge3D
 	{
 		TF3D_ASSERT(mainInstance != nullptr, "Window not yet created");
 		TF3D_SAFE_DELETE(mainInstance);
-	}
-
-	Window* Window::Get()
-	{
-		TF3D_ASSERT(mainInstance != nullptr, "Window not yet created");
-		return mainInstance;
 	}
 
 	// Window member methods
@@ -53,13 +48,19 @@ namespace TerraForge3D
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		windowHandle = glfwCreateWindow(width, height, "WINDOW", nullptr, nullptr);
+	}
 
+	void Window::Setup()
+	{
 		eventManager = new InputEventManager(windowHandle);
 		eventManager->SetupInternalCallbacks();
+
+		inputSystem = new InputSystem();
 	}
 
 	Window::~Window()
 	{
+		delete inputSystem;
 		delete eventManager;
 		glfwDestroyWindow(windowHandle);
 		glfwTerminate();
@@ -68,6 +69,7 @@ namespace TerraForge3D
 	void Window::Update()
 	{
 		glfwPollEvents();
+		inputSystem->PollEvents();
 	}
 
 	void Window::SetTitle(std::string title)
@@ -117,5 +119,17 @@ namespace TerraForge3D
 	{
 		glfwGetWindowPos(windowHandle, &positionX, &positionY);
 		return positionY;
+	}
+
+	std::pair<int32_t, int32_t> Window::GetSize()
+	{
+		glfwGetWindowSize(windowHandle, &width, &height);
+		return { width, height };
+	}
+
+	std::pair<int32_t, int32_t> Window::GetPosition()
+	{
+		glfwGetWindowPos(windowHandle, &positionX, &positionY);
+		return {positionX, positionY};
 	}
 }

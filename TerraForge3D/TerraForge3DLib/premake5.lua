@@ -39,6 +39,11 @@ project "TerraForge3DLib"
 	"GLFW"
     }
 
+    defines
+    {
+        "SPDLOG_COMPILED_LIB"
+    }
+
     filter "system:windows"
         systemversion "latest"
 
@@ -88,21 +93,4 @@ project "TerraForge3DLib"
         }
 
         optimize "Full"
-        runtime "Release"
-
-    filter "configurations:*VkCompute"
-        defines
-        {
-            "TF3D_VULKAN_COMPUTE"
-        }
-    
-    filter "configurations:*OpenCL"
-        defines
-        {
-            "TF3D_OPENCL"
-        }
-
-
-
-
-    
+        runtime "Release"    

@@ -35,6 +35,11 @@ project "TerraForge3D"
         "TerraForge3DLib"
     }
 
+    defines
+    {
+        "SPDLOG_COMPILED_LIB"
+    }
+
     filter "system:windows"
         systemversion "latest"
 
@@ -97,17 +102,6 @@ project "TerraForge3D"
         optimize "Full"
         runtime "Release"
 
-    filter "configurations:*VkCompute"
-        defines
-        {
-            "TF3D_VULKAN_COMPUTE"
-        }
-    
-    filter "configurations:*OpenCL"
-        defines
-        {
-            "TF3D_OPENCL"
-        }
 
     -- Build as a WindowedApp on Windows (WinMain Entry) and as a ConsoleApp on Linux and MacOS
     filter "system:windows"

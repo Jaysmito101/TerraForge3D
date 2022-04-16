@@ -41,3 +41,7 @@
 		a.x = a.x / inverseLength##__LINE__; \
 		a.y = a.y / inverseLength##__LINE__; \
 		a.z = a.z / inverseLength##__LINE__; 
+
+// Some useful functions
+#define TF3D_SQUARE(x) (x) * (x)
+#define TF3D_CLAMP(x, min, max) (x > max ? max : ( x < min ? min : x ) ) 

@@ -55,10 +55,7 @@ namespace TerraForge3D
 
 	uint32_t InputEventManager::RegisterCallback(std::function<bool(InputEventParams*)> callback, std::vector<InputEventType> types)
 	{
-		if (!callback)
-		{
-			TF3D_ASSERT(false, "Callback is NULL");
-		}
+		TF3D_ASSERT(callback, "Callback is NULL");
 		uint32_t currentEventID = CurrentEventID++;
 		callbacks[currentEventID] = callback;
 		for (InputEventType type : types)
@@ -70,7 +67,7 @@ namespace TerraForge3D
 
 	bool InputEventManager::DeregisterCallback(uint32_t callbackID)
 	{
-		TF3D_ASSERT(callbacks.find(callbackID) == callbacks.end(), "Callback Not Found!");
+		TF3D_ASSERT(callbacks.find(callbackID) != callbacks.end(), "Callback Not Found!");
 		callbacks.erase(callbackID);
 		for (auto& [_, value] : callbacksReference)
 		{

@@ -74,6 +74,9 @@ namespace TerraForge3D
 		void WindowCloseCallback();
 		void MousePositionCallback(double xPos, double yPos);
 
+
+		inline static void Set(InputEventManager* eventManager) { TF3D_ASSERT(eventManager, "Null Pointer Exception");  mainInstance = eventManager; }
+		inline static InputEventManager* Get() { TF3D_ASSERT(mainInstance, "Input Event Manager not yet initialized!"); return mainInstance; }
 	private:
 		// Helpers
 		void CallCallbacks();

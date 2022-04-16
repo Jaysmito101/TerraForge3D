@@ -21,14 +21,7 @@ namespace TerraForge3D
 #else
 #error "Unknown Platform"
 #endif
-			applicationName += " ";
-#ifdef TF3D_OPENCL
-			applicationName += "[OpenCL]";
-#elif defined TF3D_VULKAN_COMPUTE
-			applicationName += "[VulkanCompute]";
-#else
-#error "Unknown Compute API"
-#endif
+			applicationName += " [OpenCL + VulkanCompute]";
 			applicationName += " - Jaysmito Mukherjee";
 			SetApplicationName(applicationName);
 		}
@@ -74,6 +67,21 @@ namespace TerraForge3D
 
 		virtual void OnUpdate() override
 		{
+			if (InputSystem::IsKeyPressedS(KeyCode_Escape))
+			{
+				Close();
+			}
+
+			if (InputSystem::IsMouseButtonPressedS(MouseButton_Middle))
+			{
+				auto [posx, posy] = GetWindow()->GetPosition();
+				auto [mdx, mdy] = InputSystem::GetMouseDeltaS();
+				posx += TF3D_CLAMP(mdx, -10, 10);
+				posy += TF3D_CLAMP(mdy, -10, 10);
+				GetWindow()->SetPosition(posx, posy);
+			}
+
+			//TF3D_LOG("Mouse Pos {0} , {1}", InputSystem::GetMouseDeltaS().first, InputSystem::GetMouseDeltaS().second)
 		}
 
 		virtual void OnImGuiRender() override

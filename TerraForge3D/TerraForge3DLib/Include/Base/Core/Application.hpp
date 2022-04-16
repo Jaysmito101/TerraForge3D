@@ -67,7 +67,8 @@ namespace TerraForge3D
 		*/
 		virtual void OnEnd() = 0;
 
-		inline static Application* Get() { return mainInstance; }
+		inline static void Set(Application* application) { TF3D_ASSERT(application, "Null Pointer Exception");  mainInstance = application; }
+		inline static Application* Get() { TF3D_ASSERT(mainInstance, "Application not yet initialized!"); return mainInstance; }
 
 
 	private:

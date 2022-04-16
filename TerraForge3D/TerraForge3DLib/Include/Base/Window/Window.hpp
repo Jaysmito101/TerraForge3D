@@ -2,6 +2,7 @@
 
 #include "Base/Core/Core.hpp"
 #include "Base/Window/EventManager.hpp"
+#include "Base/Window/InputSystem.hpp"
 
 #include <string>
 
@@ -24,6 +25,8 @@ namespace TerraForge3D
 		Window();
 		~Window();
 
+		void Setup(); // This sets up the event managers, input system, ...
+
 		// Getters / Setters
 		inline UUID GetUUID() { return windowUUID; }
 
@@ -38,20 +41,27 @@ namespace TerraForge3D
 		int32_t GetWidth(); // returns the width of the windoe
 		int32_t GetPositionX(); // returns the x position of the windoe
 		int32_t GetPositionY(); // returns the y position of the windoe
+		std::pair<int32_t, int32_t> GetSize();
+		std::pair<int32_t, int32_t> GetPosition();
+
+		inline GLFWwindow* GetHandle() { return windowHandle; } /* returns the internal glfw handler */
 
 		// Static methods
 		static Window* Create(); // Creates a window handle (error if window handle alrady exists)
 		static void Destroy(); // Destroys the main window handle
-		static Window* Get(); // Returns the current window handle (error if Window::Create has not been called before)
+
+		inline static void Set(Window* window) { TF3D_ASSERT(window, "Null Pointer Exception");  mainInstance = window; }
+		inline static Window* Get() { TF3D_ASSERT(mainInstance, "Window not yet initialized!"); return mainInstance; }
 
 	public:
 		InputEventManager* eventManager = nullptr;
+		InputSystem* inputSystem = nullptr;
 	private:
-		static Window* mainInstance;
-
 		int32_t height = 600, width = 800;
 		int32_t positionX=0, positionY = 0;
 		UUID windowUUID;
 		GLFWwindow* windowHandle = nullptr;
+
+		static Window* mainInstance;
 	};
 }

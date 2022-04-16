@@ -179,7 +179,7 @@ ASTYLE_DIRECTORY = f"{GetProjectDirectory()}{PATH_SEPARATOR}vendor{PATH_SEPARATO
 ASTYLE_URL = "https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.1/AStyle_3.1_windows.zip?ts=gAAAAABiUHLIzztXmAjVoFZx_mGeriR1Bk5MMhgocea1Dod-nkmVrVkk5OoHgb_cWuYJZVlVm8mRjTxjjCOgLXKHXXqGAP-nPg%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fastyle%2Ffiles%2Flatest%2Fdownload"
 ASTYLE_EXECUTABLE_PATH = f"{ASTYLE_DIRECTORY}AStyle{PATH_SEPARATOR}bin{PATH_SEPARATOR}AStyle.exe"
 
-BUILD_CONFIGURATIONS = ["DebugVkCompute", "DebugOpenCL", "ReleaseVkCompute", "ReleaseOpenCL"]
+BUILD_CONFIGURATIONS = ["Debug", "Release"]
 STATE = {}
 
 ##############################################################################
@@ -361,7 +361,7 @@ def GenerateProjectFiles():
 def BuildOnWindows(buildConfiguration):
     # Setup visual studio developer environment
     # NOTE : This scripts assumes you have Visual Studio 2022 Community Edition Installed
-    os.system("call \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64 && SET Platform=x64 && " + f"msbuild /m /p:PlatformTarget=x64 /p:Configuration={buildConfiguration} TerraForge3D.sln")
+    os.system("call \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64  && " + f"msbuild /m /p:PlatformTarget=x64 /p:Configuration={buildConfiguration} TerraForge3D.sln")
     # I dont know why this is required but it doesnt work without this
     # os.system("SET Platform=")
     # Build TerraForge3D

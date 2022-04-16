@@ -19,10 +19,8 @@ workspace "TerraForge3D"
     -- The build configurations
     configurations 
     {
-        "DebugVkCompute",
-        "DebugOpenCL",
-        "ReleaseVkCompute",
-        "ReleaseOpenCL"
+        "Debug",
+        "Release"
     }
 
     -- Enable Milti-Processor Build
