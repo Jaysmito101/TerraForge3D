@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #ifndef TF3D_DEFAULT_CALLBACKS_CAPACITY
 #define TF3D_DEFAULT_CALLBACKS_CAPACITY 16
 #endif
@@ -84,7 +86,7 @@ namespace TerraForge3D
 	private:
 		InputEventParams eventParams;
 		std::unordered_map<uint32_t, InputEventCallback>  callbacks;
-		std::unordered_map<InputEventType, std::vector<uint32_t>> callbacksReference;
+		std::array<std::vector<uint32_t>, InputEventType_Count> callbacksReference;
 		GLFWwindow* windowHandle = nullptr;
 
 

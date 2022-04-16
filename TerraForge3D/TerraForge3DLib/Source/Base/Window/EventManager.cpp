@@ -15,8 +15,6 @@ namespace TerraForge3D
 		windowHandle = wh;
 		callbacks.clear();
 		callbacks.reserve(TF3D_DEFAULT_CALLBACKS_CAPACITY);
-		callbacksReference.clear();
-		callbacksReference.reserve(InputEventType_Count);
 		mainInstance = this;
 	}
 
@@ -50,7 +48,6 @@ namespace TerraForge3D
 	InputEventManager::~InputEventManager()
 	{
 		callbacks.clear();
-		callbacksReference.clear();
 	}
 
 	uint32_t InputEventManager::RegisterCallback(std::function<bool(InputEventParams*)> callback, std::vector<InputEventType> types)
@@ -69,7 +66,7 @@ namespace TerraForge3D
 	{
 		TF3D_ASSERT(callbacks.find(callbackID) != callbacks.end(), "Callback Not Found!");
 		callbacks.erase(callbackID);
-		for (auto& [_, value] : callbacksReference)
+		for (auto& value : callbacksReference)
 		{
 			for (int i = 0 ; i < value.size(); i++)
 			{
