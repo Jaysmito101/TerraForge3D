@@ -42,9 +42,9 @@ namespace TerraForge3D
 		/*
 		* Copy Assignent
 		*/
-		inline Vector3& operator=(const Vector3& other) { this->x = other.x, this->y = other.y; this->z = other.z; };
+		inline Vector3& operator=(const Vector3& other) { this->x = other.x, this->y = other.y; this->z = other.z; return *this; };
 
-		inline Vector3& operator=(const Vector3* other) { this->x = other->x, this->y = other->y; this->z = other->z; };
+		inline Vector3& operator=(const Vector3* other) { this->x = other->x, this->y = other->y; this->z = other->z; return *this; };
 
 		/*
 		* Binary Operations

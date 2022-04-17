@@ -34,6 +34,15 @@ project "SPDLog"
     {
         "SPDLOG_COMPILED_LIB"
     }
+
+    filter "system:linux"
+
+        links
+        {
+            "pthread"
+        }
+
+    filter "system:*"
     
     filter "configurations:Debug*"
         symbols "On"

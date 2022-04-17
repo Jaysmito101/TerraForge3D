@@ -130,11 +130,8 @@ namespace TerraForge3D
 		* This is a wrapper for the regular InputEventManager::RegisterCallback function
 		* but here you can setup a callback only for a specific event type.
 		*/
-		template <typename T>
-		inline uint32_t RegisterCallback(InputEventCallback<T> callback) {	return 0; } /* This is the primaty template and should not be used */
 
-		template <>
-		inline uint32_t RegisterCallback<MouseMoveEventParams>(InputEventCallback<MouseMoveEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<MouseMoveEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				MouseMoveEventParams data;
@@ -144,8 +141,7 @@ namespace TerraForge3D
 			}, {InputEventType_MouseMove});
 		}
 
-		template <>
-		inline uint32_t RegisterCallback<MouseButtonEventParams>(InputEventCallback<MouseButtonEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<MouseButtonEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				MouseButtonEventParams data;
@@ -155,8 +151,7 @@ namespace TerraForge3D
 			}, {InputEventType_MouseButton});
 		}
 
-		template <>
-		inline uint32_t RegisterCallback<MouseScrollEventParams>(InputEventCallback<MouseScrollEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<MouseScrollEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				MouseScrollEventParams data;
@@ -166,8 +161,7 @@ namespace TerraForge3D
 			}, {InputEventType_MouseScroll});
 		}
 
-		template <>
-		inline uint32_t RegisterCallback<KeyEventParams>(InputEventCallback<KeyEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<KeyEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				KeyEventParams data;
@@ -177,8 +171,7 @@ namespace TerraForge3D
 			}, {InputEventType_Key});
 		}
 
-		template <>
-		inline uint32_t RegisterCallback<WindowResizeEventParams>(InputEventCallback<WindowResizeEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<WindowResizeEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				WindowResizeEventParams data;
@@ -188,8 +181,7 @@ namespace TerraForge3D
 			}, {InputEventType_WindowResize});
 		}
 
-		template <>
-		inline uint32_t RegisterCallback<WindowCloseEventParams>(InputEventCallback<WindowCloseEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<WindowCloseEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				WindowCloseEventParams data;
@@ -197,8 +189,7 @@ namespace TerraForge3D
 			}, {InputEventType_WindowClose});
 		}
 
-		template <>
-		inline uint32_t RegisterCallback<DragNDropEventParams>(InputEventCallback<DragNDropEventParams> callback)
+		inline uint32_t RegisterCallback(InputEventCallback<DragNDropEventParams> callback)
 		{
 			return RegisterCallback([callback](InputEventParams* params) -> bool {
 				DragNDropEventParams data;

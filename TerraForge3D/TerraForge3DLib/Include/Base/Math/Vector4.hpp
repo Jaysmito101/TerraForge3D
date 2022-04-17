@@ -39,9 +39,9 @@ namespace TerraForge3D
 		/*
 		* Copy Assignent
 		*/
-		inline Vector4& operator=(const Vector4& other) { this->x = other.x, this->y = other.y; this->z = other.z; this->w = other.w; };
+		inline Vector4& operator=(const Vector4& other) { this->x = other.x, this->y = other.y; this->z = other.z; this->w = other.w; return *this; };
 
-		inline Vector4& operator=(const Vector4* other) { this->x = other->x, this->y = other->y; this->z = other->z; this->w = other->w; };
+		inline Vector4& operator=(const Vector4* other) { this->x = other->x, this->y = other->y; this->z = other->z; this->w = other->w; return *this; };
 
 		/*
 		* Binary Operations

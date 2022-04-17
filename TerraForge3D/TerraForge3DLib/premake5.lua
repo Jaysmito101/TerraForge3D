@@ -36,7 +36,7 @@ project "TerraForge3DLib"
     links
     {
         "SPDLog",
-	"GLFW"
+    	"GLFW"
     }
 
     defines
@@ -61,7 +61,7 @@ project "TerraForge3DLib"
 
         links
         {
-            -- TODO: Add required libs here
+            "uuid"
         }
 
     filter "system:macosx"

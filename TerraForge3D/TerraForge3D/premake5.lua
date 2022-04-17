@@ -66,6 +66,9 @@ project "TerraForge3D"
 
         links
         {
+            "dl",
+            "uuid",
+            "pthread",
             "SPDLog",
             "GLFW"
         }

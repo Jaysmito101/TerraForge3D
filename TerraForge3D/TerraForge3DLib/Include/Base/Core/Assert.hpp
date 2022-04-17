@@ -1,13 +1,14 @@
 #pragma once
 
 #include <string>
+#include <stdexcept>
 
 #include "Base/Core/Logger.hpp"
 
 #ifdef TF3D_WINDOWS
 #define TF3D_DEBUG_BREAK __debugbreak();
 #else
-#define DEBUG_BREAK() throw std::exception("DEBUG BREAK")
+#define TF3D_DEBUG_BREAK throw std::runtime_error("DEBUG BREAK");
 #endif
 
 // Disable assertions for Rlease Builds

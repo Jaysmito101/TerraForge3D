@@ -40,7 +40,7 @@ project "GLFW"
 
     defines
     {
-        ""
+        
     }
     
     filter "system:linux"
@@ -55,8 +55,16 @@ project "GLFW"
             "./Source/posix_time.c",
             "./Source/posix_thread.c",
             "./Source/posix_module.c",
+            "./Source/posix_poll.c",
             "./Source/glx_context.c",
             "./Source/linux_joystick.c"
+        }
+
+        links
+        {
+            "x11",
+            "pthread",
+            "dl"
         }
 
         defines
