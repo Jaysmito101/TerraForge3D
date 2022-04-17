@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Base/Window/KeyCodes.hpp"
+
 #include <array>
 
 #ifndef TF3D_DEFAULT_CALLBACKS_CAPACITY
@@ -10,6 +12,9 @@ struct GLFWwindow;
 
 namespace TerraForge3D
 {
+	/*
+	* These are the available event callbacks you can subscribe to.
+	*/
 	enum InputEventType
 	{
 		InputEventType_None = 0,
@@ -23,6 +28,9 @@ namespace TerraForge3D
 		InputEventType_Count
 	};
 
+	/*
+	* This is the Generic InputEventParams data structuore for all the callbacks
+	*/
 	struct InputEventParams
 	{
 		InputEventType type = InputEventType_None;
@@ -30,13 +38,65 @@ namespace TerraForge3D
 		float mouseScrollAmount[2] = { 0.0f };
 		float mousePos[2] = {0.0f};
 		float windowSize[2] = {0.0f};
-		int mouseButton = 0;
-		int keyCode = 0;
+		MouseButton mouseButton;
+		KeyCode keyCode ;
 		bool pressed = false;
 	};
 
-	typedef std::function<bool(InputEventParams*)> InputEventCallback;
+	
+	/*
+	* These are the event parameters for various events
+	* These are optional.
+	*/
 
+	struct MouseMoveEventParams
+	{
+		float mouseX = 0.0f;
+		float mouseY = 0.0f;
+	};
+
+	struct MouseButtonEventParams
+	{
+		MouseButton mouseButton ;
+		bool pressed = false;
+	};
+
+	struct MouseScrollEventParams
+	{
+		float offsetX = 0.0f;
+		float offsetY = 0.0f;
+	};
+
+	struct KeyEventParams
+	{
+		KeyCode key ;
+		bool pressed = false;
+	};
+
+	struct WindowResizeEventParams
+	{
+		int width = 0;
+		int height = 0;
+	};
+
+	struct DragNDropEventParams
+	{
+		std::vector<std::string> paths;
+	};
+
+	struct WindowCloseEventParams
+	{
+		// TODO: Place something relevent here
+	};
+
+	template<typename ParamType>
+	using InputEventCallback = std::function<bool(ParamType*)>;
+
+
+	/*
+	* The InputEventManager class is for registering to callbacks for input events
+	* like mouse move, mouse click, window close button clicked, etc.
+	*/
 	class InputEventManager
 	{
 	public:
@@ -55,7 +115,7 @@ namespace TerraForge3D
 		* 
 		* This return an uint32_t Id which wou can use to Query the Callback or deregister 
 		*/
-		uint32_t RegisterCallback(InputEventCallback callback, std::vector<InputEventType> type);
+		uint32_t RegisterCallback(InputEventCallback<InputEventParams> callback, std::vector<InputEventType> type);
 
 		/*
 		* Deregisters a callback with a given ID
@@ -66,6 +126,86 @@ namespace TerraForge3D
 		*/
 		bool DeregisterCallback(uint32_t callbackID);
 
+		/*
+		* This is a wrapper for the regular InputEventManager::RegisterCallback function
+		* but here you can setup a callback only for a specific event type.
+		*/
+		template <typename T>
+		inline uint32_t RegisterCallback(InputEventCallback<T> callback) {	return 0; } /* This is the primaty template and should not be used */
+
+		template <>
+		inline uint32_t RegisterCallback<MouseMoveEventParams>(InputEventCallback<MouseMoveEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				MouseMoveEventParams data;
+				data.mouseX = params->mousePos[0];
+				data.mouseY = params->mousePos[1];
+				return callback(&data);
+			}, {InputEventType_MouseMove});
+		}
+
+		template <>
+		inline uint32_t RegisterCallback<MouseButtonEventParams>(InputEventCallback<MouseButtonEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				MouseButtonEventParams data;
+				data.mouseButton = params->mouseButton;
+				data.pressed = params->pressed;
+				return callback(&data);
+			}, {InputEventType_MouseButton});
+		}
+
+		template <>
+		inline uint32_t RegisterCallback<MouseScrollEventParams>(InputEventCallback<MouseScrollEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				MouseScrollEventParams data;
+				data.offsetX = params->mouseScrollAmount[0];
+				data.offsetY = params->mouseScrollAmount[1];
+				return callback(&data);
+			}, {InputEventType_MouseScroll});
+		}
+
+		template <>
+		inline uint32_t RegisterCallback<KeyEventParams>(InputEventCallback<KeyEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				KeyEventParams data;
+				data.key = params->keyCode;
+				data.pressed = params->pressed;
+				return callback(&data);
+			}, {InputEventType_Key});
+		}
+
+		template <>
+		inline uint32_t RegisterCallback<WindowResizeEventParams>(InputEventCallback<WindowResizeEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				WindowResizeEventParams data;
+				data.width = static_cast<int>(params->windowSize[0]);
+				data.height = static_cast<int>(params->windowSize[1]);
+				return callback(&data);
+			}, {InputEventType_WindowResize});
+		}
+
+		template <>
+		inline uint32_t RegisterCallback<WindowCloseEventParams>(InputEventCallback<WindowCloseEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				WindowCloseEventParams data;
+				return callback(&data);
+			}, {InputEventType_WindowClose});
+		}
+
+		template <>
+		inline uint32_t RegisterCallback<DragNDropEventParams>(InputEventCallback<DragNDropEventParams> callback)
+		{
+			return RegisterCallback([callback](InputEventParams* params) -> bool {
+				DragNDropEventParams data;
+				data.paths = params->paths;
+				return callback(&data);
+			}, {InputEventType_DragNDrop});
+		}
 
 		// The internal callbacks
 		void DragNDropCallback(int pathCount, const char** paths);
@@ -85,7 +225,7 @@ namespace TerraForge3D
 
 	private:
 		InputEventParams eventParams;
-		std::unordered_map<uint32_t, InputEventCallback>  callbacks;
+		std::unordered_map<uint32_t, InputEventCallback<InputEventParams>>  callbacks;
 		std::array<std::vector<uint32_t>, InputEventType_Count> callbacksReference;
 		GLFWwindow* windowHandle = nullptr;
 

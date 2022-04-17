@@ -104,7 +104,7 @@ namespace TerraForge3D
 	{
 		eventParams.type = InputEventType_Key;
 		eventParams.pressed = (action == GLFW_REPEAT || action == GLFW_PRESS);
-		eventParams.keyCode = key;
+		eventParams.keyCode = static_cast<KeyCode>(key);
 		CallCallbacks();
 	}
 
@@ -120,7 +120,7 @@ namespace TerraForge3D
 	{
 		eventParams.type = InputEventType_MouseButton;
 		eventParams.pressed = (action == GLFW_REPEAT || action == GLFW_PRESS);
-		eventParams.mouseButton = button;
+		eventParams.mouseButton = static_cast<MouseButton>(button);
 		CallCallbacks();
 	}
 

@@ -163,7 +163,7 @@ PREMAKE_ARCHIVE_EXTENSION = ARCHIVE_EXTENSION
 PREMAKE_ARCHIVE_URL = f"https://github.com/premake/premake-core/releases/download/v{PREMAKE_VERSION}/premake-{PREMAKE_VERSION}-{PREMAKE_OS_NAME}.{PREMAKE_ARCHIVE_EXTENSION}"
 PREMAKE_LISCENSE_URL = f"https://raw.githubusercontent.com/premake/premake-core/master/LICENSE.txt"
 
-VULKAN_REQUIRED_VERSION = "1.2.170.0"
+VULKAN_REQUIRED_VERSION = "1.3.204.1"
 VULKAN_SDK_INSTALLER_EXTENSION = "exe" if GetOS() == "nt" else ( "dmg" if GetOS() == "darwin" else "tar.gz" )
 VULKAN_SDK_INSTALLER_PLATFORM_URLS = [
     f"https://sdk.lunarg.com/sdk/download/{VULKAN_REQUIRED_VERSION}/windows/VulkanSDK-{VULKAN_REQUIRED_VERSION}-Installer.exe",
