@@ -12,8 +12,9 @@ namespace TerraForge3D
 
 	Application::~Application()
 	{
-		if(logger)
-			delete logger;
+		TF3D_SAFE_DELETE(logger);
+		TF3D_SAFE_DELETE(vulkanContext);
+		Window::Destroy();
 	}
 
 	void Application::Run()
@@ -22,6 +23,9 @@ namespace TerraForge3D
 		logger = Logger::Create(logFilePath);
 		mainWindow = Window::Create();
 		mainWindow->SetTitle(applicationName);
+		// Setup Vulkan
+		TF3D_LOG_INFO("Initializing Vulkan");
+		vulkanContext = new Vulkan::Context();
 		OnStart();
 		isRunning = true;
 		while (isRunning)
@@ -31,6 +35,5 @@ namespace TerraForge3D
 			mainWindow->Update();
 		}
 		OnEnd();
-		Window::Destroy();
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "Base/Core/Core.hpp"
 #include "Base/Window/Window.hpp"
+#include "Base/Vulkan/Context.hpp"
 
 namespace TerraForge3D
 {
@@ -75,6 +76,7 @@ namespace TerraForge3D
 		static Application* mainInstance;
 
 		Logger* logger = nullptr;
+		Vulkan::Context* vulkanContext = nullptr;
 		bool isRunning = false;
 
 		UUID applicationUUID;

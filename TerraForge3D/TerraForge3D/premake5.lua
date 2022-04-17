@@ -27,7 +27,13 @@ project "TerraForge3D"
     {
         "../TerraForge3DLib/Include",
         "./Include",
+        "%{IncludeDirectories.VulkanSDK}",
         "../Vendor/SPDLog/Include"
+    }
+
+    libdirs
+    {
+        "%{LibraryDirectories.VulkanSDK}"
     }
 
     links
@@ -69,6 +75,7 @@ project "TerraForge3D"
             "dl",
             "uuid",
             "pthread",
+            "vulkan-1",
             "SPDLog",
             "GLFW"
         }

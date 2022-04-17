@@ -30,11 +30,18 @@ project "TerraForge3DLib"
     {
         "./Include",
         "../Vendor/SPDLog/Include",
-        "../Vendor/GLFW/Include"
+        "../Vendor/GLFW/Include",
+        "%{IncludeDirectories.VulkanSDK}"
+    }
+
+    libdirs
+    {
+        "%{LibraryDirectories.VulkanSDK}"
     }
 
     links
     {
+        "vulkan-1",
         "SPDLog",
     	"GLFW"
     }

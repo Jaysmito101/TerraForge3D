@@ -17,18 +17,16 @@ IncludeDirectories = {}
 -- TODO: Add the dependencies here
 IncludeDirectories["TerraForge3DLib"] = "./TerraForge3D/TerraForge3DLib"
 IncludeDirectories["TerraForge3D"] = "./TerraForge3D/TerraForge3D"
-IncludeDirectories["VulkanSDK"] = "%{VULKAN_SDK}/Include"
+IncludeDirectories["VulkanSDK"] = "%{VULKAN_SDK}/include"
 
 
 -- The list of libraries and other library directories
 LibraryDirectories = {}
 
-LibraryDirectories["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
+LibraryDirectories["VulkanSDK"] = "%{VULKAN_SDK}/lib"
 
 -- The list of libraries
 Libraries = {}
 
-Libraries["Vulkan"] = "%{LibraryDirectories.VulkanSDK}/vulkan-1.lib"
-Libraries["VulkanUtils"] = "%{LibraryDirectories.VulkanSDK}/vulkan_utils.lib"
 
 OutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"

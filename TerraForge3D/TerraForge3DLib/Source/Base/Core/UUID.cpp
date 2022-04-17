@@ -21,7 +21,7 @@
 
 #include <uuid/uuid.h>
 
-#elif defined TF3D_MACOS
+#elif defined TF3D_MACOSX
 
 #include <CoreFoundation/CFUUID.h>
 
@@ -87,7 +87,7 @@ static void GenerateNativeUUID(uint8_t* data)
           id[15]
        } };
 
-#elif defined TF3D_MACOS
+#elif defined TF3D_MACOSX
     auto newId = CFUUIDCreate(NULL);
     auto bytes0 = CFUUIDGetUUIDBytes(newId);
     CFRelease(newId);
