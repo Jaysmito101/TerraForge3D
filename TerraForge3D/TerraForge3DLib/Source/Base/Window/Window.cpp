@@ -19,7 +19,7 @@ namespace TerraForge3D
 		TF3D_ASSERT(mainInstance == nullptr, "Window already created");
 		mainInstance = new Window();
 		mainInstance->Setup();
-		TF3D_LOG("Main Window Created with UUID : {}", mainInstance->GetUUID())
+		// TF3D_LOG("Main Window Created with UUID : {}", mainInstance->GetUUID())
 		return mainInstance;
 	}
 

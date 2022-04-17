@@ -29,7 +29,7 @@ namespace TerraForge3D
 		virtual void OnStart() override
 		{
 			TF3D_LOG("Started Application!");
-			TF3D_LOG("Application UUID : {0}", GetUUID());
+			// TF3D_LOG("Application UUID : {0}", GetUUID());
 
 			// Test Vectors:
 
