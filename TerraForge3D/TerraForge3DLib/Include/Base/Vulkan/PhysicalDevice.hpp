@@ -116,8 +116,8 @@ namespace TerraForge3D
             bool isComputeCapable = false;
             bool isGraphicsCapable = false;
             
-            uint32_t computeScore = 0;
-            uint32_t graphicsScore = 0;
+            uint64_t computeScore = 0;
+            uint64_t graphicsScore = 0;
 
             bool valid = true;
 
