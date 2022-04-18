@@ -16,6 +16,10 @@ namespace TerraForge3D
             GetDeviceQueueFamilyPropeties();
             CalculateComputeScore();
             CalculateGraphicsScore();
+            if(computeScore > 1000) 
+                isComputeCompitable = true;
+            if(graphicsScore > 500)
+                isGraphicsCompitable = true;
             valid = true;
         }
 
@@ -128,9 +132,9 @@ namespace TerraForge3D
             // score is more with more que families
             computeScore += queueFamilyProperties.size() * 10;
             // more recent drivers are better
-            computeScore += (driverVersion / 100) * 10;
+            // computeScore += (driverVersion / 100) * 10;
             // more recent api versions are better
-            computeScore += (apiVersion / 100) * 10;
+            // computeScore += (apiVersion / 100) * 10;
             // GPU preference for compute Discrete > Integrated > Virtual > CPU
             if (type == PhysicalDeviceType_DiscreteGPU)
                 computeScore += 1000;
@@ -183,9 +187,9 @@ namespace TerraForge3D
             // score is more with more queue families
             graphicsScore += queueFamilyProperties.size() * 5;
             // more recent drivers are better
-            graphicsScore += (driverVersion / 100) * 5;
+            // graphicsScore += (driverVersion / 100) * 5;
             // more recent api versions are better
-            graphicsScore += (apiVersion / 100) * 5;
+            // graphicsScore += (apiVersion / 100) * 5;
             // GPU preference for graphics Discrete > Integrated > Virtual > CPU
             if (type == PhysicalDeviceType_DiscreteGPU)
                 graphicsScore += 100;
