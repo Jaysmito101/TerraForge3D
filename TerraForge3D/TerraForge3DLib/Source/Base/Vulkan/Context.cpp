@@ -57,18 +57,22 @@ namespace TerraForge3D
             uint32_t physicalDeviceCount = 0;
             vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
             TF3D_ASSERT(physicalDeviceCount > 0, "No physical device found");
-            if(physicalDeviceCount == 0)
-                throw std::runtime_error("No vulkan compitable GPU found!");
+            if (physicalDeviceCount == 0)
+            {
+                TF3D_LOG_ERROR("No Vulkan compitable GPU found");
+            }
         
             std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
             vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices.data());
 
-            TF3D_LOG("Found {0} physical devices", physicalDeviceCount);
+            TF3D_LOG("Found {0} Vulkan compitable GPU devices", physicalDeviceCount);
 
-            std::vector<PhysicalDevice*> physicalDeviceInfos(physicalDeviceCount);
+            std::vector<PhysicalDevice> physicalDeviceInfos(physicalDeviceCount);
             for(const auto& physicalDevice : physicalDevices)
             {
-                physicalDeviceInfos.push_back(new PhysicalDevice(physicalDevice));
+                physicalDeviceInfos.emplace_back(physicalDevice);
+                // Debug
+                TF3D_LOG("Device Info:- \n{0}", physicalDeviceInfos.back().ToString());
             }
 
             // TODO
