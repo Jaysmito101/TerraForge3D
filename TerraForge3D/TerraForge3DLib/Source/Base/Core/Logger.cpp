@@ -30,16 +30,5 @@ namespace TerraForge3D
 	{
 	}
 
-	Logger* Logger::Create(std::string filePath)
-	{
-		if (mainInstance)
-			return mainInstance;
-		mainInstance = new Logger(filePath);
-		return mainInstance;
-	}
-
-	Logger* Logger::Get()
-	{
-		return mainInstance;
-	}
+	
 }

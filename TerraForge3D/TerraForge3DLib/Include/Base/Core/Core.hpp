@@ -32,6 +32,5 @@
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
-#define VK_DEFINE_HANDLE(object) typedef void* object;
 
 #define TF3D_VK_CALL(x) TF3D_ASSERT(x == VK_SUCCESS, "Vulkan call failed: " + std::string(__PRETTY_FUNCTION__) + ": " + std::to_string(x))

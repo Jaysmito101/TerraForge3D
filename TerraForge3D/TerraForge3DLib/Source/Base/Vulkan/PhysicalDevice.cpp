@@ -17,9 +17,9 @@ namespace TerraForge3D
             CalculateComputeScore();
             CalculateGraphicsScore();
             if(computeScore > 1000) 
-                isComputeCompitable = true;
+                isComputeCapable = true;
             if(graphicsScore > 500)
-                isGraphicsCompitable = true;
+                isGraphicsCapable = true;
             valid = true;
         }
 

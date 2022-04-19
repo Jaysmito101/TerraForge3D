@@ -18,12 +18,13 @@ namespace TerraForge3D
 	{
 	private:
 		Logger(std::string filePath = "TerraForge3D.log", std::string name = "TerraForge3D");
-
-	public:
 		~Logger();
 
-		static Logger* Create(std::string filePath = "TerraForge3D.log");
-		static Logger* Get();
+	public:
+		inline static Logger* Create(std::string filePath = "TerraForge3D.log", std::string name = "TerraForge3D") { if (mainInstance) { return mainInstance; }mainInstance = new Logger(filePath, name); return mainInstance; }
+		inline static Logger* Get() { return mainInstance; }
+		inline static void Set(Logger* logger) { if (logger) { mainInstance = logger; } }
+		inline static void Destroy() { if (mainInstance) { delete mainInstance; mainInstance = nullptr; } }
 	public:
 		std::shared_ptr<spdlog::logger> mainLogger;
 
