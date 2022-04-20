@@ -13,6 +13,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include <functional>
 #include <cstdint>
 

@@ -1,3 +1,4 @@
+#pragma once
 #include "Base/Vulkan/Core.hpp"
 
 namespace TerraForge3D
@@ -87,6 +88,9 @@ namespace TerraForge3D
             // General Utility Functions
             std::string ToString();
 
+            uint32_t GetGraphicsQueueIndex(); /* returns a queue index which has graphics capabilities */
+            uint32_t GetComputeQueueIndex(); /* returns a queue index which has compute capabilities */
+
         private:
             void GetDeviceProperties();
             void GetDeviceFeatures();
@@ -121,8 +125,11 @@ namespace TerraForge3D
 
             bool valid = true;
 
+            /* The VkPhysicalDevice handle */
+            VkPhysicalDevice handle = VK_NULL_HANDLE;
+
         private:
-            VkPhysicalDevice handle;
+
         };
 
         std::string to_string(PhysicalDeviceType type);

@@ -16,10 +16,11 @@ namespace TerraForge3D
             GetDeviceQueueFamilyPropeties();
             CalculateComputeScore();
             CalculateGraphicsScore();
-            if(computeScore > 1000) 
+            if(computeScore > 100000) 
                 isComputeCapable = true;
-            if(graphicsScore > 500)
+            if(graphicsScore > 50000)
                 isGraphicsCapable = true;
+
             valid = true;
         }
 
@@ -147,9 +148,9 @@ namespace TerraForge3D
             // more shared memory is better
             computeScore += limits.maxComputeSharedMemorySize / (1 << 20);
             // more compute work group size is better
-            computeScore += limits.maxComputeWorkGroupSize[0] * limits.maxComputeWorkGroupSize[1] * limits.maxComputeWorkGroupSize[2];
+            computeScore += limits.maxComputeWorkGroupSize[0] + limits.maxComputeWorkGroupSize[1] + limits.maxComputeWorkGroupSize[2];
             // more compute work group count is better
-            computeScore += limits.maxComputeWorkGroupCount[0] * limits.maxComputeWorkGroupCount[1] * limits.maxComputeWorkGroupCount[2];
+            computeScore += limits.maxComputeWorkGroupCount[0] + limits.maxComputeWorkGroupCount[1] + limits.maxComputeWorkGroupCount[2];
             // more compute work group invocations is better
             computeScore += limits.maxComputeWorkGroupInvocations / 10;
             // higher image array layers is better
@@ -199,6 +200,10 @@ namespace TerraForge3D
                 graphicsScore += 10;
             else if (type == PhysicalDeviceType_CPU)
                 graphicsScore -= 100; // cpu is not good for graphics
+            // higher storage buffer range is better
+            graphicsScore += limits.maxStorageBufferRange / 100;
+            // higher uniform buffer range is better
+            graphicsScore += limits.maxUniformBufferRange / 100;
         }
 
         std::string PhysicalDevice::ToString()
@@ -271,6 +276,30 @@ namespace TerraForge3D
             ss << std::endl;
 
             return ss.str();
+        }
+
+        uint32_t PhysicalDevice::GetGraphicsQueueIndex()
+        {
+            for (auto& q : queueFamilyProperties)
+            {
+                if (q.graphics)
+                {
+                    return q.index;
+                }
+            }
+            return -1;
+        }
+
+        uint32_t PhysicalDevice::GetComputeQueueIndex()
+        {
+            for (auto& q : queueFamilyProperties)
+            {
+                if (q.compute)
+                {
+                    return q.index;
+                }
+            }
+            return -1;
         }
 
 

@@ -8,7 +8,7 @@ namespace TerraForge3D
     namespace Vulkan
     {
 #ifdef TF3D_DEBUG
-        static bool g_ValidationLayersSupported = false;
+        bool g_ValidationLayersSupported = false;
 #endif
 
         // The main vulkan context
@@ -75,6 +75,9 @@ namespace TerraForge3D
 
         Context::~Context()
         {
+            ComputeDevice::Destroy();
+            GraphicsDevice::Destroy();
+
 #ifdef TF3D_DEBUG
             if (g_ValidationLayersSupported)
                 ValidationLayers::DestroyDebugMessenger(instance);
@@ -116,6 +119,7 @@ namespace TerraForge3D
             if (physicalDeviceCount == 0)
             {
                 TF3D_LOG_ERROR("No Vulkan compitable GPU found");
+                exit(-1);
             }
         
             std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
@@ -123,15 +127,51 @@ namespace TerraForge3D
 
             TF3D_LOG("Found {0} Vulkan compitable GPU devices", physicalDeviceCount);
 
-            std::vector<PhysicalDevice> physicalDeviceInfos(physicalDeviceCount);
+            std::vector<PhysicalDevice> physicalDeviceInfos;
             for(const auto& physicalDevice : physicalDevices)
             {
                 physicalDeviceInfos.emplace_back(physicalDevice);
-                // Debug
-                TF3D_LOG("Device Info:- \n{0}", physicalDeviceInfos.back().ToString());
+                if (!physicalDeviceInfos.back().valid)
+                {
+                    physicalDeviceInfos.pop_back();
+                }
+                // TF3D_LOG("Device Info:- \n{0}", physicalDeviceInfos.back().ToString());
+            }
+            PhysicalDevice computePhysicalDevice, graphicsPhysicalDevice;
+            if (physicalDeviceInfos.size() == 0)
+            {
+                TF3D_LOG_ERROR("No suitable vulkan device found");
+                exit(-1);
+            }
+            else if (physicalDeviceInfos.size() == 1)
+            {
+                computePhysicalDevice = physicalDeviceInfos[0];
+                graphicsPhysicalDevice = physicalDeviceInfos[0];
+            }
+            else if (physicalDeviceInfos.size() == 2)
+            {
+                uint8_t deviceIndex = (physicalDeviceInfos[0].computeScore > physicalDeviceInfos[1].computeScore) ? 0 : 1;
+                computePhysicalDevice = physicalDeviceInfos[deviceIndex];
+                graphicsPhysicalDevice = physicalDeviceInfos[(deviceIndex == 0 ? 1 : 0)];
+            }
+            else
+            {
+                // Select Compute device
+                std::sort(physicalDeviceInfos.begin(), physicalDeviceInfos.end(), [](const PhysicalDevice& lhs, const PhysicalDevice& rhs)
+                    {
+                        return lhs.computeScore < rhs.computeScore;
+                    });
+                computePhysicalDevice = physicalDeviceInfos[0];
+                // Select the graphics device
+                std::sort(physicalDeviceInfos.begin(), physicalDeviceInfos.end(), [](const PhysicalDevice& lhs, const PhysicalDevice& rhs)
+                    {
+                        return lhs.graphicsScore < rhs.graphicsScore;
+                    });
+                graphicsPhysicalDevice = physicalDeviceInfos[(computePhysicalDevice.deviceID == physicalDeviceInfos[0].deviceID ? 1 : 0)];
             }
 
-            // TODO
+            graphicsDevice = GraphicsDevice::Create(graphicsPhysicalDevice);
+            computeDevice =  ComputeDevice::Create(computePhysicalDevice);
         }
     }
 }

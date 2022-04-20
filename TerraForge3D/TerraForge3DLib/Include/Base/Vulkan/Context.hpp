@@ -2,6 +2,8 @@
 
 #include "Base/Vulkan/Core.hpp"
 #include "Base/Vulkan/PhysicalDevice.hpp"
+#include "Base/Vulkan/GraphicsDevice.hpp"
+#include "Base/Vulkan/ComputeDevice.hpp"
 #include "Base/Window/Window.hpp"
 
 namespace TerraForge3D
@@ -29,8 +31,9 @@ namespace TerraForge3D
             void SelectPhysicalDevices();
 
         public:
-            VkInstance instance;
-            
+            VkInstance instance = VK_NULL_HANDLE;
+            GraphicsDevice* graphicsDevice = nullptr;
+            ComputeDevice* computeDevice = nullptr;
 
             static Context* mainInstance;
         };
