@@ -28,7 +28,8 @@ project "TerraForge3D"
         "../TerraForge3DLib/Include",
         "./Include",
         "%{IncludeDirectories.VulkanSDK}",
-        "../Vendor/SPDLog/Include"
+        "../Vendor/SPDLog/Include",
+        "../Vendor/ImGui/Include"
     }
 
     libdirs
@@ -77,7 +78,8 @@ project "TerraForge3D"
             "pthread",
             "vulkan-1",
             "SPDLog",
-            "GLFW"
+            "GLFW",
+            "ImGui"
         }
 
     filter "system:macosx"

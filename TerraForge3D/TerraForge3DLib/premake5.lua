@@ -31,6 +31,7 @@ project "TerraForge3DLib"
         "./Include",
         "../Vendor/SPDLog/Include",
         "../Vendor/GLFW/Include",
+        "../Vendor/ImGui/Include",
         "%{IncludeDirectories.VulkanSDK}"
     }
 
@@ -43,7 +44,8 @@ project "TerraForge3DLib"
     {
         "vulkan-1",
         "SPDLog",
-    	"GLFW"
+    	"GLFW",
+	"ImGui"
     }
 
     defines
