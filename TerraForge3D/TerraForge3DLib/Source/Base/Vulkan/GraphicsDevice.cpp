@@ -1,5 +1,6 @@
 #include "Base/Vulkan/GraphicsDevice.hpp"
 #include "Base/Vulkan/ValidationLayers.hpp"
+#include "Base/Vulkan/SwapChain.hpp"
 
 namespace TerraForge3D
 {
@@ -29,22 +30,32 @@ namespace TerraForge3D
 
 		void GraphicsDevice::CreateDevice()
 		{
-			uint32_t queueFamilyIndex = physicalDevice.GetGraphicsQueueIndex();
-			TF3D_ASSERT(queueFamilyIndex >= 0, "Invalid queue index");
+			uint32_t graphicsQueueFamilyIndex = physicalDevice.GetGraphicsQueueIndex();
+			TF3D_ASSERT(graphicsQueueFamilyIndex >= 0, "Invalid queue index");
+			uint32_t presentQueueFamilyIndex = physicalDevice.GetPresentQueueIndex(SwapChain::Get()->GetSurface());
+			TF3D_ASSERT(presentQueueFamilyIndex >= 0, "Invalid queue index");
 
-			VkDeviceQueueCreateInfo queueCreateInfo{};
-			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
-			queueCreateInfo.queueCount = 1;
+			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+
+			std::set<uint32_t> uniqueQueueFamilies = {graphicsQueueFamilyIndex, presentQueueFamilyIndex};
+
+			
 			float queuePriority = 1.0f;
-			queueCreateInfo.pQueuePriorities = &queuePriority;
+			for (uint32_t queueFamily : uniqueQueueFamilies) {
+				VkDeviceQueueCreateInfo queueCreateInfo{};
+				queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+				queueCreateInfo.queueFamilyIndex = queueFamily;
+				queueCreateInfo.queueCount = 1;
+				queueCreateInfo.pQueuePriorities = &queuePriority;
+				queueCreateInfos.push_back(queueCreateInfo);
+			}
 
 			VkPhysicalDeviceFeatures deviceFeatures{};
 
 			VkDeviceCreateInfo createInfo{};
 			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-			createInfo.pQueueCreateInfos = &queueCreateInfo;
-			createInfo.queueCreateInfoCount = 1;
+			createInfo.pQueueCreateInfos = queueCreateInfos.data();
+			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 			createInfo.pEnabledFeatures = &deviceFeatures;
 			createInfo.enabledExtensionCount = 0;
 #ifdef TF3D_DEBUG
@@ -61,7 +72,8 @@ namespace TerraForge3D
 			
 			TF3D_VK_CALL(vkCreateDevice(physicalDevice.handle, &createInfo, nullptr, &handle) != VK_SUCCESS);
 
-			vkGetDeviceQueue(handle, queueFamilyIndex, 0, &queue);
+			vkGetDeviceQueue(handle, graphicsQueueFamilyIndex, 0, &graphicsQueue);
+			vkGetDeviceQueue(handle, presentQueueFamilyIndex, 0, &presentQueue);
 		}
 
 

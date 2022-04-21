@@ -69,7 +69,7 @@ namespace TerraForge3D
                 }
 #endif //  TF3D_DEBUG
 
-
+            swapChain = SwapChain::Create();
             SelectPhysicalDevices();
         }
 
@@ -77,6 +77,7 @@ namespace TerraForge3D
         {
             ComputeDevice::Destroy();
             GraphicsDevice::Destroy();
+            SwapChain::Destroy();
 
 #ifdef TF3D_DEBUG
             if (g_ValidationLayersSupported)

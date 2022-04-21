@@ -302,6 +302,20 @@ namespace TerraForge3D
             return -1;
         }
 
+        uint32_t PhysicalDevice::GetPresentQueueIndex(VkSurfaceKHR surface)
+        {
+            uint32_t index = -1;
+            VkBool32 supported = false;
+            for (auto& queueFamilyProperty : queueFamilyProperties)
+            {
+                supported = false;
+                vkGetPhysicalDeviceSurfaceSupportKHR(handle, queueFamilyProperty.index, surface, &supported);
+                if (supported)
+                    return queueFamilyProperty.index;
+            }
+            return index;
+        }
+
 
         std::string to_string(PhysicalDeviceType type)
         {

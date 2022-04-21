@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <memory>
 #include <cmath>
@@ -32,6 +33,3 @@
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
-
-
-#define TF3D_VK_CALL(x) TF3D_ASSERT(x == VK_SUCCESS, "Vulkan call failed: " + std::string(__PRETTY_FUNCTION__) + ": " + std::to_string(x))

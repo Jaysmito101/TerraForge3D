@@ -30,7 +30,8 @@ namespace TerraForge3D
 
 		private:
 			PhysicalDevice physicalDevice;
-			VkQueue queue = VK_NULL_HANDLE;
+			VkQueue graphicsQueue = VK_NULL_HANDLE;
+			VkQueue presentQueue = VK_NULL_HANDLE;
 			VkDevice handle = VK_NULL_HANDLE;
 
 		private:
