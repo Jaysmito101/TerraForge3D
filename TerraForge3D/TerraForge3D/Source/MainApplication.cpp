@@ -65,6 +65,8 @@ namespace TerraForge3D
 				auto [mdx, mdy] = InputSystem::GetMouseDeltaS();
 				posx += TF3D_CLAMP(mdx, -10, 10);
 				posy += TF3D_CLAMP(mdy, -10, 10);
+				pos[0] = posx;
+				pos[1] = posy;
 				GetWindow()->SetPosition(posx, posy);
 			}
 
@@ -73,6 +75,17 @@ namespace TerraForge3D
 
 		virtual void OnImGuiRender() override
 		{
+			
+			ImGui::Begin("Hello World!");
+
+			ImGui::Text("Welcome to TerraForge3D!");
+			ImGui::Text("Window Position: %f, %f", pos[0], pos[1]);
+			ImGui::Text("Draw Window with middle mouse button to move it!");
+			if (ImGui::Button("Exit"))
+				Close();
+			ImGui::End();
+
+
 		}
 
 		virtual void OnEnd() override
@@ -83,6 +96,7 @@ namespace TerraForge3D
 
 	private:
 		uint32_t exitcb;
+		float pos[2];
 	};
 }
 

@@ -22,6 +22,7 @@ namespace TerraForge3D
 
 		private:
 			void CreateDevice();
+			void CreateDescriptorPool();
 
 		public:
 			inline static ComputeDevice* Create(PhysicalDevice& physicalDevice) { TF3D_ASSERT(mainInstance == nullptr, "A vulkan compute device already exists"); mainInstance = new ComputeDevice(physicalDevice); return mainInstance; };
@@ -33,7 +34,8 @@ namespace TerraForge3D
 			PhysicalDevice physicalDevice;
 			VkQueue queue = VK_NULL_HANDLE;
 			VkDevice handle = VK_NULL_HANDLE;
-
+			VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+			std::vector<const char*> extensions;
 		private:
 			static ComputeDevice* mainInstance;
 		};

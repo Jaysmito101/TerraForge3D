@@ -13,6 +13,9 @@ namespace TerraForge3D
 
 		GraphicsDevice::GraphicsDevice(PhysicalDevice& pD)
 		{
+			extensions = {
+				VK_KHR_SWAPCHAIN_EXTENSION_NAME
+			};
 			physicalDevice = pD;
 			if (!physicalDevice.isGraphicsCapable)
 			{
@@ -21,10 +24,12 @@ namespace TerraForge3D
 			}
 			TF3D_LOG("Using Graphics Device: {0}", physicalDevice.name);
 			CreateDevice();
+			CreateDescriptorPool();
 		}
 
 		GraphicsDevice::~GraphicsDevice()
 		{
+			vkDestroyDescriptorPool(handle, descriptorPool, nullptr);
 			vkDestroyDevice(handle, nullptr);
 		}
 
@@ -32,8 +37,10 @@ namespace TerraForge3D
 		{
 			uint32_t graphicsQueueFamilyIndex = physicalDevice.GetGraphicsQueueIndex();
 			TF3D_ASSERT(graphicsQueueFamilyIndex >= 0, "Invalid queue index");
+			graphicsQueueProperties = physicalDevice.GetQueue(graphicsQueueFamilyIndex);
 			uint32_t presentQueueFamilyIndex = physicalDevice.GetPresentQueueIndex(SwapChain::Get()->GetSurface());
 			TF3D_ASSERT(presentQueueFamilyIndex >= 0, "Invalid queue index");
+			presentQueueProperties = physicalDevice.GetQueue(presentQueueFamilyIndex);
 
 			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 
@@ -57,7 +64,10 @@ namespace TerraForge3D
 			createInfo.pQueueCreateInfos = queueCreateInfos.data();
 			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 			createInfo.pEnabledFeatures = &deviceFeatures;
-			createInfo.enabledExtensionCount = 0;
+			
+			createInfo.enabledExtensionCount = extensions.size();
+			createInfo.ppEnabledExtensionNames = extensions.data();
+
 #ifdef TF3D_DEBUG
 			if (g_ValidationLayersSupported) {
 				createInfo.enabledLayerCount = ValidationLayers::GetLayerCount();
@@ -70,12 +80,38 @@ namespace TerraForge3D
 			createInfo.enabledLayerCount = 0;
 #endif
 			
-			TF3D_VK_CALL(vkCreateDevice(physicalDevice.handle, &createInfo, nullptr, &handle) != VK_SUCCESS);
+			TF3D_VK_CALL(vkCreateDevice(physicalDevice.handle, &createInfo, nullptr, &handle));
 
 			vkGetDeviceQueue(handle, graphicsQueueFamilyIndex, 0, &graphicsQueue);
 			vkGetDeviceQueue(handle, presentQueueFamilyIndex, 0, &presentQueue);
 		}
 
+		void GraphicsDevice::CreateDescriptorPool()
+		{
+			VkDescriptorPoolSize poolSizes[] = 
+			{
+					{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+					{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+					{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+					{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+					{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+					{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+					{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+					{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+					{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+					{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+					{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+			};
+
+			VkDescriptorPoolCreateInfo poolCreateInfo = {};
+			poolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+			poolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+			poolCreateInfo.maxSets = 1000 * sizeof(poolSizes) / sizeof(poolSizes[0]);
+			poolCreateInfo.poolSizeCount = static_cast<uint32_t>(sizeof(poolSizes) / sizeof(poolSizes[0]));
+			poolCreateInfo.pPoolSizes = poolSizes;
+			TF3D_VK_CALL(vkCreateDescriptorPool(handle, &poolCreateInfo, nullptr, &descriptorPool));
+			TF3D_LOG("Created descriptor pool for graphics device");
+		}
 
 	}
 }

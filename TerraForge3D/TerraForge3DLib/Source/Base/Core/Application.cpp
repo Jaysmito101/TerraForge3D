@@ -21,18 +21,20 @@ namespace TerraForge3D
 		mainWindow = Window::Create();
 		mainWindow->SetTitle(applicationName);
 		// Setup Vulkan
-		TF3D_LOG_INFO("Initializing Vulkan");
-		vulkanContext = Vulkan::Context::Create();
+		TF3D_LOG_INFO("Initializing Render");
+		renderer = Renderer::Create();
 		OnStart();
 		isRunning = true;
 		while (isRunning)
 		{
 			OnUpdate();
+			renderer->BeginImGui();
 			OnImGuiRender();
+			renderer->EndImGui();
 			mainWindow->Update();
 		}
 		OnEnd();
-		Vulkan::Context::Destroy();
+		Renderer::Destroy();
 		Window::Destroy();
 		Logger::Destroy();
 	}

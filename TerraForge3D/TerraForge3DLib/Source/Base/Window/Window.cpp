@@ -3,6 +3,9 @@
 
 #include "GLFW/glfw3.h"
 
+// TEMPORARY
+#include "imgui/backends/imgui_impl_glfw.cpp"
+
 static void GLFWErrorCallback(int error, const char* description)
 {
 	TF3D_LOG_ERROR("GLFW Error: {0}: {1}", error, description);

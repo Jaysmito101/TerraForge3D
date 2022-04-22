@@ -2,10 +2,34 @@
 
 #include "Base/Core/Core.hpp"
 #include "Base/Window/Window.hpp"
-#include "Base/Vulkan/Context.hpp"
+#include "Base/Renderer/Renderer.hpp"
+
+struct ImFont;
 
 namespace TerraForge3D
 {
+
+	// TEMP ----------
+
+	enum FontType
+	{
+		FontType_TTF = 0
+	};
+
+	struct ApplicationFont
+	{
+		std::string path = "";
+		ImFont* handle = nullptr;
+		float size = 16.0f;
+		FontType type;
+
+		ApplicationFont(std::string path, float size = 16.0f, FontType type = FontType_TTF)
+			:path(path), size(size), type(type)
+		{}
+		
+	};
+
+	// -----------------
 
 	/**
 	* The primary application class which owns everything
@@ -30,6 +54,7 @@ namespace TerraForge3D
 
 		inline void Close() { isRunning = false; }
 
+		inline std::vector<ApplicationFont>& GetFonts() { return fonts; };
 		inline Window* GetWindow() { return mainWindow; }
 		inline InputEventManager* GetInputEventManager() { return mainWindow->eventManager; }
 
@@ -75,8 +100,9 @@ namespace TerraForge3D
 	private:
 		static Application* mainInstance;
 
+	public:
 		Logger* logger = nullptr;
-		Vulkan::Context* vulkanContext = nullptr;
+		Renderer* renderer = nullptr;
 		bool isRunning = false;
 
 		UUID applicationUUID;
@@ -85,6 +111,7 @@ namespace TerraForge3D
 		std::string applicationName = "TerraForge3D";
 		std::string logFilePath = "TerraForge3D.log";
 		std::string windowConfigPath = "WindowConfigs.ini";
+		std::vector<ApplicationFont> fonts;
 
 		// Application Window
 		Window* mainWindow = nullptr;

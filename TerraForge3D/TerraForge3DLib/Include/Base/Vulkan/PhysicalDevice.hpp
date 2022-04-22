@@ -91,6 +91,8 @@ namespace TerraForge3D
             uint32_t GetGraphicsQueueIndex(); /* returns a queue index which has graphics capabilities */
             uint32_t GetComputeQueueIndex(); /* returns a queue index which has compute capabilities */
             uint32_t GetPresentQueueIndex(VkSurfaceKHR surface); /* returns the queue index for presenting*/
+            PhysicalDeviceQueueFamilyProperties GetQueue(uint32_t index);
+            bool IsSurfaceSupported(VkSurfaceKHR surface, uint32_t queueFamilyIndex);
 
         private:
             void GetDeviceProperties();

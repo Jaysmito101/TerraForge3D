@@ -21,6 +21,7 @@ namespace TerraForge3D
 
 		private:
 			void CreateDevice();
+			void CreateDescriptorPool();
 
 		public:
 			inline static GraphicsDevice* Create(PhysicalDevice& physicalDevice) { TF3D_ASSERT(mainInstance == nullptr, "A vulkan graphics device already exists"); mainInstance = new GraphicsDevice(physicalDevice); return mainInstance; };
@@ -28,11 +29,17 @@ namespace TerraForge3D
 			inline static GraphicsDevice* Set(GraphicsDevice* device) { TF3D_ASSERT(device, "device is NULL"); mainInstance = device; return mainInstance; }
 			inline static void Destroy() { TF3D_ASSERT(mainInstance, "A vulkan graphics device does not exist"); TF3D_SAFE_DELETE(mainInstance); }
 
-		private:
+		public:
 			PhysicalDevice physicalDevice;
 			VkQueue graphicsQueue = VK_NULL_HANDLE;
 			VkQueue presentQueue = VK_NULL_HANDLE;
 			VkDevice handle = VK_NULL_HANDLE;
+			VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+			std::vector<const char*> extensions;
+
+
+			PhysicalDeviceQueueFamilyProperties graphicsQueueProperties;
+			PhysicalDeviceQueueFamilyProperties presentQueueProperties;
 
 		private:
 			static GraphicsDevice* mainInstance;
