@@ -10,5 +10,8 @@
 // Math Includes
 #include "Base/Math/Math.hpp"
 
+// Renderer
+#include "Base/Renderer/Renderer.hpp"
+
 // ImGui
 #include "imgui/imgui.h"

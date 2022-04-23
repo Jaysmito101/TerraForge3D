@@ -28,9 +28,9 @@ namespace TerraForge3D
 		while (isRunning)
 		{
 			OnUpdate();
-			renderer->BeginImGui();
+			renderer->BeginUI();
 			OnImGuiRender();
-			renderer->EndImGui();
+			renderer->EndUI();
 			mainWindow->Update();
 		}
 		OnEnd();

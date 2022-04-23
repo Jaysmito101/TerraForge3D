@@ -51,7 +51,7 @@ namespace TerraForge3D
 			createInfo.pQueueCreateInfos = &queueCreateInfo;
 			createInfo.queueCreateInfoCount = 1;
 			createInfo.pEnabledFeatures = &deviceFeatures;
-			createInfo.enabledExtensionCount = extensions.size();
+			createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 			createInfo.ppEnabledExtensionNames = extensions.data();
 #ifdef TF3D_DEBUG
 			if (g_ValidationLayersSupported) {

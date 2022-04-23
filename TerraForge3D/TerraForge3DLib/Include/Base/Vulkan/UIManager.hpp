@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base/Vulkan/Context.hpp"
+#include "Base/Renderer/UIManager.hpp"
 
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_vulkan.h"
@@ -10,11 +11,11 @@ namespace TerraForge3D
 	namespace Vulkan
 	{
 
-		class ImGuiManager
+		class UIManager : public RendererAPI::UIManager
 		{
 		public:
-			ImGuiManager();
-			~ImGuiManager();
+			UIManager();
+			~UIManager();
 
 		private:
 			void SetupWindow();
@@ -25,8 +26,8 @@ namespace TerraForge3D
 			void PresentFrame();
 		public:
 
-			void Begin();
-			void End();
+			virtual void Begin() override;
+			virtual void End() override;
 
 		private:
 			Vulkan::Context* vulkanContext = nullptr;

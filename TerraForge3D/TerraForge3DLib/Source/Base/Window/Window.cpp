@@ -46,8 +46,16 @@ namespace TerraForge3D
 
 		glfwSetErrorCallback(GLFWErrorCallback);
 
-		glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
+#if defined(TF3D_OPENGL_BACKEND)
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+		// TerraForge3D uses OpenGL 4.6
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+#elif defined(TF3D_VULKAN_BACKEND)
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+#endif
+
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		windowHandle = glfwCreateWindow(width, height, "WINDOW", nullptr, nullptr);

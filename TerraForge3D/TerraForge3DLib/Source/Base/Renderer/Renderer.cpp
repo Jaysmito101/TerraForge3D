@@ -1,29 +1,15 @@
 #include "Base/Renderer/Renderer.hpp"
-#include "Base/Renderer/OpenGLRenderer.hpp"
-#include "Base/Renderer/VulkanRenderer.hpp"
+
 
 namespace TerraForge3D
 {
 	Renderer* Renderer::mainInstance = nullptr;
 
-	Renderer::Renderer()
-	{
-	}
-
-	Renderer::~Renderer()
-	{
-	}
 
 	Renderer* Renderer::Create()
-	{
+	{ 
 		TF3D_ASSERT(mainInstance == nullptr, "Renderer already created");
-#if defined(TF3D_OPENGL_BACKEND)
-		mainInstance = new OpenGLRenderer();
-#elif defined(TF3D_VULKAN_BACKEND)
-		mainInstance = new VulkanRenderer();
-#else
-#error "Unknown Renderer Backend"
-#endif
+		mainInstance = new Renderer();
 		return mainInstance;
 	}
 
@@ -43,8 +29,36 @@ namespace TerraForge3D
 	void Renderer::Destroy()
 	{
 		TF3D_ASSERT(mainInstance, "Renderer not yet initialized");
-		mainInstance->Shutdown();
+		mainInstance->WaitForIdle();
 		TF3D_SAFE_DELETE(mainInstance);
 	}
 
+	Renderer::Renderer()
+	{
+		rendererContext = RendererAPI::Context::Create();
+		uiManager = RendererAPI::UIManager::Create();
+	}
+
+	Renderer::~Renderer()
+	{
+		RendererAPI::UIManager::Destory();
+		RendererAPI::Context::Destroy();
+	}
+
+	void Renderer::WaitForIdle()
+	{
+		rendererContext->WaitForIdle();
+	}
+
+	void Renderer::BeginUI()
+	{
+		uiManager->Begin();
+	}
+
+	void Renderer::EndUI()
+	{
+		uiManager->End();
+	}
+
+	
 }

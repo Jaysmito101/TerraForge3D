@@ -8,6 +8,7 @@ namespace TerraForge3D
 	namespace Vulkan
 	{
 		class GraphicsDevice;
+		class Context;
 
 		/*
 		* This handles the main application SwapChain,
@@ -16,7 +17,7 @@ namespace TerraForge3D
 		class SwapChain
 		{
 		private:
-			SwapChain();
+			SwapChain(Vulkan::Context* context);
 			~SwapChain();
 
 		public:
@@ -24,7 +25,7 @@ namespace TerraForge3D
 			inline void SetGraphicsDevice(GraphicsDevice* gd) { graphicsDevice = gd; }
 			
 		public:
-			inline static SwapChain* Create() { TF3D_ASSERT(mainInstance == nullptr, "Swapchain already exists"); mainInstance = new SwapChain(); return mainInstance; }
+			inline static SwapChain* Create(Context* context) { TF3D_ASSERT(mainInstance == nullptr, "Swapchain already exists"); mainInstance = new SwapChain(context); return mainInstance; }
 			inline static SwapChain* Get() { TF3D_ASSERT(mainInstance, "Swapchain not yet created"); return mainInstance; }
 			inline static SwapChain* Set(SwapChain* swapChain) { TF3D_ASSERT(swapChain, "swapChain is null"); mainInstance = swapChain; return mainInstance; }
 			inline static void Destroy() { TF3D_ASSERT(mainInstance, "Swapchain not yet created"); TF3D_SAFE_DELETE(mainInstance); }

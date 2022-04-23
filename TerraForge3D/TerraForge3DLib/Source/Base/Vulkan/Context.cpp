@@ -12,12 +12,8 @@ namespace TerraForge3D
 #endif
 
         // The main vulkan context
-        Context* Context::mainInstance = nullptr;
-
         Context::Context()
         {
-            mainInstance = this;
-
 #ifdef TF3D_DEBUG
             g_ValidationLayersSupported = ValidationLayers::CheckSupport();
             if (!g_ValidationLayersSupported)
@@ -69,7 +65,7 @@ namespace TerraForge3D
                 }
 #endif //  TF3D_DEBUG
 
-            swapChain = SwapChain::Create();
+            swapChain = SwapChain::Create(this);
             SelectPhysicalDevices();
         }
 
@@ -84,7 +80,6 @@ namespace TerraForge3D
                 ValidationLayers::DestroyDebugMessenger(instance);
 #endif
             vkDestroyInstance(instance, nullptr);
-            mainInstance = nullptr;
         }
 
         std::vector<const char*> Context::GetRequiredExtensions()
@@ -173,6 +168,12 @@ namespace TerraForge3D
 
             graphicsDevice = GraphicsDevice::Create(graphicsPhysicalDevice);
             computeDevice =  ComputeDevice::Create(computePhysicalDevice);
+        }
+
+        void Context::WaitForIdle()
+        {
+            vkDeviceWaitIdle(graphicsDevice->handle);
+            vkDeviceWaitIdle(computeDevice->handle);
         }
     }
 }

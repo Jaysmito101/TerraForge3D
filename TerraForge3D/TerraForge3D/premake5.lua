@@ -29,6 +29,7 @@ project "TerraForge3D"
         "./Include",
         "%{IncludeDirectories.VulkanSDK}",
         "../Vendor/SPDLog/Include",
+        "../Vendor/Glad/Include",
         "../Vendor/ImGui/Include"
     }
 
@@ -79,6 +80,7 @@ project "TerraForge3D"
             "vulkan-1",
             "SPDLog",
             "GLFW",
+            "Glad",
             "ImGui"
         }
 

@@ -1,4 +1,4 @@
-#include "Base/Vulkan/ImGuiManager.hpp"
+#include "Base/Vulkan/UIManager.hpp"
 #include "Base/Core/Application.hpp"
 
 #include "GLFW/glfw3.h"
@@ -9,9 +9,9 @@ namespace TerraForge3D
 {
 	namespace Vulkan
 	{
-		ImGuiManager::ImGuiManager()
+		UIManager::UIManager()
 		{
-			vulkanContext = Context::Get();
+			vulkanContext = reinterpret_cast<Context*>(RendererAPI::Context::Get());
 			graphicsDevice = GraphicsDevice::Get();
 			windowHandle = Window::Get()->GetHandle();
 			SetupWindow();
@@ -19,7 +19,7 @@ namespace TerraForge3D
 			UploadFonts();
 		}
 
-		ImGuiManager::~ImGuiManager()
+		UIManager::~UIManager()
 		{
 			ImGui_ImplVulkan_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
@@ -28,7 +28,7 @@ namespace TerraForge3D
 			ImGui_ImplVulkanH_DestroyWindow(vulkanContext->instance, vulkanContext->graphicsDevice->handle, &imguiWindow, nullptr);
 		}
 
-		void ImGuiManager::SetupWindow()
+		void UIManager::SetupWindow()
 		{
 			imguiWindow.Surface = vulkanContext->swapChain->GetSurface();
 
@@ -54,7 +54,7 @@ namespace TerraForge3D
 			ImGui_ImplVulkanH_CreateOrResizeWindow(vulkanContext->instance, vulkanContext->graphicsDevice->physicalDevice.handle, vulkanContext->graphicsDevice->handle, &imguiWindow, vulkanContext->graphicsDevice->graphicsQueueProperties.index, nullptr, w, h, minImageCount);
 		}
 
-		void ImGuiManager::SetupImGui()
+		void UIManager::SetupImGui()
 		{
 			// Setup Dear ImGui context
 			IMGUI_CHECKVERSION();
@@ -63,9 +63,9 @@ namespace TerraForge3D
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 			// io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-			
+
 			io.IniFilename = Application::Get()->windowConfigPath.c_str();
-			
+
 
 			// Setup Dear ImGui style
 			ImGui::StyleColorsDark();
@@ -97,7 +97,7 @@ namespace TerraForge3D
 			ImGui_ImplVulkan_Init(&init_info, imguiWindow.RenderPass);
 		}
 
-		void ImGuiManager::UploadFonts()
+		void UIManager::UploadFonts()
 		{
 			std::vector<ApplicationFont>& appFonts = Application::Get()->GetFonts();
 			ImGuiIO& io = ImGui::GetIO();
@@ -141,10 +141,10 @@ namespace TerraForge3D
 			err = vkDeviceWaitIdle(vulkanContext->graphicsDevice->handle);
 			check_vk_result(err);
 			ImGui_ImplVulkan_DestroyFontUploadObjects();
-			
+
 		}
 
-		void ImGuiManager::RenderFrame(ImDrawData* draw_data)
+		void UIManager::RenderFrame(ImDrawData* draw_data)
 		{
 			VkResult err;
 
@@ -211,7 +211,7 @@ namespace TerraForge3D
 			}
 		}
 
-		void ImGuiManager::PresentFrame()
+		void UIManager::PresentFrame()
 		{
 			if (requireSwapChainRebuild)
 				return;
@@ -233,7 +233,7 @@ namespace TerraForge3D
 			imguiWindow.SemaphoreIndex = (imguiWindow.SemaphoreIndex + 1) % imguiWindow.ImageCount; // Now we can use the next set of semaphoress
 		}
 
-		void ImGuiManager::Begin()
+		void UIManager::Begin()
 		{
 			if (requireSwapChainRebuild)
 			{
@@ -254,16 +254,17 @@ namespace TerraForge3D
 			ImGui::NewFrame();
 		}
 
-		void ImGuiManager::End()
+		void UIManager::End()
 		{
+			ImGui::EndFrame();
 			// Rendering
 			ImGui::Render();
 			ImDrawData* main_draw_data = ImGui::GetDrawData();
 			const bool main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
-			imguiWindow.ClearValue.color.float32[0] = clear_color.x * clear_color.w;
-			imguiWindow.ClearValue.color.float32[1] = clear_color.y * clear_color.w;
-			imguiWindow.ClearValue.color.float32[2] = clear_color.z * clear_color.w;
-			imguiWindow.ClearValue.color.float32[3] = clear_color.w;
+			imguiWindow.ClearValue.color.float32[0] = clearColor[0] * clearColor[3];
+			imguiWindow.ClearValue.color.float32[1] = clearColor[1] * clearColor[3];
+			imguiWindow.ClearValue.color.float32[2] = clearColor[2] * clearColor[3];
+			imguiWindow.ClearValue.color.float32[3] = clearColor[3];
 			if (!main_is_minimized)
 				RenderFrame(main_draw_data);
 

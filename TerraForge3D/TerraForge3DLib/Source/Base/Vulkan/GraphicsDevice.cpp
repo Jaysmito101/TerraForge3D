@@ -65,7 +65,7 @@ namespace TerraForge3D
 			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 			createInfo.pEnabledFeatures = &deviceFeatures;
 			
-			createInfo.enabledExtensionCount = extensions.size();
+			createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 			createInfo.ppEnabledExtensionNames = extensions.data();
 
 #ifdef TF3D_DEBUG

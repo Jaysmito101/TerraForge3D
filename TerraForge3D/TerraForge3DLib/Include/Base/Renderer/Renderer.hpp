@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Core/Core.hpp"
-
+#include "Base/Renderer/Context.hpp"
+#include "Base/Renderer/UIManager.hpp"
 
 namespace TerraForge3D
 {
@@ -12,19 +13,20 @@ namespace TerraForge3D
 		~Renderer();
 
 	public:
-		virtual void Shutdown() = 0;
-
-		// ImGui Functions
-		virtual void BeginImGui() = 0;
-		virtual void EndImGui() = 0;
+		virtual void WaitForIdle();
+		virtual void BeginUI();
+		virtual void EndUI();
 
 		static Renderer* Create();
 		static Renderer* Get();
 		static Renderer* Set(Renderer* context);
 		static void Destroy();
 
-	private:
+	public:
+		RendererAPI::Context* rendererContext = nullptr;
+		RendererAPI::UIManager* uiManager = nullptr;
 
+	private:
 		static Renderer* mainInstance;
 	};
 }

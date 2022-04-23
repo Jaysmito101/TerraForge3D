@@ -30,7 +30,7 @@ namespace TerraForge3D
 			inline static ComputeDevice* Set(ComputeDevice* device) { TF3D_ASSERT(device, "device is NULL"); mainInstance = device; return mainInstance; }
 			inline static void Destroy() { TF3D_ASSERT(mainInstance, "A vulkan compute device does not exist"); TF3D_SAFE_DELETE(mainInstance); }
 
-		private:
+		public:
 			PhysicalDevice physicalDevice;
 			VkQueue queue = VK_NULL_HANDLE;
 			VkDevice handle = VK_NULL_HANDLE;

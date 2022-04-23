@@ -6,29 +6,24 @@
 #include "Base/Vulkan/ComputeDevice.hpp"
 #include "Base/Vulkan/SwapChain.hpp"
 #include "Base/Window/Window.hpp"
+#include "Base/Renderer/Context.hpp"
 
 namespace TerraForge3D
 {
     namespace Vulkan
     {
         
-        class Context
+        class Context : public RendererAPI::Context
         {
-        private:
+        public:
             Context();
             ~Context();
+
+            void WaitForIdle() override;
 
         private:
             std::vector<const char*> GetRequiredExtensions();
 
-        public:
-
-            inline static Context* Create() { TF3D_ASSERT(mainInstance == nullptr, "Vulkan context already exists"); mainInstance = new Context(); return mainInstance; } 
-            inline static Context* Get() { TF3D_ASSERT(mainInstance, "No instance created"); return mainInstance; };
-            inline static void Set(Context* context) { TF3D_ASSERT(context, "Context in NULL"); mainInstance = context; };
-            inline static void Destroy() { TF3D_ASSERT(mainInstance, "No instance created");  TF3D_SAFE_DELETE(mainInstance); }
-
-        private:
             void SelectPhysicalDevices();
 
         public:
@@ -36,8 +31,6 @@ namespace TerraForge3D
             GraphicsDevice* graphicsDevice = nullptr;
             ComputeDevice* computeDevice = nullptr;
             SwapChain* swapChain = nullptr;
-
-            static Context* mainInstance;
         };
     }
 }

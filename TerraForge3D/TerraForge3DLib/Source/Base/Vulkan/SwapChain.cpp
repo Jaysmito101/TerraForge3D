@@ -11,10 +11,10 @@ namespace TerraForge3D
 
 		SwapChain* SwapChain::mainInstance;
 
-		SwapChain::SwapChain()
+		SwapChain::SwapChain(Vulkan::Context* context)
 		{
 			mainWindow = Window::Get()->GetHandle();
-			instance = Context::Get()->instance;
+			instance = context->instance;
 
 			TF3D_VK_CALL(glfwCreateWindowSurface(instance, mainWindow, nullptr, &surface));
 			TF3D_LOG("Created window surface");

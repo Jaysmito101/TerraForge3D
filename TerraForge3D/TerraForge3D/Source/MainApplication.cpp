@@ -75,6 +75,8 @@ namespace TerraForge3D
 
 		virtual void OnImGuiRender() override
 		{
+
+			Renderer::Get()->uiManager->clearColor[0] = pos[0]/ 600;
 			
 			ImGui::Begin("Hello World!");
 
