@@ -104,6 +104,7 @@ namespace TerraForge3D
 		Logger* logger = nullptr;
 		Renderer* renderer = nullptr;
 		bool isRunning = false;
+		double deltaTime = 0.0;
 
 		UUID applicationUUID;
 

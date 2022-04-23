@@ -1,5 +1,8 @@
 #include "Base/Core/Application.hpp"
 
+// TEMP
+#include "GLFW/glfw3.h"
+
 namespace TerraForge3D
 {
 	Application* Application::mainInstance = nullptr;
@@ -25,8 +28,14 @@ namespace TerraForge3D
 		renderer = Renderer::Create();
 		OnStart();
 		isRunning = true;
+		double previousTime = glfwGetTime();
+		double currentTime = 0;
 		while (isRunning)
 		{
+			currentTime = glfwGetTime();
+			deltaTime = currentTime - previousTime;
+			previousTime = currentTime;
+			deltaTime = deltaTime == 0 ? 0.001 : deltaTime;
 			OnUpdate();
 			renderer->BeginUI();
 			OnImGuiRender();

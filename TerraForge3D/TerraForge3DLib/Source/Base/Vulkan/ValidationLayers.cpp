@@ -1,5 +1,7 @@
 #include "Base/Vulkan/ValidationLayers.hpp"
 
+#ifdef TF3D_VULKAN_BACKEND
+
 #ifdef TF3D_DEBUG // Enable Validation Layers only in Debug builds
 
 static std::vector<const char*> validationLayers = {
@@ -104,4 +106,6 @@ namespace TerraForge3D
 	}
 }
 
-#endif
+#endif // TF3D_DEBUG
+
+#endif // TF3D_VULKAN_BACKEND

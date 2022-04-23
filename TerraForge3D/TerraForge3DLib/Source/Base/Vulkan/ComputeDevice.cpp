@@ -1,6 +1,8 @@
 #include "Base/Vulkan/ComputeDevice.hpp"
 #include "Base/Vulkan/ValidationLayers.hpp"
 
+#ifdef TF3D_VULKAN_BACKEND
+
 namespace TerraForge3D
 {
 	namespace Vulkan
@@ -98,3 +100,5 @@ namespace TerraForge3D
 		}
 	}
 }
+
+#endif

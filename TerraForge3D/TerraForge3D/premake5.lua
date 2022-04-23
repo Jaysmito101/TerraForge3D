@@ -77,6 +77,7 @@ project "TerraForge3D"
             "dl",
             "uuid",
             "pthread",
+            "opengl32",
             "vulkan-1",
             "SPDLog",
             "GLFW",

@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "imgui/backends/imgui_impl_vulkan.cpp"
 
+#ifdef TF3D_VULKAN_BACKEND
 
 namespace TerraForge3D
 {
@@ -283,3 +284,6 @@ namespace TerraForge3D
 	}
 
 }
+
+
+#endif

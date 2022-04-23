@@ -2,6 +2,8 @@
 #include "Base/Vulkan/ValidationLayers.hpp"
 #include "Base/Vulkan/SwapChain.hpp"
 
+#ifdef TF3D_VULKAN_BACKEND
+
 namespace TerraForge3D
 {
 	namespace Vulkan
@@ -115,3 +117,5 @@ namespace TerraForge3D
 
 	}
 }
+
+#endif

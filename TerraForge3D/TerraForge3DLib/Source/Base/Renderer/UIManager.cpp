@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Renderer/UIManager.hpp"
 #include "Base/Vulkan/UIManager.hpp"
+#include "Base/OpenGL/UIManager.hpp"
 
 namespace TerraForge3D
 {

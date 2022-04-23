@@ -78,14 +78,44 @@ namespace TerraForge3D
 
 			Renderer::Get()->uiManager->clearColor[0] = pos[0]/ 600;
 			
+			static bool isTestRunning = false;
+			static int testWindowCount = 10;
+
+			if (isTestRunning)
+			{
+				for (int i = 0; i < testWindowCount;i++)
+				{
+					ImGui::Begin((std::string("Window : ")+std::to_string(i)).c_str());
+					ImGui::Text("Test Window");
+					ImGui::Button("Button");
+					ImGui::ArrowButton("Arrow Button", ImGuiDir_Left);
+					ImGui::End();
+				}
+			}
+
+
 			ImGui::Begin("Hello World!");
 
 			ImGui::Text("Welcome to TerraForge3D!");
 			ImGui::Text("Window Position: %f, %f", pos[0], pos[1]);
 			ImGui::Text("Draw Window with middle mouse button to move it!");
+			
+			ImGui::NewLine();
+			
+			ImGui::Text("Delta Time: %f", deltaTime);
+			ImGui::Text("Frame Rate: %d", static_cast<uint32_t>(1000.0 / deltaTime));
+			
+			ImGui::NewLine();
+			
+			ImGui::Checkbox("Stress Test", &isTestRunning);
+			ImGui::InputInt("Stress Test Window Count", &testWindowCount, 5);
+			
 			if (ImGui::Button("Exit"))
 				Close();
+
 			ImGui::End();
+
+
 
 
 		}

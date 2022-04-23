@@ -47,7 +47,8 @@ project "TerraForge3DLib"
         "SPDLog",
     	"GLFW",
 	"ImGui",
-	"Glad"
+	"Glad",
+	"opengl32"
     }
 
     defines
