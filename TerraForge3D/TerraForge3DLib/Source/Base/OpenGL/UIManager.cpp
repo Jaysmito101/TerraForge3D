@@ -53,7 +53,7 @@ namespace TerraForge3D
 
 			glfwSwapInterval(1); // VSync is alwasy enabled 
 			ImGui_ImplGlfw_InitForOpenGL(window->GetHandle(), true);
-			ImGui_ImplOpenGL3_Init("#version 460");
+			ImGui_ImplOpenGL3_Init("#version 430");
 		}
 
 		void UIManager::Begin()

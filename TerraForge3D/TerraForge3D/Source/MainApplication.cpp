@@ -2,6 +2,11 @@
 #include "EntryPoint.hpp"
 
 
+// Temp
+#include "Base/Renderer/GPUTexture.hpp"
+#define STB_IMAGE_IMPLEMENTATION 
+#include "stb/stb_image.h"
+
 
 namespace TerraForge3D
 {
@@ -50,6 +55,33 @@ namespace TerraForge3D
 				return true;
 				}, { InputEventType_DragNDrop });
 
+			int w, h;
+			unsigned char* data = stbi_load("sample.png", &w, &h, nullptr, 3);
+			if (!data)
+			{
+				TF3D_LOG_ERROR("Failed to load sample.png");
+				exit(-1);
+			}
+			tex = RendererAPI::GPUTexture::Create();
+			tex->SetFormat(RendererAPI::GPUTextureFormat_RGB8I);
+			tex->SetType(RendererAPI::GPUTextureType_2D);
+			tex->SetSize(w, h);
+			tex->Setup();
+			tex->SetData(data);
+			stbi_image_free(data);
+			data = stbi_load("sample.png", &w, &h, nullptr, 4);
+			if (!data)
+			{
+				TF3D_LOG_ERROR("Failed to load sample.png");
+				exit(-1);
+			}
+			texA = RendererAPI::GPUTexture::Create();
+			texA->SetFormat(RendererAPI::GPUTextureFormat_RGBA8I);
+			texA->SetType(RendererAPI::GPUTextureType_2D);
+			texA->SetSize(w, h);
+			texA->Setup();
+			texA->SetData(data);
+			stbi_image_free(data);
 		}
 
 		virtual void OnUpdate() override
@@ -110,6 +142,14 @@ namespace TerraForge3D
 			ImGui::Checkbox("Stress Test", &isTestRunning);
 			ImGui::InputInt("Stress Test Window Count", &testWindowCount, 5);
 			
+			ImGui::NewLine();
+			ImGui::Text("Image (RGB)");
+			ImGui::Image(tex->GetImGuiID(), ImVec2(100, 100));
+
+			ImGui::NewLine();
+			ImGui::Text("Image (RGBA)");
+			ImGui::Image(texA->GetImGuiID(), ImVec2(100, 100));
+
 			if (ImGui::Button("Exit"))
 				Close();
 
@@ -124,11 +164,17 @@ namespace TerraForge3D
 		{
 			TF3D_LOG("Started Shutdown!");
 			GetInputEventManager()->DeregisterCallback(exitcb);
+
+			TF3D_SAFE_DELETE(tex);
 		}
 
 	private:
 		uint32_t exitcb;
 		float pos[2];
+
+		RendererAPI::GPUTexture* tex = nullptr;
+		RendererAPI::GPUTexture* texA = nullptr;
+
 	};
 }
 

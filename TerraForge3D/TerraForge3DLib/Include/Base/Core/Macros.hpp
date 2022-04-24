@@ -13,5 +13,5 @@
 #endif
 
 // Uncomment only one macro at a time here
-// #define TF3D_OPENGL_BACKEND
-#define TF3D_VULKAN_BACKEND
+#define TF3D_OPENGL_BACKEND
+// #define TF3D_VULKAN_BACKEND
