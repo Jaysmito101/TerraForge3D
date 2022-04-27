@@ -335,6 +335,24 @@ namespace TerraForge3D
             return supported == VK_TRUE;
         }
 
+        uint32_t PhysicalDevice::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties)
+        {
+            VkPhysicalDeviceMemoryProperties memoryProperties;
+            vkGetPhysicalDeviceMemoryProperties(handle, &memoryProperties);
+            for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+            {
+                if ((typeBits & i) == 1)
+                {
+                    if ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+                    {
+                        return i;
+                    }
+                }
+                typeBits >>= 1;
+            }
+            return 0;
+        }
+
 
         std::string to_string(PhysicalDeviceType type)
         {

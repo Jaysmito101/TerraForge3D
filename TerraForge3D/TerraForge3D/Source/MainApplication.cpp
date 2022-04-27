@@ -148,7 +148,7 @@ namespace TerraForge3D
 
 			ImGui::NewLine();
 			ImGui::Text("Image (RGBA)");
-			ImGui::Image(texA->GetImGuiID(), ImVec2(100, 100));
+			ImGui::Image(texAm->GetImGuiID(), ImVec2(100, 100));
 
 			if (ImGui::Button("Exit"))
 				Close();
