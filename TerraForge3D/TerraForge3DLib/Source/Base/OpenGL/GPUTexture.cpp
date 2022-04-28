@@ -1,6 +1,6 @@
 #include "Base/OpenGL/GPUTexture.hpp"
 
-
+#ifdef TF3D_OPENGL_BACKEND
 
 namespace TerraForge3D
 {
@@ -160,3 +160,5 @@ namespace TerraForge3D
 	}
 
 }
+
+#endif

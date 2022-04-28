@@ -1,5 +1,6 @@
-#include "Base\Renderer\GPUTexture.hpp"
+#include "Base/Renderer/GPUTexture.hpp"
 
+#include "Base/Vulkan/GPUTexture.hpp"
 #include "Base/OpenGL/GPUTexture.hpp"
 
 namespace TerraForge3D
@@ -23,7 +24,9 @@ namespace TerraForge3D
 #if defined(TF3D_OPENGL_BACKEND)
 			return new OpenGL::GPUTexture();
 #elif defined(TF3D_VULKAN_BACKEND)
-			return nullptr; // TODO : Implement Vulkan GPUTexture
+			Vulkan::GPUTexture* tex = new Vulkan::GPUTexture();
+			tex->UseGraphicsDevice();
+			return tex;
 #endif
 		}
 

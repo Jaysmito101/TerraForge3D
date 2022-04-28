@@ -2,6 +2,7 @@
 
 #include "Base/Vulkan/Core.hpp"
 #include "Base/Vulkan/PhysicalDevice.hpp"
+#include "Base/Vulkan/LogicalDevice.hpp"
 
 namespace TerraForge3D
 {
@@ -14,15 +15,13 @@ namespace TerraForge3D
 		*
 		* This takes care of almost everything done using vulkan.
 		*/
-		class ComputeDevice
+		class ComputeDevice : public LogicalDevice
 		{
 		private:
 			ComputeDevice(PhysicalDevice& physicalDevice);
 			~ComputeDevice();
 
-		private:
-			void CreateDevice();
-			void CreateDescriptorPool();
+			virtual void CreateDevice() override;
 
 		public:
 			inline static ComputeDevice* Create(PhysicalDevice& physicalDevice) { TF3D_ASSERT(mainInstance == nullptr, "A vulkan compute device already exists"); mainInstance = new ComputeDevice(physicalDevice); return mainInstance; };
@@ -31,10 +30,7 @@ namespace TerraForge3D
 			inline static void Destroy() { TF3D_ASSERT(mainInstance, "A vulkan compute device does not exist"); TF3D_SAFE_DELETE(mainInstance); }
 
 		public:
-			PhysicalDevice physicalDevice;
-			VkQueue queue = VK_NULL_HANDLE;
-			VkDevice handle = VK_NULL_HANDLE;
-			VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+			VkQueue queue = VK_NULL_HANDLE;		
 			std::vector<const char*> extensions;
 		private:
 			static ComputeDevice* mainInstance;

@@ -169,7 +169,9 @@ namespace TerraForge3D
             }
 
             graphicsDevice = GraphicsDevice::Create(graphicsPhysicalDevice);
+            graphicsDevice->Setup();
             computeDevice =  ComputeDevice::Create(computePhysicalDevice);
+            computeDevice->Setup();
         }
 
         void Context::WaitForIdle()

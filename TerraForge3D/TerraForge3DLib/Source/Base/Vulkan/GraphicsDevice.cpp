@@ -14,16 +14,12 @@ namespace TerraForge3D
 		GraphicsDevice* GraphicsDevice::mainInstance = nullptr;
 
 		GraphicsDevice::GraphicsDevice(PhysicalDevice& pD)
+			:LogicalDevice(pD)
 		{
 			extensions = {
 				VK_KHR_SWAPCHAIN_EXTENSION_NAME
 			};
 			physicalDevice = pD;
-			if (!physicalDevice.isGraphicsCapable)
-			{
-				TF3D_LOG_ERROR("Vulkan device is not graphics compatible");
-				exit(-1);
-			}
 			TF3D_LOG("Using Graphics Device: {0}", physicalDevice.name);
 			CreateDevice();
 			CreateDescriptorPool();
@@ -31,12 +27,16 @@ namespace TerraForge3D
 
 		GraphicsDevice::~GraphicsDevice()
 		{
-			vkDestroyDescriptorPool(handle, descriptorPool, nullptr);
-			vkDestroyDevice(handle, nullptr);
 		}
 
 		void GraphicsDevice::CreateDevice()
 		{
+			if (!physicalDevice.isGraphicsCapable)
+			{
+				TF3D_LOG_ERROR("Vulkan device is not graphics compatible");
+				exit(-1);
+			}
+
 			uint32_t graphicsQueueFamilyIndex = physicalDevice.GetGraphicsQueueIndex();
 			TF3D_ASSERT(graphicsQueueFamilyIndex >= 0, "Invalid queue index");
 			graphicsQueueProperties = physicalDevice.GetQueue(graphicsQueueFamilyIndex);
@@ -86,34 +86,11 @@ namespace TerraForge3D
 
 			vkGetDeviceQueue(handle, graphicsQueueFamilyIndex, 0, &graphicsQueue);
 			vkGetDeviceQueue(handle, presentQueueFamilyIndex, 0, &presentQueue);
+
+			primaryQueue = graphicsQueue;
+			primaryQueueProperties = graphicsQueueProperties;
 		}
 
-		void GraphicsDevice::CreateDescriptorPool()
-		{
-			VkDescriptorPoolSize poolSizes[] = 
-			{
-					{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-					{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-					{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-					{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-					{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-					{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-					{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-					{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-					{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-					{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-					{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-			};
-
-			VkDescriptorPoolCreateInfo poolCreateInfo = {};
-			poolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			poolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-			poolCreateInfo.maxSets = 1000 * sizeof(poolSizes) / sizeof(poolSizes[0]);
-			poolCreateInfo.poolSizeCount = static_cast<uint32_t>(sizeof(poolSizes) / sizeof(poolSizes[0]));
-			poolCreateInfo.pPoolSizes = poolSizes;
-			TF3D_VK_CALL(vkCreateDescriptorPool(handle, &poolCreateInfo, nullptr, &descriptorPool));
-			TF3D_LOG("Created descriptor pool for graphics device");
-		}
 
 	}
 }
