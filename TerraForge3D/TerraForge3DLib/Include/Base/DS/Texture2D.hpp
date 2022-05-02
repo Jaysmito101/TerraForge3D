@@ -18,6 +18,10 @@ namespace TerraForge3D
 
 		void Destroy();
 
+		void GetPixel(float u, float v, float* r = nullptr, float* g = nullptr, float* b = nullptr, float* a = nullptr);
+		void SetPixel(float u, float v, float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
+
+
 
 		inline uint32_t GetWidth() { return width; }
 		inline uint32_t GetHeight() { return height; }
@@ -33,6 +37,7 @@ namespace TerraForge3D
 		inline RendererAPI::GPUTexture* GetGPUHandle() { TF3D_ASSERT(gpuTextureHandle, "GPU Texture handle is null"); return gpuTextureHandle; }
 		inline void SetStorageMode(TextureStorageMode storageMode) { this->storageMode = storageMode; };
 		inline ImTextureID GetImGuiID() { /* TF3D_ASSERT(loadedOnGPU, "Cannot Get ImTextureID of texture not loaded on GPU"); */ return gpuTextureHandle->GetImGuiID(); }
+
 
 	private:
 		void SetUpGPUTextureHandle();

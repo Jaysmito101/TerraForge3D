@@ -111,6 +111,8 @@ namespace TerraForge3D
 					SetUpGPUTextureHandle();
 					gpuTextureHandle->SetSize(width, height);
 					gpuTextureHandle->SetData(rawTextureData);
+					stbi_image_free(rawTextureData);
+					rawTextureData = nullptr;
 					break;
 				}
 				default:
@@ -161,6 +163,11 @@ namespace TerraForge3D
 				gpuTextureHandle->sizeY = h;
 				gpuTextureHandle->Setup();
 				gpuTextureHandle->SetData(rawData);
+			}
+			if (storageMode == TextureStorageMode_GPUOnly)
+			{
+				stbi_image_free(rawTextureData);
+				rawTextureData = nullptr;
 			}
 			isLoaded = true;
 		}
@@ -232,6 +239,116 @@ namespace TerraForge3D
 		loadedOnGPU = false;
 		isCPUDataShared = false;
 		rawTextureData = nullptr;
+	}
+
+	void Texture2D::GetPixel(float u, float v, float* pr, float* pg, float* pb, float* pa)
+	{
+		TF3D_ASSERT(storageMode != TextureStorageMode_GPUOnly, "Cannot get pixel values with texture storage mode GPUOnly"); // Will soon be updated to support this as it will be needed for things like mouse picking
+
+		uint32_t x = static_cast<uint32_t>(u * (width - 1));
+		uint32_t y = static_cast<uint32_t>(v * (height - 1));
+		float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+		uint32_t bytesPerPixel = channels * dataType;
+
+		switch (dataType)
+		{
+		case TextureDataType_8UI:
+		{
+			uint8_t* pixel = &reinterpret_cast<uint8_t*>(rawTextureData)[width * y * bytesPerPixel + x * bytesPerPixel];
+			r = static_cast<float>(pixel[0] / 255.0f);
+			g = static_cast<float>(pixel[1] / 255.0f);
+			b = static_cast<float>(pixel[2] / 255.0f);
+			if(channels == TextureChannels_RGBA)
+				a = static_cast<float>(pixel[3] / 255.0f);
+			break;
+		}
+		case TextureDataType_16UI:
+		{
+			uint16_t* pixel = &reinterpret_cast<uint16_t*>(rawTextureData)[width * y * bytesPerPixel + x * bytesPerPixel];
+			r = static_cast<float>(pixel[0] / 65535.0f);
+			g = static_cast<float>(pixel[1] / 65535.0f);
+			b = static_cast<float>(pixel[2] / 65535.0f);
+			if (channels == TextureChannels_RGBA)
+				a = static_cast<float>(pixel[3] / 65535.0f);
+			break;
+		}
+		case TextureDataType_32F:
+		{
+			float* pixel = &reinterpret_cast<float*>(rawTextureData)[width * y * bytesPerPixel + x * bytesPerPixel];
+			r = pixel[0];
+			g = pixel[1];
+			b = pixel[2];
+			if (channels == TextureChannels_RGBA)
+				a = pixel[3];
+			break;
+		}
+		default:
+		{
+			TF3D_ASSERT(false, "Unknown Texture Data Type");
+			break;
+		}
+		}
+		if (pr)
+			*pr = r;
+		if (pg)
+			*pg = g;
+		if (pb)
+			*pb = b;
+		if (pa)
+			*pa = a;
+	}
+
+	void Texture2D::SetPixel(float u, float v, float r, float g, float b, float a)
+	{
+		TF3D_ASSERT(storageMode != TextureStorageMode_GPUOnly, "Cannot get pixel values with texture storage mode GPUOnly"); // Will soon be updated to support this as it will be needed for things like mouse picking
+
+		uint32_t x = static_cast<uint32_t>(u * (width - 1));
+		uint32_t y = static_cast<uint32_t>(v * (height - 1));
+		uint32_t bytesPerPixel = channels * dataType;
+
+		switch (dataType)
+		{
+		case TextureDataType_8UI:
+		{
+			uint8_t* pixel = &reinterpret_cast<uint8_t*>(rawTextureData)[width * y * bytesPerPixel + x * bytesPerPixel];
+			pixel[0] = static_cast<uint8_t>(r * 255);
+			pixel[1] = static_cast<uint8_t>(g * 255);
+			pixel[2] = static_cast<uint8_t>(b * 255);
+			if (channels == TextureChannels_RGBA)
+				pixel[3] = static_cast<uint8_t>(a * 255);
+			break;
+		}
+		case TextureDataType_16UI:
+		{
+			uint16_t* pixel = &reinterpret_cast<uint16_t*>(rawTextureData)[width * y * bytesPerPixel + x * bytesPerPixel];
+			pixel[0] = static_cast<uint16_t>(r * 255);
+			pixel[1] = static_cast<uint16_t>(g * 255);
+			pixel[2] = static_cast<uint16_t>(b * 255);
+			if (channels == TextureChannels_RGBA)
+				pixel[3] = static_cast<uint16_t>(a * 255);
+			break;
+		}
+		case TextureDataType_32F:
+		{
+			float* pixel = &reinterpret_cast<float*>(rawTextureData)[width * y * bytesPerPixel + x * bytesPerPixel];
+			pixel[0] = r;
+			pixel[1] = g;
+			pixel[2] = b;
+			if (channels == TextureChannels_RGBA)
+				pixel[3] = a;
+			break;
+		}
+		default:
+		{
+			TF3D_ASSERT(false, "Unknown Texture Data Type");
+			break;
+		}
+		}
+
+		if (storageMode == TextureStorageMode_CPUAndGPU || storageMode == TextureStorageMode_GPUOnly)
+		{
+			gpuTextureHandle->SetData(rawTextureData);
+		}
 	}
 
 	inline void Texture2D::SetUpGPUTextureHandle()
