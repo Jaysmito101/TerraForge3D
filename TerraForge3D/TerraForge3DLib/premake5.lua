@@ -32,6 +32,7 @@ project "TerraForge3DLib"
         "../Vendor/SPDLog/Include",
         "../Vendor/GLFW/Include",
         "../Vendor/Glad/Include",
+        "../Vendor/STB/Include",
         "../Vendor/ImGui/Include",
         "%{IncludeDirectories.VulkanSDK}"
     }

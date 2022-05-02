@@ -158,7 +158,7 @@ LICENSE
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef TERR3D_WIN32
+#ifndef TF3D_WINDOWS
 
 inline int sprintf_s(char* buffer, size_t sizeOfBuffer, const char* format, ...)
 {

@@ -179,6 +179,7 @@ namespace TerraForge3D
 		void GPUTexture::Destroy()
 		{
 			TF3D_ASSERT(isSetupOnGPU, "First call Setup");
+			vkDeviceWaitIdle(device);
 			vkDestroyImageView(device, view, nullptr);
 			vkDestroyImage(device, image, nullptr);
 			if (sampler)
@@ -186,6 +187,7 @@ namespace TerraForge3D
 				vkDestroySampler(device, sampler, nullptr);
 			}
 			vkFreeMemory(device, deviceMemory, nullptr);
+			imGuiID = VK_NULL_HANDLE;
 			isSetupOnGPU = false;
 		}
 

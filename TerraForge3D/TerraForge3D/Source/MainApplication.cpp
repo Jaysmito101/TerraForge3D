@@ -3,10 +3,7 @@
 
 
 // Temp
-#include "Base/Renderer/GPUTexture.hpp"
-#define STB_IMAGE_IMPLEMENTATION 
-#include "stb/stb_image.h"
-
+#include "Base/DS/DS.hpp"
 
 namespace TerraForge3D
 {
@@ -26,7 +23,11 @@ namespace TerraForge3D
 #else
 #error "Unknown Platform"
 #endif
-			applicationName += " [OpenCL + VulkanCompute]";
+#ifdef TF3D_VULKAN_BACKEND
+			applicationName += " [Vulkan]";
+#elif defined TF3D_OPENGL_BACKEND
+			applicationName += " [OpenGL]";
+#endif
 			applicationName += " - Jaysmito Mukherjee";
 			SetApplicationName(applicationName);
 		}
@@ -34,12 +35,6 @@ namespace TerraForge3D
 		virtual void OnStart() override
 		{
 			TF3D_LOG("Started Application!");
-			// TF3D_LOG("Application UUID : {0}", GetUUID());
-
-			// Test Vectors:
-
-
-
 			exitcb = GetInputEventManager()->RegisterCallback([&](InputEventParams* params) -> bool {
 				TF3D_LOG_INFO("Shutting down application.");
 				Close();
@@ -55,33 +50,9 @@ namespace TerraForge3D
 				return true;
 				}, { InputEventType_DragNDrop });
 
-			int w, h;
-			unsigned char* data = stbi_load("sample.png", &w, &h, nullptr, 3);
-			if (!data)
-			{
-				TF3D_LOG_ERROR("Failed to load sample.png");
-				exit(-1);
-			}
-			tex = RendererAPI::GPUTexture::Create();
-			tex->SetFormat(RendererAPI::GPUTextureFormat_RGB8I);
-			tex->SetType(RendererAPI::GPUTextureType_2D);
-			tex->SetSize(w, h);
-			tex->Setup();
-			tex->SetData(data);
-			stbi_image_free(data);
-			data = stbi_load("sample.png", &w, &h, nullptr, 4);
-			if (!data)
-			{
-				TF3D_LOG_ERROR("Failed to load sample.png");
-				exit(-1);
-			}
-			texA = RendererAPI::GPUTexture::Create();
-			texA->SetFormat(RendererAPI::GPUTextureFormat_RGBA8I);
-			texA->SetType(RendererAPI::GPUTextureType_2D);
-			texA->SetSize(w, h);
-			texA->Setup();
-			texA->SetData(data);
-			stbi_image_free(data);
+			tex = new Texture2D();
+			tex->LoadFromFile("sample.png");
+
 		}
 
 		virtual void OnUpdate() override
@@ -142,13 +113,18 @@ namespace TerraForge3D
 			ImGui::Checkbox("Stress Test", &isTestRunning);
 			ImGui::InputInt("Stress Test Window Count", &testWindowCount, 5);
 			
-			ImGui::NewLine();
-			ImGui::Text("Image (RGB)");
-			ImGui::Image(tex->GetImGuiID(), ImVec2(100, 100));
+			static char dataT[4096] = {0};
+			ImGui::InputTextWithHint("Path", "Enter Path of Image to Load", dataT, 4096);
+			if (ImGui::Button("Load"))
+			{
 
-			ImGui::NewLine();
-			ImGui::Text("Image (RGBA)");
-			ImGui::Image(texA->GetImGuiID(), ImVec2(100, 100));
+				tex->Destroy();
+				tex->LoadFromFile(std::string(dataT));
+
+			}
+
+			ImGui::Image(tex->GetImGuiID(), ImVec2(200, 200));
+			ImGui::Text("Data Type: %s\nChannels: %s\nWidth: %d\nHeight: %d", ToString(tex->GetDataType()).c_str(), ToString(tex->GetChannels()).c_str(), tex->GetWidth(), tex->GetHeight());
 
 			if (ImGui::Button("Exit"))
 				Close();
@@ -172,8 +148,7 @@ namespace TerraForge3D
 		uint32_t exitcb;
 		float pos[2];
 
-		RendererAPI::GPUTexture* tex = nullptr;
-		RendererAPI::GPUTexture* texA = nullptr;
+		Texture2D* tex = nullptr;
 
 	};
 }

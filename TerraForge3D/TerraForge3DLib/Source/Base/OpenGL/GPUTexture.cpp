@@ -44,6 +44,7 @@ namespace TerraForge3D
 		{
 			UpdateInfo();
 			glDeleteTextures(1, &handle);
+			imGuiID = nullptr;
 			isSetupOnGPU = false;
 		}
 
