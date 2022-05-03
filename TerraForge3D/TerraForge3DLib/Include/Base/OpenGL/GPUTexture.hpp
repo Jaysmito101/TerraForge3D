@@ -21,6 +21,7 @@ namespace TerraForge3D
 			virtual void SetData(void* data) override;
 			virtual void SetData(void* data, uint32_t depth) override;
 			virtual void SetData(void* data, RendererAPI::GPUTextureCubemapFace face) override;
+			virtual void GetData(void* data) override;
 			virtual void GetHandle(void* handle) override;
 			virtual ImTextureID GetImGuiID() override;
 

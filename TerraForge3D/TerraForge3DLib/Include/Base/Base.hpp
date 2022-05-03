@@ -12,6 +12,16 @@
 
 // Renderer
 #include "Base/Renderer/Renderer.hpp"
+#ifndef TF3D_EXCLUDE_RENDERER_API
+#include "Base/Renderer/GPUTexture.hpp"
+#include "Base/Renderer/Context.hpp"
+#include "Base/Renderer/UIManager.hpp"
+#endif
+
+// Data Strutures
+#ifndef TF3D_EXCLUDE_DATA_STRCUTRUES
+#include "Base/DS/DS.hpp"
+#endif
 
 // ImGui
 #include "imgui/imgui.h"

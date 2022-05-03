@@ -1,4 +1,4 @@
-#include "Base/Base.hpp"
+#include "TerraForge3D.hpp"
 #include "EntryPoint.hpp"
 
 
@@ -12,24 +12,12 @@ namespace TerraForge3D
 	public:
 		virtual void OnPreload()
 		{
-			SetLogFilePath("TerraForge3D.log");
-			std::string applicationName = "TerraForge3D v" + TF3D_VERSION_STRING + " ";
-#ifdef TF3D_WINDOWS
-			applicationName += "[Windows]";
-#elif defined TF3D_LINUX
-			applicationName += "[Linux]";
-#elif defined TF3D_MACOSX
-			applicationName += "[MacOS]";
-#else
-#error "Unknown Platform"
-#endif
-#ifdef TF3D_VULKAN_BACKEND
-			applicationName += " [Vulkan]";
-#elif defined TF3D_OPENGL_BACKEND
-			applicationName += " [OpenGL]";
-#endif
-			applicationName += " - Jaysmito Mukherjee";
-			SetApplicationName(applicationName);
+			appState = ApplicationState::Create();
+			appState->core.app = this;
+			appState->core.window = GetWindow();
+			SetLogFilePath(appState->appResourcePaths.currentLogFilePath);
+			SetApplicationName(appState->meta.name);
+			SetWindowConfigPath(appState->appResourcePaths.windowConfigPath);
 		}
 
 		virtual void OnStart() override
@@ -40,17 +28,8 @@ namespace TerraForge3D
 				Close();
 				return true;
 				}, { InputEventType_WindowClose });
-
-			GetInputEventManager()->RegisterCallback([&](InputEventParams* params) -> bool {
-				TF3D_LOG("Drag and Drop Recieved!");
-				for (auto& item : params->paths)
-				{
-					TF3D_LOG("\t{}", item);
-				}
-				return true;
-				}, { InputEventType_DragNDrop });
-
 			tex = new Texture2D();
+			tex->SetStorageMode(TextureStorageMode_GPUOnly);
 			tex->LoadFromFile("sample.png");
 
 		}
@@ -61,18 +40,6 @@ namespace TerraForge3D
 			{
 				Close();
 			}
-
-			if (InputSystem::IsMouseButtonPressedS(MouseButton_Middle))
-			{
-				auto [posx, posy] = GetWindow()->GetPosition();
-				auto [mdx, mdy] = InputSystem::GetMouseDeltaS();
-				posx += TF3D_CLAMP(mdx, -10, 10);
-				posy += TF3D_CLAMP(mdy, -10, 10);
-				pos[0] = posx;
-				pos[1] = posy;
-				GetWindow()->SetPosition(posx, posy);
-			}
-
 			//TF3D_LOG("Mouse Pos {0} , {1}", InputSystem::GetMouseDeltaS().first, InputSystem::GetMouseDeltaS().second)
 		}
 
@@ -165,7 +132,8 @@ namespace TerraForge3D
 		{
 			TF3D_LOG("Started Shutdown!");
 			GetInputEventManager()->DeregisterCallback(exitcb);
-
+			ApplicationState::Destory();
+			
 			TF3D_SAFE_DELETE(tex);
 		}
 
@@ -176,6 +144,7 @@ namespace TerraForge3D
 		float coord[2] = {0.0f};
 
 		Texture2D* tex = nullptr;
+		ApplicationState* appState = nullptr;
 
 	};
 }

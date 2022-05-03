@@ -92,7 +92,7 @@ namespace TerraForge3D
 			imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			imageCreateInfo.extent = {sizeX, sizeY, 1};
-			imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+			imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 			TF3D_VK_CALL(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
 
@@ -314,6 +314,65 @@ namespace TerraForge3D
 			TF3D_ASSERT(data, "Data is null");
 			UpdateInfo();
 		}
+
+		void GPUTexture::GetData(void* data)
+		{
+			TF3D_ASSERT(isSetupOnGPU, "Texture not setup on GPU (First call Setup)");
+
+			uint64_t size = sizeX * sizeY * sizeZ * bytesPerChannel;
+
+
+			stagingBuffer = new Buffer(isGraphicsDevice);
+			stagingBuffer->usageflags = BufferUsage_TransferDestination;
+			stagingBuffer->SetMemoryProperties(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+			stagingBuffer->bufferSize = size;
+			stagingBuffer->Setup();
+
+
+
+
+			// We only need 1 as there will always be 1 mipmap in this application
+			VkBufferImageCopy bufferCopyRegion = {};
+			bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			bufferCopyRegion.imageSubresource.mipLevel = 0;
+			bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
+			if (type == RendererAPI::GPUTextureType_Array)
+				bufferCopyRegion.imageSubresource.layerCount = sizeZ;
+			else
+				bufferCopyRegion.imageSubresource.layerCount = 1;
+			bufferCopyRegion.imageExtent.width = sizeX;
+			bufferCopyRegion.imageExtent.height = sizeY;
+			if (type == RendererAPI::GPUTextureType_3D)
+				bufferCopyRegion.imageExtent.depth = sizeZ;
+			else
+				bufferCopyRegion.imageExtent.depth = 1;
+			bufferCopyRegion.bufferOffset = 0;
+
+			VkImageSubresourceRange subresourceRange = {};
+			subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			subresourceRange.baseMipLevel = 0;
+			subresourceRange.levelCount = 1;
+			subresourceRange.baseArrayLayer = 0;
+			if (type == RendererAPI::GPUTextureType_Array)
+				subresourceRange.layerCount = sizeZ;
+			else
+				subresourceRange.layerCount = 1;
+
+			// Image barier for optimal image (target)
+			// Optimal image will be used as a destination for the copy
+			VkCommandBuffer commandBuffer = logicalDevice->CreateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+			SetImageLayout(commandBuffer, image, imageLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, subresourceRange);
+			vkCmdCopyImageToBuffer(commandBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer->handle, 1, &bufferCopyRegion);
+			SetImageLayout(commandBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, imageLayout, subresourceRange);
+			logicalDevice->FlushCommandBuffer(commandBuffer);
+
+			stagingBuffer->Map();
+			memcpy(data, stagingBuffer->mapped, stagingBuffer->bufferSize);
+			stagingBuffer->Unmap();
+
+			TF3D_SAFE_DELETE(stagingBuffer);
+		}
+
 
 		ImTextureID GPUTexture::GetImGuiID()
 		{

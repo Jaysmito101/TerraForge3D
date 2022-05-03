@@ -95,6 +95,19 @@ namespace TerraForge3D
 			glBindTexture(target, 0);
 		}
 
+		void GPUTexture::GetData(void* data)
+		{
+			TF3D_ASSERT(isSetupOnGPU, "Texture not setup on GPU (First call Setup)");
+			TF3D_ASSERT(type == RendererAPI::GPUTextureType_2D, "Get Data has only been implemented for 2D textures on OpenGL backend")
+
+			UpdateInfo();
+
+			// TODO: Fix this
+			glBindTexture(target, handle);
+			glReadPixels(0, 0, sizeX, sizeZ, format, dataType, data);
+			glBindTexture(target, 0);
+
+		}
 		ImTextureID GPUTexture::GetImGuiID()
 		{
 			return (ImTextureID)(handle);

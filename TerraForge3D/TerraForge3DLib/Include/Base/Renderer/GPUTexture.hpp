@@ -67,6 +67,8 @@ namespace TerraForge3D
 			virtual void SetData(void* data, uint32_t depth) = 0; // For texture 3d
 			virtual void SetData(void* data, GPUTextureCubemapFace face) = 0; // For cubemap textures
 
+			virtual void GetData(void* data) = 0; // Get the entire thing back
+
 			/*
 			* This returns a texture id (Gluint) if using the OpenGL backend
 			* or returns a VkImage if using Vulkan backend

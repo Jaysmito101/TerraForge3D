@@ -110,6 +110,7 @@ namespace TerraForge3D
 					isCPUDataShared = false;
 					SetUpGPUTextureHandle();
 					gpuTextureHandle->SetSize(width, height);
+					gpuTextureHandle->Setup();
 					gpuTextureHandle->SetData(rawTextureData);
 					stbi_image_free(rawTextureData);
 					rawTextureData = nullptr;
@@ -243,7 +244,12 @@ namespace TerraForge3D
 
 	void Texture2D::GetPixel(float u, float v, float* pr, float* pg, float* pb, float* pa)
 	{
-		TF3D_ASSERT(storageMode != TextureStorageMode_GPUOnly, "Cannot get pixel values with texture storage mode GPUOnly"); // Will soon be updated to support this as it will be needed for things like mouse picking
+		
+		if (storageMode == TextureStorageMode_GPUOnly)
+		{
+			rawTextureData = malloc(width * height * channels);
+			gpuTextureHandle->GetData(rawTextureData);
+		}
 
 		uint32_t x = static_cast<uint32_t>(u * (width - 1));
 		uint32_t y = static_cast<uint32_t>(v * (height - 1));
@@ -296,11 +302,23 @@ namespace TerraForge3D
 			*pb = b;
 		if (pa)
 			*pa = a;
+
+
+		if (storageMode == TextureStorageMode_GPUOnly)
+		{
+			free(rawTextureData);
+			rawTextureData = nullptr;
+		}
+
 	}
 
 	void Texture2D::SetPixel(float u, float v, float r, float g, float b, float a)
 	{
-		TF3D_ASSERT(storageMode != TextureStorageMode_GPUOnly, "Cannot get pixel values with texture storage mode GPUOnly"); // Will soon be updated to support this as it will be needed for things like mouse picking
+		if (storageMode == TextureStorageMode_GPUOnly)
+		{
+			rawTextureData = malloc(width * height * channels);
+			gpuTextureHandle->GetData(rawTextureData);
+		}
 
 		uint32_t x = static_cast<uint32_t>(u * (width - 1));
 		uint32_t y = static_cast<uint32_t>(v * (height - 1));
@@ -348,6 +366,12 @@ namespace TerraForge3D
 		if (storageMode == TextureStorageMode_CPUAndGPU || storageMode == TextureStorageMode_GPUOnly)
 		{
 			gpuTextureHandle->SetData(rawTextureData);
+		}
+
+		if (storageMode == TextureStorageMode_GPUOnly)
+		{
+			free(rawTextureData);
+			rawTextureData = nullptr;
 		}
 	}
 
