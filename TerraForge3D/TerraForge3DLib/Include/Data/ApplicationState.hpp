@@ -33,11 +33,13 @@ namespace TerraForge3D
 		{
 			std::string executablePath = Utils::GetExecutablePath();
 			std::string executableDir = Utils::GetExecetableDirectory();
-			std::string reosurceDir = executableDir + PATH_SEPERATOR "Data";
-			std::string logsDir = reosurceDir + PATH_SEPERATOR "Logs";
+			std::string resourceDir = executableDir + PATH_SEPERATOR "Data";
+			std::string logsDir = resourceDir + PATH_SEPERATOR "Logs";
 			std::string currentLogFilePath = logsDir + PATH_SEPERATOR + Utils::GetTimeStamp() + ".log";
-			std::string configDir = reosurceDir + PATH_SEPERATOR "Configs";
+			std::string configDir = resourceDir + PATH_SEPERATOR "Configs";
 			std::string windowConfigPath = configDir + PATH_SEPERATOR "WindowArrangement.ini";
+			std::string preferencesPath = configDir + PATH_SEPERATOR "UserPreferences.json";
+			std::string stylesDir = resourceDir + PATH_SEPERATOR "Styles";
 		} appResourcePaths;
 
 		struct 

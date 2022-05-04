@@ -78,6 +78,14 @@ namespace TerraForge3D
 			ImGui::Text("Frame Rate: %d", static_cast<uint32_t>(1000.0 / deltaTime));
 			
 			ImGui::NewLine();
+
+			if (ImGui::Button("Save Style"))
+			{
+				style.LoadCurrent();
+				style.SaveToFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR "style.json");
+			}
+
+			ImGui::NewLine();
 			
 			ImGui::Checkbox("Stress Test", &isTestRunning);
 			ImGui::InputInt("Stress Test Window Count", &testWindowCount, 5);
@@ -123,7 +131,8 @@ namespace TerraForge3D
 
 			ImGui::End();
 
-
+			ImGui::ShowStyleEditor();
+			ImGui::ShowDemoWindow();
 
 
 		}
@@ -145,6 +154,7 @@ namespace TerraForge3D
 
 		Texture2D* tex = nullptr;
 		ApplicationState* appState = nullptr;
+		UI::Style style;
 
 	};
 }

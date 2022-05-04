@@ -13,6 +13,10 @@ namespace TerraForge3D
 
 		std::string GetTimeStamp();
 
+		std::string ReadTextFile(std::string filepath, bool* success = nullptr);
+
+		bool WriteTextFile(std::string filepath, std::string contents, bool* success = nullptr);
+
 	}
 
 }

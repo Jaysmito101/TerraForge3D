@@ -6,6 +6,8 @@
 // Data
 #include "Data/ApplicationState.hpp"
 
-
 // Utils
 #include "Utils/Utils.hpp"
+
+// UI
+#include "UI/Style.hpp"

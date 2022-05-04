@@ -1,8 +1,5 @@
 #include "Utils/Utils.hpp"
 
-#include <chrono>
-#include <format>
-#include <iostream>
 
 
 #ifdef TF3D_WINDOWS
@@ -43,6 +40,68 @@ namespace TerraForge3D
 		{
 			const auto now = std::chrono::system_clock::now();
 			return std::format("{:%d-%m-%Y_%H-%M-%OS}", now);
+		}
+
+		std::string ReadTextFile(std::string filepath, bool* success)
+		{
+			try {
+				std::ifstream f;
+				f.open(filepath);
+
+				if (f.is_open() && f.good())
+				{
+					std::stringstream s;
+					s << f.rdbuf();
+					f.close();
+					if (success)
+						*success = true;
+					return s.str();
+				}
+				else
+				{
+					if (success)
+						*success = false;
+					return "";
+				}
+			}
+			catch (std::exception& e)
+			{
+				TF3D_LOG_ERROR("Error while reading text file {0}, ERROR: {1}", filepath, e.what());
+				if (success)
+					*success = false;
+				return "";
+			}
+		}
+
+		bool WriteTextFile(std::string filepath, std::string contents, bool* success)
+		{
+			try {
+				std::ofstream f;
+				f.open(filepath);
+
+				if (f.is_open() && f.good())
+				{
+					f << contents;
+					f.close();
+					if (success)
+						*success = true;
+					return true;
+				}
+				else
+				{
+					if (success)
+						*success = false;
+					return false;
+				}
+			}
+			catch (std::exception& e)
+			{
+				TF3D_LOG_ERROR("Error while writing text file {0}, ERROR: {1}", filepath, e.what());
+				if (success)
+					*success = false;
+				return false;
+			}
+
 		}
 	}
 

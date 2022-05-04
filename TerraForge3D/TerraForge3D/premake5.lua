@@ -30,6 +30,7 @@ project "TerraForge3D"
         "%{IncludeDirectories.VulkanSDK}",
         "../Vendor/SPDLog/Include",
         "../Vendor/Glad/Include",
+        "../Vendor/JSON/Include",
         "../Vendor/STB/Include",
         "../Vendor/ImGui/Include"
     }
