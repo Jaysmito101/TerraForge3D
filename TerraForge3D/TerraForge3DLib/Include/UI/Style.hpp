@@ -23,8 +23,15 @@ namespace TerraForge3D
 			std::string SaveToString();
 			void Apply();
 
+			inline void SetName(std::string name) { this->name = name; }
+			inline std::string GetName() { return this->name; }
+
+			inline void SetStyle(ImGuiStyle style) { this->style = style; }
+			inline ImGuiStyle GetStyle() { return this->style; }
+
 		private:
 			ImGuiStyle style;
+			std::string name = "Style";
 		};
 
 	}

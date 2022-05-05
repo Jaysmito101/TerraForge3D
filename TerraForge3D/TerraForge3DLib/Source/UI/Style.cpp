@@ -48,56 +48,59 @@ namespace TerraForge3D
 			nlohmann::json& colors = st["Colors"];
 			for (auto it = colors.begin(); it != colors.end(); it++)
 			{
-				auto& v = it.value();
-				TF3D_ASSERT(v["Index"] > 0 && v["Index"] < ImGuiCol_COUNT, "Invalid ImGuiCol Index");
-				style.Colors[v["Index"]] = ImVec4(v["R"], v["G"], v["B"], v["A"]);
+				auto& value = it.value()["Value"];
+				int index = it.value()["Index"].get<int>();
+				TF3D_ASSERT(index >= 0 && index < ImGuiCol_COUNT, std::string("Invalid ImGuiCol Index ") + std::to_string(index));
+				TF3D_HANDLE_EXCEPTION_MSG(style.Colors[index] = ImVec4(value["R"], value["G"], value["B"], value["A"]);, std::string("Error in loading color forom : ") + value.dump(4));
 			}
 
+			TF3D_HANDLE_EXCEPTION_MSG(name = st["Name"];, "Error in loading name from style");
+
 			// Floats
-			style.Alpha = st["Alpha"];
-			style.DisabledAlpha = st["DisabledAlpha"];
-			style.WindowRounding = st["WindowRounding"];
-			style.WindowBorderSize = st["WindowBorderSize"];
-			style.ChildRounding = st["ChildRounding"];
-			style.ChildBorderSize = st["ChildBorderSize"];
-			style.PopupRounding = st["PopupRounding"];
-			style.PopupBorderSize = st["PopupBorderSize"];
-			style.FrameRounding = st["FrameRounding"];
-			style.FrameBorderSize = st["FrameBorderSize"];
-			style.IndentSpacing = st["IndentSpacing"];
-			style.ColumnsMinSpacing = st["ColumnsMinSpacing"];
-			style.ScrollbarSize = st["ScrollbarSize"];
-			style.ScrollbarRounding = st["ScrollbarRounding"];
-			style.GrabMinSize = st["GrabMinSize"];
-			style.GrabRounding = st["GrabRounding"];
-			style.LogSliderDeadzone = st["LogSliderDeadzone"];
-			style.TabRounding = st["TabRounding"];
-			style.TabBorderSize = st["TabBorderSize"];
-			style.TabMinWidthForCloseButton = st["TabMinWidthForCloseButton"];
-			style.MouseCursorScale = st["MouseCursorScale"];
-			style.AntiAliasedLines = st["AntiAliasedLines"];
-			style.AntiAliasedLinesUseTex = st["AntiAliasedLinesUseTex"];
-			style.AntiAliasedFill = st["AntiAliasedFill"];
-			style.CurveTessellationTol = st["CurveTessellationTol"];
-			style.CircleTessellationMaxError = st["CircleTessellationMaxError"];
+			TF3D_HANDLE_EXCEPTION_MSG(style.Alpha = st["Alpha"];, "Error in loading Alpha from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.DisabledAlpha = st["DisabledAlpha"]; , "Error in loading DisabledAlpha from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.WindowRounding = st["WindowRounding"]; , "Error in loading WindowRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.WindowBorderSize = st["WindowBorderSize"]; , "Error in loading WindowBorderSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ChildRounding = st["ChildRounding"]; , "Error in loading ChildRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ChildBorderSize = st["ChildBorderSize"]; , "Error in loading ChildBorderSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.PopupRounding = st["PopupRounding"]; , "Error in loading PopupRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.PopupBorderSize = st["PopupBorderSize"]; , "Error in loading PopupBorderSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.FrameRounding = st["FrameRounding"]; , "Error in loading FrameRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.FrameBorderSize = st["FrameBorderSize"]; , "Error in loading FrameBorderSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.IndentSpacing = st["IndentSpacing"]; , "Error in loading IndentSpacing from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ColumnsMinSpacing = st["ColumnsMinSpacing"]; , "Error in loading ColumnsMinSpacing from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ScrollbarSize = st["ScrollbarSize"]; , "Error in loading ScrollbarSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ScrollbarRounding = st["ScrollbarRounding"]; , "Error in loading ScrollbarRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.GrabMinSize = st["GrabMinSize"]; , "Error in loading GrabMinSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.GrabRounding = st["GrabRounding"]; , "Error in loading GrabRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.LogSliderDeadzone = st["LogSliderDeadzone"]; , "Error in loading LogSliderDeadzone from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.TabRounding = st["TabRounding"]; , "Error in loading TabRounding from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.TabBorderSize = st["TabBorderSize"]; , "Error in loading TabBorderSize from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.TabMinWidthForCloseButton = st["TabMinWidthForCloseButton"]; , "Error in loading TabMinWidthForCloseButton from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.MouseCursorScale = st["MouseCursorScale"]; , "Error in loading MouseCursorScale from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.AntiAliasedLines = st["AntiAliasedLines"]; , "Error in loading AntiAliasedLines from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.AntiAliasedLinesUseTex = st["AntiAliasedLinesUseTex"]; , "Error in loading AntiAliasedLinesUseTex from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.AntiAliasedFill = st["AntiAliasedFill"]; , "Error in loading AntiAliasedFill from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.CurveTessellationTol = st["CurveTessellationTol"]; , "Error in loading CurveTessellationTol from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.CircleTessellationMaxError = st["CircleTessellationMaxError"]; , "Error in loading CircleTessellationMaxError from style");
 
 			// Directions (int)
-			style.ColorButtonPosition = static_cast<ImGuiDir>(st["ColorButtonPosition"].get<int>());
-			style.WindowMenuButtonPosition = static_cast<ImGuiDir>(st["WindowMenuButtonPosition"].get<int>());
+			TF3D_HANDLE_EXCEPTION_MSG(style.ColorButtonPosition = static_cast<ImGuiDir>(st["ColorButtonPosition"].get<int>());, "Error in loading ColorButtonPosition from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.WindowMenuButtonPosition = static_cast<ImGuiDir>(st["WindowMenuButtonPosition"].get<int>()), "Error in loading WindowMenuButtonPosition from style");
 
 			// ImVec2
-			style.ButtonTextAlign = ImVec2(st["ButtonTextAlign"]["X"], st["ButtonTextAlign"]["Y"]);
-			style.SelectableTextAlign = ImVec2(st["SelectableTextAlign"]["X"], st["SelectableTextAlign"]["Y"]);
-			style.DisplayWindowPadding = ImVec2(st["DisplayWindowPadding"]["X"], st["DisplayWindowPadding"]["Y"]);
-			style.DisplaySafeAreaPadding = ImVec2(st["DisplaySafeAreaPadding"]["X"], st["DisplaySafeAreaPadding"]["Y"]);
-			style.ItemSpacing = ImVec2(st["ItemSpacing"]["X"], st["ItemSpacing"]["Y"]);
-			style.ItemInnerSpacing = ImVec2(st["ItemInnerSpacing"]["X"], st["ItemInnerSpacing"]["Y"]);
-			style.CellPadding = ImVec2(st["CellPadding"]["X"], st["CellPadding"]["Y"]);
-			style.TouchExtraPadding = ImVec2(st["TouchExtraPadding"]["X"], st["TouchExtraPadding"]["Y"]);
-			style.WindowPadding = ImVec2(st["WindowPadding"]["X"], st["WindowPadding"]["Y"]);
-			style.WindowMinSize = ImVec2(st["WindowMinSize"]["X"], st["WindowMinSize"]["Y"]);
-			style.WindowTitleAlign = ImVec2(st["WindowTitleAlign"]["X"], st["WindowTitleAlign"]["Y"]);
-			style.FramePadding = ImVec2(st["FramePadding"]["X"], st["FramePadding"]["Y"]);
+			TF3D_HANDLE_EXCEPTION_MSG(style.ButtonTextAlign = ImVec2(st["ButtonTextAlign"]["X"], st["ButtonTextAlign"]["Y"]); , "Error in loading ButtonTextAlign  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.SelectableTextAlign = ImVec2(st["SelectableTextAlign"]["X"], st["SelectableTextAlign"]["Y"]);, "Error in loading SelectableTextAlign  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.DisplayWindowPadding = ImVec2(st["DisplayWindowPadding"]["X"], st["DisplayWindowPadding"]["Y"]);, "Error in loading DisplayWindowPadding  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.DisplaySafeAreaPadding = ImVec2(st["DisplaySafeAreaPadding"]["X"], st["DisplaySafeAreaPadding"]["Y"]);, "Error in loading DisplaySafeAreaPadding  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ItemSpacing = ImVec2(st["ItemSpacing"]["X"], st["ItemSpacing"]["Y"]);, "Error in loading ItemSpacing  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.ItemInnerSpacing = ImVec2(st["ItemInnerSpacing"]["X"], st["ItemInnerSpacing"]["Y"]);, "Error in loading ItemInnerSpacing  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.CellPadding = ImVec2(st["CellPadding"]["X"], st["CellPadding"]["Y"]);, "Error in loading CellPadding  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.TouchExtraPadding = ImVec2(st["TouchExtraPadding"]["X"], st["TouchExtraPadding"]["Y"]);, "Error in loading TouchExtraPadding  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.WindowPadding = ImVec2(st["WindowPadding"]["X"], st["WindowPadding"]["Y"]);, "Error in loading WindowPadding  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.WindowMinSize = ImVec2(st["WindowMinSize"]["X"], st["WindowMinSize"]["Y"]);, "Error in loading WindowMinSize  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.WindowTitleAlign = ImVec2(st["WindowTitleAlign"]["X"], st["WindowTitleAlign"]["Y"]);, "Error in loading WindowTitleAlign  from style");
+			TF3D_HANDLE_EXCEPTION_MSG(style.FramePadding = ImVec2(st["FramePadding"]["X"], st["FramePadding"]["Y"]); , "Error in loading FramePadding  from style");
 
 		}
 
@@ -133,6 +136,8 @@ namespace TerraForge3D
 				color["Value"] = colorValue;
 				colors[color["Name"]] = color;
 			}
+
+			st["Name"] = name;
 
 			st["Colors"] = colors;
 

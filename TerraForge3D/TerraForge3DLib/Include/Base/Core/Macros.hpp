@@ -8,6 +8,9 @@
 
 #define TF3D_SAFE_DELETE(x) if(x) { delete x; x = nullptr; }
 
+#define TF3D_HANDLE_EXCEPTION_MSG(x, message) { try {x;} catch(std::exception& e){TF3D_LOG_ERROR("{0} [ {1} ]", message, e.what());} }
+#define TF3D_HANDLE_EXCEPTION(x) TF3D_HANDLE_EXCEPTION_MSG(x, "Exception:")
+
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
