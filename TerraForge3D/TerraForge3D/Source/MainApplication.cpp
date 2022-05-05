@@ -25,6 +25,25 @@ namespace TerraForge3D
 				Close();
 				return true;
 				}, { InputEventType_WindowClose });
+
+			mainMenu.Register("File/Open", [](UI::MenuItem*) {exit(-1); })->SetShortcut("ABC")->SetEnabled(false);
+			mainMenu.Register("File/Close", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("File/New", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("Edit/Preferences", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("File/Recent/Abc.txt", [](UI::MenuItem*) {exit(-1); })->SetTooltip("HEllo")->SetEnabled(false);
+			mainMenu.Register("File/Recent/BCt.txt", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("Edit/Cut", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("Edit/Replace", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("Edit/Addons/Install", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("Edit/Addons/Uninstall", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("About/Website", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("About/Youtube/Tutorials", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("About/Youtube/Showcase", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("About/Feedback", [](UI::MenuItem*) {exit(-1); });
+			mainMenu.Register("Options/Select GPU", [](UI::MenuItem*) {exit(-1); });
+
+			style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR "Maya.json");
+			style.Apply();
 		}
 
 		virtual void OnUpdate() override
@@ -38,6 +57,8 @@ namespace TerraForge3D
 		virtual void OnImGuiRender() override
 		{
 			dockspace.Begin();
+
+			mainMenu.Show();
 
 			Renderer::Get()->uiManager->clearColor[0] = pos[0]/ 600;
 			ImGui::Begin("Hello World!");			
@@ -79,7 +100,8 @@ namespace TerraForge3D
 
 		ApplicationState* appState = nullptr;
 		UI::Style style;
-		UI::Dockspace dockspace;
+		UI::Dockspace dockspace;		
+		UI::Menu mainMenu;
 	};
 }
 
