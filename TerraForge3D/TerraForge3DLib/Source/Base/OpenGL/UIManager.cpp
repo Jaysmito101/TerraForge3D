@@ -4,11 +4,13 @@
 
 #include "GLFW/glfw3.h"
 #include "imgui/imgui.h"
+#include "json/json.hpp"
 
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "imgui/backends/imgui_impl_opengl3.cpp"
 
+#include "IconsMaterialDesign.h"
 
 namespace TerraForge3D
 {
@@ -49,7 +51,40 @@ namespace TerraForge3D
 				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 			}
 
-			// TODO : Load Fonts
+			nlohmann::json fontConfig;
+			try
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				io.Fonts->AddFontDefault();
+				fontConfig = nlohmann::json::parse(Application::Get()->fontConfigs);
+				std::string fontsPath = Application::Get()->fontsDir;
+				std::string fontPath = "";
+
+				auto& fonts = fontConfig["Fonts"];
+				std::unordered_map<std::string, ApplicationFont>& appFonts = Application::Get()->GetFonts();
+
+				for (auto& font : fonts)
+				{
+					fontPath = fontsPath + PATH_SEPERATOR + font["File"].get<std::string>();
+					appFonts[font["Name"]] = ApplicationFont();
+					appFonts[font["Name"]].name = font["Name"];
+					appFonts[font["Name"]].isIconFont = font["IconFont"];
+					appFonts[font["Name"]].path = fontPath;
+					appFonts[font["Name"]].size = font["Size"];
+					if (appFonts[font["Name"]].isIconFont)
+					{
+						ImWchar icons_ranges[] = { font["IconFontMIN"], font["IconFontMIN"], 0};
+						ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontPath.data(), font["Size"], &icons_config, icons_ranges);
+					}
+					else
+						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontsPath.data(), font["Size"]);
+				}
+			}
+			catch (std::exception& ex)
+			{
+				TF3D_LOG_ERROR("Error in loading fonts {0}", ex.what());
+			}
 
 			glfwSwapInterval(1); // VSync is alwasy enabled 
 			ImGui_ImplGlfw_InitForOpenGL(window->GetHandle(), true);

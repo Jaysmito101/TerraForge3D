@@ -100,19 +100,39 @@ namespace TerraForge3D
 
 		void UIManager::UploadFonts()
 		{
-			std::vector<ApplicationFont>& appFonts = Application::Get()->GetFonts();
-			ImGuiIO& io = ImGui::GetIO();
-			io.Fonts->AddFontDefault();
-			for (auto& appFont : appFonts)
+			nlohmann::json fontConfig;
+			try
 			{
-				switch (appFont.type)
+				ImGuiIO& io = ImGui::GetIO();
+				io.Fonts->AddFontDefault();
+				fontConfig = nlohmann::json::parse(Application::Get()->fontConfigs);
+				std::string fontsPath = Application::Get()->fontsDir;
+				std::string fontPath = "";
+
+				auto& fonts = fontConfig["Fonts"];
+				std::unordered_map<std::string, ApplicationFont>& appFonts = Application::Get()->GetFonts();
+
+				for (auto& font : fonts)
 				{
-				case FontType_TTF:
-					appFont.handle = io.Fonts->AddFontFromFileTTF(appFont.path.data(), appFont.size);
-					break;
-				default:
-					break;
+					fontPath = fontsPath + PATH_SEPERATOR + font["File"].get<std::string>();
+					appFonts[font["Name"]] = ApplicationFont();
+					appFonts[font["Name"]].name = font["Name"];
+					appFonts[font["Name"]].isIconFont = font["IconFont"];
+					appFonts[font["Name"]].path = fontPath;
+					appFonts[font["Name"]].size = font["Size"];
+					if (appFonts[font["Name"]].isIconFont)
+					{
+						ImWchar icons_ranges[] = { font["IconFontMIN"], font["IconFontMIN"], 0 };
+						ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontPath.data(), font["Size"], &icons_config, icons_ranges);
+					}
+					else
+						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontsPath.data(), font["Size"]);
 				}
+			}
+			catch (std::exception& ex)
+			{
+				TF3D_LOG_ERROR("Error in loading fonts {0}", ex.what());
 			}
 
 			// Upload fonts to GPU

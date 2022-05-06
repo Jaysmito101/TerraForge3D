@@ -1,5 +1,7 @@
 #pragma once
 
+#include "json/json.hpp"
+
 #include "Base/Core/Core.hpp"
 #include "Base/Window/Window.hpp"
 #include "Base/Renderer/Renderer.hpp"
@@ -9,24 +11,13 @@ struct ImFont;
 namespace TerraForge3D
 {
 
-	// TEMP ----------
-
-	enum FontType
-	{
-		FontType_TTF = 0
-	};
-
 	struct ApplicationFont
 	{
 		std::string path = "";
+		std::string name = "Font";
 		ImFont* handle = nullptr;
 		float size = 16.0f;
-		FontType type;
-
-		ApplicationFont(std::string path, float size = 16.0f, FontType type = FontType_TTF)
-			:path(path), size(size), type(type)
-		{}
-		
+		bool isIconFont = false;
 	};
 
 	// -----------------
@@ -46,6 +37,7 @@ namespace TerraForge3D
 		inline void SetLogFilePath(std::string path) { logFilePath = path; };
 		inline void SetApplicationName(std::string name) { applicationName = name; };
 		inline void SetWindowConfigPath(std::string path) { windowConfigPath = path; };
+		inline void SetFontConfig(std::string config, std::string dir) { fonts.clear(); fontConfigs = config; fontsDir = dir; }
 
 	public:
 		// Some General Getters/Setters
@@ -54,7 +46,7 @@ namespace TerraForge3D
 
 		inline void Close() { isRunning = false; }
 
-		inline std::vector<ApplicationFont>& GetFonts() { return fonts; };
+		inline std::unordered_map<std::string, ApplicationFont>& GetFonts() { return fonts; };
 		inline Window* GetWindow() { return mainWindow; }
 		inline InputEventManager* GetInputEventManager() { return mainWindow->eventManager; }
 
@@ -112,7 +104,9 @@ namespace TerraForge3D
 		std::string applicationName = "TerraForge3D";
 		std::string logFilePath = "TerraForge3D.log";
 		std::string windowConfigPath = "WindowConfigs.ini";
-		std::vector<ApplicationFont> fonts;
+		std::unordered_map<std::string, ApplicationFont> fonts;
+		std::string fontConfigs = "";
+		std::string fontsDir = "";
 
 		// Application Window
 		Window* mainWindow = nullptr;

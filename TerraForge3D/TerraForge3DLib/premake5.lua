@@ -33,7 +33,9 @@ project "TerraForge3DLib"
         "../Vendor/GLFW/Include",
         "../Vendor/Glad/Include",
         "../Vendor/STB/Include",
+        "../Vendor/IconFontCppHeaders/Include",
         "../Vendor/JSON/Include",
+        "../Vendor/IconFontCppHeaders/Include",
         "../Vendor/ImGui/Include",
         "%{IncludeDirectories.VulkanSDK}"
     }

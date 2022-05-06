@@ -1,6 +1,8 @@
 #include "TerraForge3D.hpp"
 #include "EntryPoint.hpp"
 
+#include "IconsMaterialDesign.h"
+
 
 namespace TerraForge3D
 {
@@ -15,6 +17,7 @@ namespace TerraForge3D
 			SetLogFilePath(appState->appResourcePaths.currentLogFilePath);
 			SetApplicationName(appState->meta.name);
 			SetWindowConfigPath(appState->appResourcePaths.windowConfigPath);
+			SetFontConfig(Utils::ReadTextFile(appState->appResourcePaths.fontsConfigPath), appState->appResourcePaths.fontsDir);
 		}
 
 		virtual void OnStart() override
@@ -26,24 +29,8 @@ namespace TerraForge3D
 				return true;
 				}, { InputEventType_WindowClose });
 
-			mainMenu.Register("File/Open", [](UI::MenuItem*) {exit(-1); })->SetShortcut("ABC")->SetEnabled(false);
-			mainMenu.Register("File/Close", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("File/New", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("Edit/Preferences", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("File/Recent/Abc.txt", [](UI::MenuItem*) {exit(-1); })->SetTooltip("HEllo")->SetEnabled(false);
-			mainMenu.Register("File/Recent/BCt.txt", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("Edit/Cut", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("Edit/Replace", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("Edit/Addons/Install", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("Edit/Addons/Uninstall", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("About/Website", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("About/Youtube/Tutorials", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("About/Youtube/Showcase", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("About/Feedback", [](UI::MenuItem*) {exit(-1); });
-			mainMenu.Register("Options/Select GPU", [](UI::MenuItem*) {exit(-1); });
-
-			style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR "Maya.json");
-			style.Apply();
+			// Object Creations
+			appState->menus.mainMenu = new MainMenu(appState);
 		}
 
 		virtual void OnUpdate() override
@@ -58,7 +45,7 @@ namespace TerraForge3D
 		{
 			dockspace.Begin();
 
-			mainMenu.Show();
+			appState->menus.mainMenu->Show();
 
 			Renderer::Get()->uiManager->clearColor[0] = pos[0]/ 600;
 			ImGui::Begin("Hello World!");			
@@ -74,7 +61,11 @@ namespace TerraForge3D
 				style.Apply();
 			}
 			ImGui::NewLine();
+			ImGui::Text(ICON_MD_SAVE " Save");
+			ImGui::Text(ICON_MD_FILE_COPY " File");
+			ImGui::Text(ICON_MD_ANIMATION " Animation");
 			
+
 			if (ImGui::Button("Exit"))
 				Close();
 
@@ -84,6 +75,8 @@ namespace TerraForge3D
 			ImGui::Text("sadsd");
 			ImGui::End();
 
+			ImGui::ShowDemoWindow();
+
 			dockspace.End();
 		}
 
@@ -91,6 +84,11 @@ namespace TerraForge3D
 		{
 			TF3D_LOG("Started Shutdown!");
 			GetInputEventManager()->DeregisterCallback(exitcb);
+			
+			// Object Destructions
+			TF3D_SAFE_DELETE(appState->menus.mainMenu);
+
+
 			ApplicationState::Destory();
 		}
 
@@ -100,8 +98,7 @@ namespace TerraForge3D
 
 		ApplicationState* appState = nullptr;
 		UI::Style style;
-		UI::Dockspace dockspace;		
-		UI::Menu mainMenu;
+		UI::Dockspace dockspace;
 	};
 }
 

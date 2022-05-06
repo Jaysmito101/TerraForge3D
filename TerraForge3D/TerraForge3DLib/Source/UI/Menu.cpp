@@ -30,7 +30,7 @@ namespace TerraForge3D
 		{
 			for (auto& [k, v] : subMenus)
 			{
-				delete v;
+				TF3D_SAFE_DELETE(v);
 			}
 			subMenus.clear();
 		}
@@ -86,39 +86,54 @@ namespace TerraForge3D
 			ImGui::PopID();
 		}
 
-		MenuItem* MenuItem::AddItem(MenuItemUse us, std::string subpath, std::function<void(MenuItem*)> cb)
+		MenuItem* MenuItem::AddItem(MenuItemUse us, std::vector<std::string> subpath, std::function<void(MenuItem*)> cb)
 		{
 			TF3D_ASSERT(type == MenuItemType_SubMenu, "Cannot add item to a item (type must be SubMenu)");
-			std::string subpathBase = subpath.substr(0, subpath.find("/"));
-			std::string subpathRest = subpath.substr(subpath.find("/") + 1);
+			std::string subpathBase = subpath[0];
+			subpath.erase(subpath.begin());
+			std::vector<std::string> subpathRest = subpath;
 
-			if (subpathRest.find("/") == std::string::npos)
+			if (subpathRest.size() == 0)
 			{
-				if (subpath == subpathBase)
-				{
-					if (subMenus.find(subpathBase) != subMenus.end())
-						delete subMenus[subpathBase];
-					subMenus[subpathBase] = new MenuItem(subpathBase, path + "/" + subpathBase, us, MenuItemType_Item);
-					subMenus[subpathBase]->SetCallback(cb);
-					return subMenus[subpathBase];
-				}
-				else
-				{
-					if (subMenus.find(subpathBase) == subMenus.end())
-						subMenus[subpathBase] = new MenuItem(subpathBase, path + "/" + subpathBase, MenuItemUse_Button, MenuItemType_SubMenu);
-					return subMenus[subpathBase]->AddItem(us, subpathRest, cb);
-				}
+				if (subMenus.find(subpathBase) != subMenus.end())
+					delete subMenus[subpathBase];
+				subMenus[subpathBase] = new MenuItem(subpathBase, path + "/" + subpathBase, us, MenuItemType_Item);
+				subMenus[subpathBase]->SetCallback(cb);
+				return subMenus[subpathBase];
 			}
 			else
 			{
-				if (subMenus.find(subpathBase) == subMenus.end())
-					subMenus[subpathBase] = new MenuItem(subpathBase, path + "/" + subpathBase, MenuItemUse_Button, MenuItemType_SubMenu);
-				else if (subMenus[subpathBase]->type == MenuItemType_Item)
+				if (subMenus.find(subpathBase) != subMenus.end() && subMenus[subpathBase]->type == MenuItemType_Item)
 				{
-					delete subMenus[subpathBase];
+					TF3D_SAFE_DELETE(subMenus[subpathBase]);
+					subMenus[subpathBase] = new MenuItem(subpathBase, path + "/" + subpathBase, MenuItemUse_Button, MenuItemType_SubMenu);
+				}
+				else if(subMenus.find(subpathBase) == subMenus.end())
+				{
 					subMenus[subpathBase] = new MenuItem(subpathBase, path + "/" + subpathBase, MenuItemUse_Button, MenuItemType_SubMenu);
 				}
 				return subMenus[subpathBase]->AddItem(us, subpathRest, cb);
+			}
+		}
+
+		bool MenuItem::RemoveItem(std::vector<std::string> subpath)
+		{
+			std::string subpathBase = subpath[0];
+			subpath.erase(subpath.begin());
+			std::vector<std::string> subpathRest = subpath;
+
+			if (subMenus.find(subpathBase) == subMenus.end())
+				return false;
+
+			if (subpathRest.size() == 0)
+			{
+				TF3D_SAFE_DELETE(subMenus[subpathBase]);
+				subMenus.erase(subMenus.find(subpathBase));
+				return true;
+			}
+			else
+			{
+				return subMenus[subpathBase]->RemoveItem(subpathRest);
 			}
 		}
 
@@ -127,15 +142,16 @@ namespace TerraForge3D
 		{
 			for (auto& [k, v] : subMenus)
 			{
-				delete v;
+				TF3D_SAFE_DELETE(v);
 			}
 			subMenus.clear();
 		}
 		
-		MenuItem* Menu::Register(std::string path, std::function<void(MenuItem*)> callback, MenuItemUse use)
+		MenuItem* Menu::Register(std::vector<std::string> path, std::function<void(MenuItem*)> callback, MenuItemUse use)
 		{
-			std::string baseMenu = path.substr(0, path.find("/"));
-			std::string restPath = path.substr(path.find("/") + 1);
+			std::string baseMenu = path[0];
+			path.erase(path.begin());
+			std::vector<std::string> restPath = path;
 
 			if (restPath.size() > 0)
 			{
@@ -146,21 +162,31 @@ namespace TerraForge3D
 			return nullptr;
 		}
 
-		void Menu::Deregister(std::string path)
+		void Menu::Deregister(std::vector<std::string> path)
 		{
 			// TODO : Implement
 		}
 
 		void Menu::Show()
 		{
-			if (ImGui::BeginMainMenuBar())
+			bool tmp = false;
+			if (isMainMenu)
+				tmp = ImGui::BeginMainMenuBar();
+			else
+				tmp = ImGui::BeginMenuBar();
+
+			for (auto& [k, v] : subMenus)
 			{
-				for (auto& [k, v] : subMenus)
-				{
-					v->Show();
-				}
-				ImGui::EndMainMenuBar();
+				v->Show();
 			}
+			if (tmp)
+			{
+				if (isMainMenu)
+					ImGui::EndMainMenuBar();
+				else
+					ImGui::EndMenuBar();
+			}
+			
 		}
 	}
 

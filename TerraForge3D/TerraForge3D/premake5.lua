@@ -32,6 +32,7 @@ project "TerraForge3D"
         "../Vendor/Glad/Include",
         "../Vendor/JSON/Include",
         "../Vendor/STB/Include",
+        "../Vendor/IconFontCppHeaders/Include",
         "../Vendor/ImGui/Include"
     }
 

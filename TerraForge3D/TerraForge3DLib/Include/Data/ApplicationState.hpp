@@ -2,15 +2,17 @@
 #include "Base/Core/Core.hpp"
 #include "Utils/Utils.hpp"
 
+
 namespace TerraForge3D
 {
 	class Application;
 	class Window;
+	class MainMenu;
 
 	/*
-	* This struct holds all the managers, job handlers, every thing of this application
+	* This class holds all the managers, job handlers, every thing of this application
 	*/
-	struct ApplicationState
+	class ApplicationState
 	{
 	private:
 		ApplicationState() = default;
@@ -40,6 +42,8 @@ namespace TerraForge3D
 			std::string windowConfigPath = configDir + PATH_SEPERATOR "WindowArrangement.ini";
 			std::string preferencesPath = configDir + PATH_SEPERATOR "UserPreferences.json";
 			std::string stylesDir = resourceDir + PATH_SEPERATOR "Styles";
+			std::string fontsDir = resourceDir + PATH_SEPERATOR "Fonts";
+			std::string fontsConfigPath = configDir + PATH_SEPERATOR "Fonts.json";
 		} appResourcePaths;
 
 		struct 
@@ -47,6 +51,11 @@ namespace TerraForge3D
 			Application* app = nullptr;
 			Window* window = nullptr;
 		} core;
+
+		struct
+		{
+			MainMenu* mainMenu = nullptr;
+		} menus;
 		
 
 		static ApplicationState* Create();

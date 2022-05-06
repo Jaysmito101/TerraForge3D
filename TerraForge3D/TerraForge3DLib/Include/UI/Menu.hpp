@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Core/Core.hpp"
+#include "Utils/Utils.hpp"
 
 namespace TerraForge3D
 {
@@ -28,7 +29,8 @@ namespace TerraForge3D
 			void End();
 			void Show();
 
-			MenuItem* AddItem(MenuItemUse use, std::string subpath, std::function<void(MenuItem*)> callback);
+			MenuItem* AddItem(MenuItemUse use, std::vector<std::string> subpath, std::function<void(MenuItem*)> callback);
+			bool RemoveItem(std::vector<std::string> subpath);
 
 
 			inline std::string GetPath() { return this->path; }
@@ -65,14 +67,21 @@ namespace TerraForge3D
 			Menu() = default;
 			~Menu();
 
-			MenuItem* Register(std::string path, std::function<void(MenuItem*)> callback, MenuItemUse use = MenuItemUse_Button);
-			void Deregister(std::string path);
+			inline MenuItem* Register(std::string path, std::function<void(MenuItem*)> callback, MenuItemUse use = MenuItemUse_Button) { return Register(Utils::String::Split(path, { "/" }), callback, use); }
+			MenuItem* Register(std::vector<std::string> path, std::function<void(MenuItem*)> callback, MenuItemUse use = MenuItemUse_Button);
+
+			inline void Deregister(std::string path) { Deregister(Utils::String::Split(path, {"/"})); }
+			void Deregister(std::vector<std::string> path);
 
 			void Show();
 
-			private:
-				std::string uid = UUID::Generate().ToString();
-				std::unordered_map<std::string, MenuItem*> subMenus;
+			inline bool IsMainMenu() { return this->isMainMenu; }
+			inline void SetMainMenu(bool isMainMenu) { this->isMainMenu = isMainMenu; }
+
+		private:
+			std::string uid = UUID::Generate().ToString();
+			std::unordered_map<std::string, MenuItem*> subMenus;
+			bool isMainMenu = true;
 		};
 
 	}

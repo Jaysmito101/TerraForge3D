@@ -103,6 +103,40 @@ namespace TerraForge3D
 			}
 
 		}
+
+		namespace String
+		{
+
+			std::vector<std::string> Split(std::string str, std::vector<std::string> delimeters, bool includeDelimeteres)
+			{
+				std::vector<std::string> result;
+				std::string intermediate = "";
+				for (size_t i = 0; i < str.size(); i++)
+				{
+					for (int j = 0; j < delimeters.size(); j++)
+					{
+						if (str.substr(i, delimeters[j].size()) == delimeters[j])
+						{
+							if (intermediate.size() > 0)
+								result.push_back(intermediate);
+							if (includeDelimeteres)
+								result.push_back(delimeters[j]);
+							intermediate = "";
+							i += delimeters[j].size();
+							break;
+						}
+					}
+					intermediate += str[i];
+				}
+				if (intermediate.size() > 0)
+					result.push_back(intermediate);
+				return result;
+			}
+
+
+		}
+
 	}
 
 }
+
