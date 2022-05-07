@@ -45,6 +45,7 @@ namespace TerraForge3D
 			inline MenuItem* SetTooltip(std::string tooltip) { this->tooltip = tooltip;  return this;};
 			inline MenuItem* SetShortcut(std::string shortcut) { this->shortcut = shortcut;  return this;};
 			inline MenuItem* SetEnabled(bool enabled) { this->enabled = enabled; return this; }
+			inline MenuItem* RegisterTogglePTR(bool* togglePTR) { this->togglePTR = togglePTR; return this; };
 
 		private:
 			MenuItemType type = MenuItemType_Item;
@@ -57,6 +58,7 @@ namespace TerraForge3D
 			std::string shortcut = "";
 			bool selected = false;
 			bool toggleState = false;
+			bool* togglePTR = nullptr;
 			bool enabled = true;
 			std::string uid = UUID::Generate().ToString();
 		};
@@ -75,13 +77,16 @@ namespace TerraForge3D
 
 			void Show();
 
+			inline bool IsEnabled() { return this->isEnabled; }
 			inline bool IsMainMenu() { return this->isMainMenu; }
+			inline void SetEnabled(bool enabled) { this->isEnabled = enabled; }
 			inline void SetMainMenu(bool isMainMenu) { this->isMainMenu = isMainMenu; }
 
 		private:
 			std::string uid = UUID::Generate().ToString();
 			std::unordered_map<std::string, MenuItem*> subMenus;
 			bool isMainMenu = true;
+			bool isEnabled = true;
 		};
 
 	}

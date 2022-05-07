@@ -3,6 +3,56 @@
 
 #include "IconsMaterialDesign.h"
 
+class MyEditor : public TerraForge3D::UI::Editor
+{
+public:
+	MyEditor(std::string name, TerraForge3D::ApplicationState* appState)
+		: TerraForge3D::UI::Editor(name), appState(appState)
+	{
+	}
+
+	void OnUpdate() override
+	{
+		counter += 0.001f;
+	}
+
+	void OnUIRender() override
+	{
+		ImGui::Text("Counter : %f", counter);
+		static char styleName[4096] = {};
+		ImGui::InputTextWithHint("Style Name", "Enter Style Name", styleName, 4096);
+		if (ImGui::Button("Load Style"))
+		{
+			style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR + std::string(styleName) + ".json");
+			style.Apply();
+		}
+		ImGui::NewLine();
+
+		if (ImGui::Button("Exit"))
+			appState->core.app->Close();
+
+	}
+
+	void OnStart() override
+	{
+		TF3D_LOG("On Start");
+		appState->menus.mainMenu->GetManagerPTR()->Register("Windows/Style Opener", [this](TerraForge3D::UI::MenuItem* context) {
+			isVisible = (context->GetToggleState());
+			context->RegisterTogglePTR(&isVisible);
+			}, TerraForge3D::UI::MenuItemUse_Toggle);
+	}
+
+	void OnEnd() override
+	{
+		TF3D_LOG("On End");
+	}
+
+private:
+	TerraForge3D::ApplicationState* appState = nullptr;
+	TerraForge3D::UI::Style style;
+	float counter = 0.0f;
+};
+
 
 namespace TerraForge3D
 {
@@ -31,14 +81,16 @@ namespace TerraForge3D
 
 			// Object Creations
 			appState->menus.mainMenu = new MainMenu(appState);
+			appState->editors.manager = new UI::EditorManager("Primary Editor Manager");
+
+
+			editor = new MyEditor("Style Opener", appState);
+			appState->editors.manager->AddEditor(editor);
 		}
 
 		virtual void OnUpdate() override
 		{
-			if (InputSystem::IsKeyPressedS(KeyCode_Escape))
-			{
-				Close();
-			}
+			appState->editors.manager->Update();
 		}
 
 		virtual void OnImGuiRender() override
@@ -46,32 +98,7 @@ namespace TerraForge3D
 			dockspace.Begin();
  
 			appState->menus.mainMenu->Show();
-
-			Renderer::Get()->uiManager->clearColor[0] = pos[0]/ 600;
-			ImGui::Begin("Hello World!");			
-			ImGui::NewLine();			
-			ImGui::Text("Delta Time: %f", deltaTime);
-			ImGui::Text("Frame Rate: %d", static_cast<uint32_t>(1000.0 / deltaTime));			
-			ImGui::NewLine();
-			static char styleName[4096] = {};		
-			ImGui::InputTextWithHint("Style Name", "Enter Style Name", styleName, 4096);
-			if (ImGui::Button("Load Style"))
-			{
-				style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR + std::string(styleName) + ".json");
-				style.Apply();
-			}
-			ImGui::NewLine();
-
-			if (ImGui::Button("Exit"))
-				Close();
-
-			ImGui::End();
-
-			ImGui::Begin("saddsadsa");
-			ImGui::Text("sadsd");
-			ImGui::End();
-
-			ImGui::ShowDemoWindow();
+			appState->editors.manager->RenderUI();
 
 			dockspace.End();
 		}
@@ -83,7 +110,7 @@ namespace TerraForge3D
 			
 			// Object Destructions
 			TF3D_SAFE_DELETE(appState->menus.mainMenu);
-
+			TF3D_SAFE_DELETE(appState->editors.manager);
 
 			ApplicationState::Destory();
 		}
@@ -93,8 +120,9 @@ namespace TerraForge3D
 		float pos[2] = {0.0f};
 
 		ApplicationState* appState = nullptr;
-		UI::Style style;
 		UI::Dockspace dockspace;
+
+		MyEditor* editor;
 	};
 }
 

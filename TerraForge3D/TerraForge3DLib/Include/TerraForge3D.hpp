@@ -14,3 +14,5 @@
 #include "UI/Dockspace.hpp"
 #include "UI/Menu.hpp"
 #include "UI/MainMenu.hpp"
+#include "UI/Editor.hpp"
+#include "UI/EditorManager.hpp"

@@ -8,6 +8,9 @@ namespace TerraForge3D
 	class Application;
 	class Window;
 	class MainMenu;
+	namespace UI {
+		class EditorManager;
+	}
 
 	/*
 	* This class holds all the managers, job handlers, every thing of this application
@@ -56,6 +59,11 @@ namespace TerraForge3D
 		{
 			MainMenu* mainMenu = nullptr;
 		} menus;
+
+		struct
+		{
+			UI::EditorManager* manager = nullptr;
+		} editors;
 		
 
 		static ApplicationState* Create();

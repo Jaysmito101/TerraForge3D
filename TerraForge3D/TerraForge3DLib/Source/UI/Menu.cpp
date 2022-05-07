@@ -53,6 +53,8 @@ namespace TerraForge3D
 				}
 				else if (use == MenuItemUse_Toggle)
 				{
+					if(togglePTR)
+						toggleState= *togglePTR;
 					if (ImGui::Checkbox(name.data(), &toggleState))
 					{
 						if (callback)
@@ -169,6 +171,9 @@ namespace TerraForge3D
 
 		void Menu::Show()
 		{
+			if(!isEnabled)
+				return;
+
 			bool tmp = false;
 			if (isMainMenu)
 				tmp = ImGui::BeginMainMenuBar();
