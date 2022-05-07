@@ -73,8 +73,8 @@ namespace TerraForge3D
 					appFonts[font["Name"]].size = font["Size"];
 					if (appFonts[font["Name"]].isIconFont)
 					{
-						ImWchar icons_ranges[] = { font["IconFontMIN"], font["IconFontMIN"], 0};
-						ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+						ImWchar icons_ranges[] = { font["IconFontMIN"].get<int>(), font["IconFontMAX"].get<int>(), 0 };
+						ImFontConfig icons_config; icons_config.MergeMode = false; icons_config.PixelSnapH = true;
 						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontPath.data(), font["Size"], &icons_config, icons_ranges);
 					}
 					else

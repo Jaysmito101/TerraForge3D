@@ -44,7 +44,7 @@ namespace TerraForge3D
 		virtual void OnImGuiRender() override
 		{
 			dockspace.Begin();
-
+ 
 			appState->menus.mainMenu->Show();
 
 			Renderer::Get()->uiManager->clearColor[0] = pos[0]/ 600;
@@ -61,10 +61,6 @@ namespace TerraForge3D
 				style.Apply();
 			}
 			ImGui::NewLine();
-			ImGui::Text(ICON_MD_SAVE " Save");
-			ImGui::Text(ICON_MD_FILE_COPY " File");
-			ImGui::Text(ICON_MD_ANIMATION " Animation");
-			
 
 			if (ImGui::Button("Exit"))
 				Close();

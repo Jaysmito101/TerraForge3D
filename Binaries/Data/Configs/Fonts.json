@@ -2,11 +2,11 @@
 	"Name" : "Fonts Configuration",
 	"Fonts" : [
 		{
-			"Name" : "Material Icons",
+			"Name" : "MaterialIcons",
 			"Size" : 16.0,
 			"IconFont" : true,
 			"IconFontMIN" : 57344,
-			"IconFontMAX" : 69629,
+			"IconFontMAX" : 1114109,
 			"File" : "MaterialIcons-Regular.ttf"
 		}
 	]
