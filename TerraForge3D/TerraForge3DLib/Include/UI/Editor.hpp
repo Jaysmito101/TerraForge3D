@@ -17,12 +17,12 @@ namespace TerraForge3D
 			~Editor();
 
 			virtual void OnUpdate() = 0;
-			virtual void OnUIRender() = 0;
+			virtual void OnShow() = 0;
 			virtual void OnStart() = 0;
 			virtual void OnEnd() = 0;
 
 			void Update();
-			void RenderUI();
+			void Show();
 			void Setup();
 			void Shutdown();
 

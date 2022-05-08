@@ -15,7 +15,7 @@ namespace TerraForge3D
 			EditorManager(std::string name);
 			~EditorManager();
 
-			void RenderUI();
+			void Show();
 			void Update();
 
 			void AddEditor(Editor* editor);

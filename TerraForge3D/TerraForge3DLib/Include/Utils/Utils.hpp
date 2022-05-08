@@ -1,5 +1,8 @@
 #pragma once
 #include "Base/Core/Core.hpp"
+#include "IconsMaterialDesign.h"
+
+struct ImVec4;
 
 namespace TerraForge3D
 {
@@ -16,6 +19,16 @@ namespace TerraForge3D
 		std::string ReadTextFile(std::string filepath, bool* success = nullptr);
 
 		bool WriteTextFile(std::string filepath, std::string contents, bool* success = nullptr);
+
+		namespace ImGuiC
+		{
+			void SetIconFont(void* font);
+
+			void TextIcon(const char* icon, bool newline = false);
+
+			void ColoredTextIcon(const char* icon, ImVec4 color, bool newline = false);
+
+		}
 
 		namespace String
 		{

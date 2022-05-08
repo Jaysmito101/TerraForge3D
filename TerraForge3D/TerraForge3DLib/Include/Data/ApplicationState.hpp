@@ -10,6 +10,7 @@ namespace TerraForge3D
 	class MainMenu;
 	namespace UI {
 		class EditorManager;
+		class ModalManager;
 	}
 
 	/*
@@ -64,6 +65,11 @@ namespace TerraForge3D
 		{
 			UI::EditorManager* manager = nullptr;
 		} editors;
+
+		struct
+		{
+			UI::ModalManager* manager = nullptr;
+		} modals;
 		
 
 		static ApplicationState* Create();

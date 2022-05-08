@@ -3,6 +3,11 @@
 
 #include "IconsMaterialDesign.h"
 
+#ifdef TF3D_WINDOWS
+// For the windows API
+#undef MessageBox
+#endif
+
 class MyEditor : public TerraForge3D::UI::Editor
 {
 public:
@@ -14,12 +19,16 @@ public:
 	void OnUpdate() override
 	{
 		counter += 0.001f;
+		if (counter >= 1.5f)
+			counter = 0.0f;
 	}
 
-	void OnUIRender() override
+	void OnShow() override
 	{
 		ImGui::Text("Counter : %f", counter);
 		static char styleName[4096] = {};
+
+
 		ImGui::InputTextWithHint("Style Name", "Enter Style Name", styleName, 4096);
 		if (ImGui::Button("Load Style"))
 		{
@@ -27,6 +36,25 @@ public:
 			style.Apply();
 		}
 		ImGui::NewLine();
+
+		static char message[4096];
+		ImGui::InputTextMultiline("Message", message, 4096);
+		static int mtype;
+		ImGui::InputInt("Type", &mtype, 1, 100);
+		if (ImGui::Button("Show Message Box"))
+		{
+			appState->modals.manager->MessageBox("Message", message, static_cast<TerraForge3D::UI::MessageType>(mtype));
+		}
+
+		ImGui::NewLine();
+
+		if (ImGui::Button("Show Loading Box"))
+		{
+			appState->modals.manager->LoadingBox("Loading", &counter, [this](float progress)->bool {
+				counter = 0.0f;
+				return true;
+				});
+		}
 
 		if (ImGui::Button("Exit"))
 			appState->core.app->Close();
@@ -38,8 +66,7 @@ public:
 		TF3D_LOG("On Start");
 		appState->menus.mainMenu->GetManagerPTR()->Register("Windows/Style Opener", [this](TerraForge3D::UI::MenuItem* context) {
 			isVisible = (context->GetToggleState());
-			context->RegisterTogglePTR(&isVisible);
-			}, TerraForge3D::UI::MenuItemUse_Toggle);
+			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
 	}
 
 	void OnEnd() override
@@ -62,8 +89,6 @@ namespace TerraForge3D
 		virtual void OnPreload()
 		{
 			appState = ApplicationState::Create();
-			appState->core.app = this;
-			appState->core.window = GetWindow();
 			SetLogFilePath(appState->appResourcePaths.currentLogFilePath);
 			SetApplicationName(appState->meta.name);
 			SetWindowConfigPath(appState->appResourcePaths.windowConfigPath);
@@ -78,10 +103,15 @@ namespace TerraForge3D
 				Close();
 				return true;
 				}, { InputEventType_WindowClose });
+			
+			Utils::ImGuiC::SetIconFont(fonts["MaterialIcons"].handle);
 
 			// Object Creations
+			appState->core.app = this;
+			appState->core.window = GetWindow();
 			appState->menus.mainMenu = new MainMenu(appState);
 			appState->editors.manager = new UI::EditorManager("Primary Editor Manager");
+			appState->modals.manager = new UI::ModalManager(appState);
 
 
 			editor = new MyEditor("Style Opener", appState);
@@ -91,14 +121,19 @@ namespace TerraForge3D
 		virtual void OnUpdate() override
 		{
 			appState->editors.manager->Update();
+			appState->modals.manager->Update();
 		}
 
 		virtual void OnImGuiRender() override
 		{
 			dockspace.Begin();
  
-			appState->menus.mainMenu->Show();
-			appState->editors.manager->RenderUI();
+			appState->modals.manager->Show();
+			if (!appState->modals.manager->IsActive())
+			{
+				appState->menus.mainMenu->Show();
+				appState->editors.manager->Show();
+			}
 
 			dockspace.End();
 		}
@@ -111,6 +146,7 @@ namespace TerraForge3D
 			// Object Destructions
 			TF3D_SAFE_DELETE(appState->menus.mainMenu);
 			TF3D_SAFE_DELETE(appState->editors.manager);
+			TF3D_SAFE_DELETE(appState->modals.manager);
 
 			ApplicationState::Destory();
 		}

@@ -16,3 +16,4 @@
 #include "UI/MainMenu.hpp"
 #include "UI/Editor.hpp"
 #include "UI/EditorManager.hpp"
+#include "UI/Modals.hpp"

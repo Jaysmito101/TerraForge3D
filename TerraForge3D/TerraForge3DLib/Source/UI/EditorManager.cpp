@@ -28,12 +28,12 @@ namespace TerraForge3D
 			}
 		}
 
-		void EditorManager::RenderUI()
+		void EditorManager::Show()
 		{
 			for (auto& editor : editors)
 			{
 				ImGui::PushID(uidStr.data());
-				editor->RenderUI();
+				editor->Show();
 				ImGui::PopID();
 			}
 		}

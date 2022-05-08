@@ -1,6 +1,6 @@
 #include "Utils/Utils.hpp"
 
-
+#include "imgui/imgui.h"
 
 #ifdef TF3D_WINDOWS
 
@@ -102,6 +102,34 @@ namespace TerraForge3D
 				return false;
 			}
 
+		}
+
+		namespace ImGuiC
+		{
+			static ImFont* font = nullptr;
+
+			void SetIconFont(void* f)
+			{
+				font = reinterpret_cast<ImFont*>(f);
+			}
+
+			void TextIcon(const char* icon, bool newline)
+			{				
+				ImGui::PushFont(font);
+				ImGui::Text(icon);
+				if (!newline)
+					ImGui::SameLine();
+				ImGui::PopFont();
+			}
+
+			void ColoredTextIcon(const char* icon, ImVec4 color, bool newline)
+			{
+				ImGui::PushFont(font);
+				ImGui::TextColored(color, icon);
+				if (!newline)
+					ImGui::SameLine();
+				ImGui::PopFont();
+			}
 		}
 
 		namespace String

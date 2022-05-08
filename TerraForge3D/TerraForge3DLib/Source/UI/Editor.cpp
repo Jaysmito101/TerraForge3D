@@ -35,7 +35,7 @@ namespace TerraForge3D
 			subEditorManager->Update();
 		}
 
-		void Editor::RenderUI()
+		void Editor::Show()
 		{
 			if (menu->IsEnabled())
 				windowFlags |= ImGuiWindowFlags_MenuBar;
@@ -46,11 +46,11 @@ namespace TerraForge3D
 				{
 					ImGui::PushID(uidStr.data());
 					menu->Show();
-					OnUIRender();
+					OnShow();
 					ImGui::PopID();
 				}
 				ImGui::End();
-				subEditorManager->RenderUI();
+				subEditorManager->Show();
 			}
 		}
 
