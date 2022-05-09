@@ -37,6 +37,7 @@ project "TerraForge3DLib"
         "../Vendor/JSON/Include",
         "../Vendor/IconFontCppHeaders/Include",
         "../Vendor/ImGui/Include",
+        "../Vendor/ImGuiFileDialog/Include",
         "%{IncludeDirectories.VulkanSDK}"
     }
 
@@ -51,6 +52,7 @@ project "TerraForge3DLib"
         "SPDLog",
     	"GLFW",
 	"ImGui",
+	"ImGuiFileDialog",
 	"Glad",
 	"opengl32"
     }

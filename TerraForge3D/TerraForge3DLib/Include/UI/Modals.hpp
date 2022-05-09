@@ -23,12 +23,36 @@ namespace TerraForge3D
 			MessageType_Error
 		};
 
+		enum FileDialogMode
+		{
+			FileDialogMode_Open = 0,
+			FileDialogMode_Save
+		};
+
+		enum FileDialogSelection
+		{
+			FileDialogSelection_FilesOnly = 0,
+			FileDialogSelection_DirectoriesOnly,
+		};
+		
+		struct FileDialogInfo
+		{
+			FileDialogMode mode = FileDialogMode_Open;
+			FileDialogSelection selection = FileDialogSelection_FilesOnly;
+			std::string selectedFilePath = "";
+			std::string selectedFileName = "";
+			std::string selectedFileExtension = "";
+			std::string initialDir = "";
+			std::vector<std::string> allowedExtensions = {".*"};
+			std::function<void(FileDialogInfo*)> onSelect = nullptr;
+		};
 
 		struct Modal
 		{
 			std::string name = "Modal";
-			std::function<bool(void*)> uiFunction;
-			std::function<void(void*, ModalResult)> onEnd;
+			std::function<bool(void*)> uiFunction = nullptr;
+			std::function<void(void*, ModalResult)> onEnd = nullptr;
+			std::function<void(void*)> onBegin = nullptr;
 			void* userData;
 			bool finished = true;
 			bool isOpened = true;
@@ -49,7 +73,10 @@ namespace TerraForge3D
 
 			Modal* LoadingBox(std::string title, float* progress, std::function<bool(float)> onCancel = nullptr, std::function<std::string(float)> getMessage = nullptr, float scale = 0.3f);
 
-			inline void AddModal(Modal& modal) { this->modalsQueue.push(modal); }
+			Modal* FileDialog(std::string title, FileDialogInfo fileDialogInfo, float scale = 0.7f);
+			
+			inline Modal* AddModal(Modal& modal) { this->modalsQueue.push(modal); return &this->modalsQueue.back(); }
+
 			inline bool IsActive() { return !currentModal.finished; }
 
 		private:

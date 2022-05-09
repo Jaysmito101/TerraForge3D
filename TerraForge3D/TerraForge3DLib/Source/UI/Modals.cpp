@@ -4,6 +4,7 @@
 #include "Utils/Utils.hpp"
 
 #include "imgui/imgui.h"
+#include "ImGuiFileDialog/ImGuiFileDialog.h"
 
 namespace TerraForge3D
 {
@@ -60,6 +61,8 @@ namespace TerraForge3D
 					if (modalsQueue.size() > 0)
 					{
 						currentModal = modalsQueue.front();
+						if(currentModal.onBegin)
+							currentModal.onBegin(currentModal.userData);
 						modalsQueue.pop();
 					}
 				}
@@ -72,6 +75,8 @@ namespace TerraForge3D
 					if (modalsQueue.size() > 0)
 					{
 						currentModal = modalsQueue.front();
+						if (currentModal.onBegin)
+							currentModal.onBegin(currentModal.userData);
 						modalsQueue.pop();
 					}
 				}
@@ -81,6 +86,8 @@ namespace TerraForge3D
 				if (modalsQueue.size() > 0)
 				{
 					currentModal = modalsQueue.front();
+					if (currentModal.onBegin)
+						currentModal.onBegin(currentModal.userData);
 					modalsQueue.pop();
 				}
 			}
@@ -88,12 +95,13 @@ namespace TerraForge3D
 
 		Modal* ModalManager::MessageBox(std::string title, std::string message, MessageType messageType, float scale)
 		{
-			currentModal.finished = false;
-			currentModal.isOpened = true;
-			currentModal.name = title;
-			currentModal.isClosable = true;
-			currentModal.sizeScale = scale;
-			currentModal.uiFunction = [messageType, message](void*) -> bool
+			Modal modal;
+			modal.finished = false;
+			modal.isOpened = true;
+			modal.name = title;
+			modal.isClosable = true;
+			modal.sizeScale = scale;
+			modal.uiFunction = [messageType, message](void*) -> bool
 			{
 				switch (messageType)
 				{
@@ -114,19 +122,22 @@ namespace TerraForge3D
 				}
 				return ImGui::Button("OK");
 			};
-			return &currentModal;
+			return AddModal(modal);
 		}
+
 
 		Modal* ModalManager::LoadingBox(std::string title, float* progress, std::function<bool(float)> onCancel, std::function<std::string(float)> getMessage, float scale)
 		{
 			TF3D_ASSERT(progress, "Progress pointer cannot be NULL");
-			currentModal.finished = false;
-			currentModal.isOpened = true;
-			currentModal.name = title;
-			currentModal.isClosable = false;
-			currentModal.sizeScale = scale;
-			currentModal.uiFunction = [progress, getMessage, onCancel](void*) -> bool
+			Modal modal;
+			modal.finished = false;
+			modal.isOpened = true;
+			modal.name = title;
+			modal.isClosable = false;
+			modal.sizeScale = scale;
+			modal.uiFunction = [progress, getMessage, onCancel](void*) -> bool
 			{
+				TF3D_ASSERT(*progress > 0.0, "Progress cannot be negetive");
 				ImGui::Text("Please wait ...");
 				ImGui::ProgressBar(*progress);
 				if (getMessage)
@@ -148,7 +159,66 @@ namespace TerraForge3D
 
 				return false;
 			};
-			return &currentModal;
+			return AddModal(modal);
+		}
+
+		Modal* ModalManager::FileDialog(std::string title, FileDialogInfo fileDialogInfo, float scale)
+		{
+			Modal modal;
+			modal.finished = false;
+			modal.isOpened = true;
+			modal.name = title;
+			modal.isClosable = false;
+			modal.sizeScale = scale;
+			modal.onBegin = [fileDialogInfo, title](void*) -> void
+			{
+				std::string filter = "";
+				if (fileDialogInfo.selection == FileDialogSelection_FilesOnly)
+				{
+					for (int i = 0; i < fileDialogInfo.allowedExtensions.size(); i++)
+					{
+						filter += fileDialogInfo.allowedExtensions[i];
+						if (i != fileDialogInfo.allowedExtensions.size() - 1)
+							filter += ",";
+					}
+				}
+				std::string initialDir = "";
+				if (fileDialogInfo.initialDir.size() > 3)
+					initialDir = fileDialogInfo.initialDir;
+				else
+					initialDir = Utils::GetExecetableDirectory();
+				ImGuiFileDialog::Instance()->OpenDialog(title, title, filter.data(), initialDir, 1, nullptr, ImGuiFileDialogFlags_NoDialog);
+			};
+			modal.uiFunction = [fileDialogInfo, title](void*) -> bool
+			{
+				FileDialogInfo fdi = fileDialogInfo;
+				if (ImGuiFileDialog::Instance()->Display(title, ImGuiWindowFlags_NoCollapse, ImVec2(0, 0), ImVec2(0, 350)))
+				{
+					if (ImGuiFileDialog::Instance()->IsOk())
+					{
+						if (fileDialogInfo.mode == FileDialogMode_Open)
+						{
+							std::map<std::string, std::string> files = ImGuiFileDialog::Instance()->GetSelection();
+							fdi.selectedFilePath = files.begin()->second;
+							fdi.selectedFileName = files.begin()->first;
+						}
+						else
+						{
+							fdi.selectedFilePath = ImGuiFileDialog::Instance()->GetFilePathName();
+							fdi.selectedFileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
+							fdi.selectedFileExtension = ImGuiFileDialog::Instance()->GetCurrentFilter();
+						}
+						if (fileDialogInfo.onSelect)
+							fileDialogInfo.onSelect(&fdi);
+					}
+
+					ImGuiFileDialog::Instance()->Close();
+					return true;
+				}
+				return false;
+			};
+
+			return AddModal(modal);
 		}
 
 	}

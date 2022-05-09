@@ -32,6 +32,7 @@ project "TerraForge3D"
         "../Vendor/Glad/Include",
         "../Vendor/JSON/Include",
         "../Vendor/STB/Include",
+        "../Vendor/ImGuiFileDialog/Include",
         "../Vendor/IconFontCppHeaders/Include",
         "../Vendor/ImGui/Include"
     }
@@ -85,7 +86,8 @@ project "TerraForge3D"
             "SPDLog",
             "GLFW",
             "Glad",
-            "ImGui"
+            "ImGui",
+            "ImGuiFileDialog"
         }
 
     filter "system:macosx"

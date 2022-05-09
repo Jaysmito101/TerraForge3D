@@ -20,6 +20,14 @@ namespace TerraForge3D
 
 		bool WriteTextFile(std::string filepath, std::string contents, bool* success = nullptr);
 
+
+		enum FileDialogSelection
+		{
+			FileDialogSelection_File,
+			FileDialogSelection_Directory,
+			FileDialogSelection_FileAndDirectory
+		};
+
 		namespace ImGuiC
 		{
 			void SetIconFont(void* font);

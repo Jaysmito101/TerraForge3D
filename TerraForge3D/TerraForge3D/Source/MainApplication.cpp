@@ -56,6 +56,23 @@ public:
 				});
 		}
 
+		ImGui::NewLine();
+
+		static std::string lastOpenedFile = "";
+		
+		if(lastOpenedFile.size() > 0)
+			ImGui::Text(lastOpenedFile.data());
+
+		if (ImGui::Button("Show File Dialog"))
+		{
+			TerraForge3D::UI::FileDialogInfo fdi;
+			fdi.onSelect = [this](TerraForge3D::UI::FileDialogInfo* fd) -> void
+			{
+				lastOpenedFile = fd->selectedFilePath;
+			};
+			appState->modals.manager->FileDialog("Open File", fdi);
+		}
+
 		if (ImGui::Button("Exit"))
 			appState->core.app->Close();
 

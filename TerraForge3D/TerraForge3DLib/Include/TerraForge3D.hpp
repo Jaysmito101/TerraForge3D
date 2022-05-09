@@ -5,6 +5,7 @@
 
 // Data
 #include "Data/ApplicationState.hpp"
+#include "Data/ProjectManager.hpp"
 
 // Utils
 #include "Utils/Utils.hpp"
