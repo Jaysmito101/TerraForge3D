@@ -1,17 +1,19 @@
 #pragma once
 #include "Base/Core/Core.hpp"
+#include "Base/Core/Application.hpp"
 #include "Utils/Utils.hpp"
 
 
 namespace TerraForge3D
 {
-	class Application;
 	class Window;
 	class MainMenu;
 	namespace UI {
 		class EditorManager;
 		class ModalManager;
 	}
+	class ProjectManager;
+	class StartUpScreen;
 
 	/*
 	* This class holds all the managers, job handlers, every thing of this application
@@ -54,6 +56,7 @@ namespace TerraForge3D
 		{
 			Application* app = nullptr;
 			Window* window = nullptr;
+			std::unordered_map<std::string, ApplicationFont> fonts;
 		} core;
 
 		struct
@@ -64,12 +67,18 @@ namespace TerraForge3D
 		struct
 		{
 			UI::EditorManager* manager = nullptr;
+			StartUpScreen* startUpScreen = nullptr;
 		} editors;
 
 		struct
 		{
 			UI::ModalManager* manager = nullptr;
 		} modals;
+
+		struct
+		{
+			ProjectManager* manager = nullptr;
+		} project;
 		
 
 		static ApplicationState* Create();

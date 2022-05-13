@@ -20,6 +20,13 @@ namespace TerraForge3D
 
 		bool WriteTextFile(std::string filepath, std::string contents, bool* success = nullptr);
 
+		bool PathExists(std::string path, bool requireWrite = true);
+
+		bool MkDir(std::string path);
+
+		bool RemoveFile(std::string path);
+
+		bool RmDir(std::string path);
 
 		enum FileDialogSelection
 		{

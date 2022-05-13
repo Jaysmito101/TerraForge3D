@@ -18,3 +18,4 @@
 #include "UI/Editor.hpp"
 #include "UI/EditorManager.hpp"
 #include "UI/Modals.hpp"
+#include "UI/StartUpScreen.hpp"

@@ -2,6 +2,8 @@
 
 #include "imgui/imgui.h"
 
+#include <filesystem>
+
 #ifdef TF3D_WINDOWS
 
 #include <Windows.h>
@@ -101,7 +103,61 @@ namespace TerraForge3D
 					*success = false;
 				return false;
 			}
+			return true;
+		}
 
+		bool PathExists(std::string path, bool requireWrite)
+		{
+			if (std::filesystem::exists(path))
+			{
+				// TODO: Check for write permissions
+				return true;
+			}
+			return false;
+		}
+
+		bool MkDir(std::string path)
+		{
+			if (!PathExists(path))
+			{
+				system((std::string("mkdir -p \"") + path + "\"").c_str());
+			}
+			return true;
+		}
+
+		bool RemoveFile(std::string path)
+		{
+			if (!PathExists(path))
+				return false;
+			try {
+				if (std::filesystem::remove(path))
+					return true;
+				else
+					return false;
+			}
+			catch (const std::filesystem::filesystem_error& err) {
+				TF3D_LOG_ERROR("Filesystem Error : ", err.what());
+				return false;
+			}
+			return true;
+		}
+
+		bool RmDir(std::string path)
+		{
+			if (!PathExists(path))
+				return false;
+			try {
+
+				if (std::filesystem::remove_all(path))
+					return true;
+				else
+					return false;
+			}
+			catch (const std::filesystem::filesystem_error& err) {
+				TF3D_LOG_ERROR("Filesystem Error : ", err.what());
+				return false;
+			}
+			return true;
 		}
 
 		namespace ImGuiC

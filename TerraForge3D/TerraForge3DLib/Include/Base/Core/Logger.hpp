@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Base/Core/Macros.hpp"
 // This ignores all warnings raised inside External headers
 #pragma warning(push, 0)
 #include "spdlog/spdlog.h"
@@ -42,6 +42,7 @@ namespace TerraForge3D
 #define TF3D_LOG_WARN(...)		::TerraForge3D::Logger::Get()->mainLogger->warn(__VA_ARGS__);
 #define TF3D_LOG_ERROR(...)		::TerraForge3D::Logger::Get()->mainLogger->error(__VA_ARGS__);
 #define TF3D_LOG_CRITICAL(...)	::TerraForge3D::Logger::Get()->mainLogger->critical(__VA_ARGS__);
+
 
 #else
 

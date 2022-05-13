@@ -498,6 +498,8 @@ union GL3WProcs {
 
 GL3W_API extern union GL3WProcs imgl3wProcs;
 
+#pragma warning(push, 0)
+
 /* OpenGL functions */
 #define glActiveTexture                  imgl3wProcs.gl.ActiveTexture
 #define glAttachShader                   imgl3wProcs.gl.AttachShader
@@ -553,6 +555,9 @@ GL3W_API extern union GL3WProcs imgl3wProcs;
 #define glUseProgram                     imgl3wProcs.gl.UseProgram
 #define glVertexAttribPointer            imgl3wProcs.gl.VertexAttribPointer
 #define glViewport                       imgl3wProcs.gl.Viewport
+
+#pragma warning(pop)
+
 
 #ifdef __cplusplus
 }

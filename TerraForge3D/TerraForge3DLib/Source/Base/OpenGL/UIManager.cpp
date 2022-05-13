@@ -78,7 +78,7 @@ namespace TerraForge3D
 						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontPath.data(), font["Size"], &icons_config, icons_ranges);
 					}
 					else
-						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontsPath.data(), font["Size"]);
+						appFonts[font["Name"]].handle = io.Fonts->AddFontFromFileTTF(fontPath.data(), font["Size"]);
 				}
 			}
 			catch (std::exception& ex)

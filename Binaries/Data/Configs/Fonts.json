@@ -3,11 +3,29 @@
 	"Fonts" : [
 		{
 			"Name" : "MaterialIcons",
-			"Size" : 16.0,
+			"Size" : 25.0,
 			"IconFont" : true,
 			"IconFontMIN" : 57344,
 			"IconFontMAX" : 1114109,
 			"File" : "MaterialIcons-Regular.ttf"
+		},
+		{
+			"Name" : "Header",
+			"Size" : 25.0,
+			"IconFont" : false,
+			"File" : "Nunito-Black.ttf"
+		},
+		{
+			"Name" : "SemiHeader",
+			"Size" : 22.0,
+			"IconFont" : false,
+			"File" : "Nunito-Bold.ttf"
+		},
+		{
+			"Name" : "Default",
+			"Size" : 20.0,
+			"IconFont" : false,
+			"File" : "Nunito-Medium.ttf"
 		}
 	]
 }

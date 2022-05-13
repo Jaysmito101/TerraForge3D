@@ -18,7 +18,7 @@ namespace TerraForge3D
 			void Show();
 			void Update();
 
-			void AddEditor(Editor* editor);
+			Editor* AddEditor(Editor* editor);
 
 			inline std::vector<Editor*> GetEditors() { return editors; }
 

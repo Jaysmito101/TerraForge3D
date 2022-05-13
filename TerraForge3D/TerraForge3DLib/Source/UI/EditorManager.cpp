@@ -46,11 +46,12 @@ namespace TerraForge3D
 			}
 		}
 
-		void EditorManager::AddEditor(Editor* editor)
+		Editor* EditorManager::AddEditor(Editor* editor)
 		{
 			TF3D_ASSERT(editor, "Cannot add NULL editor");
 			this->editors.push_back(editor);
 			editor->Setup();
+			return editor;
 		}
 
 	}

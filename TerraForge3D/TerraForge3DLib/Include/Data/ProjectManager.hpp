@@ -13,14 +13,19 @@ namespace TerraForge3D
 		ProjectManager(ApplicationState* appState);
 		~ProjectManager();
 
-		void Create();
-
+		bool Create(std::string path);
 		bool Load(std::string path);
+		void Close();
+		void Update();
+
+		bool Save();
 
 	private:
+		ApplicationState* appState = nullptr;
 
 	public:
 		std::string projectDir = "";
-		nlohmann::json projectMeta;
+		std::string name = "";
+		bool isOpen = false;
 	};
 }

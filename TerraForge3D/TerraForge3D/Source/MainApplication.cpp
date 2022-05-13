@@ -84,6 +84,9 @@ public:
 		appState->menus.mainMenu->GetManagerPTR()->Register("Windows/Style Opener", [this](TerraForge3D::UI::MenuItem* context) {
 			isVisible = (context->GetToggleState());
 			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
+
+		style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR + "Maya.json");
+		style.Apply();
 	}
 
 	void OnEnd() override
@@ -127,30 +130,39 @@ namespace TerraForge3D
 			appState->core.app = this;
 			appState->core.window = GetWindow();
 			appState->menus.mainMenu = new MainMenu(appState);
+			appState->project.manager = new ProjectManager(appState);
 			appState->editors.manager = new UI::EditorManager("Primary Editor Manager");
 			appState->modals.manager = new UI::ModalManager(appState);
 
 
 			editor = new MyEditor("Style Opener", appState);
 			appState->editors.manager->AddEditor(editor);
+			appState->editors.startUpScreen = reinterpret_cast<StartUpScreen*>(appState->editors.manager->AddEditor(new StartUpScreen(appState)));
+
+			appState->core.fonts = fonts;
 		}
 
 		virtual void OnUpdate() override
 		{
 			appState->editors.manager->Update();
 			appState->modals.manager->Update();
+			appState->project.manager->Update();
 		}
 
 		virtual void OnImGuiRender() override
 		{
-			dockspace.Begin();
- 
+			dockspace.Begin();			
+
+			ImGui::PushFont(fonts["Default"].handle);
+
 			appState->modals.manager->Show();
 			if (!appState->modals.manager->IsActive())
 			{
 				appState->menus.mainMenu->Show();
 				appState->editors.manager->Show();
 			}
+
+			ImGui::PopFont();
 
 			dockspace.End();
 		}
@@ -164,6 +176,7 @@ namespace TerraForge3D
 			TF3D_SAFE_DELETE(appState->menus.mainMenu);
 			TF3D_SAFE_DELETE(appState->editors.manager);
 			TF3D_SAFE_DELETE(appState->modals.manager);
+			TF3D_SAFE_DELETE(appState->project.manager);
 
 			ApplicationState::Destory();
 		}

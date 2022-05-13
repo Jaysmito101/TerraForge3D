@@ -1,6 +1,7 @@
 #include "UI/Editor.hpp"
 #include "UI/EditorManager.hpp"
 #include "UI/Menu.hpp"
+#include "Base/Core/Application.hpp"
 
 #include "imgui/imgui.h"
 
@@ -9,7 +10,7 @@ namespace TerraForge3D
 
 	namespace UI
 	{
-
+		static ImFont* headerFont = nullptr; // TEMP
 
 
 		Editor::Editor(std::string name)
@@ -33,16 +34,23 @@ namespace TerraForge3D
 		{
 			OnUpdate();
 			subEditorManager->Update();
+
 		}
 
 		void Editor::Show()
 		{
+			if (!headerFont)
+				headerFont = Application::Get()->GetFonts()["SemiHeader"].handle;
+
 			if (menu->IsEnabled())
 				windowFlags |= ImGuiWindowFlags_MenuBar;
 
 			if (isEnabled && isVisible)
 			{
-				if ( ImGui::Begin(name.data(), &isVisible, windowFlags))
+				ImGui::PushFont(headerFont);
+				bool tmp = ImGui::Begin(name.data(), &isVisible, windowFlags);
+				ImGui::PopFont();
+				if (tmp)
 				{
 					ImGui::PushID(uidStr.data());
 					menu->Show();
