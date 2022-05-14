@@ -47,9 +47,9 @@ namespace TerraForge3D
 
 			if (isEnabled && isVisible)
 			{
-				ImGui::PushFont(headerFont);
+				Utils::ImGuiC::PushSubFont(headerFont);
 				bool tmp = ImGui::Begin(name.data(), &isVisible, windowFlags);
-				ImGui::PopFont();
+				Utils::ImGuiC::PopSubFont();
 				if (tmp)
 				{
 					ImGui::PushID(uidStr.data());

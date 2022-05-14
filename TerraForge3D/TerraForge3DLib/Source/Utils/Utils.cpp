@@ -3,6 +3,7 @@
 #include "imgui/imgui.h"
 
 #include <filesystem>
+#include <stack>
 
 #ifdef TF3D_WINDOWS
 
@@ -163,6 +164,7 @@ namespace TerraForge3D
 		namespace ImGuiC
 		{
 			static ImFont* font = nullptr;
+			static std::stack<ImFont*> subFonts;
 
 			void SetIconFont(void* f)
 			{
@@ -185,6 +187,21 @@ namespace TerraForge3D
 				if (!newline)
 					ImGui::SameLine();
 				ImGui::PopFont();
+			}
+
+			void PushSubFont(ImFont* font)
+			{
+				subFonts.push(ImGui::GetFont());
+				ImGui::PopFont();
+				ImGui::PushFont(font);
+			}
+
+			void PopSubFont()
+			{
+				TF3D_ASSERT(subFonts.size() != 0, "Utils::ImGuiC::PopSubFont should only be called after Utils::ImGuiC::PushSubFont");
+				ImGui::PopFont();
+				ImGui::PushFont(subFonts.top());
+				subFonts.pop();
 			}
 		}
 

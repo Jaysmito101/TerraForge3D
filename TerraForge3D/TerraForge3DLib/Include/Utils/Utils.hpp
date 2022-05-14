@@ -2,6 +2,7 @@
 #include "Base/Core/Core.hpp"
 #include "IconsMaterialDesign.h"
 
+struct ImFont;
 struct ImVec4;
 
 namespace TerraForge3D
@@ -43,6 +44,9 @@ namespace TerraForge3D
 
 			void ColoredTextIcon(const char* icon, ImVec4 color, bool newline = false);
 
+			void PushSubFont(ImFont* font);
+
+			void PopSubFont();
 		}
 
 		namespace String

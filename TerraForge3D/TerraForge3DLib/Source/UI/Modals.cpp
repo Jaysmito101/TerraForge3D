@@ -6,6 +6,7 @@
 #include "imgui/imgui.h"
 #include "ImGuiFileDialog/ImGuiFileDialog.h"
 
+
 namespace TerraForge3D
 {
 
@@ -13,6 +14,7 @@ namespace TerraForge3D
 	{
 
 
+		static std::string	lastPath = Utils::GetExecetableDirectory();
 
 		ModalManager::ModalManager(ApplicationState* appState)
 		{
@@ -186,21 +188,31 @@ namespace TerraForge3D
 				if (fileDialogInfo.initialDir.size() > 3)
 					initialDir = fileDialogInfo.initialDir;
 				else
-					initialDir = Utils::GetExecetableDirectory();
+					initialDir = lastPath;
 				ImGuiFileDialog::Instance()->OpenDialog(title, title, filter.data(), initialDir, 1, nullptr, ImGuiFileDialogFlags_NoDialog);
 			};
 			modal.uiFunction = [fileDialogInfo, title](void*) -> bool
 			{
 				FileDialogInfo fdi = fileDialogInfo;
+				lastPath = ImGuiFileDialog::Instance()->GetCurrentPath();
 				if (ImGuiFileDialog::Instance()->Display(title, ImGuiWindowFlags_NoCollapse, ImVec2(0, 0), ImVec2(0, 350)))
 				{
 					if (ImGuiFileDialog::Instance()->IsOk())
 					{
 						if (fileDialogInfo.mode == FileDialogMode_Open)
 						{
-							std::map<std::string, std::string> files = ImGuiFileDialog::Instance()->GetSelection();
-							fdi.selectedFilePath = files.begin()->second;
-							fdi.selectedFileName = files.begin()->first;
+							if (fileDialogInfo.selection == FileDialogSelection_FilesOnly)
+							{
+								std::map<std::string, std::string> files = ImGuiFileDialog::Instance()->GetSelection();
+								if (files.size() == 0)
+									return false;
+								fdi.selectedFilePath = files.begin()->second;
+								fdi.selectedFileName = files.begin()->first;
+							}
+							else
+							{
+								fdi.selectedFilePath  = lastPath;
+							}
 						}
 						else
 						{
