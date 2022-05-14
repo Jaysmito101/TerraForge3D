@@ -8,12 +8,17 @@ namespace TerraForge3D
 {
 	class Window;
 	class MainMenu;
-	namespace UI {
+	class ProjectManager;
+	class StartUpScreen;
+	namespace UI 
+	{
 		class EditorManager;
 		class ModalManager;
 	}
-	class ProjectManager;
-	class StartUpScreen;
+	namespace JobSystem
+	{
+		class JobSystem;
+	}
 
 	/*
 	* This class holds all the managers, job handlers, every thing of this application
@@ -80,6 +85,10 @@ namespace TerraForge3D
 			ProjectManager* manager = nullptr;
 		} project;
 		
+		struct
+		{
+			JobSystem::JobSystem* manager = nullptr;
+		} jobs;
 
 		static ApplicationState* Create();
 		inline static ApplicationState* Get() { TF3D_ASSERT(appState, "Applicaiton Sate not yet created."); return appState; }

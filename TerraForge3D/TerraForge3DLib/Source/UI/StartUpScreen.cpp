@@ -21,7 +21,7 @@ namespace TerraForge3D
 
 	void StartUpScreen::OnUpdate()
 	{
-
+		isVisible = (!appState->project.manager->isOpen);
 	}
 
 	void StartUpScreen::OnShow()
@@ -64,7 +64,7 @@ namespace TerraForge3D
 		{
 			if (appState->project.manager->Load(info->selectedFilePath))
 			{
-				isVisible = false;
+				
 			}
 		};
 
@@ -74,7 +74,7 @@ namespace TerraForge3D
 		{
 			if (appState->project.manager->Create(info->selectedFilePath))
 			{
-				isVisible = false;
+				
 			}
 		};
 	}

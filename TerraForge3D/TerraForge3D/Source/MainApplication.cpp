@@ -1,8 +1,6 @@
 #include "TerraForge3D.hpp"
 #include "EntryPoint.hpp"
 
-#include "IconsMaterialDesign.h"
-
 #ifdef TF3D_WINDOWS
 // For the windows API
 #undef MessageBox
@@ -133,6 +131,7 @@ namespace TerraForge3D
 			appState->project.manager = new ProjectManager(appState);
 			appState->editors.manager = new UI::EditorManager("Primary Editor Manager");
 			appState->modals.manager = new UI::ModalManager(appState);
+			appState->jobs.manager = new JobSystem::JobSystem(appState);
 
 
 			editor = new MyEditor("Style Opener", appState);
@@ -147,6 +146,7 @@ namespace TerraForge3D
 			appState->editors.manager->Update();
 			appState->modals.manager->Update();
 			appState->project.manager->Update();
+			appState->jobs.manager->Update();
 		}
 
 		virtual void OnImGuiRender() override
@@ -177,6 +177,7 @@ namespace TerraForge3D
 			TF3D_SAFE_DELETE(appState->editors.manager);
 			TF3D_SAFE_DELETE(appState->modals.manager);
 			TF3D_SAFE_DELETE(appState->project.manager);
+			TF3D_SAFE_DELETE(appState->jobs.manager);
 
 			ApplicationState::Destory();
 		}

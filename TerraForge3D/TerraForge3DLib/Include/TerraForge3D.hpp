@@ -19,3 +19,6 @@
 #include "UI/EditorManager.hpp"
 #include "UI/Modals.hpp"
 #include "UI/StartUpScreen.hpp"
+
+// Job
+#include "Job/JobSystem.hpp"

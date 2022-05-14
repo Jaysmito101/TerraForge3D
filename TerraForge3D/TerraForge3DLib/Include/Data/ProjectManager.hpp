@@ -26,6 +26,7 @@ namespace TerraForge3D
 	public:
 		std::string projectDir = "";
 		std::string name = "";
-		bool isOpen = false;
+		// bool isOpen = false;
+		bool isOpen = true; // Temporarily for debugging
 	};
 }
