@@ -21,4 +21,5 @@
 #include "UI/StartUpScreen.hpp"
 
 // Job
+#include "Job/Job.hpp"
 #include "Job/JobSystem.hpp"

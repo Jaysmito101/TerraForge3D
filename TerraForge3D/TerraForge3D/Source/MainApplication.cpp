@@ -4,6 +4,7 @@
 #ifdef TF3D_WINDOWS
 // For the windows API
 #undef MessageBox
+#undef AddJob
 #endif
 
 class MyEditor : public TerraForge3D::UI::Editor
@@ -69,6 +70,21 @@ public:
 				lastOpenedFile = fd->selectedFilePath;
 			};
 			appState->modals.manager->FileDialog("Open File", fdi);
+		}
+
+		static float jobSleepDuration = 1.0f;
+		ImGui::DragFloat("Job Sleep Duration", &jobSleepDuration, 0.01f, 0.0001f);
+		if (ImGui::Button("Add Dummy Job(AMT)"))
+		{
+			TerraForge3D::JobSystem::Job* job = new TerraForge3D::JobSystem::Job("Temp Job");
+			job->excutionModel = TerraForge3D::JobSystem::JobExecutionModel_AsyncOnMainThread;
+			job->onRun = [](TerraForge3D::JobSystem::Job* j) -> bool
+			{
+				std::this_thread::sleep_for(std::chrono::duration<float>(jobSleepDuration));
+				TF3D_LOG("Job Done");
+				return true;
+			};
+			appState->jobs.manager->AddJob(job);
 		}
 
 		if (ImGui::Button("Exit"))

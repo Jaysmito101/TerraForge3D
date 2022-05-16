@@ -1,0 +1,55 @@
+#pragma once
+#include "Base/Core/Core.hpp"
+
+namespace TerraForge3D
+{
+
+	namespace JobSystem
+	{
+
+		enum JobExecutionModel
+		{
+			JobExecutionModel_Async = 0,
+			JobExecutionModel_AsyncOnMainThread,
+			JobExecutionModel_Count
+		};
+
+		enum JobStatus
+		{
+			JobStatus_None = 0,
+			JobStatus_Success,
+			JobStatus_Faliure,
+			JobStatus_OnGoing,
+			JobStatus_Queued,
+			JobStatus_Paused, // For future
+			JobStatus_Count
+		};
+
+		class Job
+		{
+		public:
+			Job(std::string name);
+			~Job();
+
+
+		public:
+			std::string name = "Job";
+			std::string description = "";
+			float progress = 0.0f;
+			JobExecutionModel excutionModel = JobExecutionModel_Async;
+			JobStatus status = JobStatus_None;
+			void* userData = nullptr;
+			uint32_t id;
+			// std::vector<uint32_t> dependsOn; For future
+
+			// Job Functions
+			std::function<void(Job*)> onSetup = nullptr;
+			std::function<bool(Job*)> onRun = nullptr;
+			std::function<void(Job*)> onDelete = nullptr;
+
+		private:
+		};
+
+	}
+
+}
