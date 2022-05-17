@@ -1,5 +1,8 @@
 #pragma once
 #include "Base/Core/Core.hpp"
+#include "Job/Thread.hpp"
+
+#define TF3D_THREAD_POOL_SIZE 8
 
 namespace TerraForge3D
 {
@@ -21,6 +24,7 @@ namespace TerraForge3D
 
 		private:
 			void UpdateAsyncOnMainThreadJobs();
+			void UpdateAsyncJobs();
 
 		public:
 			std::unordered_map<uint32_t, Job*> jobs;
@@ -40,6 +44,9 @@ namespace TerraForge3D
 			std::chrono::steady_clock::time_point prevTime = std::chrono::high_resolution_clock::now();
 			double deltaTime = 0.0;
 			double totalTime = 0.0;
+
+			// AsyncJobs data
+			Thread threadPool[TF3D_THREAD_POOL_SIZE];
 		};
 
 	}

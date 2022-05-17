@@ -32,7 +32,11 @@ namespace TerraForge3D
 
 		void JobSystem::Update()
 		{
+			// Assign Jobs for AsyncOnMainThread
 			UpdateAsyncOnMainThreadJobs();
+
+			// Assign Jobs for Async
+			UpdateAsyncJobs();
 
 			// Delete Completed Jobs execeding maxCompletedJobQueueSize
 			if (completedJobs.size() == maxCompletedJobQueueSize)
@@ -46,7 +50,7 @@ namespace TerraForge3D
 			}
 		}
 
-		uint32_t  JobSystem::AddJob(Job* job)
+		uint32_t JobSystem::AddJob(Job* job)
 		{
 			TF3D_ASSERT(job, "job is NULL");
 
@@ -97,6 +101,30 @@ namespace TerraForge3D
 					timeTaken = std::chrono::duration<double>(mtJobEndTime - mtJobsBeginTime).count();
 					if (timeTaken > maxMTJobExecutionTime)
 						break;
+				}
+			}
+		}
+
+		void JobSystem::UpdateAsyncJobs()
+		{
+			// Recover the finished Jobs
+			for (int i = 0; i < TF3D_THREAD_POOL_SIZE; i++)
+			{
+				if (threadPool[i].hasCompletedJob)
+				{
+					Job* job = threadPool[i].FinishPendingJob();
+					completedJobs.push(job->id);
+				}
+			}
+
+			// Assign the Jobs
+			for (int i = 0; i < TF3D_THREAD_POOL_SIZE && !asyncJobsQueue.empty(); i++)
+			{
+				if (threadPool[i].IsFree())
+				{
+					Job* job = jobs[asyncJobsQueue.front()];
+					asyncJobsQueue.pop();
+					threadPool[i].AssignJob(job);
 				}
 			}
 		}

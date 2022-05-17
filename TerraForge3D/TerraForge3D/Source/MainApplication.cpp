@@ -81,7 +81,20 @@ public:
 			job->onRun = [](TerraForge3D::JobSystem::Job* j) -> bool
 			{
 				std::this_thread::sleep_for(std::chrono::duration<float>(jobSleepDuration));
-				TF3D_LOG("Job Done");
+				TF3D_LOG("Job Done AMT");
+				return true;
+			};
+			appState->jobs.manager->AddJob(job);
+		}
+
+		if (ImGui::Button("Add Dummy Job(A)"))
+		{
+			TerraForge3D::JobSystem::Job* job = new TerraForge3D::JobSystem::Job("Temp Job");
+			job->excutionModel = TerraForge3D::JobSystem::JobExecutionModel_Async;
+			job->onRun = [](TerraForge3D::JobSystem::Job* j) -> bool
+			{
+				std::this_thread::sleep_for(std::chrono::duration<float>(jobSleepDuration));
+				TF3D_LOG("Job Done A");
 				return true;
 			};
 			appState->jobs.manager->AddJob(job);
