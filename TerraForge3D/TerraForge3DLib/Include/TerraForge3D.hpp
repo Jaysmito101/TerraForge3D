@@ -23,3 +23,5 @@
 // Job
 #include "Job/Job.hpp"
 #include "Job/JobSystem.hpp"
+#include "Job/Thread.hpp"
+#include "Job/JobManager.hpp"

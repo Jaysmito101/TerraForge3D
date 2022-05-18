@@ -54,8 +54,8 @@ namespace TerraForge3D
 		{
 			TF3D_ASSERT(job, "job is NULL");
 
-			if (job->onSetup)
-				job->onSetup(job);
+			// if (job->onSetup)
+			//  	job->onSetup(job);
 
 			jobs[job->id] = job;
 

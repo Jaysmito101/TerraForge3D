@@ -166,6 +166,8 @@ namespace TerraForge3D
 			editor = new MyEditor("Style Opener", appState);
 			appState->editors.manager->AddEditor(editor);
 			appState->editors.startUpScreen = reinterpret_cast<StartUpScreen*>(appState->editors.manager->AddEditor(new StartUpScreen(appState)));
+			appState->editors.manager->AddEditor(new JobManager(appState));
+
 
 			appState->core.fonts = fonts;
 		}
@@ -189,6 +191,10 @@ namespace TerraForge3D
 			{
 				appState->menus.mainMenu->Show();
 				appState->editors.manager->Show();
+			
+				// ImGui::Begin("sadsa");
+				// ImGui::ShowStyleEditor();
+				// ImGui::End();
 			}
 
 			ImGui::PopFont();

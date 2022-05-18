@@ -37,7 +37,7 @@ namespace TerraForge3D
 			const double flushMTJobsEvery = 5.0f;
 			const double maxMTJobExecutionTime = 0.5f;
 
-		private:
+		// private:
 			ApplicationState* appState;
 
 			// AsyncOnMainThreadJobs data

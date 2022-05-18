@@ -48,7 +48,12 @@ namespace TerraForge3D
 			if (isEnabled && isVisible)
 			{
 				Utils::ImGuiC::PushSubFont(headerFont);
+				
+				// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, ImGui::GetStyle().FramePadding.y * 2.0f));
 				bool tmp = ImGui::Begin(name.data(), &isVisible, windowFlags);
+				// ImGui::PopStyleVar();
+
+
 				Utils::ImGuiC::PopSubFont();
 				if (tmp)
 				{

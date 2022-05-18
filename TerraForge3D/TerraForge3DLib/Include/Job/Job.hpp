@@ -34,7 +34,7 @@ namespace TerraForge3D
 
 		public:
 			std::string name = "Job";
-			std::string description = "";
+			std::string description = "No Description";
 			float progress = 0.0f;
 			JobExecutionModel excutionModel = JobExecutionModel_Async;
 			JobStatus status = JobStatus_None;
@@ -43,7 +43,7 @@ namespace TerraForge3D
 			// std::vector<uint32_t> dependsOn; For future
 
 			// Job Functions
-			std::function<void(Job*)> onSetup = nullptr;
+			// std::function<void(Job*)> onSetup = nullptr;
 			std::function<bool(Job*)> onRun = nullptr;
 			std::function<void(Job*)> onDelete = nullptr;
 
