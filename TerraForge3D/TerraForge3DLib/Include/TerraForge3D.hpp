@@ -6,6 +6,8 @@
 // Data
 #include "Data/ApplicationState.hpp"
 #include "Data/ProjectManager.hpp"
+#include "Data/Preferences.hpp"
+#include "Data/PreferencesEditor.hpp"
 
 // Utils
 #include "Utils/Utils.hpp"

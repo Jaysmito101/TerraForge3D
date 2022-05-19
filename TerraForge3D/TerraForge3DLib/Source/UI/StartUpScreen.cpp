@@ -10,6 +10,7 @@
 namespace TerraForge3D
 {
 	StartUpScreen::StartUpScreen(ApplicationState* appState)
+		: UI::Editor("Startup Screen")
 	{
 		this->appState = appState;
 	}

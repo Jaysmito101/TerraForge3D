@@ -55,8 +55,16 @@ namespace TerraForge3D
 				{
 					if(togglePTR)
 						toggleState= *togglePTR;
+					/*
 					if (ImGui::Checkbox(name.data(), &toggleState))
 					{
+						if (callback)
+							callback(this);
+					}
+					*/
+					if (ImGui::MenuItem(name.data(), shortcut.data(), toggleState))
+					{
+						toggleState = !toggleState;
 						if (callback)
 							callback(this);
 					}

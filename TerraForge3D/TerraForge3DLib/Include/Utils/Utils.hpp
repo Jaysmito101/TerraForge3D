@@ -40,6 +40,8 @@ namespace TerraForge3D
 		{
 			void SetIconFont(void* font);
 
+			bool ButtonIcon(const char* icon, const char* text = nullptr, bool newline = true);
+
 			void TextIcon(const char* icon, bool newline = false);
 
 			void ColoredTextIcon(const char* icon, ImVec4 color, bool newline = false);

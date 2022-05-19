@@ -165,10 +165,28 @@ namespace TerraForge3D
 		{
 			static ImFont* font = nullptr;
 			static std::stack<ImFont*> subFonts;
+			static char buffer[4096] = {0};
 
 			void SetIconFont(void* f)
 			{
 				font = reinterpret_cast<ImFont*>(f);
+			}
+
+			bool ButtonIcon(const char* icon, const char* text, bool newline)
+			{
+				ImGui::PushFont(font);
+				bool pressed = ImGui::Button(icon);
+				ImGui::PopFont();
+				if (text)
+				{
+					if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+					{
+						ImGui::SetTooltip(text);
+					}
+				}
+				if (!newline)
+					ImGui::SameLine();
+				return pressed;
 			}
 
 			void TextIcon(const char* icon, bool newline)

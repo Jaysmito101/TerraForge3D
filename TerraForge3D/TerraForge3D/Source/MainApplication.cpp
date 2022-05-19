@@ -157,16 +157,17 @@ namespace TerraForge3D
 			appState->core.app = this;
 			appState->core.window = GetWindow();
 			appState->menus.mainMenu = new MainMenu(appState);
+			appState->preferences = new Preferences(appState);
 			appState->project.manager = new ProjectManager(appState);
 			appState->editors.manager = new UI::EditorManager("Primary Editor Manager");
 			appState->modals.manager = new UI::ModalManager(appState);
 			appState->jobs.manager = new JobSystem::JobSystem(appState);
 
-
 			editor = new MyEditor("Style Opener", appState);
 			appState->editors.manager->AddEditor(editor);
 			appState->editors.startUpScreen = reinterpret_cast<StartUpScreen*>(appState->editors.manager->AddEditor(new StartUpScreen(appState)));
 			appState->editors.manager->AddEditor(new JobManager(appState));
+			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 
 
 			appState->core.fonts = fonts;
@@ -213,6 +214,7 @@ namespace TerraForge3D
 			TF3D_SAFE_DELETE(appState->modals.manager);
 			TF3D_SAFE_DELETE(appState->project.manager);
 			TF3D_SAFE_DELETE(appState->jobs.manager);
+			TF3D_SAFE_DELETE(appState->preferences);
 
 			ApplicationState::Destory();
 		}

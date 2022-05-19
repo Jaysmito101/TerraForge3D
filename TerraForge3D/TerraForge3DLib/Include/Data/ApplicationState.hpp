@@ -10,6 +10,7 @@ namespace TerraForge3D
 	class MainMenu;
 	class ProjectManager;
 	class StartUpScreen;
+	class Preferences;
 	namespace UI 
 	{
 		class EditorManager;
@@ -89,6 +90,8 @@ namespace TerraForge3D
 		{
 			JobSystem::JobSystem* manager = nullptr;
 		} jobs;
+
+		Preferences* preferences = nullptr;
 
 		static ApplicationState* Create();
 		inline static ApplicationState* Get() { TF3D_ASSERT(appState, "Applicaiton Sate not yet created."); return appState; }
