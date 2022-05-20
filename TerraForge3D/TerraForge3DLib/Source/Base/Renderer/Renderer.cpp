@@ -1,5 +1,5 @@
 #include "Base/Renderer/Renderer.hpp"
-
+#include "Base/Renderer/NativeRenderer.hpp"
 
 namespace TerraForge3D
 {
@@ -37,12 +37,14 @@ namespace TerraForge3D
 	{
 		rendererContext = RendererAPI::Context::Create();
 		uiManager = RendererAPI::UIManager::Create();
+		nativeRenderer = RendererAPI::NativeRenderer::Create();
 	}
 
 	Renderer::~Renderer()
 	{
+		RendererAPI::NativeRenderer::Destroy();
 		RendererAPI::UIManager::Destory();
-		RendererAPI::Context::Destroy();
+		RendererAPI::Context::Destroy();		
 	}
 
 	void Renderer::WaitForIdle()
@@ -58,6 +60,11 @@ namespace TerraForge3D
 	void Renderer::EndUI()
 	{
 		uiManager->End();
+	}
+
+	void Renderer::Flush()
+	{
+		nativeRenderer->Flush();
 	}
 
 	

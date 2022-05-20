@@ -5,6 +5,22 @@
 
 namespace TerraForge3D
 {
+	namespace RendererAPI
+	{
+		class NativeRenderer;
+	}
+
+	enum RendererCommand
+	{
+		RendererCommand_None = 0,
+		RendererCommand_Clear,
+		RendererCommand_Draw,
+		RendererCommand_DrawInstanced,
+		RendererCommand_BindFrameBuffer,
+		RendererCommand_BindPipeline,
+		RendererCommand_Render,
+		RendererCommand_Count
+	};
 
 	class Renderer
 	{
@@ -17,6 +33,8 @@ namespace TerraForge3D
 		virtual void BeginUI();
 		virtual void EndUI();
 
+		virtual void Flush();
+
 		static Renderer* Create();
 		static Renderer* Get();
 		static Renderer* Set(Renderer* context);
@@ -25,6 +43,7 @@ namespace TerraForge3D
 	public:
 		RendererAPI::Context* rendererContext = nullptr;
 		RendererAPI::UIManager* uiManager = nullptr;
+		RendererAPI::NativeRenderer* nativeRenderer = nullptr;
 
 	private:
 		static Renderer* mainInstance;
