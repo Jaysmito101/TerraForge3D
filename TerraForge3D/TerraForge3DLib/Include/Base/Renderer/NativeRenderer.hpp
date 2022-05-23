@@ -19,7 +19,7 @@ namespace TerraForge3D
 
 		public:
 			static NativeRenderer* Create();
-			static void Destory();
+			static void Destroy();
 
 		public:
 			std::queue<std::pair<RendererCommand, void*>> rendererQueue;

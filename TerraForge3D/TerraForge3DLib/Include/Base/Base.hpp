@@ -16,6 +16,8 @@
 #include "Base/Renderer/GPUTexture.hpp"
 #include "Base/Renderer/Context.hpp"
 #include "Base/Renderer/UIManager.hpp"
+#include "Base/Renderer/Framebuffer.hpp"
+#include "Base/Renderer/NativeRenderer.hpp"
 #endif
 
 // Data Strutures

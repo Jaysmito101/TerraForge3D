@@ -174,9 +174,12 @@ namespace TerraForge3D
 
 			bool ButtonIcon(const char* icon, const char* text, bool newline)
 			{
-				ImGui::PushFont(font);
+				bool iconLoaded = font->IsLoaded();
+				if(iconLoaded)
+					ImGui::PushFont(font);
 				bool pressed = ImGui::Button(icon);
-				ImGui::PopFont();
+				if (iconLoaded)
+					ImGui::PopFont();
 				if (text)
 				{
 					if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
@@ -190,21 +193,27 @@ namespace TerraForge3D
 			}
 
 			void TextIcon(const char* icon, bool newline)
-			{				
-				ImGui::PushFont(font);
+			{		
+				bool iconLoaded = font->IsLoaded();
+				if (iconLoaded)
+					ImGui::PushFont(font);
 				ImGui::Text(icon);
 				if (!newline)
 					ImGui::SameLine();
-				ImGui::PopFont();
+				if (iconLoaded)
+					ImGui::PopFont();
 			}
 
 			void ColoredTextIcon(const char* icon, ImVec4 color, bool newline)
 			{
-				ImGui::PushFont(font);
+				bool iconLoaded = font->IsLoaded();
+				if (iconLoaded)
+					ImGui::PushFont(font);
 				ImGui::TextColored(color, icon);
 				if (!newline)
 					ImGui::SameLine();
-				ImGui::PopFont();
+				if (iconLoaded)
+					ImGui::PopFont();
 			}
 
 			void PushSubFont(ImFont* font)

@@ -14,6 +14,7 @@ namespace TerraForge3D
 
 		FrameBuffer::~FrameBuffer()
 		{
+		
 		}
 
 		FrameBuffer* FrameBuffer::Create()
@@ -23,12 +24,6 @@ namespace TerraForge3D
 #elif defined(TF3D_OPENGL_BACKEND)
 			return new OpenGL::FrameBuffer(); 
 #endif
-		}
-
-		void FrameBuffer::Destroy(FrameBuffer* framebuffer)
-		{
-			TF3D_ASSERT(framebuffer, "Cannot destroy null framebuffer");
-			TF3D_SAFE_DELETE(framebuffer);
 		}
 
 	}

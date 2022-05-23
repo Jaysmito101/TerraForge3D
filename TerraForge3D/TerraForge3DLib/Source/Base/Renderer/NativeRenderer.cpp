@@ -26,7 +26,7 @@ namespace TerraForge3D
 		}
 
 
-		void NativeRenderer::Destory()
+		void NativeRenderer::Destroy()
 		{
 			TF3D_SAFE_DELETE(mainInstance);
 		}

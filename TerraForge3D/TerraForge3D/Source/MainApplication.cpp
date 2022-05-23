@@ -170,6 +170,10 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 
 
+			fbo = RendererAPI::FrameBuffer::Create();
+			fbo->Setup();
+
+
 			appState->core.fonts = fonts;
 		}
 
@@ -205,7 +209,8 @@ namespace TerraForge3D
 
 		virtual void OnEnd() override
 		{
-			TF3D_LOG("Started Shutdown!");
+			delete fbo;
+			
 			GetInputEventManager()->DeregisterCallback(exitcb);
 			
 			// Object Destructions
@@ -216,7 +221,10 @@ namespace TerraForge3D
 			TF3D_SAFE_DELETE(appState->jobs.manager);
 			TF3D_SAFE_DELETE(appState->preferences);
 
+
 			ApplicationState::Destory();
+
+			TF3D_LOG("Shutdown!");
 		}
 
 	private:
@@ -227,6 +235,8 @@ namespace TerraForge3D
 		UI::Dockspace dockspace;
 
 		MyEditor* editor;
+
+		RendererAPI::FrameBuffer* fbo = nullptr;
 	};
 }
 
