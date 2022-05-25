@@ -18,6 +18,7 @@
 #include "Base/Renderer/UIManager.hpp"
 #include "Base/Renderer/Framebuffer.hpp"
 #include "Base/Renderer/NativeRenderer.hpp"
+#include "Base/Renderer/Camera.hpp"
 #endif
 
 // Data Strutures

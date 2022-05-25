@@ -38,6 +38,7 @@ project "TerraForge3DLib"
         "../Vendor/IconFontCppHeaders/Include",
         "../Vendor/ImGui/Include",
         "../Vendor/ImGuiFileDialog/Include",
+        "../Vendor/GLM/Include",
         "%{IncludeDirectories.VulkanSDK}"
     }
 
