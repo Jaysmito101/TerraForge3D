@@ -20,6 +20,7 @@ namespace TerraForge3D
 			virtual void Destroy() override;
 			virtual void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f) override;
 			virtual void* GetNativeHandle(void* handle = nullptr) override;
+			virtual ImTextureID GetColorAttachmentImGuiID(int index = 0);
 			virtual void* GetColorAttachmentHandle(int index, void* handle = nullptr) override;
 			virtual void* GetDepthAttachmentHandle(void* handle = nullptr) override;
 			virtual void* ReadPixel(uint32_t x, uint32_t y, int index = 0, void* data = nullptr) override;

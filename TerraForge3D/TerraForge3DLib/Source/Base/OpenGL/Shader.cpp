@@ -97,6 +97,8 @@ namespace TerraForge3D
 
 			isCompiled = true;
 			wasCompiled = true;
+
+			return true;
 		}
 
 		bool Shader::LoadFromBinary(std::vector<uint32_t> binary)

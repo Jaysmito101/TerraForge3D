@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Core/Core.hpp"
+#include <imgui/imgui.h>
 
 namespace TerraForge3D
 {
@@ -26,6 +27,7 @@ namespace TerraForge3D
 			virtual void Destroy() = 0;
 			virtual void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f) = 0;
 			virtual void* GetNativeHandle(void* handle = nullptr) = 0;
+			virtual ImTextureID GetColorAttachmentImGuiID(int index = 0) = 0;
 			virtual void* GetColorAttachmentHandle(int index, void* handle = nullptr) = 0;
 			virtual void* GetDepthAttachmentHandle(void* handle = nullptr) = 0;
 			virtual void* ReadPixel(uint32_t x, uint32_t y, int index = 0, void* data = nullptr) = 0;

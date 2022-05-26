@@ -1,3 +1,4 @@
+#pragma once
 #include "Base/Core/Core.hpp"
 
 namespace TerraForge3D

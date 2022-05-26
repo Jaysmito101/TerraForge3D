@@ -1,3 +1,4 @@
+#pragma once
 #include "Base/OpenGL/Core.hpp"
 #include "Base/Renderer/Shader.hpp"
 

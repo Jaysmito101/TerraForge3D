@@ -139,24 +139,28 @@ namespace TerraForge3D
 
 		void* FrameBuffer::ReadPixel(uint32_t x, uint32_t y, int index, void* data)
 		{
-			TF3D_ASSERT(index > 0 && index < colorAttachmentCount, "Index out of range");
+			TF3D_ASSERT(index >= 0 && index < colorAttachmentCount, "Index out of range");
+			glBindFramebuffer(GL_FRAMEBUFFER, handle);
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
 			uint32_t pixelData = 0;
 			glReadPixels(x, y, 1, 1, GetOpenGLFormat(colorAttachmentFromats[index]).second, GetOpenGLType(colorAttachmentFromats[index]), &pixelData);
 			if (data)
 				memcpy(data, &pixelData, sizeof(pixelData));
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			return (void*)(intptr_t)(pixelData);
 		}
 
 		void FrameBuffer::Clear(float r, float g, float b, float a)
 		{
 			float color[4] = {r, g, b, a};
+			glBindFramebuffer(GL_FRAMEBUFFER, handle);
 			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			for (int i = 0; i < colorAttachmentCount; i++)
 			{
 				glClearBufferfv(GL_COLOR, i, color);
 			}
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
 		void* FrameBuffer::GetNativeHandle(void* h)
@@ -165,10 +169,16 @@ namespace TerraForge3D
 				memcpy(h, &handle, sizeof(handle));
 			return (void*)(intptr_t)(handle);
 		}
+
+		ImTextureID FrameBuffer::GetColorAttachmentImGuiID(int index)
+		{
+			TF3D_ASSERT(index >= 0 && index < colorAttachmentCount, "Color attachment index out of range");
+			return (ImTextureID)(intptr_t)(colorAttachments[index]);
+		}
 		
 		void* FrameBuffer::GetColorAttachmentHandle(int index, void* h)
 		{
-			TF3D_ASSERT(index <= colorAttachmentCount, "Color attachment index out of range");
+			TF3D_ASSERT(index >= 0 && index < colorAttachmentCount, "Color attachment index out of range");
 			if (h)
 				memcpy(h, &colorAttachments[index], sizeof(colorAttachments[index]));
 			return (void*)(intptr_t)(colorAttachments[index]);

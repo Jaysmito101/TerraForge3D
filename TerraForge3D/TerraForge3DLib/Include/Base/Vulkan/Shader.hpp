@@ -1,3 +1,4 @@
+#pragma once
 #include "Base/Vulkan/Core.hpp"
 #include "Base/Renderer/Shader.hpp"
 

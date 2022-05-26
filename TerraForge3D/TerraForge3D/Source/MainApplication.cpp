@@ -171,10 +171,15 @@ namespace TerraForge3D
 
 
 			fbo = RendererAPI::FrameBuffer::Create();
+			fbo->SetSize(512, 512);
+			fbo->SetColorAttachmentCount(1);
+			fbo->SetDepthAttachment(true);
 			fbo->Setup();
 
 
 			appState->core.fonts = fonts;
+
+			appState->renderer = appState->core.app->renderer;
 		}
 
 		virtual void OnUpdate() override
@@ -183,6 +188,14 @@ namespace TerraForge3D
 			appState->modals.manager->Update();
 			appState->project.manager->Update();
 			appState->jobs.manager->Update();
+
+			// TEMP
+			appState->renderer->BindFramebuffer(fbo);
+			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+			appState->renderer->ClearFrame();
+			// TEMP
+
+			appState->renderer->Flush();
 		}
 
 		virtual void OnImGuiRender() override
@@ -201,6 +214,15 @@ namespace TerraForge3D
 				// ImGui::ShowStyleEditor();
 				// ImGui::End();
 			}
+
+
+			ImGui::Begin("Viewport");
+			ImGui::Text("Begin");
+			ImGui::Image(fbo->GetColorAttachmentImGuiID(0), ImVec2(256, 256));
+			ImGui::Text("End");
+			ImGui::ColorEdit4("ClearColor", clearColor);
+			ImGui::End();
+
 
 			ImGui::PopFont();
 
@@ -230,6 +252,7 @@ namespace TerraForge3D
 	private:
 		uint32_t exitcb;
 		float pos[2] = {0.0f};
+		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
 
 		ApplicationState* appState = nullptr;
 		UI::Dockspace dockspace;

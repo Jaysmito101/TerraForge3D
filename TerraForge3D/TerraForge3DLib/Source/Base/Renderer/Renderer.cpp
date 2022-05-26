@@ -67,5 +67,16 @@ namespace TerraForge3D
 		nativeRenderer->Flush();
 	}
 
-	
+	Renderer* Renderer::ClearFrame()
+	{
+		nativeRenderer->AddCommand(RendererCommand_Clear, clearColor);
+		return this;
+	}
+
+	Renderer* Renderer::BindFramebuffer(RendererAPI::FrameBuffer* framebuffer)
+	{
+		nativeRenderer->AddCommand(RendererCommand_BindFrameBuffer, framebuffer);
+		return this;
+	}
+		
 }

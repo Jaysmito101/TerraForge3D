@@ -11,6 +11,7 @@ namespace TerraForge3D
 	class ProjectManager;
 	class StartUpScreen;
 	class Preferences;
+	class Renderer;
 	namespace UI 
 	{
 		class EditorManager;
@@ -20,6 +21,7 @@ namespace TerraForge3D
 	{
 		class JobSystem;
 	}
+	
 
 	/*
 	* This class holds all the managers, job handlers, every thing of this application
@@ -92,6 +94,8 @@ namespace TerraForge3D
 		} jobs;
 
 		Preferences* preferences = nullptr;
+
+		Renderer* renderer = nullptr;
 
 		static ApplicationState* Create();
 		inline static ApplicationState* Get() { TF3D_ASSERT(appState, "Applicaiton Sate not yet created."); return appState; }

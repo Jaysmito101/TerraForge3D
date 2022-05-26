@@ -3,11 +3,13 @@
 #include "Base/Renderer/Context.hpp"
 #include "Base/Renderer/UIManager.hpp"
 
+
 namespace TerraForge3D
 {
 	namespace RendererAPI
 	{
 		class NativeRenderer;
+		class FrameBuffer;
 	}
 
 	enum RendererCommand
@@ -34,6 +36,11 @@ namespace TerraForge3D
 		virtual void EndUI();
 
 		virtual void Flush();
+		
+		inline Renderer* SetClearColor(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f) { this->clearColor[0] = r; this->clearColor[1] = g; this->clearColor[2] = b;	this->clearColor[3] = a; return this; }
+
+		Renderer* ClearFrame();
+		Renderer* BindFramebuffer(RendererAPI::FrameBuffer* framebuffer);
 
 		static Renderer* Create();
 		static Renderer* Get();
@@ -47,5 +54,7 @@ namespace TerraForge3D
 
 	private:
 		static Renderer* mainInstance;
+
+		float clearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
 	};
 }

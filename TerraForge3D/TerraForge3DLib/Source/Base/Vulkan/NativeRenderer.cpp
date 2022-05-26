@@ -22,7 +22,7 @@ namespace TerraForge3D
 
 		void NativeRenderer::Flush()
 		{
-			// TODO: Implement
+			
 		}
 
 	}
