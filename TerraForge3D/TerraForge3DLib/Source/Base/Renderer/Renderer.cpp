@@ -79,4 +79,21 @@ namespace TerraForge3D
 		return this;
 	}
 		
+	Renderer* Renderer::BindPipeline(RendererAPI::Pipeline* pipeline)
+	{
+		nativeRenderer->AddCommand(RendererCommand_BindPipeline, pipeline);
+		return this;
+	}
+
+	Renderer* Renderer::BindCamera(RendererAPI::Camera* camera)
+	{
+		nativeRenderer->AddCommand(RendererCommand_BindCamera, camera);
+		return this;
+	}
+
+	Renderer* Renderer::DrawMesh(RendererAPI::NativeMesh* mesh)
+	{
+		nativeRenderer->AddCommand(RendererCommand_Draw, mesh);
+		return this;
+	}
 }

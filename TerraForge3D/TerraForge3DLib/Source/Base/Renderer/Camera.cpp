@@ -58,6 +58,16 @@ namespace TerraForge3D
 			return this;
 		}
 
+		Camera* Camera::SetOrthographic(float left, float right, float top, float bottom)
+		{
+			this->orthoViewportSize.x = left;
+			this->orthoViewportSize.y = right;
+			this->orthoViewportSize.z = bottom;
+			this->orthoViewportSize.w = top;
+			RecalculateMatrices();
+			return this;
+		}
+
 	}
 
 }

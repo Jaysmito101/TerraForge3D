@@ -19,11 +19,14 @@
 #include "Base/Renderer/Framebuffer.hpp"
 #include "Base/Renderer/NativeRenderer.hpp"
 #include "Base/Renderer/Camera.hpp"
+#include "Base/Renderer/Pipeline.hpp"
+#include "Base/Renderer/Shader.hpp"
 #endif
 
 // Data Strutures
 #ifndef TF3D_EXCLUDE_DATA_STRCUTRUES
 #include "Base/DS/DS.hpp"
+#include "Base/DS/Mesh.hpp"
 #endif
 
 // ImGui

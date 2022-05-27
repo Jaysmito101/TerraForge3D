@@ -31,9 +31,11 @@ namespace TerraForge3D
 			void RecalculateMatrices();
 
 			Camera* SetPerspective(float fov, float aspect, float zNear, float zFar);
-			Camera* SetOrthographic();
+			Camera* SetOrthographic(float left, float right, float top, float bottom);
 
 			inline Camera* SetProjectionMode(CameraProjection proj) { this->projectionMode = proj; return this; }
+			inline Camera* SetPosition(float x, float y, float z = 0.0f) { this->position.x = x; this->position.y = y; this->position.z = z; this->position.w = 0.0f; return this; };
+			inline Camera* SetRotation(float x, float y, float z = 0.0f) { this->rotation.x = x; this->rotation.y = y; this->rotation.z = z; this->rotation.w = 0.0f; return this; };
 
 			inline float GetNearClip() { return zNear; }
 			inline float GetFarClip() { return zFar; }

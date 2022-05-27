@@ -10,7 +10,18 @@ namespace TerraForge3D
 	{
 		class NativeRenderer;
 		class FrameBuffer;
+		class Pipeline;
+		class NativeMesh;
+		class Camera;
 	}
+
+	enum RendererData
+	{
+		RendererData_FrameBuffer = 0,
+		RendererData_Pipeline,
+		RendererData_Camera,
+		RendererData_Count
+	};
 
 	enum RendererCommand
 	{
@@ -20,7 +31,11 @@ namespace TerraForge3D
 		RendererCommand_DrawInstanced,
 		RendererCommand_BindFrameBuffer,
 		RendererCommand_BindPipeline,
-		RendererCommand_Render,
+		RendererCommand_BindCamera,
+		RendererCommand_Push,
+		RendererCommand_Pop,
+		RendererCommand_PushC,
+		RendererCommand_PopC,
 		RendererCommand_Count
 	};
 
@@ -41,6 +56,10 @@ namespace TerraForge3D
 
 		Renderer* ClearFrame();
 		Renderer* BindFramebuffer(RendererAPI::FrameBuffer* framebuffer);
+		Renderer* BindPipeline(RendererAPI::Pipeline* pipeline);
+		Renderer* BindCamera(RendererAPI::Camera* camera);
+
+		Renderer* DrawMesh(RendererAPI::NativeMesh* mesh);
 
 		static Renderer* Create();
 		static Renderer* Get();

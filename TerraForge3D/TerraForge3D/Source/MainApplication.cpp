@@ -176,6 +176,19 @@ namespace TerraForge3D
 			fbo->SetDepthAttachment(true);
 			fbo->Setup();
 
+			pipeline = RendererAPI::Pipeline::Create();
+			pipeline->Setup();
+
+			mesh = new Mesh("DemoTriangle");
+			mesh->Clear();
+			mesh->SetupOnGPU();
+			mesh->Triangle({ -0.5f, -0.5f, 0.0f }, { 0.5f, -0.5f, 0.0f }, { 0.0f,  0.5f, 0.0f });
+			mesh->UploadToGPU();
+
+			camera = new RendererAPI::Camera();
+			camera->SetPerspective(90.0f, 1.0f, 0.01f, 1000.0f);
+			camera->SetPosition(0.0, 0.0, -1.f);
+			camera->SetRotation(0.0, 0.0, 0.0);
 
 			appState->core.fonts = fonts;
 
@@ -192,6 +205,11 @@ namespace TerraForge3D
 			// TEMP
 			appState->renderer->BindFramebuffer(fbo);
 			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+
+			appState->renderer->BindPipeline(pipeline);
+			appState->renderer->BindCamera(camera);
+			appState->renderer->DrawMesh(mesh->GetNativeMesh());
+
 			appState->renderer->ClearFrame();
 			// TEMP
 
@@ -221,6 +239,12 @@ namespace TerraForge3D
 			ImGui::Image(fbo->GetColorAttachmentImGuiID(0), ImVec2(256, 256));
 			ImGui::Text("End");
 			ImGui::ColorEdit4("ClearColor", clearColor);
+			if (ImGui::DragFloat3("Camera Position", camPos, 0.1f) || ImGui::DragFloat3("Camera Rotation", camRot, 0.1f))
+			{
+				camera->SetPosition(camPos[0], camPos[1], camPos[2]);
+				camera->SetRotation(camRot[0], camRot[1], camRot[2]);
+				camera->RecalculateMatrices();
+			}
 			ImGui::End();
 
 
@@ -231,6 +255,9 @@ namespace TerraForge3D
 
 		virtual void OnEnd() override
 		{
+			delete camera;
+			delete mesh;
+			delete pipeline;
 			delete fbo;
 			
 			GetInputEventManager()->DeregisterCallback(exitcb);
@@ -253,6 +280,8 @@ namespace TerraForge3D
 		uint32_t exitcb;
 		float pos[2] = {0.0f};
 		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
+		float camPos[3] = {0.0f, 0.0f, -1.0f};
+		float camRot[3] = { 0.0f, 0.0f, 0.0f };
 
 		ApplicationState* appState = nullptr;
 		UI::Dockspace dockspace;
@@ -260,6 +289,9 @@ namespace TerraForge3D
 		MyEditor* editor;
 
 		RendererAPI::FrameBuffer* fbo = nullptr;
+		RendererAPI::Pipeline* pipeline = nullptr;
+		RendererAPI::Camera* camera = nullptr;
+		Mesh* mesh = nullptr;
 	};
 }
 
