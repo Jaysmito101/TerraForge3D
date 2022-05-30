@@ -129,6 +129,9 @@ private:
 
 
 #include "Base/OpenGL/Shader.hpp"
+#include "Base/OpenGL/FrameBuffer.hpp"
+#include "Base/OpenGL/NativeMesh.hpp"
+
 
 namespace TerraForge3D
 {
@@ -192,7 +195,7 @@ uniform mat4 _PV;
 
 void main()
 {
-	gl_Position = vec4(position.xyz, 1.0);
+	gl_Position = _PV * vec4(position.xyz, 1.0f);
 }
 
 )";
@@ -203,7 +206,7 @@ out vec4 FragColor;
 
 void main()
 {
-	FragColor = vec4(0.0f);
+	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 )";
 			pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Fragment);
@@ -212,9 +215,9 @@ void main()
 
 			mesh = new Mesh("DemoTriangle");
 			mesh->Clear();
-			float A[3] = { -0.5f, -0.5f, 0.0f };
+			float A[3] = {  0.5f,  0.5f, 0.0f };
 			float B[3] = {  0.5f, -0.5f, 0.0f };
-			float C[3] = {  0.0f,  0.5f, 0.0f };
+			float C[3] = { -0.5f,  0.5f, 0.0f };
 			mesh->Triangle(A, B, C);
 			mesh->UploadToGPU();
 
@@ -243,10 +246,15 @@ void main()
 			appState->renderer->BindCamera(camera);
 			appState->renderer->DrawMesh(mesh->GetNativeMesh());
 
-			// TEMP
 			OpenGL::Shader* shd = reinterpret_cast<OpenGL::Shader*>(pipeline->shader);
 			glUseProgram(shd->handle);
+			glUniformMatrix4fv(glGetUniformLocation(shd->handle, "_PV"), 1, GL_FALSE, glm::value_ptr(camera->matrices.pv));
+
+			// TEMP
+
 			appState->renderer->Flush();
+
+
 		}
 
 		virtual void OnImGuiRender() override

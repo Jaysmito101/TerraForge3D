@@ -1,6 +1,9 @@
 #pragma once
 #include "Base/Core/Core.hpp"
 
+#include <glm/gtc/type_ptr.hpp>
+
+
 namespace TerraForge3D
 {
 

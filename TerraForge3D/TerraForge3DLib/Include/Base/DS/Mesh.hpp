@@ -22,9 +22,9 @@ namespace TerraForge3D
 
 	struct Face
 	{
-		int a = 0;
-		int b = 0;
-		int c = 0;
+		uint32_t a = 0;
+		uint32_t b = 0;
+		uint32_t c = 0;
 	};
 
 

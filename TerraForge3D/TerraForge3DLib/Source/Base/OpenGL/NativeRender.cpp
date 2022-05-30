@@ -43,7 +43,8 @@ namespace TerraForge3D
 					TF3D_ASSERT(param, "Parameter is null");
 					TF3D_ASSERT(framebuffer, "Cannot clear without any bound framebuffer");
 					float* clearColor = reinterpret_cast<float*>(param);
-					framebuffer->Clear(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+					glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 					break;
 				}
 				case RendererCommand_BindFrameBuffer:
@@ -53,6 +54,8 @@ namespace TerraForge3D
 					TF3D_ASSERT(framebuffer->IsSetup(), "Framebuffer not yet setup");
 					// if (pipeline)
 					//	pipeline->Rebuild(framebuffer);
+					glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->handle);
+					glViewport(0, 0, framebuffer->GetWidth(), framebuffer->GetHeight());
 					break;
 				}
 				case RendererCommand_BindPipeline:
