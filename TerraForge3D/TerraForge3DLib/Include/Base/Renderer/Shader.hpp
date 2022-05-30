@@ -44,6 +44,7 @@ namespace TerraForge3D
 					TF3D_ASSERT(false, "Unknown shader stage!");
 				}
 				isCompiled = false;
+				return this;
 			}
 
 

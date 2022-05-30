@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Core/Core.hpp"
+#include "Base/Renderer/Shader.hpp"
 
 namespace TerraForge3D
 {
@@ -21,6 +22,8 @@ namespace TerraForge3D
 
 		public:
 			static Pipeline* Create();
+
+			RendererAPI::Shader* shader = nullptr;
 
 		protected:
 			bool isSetup = false;

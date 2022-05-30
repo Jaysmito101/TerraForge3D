@@ -1,4 +1,5 @@
 #include "Base/DS/Mesh.hpp"
+#include "Base/Renderer/NativeMesh.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_INLINE
@@ -7,8 +8,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
-
 namespace TerraForge3D
 {
 
@@ -16,30 +15,38 @@ namespace TerraForge3D
 
 	Mesh::Mesh(std::string name)
 	{
+		this->name = name;
+		nativeHandle = RendererAPI::NativeMesh::Create();
 	}
 
 	Mesh::~Mesh()
 	{
 		if (nativeHandle)
-		{
-			// nativeHandle->Destory();
 			delete nativeHandle;
-		}
 	}
 
 	bool Mesh::Clear()
 	{
-		return false;
+		vertices.clear();
+		faces.clear();
+		if(nativeHandle->IsSetup())
+			return nativeHandle->Destroy();
+		return true;
 	}
 
-	bool Mesh::SetupOnGPU()
-	{
-		return false;
-	}
 
 	bool Mesh::UploadToGPU()
 	{
-		return false;
+		if (nativeHandle->IsSetup() && ( nativeHandle->GetIndexCount() != faces.size() * 3 || nativeHandle->GetVertexCount() != vertices.size()) )
+			nativeHandle->Destroy();
+		if (!nativeHandle->IsSetup())
+		{
+			nativeHandle->SetIndexCount(faces.size() * 3);
+			nativeHandle->SetVertexCount(vertices.size());
+		}
+		bool status = nativeHandle->Setup();
+		status = status && nativeHandle->UploadData(vertices.data(), faces.data());
+		return status;
 	}
 
 	void Mesh::RecalculateMatices()

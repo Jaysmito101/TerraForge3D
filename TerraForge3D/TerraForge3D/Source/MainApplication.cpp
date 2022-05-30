@@ -128,6 +128,8 @@ private:
 };
 
 
+#include "Base/OpenGL/Shader.hpp"
+
 namespace TerraForge3D
 {
 	class MainApplication : public Application
@@ -177,12 +179,43 @@ namespace TerraForge3D
 			fbo->Setup();
 
 			pipeline = RendererAPI::Pipeline::Create();
+			pipeline->shader = RendererAPI::Shader::Create();
+			std::string s = R"(
+#version 430 core
+layout (location = 0) in vec4 position;
+layout (location = 1) in vec4 texCoord;
+layout (location = 2) in vec2 normal;
+layout (location = 3) in vec4 extra;
+
+uniform mat4 _Model;
+uniform mat4 _PV;
+
+void main()
+{
+	gl_Position = vec4(position.xyz, 1.0);
+}
+
+)";
+			pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Vertex);
+			s = R"(
+#version 430 core
+out vec4 FragColor;
+
+void main()
+{
+	FragColor = vec4(0.0f);
+}
+)";
+			pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Fragment);
+			pipeline->shader->Compile();
 			pipeline->Setup();
 
 			mesh = new Mesh("DemoTriangle");
 			mesh->Clear();
-			mesh->SetupOnGPU();
-			mesh->Triangle({ -0.5f, -0.5f, 0.0f }, { 0.5f, -0.5f, 0.0f }, { 0.0f,  0.5f, 0.0f });
+			float A[3] = { -0.5f, -0.5f, 0.0f };
+			float B[3] = {  0.5f, -0.5f, 0.0f };
+			float C[3] = {  0.0f,  0.5f, 0.0f };
+			mesh->Triangle(A, B, C);
 			mesh->UploadToGPU();
 
 			camera = new RendererAPI::Camera();
@@ -205,14 +238,14 @@ namespace TerraForge3D
 			// TEMP
 			appState->renderer->BindFramebuffer(fbo);
 			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-
+			appState->renderer->ClearFrame();
 			appState->renderer->BindPipeline(pipeline);
 			appState->renderer->BindCamera(camera);
 			appState->renderer->DrawMesh(mesh->GetNativeMesh());
 
-			appState->renderer->ClearFrame();
 			// TEMP
-
+			OpenGL::Shader* shd = reinterpret_cast<OpenGL::Shader*>(pipeline->shader);
+			glUseProgram(shd->handle);
 			appState->renderer->Flush();
 		}
 

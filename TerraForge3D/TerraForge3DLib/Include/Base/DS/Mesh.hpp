@@ -12,6 +12,22 @@ namespace TerraForge3D
 		class NativeMesh;
 	}
 
+	struct Vertex 
+	{
+		glm::vec4 position = glm::vec4(0.0f);
+		glm::vec4 texCoord = glm::vec4(0.0f);
+		glm::vec4 normal   = glm::vec4(0.0f);
+		glm::vec4 extra    = glm::vec4(0.0f);
+	};
+
+	struct Face
+	{
+		int a = 0;
+		int b = 0;
+		int c = 0;
+	};
+
+
 	class Mesh
 	{
 	public:
@@ -20,7 +36,6 @@ namespace TerraForge3D
 
 		bool Clear();
 
-		bool SetupOnGPU();
 		bool UploadToGPU();
 
 		void RecalculateMatices();
@@ -39,6 +54,11 @@ namespace TerraForge3D
 		bool flipY = false;
 
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+		std::vector<Vertex> vertices;
+		std::vector<Face> faces;
+
+		std::string name = "";
 
 	private:
 		RendererAPI::NativeMesh* nativeHandle = nullptr;

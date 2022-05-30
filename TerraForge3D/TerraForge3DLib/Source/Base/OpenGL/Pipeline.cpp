@@ -17,10 +17,12 @@ namespace TerraForge3D
 
 		void Pipeline::Setup()
 		{
+			isSetup = true;
 		}
 
 		void Pipeline::Destory()
 		{
+			isSetup = false;
 		}
 
 	}

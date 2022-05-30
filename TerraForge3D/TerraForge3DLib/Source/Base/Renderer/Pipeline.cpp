@@ -10,6 +10,7 @@ namespace TerraForge3D
 
 		Pipeline* Pipeline::Create()
 		{
+
 #ifdef TF3D_OPENGL_BACKEND
 			return new OpenGL::Pipeline();
 #elif defined(TF3D_VULKAN_BACKEND
