@@ -30,6 +30,10 @@ namespace TerraForge3D
 			inline bool IsCompiled() { return this->isCompiled; }
 			inline std::vector<uint32_t> GetBinary() { if (isCompiled && loadedFromBinary) return binary; TF3D_ASSERT(false, "Shader binary not available"); }
 
+			inline Shader* SetIncludeDir(std::string dir) { this->includeDir = dir; if (this->includeDir[this->includeDir.size() - 1] != PATH_SEPERATOR[0]) { this->includeDir += PATH_SEPERATOR; } return this; }
+			inline Shader* SetCacheDir(std::string dir) { this->cacheDir = dir; return this; }
+			inline Shader* SetMacro(std::string name, std::string value) { this->macros[name] = value; return this; }
+
 			inline Shader* SetSource(std::string& source, ShaderStage stage)
 			{
 				switch (stage)
@@ -62,6 +66,9 @@ namespace TerraForge3D
 			std::string vertexSource = "";
 			std::string fragmentSource = "";
 			std::vector<uint32_t> binary;
+			std::string includeDir = "";
+			std::string cacheDir = ""; // For SPIRV cache
+			std::unordered_map<std::string, std::string> macros;
 
 		public:
 			std::string name = "Shader";

@@ -6,9 +6,15 @@
 
 namespace TerraForge3D
 {
+	
+	namespace RendererAPI
+	{
+		class FrameBuffer;
+	}
 
 	namespace OpenGL 
 	{
+		class FrameBuffer;
 
 		class Pipeline : public RendererAPI::Pipeline
 		{
@@ -18,9 +24,10 @@ namespace TerraForge3D
 
 			virtual void Setup() override;
 			virtual void Destory() override;
+			virtual bool Rebuild(RendererAPI::FrameBuffer* framebuffer) override;
 
 		public:
-
+			FrameBuffer* framebuffer = nullptr;
 		};
 
 	}

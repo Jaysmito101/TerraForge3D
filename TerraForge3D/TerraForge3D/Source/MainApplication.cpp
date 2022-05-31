@@ -185,6 +185,9 @@ namespace TerraForge3D
 			pipeline->shader = RendererAPI::Shader::Create();
 			std::string s = R"(
 #version 430 core
+
+#include "Animations/SinY.glsl"
+
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 texCoord;
 layout (location = 2) in vec2 normal;
@@ -195,7 +198,7 @@ uniform mat4 _PV;
 
 void main()
 {
-	gl_Position = _PV * vec4(position.xyz, 1.0f);
+	gl_Position = _PV * vec4(sin_y(position.xyz), 1.0f);
 }
 
 )";
@@ -209,6 +212,7 @@ void main()
 	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 )";
+			pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
 			pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Fragment);
 			pipeline->shader->Compile();
 			pipeline->Setup();
@@ -259,7 +263,7 @@ void main()
 
 		virtual void OnImGuiRender() override
 		{
-			dockspace.Begin();			
+			dockspace.Begin();
 
 			ImGui::PushFont(fonts["Default"].handle);
 
@@ -268,7 +272,7 @@ void main()
 			{
 				appState->menus.mainMenu->Show();
 				appState->editors.manager->Show();
-			
+
 				// ImGui::Begin("sadsa");
 				// ImGui::ShowStyleEditor();
 				// ImGui::End();
@@ -286,9 +290,44 @@ void main()
 				camera->SetRotation(camRot[0], camRot[1], camRot[2]);
 				camera->RecalculateMatrices();
 			}
+
+			if (ImGui::Button("ReCompile Shaders"))
+			{
+				std::string s = R"(
+#version 430 core
+
+#include "Animations/SinY.glsl"
+
+layout (location = 0) in vec4 position;
+layout (location = 1) in vec4 texCoord;
+layout (location = 2) in vec2 normal;
+layout (location = 3) in vec4 extra;
+
+uniform mat4 _Model;
+uniform mat4 _PV;
+
+void main()
+{
+	gl_Position = _PV * vec4(sin_y(position.xyz), 1.0f);
+}
+
+)";
+				pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Vertex);
+				s = R"(
+#version 430 core
+out vec4 FragColor;
+
+void main()
+{
+	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+}
+)";
+				pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
+				pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Fragment);
+				pipeline->shader->Compile();
+			}
+
 			ImGui::End();
-
-
 			ImGui::PopFont();
 
 			dockspace.End();

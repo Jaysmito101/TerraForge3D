@@ -10,7 +10,7 @@
 project "Glad"
     kind "StaticLib"
     --- language "C"
-    staticruntime "On"
+    --- staticruntime "On"
 
     targetdir "%{wks.location}/bin/%{OutputDir}/%{prj.name}"
     objdir "%{wks.location}/bin/obj/%{OutputDir}/%{prj.name}"

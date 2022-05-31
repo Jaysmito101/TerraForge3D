@@ -58,6 +58,7 @@ namespace TerraForge3D
 			std::string stylesDir = resourceDir + PATH_SEPERATOR "Styles";
 			std::string fontsDir = resourceDir + PATH_SEPERATOR "Fonts";
 			std::string fontsConfigPath = configDir + PATH_SEPERATOR "Fonts.json";
+			std::string shaderIncludeDir = resourceDir + PATH_SEPERATOR "Shader";
 		} appResourcePaths;
 
 		struct 

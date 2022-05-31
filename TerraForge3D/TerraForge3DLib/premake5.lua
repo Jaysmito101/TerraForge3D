@@ -12,7 +12,7 @@ project "TerraForge3DLib"
     kind "StaticLib"
     language "C++"
     cppdialect "C++20"
-    staticruntime "On"
+--    staticruntime "On"
 
     targetdir "%{wks.location}/bin/%{OutputDir}/%{prj.name}"
     objdir "%{wks.location}/bin/obj/%{OutputDir}/%{prj.name}"
@@ -102,6 +102,11 @@ project "TerraForge3DLib"
             "TF3D_DEBUG"
         }
 
+	links
+	{
+	        "shaderc_sharedd"
+	}
+
         symbols "On"
         runtime "Debug"
 
@@ -110,6 +115,11 @@ project "TerraForge3DLib"
         {
             "TF3D_RELEASE"
         }
+
+	links
+	{
+	        "shaderc_shared"
+	}
 
         optimize "Full"
         runtime "Release"    

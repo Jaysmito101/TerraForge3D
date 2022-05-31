@@ -52,23 +52,18 @@ namespace TerraForge3D
 					TF3D_ASSERT(param, "Parameter is null");
 					framebuffer = reinterpret_cast<OpenGL::FrameBuffer*>(param);
 					TF3D_ASSERT(framebuffer->IsSetup(), "Framebuffer not yet setup");
-					// if (pipeline)
-					//	pipeline->Rebuild(framebuffer);
+					if (pipeline)
+						pipeline->Rebuild(framebuffer);
 					glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->handle);
-					glViewport(0, 0, framebuffer->GetWidth(), framebuffer->GetHeight());
 					break;
 				}
 				case RendererCommand_BindPipeline:
 				{
 					TF3D_ASSERT(param, "Parameter is null");
-					if (!framebuffer)
-					{
-						TF3D_LOG_WARN("Binding renderer pipeline without a framebuffer bound");
-					}
+					TF3D_ASSERT(framebuffer, "Binding renderer pipeline without a framebuffer bound");
 					pipeline = reinterpret_cast<OpenGL::Pipeline*>(param);
 					TF3D_ASSERT(pipeline->IsSetup(), "Pipeline is not yet setup");
-					// if (!pipeline->IsReady())
-					//   pipeline->Rebuild(framebuffer);
+					pipeline->Rebuild(framebuffer);
 					break;
 				}
 				case RendererCommand_BindCamera:
@@ -85,6 +80,7 @@ namespace TerraForge3D
 
 				case RendererCommand_Draw:
 				{
+					TF3D_ASSERT(pipeline, "Cannot draw meshes without a pipeline bound");
 					TF3D_ASSERT(param, "Parameter is null");
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(param);
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
@@ -96,6 +92,7 @@ namespace TerraForge3D
 
 				case RendererCommand_DrawInstanced:
 				{
+					TF3D_ASSERT(pipeline, "Cannot draw meshes without a pipeline bound");
 					TF3D_ASSERT(param, "Parameter is null");
 					std::pair<int, OpenGL::NativeMesh*>* paramT = reinterpret_cast<std::pair<int, OpenGL::NativeMesh*>*>(param);
 					lastRendererMesh = paramT->second;
