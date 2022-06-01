@@ -16,6 +16,29 @@ namespace TerraForge3D
 			ShaderStage_Fragment
 		};
 
+		enum ShaderDataType
+		{
+			ShaderDataType_Mat3 = 0,
+			ShaderDataType_Mat4,
+			ShaderDataType_Vec2,
+			ShaderDataType_Vec3,
+			ShaderDataType_Vec4,
+			ShaderDataType_IVec2,
+			ShaderDataType_IVec3,
+			ShaderDataType_IVec4,
+			ShaderDataType_Bool
+		};
+
+		struct UBOEntry
+		{
+			std::string name;
+			ShaderDataType type;
+
+			UBOEntry(std::string n, ShaderDataType t)
+				:name(n), type(t)
+			{}
+		};
+
 		class Shader
 		{
 		public:
@@ -33,6 +56,7 @@ namespace TerraForge3D
 			inline Shader* SetIncludeDir(std::string dir) { this->includeDir = dir; if (this->includeDir[this->includeDir.size() - 1] != PATH_SEPERATOR[0]) { this->includeDir += PATH_SEPERATOR; } return this; }
 			inline Shader* SetCacheDir(std::string dir) { this->cacheDir = dir; return this; }
 			inline Shader* SetMacro(std::string name, std::string value) { this->macros[name] = value; return this; }
+			inline Shader* SetUBOLayout(std::vector<UBOEntry> layout) { this->uboLayout = layout; return this; };
 
 			inline Shader* SetSource(std::string& source, ShaderStage stage)
 			{
@@ -69,6 +93,7 @@ namespace TerraForge3D
 			std::string includeDir = "";
 			std::string cacheDir = ""; // For SPIRV cache
 			std::unordered_map<std::string, std::string> macros;
+			std::vector<UBOEntry> uboLayout;
 
 		public:
 			std::string name = "Shader";

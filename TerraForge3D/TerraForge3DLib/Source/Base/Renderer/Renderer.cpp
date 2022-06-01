@@ -5,6 +5,7 @@ namespace TerraForge3D
 {
 	Renderer* Renderer::mainInstance = nullptr;
 
+	class Mesh;
 
 	Renderer* Renderer::Create()
 	{ 
@@ -91,9 +92,15 @@ namespace TerraForge3D
 		return this;
 	}
 
-	Renderer* Renderer::DrawMesh(RendererAPI::NativeMesh* mesh)
+	Renderer* Renderer::DrawMesh(Mesh* mesh)
 	{
 		nativeRenderer->AddCommand(RendererCommand_Draw, mesh);
+		return this;
+	}
+
+	Renderer* Renderer::CustomFunction(void (*func)(void))
+	{
+		nativeRenderer->AddCommand(RendererCommand_CustomFunction, func);
 		return this;
 	}
 }

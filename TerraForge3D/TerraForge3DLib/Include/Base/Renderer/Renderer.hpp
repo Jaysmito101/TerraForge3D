@@ -15,6 +15,8 @@ namespace TerraForge3D
 		class Camera;
 	}
 
+	class Mesh;
+
 	enum RendererData
 	{
 		RendererData_FrameBuffer = 0,
@@ -32,6 +34,7 @@ namespace TerraForge3D
 		RendererCommand_BindFrameBuffer,
 		RendererCommand_BindPipeline,
 		RendererCommand_BindCamera,
+		RendererCommand_CustomFunction,
 		RendererCommand_Push,
 		RendererCommand_Pop,
 		RendererCommand_PushC,
@@ -59,7 +62,9 @@ namespace TerraForge3D
 		Renderer* BindPipeline(RendererAPI::Pipeline* pipeline);
 		Renderer* BindCamera(RendererAPI::Camera* camera);
 
-		Renderer* DrawMesh(RendererAPI::NativeMesh* mesh);
+		Renderer* DrawMesh(Mesh* mesh);
+
+		Renderer* CustomFunction(void (*func)(void));
 
 		static Renderer* Create();
 		static Renderer* Get();

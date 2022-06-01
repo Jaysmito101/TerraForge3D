@@ -2,7 +2,10 @@
 #include "Base/OpenGL/FrameBuffer.hpp"
 #include "Base/OpenGL/Pipeline.hpp"
 #include "Base/OpenGL/NativeMesh.hpp"
+#include "Base/OpenGL/Shader.hpp"
 #include "Base/Renderer/Camera.hpp"
+
+#include "Base/DS/Mesh.hpp"
 
 #include <stack>
 
@@ -28,7 +31,12 @@ namespace TerraForge3D
 			OpenGL::FrameBuffer* framebuffer = nullptr;
 			OpenGL::Pipeline* pipeline = nullptr;
 			OpenGL::NativeMesh* lastRendererMesh = nullptr;
+			OpenGL::Shader* shader = nullptr;
 			RendererAPI::Camera* camera = nullptr;
+
+			GLuint pvMatLocation = 0;
+			GLuint modelMatLocation = 0;
+			
 
 			std::stack<void*> rendererStack;
 
@@ -63,18 +71,22 @@ namespace TerraForge3D
 					TF3D_ASSERT(framebuffer, "Binding renderer pipeline without a framebuffer bound");
 					pipeline = reinterpret_cast<OpenGL::Pipeline*>(param);
 					TF3D_ASSERT(pipeline->IsSetup(), "Pipeline is not yet setup");
+					shader = reinterpret_cast<OpenGL::Shader*>(pipeline->shader);
+					TF3D_ASSERT(shader, "Shader is null");
+					TF3D_ASSERT(shader->IsCompiled(), "Shader is not compiled");
+					pvMatLocation = glGetUniformLocation(shader->handle, "_PV");
+					modelMatLocation = glGetUniformLocation(shader->handle, "_Model");
 					pipeline->Rebuild(framebuffer);
+					glUseProgram(shader->handle);
 					break;
 				}
 				case RendererCommand_BindCamera:
 				{
 					TF3D_ASSERT(param, "Parameter is null");
-					if (!pipeline)
-					{
-						TF3D_LOG_WARN("Binding camera without a pipeline bound");
-					}
+					TF3D_ASSERT(pipeline, "Binding camera without a pipeline bound");
 					camera = reinterpret_cast<RendererAPI::Camera*>(param);
 					camera->RecalculateMatrices();
+					glUniformMatrix4fv(pvMatLocation, 1, GL_FALSE, glm::value_ptr(camera->matrices.pv));
 					break;
 				}
 
@@ -82,8 +94,10 @@ namespace TerraForge3D
 				{
 					TF3D_ASSERT(pipeline, "Cannot draw meshes without a pipeline bound");
 					TF3D_ASSERT(param, "Parameter is null");
-					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(param);
+					Mesh* mesh = reinterpret_cast<Mesh*>(param);
+					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(mesh->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
+					glUniformMatrix4fv(modelMatLocation, 1, GL_FALSE, glm::value_ptr(mesh->GetModelMatrix()));
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElements(GL_TRIANGLES, lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
 					glBindVertexArray(0);
@@ -94,9 +108,10 @@ namespace TerraForge3D
 				{
 					TF3D_ASSERT(pipeline, "Cannot draw meshes without a pipeline bound");
 					TF3D_ASSERT(param, "Parameter is null");
-					std::pair<int, OpenGL::NativeMesh*>* paramT = reinterpret_cast<std::pair<int, OpenGL::NativeMesh*>*>(param);
-					lastRendererMesh = paramT->second;
+					std::pair<int, Mesh*>* paramT = reinterpret_cast<std::pair<int, Mesh*>*>(param);
+					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(paramT->second->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
+					glUniformMatrix4fv(modelMatLocation, 1, GL_FALSE, glm::value_ptr(paramT->second->GetModelMatrix()));
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElementsInstanced(GL_TRIANGLES, lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0, paramT->first);
 					glBindVertexArray(0);
@@ -129,9 +144,13 @@ namespace TerraForge3D
 					{
 					case RendererData_FrameBuffer:
 						framebuffer = reinterpret_cast<OpenGL::FrameBuffer*>(rendererStack.top());
+						if (pipeline)
+							pipeline->Rebuild(framebuffer);
 						break;
 					case RendererData_Pipeline:
 						pipeline = reinterpret_cast<OpenGL::Pipeline*>(rendererStack.top());
+						if (pipeline)
+							pipeline->Rebuild(framebuffer);
 						break;
 					case RendererData_Camera:
 						camera = reinterpret_cast<RendererAPI::Camera*>(rendererStack.top());

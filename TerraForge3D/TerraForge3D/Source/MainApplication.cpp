@@ -127,10 +127,46 @@ private:
 	float counter = 0.0f;
 };
 
+#include <glad/glad.h>
+
+std::string vss = R"(
+#version 430 core
+
+#include "Animations/SinY.glsl"
+
+layout (location = 0) in vec4 position;
+layout (location = 1) in vec4 texCoord;
+layout (location = 2) in vec2 normal;
+layout (location = 3) in vec4 extra;
+
+uniform mat4 _Model;
+uniform mat4 _PV;
+
+void main()
+{
+	gl_Position = _PV * vec4(sin_y(position.xyz), 1.0f);
+}
+
+)";
+
+static std::string fss = R"(
+#version 430 core
+out vec4 FragColor;
+
+void main()
+{
+	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+}
+)";
 
 #include "Base/OpenGL/Shader.hpp"
-#include "Base/OpenGL/FrameBuffer.hpp"
-#include "Base/OpenGL/NativeMesh.hpp"
+
+struct UBO
+{
+	glm::mat4 _PV = glm::mat4(1.0f);
+	glm::mat4 _Model = glm::mat4(1.0f);
+	glm::vec4 _Extra = glm::vec4(0.0f);
+};
 
 
 namespace TerraForge3D
@@ -182,38 +218,16 @@ namespace TerraForge3D
 			fbo->Setup();
 
 			pipeline = RendererAPI::Pipeline::Create();
-			pipeline->shader = RendererAPI::Shader::Create();
-			std::string s = R"(
-#version 430 core
-
-#include "Animations/SinY.glsl"
-
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 texCoord;
-layout (location = 2) in vec2 normal;
-layout (location = 3) in vec4 extra;
-
-uniform mat4 _Model;
-uniform mat4 _PV;
-
-void main()
-{
-	gl_Position = _PV * vec4(sin_y(position.xyz), 1.0f);
-}
-
-)";
-			pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Vertex);
-			s = R"(
-#version 430 core
-out vec4 FragColor;
-
-void main()
-{
-	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-}
-)";
+			
 			pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
-			pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Fragment);
+			pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
+			pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
+			pipeline->shader->SetUBOLayout({
+				RendererAPI::UBOEntry("_U1", RendererAPI::ShaderDataType_Vec4),
+				RendererAPI::UBOEntry("_U2", RendererAPI::ShaderDataType_Vec4),
+				RendererAPI::UBOEntry("_U3", RendererAPI::ShaderDataType_Vec4),
+				RendererAPI::UBOEntry("_U4", RendererAPI::ShaderDataType_Vec4)
+				});
 			pipeline->shader->Compile();
 			pipeline->Setup();
 
@@ -242,18 +256,15 @@ void main()
 			appState->project.manager->Update();
 			appState->jobs.manager->Update();
 
+			
 			// TEMP
+
 			appState->renderer->BindFramebuffer(fbo);
 			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 			appState->renderer->ClearFrame();
 			appState->renderer->BindPipeline(pipeline);
 			appState->renderer->BindCamera(camera);
-			appState->renderer->DrawMesh(mesh->GetNativeMesh());
-
-			OpenGL::Shader* shd = reinterpret_cast<OpenGL::Shader*>(pipeline->shader);
-			glUseProgram(shd->handle);
-			glUniformMatrix4fv(glGetUniformLocation(shd->handle, "_PV"), 1, GL_FALSE, glm::value_ptr(camera->matrices.pv));
-
+			appState->renderer->DrawMesh(mesh);
 			// TEMP
 
 			appState->renderer->Flush();
@@ -293,38 +304,10 @@ void main()
 
 			if (ImGui::Button("ReCompile Shaders"))
 			{
-				std::string s = R"(
-#version 430 core
-
-#include "Animations/SinY.glsl"
-
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 texCoord;
-layout (location = 2) in vec2 normal;
-layout (location = 3) in vec4 extra;
-
-uniform mat4 _Model;
-uniform mat4 _PV;
-
-void main()
-{
-	gl_Position = _PV * vec4(sin_y(position.xyz), 1.0f);
-}
-
-)";
-				pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Vertex);
-				s = R"(
-#version 430 core
-out vec4 FragColor;
-
-void main()
-{
-	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-}
-)";
-				pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
-				pipeline->shader->SetSource(s, RendererAPI::ShaderStage_Fragment);
+				pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
+				pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
 				pipeline->shader->Compile();
+				pipeline->Setup();
 			}
 
 			ImGui::End();

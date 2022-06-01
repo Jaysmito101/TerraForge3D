@@ -76,6 +76,8 @@ namespace TerraForge3D
 			for (auto& [name, value] : macros)
 				options.AddMacroDefinition(name, value);
 
+			options.AddMacroDefinition("TF3D_OPENGL", "");
+
 			options.SetIncluder(std::make_unique<ShaderIncluder>(includeDir));
 
 #ifdef TF3D_DEBUG

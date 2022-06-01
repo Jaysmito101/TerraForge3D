@@ -11,8 +11,8 @@ namespace TerraForge3D
 		class Pipeline
 		{
 		public:
-			Pipeline() = default;
-			~Pipeline() = default;
+			Pipeline();
+			~Pipeline();
 
 			virtual void Setup() = 0;
 			virtual void Destory() = 0;

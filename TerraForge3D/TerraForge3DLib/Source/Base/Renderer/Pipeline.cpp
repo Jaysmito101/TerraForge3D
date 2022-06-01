@@ -1,4 +1,5 @@
 #include "Base/Renderer/Pipeline.hpp"
+#include "Base/Renderer/Shader.hpp"
 #include "Base/OpenGL/Pipeline.hpp"
 #include "Base/Vulkan/Pipeline.hpp"
 
@@ -17,6 +18,16 @@ namespace TerraForge3D
 			return new Vulkan::Pipeline();
 #endif
 			return nullptr;
+		}
+
+		Pipeline::Pipeline()
+		{
+			this->shader = Shader::Create();
+		}
+
+		Pipeline::~Pipeline()
+		{
+			delete this->shader;
 		}
 
 	}
