@@ -168,12 +168,36 @@ struct UBO
 	glm::vec4 _Extra = glm::vec4(0.0f);
 };
 
+class Temp
+{
+public:
+	Temp(std::string name=  "tmp")
+		:name(name)
+	{
+		std::cout << "Created Temp Object [" << name << "]\n";
+	}
+
+	void Func(std::string str)
+	{
+		std::cout <<  "Call Temp Object [" << name << "] Func with : [" << str << "]\n";
+	}
+
+	~Temp()
+	{
+		std::cout << "Destroyed Temp Object " << name << "\n";
+	}
+
+	std::string name = "";
+};
+
 
 namespace TerraForge3D
 {
 	class MainApplication : public Application
 	{
 	public:
+		~MainApplication() {};
+
 		virtual void OnPreload()
 		{
 			appState = ApplicationState::Create();
@@ -181,10 +205,18 @@ namespace TerraForge3D
 			SetApplicationName(appState->meta.name);
 			SetWindowConfigPath(appState->appResourcePaths.windowConfigPath);
 			SetFontConfig(Utils::ReadTextFile(appState->appResourcePaths.fontsConfigPath), appState->appResourcePaths.fontsDir);
+
+			ptr = new Temp("Preloaded one");
 		}
 
 		virtual void OnStart() override
 		{
+			Ref<Temp> t = new Temp("onstated one");
+			t->Func("On Start");
+
+			t = ptr;
+			t->Func("On Start");
+
 			TF3D_LOG("Started Application!");
 			exitcb = GetInputEventManager()->RegisterCallback([&](InputEventParams* params) -> bool {
 				TF3D_LOG_INFO("Shutting down application.");
@@ -337,6 +369,7 @@ namespace TerraForge3D
 			ApplicationState::Destory();
 
 			TF3D_LOG("Shutdown!");
+
 		}
 
 	private:
@@ -355,6 +388,9 @@ namespace TerraForge3D
 		RendererAPI::Pipeline* pipeline = nullptr;
 		RendererAPI::Camera* camera = nullptr;
 		Mesh* mesh = nullptr;
+
+
+		Ref<Temp> ptr;
 	};
 }
 
