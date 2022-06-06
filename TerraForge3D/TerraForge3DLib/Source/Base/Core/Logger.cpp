@@ -7,7 +7,7 @@
 namespace TerraForge3D
 {
 
-	Logger* Logger::mainInstance = nullptr;
+	Logger* Logger::mainInstance;
 
 	Logger::Logger(std::string filePath, std::string name)
 	{
@@ -28,6 +28,7 @@ namespace TerraForge3D
 
 	Logger::~Logger()
 	{
+		mainLogger->info("Logger Shutdown");
 	}
 
 	

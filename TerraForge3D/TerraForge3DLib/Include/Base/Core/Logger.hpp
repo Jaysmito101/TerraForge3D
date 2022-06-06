@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Core/Macros.hpp"
+#include "Base/Core/SharedPtr.hpp"
 // This ignores all warnings raised inside External headers
 #pragma warning(push, 0)
 #include "spdlog/spdlog.h"
@@ -16,7 +17,7 @@ namespace TerraForge3D
 	*/
 	class Logger
 	{
-	private:
+	public:
 		Logger(std::string filePath = "TerraForge3D.log", std::string name = "TerraForge3D");
 		~Logger();
 
@@ -24,7 +25,6 @@ namespace TerraForge3D
 		inline static Logger* Create(std::string filePath = "TerraForge3D.log", std::string name = "TerraForge3D") { if (mainInstance) { return mainInstance; }mainInstance = new Logger(filePath, name); return mainInstance; }
 		inline static Logger* Get() { return mainInstance; }
 		inline static void Set(Logger* logger) { if (logger) { mainInstance = logger; } }
-		inline static void Destroy() { if (mainInstance) { delete mainInstance; mainInstance = nullptr; } }
 	public:
 		std::shared_ptr<spdlog::logger> mainLogger;
 

@@ -3,7 +3,7 @@
 #include "Base/Core/Assert.hpp"
 #include "Base/Core/Logger.hpp"
 #include "Base/Core/UUID.hpp"
-#include "Base/Core/Ref.hpp"
+#include "Base/Core/SharedPtr.hpp"
 
 // STL Includes
 #include <string>

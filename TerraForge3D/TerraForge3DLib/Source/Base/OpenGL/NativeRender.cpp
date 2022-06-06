@@ -99,7 +99,7 @@ namespace TerraForge3D
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
 					glUniformMatrix4fv(modelMatLocation, 1, GL_FALSE, glm::value_ptr(mesh->GetModelMatrix()));
 					glBindVertexArray(lastRendererMesh->vertexArray);
-					glDrawElements(GL_TRIANGLES, lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
+					glDrawElements(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
 					glBindVertexArray(0);
 					break;
 				}
@@ -113,7 +113,7 @@ namespace TerraForge3D
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
 					glUniformMatrix4fv(modelMatLocation, 1, GL_FALSE, glm::value_ptr(paramT->second->GetModelMatrix()));
 					glBindVertexArray(lastRendererMesh->vertexArray);
-					glDrawElementsInstanced(GL_TRIANGLES, lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0, paramT->first);
+					glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0, paramT->first);
 					glBindVertexArray(0);
 					break;
 				}

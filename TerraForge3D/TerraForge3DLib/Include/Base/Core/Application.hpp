@@ -29,7 +29,7 @@ namespace TerraForge3D
 	{
 	public:
 		Application();
-		~Application();
+		virtual ~Application();
 
 	protected:
 		// Utility Functions for inherited classes
@@ -93,7 +93,7 @@ namespace TerraForge3D
 		static Application* mainInstance;
 
 	public:
-		Logger* logger = nullptr;
+		SharedPtr<Logger> logger;
 		Renderer* renderer = nullptr;
 		bool isRunning = false;
 		double deltaTime = 0.0;

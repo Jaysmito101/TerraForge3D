@@ -21,6 +21,7 @@ namespace TerraForge3D
 	{
 		OnPreload();
 		logger = Logger::Create(logFilePath, "TerraForge3D");
+
 		mainWindow = Window::Create();
 		mainWindow->SetTitle(applicationName);
 		// Setup Vulkan
@@ -45,6 +46,5 @@ namespace TerraForge3D
 		OnEnd();
 		Renderer::Destroy();
 		Window::Destroy();
-		Logger::Destroy();
 	}
 }

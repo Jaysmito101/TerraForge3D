@@ -110,7 +110,7 @@ namespace TerraForge3D
 		}
 		ImTextureID GPUTexture::GetImGuiID()
 		{
-			return (ImTextureID)(handle);
+			return (ImTextureID)(intptr_t)(handle);
 		}
 
 		void GPUTexture::UpdateInfo()
