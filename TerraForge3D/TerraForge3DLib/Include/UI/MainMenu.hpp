@@ -10,7 +10,7 @@ namespace TerraForge3D
 	{
 	public:
 		MainMenu(ApplicationState* appState);
-		~MainMenu();
+		virtual ~MainMenu();
 
 		void Show();
 

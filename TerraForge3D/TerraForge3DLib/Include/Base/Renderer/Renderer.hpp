@@ -46,7 +46,7 @@ namespace TerraForge3D
 	{
 	protected:
 		Renderer();
-		~Renderer();
+		virtual ~Renderer();
 
 	public:
 		virtual void WaitForIdle();

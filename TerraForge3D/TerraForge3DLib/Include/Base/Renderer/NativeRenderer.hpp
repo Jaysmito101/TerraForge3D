@@ -12,7 +12,7 @@ namespace TerraForge3D
 		{
 		public:
 			NativeRenderer() = default;
-			~NativeRenderer() = default;
+			virtual ~NativeRenderer() = default;
 
 			virtual void Flush() = 0;
 			virtual void AddCommand(RendererCommand command, void* params = nullptr);

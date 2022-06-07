@@ -1,7 +1,5 @@
 #include "UI/Editor.hpp"
-#include "UI/EditorManager.hpp"
-#include "UI/Menu.hpp"
-#include "Base/Core/Application.hpp"
+#include "TerraForge3D.hpp"
 
 #include "imgui/imgui.h"
 
@@ -26,8 +24,8 @@ namespace TerraForge3D
 
 		Editor::~Editor()
 		{
-			TF3D_SAFE_DELETE(this->menu);
-			TF3D_SAFE_DELETE(this->subEditorManager);
+			// TF3D_SAFE_DELETE(this->menu);
+			// TF3D_SAFE_DELETE(this->subEditorManager);
 		}
 
 		void Editor::Update()

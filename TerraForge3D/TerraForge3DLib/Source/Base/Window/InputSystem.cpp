@@ -21,6 +21,8 @@ namespace TerraForge3D
 		callbackID = InputEventManager::Get()->RegisterCallback(std::bind(&InputSystem::EventCallback, this, std::placeholders::_1), {InputEventType_Key, InputEventType_MouseMove, InputEventType_MouseButton, InputEventType_MouseScroll});
 		
 		mainInstance = this;
+
+		TF3D_LOG("Input system initialized");
 	}
 
 	InputSystem::~InputSystem()
@@ -29,6 +31,7 @@ namespace TerraForge3D
 		{
 			InputEventManager::Get()->DeregisterCallback(callbackID);
 		}
+		TF3D_LOG("Input system shutdown");
 	}
 
 	bool InputSystem::IsKeyPressed(KeyCode code)
@@ -69,7 +72,7 @@ namespace TerraForge3D
 		mousePos[1] = static_cast<float>(mpy);
 	}
 
-	bool InputSystem::EventCallback(InputEventParams* params)
+	bool InputSystem::EventCallback(SharedPtr<InputEventParams> params)
 	{
 		switch (params->type)
 		{ // Switch Begin

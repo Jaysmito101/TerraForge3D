@@ -1,7 +1,5 @@
 #include "Job/JobSystem.hpp"
-#include "Job/Job.hpp"
-
-#include "Data/ApplicationState.hpp"
+#include "TerraForge3D.hpp"
 
 
 namespace TerraForge3D

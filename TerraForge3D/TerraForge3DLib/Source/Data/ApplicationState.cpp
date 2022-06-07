@@ -1,5 +1,7 @@
 #include "Data/ApplicationState.hpp"
 
+#include "TerraForge3D.hpp"
+
 namespace TerraForge3D
 {
 

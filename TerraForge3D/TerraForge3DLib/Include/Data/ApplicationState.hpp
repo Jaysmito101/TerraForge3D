@@ -70,31 +70,31 @@ namespace TerraForge3D
 
 		struct
 		{
-			MainMenu* mainMenu = nullptr;
+			SharedPtr<MainMenu> mainMenu ;
 		} menus;
 
 		struct
 		{
-			UI::EditorManager* manager = nullptr;
+			SharedPtr<UI::EditorManager> manager;
 			StartUpScreen* startUpScreen = nullptr;
 		} editors;
 
 		struct
 		{
-			UI::ModalManager* manager = nullptr;
+			SharedPtr<UI::ModalManager> manager;
 		} modals;
 
 		struct
 		{
-			ProjectManager* manager = nullptr;
+			SharedPtr<ProjectManager> manager;
 		} project;
 		
 		struct
 		{
-			JobSystem::JobSystem* manager = nullptr;
+			SharedPtr<JobSystem::JobSystem> manager ;
 		} jobs;
 
-		Preferences* preferences = nullptr;
+		SharedPtr<Preferences> preferences;
 
 		Renderer* renderer = nullptr;
 

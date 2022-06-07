@@ -12,7 +12,7 @@ namespace TerraForge3D
 		{
 		public:
 			NativeMesh() = default;
-			~NativeMesh() = default;
+			virtual ~NativeMesh() = default;
 			
 			inline size_t GetIndexCount() {  return indexCount; };
 			inline size_t GetVertexCount() { return vertexCount; };

@@ -78,6 +78,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     TerraForge3D::Application* mainApplication = CreateApplication();
     mainApplication->Run();
     delete mainApplication;
+    return EXIT_SUCCESS;
 }
 
 #else
@@ -107,6 +108,7 @@ int main(int argc, char* argv[], char* envp[])
     TerraForge3D::Application* mainApplication = CreateApplication();
     mainApplication->Run();
     delete mainApplication;
+    return EXIT_SUCCESS;
 }
 
 #endif

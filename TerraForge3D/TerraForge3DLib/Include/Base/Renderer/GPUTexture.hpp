@@ -44,7 +44,7 @@ namespace TerraForge3D
 		{
 		public:
 			GPUTexture();
-			~GPUTexture();
+			virtual ~GPUTexture();
 
 			/*
 			* This sets up the GPU handle of the texture usng the native Backend (Vulkan or OpenGL)

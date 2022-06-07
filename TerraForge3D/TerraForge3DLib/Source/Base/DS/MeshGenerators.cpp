@@ -3,7 +3,7 @@
 namespace TerraForge3D
 {
 
-	Mesh* Mesh::Triangle(float* A, float* B, float* C)
+	Mesh& Mesh::Triangle(float* A, float* B, float* C)
 	{
 		Clear();
 		Vertex v;
@@ -18,7 +18,7 @@ namespace TerraForge3D
 
 		faces.push_back({0, 1, 2});
 
-		return this;
+		return *this;
 	}
 
 }

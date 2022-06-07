@@ -13,23 +13,23 @@ namespace TerraForge3D
 		{
 		public:
 			EditorManager(std::string name);
-			~EditorManager();
+			virtual ~EditorManager();
 
 			void Show();
 			void Update();
 
-			Editor* AddEditor(Editor* editor);
+			Editor* AddEditor(SharedPtr<Editor> editor);
 
-			inline std::vector<Editor*> GetEditors() { return editors; }
+			inline std::vector<SharedPtr<Editor>> GetEditors() { return editors; }
 
-			inline const std::vector<Editor*>::iterator& begin() { return editors.begin(); }
-			inline const std::vector<Editor*>::iterator& end() { return editors.end(); }
+			inline const std::vector<SharedPtr<Editor>>::iterator& begin() { return editors.begin(); }
+			inline const std::vector<SharedPtr<Editor>>::iterator& end() { return editors.end(); }
 
 		private:
 			std::string name = "Editor Manager";
 			UUID uid;
 			std::string uidStr = "";
-			std::vector<Editor*> editors;
+			std::vector<SharedPtr<Editor>> editors;
 		};
 
 	}

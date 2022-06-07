@@ -11,7 +11,7 @@ namespace TerraForge3D
 		{
 		public:
 			UIManager();
-			~UIManager();
+			virtual ~UIManager();
 
 			virtual void Begin() = 0;
 			virtual void End() = 0;

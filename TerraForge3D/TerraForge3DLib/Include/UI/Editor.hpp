@@ -14,7 +14,7 @@ namespace TerraForge3D
 		{
 		public:
 			Editor(std::string name = "Editor");
-			~Editor();
+			virtual ~Editor();
 
 			virtual void OnUpdate() = 0;
 			virtual void OnShow() = 0;
@@ -35,18 +35,18 @@ namespace TerraForge3D
 			inline bool IsEnabled() { return this->isEnabled; }
 			inline bool IsVisible() { return this->isVisible; }
 			inline std::string GetName() { return this->name; }
-			inline EditorManager* GetSubEditorManager() { return this->subEditorManager; }
-			inline Menu* GetMenu() { return this->menu; }
+			inline EditorManager* GetSubEditorManager() { return this->subEditorManager.Get(); }
+			inline Menu* GetMenu() { return this->menu.Get(); }
 
 		protected:
 			std::string name = "Editor";
 			UUID uid;
 			std::string uidStr = "";
-			EditorManager* subEditorManager = nullptr;
 			bool isVisible = true;
 			bool isEnabled = true;
 			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
-			Menu* menu = nullptr;
+			SharedPtr<EditorManager> subEditorManager ;
+			SharedPtr<Menu> menu;
 		};
 
 	}

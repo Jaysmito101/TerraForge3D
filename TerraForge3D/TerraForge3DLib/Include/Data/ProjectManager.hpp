@@ -11,7 +11,7 @@ namespace TerraForge3D
 	{
 	public:
 		ProjectManager(ApplicationState* appState);
-		~ProjectManager();
+		virtual ~ProjectManager();
 
 		bool Create(std::string path);
 		bool Load(std::string path);

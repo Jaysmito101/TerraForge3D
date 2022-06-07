@@ -220,7 +220,7 @@ namespace TerraForge3D
 
 			editor = new MyEditor("Style Opener", appState);
 			appState->editors.manager->AddEditor(editor);
-			appState->editors.startUpScreen = reinterpret_cast<StartUpScreen*>(appState->editors.manager->AddEditor(new StartUpScreen(appState)));
+			appState->editors.startUpScreen = reinterpret_cast<StartUpScreen*>(appState->editors.manager->AddEditor(SharedPtr<StartUpScreen>(new StartUpScreen(appState))));
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 
@@ -273,12 +273,12 @@ namespace TerraForge3D
 			
 			// TEMP
 
-			appState->renderer->BindFramebuffer(fbo);
+			appState->renderer->BindFramebuffer(fbo.Get());
 			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 			appState->renderer->ClearFrame();
-			appState->renderer->BindPipeline(pipeline);
-			appState->renderer->BindCamera(camera);
-			appState->renderer->DrawMesh(mesh);
+			appState->renderer->BindPipeline(pipeline.Get());
+			appState->renderer->BindCamera(camera.Get());
+			appState->renderer->DrawMesh(mesh.Get());
 			// TEMP
 
 			appState->renderer->Flush();
@@ -332,20 +332,8 @@ namespace TerraForge3D
 
 		virtual void OnEnd() override
 		{
-			delete camera;
-			delete mesh;
-			delete pipeline;
-			delete fbo;
 			
 			GetInputEventManager()->DeregisterCallback(exitcb);
-			
-			// Object Destructions
-			TF3D_SAFE_DELETE(appState->menus.mainMenu);
-			TF3D_SAFE_DELETE(appState->editors.manager);
-			TF3D_SAFE_DELETE(appState->modals.manager);
-			TF3D_SAFE_DELETE(appState->project.manager);
-			TF3D_SAFE_DELETE(appState->jobs.manager);
-			TF3D_SAFE_DELETE(appState->preferences);
 
 
 			ApplicationState::Destory();
@@ -364,12 +352,12 @@ namespace TerraForge3D
 		ApplicationState* appState = nullptr;
 		UI::Dockspace dockspace;
 
-		MyEditor* editor;
+		SharedPtr<MyEditor> editor;
 
-		RendererAPI::FrameBuffer* fbo = nullptr;
-		RendererAPI::Pipeline* pipeline = nullptr;
-		RendererAPI::Camera* camera = nullptr;
-		Mesh* mesh = nullptr;
+		SharedPtr<RendererAPI::FrameBuffer> fbo;
+		SharedPtr<RendererAPI::Pipeline> pipeline;
+		SharedPtr<RendererAPI::Camera> camera;
+		SharedPtr<Mesh> mesh;
 	};
 }
 #pragma optimize( "", on )

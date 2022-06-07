@@ -16,6 +16,8 @@ namespace TerraForge3D
 		callbacks.clear();
 		callbacks.reserve(TF3D_DEFAULT_CALLBACKS_CAPACITY);
 		mainInstance = this;
+
+		TF3D_LOG("Input Event Manager initialized");
 	}
 
 	void InputEventManager::SetupInternalCallbacks()
@@ -47,6 +49,7 @@ namespace TerraForge3D
 
 	InputEventManager::~InputEventManager()
 	{
+		TF3D_LOG("Input Event Manager shutdown");
 		callbacks.clear();
 	}
 
@@ -140,13 +143,15 @@ namespace TerraForge3D
 
 	void InputEventManager::CallCallbacks()
 	{
-		std::vector<uint32_t>& callbackIDs = callbacksReference[eventParams.type];
-		for (auto& callbackID : callbackIDs)
+		std::vector<uint32_t> callbackIDs = callbacksReference[eventParams.type];
+		std::cout << callbacksReference[InputEventType_WindowClose].size() << " ";
+		for (auto callbackID : callbackIDs)
 		{
-			if (callbacks[callbackID](&eventParams))
+			if ((callbacks[callbackID])(&eventParams))
 			{
 				// break;
 			}
 		}
+		std::cout << callbacksReference[InputEventType_WindowClose].size() << "\n";
 	}
 }

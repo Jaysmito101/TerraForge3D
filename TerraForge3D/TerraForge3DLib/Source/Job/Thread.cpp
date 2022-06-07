@@ -84,6 +84,7 @@ namespace TerraForge3D
 		{
 			TF3D_ASSERT(currentJob, "No Job assigned");
 
+			// TODO : fix me use something better
 			if (wait)
 				while (isRunningJob); // Wait for current job to finish
 

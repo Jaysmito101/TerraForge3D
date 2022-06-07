@@ -26,12 +26,6 @@ namespace TerraForge3D
 		return mainInstance;
 	}
 
-	void Window::Destroy()
-	{
-		TF3D_ASSERT(mainInstance != nullptr, "Window not yet created");
-		TF3D_SAFE_DELETE(mainInstance);
-	}
-
 	// Window member methods
 
 	Window::Window()
@@ -77,10 +71,10 @@ namespace TerraForge3D
 
 	Window::~Window()
 	{
-		delete inputSystem;
-		delete eventManager;
 		glfwDestroyWindow(windowHandle);
 		glfwTerminate();
+
+		TF3D_LOG("Main window destoryed");
 	}
 
 	void Window::Update()

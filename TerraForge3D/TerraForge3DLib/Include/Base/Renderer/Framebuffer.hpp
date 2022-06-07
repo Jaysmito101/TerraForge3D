@@ -20,7 +20,7 @@ namespace TerraForge3D
 		{
 		public:
 			FrameBuffer();
-			~FrameBuffer();
+			virtual ~FrameBuffer();
 
 
 			virtual void Setup() = 0; 

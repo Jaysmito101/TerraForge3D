@@ -44,7 +44,7 @@ namespace TerraForge3D
 		
 
 	private:
-		bool EventCallback(InputEventParams* params);
+		bool EventCallback(SharedPtr<InputEventParams> params);
 
 	private:
 		bool keyStates[512] = { false }; /* Stores the state of all the keys in KeyCode */

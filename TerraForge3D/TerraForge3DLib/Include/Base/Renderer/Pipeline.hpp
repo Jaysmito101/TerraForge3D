@@ -12,7 +12,7 @@ namespace TerraForge3D
 		{
 		public:
 			Pipeline();
-			~Pipeline();
+			virtual ~Pipeline();
 
 			virtual void Setup() = 0;
 			virtual void Destory() = 0;

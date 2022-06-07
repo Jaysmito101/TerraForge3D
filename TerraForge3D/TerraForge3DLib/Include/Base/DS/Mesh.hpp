@@ -32,7 +32,7 @@ namespace TerraForge3D
 	{
 	public:
 		Mesh(std::string name = "Mesh");
-		~Mesh();
+		virtual ~Mesh();
 
 		bool Clear();
 
@@ -45,7 +45,7 @@ namespace TerraForge3D
 		inline glm::mat4& GetModelMatrix() { return modelMatrix; };
 
 		// Mesh Generators
-		Mesh* Triangle(float* A, float* B, float* C);
+		Mesh& Triangle(float* A, float* B, float* C);
 
 	public:
 		float position[3] = { 0.0f, 0.0f, 0.0f };

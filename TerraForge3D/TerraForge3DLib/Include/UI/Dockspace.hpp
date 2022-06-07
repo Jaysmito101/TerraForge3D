@@ -18,7 +18,7 @@ namespace TerraForge3D
 			void End();
 
 			inline void SetOpen(bool open) { this->isOpen = open; }
-			inline bool IsOpen() { this->isOpen; }
+			inline bool IsOpen() { return this->isOpen; }
 
 		private:
 			bool isOpen = true;

@@ -1,7 +1,5 @@
 #include "Data/PreferencesEditor.hpp"
-#include "Data/Preferences.hpp"
-#include "Data/ApplicationState.hpp"
-#include "UI/MainMenu.hpp"
+#include "TerraForge3D.hpp"
 
 #include "imgui/imgui.h"
 
@@ -11,7 +9,7 @@ namespace TerraForge3D
 		: UI::Editor("Preferences")
 	{
 		this->appState = appState;
-		this->preferences = appState->preferences;
+		this->preferences = appState->preferences.Get();
 	}
 
 	PreferencesEditor::~PreferencesEditor()

@@ -1,5 +1,5 @@
 #include "UI/EditorManager.hpp"
-#include "UI/Editor.hpp"
+#include "TerraForge3D.hpp"
 
 #include "imgui/imgui.h"
 
@@ -24,8 +24,9 @@ namespace TerraForge3D
 			for (auto& editor : editors)
 			{
 				editor->Shutdown();
-				TF3D_SAFE_DELETE(editor);
+				// TF3D_SAFE_DELETE(editor);
 			}
+			editors.clear();
 		}
 
 		void EditorManager::Show()
@@ -46,12 +47,12 @@ namespace TerraForge3D
 			}
 		}
 
-		Editor* EditorManager::AddEditor(Editor* editor)
+		Editor* EditorManager::AddEditor(SharedPtr<Editor> editor)
 		{
 			TF3D_ASSERT(editor, "Cannot add NULL editor");
 			this->editors.push_back(editor);
 			editor->Setup();
-			return editor;
+			return editor.Get();
 		}
 
 	}

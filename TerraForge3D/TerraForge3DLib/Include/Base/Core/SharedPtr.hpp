@@ -15,10 +15,9 @@ namespace TerraForge3D
 #else
 		uint64_t count = 0;
 #endif
-		void* handle = nullptr;
 
-		SharedPtrControlBlock(void* handle = nullptr, uint64_t count = 0)
-			:count(count), handle(handle)
+		SharedPtrControlBlock(uint64_t count = 0)
+			:count(count)
 		{}
 	};
 
@@ -31,10 +30,10 @@ namespace TerraForge3D
 		template<typename>
 		friend class SharedPtr;
 
-
 		SharedPtr()
 		{
 			this->controlBlock = nullptr;
+			this->handle = nullptr;
 		}
 
 		template <typename Derived>
@@ -43,27 +42,30 @@ namespace TerraForge3D
 			if (derived == nullptr)
 			{
 				this->controlBlock = nullptr;
+				this->handle = nullptr;
 			}
 			else
 			{
 				static_assert(std::is_base_of_v<Base, Derived>);
-				this->Release();
-				this->controlBlock = new SharedPtrControlBlock(derived, 1);
+				this->controlBlock = new SharedPtrControlBlock(1);
+				this->handle = derived;
 			}
 		}
 
 		SharedPtr(const SharedPtr& other)
 		{
 			this->controlBlock = other.controlBlock;
+			this->handle = other.handle;
 			if (this->controlBlock)
 				this->controlBlock->count += 1;
 		}
 
 		template <typename Derived>
-		SharedPtr(const SharedPtr<Derived>& derivedRef)
+		SharedPtr(const SharedPtr<Derived>& other)
 		{
 			static_assert(std::is_base_of_v<Base, Derived>);
-			this->controlBlock = derivedRef.controlBlock;
+			this->controlBlock = other.controlBlock;
+			this->handle = other.handle;
 			if (this->controlBlock)
 				this->controlBlock->count += 1;
 		}
@@ -71,6 +73,15 @@ namespace TerraForge3D
 		virtual ~SharedPtr()
 		{
 			this->Release();
+		}
+
+		inline SharedPtr& operator=(SharedPtr& other)
+		{
+			this->Release();
+			this->controlBlock = other.controlBlock;
+			if (this->controlBlock)
+				this->controlBlock->count += 1;
+			return *this;
 		}
 
 		template <typename Derived>
@@ -87,16 +98,17 @@ namespace TerraForge3D
 		template <typename Derived>
 		inline SharedPtr<Base>& operator=(Derived* ptr)
 		{
+			this->Release();
 			if(ptr == nullptr)
 			{
-				this->Release();
 				this->controlBlock = nullptr;
+				this->handle = nullptr;
 			}
 			else
 			{
 				static_assert(std::is_base_of_v<Base, Derived>);
-				this->Release();
-				this->controlBlock = new SharedPtrControlBlock(ptr, 1);
+				this->controlBlock = new SharedPtrControlBlock(1);
+				this->handle = ptr;
 			}
 			return *this;
 		}
@@ -108,17 +120,17 @@ namespace TerraForge3D
 
 		inline Base& operator*() const
 		{
-			return *(reinterpret_cast<Base*>(controlBlock->handle));
+			return *(this->handle);
 		}
 
 		inline Base* operator->() const
 		{
-			return reinterpret_cast<Base*>(controlBlock->handle);
+			return this->handle;
 		}
 
 		inline Base* Get() const
 		{
-			return reinterpret_cast<Base*>(controlBlock->handle);
+			return this->handle;
 		}
 
 
@@ -131,8 +143,11 @@ namespace TerraForge3D
 				this->controlBlock->count -= 1;
 				if (this->controlBlock->count <= 0)
 				{
-					if (this->controlBlock->handle)
-						delete reinterpret_cast<Base*>(this->controlBlock->handle);
+					if (this->handle)
+					{
+						delete this->handle;
+						this->handle = nullptr;
+					}
 					delete this->controlBlock;
 					this->controlBlock = nullptr;
 				}
@@ -141,6 +156,7 @@ namespace TerraForge3D
 
 
 	public:
+		Base* handle = nullptr;
 		SharedPtrControlBlock* controlBlock = nullptr;
 	};
 
@@ -149,6 +165,7 @@ namespace TerraForge3D
 	{
 		SharedPtr<NewType> nref;
 		nref.controlBlock = oref.controlBlock;
+		nref.handle = reinterpret_cast<NewType>(oref.handle);
 		if (nref.controlBlock)
 			nref.controlBlock->count += 1;
 		return nref;
@@ -158,11 +175,10 @@ namespace TerraForge3D
 	inline static SharedPtr<NewType> StaticCast(SharedPtr<OldType> oref)
 	{
 		SharedPtr<NewType> nref;
-		if (oref.controlBlock)
-		{
-			nref.controlBlock->handle = static_cast<NewType>(reinterpret_cast<OldType>(oref.controlBlock->handle));
-			nref.controlBlock->count = oref.controlBlock->count;
-		}
+		nref.controlBlock = oref.controlBlock;
+		nref.handle = static_cast<NewType>(oref.handle);
+		if(oref.handle)
+			assert(nref.handle);
 		if (nref.controlBlock)
 			nref.controlBlock->count += 1;
 		return nref;
@@ -172,11 +188,10 @@ namespace TerraForge3D
 	inline static SharedPtr<NewType> DynamicCast(SharedPtr<OldType> oref)
 	{
 		SharedPtr<NewType> nref;
-		if (oref.controlBlock)
-		{
-			nref.controlBlock->handle = dynamic_cast<NewType>(reinterpret_cast<OldType>(oref.controlBlock->handle));
-			nref.controlBlock->count = oref.controlBlock->count;
-		}
+		nref.controlBlock = oref.controlBlock;
+		nref.handle = dynamic_cast<NewType>(oref.handle);
+		if (oref.handle)
+			assert(nref.handle);
 		if (nref.controlBlock)
 			nref.controlBlock->count += 1;
 		return nref;

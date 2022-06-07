@@ -11,7 +11,7 @@ namespace TerraForge3D
 		{
 		public:
 			Context();
-			~Context();
+			virtual ~Context();
 
 			/*
 			* This functions finishes all the ongoing oprtation with the context

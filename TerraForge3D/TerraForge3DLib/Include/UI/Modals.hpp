@@ -64,7 +64,7 @@ namespace TerraForge3D
 		{
 		public:
 			ModalManager(ApplicationState* appState);
-			~ModalManager();
+			virtual ~ModalManager();
 
 			void Update();
 			void Show();

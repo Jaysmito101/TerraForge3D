@@ -48,14 +48,13 @@ namespace TerraForge3D
 
 		// Static methods
 		static Window* Create(); // Creates a window handle (error if window handle alrady exists)
-		static void Destroy(); // Destroys the main window handle
 
 		inline static void Set(Window* window) { TF3D_ASSERT(window, "Null Pointer Exception");  mainInstance = window; }
 		inline static Window* Get() { TF3D_ASSERT(mainInstance, "Window not yet initialized!"); return mainInstance; }
 
 	public:
-		InputEventManager* eventManager = nullptr;
-		InputSystem* inputSystem = nullptr;
+		SharedPtr<InputEventManager> eventManager;
+		SharedPtr<InputSystem> inputSystem;
 	private:
 		int32_t height = 600, width = 800;
 		int32_t positionX=0, positionY = 0;

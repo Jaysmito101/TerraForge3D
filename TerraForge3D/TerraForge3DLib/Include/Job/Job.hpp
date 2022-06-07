@@ -29,7 +29,7 @@ namespace TerraForge3D
 		{
 		public:
 			Job(std::string name);
-			~Job();
+			virtual ~Job();
 
 
 		public:

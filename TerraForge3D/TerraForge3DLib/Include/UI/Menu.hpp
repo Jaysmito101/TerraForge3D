@@ -23,7 +23,7 @@ namespace TerraForge3D
 		{
 		public:
 			MenuItem(std::string name, std::string path, MenuItemUse use = MenuItemUse_Button, MenuItemType type = MenuItemType_Item);
-			~MenuItem();
+			virtual ~MenuItem();
 
 			bool Begin();
 			void End();
@@ -39,7 +39,7 @@ namespace TerraForge3D
 			inline std::string GetTooltip() { return this->tooltip; }
 			inline bool IsEnabled() { return this->enabled; }
 			inline bool IsSelected() { return this->selected; }
-			inline bool GetToggleState() { TF3D_ASSERT(use = MenuItemUse_Toggle, "Cannot get toggle state without mode being toggle"); return this->toggleState; }
+			inline bool GetToggleState() { TF3D_ASSERT(use == MenuItemUse_Toggle, "Cannot get toggle state without mode being toggle"); return this->toggleState; }
 			
 			inline MenuItem* SetCallback(std::function<void(MenuItem*)> callback) { TF3D_ASSERT(callback, "Callback is null");	this->callback = callback; return this; }
 			inline MenuItem* SetTooltip(std::string tooltip) { this->tooltip = tooltip;  return this;};

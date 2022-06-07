@@ -70,7 +70,7 @@ namespace TerraForge3D
 			TF3D_ASSERT(isSetupOnGPU, "Texture not setup on GPU (First call Setup)");
 			TF3D_ASSERT(sizeX > 0 && sizeY > 0 && sizeZ > 0, "Texture sizes cannot be all 0");
 			TF3D_ASSERT(data, "Data is null");
-			TF3D_ASSERT(depth >= 0, "Depth must be greater than or equal to 0");
+			// TF3D_ASSERT(depth >= 0, "Depth must be greater than or equal to 0"); // uinsigned valuw is always >= 0
 			if (depth > 256)
 			{
 				TF3D_LOG_WARN("Using 3D texture with depth {0} (might be unsupported on certain gpus)", depth);

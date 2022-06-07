@@ -1,5 +1,6 @@
 #include "Data/Preferences.hpp"
-#include "Data/ApplicationState.hpp"
+#include "TerraForge3D.hpp"
+
 
 namespace TerraForge3D
 {
@@ -32,7 +33,7 @@ namespace TerraForge3D
 	{
 		if (!editor)
 			editor = new PreferencesEditor(appState);
-		return editor;
+		return editor.Get();
 	}
 
 }

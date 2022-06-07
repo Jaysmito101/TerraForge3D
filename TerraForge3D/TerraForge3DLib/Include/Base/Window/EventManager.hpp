@@ -38,8 +38,8 @@ namespace TerraForge3D
 		float mouseScrollAmount[2] = { 0.0f };
 		float mousePos[2] = {0.0f};
 		float windowSize[2] = {0.0f};
-		MouseButton mouseButton;
-		KeyCode keyCode ;
+		MouseButton mouseButton = MouseButton_Left;
+		KeyCode keyCode = KeyCode_Enter;
 		bool pressed = false;
 	};
 

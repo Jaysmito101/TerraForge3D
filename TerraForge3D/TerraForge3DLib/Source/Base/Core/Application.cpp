@@ -45,6 +45,5 @@ namespace TerraForge3D
 		}
 		OnEnd();
 		Renderer::Destroy();
-		Window::Destroy();
 	}
 }

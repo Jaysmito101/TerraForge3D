@@ -1,7 +1,5 @@
 #include "UI/Modals.hpp"
-#include "Data/ApplicationState.hpp"
-#include "Base/Base.hpp"
-#include "Utils/Utils.hpp"
+#include "TerraForge3D.hpp"
 
 #include "imgui/imgui.h"
 #include "ImGuiFileDialog/ImGuiFileDialog.h"

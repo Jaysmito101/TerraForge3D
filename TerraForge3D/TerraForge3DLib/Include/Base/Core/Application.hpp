@@ -47,8 +47,8 @@ namespace TerraForge3D
 		inline void Close() { isRunning = false; }
 
 		inline std::unordered_map<std::string, ApplicationFont>& GetFonts() { return fonts; };
-		inline Window* GetWindow() { return mainWindow; }
-		inline InputEventManager* GetInputEventManager() { return mainWindow->eventManager; }
+		inline Window* GetWindow() { return mainWindow.Get(); }
+		inline InputEventManager* GetInputEventManager() { return mainWindow->eventManager.Get(); }
 
 		/*
 		* This is the entire lifecycle of the Application
@@ -109,7 +109,7 @@ namespace TerraForge3D
 		std::string fontsDir = "";
 
 		// Application Window
-		Window* mainWindow = nullptr;
+		SharedPtr<Window> mainWindow;
 	};
 
 }

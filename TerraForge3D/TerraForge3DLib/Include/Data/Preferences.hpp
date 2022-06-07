@@ -20,7 +20,7 @@ namespace TerraForge3D
 	public:
 
 	private:
-		PreferencesEditor* editor = nullptr;
+		SharedPtr<PreferencesEditor> editor;
 		ApplicationState* appState = nullptr;
 	};
 

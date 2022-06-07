@@ -1,8 +1,5 @@
 #include "UI/StartUpScreen.hpp"
-#include "UI/Modals.hpp"
-#include "Data/ApplicationState.hpp"
-#include "Data/ProjectManager.hpp"
-#include "Utils/Utils.hpp"
+#include "TerraForge3D.hpp"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui_internal.h"

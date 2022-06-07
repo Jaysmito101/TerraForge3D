@@ -44,14 +44,14 @@ namespace TerraForge3D
 		public:
 
 			Shader() = default;
-			~Shader() = default;
+			virtual ~Shader() = default;
 
 			virtual void Cleanup() = 0;
 			virtual bool Compile() = 0;
 			virtual bool LoadFromBinary(std::vector<uint32_t> binary) = 0;
 
 			inline bool IsCompiled() { return this->isCompiled; }
-			inline std::vector<uint32_t> GetBinary() { if (isCompiled && loadedFromBinary) return binary; TF3D_ASSERT(false, "Shader binary not available"); }
+			inline std::vector<uint32_t> GetBinary() { if (isCompiled && loadedFromBinary) return binary; TF3D_ASSERT(false, "Shader binary not available");  return std::vector<uint32_t>(); }
 
 			inline Shader* SetIncludeDir(std::string dir) { this->includeDir = dir; if (this->includeDir[this->includeDir.size() - 1] != PATH_SEPERATOR[0]) { this->includeDir += PATH_SEPERATOR; } return this; }
 			inline Shader* SetCacheDir(std::string dir) { this->cacheDir = dir; return this; }
