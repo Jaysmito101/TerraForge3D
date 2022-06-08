@@ -34,15 +34,14 @@ namespace TerraForge3D
 			OpenGL::Shader* shader = nullptr;
 			RendererAPI::Camera* camera = nullptr;
 
-			GLuint pvMatLocation = 0;
-			GLuint modelMatLocation = 0;
 			
 
 			std::stack<void*> rendererStack;
 
 			while (!rendererQueue.empty())
 			{
-				auto& [command, param] = rendererQueue.front();
+				auto [command, params] = rendererQueue.front();
+				void* param = params.custom;
 				rendererQueue.pop();
 				switch (command)
 				{
@@ -74,12 +73,11 @@ namespace TerraForge3D
 					shader = reinterpret_cast<OpenGL::Shader*>(pipeline->shader);
 					TF3D_ASSERT(shader, "Shader is null");
 					TF3D_ASSERT(shader->IsCompiled(), "Shader is not compiled");
-					pvMatLocation = glGetUniformLocation(shader->handle, "_PV");
-					modelMatLocation = glGetUniformLocation(shader->handle, "_Model");
 					pipeline->Rebuild(framebuffer);
 					glUseProgram(shader->handle);
 					break;
 				}
+				/*
 				case RendererCommand_BindCamera:
 				{
 					TF3D_ASSERT(param, "Parameter is null");
@@ -89,7 +87,7 @@ namespace TerraForge3D
 					glUniformMatrix4fv(pvMatLocation, 1, GL_FALSE, glm::value_ptr(camera->matrices.pv));
 					break;
 				}
-
+				*/
 				case RendererCommand_Draw:
 				{
 					TF3D_ASSERT(pipeline, "Cannot draw meshes without a pipeline bound");
@@ -97,7 +95,6 @@ namespace TerraForge3D
 					Mesh* mesh = reinterpret_cast<Mesh*>(param);
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(mesh->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
-					glUniformMatrix4fv(modelMatLocation, 1, GL_FALSE, glm::value_ptr(mesh->GetModelMatrix()));
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElements(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
 					glBindVertexArray(0);
@@ -111,10 +108,53 @@ namespace TerraForge3D
 					std::pair<int, Mesh*>* paramT = reinterpret_cast<std::pair<int, Mesh*>*>(param);
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(paramT->second->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
-					glUniformMatrix4fv(modelMatLocation, 1, GL_FALSE, glm::value_ptr(paramT->second->GetModelMatrix()));
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0, paramT->first);
 					glBindVertexArray(0);
+					break;
+				}
+
+				case RendererCommand_UploadUniform:
+				{
+					TF3D_ASSERT(pipeline, "Cannot upload uniforms without a pipeline bound");
+					if (shader->UniformExists(params.str))
+					{
+						auto& [location, type] = shader->GetUniform(params.str);
+						switch (type)
+						{
+							case RendererAPI::ShaderDataType_Mat3:
+								glUniformMatrix3fv(location, 1, GL_FALSE, (GLfloat*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_Mat4:
+								glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_Vec2:
+								glUniform2fv(location, 1, (GLfloat*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_IVec2:
+								glUniform2iv(location, 1, (GLint*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_Vec3:
+								glUniform3fv(location, 1, (GLfloat*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_IVec3:
+								glUniform3iv(location, 1, (GLint*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_Vec4:
+								glUniform4fv(location, 1, (GLfloat*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_IVec4:
+								glUniform4iv(location, 1, (GLint*)params.custom);
+								break;
+							case RendererAPI::ShaderDataType_Bool:
+								glUniform1i(location, (GLint)params.custom);
+								break;
+						}
+					}
+					else
+					{
+						TF3D_LOG_WARN("Uniform {0} not found", params.str);
+					}
 					break;
 				}
 
@@ -128,9 +168,9 @@ namespace TerraForge3D
 					case RendererData_Pipeline:
 						rendererStack.push(pipeline);
 						break;
-					case RendererData_Camera:
-						rendererStack.push(camera);
-						break;
+					//case RendererData_Camera:
+					//	rendererStack.push(camera);
+					//	break;
 					default:
 						TF3D_ASSERT(false, "Unknown RendererData item");
 						break;
@@ -152,9 +192,9 @@ namespace TerraForge3D
 						if (pipeline)
 							pipeline->Rebuild(framebuffer);
 						break;
-					case RendererData_Camera:
-						camera = reinterpret_cast<RendererAPI::Camera*>(rendererStack.top());
-						break;
+					//case RendererData_Camera:
+					//	camera = reinterpret_cast<RendererAPI::Camera*>(rendererStack.top());
+					//	break;
 					default:
 						TF3D_ASSERT(false, "Unknown RendererData item");
 						break;

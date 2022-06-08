@@ -10,9 +10,9 @@ namespace TerraForge3D
 		NativeRenderer* NativeRenderer::mainInstance = nullptr;
 
 
-		void NativeRenderer::AddCommand(RendererCommand command, void* params)
+		void NativeRenderer::AddCommand(RendererCommand command, RendererCommandParams params)
 		{
-			rendererQueue.push({ command, params });
+			rendererQueue.push(std::make_pair( command, params ));
 		}
 
 		NativeRenderer* TerraForge3D::RendererAPI::NativeRenderer::Create()

@@ -202,6 +202,8 @@ namespace TerraForge3D
 			isCompiled = true;
 			wasCompiled = true;
 
+			LoadUniformLocations();
+
 			return true;
 		}
 
@@ -209,6 +211,13 @@ namespace TerraForge3D
 		{
 			TF3D_ASSERT(false, "Shader::LoadFromBinary not yet supported for OpenGL backend");
 			return false;
+		}
+
+		void Shader::LoadUniformLocations()
+		{
+			uniformLocations.clear();
+			for (auto& uniform : uniformsLayout)
+				uniformLocations[uniform.name] = std::make_pair( glGetUniformLocation(handle, uniform.name.data()) , uniform.type);
 		}
 
 	}

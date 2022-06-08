@@ -33,13 +33,21 @@ namespace TerraForge3D
 		RendererCommand_DrawInstanced,
 		RendererCommand_BindFrameBuffer,
 		RendererCommand_BindPipeline,
-		RendererCommand_BindCamera,
+		RendererCommand_UploadUniform,
 		RendererCommand_CustomFunction,
 		RendererCommand_Push,
 		RendererCommand_Pop,
 		RendererCommand_PushC,
 		RendererCommand_PopC,
 		RendererCommand_Count
+		//RendererCommand_BindCamera,
+	};
+
+	struct RendererCommandParams
+	{
+		void* custom = nullptr;
+		std::string str = "";
+		int32_t num = 0;
 	};
 
 	class Renderer
@@ -56,11 +64,11 @@ namespace TerraForge3D
 		virtual void Flush();
 		
 		inline Renderer* SetClearColor(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f) { this->clearColor[0] = r; this->clearColor[1] = g; this->clearColor[2] = b;	this->clearColor[3] = a; return this; }
+		inline Renderer* SetCamera(RendererAPI::Camera* camera) { this->camera = camera; return this; }
 
 		Renderer* ClearFrame();
 		Renderer* BindFramebuffer(RendererAPI::FrameBuffer* framebuffer);
 		Renderer* BindPipeline(RendererAPI::Pipeline* pipeline);
-		Renderer* BindCamera(RendererAPI::Camera* camera);
 
 		Renderer* DrawMesh(Mesh* mesh);
 
@@ -75,6 +83,7 @@ namespace TerraForge3D
 		RendererAPI::Context* rendererContext = nullptr;
 		RendererAPI::UIManager* uiManager = nullptr;
 		RendererAPI::NativeRenderer* nativeRenderer = nullptr;
+		RendererAPI::Camera* camera = nullptr;
 
 	private:
 		static Renderer* mainInstance;

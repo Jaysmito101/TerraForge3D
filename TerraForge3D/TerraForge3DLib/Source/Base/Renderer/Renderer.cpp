@@ -1,5 +1,5 @@
 #include "Base/Renderer/Renderer.hpp"
-#include "Base/Renderer/NativeRenderer.hpp"
+#include "Base/Base.hpp"
 
 namespace TerraForge3D
 {
@@ -8,7 +8,7 @@ namespace TerraForge3D
 	class Mesh;
 
 	Renderer* Renderer::Create()
-	{ 
+	{
 		TF3D_ASSERT(mainInstance == nullptr, "Renderer already created");
 		mainInstance = new Renderer();
 		return mainInstance;
@@ -30,7 +30,6 @@ namespace TerraForge3D
 	void Renderer::Destroy()
 	{
 		TF3D_ASSERT(mainInstance, "Renderer not yet initialized");
-		mainInstance->WaitForIdle();
 		TF3D_SAFE_DELETE(mainInstance);
 	}
 
@@ -43,9 +42,10 @@ namespace TerraForge3D
 
 	Renderer::~Renderer()
 	{
+		rendererContext->WaitForIdle();
 		RendererAPI::NativeRenderer::Destroy();
 		RendererAPI::UIManager::Destory();
-		RendererAPI::Context::Destroy();		
+		RendererAPI::Context::Destroy();
 	}
 
 	void Renderer::WaitForIdle()
@@ -79,21 +79,27 @@ namespace TerraForge3D
 		nativeRenderer->AddCommand(RendererCommand_BindFrameBuffer, framebuffer);
 		return this;
 	}
-		
+
 	Renderer* Renderer::BindPipeline(RendererAPI::Pipeline* pipeline)
 	{
 		nativeRenderer->AddCommand(RendererCommand_BindPipeline, pipeline);
-		return this;
-	}
-
-	Renderer* Renderer::BindCamera(RendererAPI::Camera* camera)
-	{
-		nativeRenderer->AddCommand(RendererCommand_BindCamera, camera);
+		if (this->camera)
+		{
+			this->camera->RecalculateMatrices();
+			RendererCommandParams params;
+			params.custom = glm::value_ptr(camera->matrices.pv);
+			params.str = "_PV";
+			nativeRenderer->AddCommand(RendererCommand_UploadUniform, params);
+		}
 		return this;
 	}
 
 	Renderer* Renderer::DrawMesh(Mesh* mesh)
-	{
+	{	
+		RendererCommandParams params;
+		params.custom = glm::value_ptr(mesh->GetModelMatrix());
+		params.str = "_Model";
+		nativeRenderer->AddCommand(RendererCommand_UploadUniform, params);
 		nativeRenderer->AddCommand(RendererCommand_Draw, mesh);
 		return this;
 	}

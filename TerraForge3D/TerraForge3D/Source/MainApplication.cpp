@@ -238,10 +238,14 @@ namespace TerraForge3D
 			pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
 			pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
 			pipeline->shader->SetUBOLayout({
-				RendererAPI::UBOEntry("_U1", RendererAPI::ShaderDataType_Vec4),
-				RendererAPI::UBOEntry("_U2", RendererAPI::ShaderDataType_Vec4),
-				RendererAPI::UBOEntry("_U3", RendererAPI::ShaderDataType_Vec4),
-				RendererAPI::UBOEntry("_U4", RendererAPI::ShaderDataType_Vec4)
+				RendererAPI::ShaderVar("_U1", RendererAPI::ShaderDataType_Vec4),
+				RendererAPI::ShaderVar("_U2", RendererAPI::ShaderDataType_Vec4),
+				RendererAPI::ShaderVar("_U3", RendererAPI::ShaderDataType_Vec4),
+				RendererAPI::ShaderVar("_U4", RendererAPI::ShaderDataType_Vec4)
+				});
+			pipeline->shader->SetUniformsLayout({
+				RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
+				RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
 				});
 			pipeline->shader->Compile();
 			pipeline->Setup();
@@ -273,12 +277,12 @@ namespace TerraForge3D
 
 			
 			// TEMP
+			appState->renderer->SetCamera(camera.Get());
 
 			appState->renderer->BindFramebuffer(fbo.Get());
 			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 			appState->renderer->ClearFrame();
 			appState->renderer->BindPipeline(pipeline.Get());
-			appState->renderer->BindCamera(camera.Get());
 			appState->renderer->DrawMesh(mesh.Get());
 			// TEMP
 
