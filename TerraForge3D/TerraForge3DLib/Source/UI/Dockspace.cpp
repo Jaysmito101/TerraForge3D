@@ -1,4 +1,5 @@
 #include "UI/Dockspace.hpp"
+#include "TerraForge3D.hpp"
 
 namespace TerraForge3D
 {

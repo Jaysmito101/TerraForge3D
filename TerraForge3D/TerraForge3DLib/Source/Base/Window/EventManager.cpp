@@ -144,7 +144,6 @@ namespace TerraForge3D
 	void InputEventManager::CallCallbacks()
 	{
 		std::vector<uint32_t> callbackIDs = callbacksReference[eventParams.type];
-		std::cout << callbacksReference[InputEventType_WindowClose].size() << " ";
 		for (auto callbackID : callbackIDs)
 		{
 			if ((callbacks[callbackID])(&eventParams))
@@ -152,6 +151,5 @@ namespace TerraForge3D
 				// break;
 			}
 		}
-		std::cout << callbacksReference[InputEventType_WindowClose].size() << "\n";
 	}
 }

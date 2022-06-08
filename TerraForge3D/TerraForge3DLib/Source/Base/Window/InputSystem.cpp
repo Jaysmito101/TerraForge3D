@@ -72,7 +72,7 @@ namespace TerraForge3D
 		mousePos[1] = static_cast<float>(mpy);
 	}
 
-	bool InputSystem::EventCallback(SharedPtr<InputEventParams> params)
+	bool InputSystem::EventCallback(InputEventParams* params)
 	{
 		switch (params->type)
 		{ // Switch Begin

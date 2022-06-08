@@ -15,7 +15,7 @@ namespace TerraForge3D
 		std::string Save();
 		bool Load(std::string data);
 
-		PreferencesEditor* GetEditor();
+		SharedPtr<PreferencesEditor> GetEditor();
 
 	public:
 

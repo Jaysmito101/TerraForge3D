@@ -76,7 +76,7 @@ namespace TerraForge3D
 		struct
 		{
 			SharedPtr<UI::EditorManager> manager;
-			StartUpScreen* startUpScreen = nullptr;
+			SharedPtr<StartUpScreen> startUpScreen;
 		} editors;
 
 		struct

@@ -39,7 +39,7 @@ namespace TerraForge3D
 
 	private:
 		ApplicationState* appState = nullptr;
-		Preferences* preferences = nullptr;
+		SharedPtr<Preferences> preferences;
 
 		std::unordered_map<uint32_t, PreferencesEditorTab> tabs;
 		uint32_t selectedTab = 1;

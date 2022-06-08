@@ -35,8 +35,8 @@ namespace TerraForge3D
 			inline bool IsEnabled() { return this->isEnabled; }
 			inline bool IsVisible() { return this->isVisible; }
 			inline std::string GetName() { return this->name; }
-			inline EditorManager* GetSubEditorManager() { return this->subEditorManager.Get(); }
-			inline Menu* GetMenu() { return this->menu.Get(); }
+			inline SharedPtr<EditorManager> GetSubEditorManager() { return this->subEditorManager; }
+			inline SharedPtr<Menu> GetMenu() { return this->menu; }
 
 		protected:
 			std::string name = "Editor";

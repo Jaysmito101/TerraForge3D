@@ -29,11 +29,11 @@ namespace TerraForge3D
 		return true;
 	}
 
-	PreferencesEditor* Preferences::GetEditor()
+	SharedPtr<PreferencesEditor> Preferences::GetEditor()
 	{
 		if (!editor)
 			editor = new PreferencesEditor(appState);
-		return editor.Get();
+		return editor;
 	}
 
 }

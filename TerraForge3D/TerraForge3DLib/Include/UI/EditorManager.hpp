@@ -18,7 +18,7 @@ namespace TerraForge3D
 			void Show();
 			void Update();
 
-			Editor* AddEditor(SharedPtr<Editor> editor);
+			SharedPtr<Editor> AddEditor(SharedPtr<Editor> editor);
 
 			inline std::vector<SharedPtr<Editor>> GetEditors() { return editors; }
 

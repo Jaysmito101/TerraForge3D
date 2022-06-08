@@ -1,5 +1,6 @@
 #include "Job/Job.hpp"
 #include "Job/Thread.hpp"
+#include "TerraForge3D.hpp"
 
 static uint32_t threadId = 0;
 

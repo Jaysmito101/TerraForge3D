@@ -220,7 +220,8 @@ namespace TerraForge3D
 
 			editor = new MyEditor("Style Opener", appState);
 			appState->editors.manager->AddEditor(editor);
-			appState->editors.startUpScreen = reinterpret_cast<StartUpScreen*>(appState->editors.manager->AddEditor(SharedPtr<StartUpScreen>(new StartUpScreen(appState))));
+			appState->editors.startUpScreen = new StartUpScreen(appState);
+			appState->editors.manager->AddEditor(appState->editors.startUpScreen);
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 

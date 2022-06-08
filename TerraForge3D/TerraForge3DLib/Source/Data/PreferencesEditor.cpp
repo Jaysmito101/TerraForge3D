@@ -9,7 +9,7 @@ namespace TerraForge3D
 		: UI::Editor("Preferences")
 	{
 		this->appState = appState;
-		this->preferences = appState->preferences.Get();
+		this->preferences = appState->preferences;
 	}
 
 	PreferencesEditor::~PreferencesEditor()
@@ -39,7 +39,7 @@ namespace TerraForge3D
 		{
 			if (tab.onUpdate)
 			{
-				tab.requireSave = tab.onUpdate(preferences, &tab);
+				tab.requireSave = tab.onUpdate(preferences.Get(), &tab);
 			}
 		}
 	}
@@ -66,7 +66,7 @@ namespace TerraForge3D
 		PreferencesEditorTab& tab = tabs[selectedTab];
 		ImGui::PushID(selectedTab);
 		if (tab.onShow)
-			tab.requireSave = tab.onShow(preferences, &tab);
+			tab.requireSave = tab.onShow(preferences.Get(), &tab);
 		ImGui::PopID();
 		if (!tab.requireSave)
 			ImGui::BeginDisabled();
@@ -108,7 +108,7 @@ namespace TerraForge3D
 	{
 		if (tabs[tabID].reset)
 		{
-			return tabs[tabID].reset(preferences);
+			return tabs[tabID].reset(preferences.Get());
 		}
 		else
 			TF3D_LOG_WARN("Reset function not found for preferences tab {0}", tabs[tabID].name);

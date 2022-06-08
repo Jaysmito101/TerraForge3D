@@ -47,12 +47,12 @@ namespace TerraForge3D
 			}
 		}
 
-		Editor* EditorManager::AddEditor(SharedPtr<Editor> editor)
+		SharedPtr<Editor> EditorManager::AddEditor(SharedPtr<Editor> editor)
 		{
 			TF3D_ASSERT(editor, "Cannot add NULL editor");
 			this->editors.push_back(editor);
 			editor->Setup();
-			return editor.Get();
+			return editor;
 		}
 
 	}

@@ -1,7 +1,6 @@
 #include "UI/MainMenu.hpp"
 
-#include "Base/Base.hpp"
-#include "Data/ApplicationState.hpp"
+#include "TerraForge3D.hpp"
 
 namespace TerraForge3D
 {
