@@ -21,6 +21,8 @@ namespace TerraForge3D
 			virtual void OnStart() = 0;
 			virtual void OnEnd() = 0;
 
+			virtual bool OnContextMenu();
+
 			void Update();
 			void Show();
 			void Setup();

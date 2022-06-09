@@ -35,6 +35,13 @@ namespace TerraForge3D
 
 		}
 
+		bool Editor::OnContextMenu()
+		{
+			ImGui::Text("Editor Context Menu");
+			ImGui::NewLine();
+			return ImGui::Button("Close");
+		}
+
 		void Editor::Show()
 		{
 			if (!headerFont)
@@ -58,6 +65,14 @@ namespace TerraForge3D
 					ImGui::PushID(uidStr.data());
 					menu->Show();
 					OnShow();
+					if (ImGui::BeginPopupContextItem(("##ContextMenu" + uidStr).data()))
+					{
+						if (OnContextMenu())
+						{
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
 					ImGui::PopID();
 				}
 				ImGui::End();

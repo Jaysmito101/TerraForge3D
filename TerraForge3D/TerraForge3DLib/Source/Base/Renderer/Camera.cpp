@@ -30,7 +30,9 @@ namespace TerraForge3D
 
 			matrices.view = transM * rotM;
 
-			viewPos = position;
+			viewPos.x = position.x;
+			viewPos.y = position.y;
+			viewPos.z = position.z;
 			viewPos.w = 0.0f;
 			viewPos = viewPos * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
 

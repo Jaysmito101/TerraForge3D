@@ -34,8 +34,8 @@ namespace TerraForge3D
 			Camera* SetOrthographic(float left, float right, float top, float bottom);
 
 			inline Camera* SetProjectionMode(CameraProjection proj) { this->projectionMode = proj; return this; }
-			inline Camera* SetPosition(float x, float y, float z = 0.0f) { this->position.x = x; this->position.y = y; this->position.z = z; this->position.w = 0.0f; return this; };
-			inline Camera* SetRotation(float x, float y, float z = 0.0f) { this->rotation.x = x; this->rotation.y = y; this->rotation.z = z; this->rotation.w = 0.0f; return this; };
+			inline Camera* SetPosition(float x, float y, float z = 0.0f) { this->position.x = x; this->position.y = y; this->position.z = z; return this; };
+			inline Camera* SetRotation(float x, float y, float z = 0.0f) { this->rotation.x = x; this->rotation.y = y; this->rotation.z = z; return this; };
 
 			inline float GetNearClip() { return zNear; }
 			inline float GetFarClip() { return zFar; }
@@ -59,8 +59,9 @@ namespace TerraForge3D
 			bool isPerspective = true;
 			bool flipY = false;
 
-			glm::vec4 position = glm::vec4(0.0f);
-			glm::vec4 rotation = glm::vec4(0.0f);
+			glm::vec3 position = glm::vec4(0.0f);
+			glm::vec3 rotation = glm::vec4(0.0f);
+			glm::vec3 lookPosition = glm::vec3(0.0f);
 			glm::vec4 viewPos = glm::vec4(0.0f);
 
 		};

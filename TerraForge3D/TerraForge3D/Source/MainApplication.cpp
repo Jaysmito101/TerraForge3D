@@ -144,7 +144,7 @@ uniform mat4 _PV;
 
 void main()
 {
-	gl_Position = _PV * vec4(sin_y(position.xyz), 1.0f);
+	gl_Position = _PV * _Model * vec4(sin_y(position.xyz), 1.0f);
 }
 
 )";
@@ -160,13 +160,6 @@ void main()
 )";
 
 #include "Base/OpenGL/Shader.hpp"
-
-struct UBO
-{
-	glm::mat4 _PV = glm::mat4(1.0f);
-	glm::mat4 _Model = glm::mat4(1.0f);
-	glm::vec4 _Extra = glm::vec4(0.0f);
-};
 
 namespace TerraForge3D
 {
@@ -290,10 +283,9 @@ namespace TerraForge3D
 
 			ImGui::Begin("Viewport");
 			ImGui::ColorEdit4("ClearColor", clearColor);
-			bool a = ImGui::DragFloat3("Position", appState->mesh->position, 0.1f);
-			a &= ImGui::DragFloat3("Rotation", appState->mesh->rotation, 0.1f);
-			if(a)
-				appState->mesh->RecalculateMatices();
+			ImGui::DragFloat3("Position", appState->mesh->position, 0.1f);
+			ImGui::DragFloat3("Rotation", appState->mesh->rotation, 0.1f);
+			appState->mesh->RecalculateMatices();
 
 			if (ImGui::Button("ReCompile Shaders"))
 			{

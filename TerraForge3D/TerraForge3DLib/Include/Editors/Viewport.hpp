@@ -12,10 +12,11 @@ namespace TerraForge3D
 		Viewport(ApplicationState* appState);
 		~Viewport();
 
-		virtual void OnUpdate();
-		virtual void OnShow();
-		virtual void OnStart();
-		virtual void OnEnd();
+		virtual void OnUpdate() override;
+		virtual void OnShow() override;
+		virtual void OnStart() override;
+		virtual void OnEnd() override;
+		virtual bool OnContextMenu() override;
 
 	protected:
 		void RebuildFrameBuffer();
@@ -27,6 +28,12 @@ namespace TerraForge3D
 		ApplicationState* appState = nullptr;
 		SharedPtr<RendererAPI::FrameBuffer> framebuffer;
 		SharedPtr<RendererAPI::Camera> camera;
+		float prevMouseX = 0.0f;
+		float prevMouseY = 0.0f;
+		float rotationSpeed = 20.0f;
+		float positionSpeed = 1.0f;
+		bool invertYInput = true;
+		glm::vec3 focusedPosition = glm::vec3(0.0f);
 	};
 
 }
