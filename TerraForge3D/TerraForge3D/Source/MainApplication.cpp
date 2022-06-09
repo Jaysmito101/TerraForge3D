@@ -230,10 +230,11 @@ namespace TerraForge3D
 
 			appState->mesh = new Mesh("DemoTriangle");
 			appState->mesh->Clear();
-			float A[3] = {  0.5f,  0.5f, 0.0f };
-			float B[3] = {  0.5f, -0.5f, 0.0f };
-			float C[3] = { -0.5f,  0.5f, 0.0f };
-			appState->mesh->Triangle(A, B, C);
+			//float A[3] = {  0.5f,  0.5f, 0.0f };
+			//float B[3] = {  0.5f, -0.5f, 0.0f };
+			//float C[3] = { -0.5f,  0.5f, 0.0f };
+			//appState->mesh->Triangle(A, B, C);
+			appState->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 8);
 			appState->mesh->UploadToGPU();
 
 			appState->core.fonts = fonts;

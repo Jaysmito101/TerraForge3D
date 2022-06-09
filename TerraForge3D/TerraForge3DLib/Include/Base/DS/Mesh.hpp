@@ -46,6 +46,7 @@ namespace TerraForge3D
 
 		// Mesh Generators
 		Mesh& Triangle(float* A, float* B, float* C);
+		Mesh& Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution = 256);
 
 	public:
 		float position[3] = { 0.0f, 0.0f, 0.0f };

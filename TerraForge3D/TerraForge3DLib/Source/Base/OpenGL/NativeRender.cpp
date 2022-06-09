@@ -36,6 +36,7 @@ namespace TerraForge3D
 
 			
 
+
 			std::stack<void*> rendererStack;
 
 			while (!rendererQueue.empty())
@@ -95,9 +96,11 @@ namespace TerraForge3D
 					Mesh* mesh = reinterpret_cast<Mesh*>(param);
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(mesh->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElements(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
-					glBindVertexArray(0);
+					glPolygonMode(GL_BACK, GL_LINE); glBindVertexArray(0);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 					break;
 				}
 
