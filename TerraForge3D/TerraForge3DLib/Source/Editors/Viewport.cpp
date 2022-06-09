@@ -57,14 +57,14 @@ namespace TerraForge3D
 					else
 					{
 						camera->rotation[1] += mouseDeltaX * rotationSpeed;
-						camera->rotation[0] += mouseDeltaY * rotationSpeed * invertYFactor;
+						camera->rotation[0] += mouseDeltaY * rotationSpeed;
 					}
 				}
 			}
 
 		}
 		if (windowSize.x != 0.0f && windowSize.y != 0.0f)
-			camera->SetPerspective(90.0f, windowSize.x / windowSize.y, 0.01f, 1000.0f);
+			camera->aspect = windowSize.x / windowSize.y;
 		
 		ImGui::EndChild();
 	}
@@ -74,10 +74,9 @@ namespace TerraForge3D
 		framebuffer = RendererAPI::FrameBuffer::Create();
 		RebuildFrameBuffer();
 		camera = new RendererAPI::Camera();
-		camera->SetPerspective(90.0f, 1.0f, 0.01f, 1000.0f);
+		camera->SetPerspective(45.0f, 1.0f, 0.01f, 1000.0f);
 		camera->SetPosition(0.0, 0.0, -1.f);
 		camera->SetRotation(0.0, 0.0, 0.0);
-		camera->lookPosition = focusedPosition;
 		this->isVisible = true;
 	}
 
@@ -92,6 +91,7 @@ namespace TerraForge3D
 	{
 		ImGui::DragFloat("Camera Movement Speed", &positionSpeed, 0.01f);
 		ImGui::DragFloat("Camera Rotation Speed", &rotationSpeed, 0.01f);
+		ImGui::DragFloat("Camera FOV", &camera->fov, 0.01f);
 		ImGui::Checkbox("Camera Flip Y", &camera->flipY);
 		ImGui::Checkbox("Invert Y Input", &invertYInput);
 
