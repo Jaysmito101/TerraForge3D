@@ -168,15 +168,6 @@ struct UBO
 	glm::vec4 _Extra = glm::vec4(0.0f);
 };
 
-#pragma optimize( "", off )
-	static void Temp(TerraForge3D::SharedPtr<TerraForge3D::Logger> l, int depth = 1)
-	{
-		if (depth == 0)
-			return;
-		l->mainLogger->info("Hi {0}", depth - 1);
-		Temp(l, depth -1);
-	}
-
 namespace TerraForge3D
 {
 	class MainApplication : public Application
@@ -198,7 +189,6 @@ namespace TerraForge3D
 
 		virtual void OnStart() override
 		{
-			Temp(logger, 10);
 			TF3D_LOG("Started Application!");
 			exitcb = GetInputEventManager()->RegisterCallback([&](InputEventParams* params) -> bool {
 				TF3D_LOG_INFO("Shutting down application.");
@@ -224,44 +214,34 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(appState->editors.startUpScreen);
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
+			appState->editors.manager->AddEditor(new Viewport(appState));
 
 
-			fbo = RendererAPI::FrameBuffer::Create();
-			fbo->SetSize(512, 512);
-			fbo->SetColorAttachmentCount(1);
-			fbo->SetDepthAttachment(true);
-			fbo->Setup();
-
-			pipeline = RendererAPI::Pipeline::Create();
+			appState->pipeline = RendererAPI::Pipeline::Create();
 			
-			pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
-			pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
-			pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
-			pipeline->shader->SetUBOLayout({
+			appState->pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
+			appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
+			appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
+			appState->pipeline->shader->SetUBOLayout({
 				RendererAPI::ShaderVar("_U1", RendererAPI::ShaderDataType_Vec4),
 				RendererAPI::ShaderVar("_U2", RendererAPI::ShaderDataType_Vec4),
 				RendererAPI::ShaderVar("_U3", RendererAPI::ShaderDataType_Vec4),
 				RendererAPI::ShaderVar("_U4", RendererAPI::ShaderDataType_Vec4)
 				});
-			pipeline->shader->SetUniformsLayout({
+			appState->pipeline->shader->SetUniformsLayout({
 				RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
 				RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
 				});
-			pipeline->shader->Compile();
-			pipeline->Setup();
+			appState->pipeline->shader->Compile();
+			appState->pipeline->Setup();
 
-			mesh = new Mesh("DemoTriangle");
-			mesh->Clear();
+			appState->mesh = new Mesh("DemoTriangle");
+			appState->mesh->Clear();
 			float A[3] = {  0.5f,  0.5f, 0.0f };
 			float B[3] = {  0.5f, -0.5f, 0.0f };
 			float C[3] = { -0.5f,  0.5f, 0.0f };
-			mesh->Triangle(A, B, C);
-			mesh->UploadToGPU();
-
-			camera = new RendererAPI::Camera();
-			camera->SetPerspective(90.0f, 1.0f, 0.01f, 1000.0f);
-			camera->SetPosition(0.0, 0.0, -1.f);
-			camera->SetRotation(0.0, 0.0, 0.0);
+			appState->mesh->Triangle(A, B, C);
+			appState->mesh->UploadToGPU();
 
 			appState->core.fonts = fonts;
 
@@ -277,13 +257,12 @@ namespace TerraForge3D
 
 			
 			// TEMP
-			appState->renderer->SetCamera(camera.Get());
-
-			appState->renderer->BindFramebuffer(fbo.Get());
-			appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-			appState->renderer->ClearFrame();
-			appState->renderer->BindPipeline(pipeline.Get());
-			appState->renderer->DrawMesh(mesh.Get());
+			// appState->renderer->SetCamera(camera.Get());
+			// appState->renderer->BindFramebuffer(fbo.Get());
+			// appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+			// appState->renderer->ClearFrame();
+			// appState->renderer->BindPipeline(pipeline.Get());
+			// appState->renderer->DrawMesh(mesh.Get());
 			// TEMP
 
 			appState->renderer->Flush();
@@ -310,23 +289,18 @@ namespace TerraForge3D
 
 
 			ImGui::Begin("Viewport");
-			ImGui::Text("Begin");
-			ImGui::Image(fbo->GetColorAttachmentImGuiID(0), ImVec2(256, 256));
-			ImGui::Text("End");
 			ImGui::ColorEdit4("ClearColor", clearColor);
-			if (ImGui::DragFloat3("Camera Position", camPos, 0.1f) || ImGui::DragFloat3("Camera Rotation", camRot, 0.1f))
-			{
-				camera->SetPosition(camPos[0], camPos[1], camPos[2]);
-				camera->SetRotation(camRot[0], camRot[1], camRot[2]);
-				camera->RecalculateMatrices();
-			}
+			bool a = ImGui::DragFloat3("Position", appState->mesh->position, 0.1f);
+			a &= ImGui::DragFloat3("Rotation", appState->mesh->rotation, 0.1f);
+			if(a)
+				appState->mesh->RecalculateMatices();
 
 			if (ImGui::Button("ReCompile Shaders"))
 			{
-				pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
-				pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
-				pipeline->shader->Compile();
-				pipeline->Setup();
+				appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
+				appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
+				appState->pipeline->shader->Compile();
+				appState->pipeline->Setup();
 			}
 
 			ImGui::End();
@@ -359,13 +333,8 @@ namespace TerraForge3D
 
 		SharedPtr<MyEditor> editor;
 
-		SharedPtr<RendererAPI::FrameBuffer> fbo;
-		SharedPtr<RendererAPI::Pipeline> pipeline;
-		SharedPtr<RendererAPI::Camera> camera;
-		SharedPtr<Mesh> mesh;
 	};
 }
-#pragma optimize( "", on )
 
 TerraForge3D::Application* CreateApplication()
 {

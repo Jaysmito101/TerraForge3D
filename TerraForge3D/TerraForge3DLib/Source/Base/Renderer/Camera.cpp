@@ -53,6 +53,7 @@ namespace TerraForge3D
 			this->fov = fov;
 			this->zNear = zNear;
 			this->zFar = zFar;
+			this->aspect = aspect;
 			this->projectionMode = CameraProjection_Perspective;
 			RecalculateMatrices();
 			return this;

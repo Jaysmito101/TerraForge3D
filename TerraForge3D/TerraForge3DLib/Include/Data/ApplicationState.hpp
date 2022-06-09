@@ -98,6 +98,10 @@ namespace TerraForge3D
 
 		Renderer* renderer = nullptr;
 
+		// TEMP
+		SharedPtr<RendererAPI::Pipeline> pipeline;
+		SharedPtr<Mesh> mesh;
+
 		static ApplicationState* Create();
 		inline static ApplicationState* Get() { TF3D_ASSERT(appState, "Applicaiton Sate not yet created."); return appState; }
 		static void Set(ApplicationState* appState);

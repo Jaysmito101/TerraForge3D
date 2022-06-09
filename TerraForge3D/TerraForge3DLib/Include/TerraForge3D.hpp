@@ -27,3 +27,6 @@
 #include "Job/JobSystem.hpp"
 #include "Job/Thread.hpp"
 #include "Job/JobManager.hpp"
+
+// Editors
+#include "Editors/Viewport.hpp"
