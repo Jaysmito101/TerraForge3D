@@ -24,7 +24,7 @@ namespace TerraForge3D
 				fm = GL_RGBA;
 				break;
 			case RendererAPI::FrameBufferAttachmentFormat_RGBA32:
-				ifm = GL_FLOAT;
+				ifm = GL_RGBA32F;
 				fm = GL_RGBA;
 				break;
 			case RendererAPI::FrameBufferAttachmentFormat_R32I:
@@ -119,6 +119,7 @@ namespace TerraForge3D
 				glDrawBuffers(colorAttachmentCount, buffers);
 			}
 
+
 			TF3D_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
 
 			// Unbind the newly created framebuffer object
@@ -142,7 +143,7 @@ namespace TerraForge3D
 			TF3D_ASSERT(index >= 0 && index < colorAttachmentCount, "Index out of range");
 			glBindFramebuffer(GL_FRAMEBUFFER, handle);
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
-			uint32_t pixelData = 0;
+			uint32_t pixelData = 0; // TODO fixme for sizes more than 32 bit
 			glReadPixels(x, y, 1, 1, GetOpenGLFormat(colorAttachmentFromats[index]).second, GetOpenGLType(colorAttachmentFromats[index]), &pixelData);
 			if (data)
 				memcpy(data, &pixelData, sizeof(pixelData));

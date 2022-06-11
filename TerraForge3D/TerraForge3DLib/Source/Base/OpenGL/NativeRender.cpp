@@ -34,8 +34,7 @@ namespace TerraForge3D
 			OpenGL::Shader* shader = nullptr;
 			RendererAPI::Camera* camera = nullptr;
 
-			
-
+			GLuint mousePickIDUniformLocation = 0;
 
 			std::stack<void*> rendererStack;
 
@@ -72,6 +71,7 @@ namespace TerraForge3D
 					pipeline = reinterpret_cast<OpenGL::Pipeline*>(param);
 					TF3D_ASSERT(pipeline->IsSetup(), "Pipeline is not yet setup");
 					shader = reinterpret_cast<OpenGL::Shader*>(pipeline->shader);
+					mousePickIDUniformLocation = glGetUniformLocation(shader->handle, "_MousePickID"); // TEMP here
 					TF3D_ASSERT(shader, "Shader is null");
 					TF3D_ASSERT(shader->IsCompiled(), "Shader is not compiled");
 					pipeline->Rebuild(framebuffer);
@@ -96,11 +96,12 @@ namespace TerraForge3D
 					Mesh* mesh = reinterpret_cast<Mesh*>(param);
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(mesh->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					glUniform1i(mousePickIDUniformLocation, params.num);
+					// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElements(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
 					glPolygonMode(GL_BACK, GL_LINE); glBindVertexArray(0);
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 					break;
 				}
 
@@ -111,6 +112,7 @@ namespace TerraForge3D
 					std::pair<int, Mesh*>* paramT = reinterpret_cast<std::pair<int, Mesh*>*>(param);
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(paramT->second->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
+					glUniform1i(mousePickIDUniformLocation, params.num); 
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0, paramT->first);
 					glBindVertexArray(0);
@@ -158,6 +160,14 @@ namespace TerraForge3D
 					{
 						TF3D_LOG_WARN("Uniform {0} not found", params.str);
 					}
+					break;
+				}
+
+				case RendererCommand_CustomFunction:
+				{
+					void (*func)(void) = reinterpret_cast<void (*)(void)>(param);
+					TF3D_ASSERT(func, "Invalid custom function pointer");
+					func();
 					break;
 				}
 

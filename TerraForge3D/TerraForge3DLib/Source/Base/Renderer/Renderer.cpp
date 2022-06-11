@@ -85,22 +85,28 @@ namespace TerraForge3D
 		nativeRenderer->AddCommand(RendererCommand_BindPipeline, pipeline);
 		if (this->camera)
 		{
-			this->camera->RecalculateMatrices();
-			RendererCommandParams params;
-			params.custom = glm::value_ptr(camera->matrices.pv);
-			params.str = "_PV";
-			nativeRenderer->AddCommand(RendererCommand_UploadUniform, params);
+			this->camera->RecalculateMatrices();			
+			this->UploadUnifrom("_PV", glm::value_ptr(camera->matrices.pv));
 		}
 		return this;
 	}
 
-	Renderer* Renderer::DrawMesh(Mesh* mesh)
+	Renderer* Renderer::DrawMesh(Mesh* mesh, int32_t mousePickID)
 	{	
+		this->UploadUnifrom("_Model", glm::value_ptr(mesh->GetModelMatrix()));
 		RendererCommandParams params;
-		params.custom = glm::value_ptr(mesh->GetModelMatrix());
-		params.str = "_Model";
+		params.custom = mesh;
+		params.num = mousePickID;
+		nativeRenderer->AddCommand(RendererCommand_Draw, params);
+		return this;
+	}
+
+	Renderer* Renderer::UploadUnifrom(std::string name, void* data)
+	{
+		RendererCommandParams params;
+		params.custom = data;
+		params.str = name;
 		nativeRenderer->AddCommand(RendererCommand_UploadUniform, params);
-		nativeRenderer->AddCommand(RendererCommand_Draw, mesh);
 		return this;
 	}
 

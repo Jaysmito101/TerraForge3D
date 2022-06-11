@@ -144,18 +144,23 @@ uniform mat4 _PV;
 
 void main()
 {
-	gl_Position = _PV * _Model * vec4(sin_y(position.xyz), 1.0f);
+	gl_Position = _PV * _Model * vec4(position.xyz, 1.0f);
 }
 
 )";
 
 static std::string fss = R"(
 #version 430 core
-out vec4 FragColor;
+
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out int MousePickID;
+
+uniform int _MousePickID = 0;
 
 void main()
 {
 	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	MousePickID = _MousePickID;
 }
 )";
 

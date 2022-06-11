@@ -70,7 +70,9 @@ namespace TerraForge3D
 		Renderer* BindFramebuffer(RendererAPI::FrameBuffer* framebuffer);
 		Renderer* BindPipeline(RendererAPI::Pipeline* pipeline);
 
-		Renderer* DrawMesh(Mesh* mesh);
+		Renderer* UploadUnifrom(std::string name, void* data);
+
+		Renderer* DrawMesh(Mesh* mesh, int32_t mousePickID = 0);
 
 		Renderer* CustomFunction(void (*func)(void));
 
