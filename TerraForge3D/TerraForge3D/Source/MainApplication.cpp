@@ -132,19 +132,24 @@ private:
 std::string vss = R"(
 #version 430 core
 
-#include "Animations/SinY.glsl"
+#include "Temp.glsl"
 
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 texCoord;
-layout (location = 2) in vec2 normal;
+layout (location = 2) in vec4 normal;
 layout (location = 3) in vec4 extra;
+
+out vec3 Position;
+out vec3 Normal;
 
 uniform mat4 _Model;
 uniform mat4 _PV;
 
 void main()
 {
-	gl_Position = _PV * _Model * vec4(position.xyz, 1.0f);
+	gl_Position = _PV * _Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
+	Position = position.xyz;
+	Normal = normal.xyz;
 }
 
 )";
@@ -155,11 +160,31 @@ static std::string fss = R"(
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out int MousePickID;
 
+in vec3 Position;
+in vec3 Normal;
+
 uniform int _MousePickID = 0;
 
 void main()
 {
-	FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	vec3 lightPos = vec3(0.0, 0.5f, 0.0f);
+	vec3 lightColor = vec3(0.8f);
+	vec3 objectColor = vec3(0.8f);
+
+    // ambient
+    float ambientStrength = 0.1f;
+    vec3 ambient = ambientStrength * lightColor;
+  	
+    // diffuse 
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - Position);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor; 
+    
+
+	//FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	//FragColor = vec4(pos * 0.5f + vec3(0.5f), 1.0f);
+	FragColor = vec4(vec3(diff), 1.0f);
 	MousePickID = _MousePickID;
 }
 )";
@@ -212,10 +237,22 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(appState->editors.startUpScreen);
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
-			appState->editors.manager->AddEditor(new Viewport(appState));
+			
+			appState->viewports[0] = new Viewport(appState, 1);
+			appState->viewports[1] = new Viewport(appState, 2);
+			appState->viewports[2] = new Viewport(appState, 3);
+			appState->viewports[3] = new Viewport(appState, 4);
+
+			appState->editors.manager->AddEditor(appState->viewports[0]);
+			appState->editors.manager->AddEditor(appState->viewports[1]);
+			appState->editors.manager->AddEditor(appState->viewports[2]);
+			appState->editors.manager->AddEditor(appState->viewports[3]);
+
+
 
 
 			appState->pipeline = RendererAPI::Pipeline::Create();
+
 			
 			appState->pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
 			appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
@@ -239,7 +276,8 @@ namespace TerraForge3D
 			//float B[3] = {  0.5f, -0.5f, 0.0f };
 			//float C[3] = { -0.5f,  0.5f, 0.0f };
 			//appState->mesh->Triangle(A, B, C);
-			appState->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 2);
+			appState->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 256);
+			//appState->mesh->Sphere(glm::vec3(0.0f), 1.0f);
 			appState->mesh->UploadToGPU();
 
 			appState->core.fonts = fonts;

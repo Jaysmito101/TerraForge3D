@@ -38,6 +38,10 @@ namespace TerraForge3D
 
 			std::stack<void*> rendererStack;
 
+
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS); 
+
 			while (!rendererQueue.empty())
 			{
 				auto [command, params] = rendererQueue.front();
@@ -97,11 +101,11 @@ namespace TerraForge3D
 					lastRendererMesh = reinterpret_cast<OpenGL::NativeMesh*>(mesh->GetNativeMesh());
 					TF3D_ASSERT(lastRendererMesh->IsSetup(), "Native mesh not yet setup");
 					glUniform1i(mousePickIDUniformLocation, params.num);
-					// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+						//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 					glBindVertexArray(lastRendererMesh->vertexArray);
 					glDrawElements(GL_TRIANGLES, (GLsizei)lastRendererMesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
 					glPolygonMode(GL_BACK, GL_LINE); glBindVertexArray(0);
-					// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+						//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 					break;
 				}
 

@@ -6,7 +6,8 @@
 
 namespace TerraForge3D
 {
-	Viewport::Viewport(ApplicationState* appState)
+	Viewport::Viewport(ApplicationState* appState, uint32_t number)
+	:UI::Editor("Viewport " + std::to_string(number)), viewportNumber(number)
 	{
 		this->appState = appState;
 	}
@@ -63,7 +64,7 @@ namespace TerraForge3D
 					else
 					{
 						camera->rotation[1] += mouseDeltaX * rotationSpeed;
-						camera->rotation[0] += mouseDeltaY * rotationSpeed;
+						camera->rotation[0] += mouseDeltaY * rotationSpeed * invertYFactor * -1.0f;
 					}
 				}
 			}
@@ -83,7 +84,10 @@ namespace TerraForge3D
 		camera->SetPerspective(45.0f, 1.0f, 0.01f, 1000.0f);
 		camera->SetPosition(0.0, 0.0, -1.f);
 		camera->SetRotation(0.0, 0.0, 0.0);
-		this->isVisible = true;
+		
+		appState->menus.mainMenu->GetManagerPTR()->Register("Windows/Viewports/Viewport " + std::to_string(viewportNumber), [this](TerraForge3D::UI::MenuItem* context) {
+			isVisible = (context->GetToggleState());
+			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
 	}
 
 	void Viewport::OnEnd()

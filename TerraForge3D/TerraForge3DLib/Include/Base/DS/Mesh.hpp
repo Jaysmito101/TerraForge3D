@@ -18,6 +18,12 @@ namespace TerraForge3D
 		glm::vec4 texCoord = glm::vec4(0.0f);
 		glm::vec4 normal   = glm::vec4(0.0f);
 		glm::vec4 extra    = glm::vec4(0.0f);
+
+		Vertex(float x, float y, float z)
+		: position(x, y, z, 0.0f)
+		{}
+
+		Vertex(){}
 	};
 
 	struct Face
@@ -25,6 +31,12 @@ namespace TerraForge3D
 		uint32_t a = 0;
 		uint32_t b = 0;
 		uint32_t c = 0;
+
+		Face(uint32_t a, uint32_t b, uint32_t c)
+		:a(a), b(b), c(c)
+		{}
+
+		Face(){}
 	};
 
 
@@ -47,6 +59,7 @@ namespace TerraForge3D
 		// Mesh Generators
 		Mesh& Triangle(float* A, float* B, float* C);
 		Mesh& Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution = 256);
+		Mesh& Sphere(glm::vec3 position, float radius);
 
 	public:
 		float position[3] = { 0.0f, 0.0f, 0.0f };

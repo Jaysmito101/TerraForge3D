@@ -19,16 +19,17 @@ namespace TerraForge3D
 			glm::mat4 rotM = glm::mat4(1.0f);
 			glm::mat4 transM = glm::mat4(1.0f);
 			
+			rotM = glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
 			rotM = glm::rotate(rotM, glm::radians(rotation.x * (flipY ? -1.0f : 1.0f)), glm::vec3(1.0f, 0.0f, 0.0f));
 			rotM = glm::rotate(rotM, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 			rotM = glm::rotate(rotM, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 			
-			glm::vec3 translation = position;
-			if (flipY)
-				translation.y *= -1.0f;
-			transM = glm::translate(transM, translation);
+			//glm::vec3 translation = position;
+			//if (flipY)
+				//translation.y *= -1.0f;
+			//transM = glm::translate(transM, translation);
 
-			matrices.view = transM * rotM;
+			matrices.view = /*transM **/ rotM;
 
 			viewPos.x = position.x;
 			viewPos.y = position.y;

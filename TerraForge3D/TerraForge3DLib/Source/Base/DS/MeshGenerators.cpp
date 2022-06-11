@@ -1,5 +1,9 @@
 #include "Base/DS/Mesh.hpp"
 
+#include <cmath>
+
+#define PI 3.141f
+
 namespace TerraForge3D
 {
 
@@ -25,7 +29,7 @@ namespace TerraForge3D
 	{
 		TF3D_ASSERT(resolution >= 2,  "Plane resulution must be greater than equal to 2");
 		Clear();
-		glm::vec3 up = glm::cross(front, right);
+		glm::vec3 up = glm::normalize(glm::cross(right, front));
 		for (uint32_t y = 0; y < resolution; y++)
 		{
 			for (uint32_t x = 0; x < resolution; x++)
@@ -41,7 +45,7 @@ namespace TerraForge3D
 				v.position.y = (float)pointOnPlane.y;
 				v.position.z = (float)pointOnPlane.z;
 				v.texCoord = glm::vec4(percent.x, percent.y, 0.0f, 0.0f);
-				v.normal = glm::vec4(0.0f);
+				v.normal = glm::vec4(up.x, up.y, up.z, 0.0f);
 				vertices.push_back(v);
 
 				if (x != resolution - 1 && y != resolution - 1)
@@ -59,6 +63,30 @@ namespace TerraForge3D
 
 			}
 		}
+		return *this;
+	}
+
+
+	Mesh& Mesh::Sphere(glm::vec3 position, float radius)
+	{
+		Clear();
+		vertices.emplace_back( 0.0f,  1.0f,  0.0f); // +Y 0
+		vertices.emplace_back( 0.0f, -1.0f,  0.0f); // -Y 1
+		vertices.emplace_back( 1.0f,  0.0f,  0.0f); // +X 2
+		vertices.emplace_back(-1.0f,  0.0f,  0.0f); // -X 3
+		vertices.emplace_back( 0.0f,  0.0f, -1.0f); // +Z 4
+		vertices.emplace_back( 0.0f,  0.0f,  1.0f); // -Z 5
+		
+
+		faces.emplace_back(0, 2, 4); // +Y +X +Z
+		faces.emplace_back(0, 4, 3); // +Y +Z -X
+		faces.emplace_back(0, 3, 5); // +Y -X -Z
+		faces.emplace_back(0, 5, 2); // +Y -Z +X
+		faces.emplace_back(4, 1, 2); // +Z -Y +X
+		faces.emplace_back(2, 1, 4); // +X -Y +Z
+		faces.emplace_back(4, 1, 3); // +Z -Y -X
+		faces.emplace_back(3, 1, 5); // -X -Y -Z
+
 		return *this;
 	}
 }
