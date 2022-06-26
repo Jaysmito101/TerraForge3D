@@ -63,8 +63,8 @@ namespace TerraForge3D
 					TF3D_ASSERT(param, "Parameter is null");
 					framebuffer = reinterpret_cast<OpenGL::FrameBuffer*>(param);
 					TF3D_ASSERT(framebuffer->IsSetup(), "Framebuffer not yet setup");
-					if (pipeline)
-						pipeline->Rebuild(framebuffer);
+					// if (pipeline)
+					//	pipeline->Rebuild(framebuffer);
 					glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->handle);
 					break;
 				}

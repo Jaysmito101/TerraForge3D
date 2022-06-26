@@ -3,6 +3,8 @@
 #include "Base/Core/Application.hpp"
 #include "Utils/Utils.hpp"
 
+#define VIEWPORT_COUNT 4
+
 
 namespace TerraForge3D
 {
@@ -97,7 +99,7 @@ namespace TerraForge3D
 
 		SharedPtr<Preferences> preferences;
 
-		SharedPtr<Viewport> viewports[4];
+		SharedPtr<Viewport> viewports[VIEWPORT_COUNT];
 
 		Renderer* renderer = nullptr;
 

@@ -30,7 +30,7 @@ namespace TerraForge3D
 		uint32_t my = resolution - static_cast<uint32_t>(prevMouseY * (resolution - 2)) + 1;
 		uint32_t val = 0;
 		framebuffer->ReadPixel(mx, my, 1, &val);
-		TF3D_LOG("{} {} -> {}", mx, my, val);
+		//TF3D_LOG("{} {} -> {}", mx, my, val);
 	}
 
 	void Viewport::OnShow()

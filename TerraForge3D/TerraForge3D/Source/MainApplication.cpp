@@ -238,18 +238,13 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 			
-			appState->viewports[0] = new Viewport(appState, 1);
-			appState->viewports[1] = new Viewport(appState, 2);
-			appState->viewports[2] = new Viewport(appState, 3);
-			appState->viewports[3] = new Viewport(appState, 4);
-
-			appState->editors.manager->AddEditor(appState->viewports[0]);
-			appState->editors.manager->AddEditor(appState->viewports[1]);
-			appState->editors.manager->AddEditor(appState->viewports[2]);
-			appState->editors.manager->AddEditor(appState->viewports[3]);
-
-
-
+			TF3D_ASSERT(VIEWPORT_COUNT >= 1, "Minimum viewport count is 1");
+			for (int i = 0; i < VIEWPORT_COUNT; i++)
+			{
+				appState->viewports[i] = new Viewport(appState, i + 1);
+				appState->editors.manager->AddEditor(appState->viewports[i]);
+			}
+			appState->viewports[0]->SetVisible(true);
 
 			appState->pipeline = RendererAPI::Pipeline::Create();
 

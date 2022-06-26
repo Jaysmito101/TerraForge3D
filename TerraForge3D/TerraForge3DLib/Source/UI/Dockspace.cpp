@@ -43,7 +43,8 @@ namespace TerraForge3D
 
 			if (io.ConfigFlags && ImGuiConfigFlags_DockingEnable)
 			{
-				ImGuiID dockSpaceID = ImGui::GetID(uid.ToString().c_str());
+				// ImGuiID dockSpaceID = ImGui::GetID(uid.ToString().c_str());
+				ImGuiID dockSpaceID = ImGui::GetID("MainDockspace");
 				ImGui::DockSpace(dockSpaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 			}
 
