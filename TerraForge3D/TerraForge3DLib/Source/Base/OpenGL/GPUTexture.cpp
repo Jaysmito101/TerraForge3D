@@ -165,6 +165,11 @@ namespace TerraForge3D
 				textureFormat = GL_RGBA;
 				dataType = GL_FLOAT;
 				break;
+			case TerraForge3D::RendererAPI::GPUTextureFormat_R32I:
+				internalFormat = GL_R32I;
+				textureFormat = GL_RED_INTEGER;
+				dataType = GL_UNSIGNED_INT;
+				break;
 			default:
 				TF3D_ASSERT(false, "Unknown texture format");
 			}

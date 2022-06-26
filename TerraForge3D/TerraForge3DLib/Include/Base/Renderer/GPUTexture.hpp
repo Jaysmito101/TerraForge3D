@@ -15,6 +15,7 @@ namespace TerraForge3D
 			GPUTextureFormat_RGBA8I,
 			GPUTextureFormat_RGBA16I,
 			GPUTextureFormat_RGBA32F,
+			GPUTextureFormat_R32I,
 			GPUTextureFormat_Count
 		};
 
