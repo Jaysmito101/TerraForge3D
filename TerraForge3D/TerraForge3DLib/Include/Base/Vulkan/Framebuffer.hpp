@@ -29,6 +29,7 @@ namespace TerraForge3D
 
 			void SetupRenderPass();
 			void SetupAttachments();
+			void SetupDepthAttachment();
 
 			inline FrameBuffer* SetDevice(LogicalDevice* d) { TF3D_ASSERT(!setupOnGPU, "Cannot set device after framebuffer has been setup [Call Destroy first]"); this->device = d; }
 
@@ -39,7 +40,13 @@ namespace TerraForge3D
 			std::vector<VkImageView> attachments;
 
 			GPUTexture* colorAttachments[4] = { nullptr, nullptr, nullptr, nullptr };
-			GPUTexture* depthAttachment = nullptr;
+			struct {
+				VkImage handle = VK_NULL_HANDLE;
+				VkImageView view = VK_NULL_HANDLE;
+				VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
+			} depthAttachment;
+
+			ImTextureID colorAttachemtImGuiIDs[4] = { nullptr, nullptr, nullptr, nullptr };
 
 			LogicalDevice* device = nullptr;
 		};

@@ -18,19 +18,24 @@ namespace TerraForge3D
 
 	void Viewport::OnUpdate()
 	{
-		appState->renderer->SetCamera(camera.Get());
+		// Rendeer the frame and update mouse only if the viewport is visible
+		if (isVisible)
+		{
+			appState->renderer->SetCamera(camera.Get());
 
-		appState->renderer->BindFramebuffer(framebuffer.Get());
-		appState->renderer->SetClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		appState->renderer->ClearFrame();
-		appState->renderer->BindPipeline(appState->pipeline.Get());
-		appState->renderer->DrawMesh(appState->mesh.Get(), 484);
+			appState->renderer->BindFramebuffer(framebuffer.Get());
+			appState->renderer->SetClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			appState->renderer->ClearFrame();
+			appState->renderer->BindPipeline(appState->pipeline.Get());
+			appState->renderer->DrawMesh(appState->mesh.Get(), 484);
 
-		uint32_t mx = static_cast<uint32_t>(prevMouseX * (resolution - 2)) + 1;
-		uint32_t my = resolution - static_cast<uint32_t>(prevMouseY * (resolution - 2)) + 1;
-		uint32_t val = 0;
-		framebuffer->ReadPixel(mx, my, 1, &val);
-		//TF3D_LOG("{} {} -> {}", mx, my, val);
+			uint32_t mx = static_cast<uint32_t>(prevMouseX * (resolution - 2)) + 1;
+			uint32_t my = resolution - static_cast<uint32_t>(prevMouseY * (resolution - 2)) + 1;
+			uint32_t val = 0;
+			framebuffer->ReadPixel(mx, my, 1, &val);
+			//TF3D_LOG("{} {} -> {}", mx, my, val);
+
+		}
 	}
 
 	void Viewport::OnShow()
@@ -88,6 +93,8 @@ namespace TerraForge3D
 		appState->menus.mainMenu->GetManagerPTR()->Register("Windows/Viewports/Viewport " + std::to_string(viewportNumber), [this](TerraForge3D::UI::MenuItem* context) {
 			isVisible = (context->GetToggleState());
 			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
+		
+		isVisible = false;
 	}
 
 	void Viewport::OnEnd()

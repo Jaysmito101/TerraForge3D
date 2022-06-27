@@ -35,7 +35,7 @@ namespace TerraForge3D
 			virtual void UseComputeDevice();
 
 			void UpdateInfo();
-		private:
+		// private:
 			static void SetImageLayout(
 				VkCommandBuffer cmdBuffer,
 				VkImage image,
