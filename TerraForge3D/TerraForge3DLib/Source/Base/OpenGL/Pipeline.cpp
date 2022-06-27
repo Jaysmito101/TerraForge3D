@@ -26,7 +26,7 @@ namespace TerraForge3D
 			isSetup = false;
 		}
 
-		bool Pipeline::Rebuild(RendererAPI::FrameBuffer* fbo)
+		bool Pipeline::Rebuild(RendererAPI::FrameBuffer* fbo, bool forceRebuild)
 		{
 			if (this->framebuffer != fbo)
 			{

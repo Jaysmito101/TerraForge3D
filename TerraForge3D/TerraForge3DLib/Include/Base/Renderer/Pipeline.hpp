@@ -16,7 +16,7 @@ namespace TerraForge3D
 
 			virtual void Setup() = 0;
 			virtual void Destory() = 0;
-			virtual bool Rebuild(FrameBuffer* framebuffer) = 0;
+			virtual bool Rebuild(FrameBuffer* framebuffer, bool forceRebuild = false) = 0;
 
 			inline Pipeline* SetAutoDestroy(bool value) { this->autoDestory = value; return this; }
 

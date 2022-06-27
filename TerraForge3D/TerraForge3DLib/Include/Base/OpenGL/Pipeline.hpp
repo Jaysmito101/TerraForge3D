@@ -24,7 +24,7 @@ namespace TerraForge3D
 
 			virtual void Setup() override;
 			virtual void Destory() override;
-			virtual bool Rebuild(RendererAPI::FrameBuffer* framebuffer) override;
+			virtual bool Rebuild(RendererAPI::FrameBuffer* framebuffer, bool forceRebuild = false) override;
 
 		public:
 			FrameBuffer* framebuffer = nullptr;
