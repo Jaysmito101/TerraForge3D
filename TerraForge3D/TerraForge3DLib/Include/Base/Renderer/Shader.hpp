@@ -48,10 +48,24 @@ namespace TerraForge3D
 
 			virtual void Cleanup() = 0;
 			virtual bool Compile() = 0;
-			virtual bool LoadFromBinary(std::vector<uint32_t> binary) = 0;
+			virtual bool LoadFromBinary() = 0;
 
 			inline bool IsCompiled() { return this->isCompiled; }
-			inline std::vector<uint32_t> GetBinary() { if (isCompiled && loadedFromBinary) return binary; TF3D_ASSERT(false, "Shader binary not available");  return std::vector<uint32_t>(); }
+			inline std::vector<char> GetBinary(ShaderStage stage) 
+			{
+				if (isCompiled && loadedFromBinary)
+				{
+					switch (stage)
+					{
+					case ShaderStage_Vertex   : return binary.vertex;
+					case ShaderStage_Geometry : return binary.geometry;
+					case ShaderStage_Fragment : return binary.fragment;
+						
+					}
+				}
+				TF3D_ASSERT(false, "Shader binary not available");
+				return std::vector<char>();
+			}
 
 			inline Shader* SetIncludeDir(std::string dir) { this->includeDir = dir; if (this->includeDir[this->includeDir.size() - 1] != PATH_SEPERATOR[0]) { this->includeDir += PATH_SEPERATOR; } return this; }
 			inline Shader* SetCacheDir(std::string dir) { this->cacheDir = dir; return this; }
@@ -84,18 +98,23 @@ namespace TerraForge3D
 			static Shader* Create();
 
 
-		protected:
+		public:
 			bool isCompiled = false;
 			bool wasCompiled = false;
 			bool loadedFromBinary = false;
 			std::string vertexSource = "";
 			std::string fragmentSource = "";
-			std::vector<uint32_t> binary;
 			std::string includeDir = "";
 			std::string cacheDir = ""; // For SPIRV cache
 			std::unordered_map<std::string, std::string> macros;
 			std::vector<ShaderVar> uboLayout;
 			std::vector<ShaderVar> uniformsLayout;
+			struct
+			{
+				std::vector<char> vertex;
+				std::vector<char> geometry;
+				std::vector<char> fragment;
+			} binary;
 
 		public:
 			std::string name = "Shader";

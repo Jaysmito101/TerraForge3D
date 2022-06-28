@@ -1,6 +1,7 @@
 #include "Base/Vulkan/Pipeline.hpp"
 #include "Base/Vulkan/Framebuffer.hpp"
 #include "Base/Vulkan/GraphicsDevice.hpp"
+#include "Base/Vulkan/Shader.hpp"
 
 #ifdef TF3D_VULKAN_BACKEND
 
@@ -22,6 +23,7 @@ namespace TerraForge3D
 
 		void Pipeline::Setup()
 		{
+			
 		}
 
 		void Pipeline::Destory()
@@ -145,6 +147,20 @@ namespace TerraForge3D
 			dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 			dynamicStateCreateInfo.dynamicStateCount = dynamicStates.size();
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
+
+			VkPipelineShaderStageCreateInfo vertexShaderStageCreateInfo{};
+			vertexShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			vertexShaderStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+			vertexShaderStageCreateInfo.module = reinterpret_cast<Shader*>(shader)->vertexShaderModule;
+			vertexShaderStageCreateInfo.pName = "main";
+
+			VkPipelineShaderStageCreateInfo fragmentShaderStageCreateInfo{};
+			fragmentShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			fragmentShaderStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+			fragmentShaderStageCreateInfo.module = reinterpret_cast<Shader*>(shader)->fragmentShaderModule;
+			fragmentShaderStageCreateInfo.pName = "main";
+						
+			VkPipelineShaderStageCreateInfo shaderStages[] = {vertexShaderStageCreateInfo, fragmentShaderStageCreateInfo};
 
 			VkPipelineLayoutCreateInfo layoutCreateInfo{};
 			layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;

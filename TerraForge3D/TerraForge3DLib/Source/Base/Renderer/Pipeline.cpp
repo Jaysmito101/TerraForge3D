@@ -27,7 +27,7 @@ namespace TerraForge3D
 
 		Pipeline::~Pipeline()
 		{
-			delete this->shader;
+			TF3D_SAFE_DELETE(this->shader);
 		}
 
 	}

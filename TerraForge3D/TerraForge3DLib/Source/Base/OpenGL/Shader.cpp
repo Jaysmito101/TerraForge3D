@@ -81,7 +81,10 @@ namespace TerraForge3D
 			options.SetIncluder(std::make_unique<ShaderIncluder>(includeDir));
 
 #ifdef TF3D_DEBUG
+			options.AddMacroDefinition("TF3D_DEBUG", "");
 //			options.SetGenerateDebugInfo();
+#else
+			options.AddMacroDefinition("TF3D_RELEASE", "");
 #endif
 
 			shaderc::PreprocessedSourceCompilationResult result = compiler.PreprocessGlsl(source, kind, sourceName.data(), options);
@@ -207,7 +210,7 @@ namespace TerraForge3D
 			return true;
 		}
 
-		bool Shader::LoadFromBinary(std::vector<uint32_t> binary)
+		bool Shader::LoadFromBinary()
 		{
 			TF3D_ASSERT(false, "Shader::LoadFromBinary not yet supported for OpenGL backend");
 			return false;

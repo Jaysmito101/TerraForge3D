@@ -17,7 +17,7 @@ namespace TerraForge3D
 			
 			virtual void Cleanup() override;
 			virtual bool Compile() override;
-			virtual bool LoadFromBinary(std::vector<uint32_t> binary) override;
+			virtual bool LoadFromBinary() override;
 
 			void LoadUniformLocations();
 
