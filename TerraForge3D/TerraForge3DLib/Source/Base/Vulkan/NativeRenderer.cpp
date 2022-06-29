@@ -75,6 +75,8 @@ namespace TerraForge3D
 					renderPassBeginInfo.renderArea.extent = { framebuffer->GetHeight(), framebuffer->GetWidth() };
 					// TODO: Fixme for multiple attachments
 					VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+					clearColor.depthStencil.depth = 0.0;
+					clearColor.depthStencil.stencil = 0.0;
 					renderPassBeginInfo.clearValueCount = 1;
 					renderPassBeginInfo.pClearValues = &clearColor;
 					renderPassBeginInfos.push_back(renderPassBeginInfo);
@@ -119,7 +121,7 @@ namespace TerraForge3D
 					buffers.push_back(vbuffer);
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, &buffers.back().first, &buffers.back().second);
 					vkCmdBindIndexBuffer(commandBuffer, lastRenderedMesh->indexBuffer->handle, 0, VK_INDEX_TYPE_UINT32);
-					vkCmdDrawIndexed(commandBuffer, lastRenderedMesh->GetIndexCount(), 1, 0, 0, 0);
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(lastRenderedMesh->GetIndexCount()), 1, 0, 0, 0);
 					break;
 				}
 
@@ -136,7 +138,7 @@ namespace TerraForge3D
 					buffers.push_back(vbuffer);
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, &buffers.back().first, &buffers.back().second);
 					vkCmdBindIndexBuffer(commandBuffer, lastRenderedMesh->indexBuffer->handle, 0, VK_INDEX_TYPE_UINT32);
-					vkCmdDrawIndexed(commandBuffer, lastRenderedMesh->GetIndexCount(), params.num, 0, 0, 0);
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(lastRenderedMesh->GetIndexCount()), params.num, 0, 0, 0);
 					break;
 				}
 

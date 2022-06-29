@@ -60,6 +60,7 @@ namespace TerraForge3D
 
 			bool isRGBA = false;
 
+			VkImageUsageFlags usage = 0;
 			VkFormat imageFormat = VK_FORMAT_R8G8B8_UINT;
 			VkImageViewType imageViewType = VK_IMAGE_VIEW_TYPE_2D;
 			VkImageType imageType = VK_IMAGE_TYPE_2D;

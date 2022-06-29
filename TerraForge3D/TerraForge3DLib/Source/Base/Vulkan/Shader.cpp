@@ -69,7 +69,7 @@ namespace TerraForge3D
 			std::string includeDir = "";
 		};
 
-		static std::vector<char> PreprocessAndCompileShader(std::string& source, shaderc_shader_kind kind, std::unordered_map<std::string, std::string>& macros, std::string& includeDir, std::string sourceName = "shader.glsl")
+		static std::vector<uint32_t> PreprocessAndCompileShader(std::string& source, shaderc_shader_kind kind, std::unordered_map<std::string, std::string>& macros, std::string& includeDir, std::string sourceName = "shader.glsl")
 		{
 			shaderc::Compiler compiler;
 			shaderc::CompileOptions options;
@@ -113,17 +113,24 @@ namespace TerraForge3D
 			*/
 
 			shaderc::SpvCompilationResult resultSpv = compiler.CompileGlslToSpv(resultSource, kind, sourceName.data());
-			
-			return std::vector<char>(resultSpv.begin(), resultSpv.end());
+
+			if (resultSpv.GetCompilationStatus() != shaderc_compilation_status_success)
+			{
+				TF3D_LOG_ERROR("Shader compilation failed\n{0}", resultSpv.GetErrorMessage());
+			}
+			else
+				return std::vector<uint32_t>(resultSpv.begin(), resultSpv.end());
+
+			return std::vector<uint32_t>();
 		}
 
-		static VkShaderModule CreateShaderModule(std::vector<char>& binary, VkDevice device)
+		static VkShaderModule CreateShaderModule(std::vector<uint32_t>& binary, VkDevice device)
 		{
 			VkShaderModuleCreateInfo shaderModuleCreateInfo{};
 			shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-			shaderModuleCreateInfo.codeSize = binary.size();
-			shaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(binary.data());
-			
+			shaderModuleCreateInfo.codeSize = binary.size() * sizeof(uint32_t);
+			shaderModuleCreateInfo.pCode = binary.data();
+
 			VkShaderModule shaderModule;
 			TF3D_VK_CALL(vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &shaderModule));
 			return shaderModule;
@@ -143,7 +150,7 @@ namespace TerraForge3D
 		void Shader::Cleanup()
 		{
 			if (!wasCompiled) return;
-			
+
 			TF3D_ASSERT(device, "Device handle is NULL");
 
 			vkDeviceWaitIdle(device->handle);
@@ -176,7 +183,7 @@ namespace TerraForge3D
 			wasCompiled = true;
 
 			LoadPushConstantLocations();
-			
+
 			return true;
 		}
 
@@ -188,7 +195,7 @@ namespace TerraForge3D
 
 			if (!device)
 				device = GraphicsDevice::Get();
-			
+
 			vertexShaderModule = CreateShaderModule(binary.vertex, device->handle);
 			fragmentShaderModule = CreateShaderModule(binary.fragment, device->handle);
 

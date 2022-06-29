@@ -108,7 +108,7 @@ namespace TerraForge3D
 
 			VkRenderPassCreateInfo renderPassCreateInfo{};
 			renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-			renderPassCreateInfo.attachmentCount = attachmentDescriptions.size();
+			renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentDescriptions.size());
 			renderPassCreateInfo.pAttachments = attachmentDescriptions.data();
 			renderPassCreateInfo.subpassCount = 1;
 			renderPassCreateInfo.pSubpasses = &subpass;
@@ -147,6 +147,7 @@ namespace TerraForge3D
 				}
 				colorAttachments[i]->UseGraphicsDevice();
 				colorAttachments[i]->imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; // TODO: Look this up
+				colorAttachments[i]->usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 				colorAttachments[i]->Setup();
 			
 				attachments.push_back(colorAttachments[i]->view);
@@ -195,10 +196,11 @@ namespace TerraForge3D
 			imageViewCreateInfo.image = depthAttachment.handle;
 			imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 			imageViewCreateInfo.format = VK_FORMAT_D24_UNORM_S8_UINT;
-			imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 			imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
 			imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 			imageViewCreateInfo.subresourceRange.layerCount = 1;
+			imageViewCreateInfo.subresourceRange.levelCount = 1;
 
 			TF3D_VK_CALL(vkCreateImageView(device->handle, &imageViewCreateInfo, nullptr, &depthAttachment.view));
 
@@ -231,7 +233,7 @@ namespace TerraForge3D
 			VkFramebufferCreateInfo framebufferCreateInfo{};
 			framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebufferCreateInfo.renderPass = renderPass;
-			framebufferCreateInfo.attachmentCount = attachments.size();
+			framebufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 			framebufferCreateInfo.pAttachments = attachments.data();
 			framebufferCreateInfo.width = width;
 			framebufferCreateInfo.height = height;
@@ -304,6 +306,7 @@ namespace TerraForge3D
 		void* FrameBuffer::GetDepthAttachmentHandle(void* h)
 		{
 			TF3D_ASSERT(false, "Depth not yet implemented");
+			return nullptr;
 		}
 
 		void* FrameBuffer::ReadPixel(uint32_t x, uint32_t y, int index, void* data)

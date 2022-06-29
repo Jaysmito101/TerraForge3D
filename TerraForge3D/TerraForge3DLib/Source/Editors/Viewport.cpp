@@ -32,7 +32,7 @@ namespace TerraForge3D
 			uint32_t mx = static_cast<uint32_t>(prevMouseX * (resolution - 2)) + 1;
 			uint32_t my = resolution - static_cast<uint32_t>(prevMouseY * (resolution - 2)) + 1;
 			uint32_t val = 0;
-			framebuffer->ReadPixel(mx, my, 1, &val);
+			//framebuffer->ReadPixel(mx, my, 1, &val);
 			//TF3D_LOG("{} {} -> {}", mx, my, val);
 
 		}
@@ -123,9 +123,9 @@ namespace TerraForge3D
 		if (framebuffer->IsSetup())
 			framebuffer->Destroy();
 		framebuffer->SetSize(resolution, resolution);
-		framebuffer->SetColorAttachmentCount(2);
+		framebuffer->SetColorAttachmentCount(1);
 		framebuffer->SetColorAttachmentFormat(RendererAPI::FrameBufferAttachmentFormat_RGBA32, 0);
-		framebuffer->SetColorAttachmentFormat(RendererAPI::FrameBufferAttachmentFormat_R32I, 1);
+		//framebuffer->SetColorAttachmentFormat(RendererAPI::FrameBufferAttachmentFormat_R32I, 1);
 		framebuffer->SetDepthAttachment(true);
 		framebuffer->Setup();
 	}

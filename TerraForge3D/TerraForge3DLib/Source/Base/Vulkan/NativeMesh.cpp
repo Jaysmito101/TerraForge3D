@@ -60,9 +60,12 @@ namespace TerraForge3D
 			TF3D_ASSERT(isSetup, "Mesh has not yet been setup call setup first");
 			TF3D_ASSERT(vertices, "Vertices is null");
 			TF3D_ASSERT(indices, "Indices is null");
-
+			vertexBuffer->Map();
 			vertexBuffer->SetData(vertices, sizeof(Vertex) * vertexCount);
-
+			vertexBuffer->Unmap();
+			indexBuffer->Map();
+			indexBuffer->SetData(indices, sizeof(uint32_t) * indexCount);
+			indexBuffer->Unmap();
 			return true;
 		}
 	}

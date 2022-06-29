@@ -69,7 +69,7 @@ namespace TerraForge3D
 			virtual bool LoadFromBinary() = 0;
 
 			inline bool IsCompiled() { return this->isCompiled; }
-			inline std::vector<char> GetBinary(ShaderStage stage) 
+			inline std::vector<uint32_t> GetBinary(ShaderStage stage) 
 			{
 				if (isCompiled && loadedFromBinary)
 				{
@@ -82,7 +82,7 @@ namespace TerraForge3D
 					}
 				}
 				TF3D_ASSERT(false, "Shader binary not available");
-				return std::vector<char>();
+				return std::vector<uint32_t>();
 			}
 
 			inline Shader* SetIncludeDir(std::string dir) { this->includeDir = dir; if (this->includeDir[this->includeDir.size() - 1] != PATH_SEPERATOR[0]) { this->includeDir += PATH_SEPERATOR; } return this; }
@@ -129,9 +129,9 @@ namespace TerraForge3D
 			std::vector<ShaderVar> uniformsLayout;
 			struct
 			{
-				std::vector<char> vertex;
-				std::vector<char> geometry;
-				std::vector<char> fragment;
+				std::vector<uint32_t> vertex;
+				std::vector<uint32_t> geometry;
+				std::vector<uint32_t> fragment;
 			} binary;
 
 		public:

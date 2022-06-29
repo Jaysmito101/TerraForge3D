@@ -14,7 +14,7 @@ namespace TerraForge3D
 
 #ifdef TF3D_OPENGL_BACKEND
 			return new OpenGL::Pipeline();
-#elif defined(TF3D_VULKAN_BACKEND
+#elif defined(TF3D_VULKAN_BACKEND)
 			return new Vulkan::Pipeline();
 #endif
 			return nullptr;

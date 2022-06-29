@@ -107,10 +107,10 @@ namespace TerraForge3D
 			inputAssemblyStateCreateInfo.primitiveRestartEnable = primitiveRestartEnabled;
 
 			VkViewport viewport{};
-			viewport.x = viewportBegin[0];
-			viewport.y = viewportBegin[1];
-			viewport.width = currentFramebuffer.width;
-			viewport.height = currentFramebuffer.height;
+			viewport.x = static_cast<float>(viewportBegin[0]);
+			viewport.y = static_cast<float>(viewportBegin[1]);
+			viewport.width = static_cast<float>(currentFramebuffer.width);
+			viewport.height = static_cast<float>(currentFramebuffer.height);
 			viewport.minDepth = 0.0f;
 			viewport.maxDepth = 1.0f;
 
@@ -186,7 +186,7 @@ namespace TerraForge3D
 
 			VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo{};
 			dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-			dynamicStateCreateInfo.dynamicStateCount = dynamicStates.size();
+			dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
 			VkPipelineShaderStageCreateInfo vertexShaderStageCreateInfo{};
