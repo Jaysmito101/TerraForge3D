@@ -41,6 +41,7 @@ namespace TerraForge3D
 			VkCommandBuffer commandBuffer = device->CreateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 				
 			std::vector<VkRenderPassBeginInfo> renderPassBeginInfos;
+			std::vector<VkClearValue> clearValues;
 			std::vector<std::pair<VkBuffer, VkDeviceSize>> buffers;
 
 			std::stack<void*> rendererStack;
@@ -74,11 +75,21 @@ namespace TerraForge3D
 					renderPassBeginInfo.renderArea.offset = {0, 0};
 					renderPassBeginInfo.renderArea.extent = { framebuffer->GetHeight(), framebuffer->GetWidth() };
 					// TODO: Fixme for multiple attachments
-					VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-					clearColor.depthStencil.depth = 0.0;
-					clearColor.depthStencil.stencil = 0.0;
-					renderPassBeginInfo.clearValueCount = 1;
-					renderPassBeginInfo.pClearValues = &clearColor;
+					for (int i = 0; i < framebuffer->GetColorAttachmentCount();i++)
+					{
+						VkClearValue clearValue = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+						clearValues.push_back(clearValue);
+					}
+
+					if (framebuffer->HasDepthAttachment())
+					{
+						VkClearValue clearValue = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+						clearValue.depthStencil = {0.0f, 0};
+						clearValues.push_back(clearValue);
+					}
+					int clearValueCount = framebuffer->GetColorAttachmentCount() + (framebuffer->HasDepthAttachment() ? 1 : 0);
+					renderPassBeginInfo.clearValueCount = clearValueCount;
+					renderPassBeginInfo.pClearValues = (&clearValues.back() - clearValueCount);
 					renderPassBeginInfos.push_back(renderPassBeginInfo);
 					vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfos.back(), VK_SUBPASS_CONTENTS_INLINE);
 					break;

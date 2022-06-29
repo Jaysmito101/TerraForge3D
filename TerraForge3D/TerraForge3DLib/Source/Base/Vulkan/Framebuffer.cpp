@@ -59,12 +59,14 @@ namespace TerraForge3D
 				colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 				colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 				colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-				colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				// colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				colorAttachment.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
 				attachmentDescriptions.push_back(colorAttachment);
 
 				VkAttachmentReference colorAttachmentRef{};
 				colorAttachmentRef.attachment = i;
-				colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				// colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				colorAttachmentRef.layout = VK_IMAGE_LAYOUT_GENERAL;
 				attachmentReferences.push_back(colorAttachmentRef);
 			}
 
@@ -95,16 +97,7 @@ namespace TerraForge3D
 			dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 			dependency.srcAccessMask = 0;
 			dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-			dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-			/*
-			* Note : Will be implemented in future
-			std::array<VkClearValue, 2> clearValues{};
-			clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-			clearValues[1].depthStencil = {1.0f, 0};
-			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-			renderPassInfo.pClearValues = clearValues.data();
-			*/
+			dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;			
 
 			VkRenderPassCreateInfo renderPassCreateInfo{};
 			renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -146,7 +139,8 @@ namespace TerraForge3D
 					TF3D_ASSERT(false, "Unknown FrameBuffer attachment format");
 				}
 				colorAttachments[i]->UseGraphicsDevice();
-				colorAttachments[i]->imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; // TODO: Look this up
+				// colorAttachments[i]->imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; // TODO: Look this up
+				colorAttachments[i]->imageLayout = VK_IMAGE_LAYOUT_GENERAL; // TODO: Look this up
 				colorAttachments[i]->usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 				colorAttachments[i]->Setup();
 			
