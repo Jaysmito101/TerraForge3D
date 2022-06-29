@@ -39,6 +39,24 @@ namespace TerraForge3D
 			{}
 		};
 
+		inline uint32_t GetShaderDataTypeSize(ShaderDataType type)
+		{
+			switch (type)
+			{
+				case ShaderDataType_Mat3	: return 3 * 3 * sizeof(float);
+				case ShaderDataType_Mat4	: return 4 * 4 * sizeof(float);
+				case ShaderDataType_Vec2	: return 2 * sizeof(float);
+				case ShaderDataType_Vec3	: return 3 * sizeof(float);
+				case ShaderDataType_Vec4	: return 4 * sizeof(float);
+				case ShaderDataType_IVec2	: return 2 * sizeof(int);
+				case ShaderDataType_IVec3	: return 3 * sizeof(int);
+				case ShaderDataType_IVec4	: return 4 * sizeof(int);
+				case ShaderDataType_Bool	: return sizeof(bool);
+				default						: return 0;
+			}
+			return 0;
+		}
+
 		class Shader
 		{
 		public:

@@ -23,8 +23,7 @@ namespace TerraForge3D
 			GLuint vertexArray = 0;
 			GLuint vertexBuffer = 0;
 			GLuint indexBuffer = 0;			
-
-				size_t triangleCount = 0;
+			size_t triangleCount = 0;
 		};
 
 	}

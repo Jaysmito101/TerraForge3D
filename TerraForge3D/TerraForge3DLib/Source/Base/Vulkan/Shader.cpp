@@ -202,7 +202,16 @@ namespace TerraForge3D
 
 		void Shader::LoadPushConstantLocations()
 		{
-			
+			pushConstantsLocations.clear();
+			uint32_t offset = 0;
+			for (int i = 0; i < uniformsLayout.size(); i++)
+			{
+				auto& unifrom = uniformsLayout[i];
+				uint32_t size = RendererAPI::GetShaderDataTypeSize(unifrom.type);
+				pushConstantsLocations[unifrom.name] = { size, offset };
+				offset += size;
+			}
+			pushConstantsSize = offset;
 		}
 
 

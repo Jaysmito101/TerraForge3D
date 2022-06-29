@@ -246,18 +246,10 @@ namespace TerraForge3D
 			}
 			appState->viewports[0]->SetVisible(true);
 
-			appState->pipeline = RendererAPI::Pipeline::Create();
-
-			
+			appState->pipeline = RendererAPI::Pipeline::Create();			
 			appState->pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
 			appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
 			appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
-			appState->pipeline->shader->SetUBOLayout({
-				RendererAPI::ShaderVar("_U1", RendererAPI::ShaderDataType_Vec4),
-				RendererAPI::ShaderVar("_U2", RendererAPI::ShaderDataType_Vec4),
-				RendererAPI::ShaderVar("_U3", RendererAPI::ShaderDataType_Vec4),
-				RendererAPI::ShaderVar("_U4", RendererAPI::ShaderDataType_Vec4)
-				});
 			appState->pipeline->shader->SetUniformsLayout({
 				RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
 				RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)

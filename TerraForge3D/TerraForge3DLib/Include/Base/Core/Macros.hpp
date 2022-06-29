@@ -55,3 +55,5 @@
 // #error "Unknown Platform"
 
 #endif
+
+#define TF3D_STATIC_ARRAY_SIZE(x) ( sizeof(x) / sizeof(x[0]) )

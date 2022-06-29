@@ -2,6 +2,7 @@
 #include "Base/Vulkan/Framebuffer.hpp"
 #include "Base/Vulkan/GraphicsDevice.hpp"
 #include "Base/Vulkan/Shader.hpp"
+#include "Base/DS/Mesh.hpp"
 
 #ifdef TF3D_VULKAN_BACKEND
 
@@ -18,12 +19,13 @@ namespace TerraForge3D
 		{
 			if (autoDestory && isBuild)
 			{
+				Destory();
 			}
 		}
 
 		void Pipeline::Setup()
 		{
-			
+			isSetup = true;
 		}
 
 		void Pipeline::Destory()
@@ -34,6 +36,7 @@ namespace TerraForge3D
 			vkDestroyPipelineLayout(device->handle, pipelineLayout, nullptr);
 
 			isBuild = false;
+			isSetup = false;
 		}
 
 		bool Pipeline::IsRebuildRequired(RendererAPI::FrameBuffer* f)
@@ -65,12 +68,38 @@ namespace TerraForge3D
 			if (!device)
 				device = GraphicsDevice::Get();
 
+			VkVertexInputBindingDescription vertexInputBindingDescription{};
+			vertexInputBindingDescription.binding = 0;
+			vertexInputBindingDescription.stride = sizeof(Vertex);
+			vertexInputBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+			VkVertexInputAttributeDescription vertexInputAttributeDescription[4];
+			vertexInputAttributeDescription[0].binding = 0;
+			vertexInputAttributeDescription[0].location = 0;
+			vertexInputAttributeDescription[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+			vertexInputAttributeDescription[0].offset = offsetof(Vertex, position);
+
+			vertexInputAttributeDescription[1].binding = 0;
+			vertexInputAttributeDescription[1].location = 1;
+			vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+			vertexInputAttributeDescription[1].offset = offsetof(Vertex, texCoord);
+
+			vertexInputAttributeDescription[2].binding = 0;
+			vertexInputAttributeDescription[2].location = 2;
+			vertexInputAttributeDescription[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+			vertexInputAttributeDescription[2].offset = offsetof(Vertex, normal);
+
+			vertexInputAttributeDescription[3].binding = 0;
+			vertexInputAttributeDescription[3].location = 3;
+			vertexInputAttributeDescription[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+			vertexInputAttributeDescription[3].offset = offsetof(Vertex, extra);
+
 			VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo{};
 			vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			vertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
-			vertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
-			vertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0;
-			vertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr;
+			vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
+			vertexInputStateCreateInfo.pVertexBindingDescriptions = &vertexInputBindingDescription;
+			vertexInputStateCreateInfo.vertexAttributeDescriptionCount = TF3D_STATIC_ARRAY_SIZE(vertexInputAttributeDescription);
+			vertexInputStateCreateInfo.pVertexAttributeDescriptions = vertexInputAttributeDescription;
 
 			VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo{};
 			inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -143,6 +172,18 @@ namespace TerraForge3D
 			colorBlendStateCreateInfo.blendConstants[2] = 0.0f; // Optional
 			colorBlendStateCreateInfo.blendConstants[3] = 0.0f; // Optional
 
+			VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo{};
+			depthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+			depthStencilStateCreateInfo.depthTestEnable = VK_TRUE;
+			depthStencilStateCreateInfo.depthWriteEnable = VK_TRUE;
+			depthStencilStateCreateInfo.depthCompareOp = VK_COMPARE_OP_LESS;
+			depthStencilStateCreateInfo.depthBoundsTestEnable = VK_FALSE;
+			depthStencilStateCreateInfo.minDepthBounds = 0.0f;
+			depthStencilStateCreateInfo.maxDepthBounds = 1.0f;
+			depthStencilStateCreateInfo.stencilTestEnable = VK_FALSE;
+			depthStencilStateCreateInfo.front = {};
+			depthStencilStateCreateInfo.back = {};
+
 			VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo{};
 			dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 			dynamicStateCreateInfo.dynamicStateCount = dynamicStates.size();
@@ -162,12 +203,17 @@ namespace TerraForge3D
 						
 			VkPipelineShaderStageCreateInfo shaderStages[] = {vertexShaderStageCreateInfo, fragmentShaderStageCreateInfo};
 
+			VkPushConstantRange pushConstantsRange{};
+			pushConstantsRange.offset = 0;
+			pushConstantsRange.size = reinterpret_cast<Shader*>(shader)->pushConstantsSize;
+			pushConstantsRange.stageFlags =VK_SHADER_STAGE_ALL_GRAPHICS;
+
 			VkPipelineLayoutCreateInfo layoutCreateInfo{};
 			layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 			layoutCreateInfo.setLayoutCount = 0;
 			layoutCreateInfo.pSetLayouts = nullptr;
-			layoutCreateInfo.pushConstantRangeCount = 0;
-			layoutCreateInfo.pPushConstantRanges = nullptr;
+			layoutCreateInfo.pushConstantRangeCount = 1;
+			layoutCreateInfo.pPushConstantRanges = &pushConstantsRange;
 
 			TF3D_VK_CALL(vkCreatePipelineLayout(device->handle, &layoutCreateInfo, nullptr, &pipelineLayout));
 
@@ -186,6 +232,8 @@ namespace TerraForge3D
 			graphicsPipelineCreateInfo.subpass = 0;
 			// graphicsPipelineCreateInfo.basePipelineHandle = pipeline;
 			graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
+			if (currentFramebuffer.handle->HasDepthAttachment())
+				graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilStateCreateInfo;
 
 			TF3D_VK_CALL(vkCreateGraphicsPipelines(device->handle, VK_NULL_HANDLE /* pipelineCache */, 1, &graphicsPipelineCreateInfo, nullptr, &pipeline));
 

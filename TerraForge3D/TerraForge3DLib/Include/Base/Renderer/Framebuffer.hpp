@@ -41,8 +41,8 @@ namespace TerraForge3D
 			inline FrameBuffer* SetSize(uint32_t w, uint32_t h) { TF3D_ASSERT(setupOnGPU == false, "Cannot change paramaeter after setup on GPU (call Destory first)"); TF3D_ASSERT(w > 0 && h > 0, "Size cannot be negetive"); this->width = w; this->height = h; return this; }
 
 			inline bool IsSetup() { return this->setupOnGPU; }
-			inline bool GetAutoDestroy() { return this->autoDestroy; }
-			inline bool GetDepthAttachment() { return this->hasDepthAttachment; }
+			inline bool IsAutoDestroyEnabled() { return this->autoDestroy; }
+			inline bool HasDepthAttachment() { return this->hasDepthAttachment; }
 			inline int  GetColorAttachmentCount() { return this->colorAttachmentCount; }
 			inline std::pair<uint32_t, uint32_t> GetSize() { return { this->width, this->height }; }
 			inline uint32_t GetWidth() { return this->width; }

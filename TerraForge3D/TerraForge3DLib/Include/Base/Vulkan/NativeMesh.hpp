@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Vulkan/Core.hpp"
 #include "Base/Renderer/NativeMesh.hpp"
+#include "Base/Vulkan/Buffer.hpp"
 
 #ifdef TF3D_VULKAN_BACKEND
 namespace TerraForge3D
@@ -12,7 +13,7 @@ namespace TerraForge3D
 		class NativeMesh : public RendererAPI::NativeMesh
 		{
 		public:
-			NativeMesh() = default;
+			NativeMesh();
 			~NativeMesh();
 
 			virtual bool Setup() override;
@@ -20,7 +21,8 @@ namespace TerraForge3D
 			virtual bool UploadData(void* vertices, void* indices) override;
 
 		public:
-			// TODO: Implement
+			Buffer* vertexBuffer = nullptr;
+			Buffer* indexBuffer = nullptr;
 		};
 
 	}

@@ -35,7 +35,7 @@ namespace TerraForge3D
 			LogicalDevice* device = nullptr;
 
 			// Pipeline Options
-			// 
+			
 			// Vertex Input Assembly
 			VkPrimitiveTopology primitiveTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 			VkBool32 primitiveRestartEnabled = VK_FALSE;

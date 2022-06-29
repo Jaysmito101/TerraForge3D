@@ -23,14 +23,17 @@ namespace TerraForge3D
 
 			void LoadPushConstantLocations();
 
-			inline bool PushConstantExists(const std::string& name) { return true; };
-			
+			inline bool PushConstantExists(const std::string& name) { return pushConstantsLocations.find(name) != pushConstantsLocations.end(); };
+			inline std::pair<uint32_t, uint32_t>& GetPushConstantLocation(const std::string& name) { return pushConstantsLocations[name]; }
 
 		public:
 			LogicalDevice* device = nullptr;
 
 			VkShaderModule vertexShaderModule = VK_NULL_HANDLE;
 			VkShaderModule fragmentShaderModule = VK_NULL_HANDLE;
+
+			std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> pushConstantsLocations;
+			uint32_t pushConstantsSize = 0;
 		};
 
 	}
