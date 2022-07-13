@@ -10,9 +10,9 @@
 #define DEFINE_FRAGMENT_OUTPUT(loc, type, name) layout (location = loc) out type name;
 
 #define BEGIN_UNIFORMS()
-#define END_UNIFROMS()
-#define DEFINE_UNIFROM(type, name) unifrom type name = type(1.0f);
-#define UNIFROM(name) name
+#define END_UNIFORMS()
+#define DEFINE_UNIFORM(type, name) uniform type name = type(1.0f);
+#define UNIFORM(name) name
 
 #define GET_MOUSE_PICK_ID() _MousePickID;
 
@@ -24,12 +24,12 @@
 #define DEFINE_FRAGMENT_INPUT(loc, type, name) layout (location = loc) in type name;
 #define DEFINE_FRAGMENT_OUTPUT(loc, type, name) layout (location = loc) out type name;
 
-#define BEGIN_UNIFORMS() layout (push_constant) unifrom Constants {
-#define END_UNIFROMS() } PushConstants;
-#define DEFINE_UNIFROM(type, name)     type name;
-#define UNIFROM(name) PushConstants.name
+#define BEGIN_UNIFORMS() layout (push_constant) uniform Constants {
+#define END_UNIFORMS() } PushConstants;
+#define DEFINE_UNIFORM(type, name)     type name;
+#define UNIFORM(name) PushConstants.name
 
-#define GET_MOUSE_PICK_ID() UNIFROM(_Engine).x;
+#define GET_MOUSE_PICK_ID() UNIFORM(_Engine).x;
 
 #endif // TF3D_VULKAN
 

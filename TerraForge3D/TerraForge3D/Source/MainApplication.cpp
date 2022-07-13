@@ -129,152 +129,9 @@ private:
 
 #include <glad/glad.h>
 
-std::string vss = R"(
-#version 430 core
-#ifdef TF3D_OPENGL
+std::string vss = "";
 
-
-#include "Temp.glsl"
-
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 texCoord;
-layout (location = 2) in vec4 normal;
-layout (location = 3) in vec4 extra;
-
-out vec3 Position;
-out vec3 Normal;
-
-uniform mat4 _Model;
-uniform mat4 _PV;
-
-void main()
-{
-	gl_Position = _PV * _Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
-	Position = position.xyz;
-	Normal = normal.xyz;
-}
-
-#endif
-
-#ifdef TF3D_VULKAN
-//#extension GL_EXT_debug_printf : enable
-#include "Temp.glsl"
-
-
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 texCoord;
-layout (location = 2) in vec4 normal;
-layout (location = 3) in vec4 extra;
-
-layout (location = 0) out vec3 Position;
-layout (location = 1) out vec3 Normal;
-
-layout (push_constant) uniform Constants
-{
-	ivec4 _Engine;
-	mat4 _PV;
-	mat4 _Model;
-} PushConstants;
-
-
-void main()
-{
-	//debugPrintfEXT("Hello World!");
-	//gl_Position = PushConstants._PV * PushConstants._Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
-	gl_Position = PushConstants._PV *  PushConstants._Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
-	//gl_Position = vec4(position.xy, 0.0f, 1.0f);
-	Position = position.xyz;
-	Normal = normal.xyz;
-}
-
-#endif
-
-
-)";
-
-static std::string fss = R"(
-#version 430 core
-
-#ifdef TF3D_OPENGL
-
-layout(location = 0) out vec4 FragColor;
-layout(location = 1) out int MousePickID;
-
-in vec3 Position;
-in vec3 Normal;
-
-uniform int _MousePickID = 0;
-
-void main()
-{
-	vec3 lightPos = vec3(0.0, 0.5f, 0.0f);
-	vec3 lightColor = vec3(0.8f);
-	vec3 objectColor = vec3(0.8f);
-
-    // ambient
-    float ambientStrength = 0.1f;
-    vec3 ambient = ambientStrength * lightColor;
-  	
-    // diffuse 
-    vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(lightPos - Position);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor; 
-    
-
-	//FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	//FragColor = vec4(pos * 0.5f + vec3(0.5f), 1.0f);
-	FragColor = vec4(vec3(diff), 1.0f);
-	MousePickID = _MousePickID;
-}
-
-#endif
-
-#ifdef TF3D_VULKAN
-
-layout (location = 0) out vec4 FragColor;
-layout (location = 1) out int MousePickID;
-
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec3 Normal;
-
-layout (push_constant) uniform Constants
-{
-	ivec4 _Engine;
-	mat4 _PV;
-	mat4 _Model;
-} PushConstants;
-
-
-// uniform int _MousePickID = 0;
-
-void main()
-{
-	vec3 lightPos = vec3(0.0, 0.5f, 0.0f);
-	vec3 lightColor = vec3(0.8f);
-	vec3 objectColor = vec3(0.8f);
-
-    // ambient
-    float ambientStrength = 0.1f;
-    vec3 ambient = ambientStrength * lightColor;
-  	
-    // diffuse 
-    vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(lightPos - Position);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor; 
-    
-
-	//FragColor = vec4(1.0f);
-	//FragColor = vec4(pos * 0.5f + vec3(0.5f), 1.0f);
-	FragColor = vec4(vec3(diff), 1.0f);
-	// MousePickID = _MousePickID;
-	MousePickID = PushConstants._Engine.x;
-}
-
-#endif
-
-)";
+static std::string fss = "";
 
 #include "Base/OpenGL/Shader.hpp"
 
@@ -293,6 +150,8 @@ namespace TerraForge3D
 			SetWindowConfigPath(appState->appResourcePaths.windowConfigPath);
 			SetFontConfig(Utils::ReadTextFile(appState->appResourcePaths.fontsConfigPath), appState->appResourcePaths.fontsDir);
 
+			vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
+			fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
 			
 		}
 

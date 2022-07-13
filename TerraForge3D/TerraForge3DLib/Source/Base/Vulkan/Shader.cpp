@@ -110,7 +110,7 @@ namespace TerraForge3D
 			}
 
 			return ss.str();
-			*/
+			*/ 
 
 			shaderc::SpvCompilationResult resultSpv = compiler.CompileGlslToSpv(resultSource, kind, sourceName.data());
 
@@ -130,7 +130,7 @@ namespace TerraForge3D
 			shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 			shaderModuleCreateInfo.codeSize = binary.size() * sizeof(uint32_t);
 			shaderModuleCreateInfo.pCode = binary.data();
-
+			 
 			VkShaderModule shaderModule;
 			TF3D_VK_CALL(vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &shaderModule));
 			return shaderModule;
@@ -138,7 +138,7 @@ namespace TerraForge3D
 
 
 		Shader::Shader()
-		{
+		{ 
 		}
 
 		Shader::~Shader()

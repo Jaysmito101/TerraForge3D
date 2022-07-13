@@ -3,17 +3,17 @@
 #include "Core/Extensions.glsl"
 #include "Core/Core.glsl"
 
-DEFINE_FRAGMENT_OUTPUT(0, vec4, FragColor);
-DEFINE_FRAGMENT_OUTPUT(0, int, MousePickID);
+DEFINE_FRAGMENT_OUTPUT(0, vec4, FragColor)
+DEFINE_FRAGMENT_OUTPUT(1, int, MousePickID)
 
-DEFINE_FRAGMENT_INPUT(0, vec3, Position);
-DEFINE_FRAGMENT_INPUT(1, vec3, Normal);
+DEFINE_FRAGMENT_INPUT(0, vec3, Position)
+DEFINE_FRAGMENT_INPUT(1, vec3, Normal)
 
-BEGIN_UNIFROMS();
-	DEFINE_UNIFORM(ivec4, _Engine);
-	DEFINE_UNIFORM(mat4, _Model);
-	DEFINE_UNIFORM(mat4, _PV);
-END_UNIFORMS();
+BEGIN_UNIFORMS()
+	DEFINE_UNIFORM(ivec4, _Engine)
+	DEFINE_UNIFORM(mat4, _Model)
+	DEFINE_UNIFORM(mat4, _PV)
+END_UNIFORMS()
 
 #ifdef TF3D_OPENGL
 uniform int _MousePickID = 0;
