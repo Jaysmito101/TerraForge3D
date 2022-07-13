@@ -17,7 +17,7 @@ namespace TerraForge3D
 
 		GPUTexture::~GPUTexture()
 		{
-			if (autoDestroy)
+			if (isSetupOnGPU && autoDestroy)
 				Destroy();
 		}
 
@@ -383,6 +383,63 @@ namespace TerraForge3D
 			return imGuiID;
 		}
 
+		void* GPUTexture::ReadPixel(uint32_t x, uint32_t y, uint32_t z, void* data)
+		{
+			if (data)
+			{
+				uint64_t size = bytesPerChannel;
+
+
+				stagingBuffer = new Buffer(isGraphicsDevice);
+				stagingBuffer->usageflags = BufferUsage_TransferDestination;
+				stagingBuffer->SetMemoryProperties(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+				stagingBuffer->bufferSize = size;
+				stagingBuffer->Setup();
+
+				// We only need 1 as there will always be 1 mipmap in this application
+				VkBufferImageCopy bufferCopyRegion = {};
+				bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				bufferCopyRegion.imageSubresource.mipLevel = 0;
+				bufferCopyRegion.imageSubresource.baseArrayLayer = z;
+				if (type == RendererAPI::GPUTextureType_Array)
+					bufferCopyRegion.imageSubresource.layerCount = 1;
+				else
+					bufferCopyRegion.imageSubresource.layerCount = 1;
+				bufferCopyRegion.imageExtent.width = 1;
+				bufferCopyRegion.imageExtent.height = 1;
+				if (type == RendererAPI::GPUTextureType_3D)
+					bufferCopyRegion.imageExtent.depth = z;
+				else
+					bufferCopyRegion.imageExtent.depth = 1;
+				bufferCopyRegion.bufferOffset = 0;
+
+				VkImageSubresourceRange subresourceRange = {};
+				subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				subresourceRange.baseMipLevel = 0;
+				subresourceRange.levelCount = 1;
+				subresourceRange.baseArrayLayer = z;
+				if (type == RendererAPI::GPUTextureType_Array)
+					subresourceRange.layerCount = 1;
+				else
+					subresourceRange.layerCount = 1;
+
+				// Image barier for optimal image (target)
+				// Optimal image will be used as a destination for the copy
+				VkCommandBuffer commandBuffer = logicalDevice->CreateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+				SetImageLayout(commandBuffer, image, imageLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, subresourceRange);
+				vkCmdCopyImageToBuffer(commandBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer->handle, 1, &bufferCopyRegion);
+				SetImageLayout(commandBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, imageLayout, subresourceRange);
+				logicalDevice->FlushCommandBuffer(commandBuffer);
+
+				stagingBuffer->Map();
+				memcpy(data, stagingBuffer->mapped, stagingBuffer->bufferSize);
+				stagingBuffer->Unmap();
+
+				TF3D_SAFE_DELETE(stagingBuffer);
+			}
+			return data;
+		}
+
 		void GPUTexture::UseGraphicsDevice()
 		{
 			TF3D_ASSERT(!isSetupOnGPU, "Device can not be chaned after setup");
@@ -450,6 +507,11 @@ namespace TerraForge3D
 				bytesPerChannel = sizeof(float) * 4;
 				imageFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
 				isRGBA = true;
+				break;
+			case TerraForge3D::RendererAPI::GPUTextureFormat_R32I:
+				bytesPerChannel = sizeof(uint32_t);
+				imageFormat = VK_FORMAT_R32_SINT;
+				isRGBA = false;
 				break;
 			default:
 				TF3D_ASSERT(false, "Unknown texture format");

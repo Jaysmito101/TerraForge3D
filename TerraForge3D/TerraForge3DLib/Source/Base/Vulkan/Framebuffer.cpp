@@ -46,7 +46,7 @@ namespace TerraForge3D
 					colorAttachment.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 					break;
 				case RendererAPI::FrameBufferAttachmentFormat_R32I:
-					colorAttachment.format = VK_FORMAT_R32_UINT;
+					colorAttachment.format = VK_FORMAT_R32_SINT;
 					break;
 
 				default:
@@ -79,7 +79,8 @@ namespace TerraForge3D
 			depthAttachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			depthAttachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			depthAttachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-			attachmentDescriptions.push_back(depthAttachmentDescription);
+			if(hasDepthAttachment)
+				attachmentDescriptions.push_back(depthAttachmentDescription);
 
 			VkAttachmentReference depthAttachmentReference{};
 			depthAttachmentReference.attachment = colorAttachmentCount;
@@ -89,7 +90,10 @@ namespace TerraForge3D
 			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 			subpass.colorAttachmentCount = colorAttachmentCount;
 			subpass.pColorAttachments = attachmentReferences.data();
-			subpass.pDepthStencilAttachment = &depthAttachmentReference;
+			if (hasDepthAttachment)
+				subpass.pDepthStencilAttachment = &depthAttachmentReference;
+			else
+				subpass.pDepthStencilAttachment = nullptr;
 
 			VkSubpassDependency dependency{};
 			dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -299,8 +303,10 @@ namespace TerraForge3D
 
 		void* FrameBuffer::GetDepthAttachmentHandle(void* h)
 		{
-			TF3D_ASSERT(false, "Depth not yet implemented");
-			return nullptr;
+			TF3D_ASSERT(setupOnGPU, "Cannot get color atachment handle before framebuffer is setup");
+			if (h)
+				memcpy(h, &depthAttachment.handle, sizeof(depthAttachment.handle));
+			return depthAttachment.handle;
 		}
 
 		void* FrameBuffer::ReadPixel(uint32_t x, uint32_t y, int index, void* data)
@@ -308,10 +314,8 @@ namespace TerraForge3D
 			TF3D_ASSERT(index < 4 && index >= 0, "Color attachment index must be greater than equal to 0 and less than 4");
 			TF3D_ASSERT(index < colorAttachmentCount, "Color attachment index out of bounds");
 			TF3D_ASSERT(setupOnGPU, "Cannot read pixel handle before framebuffer is setup");
-			
 			GPUTexture* texture = colorAttachments[index];
-			TF3D_ASSERT(false, "Not yet implemented");
-			return nullptr;
+			return texture->ReadPixel(x, y, data);
 		}
 	}
 

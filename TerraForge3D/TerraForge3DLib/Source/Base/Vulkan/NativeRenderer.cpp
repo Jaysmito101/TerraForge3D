@@ -42,6 +42,7 @@ namespace TerraForge3D
 				
 			std::vector<VkRenderPassBeginInfo> renderPassBeginInfos;
 			std::vector<VkClearValue> clearValues;
+			std::vector<std::array<int32_t, 4>> uvectors;
 			std::vector<std::pair<VkBuffer, VkDeviceSize>> buffers;
 
 			std::stack<void*> rendererStack;
@@ -57,8 +58,7 @@ namespace TerraForge3D
 				{
 					TF3D_ASSERT(param, "Parameter is null");
 					TF3D_ASSERT(framebuffer, "Cannot clear without any bound framebuffer");
-					float* clearColor = reinterpret_cast<float*>(param);
-					// TODO: Implement
+					// This is not available on vulkan backend clearing is automatically done on binding a framebuffer
 					break;
 				}
 				case RendererCommand_BindFrameBuffer:
@@ -74,22 +74,26 @@ namespace TerraForge3D
 					renderPassBeginInfo.framebuffer = framebuffer->handle;
 					renderPassBeginInfo.renderArea.offset = {0, 0};
 					renderPassBeginInfo.renderArea.extent = { framebuffer->GetHeight(), framebuffer->GetWidth() };
-					// TODO: Fixme for multiple attachments
+					VkClearValue clearValue;
+					TF3D_ASSERT(!rendererStack.empty(), "Clear color must be pushed into the renderer stack before binding a Framebuffer in Vulkan backend")
+					float* clearColor = reinterpret_cast<float*>(rendererStack.top());
+					rendererStack.pop();
+					clearValue.color.float32[0] = clearColor[0];
+					clearValue.color.float32[1] = clearColor[1];
+					clearValue.color.float32[2] = clearColor[2];
+					clearValue.color.float32[3] = clearColor[3];
 					for (int i = 0; i < framebuffer->GetColorAttachmentCount();i++)
-					{
-						VkClearValue clearValue = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
 						clearValues.push_back(clearValue);
-					}
 
 					if (framebuffer->HasDepthAttachment())
 					{
-						VkClearValue clearValue = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-						clearValue.depthStencil = {0.0f, 0};
+						clearValue.depthStencil = {1.0f, 0};
 						clearValues.push_back(clearValue);
 					}
+					
 					int clearValueCount = framebuffer->GetColorAttachmentCount() + (framebuffer->HasDepthAttachment() ? 1 : 0);
 					renderPassBeginInfo.clearValueCount = clearValueCount;
-					renderPassBeginInfo.pClearValues = (&clearValues.back() - clearValueCount);
+					renderPassBeginInfo.pClearValues = (&clearValues.back() - clearValueCount + 1);
 					renderPassBeginInfos.push_back(renderPassBeginInfo);
 					vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfos.back(), VK_SUBPASS_CONTENTS_INLINE);
 					break;
@@ -104,8 +108,10 @@ namespace TerraForge3D
 					// mousePickIDUniformLocation = glGetUniformLocation(shader->handle, "_MousePickID"); // TEMP here
 					TF3D_ASSERT(shader, "Shader is null");
 					TF3D_ASSERT(shader->IsCompiled(), "Shader is not compiled");
-					pipeline->Rebuild(framebuffer);
+					pipeline->Rebuild(framebuffer, true); // TEMP FOR DEBUGGING
 					vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+					vkCmdSetViewport(commandBuffer, 0, 1, &pipeline->viewport);
+					vkCmdSetScissor(commandBuffer, 0, 1, &pipeline->scissor);
 					break;
 				}
 				/*
@@ -126,6 +132,17 @@ namespace TerraForge3D
 					Mesh* mesh = reinterpret_cast<Mesh*>(param);
 					lastRenderedMesh = reinterpret_cast<Vulkan::NativeMesh*>(mesh->GetNativeMesh());
 					TF3D_ASSERT(lastRenderedMesh->IsSetup(), "Native mesh not yet setup");
+					uvectors.push_back({ params.num, 0, 0, 0 });
+					if (shader->PushConstantExists("_Engine"))
+					{
+						auto& [size, offset] = shader->GetPushConstantLocation("_Engine");
+						vkCmdPushConstants(commandBuffer, pipeline->pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, offset, size, &uvectors.back());
+					}
+					else
+					{
+						TF3D_ASSERT(false, "Engine reserved uniform not found");
+						TF3D_LOG_WARN("Engine reserved uniform not found");
+					}
 					std::pair < VkBuffer, VkDeviceSize> vbuffer;
 					vbuffer.first = lastRenderedMesh->vertexBuffer->handle;
 					vbuffer.second = 0;

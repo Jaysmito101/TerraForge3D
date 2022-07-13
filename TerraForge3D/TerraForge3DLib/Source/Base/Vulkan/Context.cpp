@@ -38,13 +38,24 @@ namespace TerraForge3D
             createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
             createInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
+
 #ifdef TF3D_DEBUG
+            VkValidationFeaturesEXT validationFeatures{};
+            std::vector valFeaturesEnabled = {VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT};
+            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
+
             if (g_ValidationLayersSupported)
             {
                 createInfo.enabledLayerCount = ValidationLayers::GetLayerCount();
                 createInfo.ppEnabledLayerNames = ValidationLayers::GetLayerNames();
-                VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
-                createInfo.pNext = ValidationLayers::PopulateDebugMessengerCreateInfo(&debugCreateInfo);
+                // TODO : Add both
+                //createInfo.pNext = ValidationLayers::PopulateDebugMessengerCreateInfo(&debugCreateInfo);
+                validationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+                validationFeatures.enabledValidationFeatureCount = valFeaturesEnabled.size();
+                validationFeatures.pEnabledValidationFeatures = valFeaturesEnabled.data();
+                validationFeatures.pNext = ValidationLayers::PopulateDebugMessengerCreateInfo(&debugCreateInfo);
+                createInfo.pNext = &validationFeatures;
+
             }
             else
             {
@@ -95,7 +106,9 @@ namespace TerraForge3D
 #ifdef TF3D_DEBUG
             // In debug builds we also need the DEBUG_UTILS_EXTENSION for debug messages
             if (g_ValidationLayersSupported)
+            {
                 requiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+            }
 #endif
             return requiredExtensions;
         }

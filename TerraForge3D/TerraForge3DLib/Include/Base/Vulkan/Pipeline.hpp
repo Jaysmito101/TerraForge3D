@@ -50,7 +50,11 @@ namespace TerraForge3D
 			float depthBiasSlopeFactor = 0.0f;
 
 			// Dynamic State
-			std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT};
+			std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+
+			// Viewport ans Scissor
+			VkViewport viewport;
+			VkRect2D scissor;
 
 			// Vulkan Pipeline Data
 			VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;

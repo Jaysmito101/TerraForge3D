@@ -106,7 +106,6 @@ namespace TerraForge3D
 			inputAssemblyStateCreateInfo.topology = primitiveTopology;
 			inputAssemblyStateCreateInfo.primitiveRestartEnable = primitiveRestartEnabled;
 
-			VkViewport viewport{};
 			viewport.x = static_cast<float>(viewportBegin[0]);
 			viewport.y = static_cast<float>(viewportBegin[1]);
 			viewport.width = static_cast<float>(currentFramebuffer.width);
@@ -114,13 +113,9 @@ namespace TerraForge3D
 			viewport.minDepth = 0.0f;
 			viewport.maxDepth = 1.0f;
 
-			VkExtent2D extent{};
-			extent.height = currentFramebuffer.height;
-			extent.width = currentFramebuffer.width;
-
-			VkRect2D scissor{};
 			scissor.offset = {0, 0};
-			scissor.extent = extent;
+			scissor.extent.height = currentFramebuffer.height;
+			scissor.extent.width = currentFramebuffer.width;
 
 			VkPipelineViewportStateCreateInfo viewportStateCreateInfo{};
 			viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -151,22 +146,27 @@ namespace TerraForge3D
 			multisamplinStateCreateInfo.alphaToCoverageEnable = VK_FALSE; // Optional
 			multisamplinStateCreateInfo.alphaToOneEnable = VK_FALSE; // Optional
 
-			VkPipelineColorBlendAttachmentState colorBlendAttachmentState{};
-			colorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-			colorBlendAttachmentState.blendEnable = VK_FALSE;
-			colorBlendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-			colorBlendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-			colorBlendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-			colorBlendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-			colorBlendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-			colorBlendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
+			std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachmentStates;
+			for (int i = 0; i < currentFramebuffer.handle->GetColorAttachmentCount(); i++)
+			{
+				VkPipelineColorBlendAttachmentState colorBlendAttachmentState{};
+				colorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+				colorBlendAttachmentState.blendEnable = VK_FALSE;
+				colorBlendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
+				colorBlendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+				colorBlendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD; // Optional
+				colorBlendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
+				colorBlendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+				colorBlendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
+				colorBlendAttachmentStates.push_back(colorBlendAttachmentState);
+			}
 
 			VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo{};
 			colorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 			colorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
 			colorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY; // Optional
-			colorBlendStateCreateInfo.attachmentCount = 1;
-			colorBlendStateCreateInfo.pAttachments = &colorBlendAttachmentState;
+			colorBlendStateCreateInfo.attachmentCount = colorBlendAttachmentStates.size();
+			colorBlendStateCreateInfo.pAttachments = colorBlendAttachmentStates.data();
 			colorBlendStateCreateInfo.blendConstants[0] = 0.0f; // Optional
 			colorBlendStateCreateInfo.blendConstants[1] = 0.0f; // Optional
 			colorBlendStateCreateInfo.blendConstants[2] = 0.0f; // Optional
@@ -227,6 +227,7 @@ namespace TerraForge3D
 			graphicsPipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
 			graphicsPipelineCreateInfo.pMultisampleState = &multisamplinStateCreateInfo;
 			graphicsPipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
+			graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
 			graphicsPipelineCreateInfo.layout = pipelineLayout;
 			graphicsPipelineCreateInfo.renderPass = currentFramebuffer.handle->renderPass;
 			graphicsPipelineCreateInfo.subpass = 0;

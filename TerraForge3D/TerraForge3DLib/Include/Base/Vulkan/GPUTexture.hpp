@@ -30,6 +30,9 @@ namespace TerraForge3D
 			virtual void GetData(void* data) override;
 			virtual ImTextureID GetImGuiID() override;
 
+			virtual void* ReadPixel(uint32_t x, uint32_t y, uint32_t z, void* data = nullptr);
+			inline void* ReadPixel(uint32_t x, uint32_t y, void* data = nullptr) { return ReadPixel(x, y, 0, data); }
+
 
 			virtual void UseGraphicsDevice();
 			virtual void UseComputeDevice();

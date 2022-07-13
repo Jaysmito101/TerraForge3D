@@ -19,6 +19,30 @@ namespace TerraForge3D
 			extensions = {
 				VK_KHR_SWAPCHAIN_EXTENSION_NAME
 			};
+
+#ifdef TF3D_DEBUG
+			{
+				uint32_t extensionCount = 0;
+				TF3D_VK_CALL(vkEnumerateDeviceExtensionProperties(pD.handle, nullptr, &extensionCount, nullptr));
+				std::vector<VkExtensionProperties> extensionProperties(extensionCount);
+				TF3D_VK_CALL(vkEnumerateDeviceExtensionProperties(pD.handle, nullptr, &extensionCount, extensionProperties.data()));
+				bool available = false;
+				for (auto extension : extensionProperties)
+				{
+					if (strcmp(extension.extensionName, VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME) == 0)
+					{
+						available = true;
+						break;
+					}
+				}
+				if (available)
+					extensions.push_back(VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME);
+				else
+				{
+					TF3D_LOG_WARN("Extension {0} is not supported by Physical Device {1}", VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME, pD.name.data());
+				}
+			}
+#endif
 			physicalDevice = pD;
 			TF3D_LOG("Using Graphics Device: {0}", physicalDevice.name);
 			CreateDevice();

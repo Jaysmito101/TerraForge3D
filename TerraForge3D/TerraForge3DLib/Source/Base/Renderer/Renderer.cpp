@@ -70,12 +70,18 @@ namespace TerraForge3D
 
 	Renderer* Renderer::ClearFrame()
 	{
+#ifdef TF3D_OPENGL_BACKEND
+		// This will be ignored anyway inside Vulkan native renderer so better to skip adding the command at all
 		nativeRenderer->AddCommand(RendererCommand_Clear, clearColor);
+#endif
 		return this;
 	}
 
 	Renderer* Renderer::BindFramebuffer(RendererAPI::FrameBuffer* framebuffer)
 	{
+#ifdef TF3D_VULKAN_BACKEND
+		nativeRenderer->AddCommand(RendererCommand_PushC, clearColor);
+#endif
 		nativeRenderer->AddCommand(RendererCommand_BindFrameBuffer, framebuffer);
 		return this;
 	}

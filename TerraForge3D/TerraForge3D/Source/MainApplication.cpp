@@ -157,6 +157,7 @@ void main()
 #endif
 
 #ifdef TF3D_VULKAN
+//#extension GL_EXT_debug_printf : enable
 #include "Temp.glsl"
 
 
@@ -170,13 +171,18 @@ layout (location = 1) out vec3 Normal;
 
 layout (push_constant) uniform Constants
 {
+	ivec4 _Engine;
 	mat4 _PV;
 	mat4 _Model;
 } PushConstants;
 
+
 void main()
 {
-	gl_Position = PushConstants._PV * PushConstants._Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
+	//debugPrintfEXT("Hello World!");
+	//gl_Position = PushConstants._PV * PushConstants._Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
+	gl_Position = PushConstants._PV *  PushConstants._Model * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
+	//gl_Position = vec4(position.xy, 0.0f, 1.0f);
 	Position = position.xyz;
 	Normal = normal.xyz;
 }
@@ -188,6 +194,7 @@ void main()
 
 static std::string fss = R"(
 #version 430 core
+
 #ifdef TF3D_OPENGL
 
 layout(location = 0) out vec4 FragColor;
@@ -226,10 +233,18 @@ void main()
 #ifdef TF3D_VULKAN
 
 layout (location = 0) out vec4 FragColor;
-// layout(location = 1) out int MousePickID;
+layout (location = 1) out int MousePickID;
 
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec3 Normal;
+
+layout (push_constant) uniform Constants
+{
+	ivec4 _Engine;
+	mat4 _PV;
+	mat4 _Model;
+} PushConstants;
+
 
 // uniform int _MousePickID = 0;
 
@@ -250,10 +265,11 @@ void main()
     vec3 diffuse = diff * lightColor; 
     
 
-	//FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	//FragColor = vec4(1.0f);
 	//FragColor = vec4(pos * 0.5f + vec3(0.5f), 1.0f);
 	FragColor = vec4(vec3(diff), 1.0f);
 	// MousePickID = _MousePickID;
+	MousePickID = PushConstants._Engine.x;
 }
 
 #endif
@@ -322,6 +338,7 @@ namespace TerraForge3D
 			appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
 			appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
 			appState->pipeline->shader->SetUniformsLayout({
+				RendererAPI::ShaderVar("_Engine", RendererAPI::ShaderDataType_IVec4),
 				RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
 				RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
 				});
@@ -330,9 +347,9 @@ namespace TerraForge3D
 
 			appState->mesh = new Mesh("DemoTriangle");
 			appState->mesh->Clear();
-			//float A[3] = {  0.5f,  0.5f, 0.0f };
-			//float B[3] = {  0.5f, -0.5f, 0.0f };
-			//float C[3] = { -0.5f,  0.5f, 0.0f };
+			float A[3] = {  0.0f, -0.5f, 0.0f };
+			float B[3] = {  0.5f,  0.5f, 0.0f };
+			float C[3] = { -0.5f,  0.5f, 0.0f };
 			//appState->mesh->Triangle(A, B, C);
 			appState->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 256);
 			//appState->mesh->Sphere(glm::vec3(0.0f), 1.0f);

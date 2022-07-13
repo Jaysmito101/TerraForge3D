@@ -34,7 +34,7 @@ def PrintUsage(errorMessage=None, exit=True):
     print("\nCommands:")
     print("\tsetup      - Sets up the environment for TerraForge3D ( default )")
     print("\tgenerate   - Generates the TerraForge3D project files")
-    pirnt("\tbuild      - Builds TerraForge3D and its dependencies")
+    print("\tbuild      - Builds TerraForge3D and its dependencies")
     print("\tclean      - Cleans the TerraForge3D project files and build files")
     print("\tformat     - Formats the TerraForge3D source files (Windows Only)")
     print("\tupdate     - Updates git submodules ...")

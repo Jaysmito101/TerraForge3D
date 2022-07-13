@@ -25,6 +25,7 @@ namespace TerraForge3D
 		SwapChain::~SwapChain()
 		{
 			vkDestroySurfaceKHR(instance, surface, nullptr);
+			TF3D_LOG("Destroyed window surface");
 		}
 
 
