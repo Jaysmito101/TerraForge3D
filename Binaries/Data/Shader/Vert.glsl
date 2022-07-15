@@ -22,7 +22,7 @@ END_UNIFORMS()
 void main()
 {
 	// DEBUG_PRINT("Hello World!");
-	gl_Position = UNIFORM(_PV) * UNIFORM(_Model) * vec4(position.xyz + vec3(0.0f, noise(position.xyz), 0.0f), 1.0f);
+	gl_Position = UNIFORM(_PV) * UNIFORM(_Model) * vec4(position.xyz, 1.0f);
 	Position = position.xyz;
 	Normal = normal.xyz;
 }

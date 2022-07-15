@@ -100,6 +100,13 @@ public:
 			appState->jobs.manager->AddJob(job);
 		}
 
+		if (ImGui::Button("Subdivide"))
+		{
+			appState->mesh->CentroidSubdivision();
+			appState->mesh->RecalculateNormals();
+			appState->mesh->UploadToGPU();
+		}
+
 		if (ImGui::Button("Exit"))
 			appState->core.app->Close();
 
@@ -206,12 +213,13 @@ namespace TerraForge3D
 
 			appState->mesh = new Mesh("DemoTriangle");
 			appState->mesh->Clear();
-			float A[3] = {  0.0f, -0.5f, 0.0f };
+			float A[3] = {  0.0f, -0.5f, 0.0f }; 
 			float B[3] = {  0.5f,  0.5f, 0.0f };
 			float C[3] = { -0.5f,  0.5f, 0.0f };
 			//appState->mesh->Triangle(A, B, C);
 			appState->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 256);
 			//appState->mesh->Sphere(glm::vec3(0.0f), 1.0f);
+			appState->mesh->RecalculateNormals();
 			appState->mesh->UploadToGPU();
 
 			appState->core.fonts = fonts;
@@ -267,6 +275,8 @@ namespace TerraForge3D
 
 			if (ImGui::Button("ReCompile Shaders"))
 			{
+				vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
+				fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
 				appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
 				appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
 				appState->pipeline->shader->Compile();

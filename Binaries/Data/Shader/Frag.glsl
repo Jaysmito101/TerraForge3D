@@ -21,7 +21,7 @@ uniform int _MousePickID = 0;
 
 void main()
 {
-	vec3 lightPos = vec3(0.0, 0.5f, 0.0f);
+	vec3 lightPos = vec3(0.0, 1.5f, 0.0f);
 	vec3 lightColor = vec3(0.8f);
 	vec3 objectColor = vec3(0.8f);
 

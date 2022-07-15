@@ -1,4 +1,5 @@
 #include "Base/DS/Mesh.hpp"
+#include "Base/Math/Math.hpp"
 
 #include <cmath>
 
@@ -67,7 +68,7 @@ namespace TerraForge3D
 	}
 
 
-	Mesh& Mesh::Sphere(glm::vec3 position, float radius)
+	Mesh& Mesh::Sphere(glm::vec3 position, float radius, uint32_t subdivisions)
 	{
 		Clear();
 		vertices.emplace_back( 0.0f,  1.0f,  0.0f); // +Y 0
@@ -86,6 +87,15 @@ namespace TerraForge3D
 		faces.emplace_back(2, 1, 4); // +X -Y +Z
 		faces.emplace_back(4, 1, 3); // +Z -Y -X
 		faces.emplace_back(3, 1, 5); // -X -Y -Z
+
+		for (int i = 0; i < subdivisions; i++)
+			CentroidSubdivision();
+
+		for (Vertex& v : vertices)
+		{
+			float invDist = FastInverseSqrt(v.position.x* v.position.x + v.position.y* v.position.y + v.position.z* v.position.z);
+			v.position *= radius * invDist;
+		}
 
 		return *this;
 	}

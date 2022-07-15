@@ -56,10 +56,14 @@ namespace TerraForge3D
 		inline RendererAPI::NativeMesh* GetNativeMesh() { return this->nativeHandle; }
 		inline glm::mat4& GetModelMatrix() { return modelMatrix; };
 
+		// Mesh Functions
+		Mesh& CentroidSubdivision();
+		Mesh& RecalculateNormals();
+
 		// Mesh Generators
 		Mesh& Triangle(float* A, float* B, float* C);
 		Mesh& Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution = 256);
-		Mesh& Sphere(glm::vec3 position, float radius);
+		Mesh& Sphere(glm::vec3 position, float radius, uint32_t subdivisions = 4);
 
 	public:
 		float position[3] = { 0.0f, 0.0f, 0.0f };

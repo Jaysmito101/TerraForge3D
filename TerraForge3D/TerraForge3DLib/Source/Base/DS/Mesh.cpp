@@ -1,12 +1,15 @@
 #include "Base/DS/Mesh.hpp"
 #include "Base/Renderer/NativeMesh.hpp"
 
+#include "Base/Math/Math.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 
 namespace TerraForge3D
 {
@@ -66,4 +69,61 @@ namespace TerraForge3D
 		modelMatrix = transM * rotM;
 	}
 
+	Mesh& Mesh::CentroidSubdivision()
+	{
+		std::vector<Face> newFaces;
+		for (Face& face : faces)
+		{
+			Vertex& a = vertices[face.a];
+			Vertex& b = vertices[face.b];
+			Vertex& c = vertices[face.c];
+
+			Vertex centroid;
+			centroid.position = (a.position + b.position + c.position) / 3.0f;
+			centroid.texCoord = (a.texCoord + b.texCoord + c.texCoord) / 3.0f;
+			centroid.extra = glm::vec4(0.0f);
+			centroid.normal = glm::vec4(0.0f);
+			vertices.push_back(centroid);
+
+			newFaces.emplace_back(face.a, face.b, vertices.size() - 1);
+			newFaces.emplace_back(vertices.size() - 1, face.b, face.c);
+			newFaces.emplace_back(face.a, vertices.size() - 1, face.c);
+		}
+		faces = newFaces;
+		return *this;
+	}
+
+	Mesh& Mesh::RecalculateNormals()
+	{
+		glm::vec3 e1(0.0f);
+		glm::vec3 e2(0.0f);
+		glm::vec3 no(0.0f);
+		
+#ifndef TF3D_MESH_RETAIN_OLD_NORMALS
+		for (Vertex& v : vertices)
+			v.normal.x = v.normal.y = v.normal.z = v.normal.w = 0.0f;
+#endif // TF3D_MESH_RETAIN_OLD_NORMALS
+
+		for (Face& f : faces)
+		{
+		
+			glm::vec4& tmp4a = vertices[f.a].position;
+			glm::vec4& tmp4b = vertices[f.b].position;
+			glm::vec4& tmp4c = vertices[f.c].position;
+			TF3D_VEC3_SUB(e1, tmp4a, tmp4b);
+			TF3D_VEC3_SUB(e2, tmp4c, tmp4b);
+			TF3D_VEC3_CROSS(no, e1, e2);
+			TF3D_VEC3_ADD(vertices[f.a].normal, no, vertices[f.a].normal);
+			TF3D_VEC3_ADD(vertices[f.b].normal, no, vertices[f.b].normal);
+			TF3D_VEC3_ADD(vertices[f.c].normal, no, vertices[f.c].normal);
+		}
+#ifndef TF3D_MESH_UNSAFE_NORMALS
+		for (Vertex& v : vertices)
+		{
+			TF3D_VEC3_NORMALIZE(v.normal);
+			v.normal.w = 0.0f;
+		}
+#endif // TF3D_MESH_UNSAFE_NORMALS
+		return *this;
+	}
 }
