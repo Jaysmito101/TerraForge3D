@@ -30,3 +30,4 @@
 
 // Editors
 #include "Editors/Viewport.hpp"
+#include "Editors/Inspector.hpp"

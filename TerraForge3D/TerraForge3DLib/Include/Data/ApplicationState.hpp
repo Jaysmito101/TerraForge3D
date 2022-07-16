@@ -14,7 +14,6 @@ namespace TerraForge3D
 	class StartUpScreen;
 	class Preferences;
 	class Renderer;
-	class Viewport;
 	namespace UI 
 	{
 		class EditorManager;
@@ -24,6 +23,9 @@ namespace TerraForge3D
 	{
 		class JobSystem;
 	}
+	// Editors
+	class Viewport;
+	class Inspector;
 	
 
 	/*
@@ -80,6 +82,8 @@ namespace TerraForge3D
 		{
 			SharedPtr<UI::EditorManager> manager;
 			SharedPtr<StartUpScreen> startUpScreen;
+			SharedPtr<Viewport> viewports[VIEWPORT_COUNT];
+			SharedPtr<Inspector> inspector;
 		} editors;
 
 		struct
@@ -99,7 +103,6 @@ namespace TerraForge3D
 
 		SharedPtr<Preferences> preferences;
 
-		SharedPtr<Viewport> viewports[VIEWPORT_COUNT];
 
 		Renderer* renderer = nullptr;
 

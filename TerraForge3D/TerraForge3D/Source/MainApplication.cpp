@@ -194,10 +194,10 @@ namespace TerraForge3D
 			TF3D_ASSERT(VIEWPORT_COUNT >= 1, "Minimum viewport count is 1");
 			for (int i = 0; i < VIEWPORT_COUNT; i++)
 			{
-				appState->viewports[i] = new Viewport(appState, i + 1);
-				appState->editors.manager->AddEditor(appState->viewports[i]);
+				appState->editors.viewports[i] = new Viewport(appState, i + 1);
+				appState->editors.manager->AddEditor(appState->editors.viewports[i]);
 			}
-			appState->viewports[0]->SetVisible(true);
+			appState->editors.viewports[0]->SetVisible(true);
 
 			appState->pipeline = RendererAPI::Pipeline::Create();			
 			appState->pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
@@ -223,8 +223,10 @@ namespace TerraForge3D
 			appState->mesh->UploadToGPU();
 
 			appState->core.fonts = fonts;
-
 			appState->renderer = appState->core.app->renderer;
+
+			appState->editors.inspector = new Inspector(appState);
+			appState->editors.manager->AddEditor(appState->editors.inspector);
 		}
 
 		virtual void OnUpdate() override
