@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-project(Glad C)
+# project(Glad C)
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
@@ -19,6 +19,9 @@ add_library(Glad STATIC
 	./Source/glad.c
 )
 
+set_target_properties(Glad PROPERTIES LINKER_LANGUAGE CXX)
+
+
 target_include_directories(Glad
 	PUBLIC ./Include
 )
@@ -27,7 +30,7 @@ target_link_libraries(Glad
 	opengl32
 )
 
-if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	# On Windows
 	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 

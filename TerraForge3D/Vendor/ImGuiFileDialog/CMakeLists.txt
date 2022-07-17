@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-project(ImGuiFileDialog CXX)
+# project(ImGuiFileDialog CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)

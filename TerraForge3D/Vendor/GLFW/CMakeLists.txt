@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-project(GLFW C)
+# project(GLFW C)
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
@@ -30,7 +30,7 @@ list(APPEND SOURCES "./Source/null_joystick.c")
 list(APPEND SOURCES "./Source/null_monitor.c")
 list(APPEND SOURCES "./Source/null_init.c")
 
-if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	# On Windows
 	list(APPEND SOURCES "./Source/win32_init.c")
 	list(APPEND SOURCES "./Source/win32_monitor.c")
@@ -75,6 +75,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 add_library(GLFW STATIC ${SOURCES})
+
+set_target_properties(GLFW PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(GLFW
 	PUBLIC ./Include

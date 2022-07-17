@@ -47,7 +47,7 @@ static std::vector<std::string> ParseArguments()
     std::vector<std::string> args;
     LPWSTR *szArgList;
     int argCount;
-    szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
+    szArgList = CommandLineToArgvW(GetCommandLineW(), &argCount);
     if (szArgList == nullptr)
     {
         return args;
