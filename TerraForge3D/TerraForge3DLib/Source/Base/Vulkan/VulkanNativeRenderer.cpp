@@ -108,7 +108,7 @@ namespace TerraForge3D
 					// mousePickIDUniformLocation = glGetUniformLocation(shader->handle, "_MousePickID"); // TEMP here
 					TF3D_ASSERT(shader, "Shader is null");
 					TF3D_ASSERT(shader->IsCompiled(), "Shader is not compiled");
-					pipeline->Rebuild(framebuffer, true); // TEMP FOR DEBUGGING
+					pipeline->Rebuild(framebuffer);
 					vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
 					vkCmdSetViewport(commandBuffer, 0, 1, &pipeline->viewport);
 					vkCmdSetScissor(commandBuffer, 0, 1, &pipeline->scissor);

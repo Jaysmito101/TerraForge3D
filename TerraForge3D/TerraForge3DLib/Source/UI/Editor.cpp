@@ -58,6 +58,8 @@ namespace TerraForge3D
 				bool tmp = ImGui::Begin(name.data(), &isVisible, windowFlags);
 				// ImGui::PopStyleVar();
 
+				state.isFocused = ImGui::IsWindowFocused();
+				state.isHovered = ImGui::IsWindowHovered();
 
 				Utils::ImGuiC::PopSubFont();
 				if (tmp)

@@ -21,14 +21,7 @@ namespace TerraForge3D
 		// Rendeer the frame and update mouse only if the viewport is visible
 		if (isVisible)
 		{
-			appState->renderer->SetCamera(camera.Get());
-			appState->renderer->SetClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-
-			appState->renderer->BindFramebuffer(framebuffer.Get());
-			appState->renderer->ClearFrame();
-			appState->renderer->BindPipeline(appState->pipeline.Get());
-			appState->renderer->DrawMesh(appState->mesh.Get(), 484);
-
+			appState->editors.inspector->RenderItems(this);
 			uint32_t mx = static_cast<uint32_t>(prevMouseX * (resolution - 2)) + 1;
 			uint32_t my = resolution - static_cast<uint32_t>(prevMouseY * (resolution - 2)) + 1;
 			//int32_t val = 0;
@@ -44,7 +37,8 @@ namespace TerraForge3D
 
 		ImVec2 windowSize = ImGui::GetWindowSize();
 		ImGui::Image(framebuffer->GetColorAttachmentImGuiID(0), windowSize, ImVec2(0, 1), ImVec2(1, 0));
-		if (ImGui::IsItemHovered())
+		isHovered = ImGui::IsItemHovered();
+		if (isHovered)
 		{
 			ImVec2 imageBegin = ImGui::GetItemRectMin();
 			ImVec2 relativeMousePosition = ImGui::GetMousePos() - imageBegin;
@@ -95,6 +89,18 @@ namespace TerraForge3D
 			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
 		
 		isVisible = false;
+
+		mouseScrollEventCallback = appState->core.window->eventManager->RegisterCallback([this](MouseScrollEventParams* params) -> bool {
+			if (this->isHovered)
+			{
+				float scrollDelta = params->offsetY;
+				// TEMP BEGIN
+				// This part will be modified later	
+				this->camera->position += glm::vec3(0, 0, 1) * this->zoomSpeed * scrollDelta;
+				// TEMP END
+			}
+			return true;
+		});
 	}
 
 	void Viewport::OnEnd()
@@ -102,18 +108,34 @@ namespace TerraForge3D
 		// OPTIONAL : as the following will automatically be done by framebuffers destrustor as autoDestory is true by default
 		if (framebuffer->IsSetup())
 			framebuffer->Destroy();
+
+		appState->core.window->eventManager->DeregisterCallback(mouseScrollEventCallback);
 	}
 
 	bool Viewport::OnContextMenu()
 	{
 		ImGui::DragFloat("Camera Movement Speed", &positionSpeed, 0.01f);
 		ImGui::DragFloat("Camera Rotation Speed", &rotationSpeed, 0.01f);
+		ImGui::DragFloat("Camera Zoom Speed", &zoomSpeed, 0.01f);
 		ImGui::DragFloat("Camera FOV", &camera->fov, 0.01f);
 		ImGui::Checkbox("Camera Flip Y", &camera->flipY);
 		ImGui::Checkbox("Invert Y Input", &invertYInput);
 
 		ImGui::DragFloat3("Camera Position", &camera->position[0], 0.01f);
 		ImGui::DragFloat3("Camera Rotation", &camera->rotation[0], 0.01f);
+
+		if (ImGui::BeginCombo("Viewport Mode", ViewportModeStr[mode]))
+		{
+			for (int n = 0; n < TF3D_STATIC_ARRAY_SIZE(ViewportModeStr); n++)
+			{
+				bool isSelected = (ViewportModeStr[mode] == ViewportModeStr[n]);
+				if (ImGui::Selectable(ViewportModeStr[n], isSelected))
+					mode = static_cast<ViewportMode>(n);
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
 
 		return ImGui::Button("Close");			
 	}

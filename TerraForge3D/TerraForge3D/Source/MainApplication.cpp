@@ -134,14 +134,6 @@ private:
 	float counter = 0.0f;
 };
 
-#include <glad/glad.h>
-
-std::string vss = "";
-
-static std::string fss = "";
-
-#include "Base/OpenGL/Shader.hpp"
-
 namespace TerraForge3D
 {
 	class MainApplication : public Application
@@ -156,10 +148,6 @@ namespace TerraForge3D
 			SetApplicationName(appState->meta.name);
 			SetWindowConfigPath(appState->appResourcePaths.windowConfigPath);
 			SetFontConfig(Utils::ReadTextFile(appState->appResourcePaths.fontsConfigPath), appState->appResourcePaths.fontsDir);
-
-			vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
-			fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
-			
 		}
 
 
@@ -191,6 +179,9 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 			
+			appState->editors.inspector = new Inspector(appState);
+			appState->editors.manager->AddEditor(appState->editors.inspector);
+
 			TF3D_ASSERT(VIEWPORT_COUNT >= 1, "Minimum viewport count is 1");
 			for (int i = 0; i < VIEWPORT_COUNT; i++)
 			{
@@ -198,18 +189,6 @@ namespace TerraForge3D
 				appState->editors.manager->AddEditor(appState->editors.viewports[i]);
 			}
 			appState->editors.viewports[0]->SetVisible(true);
-
-			appState->pipeline = RendererAPI::Pipeline::Create();			
-			appState->pipeline->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
-			appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
-			appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
-			appState->pipeline->shader->SetUniformsLayout({
-				RendererAPI::ShaderVar("_Engine", RendererAPI::ShaderDataType_IVec4),
-				RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
-				RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
-				});
-			appState->pipeline->shader->Compile();
-			appState->pipeline->Setup();
 
 			appState->mesh = new Mesh("DemoTriangle");
 			appState->mesh->Clear();
@@ -225,8 +204,6 @@ namespace TerraForge3D
 			appState->core.fonts = fonts;
 			appState->renderer = appState->core.app->renderer;
 
-			appState->editors.inspector = new Inspector(appState);
-			appState->editors.manager->AddEditor(appState->editors.inspector);
 		}
 
 		virtual void OnUpdate() override
@@ -235,16 +212,6 @@ namespace TerraForge3D
 			appState->modals.manager->Update();
 			appState->project.manager->Update();
 			appState->jobs.manager->Update();
-
-			
-			// TEMP
-			// appState->renderer->SetCamera(camera.Get());
-			// appState->renderer->BindFramebuffer(fbo.Get());
-			// appState->renderer->SetClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-			// appState->renderer->ClearFrame();
-			// appState->renderer->BindPipeline(pipeline.Get());
-			// appState->renderer->DrawMesh(mesh.Get());
-			// TEMP
 
 			appState->renderer->Flush();
 
@@ -262,30 +229,9 @@ namespace TerraForge3D
 			{
 				appState->menus.mainMenu->Show();
 				appState->editors.manager->Show();
-
-				// ImGui::Begin("sadsa");
-				// ImGui::ShowStyleEditor();
-				// ImGui::End();
 			}
 
 
-			ImGui::Begin("Viewport");
-			ImGui::ColorEdit4("ClearColor", clearColor);
-			ImGui::DragFloat3("Position", appState->mesh->position, 0.1f);
-			ImGui::DragFloat3("Rotation", appState->mesh->rotation, 0.1f);
-			appState->mesh->RecalculateMatices();
-
-			if (ImGui::Button("ReCompile Shaders"))
-			{
-				vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
-				fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
-				appState->pipeline->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
-				appState->pipeline->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
-				appState->pipeline->shader->Compile();
-				appState->pipeline->Setup();
-			}
-
-			ImGui::End();
 			ImGui::PopFont();
 
 			dockspace.End();
@@ -303,7 +249,7 @@ namespace TerraForge3D
 
 		}
 
-	private:
+	private: 
 		uint32_t exitcb;
 		float pos[2] = {0.0f};
 		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f};

@@ -36,10 +36,18 @@ namespace TerraForge3D
 
 			inline bool IsEnabled() { return this->isEnabled; }
 			inline bool IsVisible() { return this->isVisible; }
+			inline bool IsHovered() { return this->state.isHovered; }
+			inline bool IsFocused() { return this->state.isFocused; }
 			inline std::string GetName() { return this->name; }
 			inline SharedPtr<EditorManager> GetSubEditorManager() { return this->subEditorManager; }
 			inline SharedPtr<Menu> GetMenu() { return this->menu; }
 
+		public:
+			struct
+			{
+				bool isHovered = false;
+				bool isFocused = false;
+			} state;
 		protected:
 			std::string name = "Editor";
 			UUID uid;

@@ -70,6 +70,9 @@ namespace TerraForge3D
 
 		mousePos[0] = static_cast<float>(mpx);
 		mousePos[1] = static_cast<float>(mpy);
+
+		mouseScrollDelta[0] = 0.0f;
+		mouseScrollDelta[1] = 0.0f;
 	}
 
 	bool InputSystem::EventCallback(InputEventParams* params)

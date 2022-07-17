@@ -1,12 +1,17 @@
 #include "Editors/Inspector.hpp"
 #include "Data/ApplicationState.hpp"
 
+#include "Editors/Viewport.hpp"
+#include "UI/MainMenu.hpp"
+
 #include "imgui/imgui_internal.h"
 
 namespace TerraForge3D
 {
+	static SharedPtr<RendererAPI::Pipeline> renderPipeline[VIEWPORT_COUNT];
 
-	
+	// TEMP
+	static std::string vss, fss;
 
 	Inspector::Inspector(ApplicationState* as)
 	{
@@ -19,6 +24,27 @@ namespace TerraForge3D
 
 	void Inspector::OnStart()
 	{
+		this->appState->menus.mainMenu->GetManagerPTR()->Register("Windows/Inspector", [this](TerraForge3D::UI::MenuItem* context) {
+			isVisible = context->GetToggleState();
+			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
+
+			vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
+			fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
+
+			for (int i = 0; i < VIEWPORT_COUNT; i++)
+			{
+				renderPipeline[i] = RendererAPI::Pipeline::Create();
+				renderPipeline[i]->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
+				renderPipeline[i]->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
+				renderPipeline[i]->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
+				renderPipeline[i]->shader->SetUniformsLayout({
+					RendererAPI::ShaderVar("_Engine", RendererAPI::ShaderDataType_IVec4),
+					RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
+					RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
+					});
+				renderPipeline[i]->shader->Compile();
+				renderPipeline[i]->Setup();
+			}
 	}
 
 	void Inspector::OnShow()
@@ -86,4 +112,14 @@ namespace TerraForge3D
 		return false;
 	}
 
+	bool Inspector::RenderItems(Viewport* viewport)
+	{
+		appState->renderer->SetCamera(viewport->GetCamera().Get());
+		appState->renderer->SetClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		appState->renderer->BindFramebuffer(viewport->GetFramebuffer().Get());
+		appState->renderer->ClearFrame();
+		appState->renderer->BindPipeline(renderPipeline[viewport->GetNumber()].Get());
+		appState->renderer->DrawMesh(appState->mesh.Get(), 484);
+		return true;
+	}
 }

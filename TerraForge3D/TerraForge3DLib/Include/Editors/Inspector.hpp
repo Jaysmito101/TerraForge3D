@@ -6,6 +6,7 @@ namespace TerraForge3D
 {
 
 	class ApplicationState;
+	class Viewport;
 
 	class Inspector : public UI::Editor
 	{
@@ -19,9 +20,11 @@ namespace TerraForge3D
 		virtual void OnEnd() override;
 		virtual bool OnContextMenu() override;
 
+		bool RenderItems(Viewport* viewport);
+
 	private:
 		ApplicationState* appState = nullptr;
-		uint32_t itemViewHeight = 100;
+		float itemViewHeight = 100;
 		float separatorSliderWidth = 20.0f;
 
 		float prevMousePos = 0.0f;

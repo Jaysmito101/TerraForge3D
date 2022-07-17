@@ -107,7 +107,6 @@ namespace TerraForge3D
 		Renderer* renderer = nullptr;
 
 		// TEMP
-		SharedPtr<RendererAPI::Pipeline> pipeline;
 		SharedPtr<Mesh> mesh;
 
 		static ApplicationState* Create();
