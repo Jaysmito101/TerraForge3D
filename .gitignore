@@ -7,6 +7,7 @@ vendor/astyle
 vendor/doxygen
 vendor/VulkanSDK
 Binaries/VCRuntime
+build
 
 # Files
 .helpercache

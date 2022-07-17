@@ -6,6 +6,10 @@
 #include <atomic>
 #include <iostream>
 
+#ifdef TerraForge3D
+#error "Error"
+#endif
+
 namespace TerraForge3D
 {
 	struct SharedPtrControlBlock
