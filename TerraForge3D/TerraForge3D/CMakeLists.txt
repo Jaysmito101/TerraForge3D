@@ -105,7 +105,7 @@ target_link_libraries(TerraForge3D1
     TerraForge3DLib
 )
 
-add_compile_definitions(TerraForge3D1
+target_compile_definitions(TerraForge3D1
     Lib_COMPILED_LIB
     SPDLOG_COMPILED_LIB
 )

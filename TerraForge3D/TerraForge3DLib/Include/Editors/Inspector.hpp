@@ -8,6 +8,11 @@ namespace TerraForge3D
 	class ApplicationState;
 	class Viewport;
 
+	namespace Terrain
+	{
+		class Manager;
+	}
+
 	class Inspector : public UI::Editor
 	{
 	public:
@@ -23,7 +28,12 @@ namespace TerraForge3D
 		bool RenderItems(Viewport* viewport);
 
 	private:
+		void ShowTerrainSettings();
+
+
+	private:
 		ApplicationState* appState = nullptr;
+
 		float itemViewHeight = 100;
 		float separatorSliderWidth = 20.0f;
 
@@ -31,6 +41,23 @@ namespace TerraForge3D
 
 	public:
 		bool isTerrainSelected = false;
+
+		struct
+		{
+			uint32_t resolutionIndex = 0;
+			uint32_t resolution = 128;
+			float scale = 1.0f;
+			SharedPtr<Terrain::Manager> manager;
+		} terrain;
+
+		struct
+		{
+
+		} generators;
 	};
 
+
+
 }
+
+

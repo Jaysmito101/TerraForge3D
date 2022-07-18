@@ -8,8 +8,10 @@
 namespace TerraForge3D
 {
 
-	Mesh& Mesh::Triangle(float* A, float* B, float* C)
+	Mesh& Mesh::Triangle(float* A, float* B, float* C, float* progress)
 	{
+		if (progress)
+			*progress = 0.0f;
 		Clear();
 		Vertex v;
 		v.position = glm::vec4(A[0], A[1], A[2], 0.0f);
@@ -23,12 +25,16 @@ namespace TerraForge3D
 
 		faces.push_back({0, 1, 2});
 
+		if (progress)
+			*progress = 1.1f;
 		return *this;
 	}
 
-	Mesh& Mesh::Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution)
+	Mesh& Mesh::Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution, float scale, float* progress)
 	{
 		TF3D_ASSERT(resolution >= 2,  "Plane resulution must be greater than equal to 2");
+		if (progress)
+			*progress = 0.0f;
 		Clear();
 		glm::vec3 up = glm::normalize(glm::cross(right, front));
 		for (uint32_t y = 0; y < resolution; y++)
@@ -39,7 +45,8 @@ namespace TerraForge3D
 				glm::vec2 percent = glm::vec2(x, y) / ((float)resolution - 1);
 				glm::vec3 pointOnPlane = (percent.x - .5f) * 2 * right + (percent.y - .5f) * 2 * front;
 				pointOnPlane -= position; // origin shift
-				// pointOnPlane *= scale;
+				pointOnPlane.x *= scale; // scale the terrain on X axis
+				pointOnPlane.z *= scale; // scale the terrain on Y axis
 				Vertex v;
 				v.position = glm::vec4(0.0f);
 				v.position.x = (float)pointOnPlane.x;
@@ -63,13 +70,19 @@ namespace TerraForge3D
 				}
 
 			}
+			if (progress)
+				*progress = (float)y / resolution;
 		}
+		if (progress)
+			*progress = 1.1f;
 		return *this;
 	}
 
 
-	Mesh& Mesh::Sphere(glm::vec3 position, float radius, uint32_t subdivisions)
+	Mesh& Mesh::Sphere(glm::vec3 position, float radius, uint32_t subdivisions, float* progress)
 	{
+		if (progress)
+			*progress = 0.0f;
 		Clear();
 		vertices.emplace_back( 0.0f,  1.0f,  0.0f); // +Y 0
 		vertices.emplace_back( 0.0f, -1.0f,  0.0f); // -Y 1
@@ -88,14 +101,23 @@ namespace TerraForge3D
 		faces.emplace_back(4, 1, 3); // +Z -Y -X
 		faces.emplace_back(3, 1, 5); // -X -Y -Z
 
+		if (progress)
+			*progress = 0.3f;
+
 		for (int i = 0; i < subdivisions; i++)
 			CentroidSubdivision();
+
+		if (progress)
+			*progress = 0.6f;
 
 		for (Vertex& v : vertices)
 		{
 			float invDist = FastInverseSqrt(v.position.x* v.position.x + v.position.y* v.position.y + v.position.z* v.position.z);
 			v.position *= radius * invDist;
 		}
+
+		if (progress)
+			*progress = 1.1f;
 
 		return *this;
 	}

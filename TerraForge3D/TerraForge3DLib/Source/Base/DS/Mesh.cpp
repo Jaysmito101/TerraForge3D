@@ -28,11 +28,11 @@ namespace TerraForge3D
 			delete nativeHandle;
 	}
 
-	bool Mesh::Clear()
+	bool Mesh::Clear(bool destroyNativeMesh)
 	{
 		vertices.clear();
 		faces.clear();
-		if(nativeHandle->IsSetup())
+		if (destroyNativeMesh && nativeHandle->IsSetup())
 			return nativeHandle->Destroy();
 		return true;
 	}
@@ -69,8 +69,10 @@ namespace TerraForge3D
 		modelMatrix = transM * rotM;
 	}
 
-	Mesh& Mesh::CentroidSubdivision()
+	Mesh& Mesh::CentroidSubdivision(float* progress)
 	{
+		if (progress)
+			*progress = 0.0f;
 		std::vector<Face> newFaces;
 		for (Face& face : faces)
 		{
@@ -88,13 +90,21 @@ namespace TerraForge3D
 			newFaces.emplace_back(face.a, face.b, vertices.size() - 1);
 			newFaces.emplace_back(vertices.size() - 1, face.b, face.c);
 			newFaces.emplace_back(face.a, vertices.size() - 1, face.c);
+
+			if (progress && newFaces.size() % 10 == 0)
+				*progress = (float)newFaces.size() / faces.size();
+
 		}
+		if (progress)
+			*progress = 1.1f;
 		faces = newFaces;
 		return *this;
 	}
 
-	Mesh& Mesh::RecalculateNormals()
+	Mesh& Mesh::RecalculateNormals(float* progress)
 	{
+		if (progress)
+			*progress = 0.0f;
 		glm::vec3 e1(0.0f);
 		glm::vec3 e2(0.0f);
 		glm::vec3 no(0.0f);
@@ -117,6 +127,8 @@ namespace TerraForge3D
 			TF3D_VEC3_ADD(vertices[f.b].normal, no, vertices[f.b].normal);
 			TF3D_VEC3_ADD(vertices[f.c].normal, no, vertices[f.c].normal);
 		}
+		if (progress)
+			*progress = 0.5f;
 #ifndef TF3D_MESH_UNSAFE_NORMALS
 		for (Vertex& v : vertices)
 		{
@@ -124,6 +136,8 @@ namespace TerraForge3D
 			v.normal.w = 0.0f;
 		}
 #endif // TF3D_MESH_UNSAFE_NORMALS
+		if (progress)
+			*progress = 1.1f;
 		return *this;
 	}
 }

@@ -46,6 +46,7 @@ namespace TerraForge3D
 			// std::function<void(Job*)> onSetup = nullptr;
 			std::function<bool(Job*)> onRun = nullptr;
 			std::function<void(Job*)> onDelete = nullptr;
+			std::function<void(Job*)> onComplete = nullptr;
 
 		private:
 		};

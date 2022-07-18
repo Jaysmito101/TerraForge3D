@@ -23,6 +23,10 @@ namespace TerraForge3D
 	{
 		class JobSystem;
 	}
+	namespace Terrain
+	{
+		class Manager;
+	}
 	// Editors
 	class Viewport;
 	class Inspector;
@@ -98,7 +102,7 @@ namespace TerraForge3D
 		
 		struct
 		{
-			SharedPtr<JobSystem::JobSystem> manager ;
+			SharedPtr<JobSystem::JobSystem> manager;
 		} jobs;
 
 		SharedPtr<Preferences> preferences;
@@ -106,8 +110,10 @@ namespace TerraForge3D
 
 		Renderer* renderer = nullptr;
 
-		// TEMP
-		SharedPtr<Mesh> mesh;
+		struct 
+		{
+			SharedPtr<Terrain::Manager> manager;
+		} terrain;
 
 		static ApplicationState* Create();
 		inline static ApplicationState* Get() { TF3D_ASSERT(appState, "Applicaiton Sate not yet created."); return appState; }

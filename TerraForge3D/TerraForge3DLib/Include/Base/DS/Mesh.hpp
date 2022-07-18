@@ -46,7 +46,7 @@ namespace TerraForge3D
 		Mesh(std::string name = "Mesh");
 		virtual ~Mesh();
 
-		bool Clear();
+		bool Clear(bool destroyNativeMesh = false);
 
 		bool UploadToGPU();
 
@@ -57,13 +57,13 @@ namespace TerraForge3D
 		inline glm::mat4& GetModelMatrix() { return modelMatrix; };
 
 		// Mesh Functions
-		Mesh& CentroidSubdivision();
-		Mesh& RecalculateNormals();
+		Mesh& CentroidSubdivision(float* progress = nullptr);
+		Mesh& RecalculateNormals(float* progress = nullptr);
 
 		// Mesh Generators
-		Mesh& Triangle(float* A, float* B, float* C);
-		Mesh& Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution = 256);
-		Mesh& Sphere(glm::vec3 position, float radius, uint32_t subdivisions = 4);
+		Mesh& Triangle(float* A, float* B, float* C, float* progress = nullptr);
+		Mesh& Plane(glm::vec3 position, glm::vec3 right, glm::vec3 front, uint32_t resolution = 256, float scale = 1.0f, float* progress = nullptr);
+		Mesh& Sphere(glm::vec3 position, float radius, uint32_t subdivisions = 4, float* progress = nullptr);
 
 	public:
 		float position[3] = { 0.0f, 0.0f, 0.0f };

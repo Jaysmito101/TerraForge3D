@@ -107,7 +107,7 @@ target_link_libraries(TerraForge3DLib
 target_link_libraries(TerraForge3DLib debug "$ENV{VULKAN_SDK}/lib/shaderc_sharedd.lib")
 target_link_libraries(TerraForge3DLib optimized "$ENV{VULKAN_SDK}/lib/shaderc_shared.lib")
 
-add_compile_definitions(TerraForge3DLib
+target_compile_definitions(TerraForge3DLib
     Lib_COMPILED_LIB
     SPDLOG_COMPILED_LIB
 )

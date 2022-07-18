@@ -124,17 +124,9 @@ namespace TerraForge3D
 		ImGui::DragFloat3("Camera Position", &camera->position[0], 0.01f);
 		ImGui::DragFloat3("Camera Rotation", &camera->rotation[0], 0.01f);
 
-		if (ImGui::BeginCombo("Viewport Mode", ViewportModeStr[mode]))
+		if (Utils::ImGuiC::ComboBox("Viewport Mode", &mode, ViewportModeStr, TF3D_STATIC_ARRAY_SIZE(ViewportModeStr)))
 		{
-			for (int n = 0; n < TF3D_STATIC_ARRAY_SIZE(ViewportModeStr); n++)
-			{
-				bool isSelected = (ViewportModeStr[mode] == ViewportModeStr[n]);
-				if (ImGui::Selectable(ViewportModeStr[n], isSelected))
-					mode = static_cast<ViewportMode>(n);
-					if (isSelected)
-						ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
+			TF3D_LOG_TRACE("Viewport Mode Changed for Viewport {}", viewportNumber);
 		}
 
 		return ImGui::Button("Close");			

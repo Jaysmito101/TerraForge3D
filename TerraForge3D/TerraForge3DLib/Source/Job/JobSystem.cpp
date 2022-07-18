@@ -94,6 +94,8 @@ namespace TerraForge3D
 						else
 							job->status = JobStatus_Faliure;
 					}
+					if (job->onComplete)
+						job->onComplete(job);
 					completedJobs.push(job->id);
 					auto mtJobEndTime = std::chrono::high_resolution_clock::now();
 					timeTaken = std::chrono::duration<double>(mtJobEndTime - mtJobsBeginTime).count();
@@ -111,6 +113,8 @@ namespace TerraForge3D
 				if (threadPool[i].hasCompletedJob)
 				{
 					Job* job = threadPool[i].FinishPendingJob();
+					if (job->onComplete)
+						job->onComplete(job);
 					completedJobs.push(job->id);
 				}
 			}

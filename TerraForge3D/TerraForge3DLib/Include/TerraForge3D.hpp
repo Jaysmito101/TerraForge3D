@@ -31,3 +31,6 @@
 // Editors
 #include "Editors/Viewport.hpp"
 #include "Editors/Inspector.hpp"
+
+// Terrain
+#include "Terrain/Manager.hpp"

@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Core/Core.hpp"
 #include "IconsMaterialDesign.h"
+#include "imgui/imgui.h"
 
 struct ImFont;
 struct ImVec4;
@@ -49,6 +50,25 @@ namespace TerraForge3D
 			void PushSubFont(ImFont* font);
 
 			void PopSubFont();
+
+			template <typename Type>
+			bool ComboBox(const char* id, Type* current, const char** list, uint32_t listCount)
+			{
+				Type oldValue = *current;
+				if (ImGui::BeginCombo(id, list[static_cast<uint32_t>(*current)]))
+				{
+					for (uint32_t n = 0; n < listCount; n++)
+					{
+						bool isSelected = (list[static_cast<uint32_t>(*current)] == list[n]);
+						if (ImGui::Selectable(list[n], isSelected))
+							*current = static_cast<Type>(n);
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+				return oldValue != *current;
+			}
 		}
 
 		namespace String

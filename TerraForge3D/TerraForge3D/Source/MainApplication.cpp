@@ -58,8 +58,8 @@ public:
 		ImGui::NewLine();
 
 		static std::string lastOpenedFile = "";
-		
-		if(lastOpenedFile.size() > 0)
+
+		if (lastOpenedFile.size() > 0)
 			ImGui::Text(lastOpenedFile.data());
 
 		if (ImGui::Button("Show File Dialog"))
@@ -100,13 +100,6 @@ public:
 			appState->jobs.manager->AddJob(job);
 		}
 
-		if (ImGui::Button("Subdivide"))
-		{
-			appState->mesh->CentroidSubdivision();
-			appState->mesh->RecalculateNormals();
-			appState->mesh->UploadToGPU();
-		}
-
 		if (ImGui::Button("Exit"))
 			appState->core.app->Close();
 
@@ -119,8 +112,8 @@ public:
 			isVisible = (context->GetToggleState());
 			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
 
-		style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR + "Maya.json");
-		style.Apply();
+			style.LoadFromFile(appState->appResourcePaths.stylesDir + PATH_SEPERATOR + "Maya.json");
+			style.Apply();
 	}
 
 	void OnEnd() override
@@ -159,7 +152,7 @@ namespace TerraForge3D
 				Close();
 				return true;
 				}, { InputEventType_WindowClose });
-			
+
 			Utils::ImGuiC::SetIconFont(fonts["MaterialIcons"].handle);
 
 			// Object Creations
@@ -178,7 +171,9 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(appState->editors.startUpScreen);
 			appState->editors.manager->AddEditor(new JobManager(appState));
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
-			
+
+			appState->terrain.manager = new Terrain::Manager(appState);
+
 			appState->editors.inspector = new Inspector(appState);
 			appState->editors.manager->AddEditor(appState->editors.inspector);
 
@@ -190,19 +185,9 @@ namespace TerraForge3D
 			}
 			appState->editors.viewports[0]->SetVisible(true);
 
-			appState->mesh = new Mesh("DemoTriangle");
-			appState->mesh->Clear();
-			float A[3] = {  0.0f, -0.5f, 0.0f }; 
-			float B[3] = {  0.5f,  0.5f, 0.0f };
-			float C[3] = { -0.5f,  0.5f, 0.0f };
-			//appState->mesh->Triangle(A, B, C);
-			appState->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 256);
-			//appState->mesh->Sphere(glm::vec3(0.0f), 1.0f);
-			appState->mesh->RecalculateNormals();
-			appState->mesh->UploadToGPU();
-
 			appState->core.fonts = fonts;
 			appState->renderer = appState->core.app->renderer;
+
 
 		}
 
@@ -212,6 +197,7 @@ namespace TerraForge3D
 			appState->modals.manager->Update();
 			appState->project.manager->Update();
 			appState->jobs.manager->Update();
+			appState->terrain.manager->Update();
 
 			appState->renderer->Flush();
 
@@ -239,7 +225,7 @@ namespace TerraForge3D
 
 		virtual void OnEnd() override
 		{
-			
+
 			GetInputEventManager()->DeregisterCallback(exitcb);
 
 
@@ -249,11 +235,11 @@ namespace TerraForge3D
 
 		}
 
-	private: 
+	private:
 		uint32_t exitcb;
-		float pos[2] = {0.0f};
-		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
-		float camPos[3] = {0.0f, 0.0f, -1.0f};
+		float pos[2] = { 0.0f };
+		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float camPos[3] = { 0.0f, 0.0f, -1.0f };
 		float camRot[3] = { 0.0f, 0.0f, 0.0f };
 
 		ApplicationState* appState = nullptr;
