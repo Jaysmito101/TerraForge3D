@@ -15,6 +15,8 @@ namespace TerraForge3D
 			Context();
 			~Context();
 
+			std::string GetGPUName();
+
 			void WaitForIdle() override;
 		};
 

@@ -1,17 +1,28 @@
 #include "Editors/Inspector.hpp"
-#include "Data/ApplicationState.hpp"
 
-#include "Editors/Viewport.hpp"
-#include "UI/MainMenu.hpp"
-#include "Job/JobSystem.hpp"
-#include "Job/Job.hpp"
-#include "UI/Modals.hpp"
-#include "Terrain/Manager.hpp"
+#include "TerraForge3D.hpp"
+
+
+#ifdef TF3D_VULKAN_BACKEND
+#include "Base/Vulkan/ComputeDevice.hpp"
+#else // TF3D_OPENGL_BACKEND
+#include "Base/Renderer/Context.hpp"
+#include "Base/OpenGL/Context.hpp"
+#endif
 
 #include "imgui/imgui_internal.h"
 
+
 namespace TerraForge3D
 {
+
+	static Terrain::Generator* ShowAddGeneratorButtons(ApplicationState* appState)
+	{
+		if (ImGui::Button("Dummy"))
+			return new Terrain::Dummy::Generator(appState);
+		return nullptr;
+	}
+
 	static SharedPtr<RendererAPI::Pipeline> renderPipeline[VIEWPORT_COUNT];
 
 	// TEMP
@@ -50,7 +61,15 @@ namespace TerraForge3D
 				renderPipeline[i]->Setup();
 			}
 
-			this->terrain.manager = appState->terrain.manager;
+			this->terrain.manager = appState->terrain.manager.Get();
+
+			// TEMP
+#ifdef TF3D_VULKAN_BACKEND
+			gpuName = Vulkan::ComputeDevice::Get()->physicalDevice.name;
+#else // TF3D_OPENGL_BACKEND
+			gpuName = static_cast<OpenGL::Context*>(RendererAPI::Context::Get())->GetGPUName();
+#endif
+			cpuName = "TBI";
 	}
 
 	void Inspector::OnShow()
@@ -134,9 +153,6 @@ namespace TerraForge3D
 		}
 		ImGui::DragFloat("Scale", &terrain.scale, 0.01f, 1.0f);
 
-		Utils::ImGuiC::PushSubFont(appState->core.fonts["SemiHeader"].handle);
-		ImGui::Text("Generators Settings");	
-		Utils::ImGuiC::PopSubFont();
 
 		if (terrain.manager->resolution != terrain.resolution
 		|| terrain.manager->scale != terrain.scale)
@@ -151,7 +167,7 @@ namespace TerraForge3D
 			resizeJob->description = "Resize the mesh";
 			resizeJob->excutionModel = JobSystem::JobExecutionModel_Async;
 			resizeJob->onRun = [this](JobSystem::Job* context) -> bool {
-				terrain.manager->Resize(terrain.resolution, terrain.scale);
+				terrain.manager->Resize(terrain.resolution, terrain.scale, &context->progress);
 				return true;
 			};
 			resizeJob->onComplete = [this](JobSystem::Job* context)-> void {
@@ -160,6 +176,51 @@ namespace TerraForge3D
 			appState->modals.manager->LoadingBox("Resizing Mesh", &resizeJob->progress);
 			appState->jobs.manager->AddJob(resizeJob);
 		}
+
+		Utils::ImGuiC::ComboBox("Generator Device", &generators.device, Terrain::ProcessorDeviceStr, TF3D_STATIC_ARRAY_SIZE(Terrain::ProcessorDeviceStr));
+		
+		switch (generators.device)
+		{
+		case Terrain::ProcessorDevice_CPU:
+			ImGui::Text("Processor Device Name : %s", cpuName.data());
+			break;
+		case Terrain::ProcessorDevice_GPU:
+			ImGui::Text("Processor Device Name : %s", gpuName.data());
+			break;
+		default:			
+			ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "Unknown Processor Device Selected");
+		break;
+		}
+
+		Utils::ImGuiC::PushSubFont(appState->core.fonts["SemiHeader"].handle);
+		ImGui::Text("Generators");
+		Utils::ImGuiC::PopSubFont();
+
+		ImGui::Separator();
+
+		terrain.manager->ShowGeneratorSettings();
+
+
+		if (ImGui::Button("Add"))
+		{
+			ImGui::OpenPopup("##InscpectorAddGenerator");
+		}
+
+		Terrain::Generator* temp = nullptr;
+		if (ImGui::BeginPopup("##InscpectorAddGenerator"))
+		{
+			ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+			temp = ShowAddGeneratorButtons(appState);
+			if (temp)
+			{
+				terrain.manager->AddGenerator(temp);
+				this->GetSubEditorManager()->AddEditor(temp->editor);
+				temp = nullptr;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::PopItemWidth();
+			ImGui::EndPopup();
+		}		
 	}
 
 	void Inspector::OnUpdate()
@@ -168,6 +229,8 @@ namespace TerraForge3D
 
 	void Inspector::OnEnd()
 	{
+		for (int i = 0; i < VIEWPORT_COUNT; i++)
+			renderPipeline[i]->Destory();
 	}
 
 	bool Inspector::OnContextMenu()

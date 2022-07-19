@@ -87,7 +87,7 @@ namespace TerraForge3D
 
 			inline Shader* SetIncludeDir(std::string dir) { this->includeDir = dir; if (this->includeDir[this->includeDir.size() - 1] != PATH_SEPERATOR[0]) { this->includeDir += PATH_SEPERATOR; } return this; }
 			inline Shader* SetCacheDir(std::string dir) { this->cacheDir = dir; return this; }
-			inline Shader* SetMacro(std::string name, std::string value) { this->macros[name] = value; return this; }
+			inline Shader* SetMacro(std::string macroName, std::string value) { this->macros[macroName] = value; return this; }
 			inline Shader* SetUBOLayout(std::vector<ShaderVar> layout) { this->uboLayout = layout; return this; };
 			inline Shader* SetUniformsLayout(std::vector<ShaderVar> layout) { this->uniformsLayout = layout; return this; };
 

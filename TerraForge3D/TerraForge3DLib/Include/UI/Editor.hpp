@@ -29,7 +29,8 @@ namespace TerraForge3D
 			void Shutdown();
 
 
-			inline Editor* SetEnabled(bool enabled) { this->isEnabled = enabled; return this;}
+			inline Editor* SetEnabled(bool enabled) { this->isEnabled = enabled; return this; }
+			inline Editor* SetVisible(bool enabled) { this->isVisible = enabled; return this;}
 			inline Editor* SetName(std::string name) { this->name = name; return this;}
 			inline Editor* ClearFlags() { this->windowFlags = ImGuiWindowFlags_None; return this;}
 			inline Editor* AddFlags(ImGuiWindowFlags flags) { this->windowFlags |= flags; return this; }

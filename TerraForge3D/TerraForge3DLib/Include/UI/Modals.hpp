@@ -53,7 +53,7 @@ namespace TerraForge3D
 			std::function<bool(void*)> uiFunction = nullptr;
 			std::function<void(void*, ModalResult)> onEnd = nullptr;
 			std::function<void(void*)> onBegin = nullptr;
-			void* userData;
+			void* userData = nullptr;
 			bool finished = true;
 			bool isOpened = true;
 			bool isClosable = true;
@@ -74,6 +74,8 @@ namespace TerraForge3D
 			Modal* LoadingBox(std::string title, float* progress, std::function<bool(float)> onCancel = nullptr, std::function<std::string(float)> getMessage = nullptr, float scale = 0.3f);
 
 			Modal* FileDialog(std::string title, FileDialogInfo fileDialogInfo, float scale = 0.7f);
+
+			Modal* InputBox(std::string title, std::function<bool(std::string, std::string&)> onSubmit, std::string message = "", float scale = 0.7f);
 			
 			inline Modal* AddModal(Modal& modal) { this->modalsQueue.push(modal); return &this->modalsQueue.back(); }
 

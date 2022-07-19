@@ -41,7 +41,7 @@ namespace TerraForge3D
 			inline bool IsSelected() { return this->selected; }
 			inline bool GetToggleState() { TF3D_ASSERT(use == MenuItemUse_Toggle, "Cannot get toggle state without mode being toggle"); return this->toggleState; }
 			
-			inline MenuItem* SetCallback(std::function<void(MenuItem*)> callback) { TF3D_ASSERT(callback, "Callback is null");	this->callback = callback; return this; }
+			inline MenuItem* SetCallback(std::function<void(MenuItem*)> callbackFunc) { TF3D_ASSERT(callbackFunc, "Callback is null");	this->callback = callbackFunc; return this; }
 			inline MenuItem* SetTooltip(std::string tooltip) { this->tooltip = tooltip;  return this;};
 			inline MenuItem* SetShortcut(std::string shortcut) { this->shortcut = shortcut;  return this;};
 			inline MenuItem* SetEnabled(bool enabled) { this->enabled = enabled; return this; }

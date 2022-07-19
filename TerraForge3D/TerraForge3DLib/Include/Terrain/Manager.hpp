@@ -12,7 +12,8 @@ namespace TerraForge3D
 
 	namespace Terrain
 	{
-
+		class Generator;
+			
 		class Manager
 		{
 		public:
@@ -23,12 +24,19 @@ namespace TerraForge3D
 
 			void Update();
 
+			void ShowGeneratorSettings();
+
+			void AddGenerator(SharedPtr<Generator> generator);
+
 			inline void SetResolution(uint32_t res) { this->resolution = res; };
 			inline void SetScale(float sc) { this->scale = sc; };
+
+
 
 		private:
 			ApplicationState* appState = nullptr;
 
+			std::vector<SharedPtr<Generator>> generators;
 
 		public:
 			SharedPtr<Mesh> mesh;

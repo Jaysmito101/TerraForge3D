@@ -1,4 +1,4 @@
-#include "Base/OpenGL/Context.hpp"
+﻿#include "Base/OpenGL/Context.hpp"
 
 #ifdef TF3D_OPENGL_BACKEND
 
@@ -26,6 +26,12 @@ namespace TerraForge3D
 			// TODO: Implement
 		}
 
+		std::string GetGPUName()
+		{
+			const GLubyte* vendor = glGetString​(GL_VENDOR); 
+			const GLubyte* renderer = glGetString​(GL_RENDERER);
+			return std::string(vendor) + " " + std::string(renderer);
+		}
 	}
 
 }

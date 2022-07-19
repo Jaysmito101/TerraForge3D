@@ -1,0 +1,35 @@
+#pragma once
+#include "Base/Base.hpp"
+#include "Terrain/Processor.hpp"
+
+namespace TerraForge3D
+{
+	class ApplicationState;
+	namespace UI { class Editor; }
+
+	namespace Terrain
+	{
+
+		class Generator
+		{
+		public:
+			Generator(ApplicationState* appState)
+				:appState(appState) 
+			{}
+
+			virtual ~Generator() = default;
+
+			virtual void OnAttach() = 0;
+			virtual void OnDetach() = 0;
+
+		protected:
+			ApplicationState* appState;
+
+		public:
+			std::string name = "Generator";
+			std::string description = "";
+			SharedPtr<UI::Editor> editor;
+		};
+
+	}
+}

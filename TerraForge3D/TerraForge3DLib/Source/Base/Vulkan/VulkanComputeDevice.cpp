@@ -25,6 +25,7 @@ namespace TerraForge3D
 
 		ComputeDevice::~ComputeDevice()
 		{
+			TF3D_LOG("Destroyed Vulkan Compute Device");
 		}
 
 		void ComputeDevice::CreateDevice()

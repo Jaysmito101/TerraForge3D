@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Base.hpp"
 #include "UI/Editor.hpp"
+#include "Terrain/Processor.hpp"
 
 namespace TerraForge3D
 {
@@ -35,7 +36,7 @@ namespace TerraForge3D
 		ApplicationState* appState = nullptr;
 
 		float itemViewHeight = 100;
-		float separatorSliderWidth = 20.0f;
+		float separatorSliderWidth = 40.0f;
 
 		float prevMousePos = 0.0f;
 
@@ -47,13 +48,16 @@ namespace TerraForge3D
 			uint32_t resolutionIndex = 0;
 			uint32_t resolution = 128;
 			float scale = 1.0f;
-			SharedPtr<Terrain::Manager> manager;
+			Terrain::Manager* manager = nullptr;
 		} terrain;
 
 		struct
 		{
-
+			Terrain::ProcessorDevice device = Terrain::ProcessorDevice_CPU;
 		} generators;
+
+		std::string gpuName = "";
+		std::string cpuName = "";
 	};
 
 

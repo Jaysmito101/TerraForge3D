@@ -42,12 +42,13 @@ namespace TerraForge3D
 	{
 		if (nativeHandle->IsSetup() && ( nativeHandle->GetIndexCount() != faces.size() * 3 || nativeHandle->GetVertexCount() != vertices.size()) )
 			nativeHandle->Destroy();
+		bool status = true;
 		if (!nativeHandle->IsSetup())
 		{
 			nativeHandle->SetIndexCount(faces.size() * 3);
 			nativeHandle->SetVertexCount(vertices.size());
+			status = nativeHandle->Setup();
 		}
-		bool status = nativeHandle->Setup();
 		status = status && nativeHandle->UploadData(vertices.data(), faces.data());
 		return status;
 	}

@@ -137,7 +137,7 @@ namespace TerraForge3D
 			modal.sizeScale = scale;
 			modal.uiFunction = [progress, getMessage, onCancel](void*) -> bool
 			{
-				TF3D_ASSERT(*progress > 0.0, "Progress cannot be negetive");
+				TF3D_ASSERT(*progress >= 0.0, "Progress cannot be negetive");
 				ImGui::Text("Please wait ...");
 				ImGui::ProgressBar(*progress);
 				if (getMessage)
@@ -228,6 +228,43 @@ namespace TerraForge3D
 				return false;
 			};
 
+			return AddModal(modal);
+		}
+
+		Modal* ModalManager::InputBox(std::string title, std::function<bool(std::string, std::string&)> onSubmit, std::string message, float scale)
+		{
+			Modal modal;
+			modal.finished = false;
+			modal.isOpened = true;
+			modal.name = title;
+			modal.isClosable = false;
+			modal.sizeScale = scale;
+			static char buffer[4096] = {0};
+			static std::string errorString = "";
+			buffer[0] = 0;
+			errorString = "";
+			modal.uiFunction = [title, onSubmit, message, this](void*) -> bool
+			{
+				ImGui::InputTextWithHint("##EnterText", "Enter Text ...", buffer, 4096);
+				if (ImGui::Button("Ok"))
+				{
+					std::string input(buffer), result;
+					if (!onSubmit(input, result))
+						errorString = result;
+					else
+					{
+						if (message.size() > 0)
+						{
+							this->MessageBox(title, message, MessageType_Info);
+						}
+						return true;
+					}
+				}
+				if (errorString.size() > 0)
+					ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), errorString.data());
+
+				return false;
+			};
 			return AddModal(modal);
 		}
 

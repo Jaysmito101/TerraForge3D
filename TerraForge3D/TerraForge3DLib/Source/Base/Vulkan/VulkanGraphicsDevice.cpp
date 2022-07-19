@@ -51,6 +51,7 @@ namespace TerraForge3D
 
 		GraphicsDevice::~GraphicsDevice()
 		{
+			TF3D_LOG("Destroyed Vulkan Graphics Device");
 		}
 
 		void GraphicsDevice::CreateDevice()

@@ -57,7 +57,7 @@ namespace TerraForge3D
 
 	struct MouseButtonEventParams
 	{
-		MouseButton mouseButton ;
+		MouseButton mouseButton = MouseButton_1;
 		bool pressed = false;
 	};
 
@@ -69,7 +69,7 @@ namespace TerraForge3D
 
 	struct KeyEventParams
 	{
-		KeyCode key ;
+		KeyCode key = KeyCode_A;
 		bool pressed = false;
 	};
 

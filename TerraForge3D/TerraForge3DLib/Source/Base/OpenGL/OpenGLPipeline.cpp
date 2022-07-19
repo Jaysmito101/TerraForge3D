@@ -23,6 +23,7 @@ namespace TerraForge3D
 
 		void Pipeline::Destory()
 		{
+			shader->Cleanup();
 			isSetup = false;
 		}
 

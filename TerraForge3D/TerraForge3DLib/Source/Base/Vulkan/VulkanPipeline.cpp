@@ -30,6 +30,8 @@ namespace TerraForge3D
 
 		void Pipeline::Destory()
 		{
+			shader->Cleanup();
+
 			if (!isBuild)
 				return;
 
