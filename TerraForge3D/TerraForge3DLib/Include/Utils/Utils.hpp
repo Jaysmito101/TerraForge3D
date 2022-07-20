@@ -30,6 +30,8 @@ namespace TerraForge3D
 
 		bool RmDir(std::string path);
 
+		void SleepFor(uint64_t duration);
+
 		enum FileDialogSelection
 		{
 			FileDialogSelection_File,

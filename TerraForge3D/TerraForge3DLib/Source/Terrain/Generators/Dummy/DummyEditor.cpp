@@ -1,5 +1,4 @@
-#pragma once
-#include "Terrain/Generators/Dummy/Editor.hpp"
+#include "Terrain/Generators/Dummy/Generator.hpp"
 #include "TerraForge3D.hpp"
 
 namespace TerraForge3D
@@ -9,8 +8,8 @@ namespace TerraForge3D
 	{
 		namespace Dummy
 		{
-			Editor::Editor(ApplicationState* as)
-				:UI::Editor("Dummy Generator Editor"), appState(as)
+			Editor::Editor(ApplicationState* as, SharedData* sd)
+				:UI::Editor("Dummy Generator Editor"), appState(as), data(sd)
 			{}
 
 			void Editor::OnUpdate()

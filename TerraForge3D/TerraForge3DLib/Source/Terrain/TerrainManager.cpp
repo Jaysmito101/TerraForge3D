@@ -1,8 +1,5 @@
 #include "Terrain/Manager.hpp"
-#include "Data/ApplicationState.hpp"
-#include "Terrain/Generators/Generator.hpp"
-#include "UI/Modals.hpp"
-#include "UI/Editor.hpp"
+#include "TerraForge3D.hpp"
 
 namespace TerraForge3D
 {
@@ -13,14 +10,33 @@ namespace TerraForge3D
 		Manager::Manager(ApplicationState* as)
 		{
 			this->appState = as;
-			this->mesh = new Mesh("MainTerrain");
-			this->mesh->Clear();
-			this->Resize(TF3D_DEFAULT_TERRAIN_RESOLUTION, TF3D_DEFAULT_TERRAIN_SCALE);
-			this->mesh->UploadToGPU();
 		}
 
 		Manager::~Manager()
 		{
+		}
+
+		void Manager::OnStart()
+		{
+			this->mesh = new Mesh("MainTerrain");
+			this->meshClone = new Mesh("MainTerrain [CLONE]");
+			this->mesh->Clear();
+			this->Resize(TF3D_DEFAULT_TERRAIN_RESOLUTION, TF3D_DEFAULT_TERRAIN_SCALE);
+			this->mesh->UploadToGPU();
+			workerThreadRunning = true;
+			workerThread = std::thread(std::bind(&Manager::WorkerThread, this));
+			workerThread.detach();
+			terrainData = new Terrain::Data(appState);
+			terrainData->LoadData();
+		}
+
+		void Manager::OnEnd()
+		{
+			workerThreadReady = true;
+			condVar.notify_one();
+			workerThreadRunning = false;
+			if (workerThread.joinable())
+				workerThread.join();
 			for (auto& gen : generators)
 			{
 				gen->OnDetach();
@@ -29,12 +45,19 @@ namespace TerraForge3D
 
 		void Manager::Update()
 		{
+			if (!workerThreadBusy)
+			{
+				OnJobDone();
+				mesh->UploadToGPU();
+				workerThreadReady = true;
+				condVar.notify_one();
+			}
 		}
 
 		void Manager::AddGenerator(SharedPtr<Generator> generator)
 		{
-			this->generators.push_back(generator);
-			this->generators.back()->OnAttach();
+			this->generatorsTemp.push_back(generator);
+			this->generatorsTemp.back()->OnAttach();
 		}
 
 		void Manager::ShowGeneratorSettings()
@@ -69,6 +92,8 @@ namespace TerraForge3D
 
 		void Manager::Resize(uint32_t res, float sc, float* progress)
 		{
+			while (workerThreadBusy) Utils::SleepFor(100);
+
 			//if (progress)
 			//	*progress = 0.0f;
 			this->isBeingResized = true;
@@ -76,8 +101,67 @@ namespace TerraForge3D
 			this->scale = sc;
 			this->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), resolution, scale, progress);
 			mesh->RecalculateNormals();
+			this->mesh->Clone(this->meshClone.Get());
 			this->isBeingResized = false;
 		}
 
+
+		void Manager::WorkerThread()
+		{
+			while (workerThreadRunning)
+			{
+				workerThreadBusy = false;
+				std::unique_lock lock(mutex);
+				condVar.wait(lock, [this]()->bool {return workerThreadReady; });
+				if (!workerThreadRunning)
+					break;
+				workerThreadBusy = true;
+				switch (processorDevice)
+				{
+				case ProcessorDevice_CPU:
+					ProcessGeneratorsOnCPU();
+					break;
+#ifdef TF3D_VULKAN_BACKEND
+				case ProcessorDevice_Vulkan:
+					ProcessGeneratorsOnVulkan();
+					break;
+#endif
+				case ProcessorDevice_OpenCL:
+					ProcessGeneratorsOnOpenCL();
+					break;
+				default:
+					TF3D_ASSERT(false, "Invalid Processor Device");
+					break;
+				}
+			}
+		}
+
+		void Manager::OnJobDone()
+		{
+			for (uint32_t i = 0; i < generatorsTemp.size(); i++)
+			{
+				generators.push_back(generatorsTemp.back());
+				generatorsTemp.pop_back();
+			}
+			TF3D_LOG_TRACE("Job Done!");
+		}
+
+		void Manager::ProcessGeneratorsOnCPU()
+		{
+			terrainData->PrepareForGenerators();
+			for (int i = 0; i <generators.size();i++)
+				generators[i]->cpuProcessor->Process(terrainData.Get());
+		}
+
+		void Manager::ProcessGeneratorsOnVulkan()
+		{
+#ifdef TF3D_VULKAN_BACKEND
+
+#endif
+		}
+
+		void Manager::ProcessGeneratorsOnOpenCL()
+		{
+		}
 	}
 }

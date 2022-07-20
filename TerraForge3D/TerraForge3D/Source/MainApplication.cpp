@@ -173,6 +173,7 @@ namespace TerraForge3D
 			appState->editors.manager->AddEditor(appState->preferences->GetEditor());
 
 			appState->terrain.manager = new Terrain::Manager(appState);
+			appState->terrain.manager->OnStart();
 
 			appState->editors.inspector = new Inspector(appState);
 			appState->editors.manager->AddEditor(appState->editors.inspector);
@@ -225,9 +226,9 @@ namespace TerraForge3D
 
 		virtual void OnEnd() override
 		{
+			appState->terrain.manager->OnEnd();
 
 			GetInputEventManager()->DeregisterCallback(exitcb);
-
 
 			ApplicationState::Destory();
 

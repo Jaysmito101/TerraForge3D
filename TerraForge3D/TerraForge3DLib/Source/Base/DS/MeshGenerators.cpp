@@ -104,7 +104,7 @@ namespace TerraForge3D
 		if (progress)
 			*progress = 0.3f;
 
-		for (int i = 0; i < subdivisions; i++)
+		for (uint32_t i = 0; i < subdivisions; i++)
 			CentroidSubdivision();
 
 		if (progress)

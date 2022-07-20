@@ -12,12 +12,18 @@ namespace TerraForge3D
 		enum ProcessorDevice
 		{
 			ProcessorDevice_CPU = 0,
-			ProcessorDevice_GPU = 1
+#ifdef TF3D_VULKAN_BACKEND
+			ProcessorDevice_Vulkan,
+#endif
+			ProcessorDevice_OpenCL
 		};
 
 		static const char* ProcessorDeviceStr[] = {
 			"CPU",
-			"GPU"
+#ifdef TF3D_VULKAN_BACKEND
+			"Vulkan",
+#endif
+			"OpenCL"
 		};
 
 		class Processor

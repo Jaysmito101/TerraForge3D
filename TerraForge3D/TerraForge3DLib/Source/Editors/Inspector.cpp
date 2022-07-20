@@ -65,10 +65,11 @@ namespace TerraForge3D
 
 			// TEMP
 #ifdef TF3D_VULKAN_BACKEND
-			gpuName = Vulkan::ComputeDevice::Get()->physicalDevice.name;
+			vulkanGPUName = Vulkan::ComputeDevice::Get()->physicalDevice.name;
 #else // TF3D_OPENGL_BACKEND
-			gpuName = static_cast<OpenGL::Context*>(RendererAPI::Context::Get())->GetGPUName();
+			vulkanGPUName = "";
 #endif
+			openCLGPUName = "TBI";
 			cpuName = "TBI";
 	}
 
@@ -154,7 +155,7 @@ namespace TerraForge3D
 		ImGui::DragFloat("Scale", &terrain.scale, 0.01f, 1.0f);
 
 
-		if (terrain.manager->resolution != terrain.resolution
+		if (terrain.manager->resolution != static_cast<uint32_t>(pow(2, 7 + terrain.resolutionIndex))
 		|| terrain.manager->scale != terrain.scale)
 		{
 			ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "Settings not yet applied");
@@ -184,8 +185,11 @@ namespace TerraForge3D
 		case Terrain::ProcessorDevice_CPU:
 			ImGui::Text("Processor Device Name : %s", cpuName.data());
 			break;
-		case Terrain::ProcessorDevice_GPU:
-			ImGui::Text("Processor Device Name : %s", gpuName.data());
+		case Terrain::ProcessorDevice_Vulkan:
+			ImGui::Text("Processor Device Name : %s", vulkanGPUName.data());
+			break;
+		case Terrain::ProcessorDevice_OpenCL:
+			ImGui::Text("Processor Device Name : %s", openCLGPUName.data());
 			break;
 		default:			
 			ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "Unknown Processor Device Selected");

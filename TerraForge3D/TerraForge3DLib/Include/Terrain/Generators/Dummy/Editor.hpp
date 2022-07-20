@@ -10,10 +10,12 @@ namespace TerraForge3D
 	{
 		namespace Dummy
 		{
+			struct SharedData;
+
 			class Editor : public UI::Editor
 			{
 			public:
-				Editor(ApplicationState* appState);
+				Editor(ApplicationState* appState, SharedData* sharedData);
 				~Editor() = default;
 				void OnUpdate() override;
 				void OnShow() override;
@@ -22,7 +24,7 @@ namespace TerraForge3D
 
 			private:
 				ApplicationState* appState = nullptr;
-
+				SharedData* data;
 			public:
 			};
 		}

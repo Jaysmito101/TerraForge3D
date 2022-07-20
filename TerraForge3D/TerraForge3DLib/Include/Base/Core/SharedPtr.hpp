@@ -103,7 +103,7 @@ namespace TerraForge3D
 		inline SharedPtr<Base>& operator=(Derived* ptr)
 		{
 			this->Release();
-			if(ptr == nullptr)
+			if (ptr == nullptr)
 			{
 				this->controlBlock = nullptr;
 				this->handle = nullptr;
@@ -142,16 +142,14 @@ namespace TerraForge3D
 
 		inline void Release()
 		{
-			if (this->controlBlock)
+			if (this->controlBlock && this->handle)
 			{
 				this->controlBlock->count -= 1;
 				if (this->controlBlock->count <= 0)
 				{
-					if (this->handle)
-					{
-						delete this->handle;
-						this->handle = nullptr;
-					}
+					delete this->handle;
+					this->handle = nullptr;
+
 					delete this->controlBlock;
 					this->controlBlock = nullptr;
 				}
@@ -181,7 +179,7 @@ namespace TerraForge3D
 		SharedPtr<NewType> nref;
 		nref.controlBlock = oref.controlBlock;
 		nref.handle = static_cast<NewType>(oref.handle);
-		if(oref.handle)
+		if (oref.handle)
 			assert(nref.handle);
 		if (nref.controlBlock)
 			nref.controlBlock->count += 1;

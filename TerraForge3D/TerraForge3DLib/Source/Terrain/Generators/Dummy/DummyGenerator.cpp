@@ -10,8 +10,9 @@ namespace TerraForge3D
 		void Dummy::Generator::OnAttach()
 		{
 			this->name = "Dummy Generator";
-			this->editor = new Dummy::Editor(appState);
+			this->editor = new Dummy::Editor(appState, &data);
 			this->editor->SetVisible(false);
+			this->cpuProcessor = new Dummy::CPUProcessor(&data);
 		}
 
 		void Dummy::Generator::OnDetach()

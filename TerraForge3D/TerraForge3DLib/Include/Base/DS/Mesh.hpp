@@ -47,6 +47,7 @@ namespace TerraForge3D
 		virtual ~Mesh();
 
 		bool Clear(bool destroyNativeMesh = false);
+		void Clone(Mesh* other);
 
 		bool UploadToGPU();
 

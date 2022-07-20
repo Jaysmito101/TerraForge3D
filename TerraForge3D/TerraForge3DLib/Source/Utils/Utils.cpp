@@ -162,6 +162,17 @@ namespace TerraForge3D
 			return true;
 		}
 
+		void SleepFor(uint64_t duration)
+		{
+#ifdef TF3D_WINDOWS
+			Sleep(duration);
+#elif defined(TF3D_LINUX)
+			usleep(duration);
+#elif defined(TF3D_MACOSX)
+			TF3D_ASSERT(false, "Not yet implemented");
+#endif
+		}
+
 		namespace ImGuiC
 		{
 			static ImFont* font = nullptr;

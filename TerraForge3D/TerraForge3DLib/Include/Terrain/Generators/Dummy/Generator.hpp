@@ -2,7 +2,8 @@
 #include "Base/Base.hpp"
 #include "Terrain/Generators/Generator.hpp"
 #include "Terrain/Generators/Dummy/CPUProcessor.hpp"
-#include "Terrain/Generators/Dummy/GPUProcessor.hpp"
+#include "Terrain/Generators/Dummy/VulkanProcessor.hpp"
+#include "Terrain/Generators/Dummy/OpenCLProcessor.hpp"
 #include "Terrain/Generators/Dummy/Editor.hpp"
 
 namespace TerraForge3D
@@ -11,6 +12,12 @@ namespace TerraForge3D
 	{
 		namespace Dummy
 		{
+
+			struct SharedData
+			{
+
+			};
+
 			class Generator : public Terrain::Generator
 			{
 			public:
@@ -23,9 +30,8 @@ namespace TerraForge3D
 				virtual void OnAttach() override;
 				virtual void OnDetach() override;
 
-			private:
-
 			public:
+				SharedData data;
 				
 			};
 		}

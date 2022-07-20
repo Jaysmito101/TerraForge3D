@@ -29,6 +29,11 @@ namespace TerraForge3D
 			std::string name = "Generator";
 			std::string description = "";
 			SharedPtr<UI::Editor> editor;
+			SharedPtr<Processor> cpuProcessor;
+#ifdef TF3D_VULKAN_BACKEND
+			SharedPtr<Processor> vulkanProcessor;
+#endif
+			SharedPtr<Processor> openCLProcessor;
 		};
 
 	}

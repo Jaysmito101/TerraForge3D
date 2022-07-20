@@ -56,7 +56,8 @@ namespace TerraForge3D
 			Terrain::ProcessorDevice device = Terrain::ProcessorDevice_CPU;
 		} generators;
 
-		std::string gpuName = "";
+		std::string vulkanGPUName = "";
+		std::string openCLGPUName = "";
 		std::string cpuName = "";
 	};
 

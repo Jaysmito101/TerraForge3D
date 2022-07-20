@@ -167,7 +167,7 @@ namespace TerraForge3D
 			colorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 			colorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
 			colorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY; // Optional
-			colorBlendStateCreateInfo.attachmentCount = colorBlendAttachmentStates.size();
+			colorBlendStateCreateInfo.attachmentCount = static_cast<uint32_t>(colorBlendAttachmentStates.size());
 			colorBlendStateCreateInfo.pAttachments = colorBlendAttachmentStates.data();
 			colorBlendStateCreateInfo.blendConstants[0] = 0.0f; // Optional
 			colorBlendStateCreateInfo.blendConstants[1] = 0.0f; // Optional

@@ -25,6 +25,12 @@ namespace TerraForge3D
 			this->meshClone = appState->terrain.manager->meshClone.Get();			
 		}
 
+		void Data::PrepareForGenerators()
+		{
+
+		}
+
+
 	}
 
 }

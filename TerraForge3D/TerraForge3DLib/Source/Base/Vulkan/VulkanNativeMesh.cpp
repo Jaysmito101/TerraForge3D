@@ -16,7 +16,7 @@ namespace TerraForge3D
 
 		NativeMesh::~NativeMesh()
 		{
-			if (autoDestroy)
+			if (autoDestroy && isSetup)
 				Destroy();
 			
 			TF3D_SAFE_DELETE(vertexBuffer);

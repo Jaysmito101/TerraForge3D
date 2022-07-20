@@ -20,8 +20,12 @@ namespace TerraForge3D
 
 			void LoadData();
 
+			void PrepareForGenerators();
+		
 		private:
 			ApplicationState* appState = nullptr;
+		
+		public:
 			Mesh* mesh = nullptr;
 			Mesh* meshClone = nullptr;
 		};
