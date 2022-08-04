@@ -28,8 +28,8 @@ namespace TerraForge3D
 
 		std::string GetGPUName()
 		{
-			const GLubyte* vendor = glGetString​(GL_VENDOR); 
-			const GLubyte* renderer = glGetString​(GL_RENDERER);
+			const char* vendor = (const char*)glGetString(GL_VENDOR);
+			const char* renderer = (const char*)glGetString(GL_RENDERER);
 			return std::string(vendor) + " " + std::string(renderer);
 		}
 	}

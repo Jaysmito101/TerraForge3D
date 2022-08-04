@@ -7,6 +7,7 @@ namespace TerraForge3D
 	namespace RendererAPI
 	{
 		class FrameBuffer;
+		class SharedStorageBuffer;
 
 		class Pipeline
 		{
@@ -19,6 +20,7 @@ namespace TerraForge3D
 			virtual bool Rebuild(FrameBuffer* framebuffer, bool forceRebuild = false) = 0;
 
 			inline Pipeline* SetAutoDestroy(bool value) { this->autoDestory = value; return this; }
+			inline Pipeline* SetSharedStorageBuffer(SharedStorageBuffer* buffer) { this->sharedStorageBuffer = buffer; return this; }
 
 			inline bool IsSetup() { return this->isSetup; }
 
@@ -31,6 +33,7 @@ namespace TerraForge3D
 			bool isSetup = false;
 			bool autoDestory = true;
 			int viewportBegin[2] = {0, 0};
+			SharedStorageBuffer* sharedStorageBuffer;
 		};
 
 	}

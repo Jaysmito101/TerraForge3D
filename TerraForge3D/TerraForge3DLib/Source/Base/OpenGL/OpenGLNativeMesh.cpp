@@ -11,7 +11,7 @@ namespace TerraForge3D
 	{
 		NativeMesh::~NativeMesh()
 		{
-			if (autoDestroy)
+			if (autoDestroy && isSetup)
 				Destroy();
 		}
 

@@ -47,9 +47,9 @@
 #define TF3D_VEC3_NORMALIZE(a) \
 		{ \
 			float inverseLength##__LINE__ = 1.0f / TF3D_VEC3_LENGTH(a); \
-			a.x = a.x / inverseLength##__LINE__; \
-			a.y = a.y / inverseLength##__LINE__; \
-			a.z = a.z / inverseLength##__LINE__; \
+			a.x = a.x * inverseLength##__LINE__; \
+			a.y = a.y * inverseLength##__LINE__; \
+			a.z = a.z * inverseLength##__LINE__; \
 		}
 
 // Some useful functions

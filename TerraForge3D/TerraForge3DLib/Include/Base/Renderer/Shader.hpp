@@ -3,7 +3,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-
 namespace TerraForge3D
 {
 
@@ -43,16 +42,16 @@ namespace TerraForge3D
 		{
 			switch (type)
 			{
-				case ShaderDataType_Mat3	: return 3 * 3 * sizeof(float);
-				case ShaderDataType_Mat4	: return 4 * 4 * sizeof(float);
-				case ShaderDataType_Vec2	: return 2 * sizeof(float);
-				case ShaderDataType_Vec3	: return 3 * sizeof(float);
-				case ShaderDataType_Vec4	: return 4 * sizeof(float);
-				case ShaderDataType_IVec2	: return 2 * sizeof(int);
-				case ShaderDataType_IVec3	: return 3 * sizeof(int);
-				case ShaderDataType_IVec4	: return 4 * sizeof(int);
-				case ShaderDataType_Bool	: return sizeof(bool);
-				default						: return 0;
+			case ShaderDataType_Mat3: return 3 * 3 * sizeof(float);
+			case ShaderDataType_Mat4: return 4 * 4 * sizeof(float);
+			case ShaderDataType_Vec2: return 2 * sizeof(float);
+			case ShaderDataType_Vec3: return 3 * sizeof(float);
+			case ShaderDataType_Vec4: return 4 * sizeof(float);
+			case ShaderDataType_IVec2: return 2 * sizeof(int);
+			case ShaderDataType_IVec3: return 3 * sizeof(int);
+			case ShaderDataType_IVec4: return 4 * sizeof(int);
+			case ShaderDataType_Bool: return sizeof(bool);
+			default: return 0;
 			}
 			return 0;
 		}
@@ -69,16 +68,16 @@ namespace TerraForge3D
 			virtual bool LoadFromBinary() = 0;
 
 			inline bool IsCompiled() { return this->isCompiled; }
-			inline std::vector<uint32_t> GetBinary(ShaderStage stage) 
+			inline std::vector<uint32_t> GetBinary(ShaderStage stage)
 			{
 				if (isCompiled && loadedFromBinary)
 				{
 					switch (stage)
 					{
-					case ShaderStage_Vertex   : return binary.vertex;
-					case ShaderStage_Geometry : return binary.geometry;
-					case ShaderStage_Fragment : return binary.fragment;
-						
+					case ShaderStage_Vertex: return binary.vertex;
+					case ShaderStage_Geometry: return binary.geometry;
+					case ShaderStage_Fragment: return binary.fragment;
+
 					}
 				}
 				TF3D_ASSERT(false, "Shader binary not available");
@@ -109,7 +108,7 @@ namespace TerraForge3D
 				}
 				isCompiled = false;
 				return this;
-			}
+			}		
 
 
 		public:

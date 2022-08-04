@@ -16,16 +16,16 @@
 #endif
 
 // Uncomment only one macro at a time here
-//#define TF3D_OPENGL_BACKEND
-#define TF3D_VULKAN_BACKEND
+#define TF3D_OPENGL_BACKEND
+// #define TF3D_VULKAN_BACKEND
 
-#if defined(TF3D_OPENGL_BACKEND) and defined(TF3D_VULKAN_BACKEND)
+// #if defined(TF3D_OPENGL_BACKEND) and defined(TF3D_VULKAN_BACKEND)
 // #error "Cannot use both Vulkan and OpenGL backends together"
-#endif
+// #endif
 
-#if not defined(TF3D_OPENGL_BACKEND) and not defined(TF3D_VULKAN_BACKEND)
-#error "GPU backend not set"
-#endif
+// #if not defined(TF3D_OPENGL_BACKEND) and not defined(TF3D_VULKAN_BACKEND)
+// #error "GPU backend not set"
+// #endif
 
 #ifdef TF3D_VULKAN_BACKEND
 #define TF3D_BACKEND "Vulkan"

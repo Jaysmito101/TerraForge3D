@@ -6,32 +6,30 @@ namespace TerraForge3D
 
 	namespace Terrain
 	{
-		namespace Dummy
+		Dummy_Editor::Dummy_Editor(ApplicationState* as, Dummy_SharedData* sd)
+			:UI::Editor("Dummy Generator Editor"), appState(as), data(sd)
+		{}
+
+		void Dummy_Editor::OnUpdate()
 		{
-			Editor::Editor(ApplicationState* as, SharedData* sd)
-				:UI::Editor("Dummy Generator Editor"), appState(as), data(sd)
-			{}
 
-			void Editor::OnUpdate()
-			{
-
-			}
-			
-			void Editor::OnShow()
-			{
-				ImGui::Text("Dummy Editor");
-			}
-			
-			void Editor::OnStart()
-			{
-
-			}
-
-			void Editor::OnEnd()
-			{
-
-			}
 		}
+
+		void Dummy_Editor::OnShow()
+		{
+			ImGui::Text("Dummy Editor");
+		}
+
+		void Dummy_Editor::OnStart()
+		{
+
+		}
+
+		void Dummy_Editor::OnEnd()
+		{
+
+		}
+
 	}
 
 }

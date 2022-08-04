@@ -32,11 +32,17 @@ namespace TerraForge3D
 
 		void Manager::OnEnd()
 		{
-			workerThreadReady = true;
-			condVar.notify_one();
+			while (workerThreadBusy)
+			{
+				TF3D_LOG("Waiting for worker thread to finish pending jobs.");
+				Utils::SleepFor(100);
+			}
 			workerThreadRunning = false;
+			workerThreadReady = true;
+			
 			if (workerThread.joinable())
 				workerThread.join();
+
 			for (auto& gen : generators)
 			{
 				gen->OnDetach();
@@ -50,7 +56,6 @@ namespace TerraForge3D
 				OnJobDone();
 				mesh->UploadToGPU();
 				workerThreadReady = true;
-				condVar.notify_one();
 			}
 		}
 
@@ -68,6 +73,9 @@ namespace TerraForge3D
 			currentChildBgColor.x = 0.1f;
 			currentChildBgColor.y = 0.1f;
 			currentChildBgColor.z = 0.1f;
+
+			
+
 			ImGui::PushStyleColor(ImGuiCol_ChildBg, currentChildBgColor);
 			for (auto& generator : generators)
 			{
@@ -92,11 +100,14 @@ namespace TerraForge3D
 
 		void Manager::Resize(uint32_t res, float sc, float* progress)
 		{
-			while (workerThreadBusy) Utils::SleepFor(100);
-
+			this->isBeingResized = true;
+			while (workerThreadBusy)
+			{
+				TF3D_LOG("Waiting for worker thread to finish pending jobs.");
+				Utils::SleepFor(100);
+			}
 			//if (progress)
 			//	*progress = 0.0f;
-			this->isBeingResized = true;
 			this->resolution = res;
 			this->scale = sc;
 			this->mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), resolution, scale, progress);
@@ -108,14 +119,20 @@ namespace TerraForge3D
 
 		void Manager::WorkerThread()
 		{
+			TF3D_LOG("Starting up worker thread");
 			while (workerThreadRunning)
 			{
+				workerThreadReady = false;
 				workerThreadBusy = false;
-				std::unique_lock lock(mutex);
-				condVar.wait(lock, [this]()->bool {return workerThreadReady; });
+				
+				while (!workerThreadReady)	Utils::SleepFor(10);
+				while (isBeingResized)	Utils::SleepFor(10);
+
 				if (!workerThreadRunning)
 					break;
+				
 				workerThreadBusy = true;
+				
 				switch (processorDevice)
 				{
 				case ProcessorDevice_CPU:
@@ -133,7 +150,9 @@ namespace TerraForge3D
 					TF3D_ASSERT(false, "Invalid Processor Device");
 					break;
 				}
+			
 			}
+			TF3D_LOG("Shutting down worker thread");
 		}
 
 		void Manager::OnJobDone()
@@ -143,7 +162,6 @@ namespace TerraForge3D
 				generators.push_back(generatorsTemp.back());
 				generatorsTemp.pop_back();
 			}
-			TF3D_LOG_TRACE("Job Done!");
 		}
 
 		void Manager::ProcessGeneratorsOnCPU()

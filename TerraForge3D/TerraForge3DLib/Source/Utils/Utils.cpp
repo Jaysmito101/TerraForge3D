@@ -165,7 +165,7 @@ namespace TerraForge3D
 		void SleepFor(uint64_t duration)
 		{
 #ifdef TF3D_WINDOWS
-			Sleep(duration);
+			Sleep((DWORD)duration);
 #elif defined(TF3D_LINUX)
 			usleep(duration);
 #elif defined(TF3D_MACOSX)

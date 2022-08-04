@@ -6,24 +6,23 @@ namespace TerraForge3D
 	namespace Terrain
 	{
 		class Data;
-		namespace Dummy
+
+		struct Dummy_SharedData;
+
+
+		class Dummy_CPUProcessor : public Processor
 		{
-			struct SharedData;
+		public:
+			Dummy_CPUProcessor(Dummy_SharedData* sharedData);
+			~Dummy_CPUProcessor();
+
+			virtual bool Process(Terrain::Data* data) override;
+
+		private:
+			Dummy_SharedData* data = nullptr;
+		};
 
 
-			class CPUProcessor : public Terrain::Processor
-			{
-			public:
-				CPUProcessor(SharedData* sharedData);
-				~CPUProcessor();
-
-				virtual bool Process(Terrain::Data* data) override;
-
-			private:
-				SharedData* data = nullptr;
-			};
-
-		}
 
 	}
 

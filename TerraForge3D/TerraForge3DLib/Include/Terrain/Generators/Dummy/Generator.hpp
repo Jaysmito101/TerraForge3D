@@ -10,30 +10,26 @@ namespace TerraForge3D
 {
 	namespace Terrain
 	{
-		namespace Dummy
-		{
 
-			struct SharedData
+			struct Dummy_SharedData
 			{
 
 			};
 
-			class Generator : public Terrain::Generator
+			class Dummy_Generator : public Terrain::Generator
 			{
 			public:
-				Generator(ApplicationState* appState)
+				Dummy_Generator(ApplicationState* appState)
 					:Terrain::Generator(appState)
 				{}
 
-				virtual ~Generator() = default;
+				virtual ~Dummy_Generator() = default;
 
 				virtual void OnAttach() override;
 				virtual void OnDetach() override;
 
 			public:
-				SharedData data;
-				
+				Dummy_SharedData data;				
 			};
-		}
 	}
 }

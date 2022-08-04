@@ -6,28 +6,25 @@ namespace TerraForge3D
 
 	namespace Terrain
 	{
-		namespace Dummy
+		Dummy_CPUProcessor::Dummy_CPUProcessor(Dummy_SharedData* sd)
+			:data(sd), Terrain::Processor("Dummy CPU Processor", ProcessorDevice_CPU)
+		{}
+
+		Dummy_CPUProcessor::~Dummy_CPUProcessor()
+		{}
+
+		bool Dummy_CPUProcessor::Process(Terrain::Data* data)
 		{
-
-			CPUProcessor::CPUProcessor(SharedData* sd)
-				:data(sd), Terrain::Processor("Dummy CPU Processor", ProcessorDevice_CPU)
-			{}
-
-			CPUProcessor::~CPUProcessor()
-			{}
-
-			bool CPUProcessor::Process(Terrain::Data* data)
+			uint64_t size = data->mesh->vertices.size();
+			auto& clonevertices = data->meshClone->vertices;
+			for (uint64_t i = 0; i < size; i++)
 			{
-				uint32_t size = data->mesh->vertices.size();
-				auto& clonevertices = data->meshClone->vertices;
-				for (uint32_t i = 0 ; i < size ; i++)
-				{
-					data->mesh->vertices[i].position = sin(data->mesh->vertices[i].position.x * 4.0f) * 4.0f * clonevertices[i].normal;
-				}
-				return true;
+				data->mesh->vertices[i].position += sin(data->mesh->vertices[i].position.x * 4.0f) * 4.0f * clonevertices[i].normal;
 			}
-
+			return true;
 		}
+
+
 	}
 
 }

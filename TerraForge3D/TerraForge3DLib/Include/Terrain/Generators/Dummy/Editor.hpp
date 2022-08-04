@@ -8,25 +8,22 @@ namespace TerraForge3D
 
 	namespace Terrain
 	{
-		namespace Dummy
+		struct Dummy_SharedData;
+
+		class Dummy_Editor : public UI::Editor
 		{
-			struct SharedData;
+		public:
+			Dummy_Editor(ApplicationState* appState, Dummy_SharedData* sharedData);
+			~Dummy_Editor() = default;
+			void OnUpdate() override;
+			void OnShow() override;
+			void OnStart() override;
+			void OnEnd() override;
 
-			class Editor : public UI::Editor
-			{
-			public:
-				Editor(ApplicationState* appState, SharedData* sharedData);
-				~Editor() = default;
-				void OnUpdate() override;
-				void OnShow() override;
-				void OnStart() override;
-				void OnEnd() override;
-
-			private:
-				ApplicationState* appState = nullptr;
-				SharedData* data;
-			public:
-			};
-		}
+		private:
+			ApplicationState* appState = nullptr;
+			Dummy_SharedData* data;
+		public:
+		};
 	}
 }

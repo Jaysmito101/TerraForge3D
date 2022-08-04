@@ -19,7 +19,7 @@ namespace TerraForge3D
 	static Terrain::Generator* ShowAddGeneratorButtons(ApplicationState* appState)
 	{
 		if (ImGui::Button("Dummy"))
-			return new Terrain::Dummy::Generator(appState);
+			return new Terrain::Dummy_Generator(appState);
 		return nullptr;
 	}
 
@@ -28,13 +28,22 @@ namespace TerraForge3D
 	// TEMP
 	static std::string vss, fss;
 
+	static SharedPtr<RendererAPI::SharedStorageBuffer> buff;
+	static float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 	Inspector::Inspector(ApplicationState* as)
 	{
 		this->appState = as;
+
+		buff = RendererAPI::SharedStorageBuffer::Create();
+		buff->SetSize(sizeof(color));
+		buff->SetBinding(0);
+		buff->Setup();
 	}
 
 	Inspector::~Inspector()
 	{
+		buff->Destroy();
 	}
 
 	void Inspector::OnStart()
@@ -57,6 +66,10 @@ namespace TerraForge3D
 					RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
 					RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
 					});
+				
+				// TEMP ------------------------------------------------------------------
+				renderPipeline[i]->SetSharedStorageBuffer(buff.Get());
+				
 				renderPipeline[i]->shader->Compile();
 				renderPipeline[i]->Setup();
 			}
@@ -125,6 +138,7 @@ namespace TerraForge3D
 		ImGui::EndChild();
 	}
 
+
 	void Inspector::ShowTerrainSettings()
 	{
 		float windowWidth = ImGui::GetWindowWidth();
@@ -142,6 +156,10 @@ namespace TerraForge3D
 			"4096x4096",
 			"8192x8192",
 		};
+
+		// TEMP ----------------------------------------------------------------------
+		if (ImGui::ColorEdit4("color", color))
+			buff->SetData(color, sizeof(color), 0);
 
 		Utils::ImGuiC::ComboBox("Resolution", &terrain.resolutionIndex, MeshResolutionsStr, TF3D_STATIC_ARRAY_SIZE(MeshResolutionsStr));
 		
@@ -185,9 +203,11 @@ namespace TerraForge3D
 		case Terrain::ProcessorDevice_CPU:
 			ImGui::Text("Processor Device Name : %s", cpuName.data());
 			break;
-		case Terrain::ProcessorDevice_Vulkan:
+#ifdef TF3D_VULKAN_BACKEND
+		case ProcessorDevice_Vulkan:
 			ImGui::Text("Processor Device Name : %s", vulkanGPUName.data());
 			break;
+#endif
 		case Terrain::ProcessorDevice_OpenCL:
 			ImGui::Text("Processor Device Name : %s", openCLGPUName.data());
 			break;

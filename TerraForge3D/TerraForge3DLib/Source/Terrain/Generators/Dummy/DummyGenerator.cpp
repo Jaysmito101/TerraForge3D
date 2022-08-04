@@ -7,15 +7,15 @@ namespace TerraForge3D
 	namespace Terrain
 	{
 
-		void Dummy::Generator::OnAttach()
+		void Dummy_Generator::OnAttach()
 		{
 			this->name = "Dummy Generator";
-			this->editor = new Dummy::Editor(appState, &data);
+			this->editor = new Dummy_Editor(appState, &data);
 			this->editor->SetVisible(false);
-			this->cpuProcessor = new Dummy::CPUProcessor(&data);
+			this->cpuProcessor = new Dummy_CPUProcessor(&data);
 		}
 
-		void Dummy::Generator::OnDetach()
+		void Dummy_Generator::OnDetach()
 		{
 
 		}

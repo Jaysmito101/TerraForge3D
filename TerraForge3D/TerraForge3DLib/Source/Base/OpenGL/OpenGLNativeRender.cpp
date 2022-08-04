@@ -156,7 +156,7 @@ namespace TerraForge3D
 								glUniform4iv(location, 1, (GLint*)params.custom);
 								break;
 							case RendererAPI::ShaderDataType_Bool:
-								glUniform1i(location, (GLint)params.custom);
+								glUniform1i(location, (GLint)(intptr_t)params.custom);
 								break;
 						}
 					}

@@ -155,10 +155,10 @@ namespace TerraForge3D
 		if (progress)
 			*progress = 0.5f;
 #ifndef TF3D_MESH_UNSAFE_NORMALS
-		for (Vertex& v : vertices)
+		for (uint64_t i = 0 ; i < vertices.size() ; i++)
 		{
-			TF3D_VEC3_NORMALIZE(v.normal);
-			v.normal.w = 0.0f;
+			TF3D_VEC3_NORMALIZE(vertices[i].normal);
+			vertices[i].normal.w = 0.0f;
 		}
 #endif // TF3D_MESH_UNSAFE_NORMALS
 		if (progress)

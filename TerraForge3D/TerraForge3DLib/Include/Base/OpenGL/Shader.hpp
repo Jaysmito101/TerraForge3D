@@ -21,7 +21,7 @@ namespace TerraForge3D
 
 			void LoadUniformLocations();
 
-			inline bool UniformExists(const std::string& name) { return uniformLocations.find(name) != uniformLocations.end(); }
+			inline bool UniformExists(std::string name) { return uniformLocations.find(name) != uniformLocations.end(); }
 			inline std::pair<GLuint, RendererAPI::ShaderDataType>& GetUniform(const std::string& name) { return uniformLocations[name]; }
 				
 		public:

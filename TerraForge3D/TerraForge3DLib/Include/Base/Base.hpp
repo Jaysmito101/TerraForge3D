@@ -21,6 +21,7 @@
 #include "Base/Renderer/Camera.hpp"
 #include "Base/Renderer/Pipeline.hpp"
 #include "Base/Renderer/Shader.hpp"
+#include "Base/Renderer/SharedStorageBuffer.hpp"
 #endif
 
 // Data Strutures
