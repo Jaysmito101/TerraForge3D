@@ -1,7 +1,5 @@
 #include "Terrain/Data.hpp"
-#include "Terrain/Manager.hpp"
-#include "Data/ApplicationState.hpp"
-#include "Base/Base.hpp"
+#include "TerraForge3D.hpp"
 
 namespace TerraForge3D
 {

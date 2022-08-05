@@ -5,6 +5,7 @@
 #include "Base/Vulkan/Pipeline.hpp"
 #include "Base/Vulkan/NativeMesh.hpp"
 #include "Base/Vulkan/Shader.hpp"
+#include "Base/Vulkan/SharedStorageBuffer.hpp"
 #include "Base/Renderer/Camera.hpp"
 
 #include "Base/DS/Mesh.hpp"
@@ -112,6 +113,13 @@ namespace TerraForge3D
 					vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
 					vkCmdSetViewport(commandBuffer, 0, 1, &pipeline->viewport);
 					vkCmdSetScissor(commandBuffer, 0, 1, &pipeline->scissor);
+
+					// bind the shared storage buffers
+					for (auto& ssb : pipeline->sharedStorageBuffers)
+					{
+						Vulkan::SharedStorageBuffer* ssbo = static_cast<Vulkan::SharedStorageBuffer*>(ssb);
+						vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipelineLayout, 0, 1, &ssbo->descriptorSet, 0, nullptr);
+					}
 					break;
 				}
 				/*

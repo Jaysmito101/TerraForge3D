@@ -95,11 +95,26 @@ namespace TerraForge3D
 			descriptor.range = size;
 		}
 
-		void Buffer::SetData(void* data, VkDeviceSize size)
+		void Buffer::SetData(void* data, VkDeviceSize lSize, VkDeviceSize lOffset)
 		{
 			TF3D_ASSERT(isSetupOnGPU, "Buffer not yet setup");
 			TF3D_ASSERT(mapped, "Memory is not mapped yet");
-			memcpy(mapped, data, size);
+			TF3D_ASSERT(lSize <= this->bufferSize, "Invalid size");
+			TF3D_ASSERT(lOffset >= 0, "Invalid offset");
+			TF3D_ASSERT((lOffset + lSize) <= this->bufferSize, "Invalid offset");
+
+			memcpy(((char*)mapped + lOffset), data, lSize);
+		}
+
+		void Buffer::GetData(void* data, VkDeviceSize lSize, VkDeviceSize lOffset)
+		{
+			TF3D_ASSERT(isSetupOnGPU, "Buffer not yet setup");
+			TF3D_ASSERT(mapped, "Memory is not mapped yet");
+			TF3D_ASSERT(lSize <= this->bufferSize, "Invalid size");
+			TF3D_ASSERT(lOffset >= 0, "Invalid offset");
+			TF3D_ASSERT((lOffset + lSize) <= this->bufferSize, "Invalid offset");
+
+			memcpy(data, ((char*)mapped + lOffset), lSize);
 		}
 
 		void Buffer::Flush(VkDeviceSize size, VkDeviceSize offset)

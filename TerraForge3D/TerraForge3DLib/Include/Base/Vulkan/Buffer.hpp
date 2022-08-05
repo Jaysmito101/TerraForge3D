@@ -40,7 +40,8 @@ namespace TerraForge3D
 			void Unmap();
 			void Bind(VkDeviceSize offset = 0);
 			void SetupDescriptor(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-			void SetData(void* data, VkDeviceSize size);
+			void SetData(void* data, VkDeviceSize size, VkDeviceSize offset = 0);
+			void GetData(void* data, VkDeviceSize size, VkDeviceSize offset = 0);
 			void Flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 			void Invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 			uint32_t GetMemoryTypeIndex(uint32_t type, VkMemoryPropertyFlags properties);

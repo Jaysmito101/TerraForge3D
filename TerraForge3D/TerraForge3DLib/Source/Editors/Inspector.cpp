@@ -68,7 +68,7 @@ namespace TerraForge3D
 					});
 				
 				// TEMP ------------------------------------------------------------------
-				renderPipeline[i]->SetSharedStorageBuffer(buff.Get());
+				renderPipeline[i]->AddSharedStorageBuffer(buff.Get());
 				
 				renderPipeline[i]->shader->Compile();
 				renderPipeline[i]->Setup();
@@ -204,7 +204,7 @@ namespace TerraForge3D
 			ImGui::Text("Processor Device Name : %s", cpuName.data());
 			break;
 #ifdef TF3D_VULKAN_BACKEND
-		case ProcessorDevice_Vulkan:
+		case Terrain::ProcessorDevice_Vulkan:
 			ImGui::Text("Processor Device Name : %s", vulkanGPUName.data());
 			break;
 #endif

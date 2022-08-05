@@ -1,6 +1,7 @@
 #include "Base/Vulkan/Pipeline.hpp"
 #include "Base/Vulkan/Framebuffer.hpp"
 #include "Base/Vulkan/GraphicsDevice.hpp"
+#include "Base/Vulkan/SharedStorageBuffer.hpp"
 #include "Base/Vulkan/Shader.hpp"
 #include "Base/DS/Mesh.hpp"
 
@@ -210,10 +211,16 @@ namespace TerraForge3D
 			pushConstantsRange.size = reinterpret_cast<Shader*>(shader)->pushConstantsSize;
 			pushConstantsRange.stageFlags =VK_SHADER_STAGE_ALL_GRAPHICS;
 
+			std::vector<VkDescriptorSetLayout> descriptorsetLayouts;
+			
+			// shared storage buffers
+			for (auto& ssb : this->sharedStorageBuffers)
+				descriptorsetLayouts.push_back(static_cast<Vulkan::SharedStorageBuffer*>(ssb)->descriptorSetLayout);
+
 			VkPipelineLayoutCreateInfo layoutCreateInfo{};
 			layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-			layoutCreateInfo.setLayoutCount = 0;
-			layoutCreateInfo.pSetLayouts = nullptr;
+			layoutCreateInfo.setLayoutCount = static_cast<uint32_t>(descriptorsetLayouts.size());
+			layoutCreateInfo.pSetLayouts = descriptorsetLayouts.data();
 			layoutCreateInfo.pushConstantRangeCount = 1;
 			layoutCreateInfo.pPushConstantRanges = &pushConstantsRange;
 
