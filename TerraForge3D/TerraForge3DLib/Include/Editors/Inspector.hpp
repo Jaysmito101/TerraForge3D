@@ -1,18 +1,12 @@
 #pragma once
 #include "Base/Base.hpp"
 #include "UI/Editor.hpp"
-#include "Terrain/Processor.hpp"
 
 namespace TerraForge3D
 {
 
 	class ApplicationState;
 	class Viewport;
-
-	namespace Terrain
-	{
-		class Manager;
-	}
 
 	class Inspector : public UI::Editor
 	{
@@ -45,16 +39,11 @@ namespace TerraForge3D
 
 		struct
 		{
-			uint32_t resolutionIndex = 0;
-			uint32_t resolution = 128;
+			uint32_t resolution = 256;
 			float scale = 1.0f;
-			Terrain::Manager* manager = nullptr;
+			SharedPtr<Mesh> mesh;
 		} terrain;
 
-		struct
-		{
-			Terrain::ProcessorDevice device = Terrain::ProcessorDevice_CPU;
-		} generators;
 
 		std::string vulkanGPUName = "";
 		std::string openCLGPUName = "";

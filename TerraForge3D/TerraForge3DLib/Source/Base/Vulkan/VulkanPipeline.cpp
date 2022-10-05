@@ -44,6 +44,9 @@ namespace TerraForge3D
 
 		bool Pipeline::IsRebuildRequired(RendererAPI::FrameBuffer* f)
 		{
+			if (forceRequireRebuild)
+				return true;
+
 			if (!currentFramebuffer.handle)
 				return true;
 
@@ -59,8 +62,14 @@ namespace TerraForge3D
 
 		bool Pipeline::Rebuild(RendererAPI::FrameBuffer* f, bool forceRebuild)
 		{
-			if (!IsRebuildRequired(f) && !forceRebuild)
-				return true;
+			if (!forceRebuild)
+			{
+				if (!IsRebuildRequired(f))
+					return true;
+			}
+
+			forceRequireRebuild = false;
+
 
 			currentFramebuffer.handle = reinterpret_cast<FrameBuffer*>(f);
 			currentFramebuffer.width = f->GetWidth();

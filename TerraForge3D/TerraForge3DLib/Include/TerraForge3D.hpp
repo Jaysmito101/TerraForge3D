@@ -33,10 +33,5 @@
 #include "Editors/Inspector.hpp"
 
 // Terrain
-#include "Terrain/Manager.hpp"
-#include "Terrain/Data.hpp"
-#include "Terrain/Processor.hpp"
 
 // Terrain/Generators
-#include "Terrain/Generators/Generator.hpp"
-#include "Terrain/Generators/Dummy/Generator.hpp"

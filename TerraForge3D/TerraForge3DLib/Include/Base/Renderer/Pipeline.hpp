@@ -21,6 +21,7 @@ namespace TerraForge3D
 
 			inline Pipeline* SetAutoDestroy(bool value) { this->autoDestory = value; return this; }
 			inline Pipeline* AddSharedStorageBuffer(SharedStorageBuffer* buffer) { this->sharedStorageBuffers.push_back(buffer); return this; }
+			inline Pipeline* ForceRequireRebuild() { this->forceRequireRebuild = true; return this; }
 
 			inline bool IsSetup() { return this->isSetup; }
 
@@ -30,6 +31,7 @@ namespace TerraForge3D
 			RendererAPI::Shader* shader = nullptr;
 
 		public:
+			bool forceRequireRebuild = false;
 			bool isSetup = false;
 			bool autoDestory = true;
 			int viewportBegin[2] = {0, 0};
