@@ -13,6 +13,7 @@ BEGIN_UNIFORMS()
 	DEFINE_UNIFORM(ivec4, _Engine)
 	DEFINE_UNIFORM(mat4, _Model)
 	DEFINE_UNIFORM(mat4, _PV)
+	DEFINE_UNIFORM(vec4, _Resolution)
 END_UNIFORMS()
 
 #ifdef TF3D_OPENGL
@@ -30,7 +31,7 @@ void main()
 	vec3 ambient = ambientStrength * lightColor;
   	
 	// diffuse 
-	vec3 norm = -normalize(Normal);
+	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(lightPos - Position);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor; 

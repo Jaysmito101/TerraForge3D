@@ -42,6 +42,8 @@ namespace TerraForge3D
 			uint32_t resolution = 256;
 			float scale = 1.0f;
 			SharedPtr<Mesh> mesh;
+			SharedPtr<RendererAPI::SharedStorageBuffer> dataBuffer;
+			float resolutionData[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 		} terrain;
 
 

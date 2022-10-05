@@ -20,6 +20,20 @@ namespace TerraForge3D
 
 	// TEMP
 	static std::string vss, fss;
+	static TerrainPointData ptd[1024 * 1024];
+
+	static void GenerateTerrain(int res)
+	{
+		for(int i = 0 ; i < res ; i++)
+		{
+			for(int j = 0 ; j < res ; j++)
+			{
+				float x = (float)j / res;
+				float y = (float)i / res;
+				ptd[i * res + j].a.x = fabs(sin(x * 8) + cos(y * 8));
+			}
+		}
+	}
 
 	Inspector::Inspector(ApplicationState* as)
 	{
@@ -36,34 +50,42 @@ namespace TerraForge3D
 			isVisible = context->GetToggleState();
 			}, TerraForge3D::UI::MenuItemUse_Toggle)->RegisterTogglePTR(&isVisible);
 
+		terrain.mesh = new Mesh();
+		terrain.mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		terrain.mesh->RecalculateMatices();
+		terrain.mesh->RecalculateNormals();
+		terrain.mesh->UploadToGPU();
+		terrain.mesh->Clear();
 
-			vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
-			fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
+		terrain.dataBuffer = RendererAPI::SharedStorageBuffer::Create();
+		terrain.dataBuffer->UseForGraphics();
+		terrain.dataBuffer->SetSize(sizeof(TerrainPointData) * terrain.resolution * terrain.resolution);
+		terrain.dataBuffer->SetBinding(0);
+		terrain.dataBuffer->Setup();
 
-			for (int i = 0; i < VIEWPORT_COUNT; i++)
-			{
-				renderPipeline[i] = RendererAPI::Pipeline::Create();
-				renderPipeline[i]->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
-				renderPipeline[i]->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
-				renderPipeline[i]->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
-				renderPipeline[i]->shader->SetUniformsLayout({
-					RendererAPI::ShaderVar("_Engine", RendererAPI::ShaderDataType_IVec4),
-					RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
-					RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4)
-					});
+
+		vss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Vert.glsl");
+		fss = Utils::ReadTextFile(appState->appResourcePaths.shaderIncludeDir + PATH_SEPERATOR "Frag.glsl");
+
+		for (int i = 0; i < VIEWPORT_COUNT; i++)
+		{
+			renderPipeline[i] = RendererAPI::Pipeline::Create();
+			renderPipeline[i]->shader->SetIncludeDir(appState->appResourcePaths.shaderIncludeDir);
+			renderPipeline[i]->shader->SetSource(vss, RendererAPI::ShaderStage_Vertex);
+			renderPipeline[i]->shader->SetSource(fss, RendererAPI::ShaderStage_Fragment);
+			renderPipeline[i]->shader->SetUniformsLayout({
+			RendererAPI::ShaderVar("_Engine", RendererAPI::ShaderDataType_IVec4),
+				RendererAPI::ShaderVar("_PV", RendererAPI::ShaderDataType_Mat4),
+				RendererAPI::ShaderVar("_Model", RendererAPI::ShaderDataType_Mat4),
+				RendererAPI::ShaderVar("_Resolution", RendererAPI::ShaderDataType_Vec4)
+			});
+			
+			renderPipeline[i]->AddSharedStorageBuffer(this->terrain.dataBuffer.Get());
 				
-				//renderPipeline[i]->AddSharedStorageBuffer(this->terrain.manager->sharedBuffer.Get());
-				
-				renderPipeline[i]->shader->Compile();
-				renderPipeline[i]->Setup();
-			}
-
-			terrain.mesh = new Mesh();
-			terrain.mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			terrain.mesh->RecalculateMatices();
-			terrain.mesh->RecalculateNormals();
-			terrain.mesh->UploadToGPU();
-			terrain.mesh->Clear();
+			renderPipeline[i]->shader->Compile();
+			renderPipeline[i]->Setup();
+		}
+			
 	}
 
 	void Inspector::OnShow()
@@ -98,8 +120,7 @@ namespace TerraForge3D
 				itemViewHeight = separatorSliderWidth;
 			if (itemViewHeight > windowHeight - separatorSliderWidth)
 				itemViewHeight = windowHeight - separatorSliderWidth;
-		}
-		ImGui::SetMouseCursor(currentCursor);
+		}		ImGui::SetMouseCursor(currentCursor);
 		ImGui::BeginChild("##InspectorList", ImVec2(windowWidth, windowHeight - itemViewHeight - separatorSliderWidth - 30));
 		Utils::ImGuiC::PushSubFont(appState->core.fonts["Header"].handle);
 		ImGui::Text("Objects");
@@ -145,6 +166,8 @@ namespace TerraForge3D
 		if(terrain.resolution != oldResolution)
 		{
 			oldResolution = terrain.resolution;
+			terrain.resolutionData[0] = (float)terrain.resolution;
+			terrain.resolutionData[1] = (float)terrain.resolution;
 			JobSystem::Job* job = new JobSystem::Job("Resize Terrain");
 			job->excutionModel = JobSystem::JobExecutionModel_Async;
 			job->onRun = [this] (JobSystem::Job* context) -> bool {
@@ -152,11 +175,18 @@ namespace TerraForge3D
 				terrain.mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), terrain.resolution, 1.0f, &context->progress);
 				terrain.mesh->RecalculateMatices();
 				terrain.mesh->RecalculateNormals();
+				GenerateTerrain(terrain.resolution);
 				return true;
 			};
 			job->onComplete = [this] (JobSystem::Job* context) -> bool {
 				terrain.mesh->UploadToGPU();
 				terrain.mesh->Clear();
+				terrain.dataBuffer->Destroy();
+				terrain.dataBuffer->UseForGraphics();
+				terrain.dataBuffer->SetSize(sizeof(TerrainPointData) * terrain.resolution * terrain.resolution);
+				terrain.dataBuffer->SetBinding(0);
+				terrain.dataBuffer->Setup();
+				terrain.dataBuffer->SetData(ptd, terrain.dataBuffer->GetSize(), 0);
 				return true;
 			};
 			appState->jobs.manager->AddJob(job);
@@ -169,6 +199,8 @@ namespace TerraForge3D
 
 	void Inspector::OnEnd()
 	{
+		terrain.mesh->Clear(true);
+		terrain.dataBuffer->Destroy();
 		for (int i = 0; i < VIEWPORT_COUNT; i++)
 			renderPipeline[i]->Destory();
 	}
@@ -185,6 +217,7 @@ namespace TerraForge3D
 		appState->renderer->BindFramebuffer(viewport->GetFramebuffer().Get());
 		appState->renderer->ClearFrame();
 		appState->renderer->BindPipeline(renderPipeline[viewport->GetNumber()].Get());
+		appState->renderer->UploadUnifrom("_Resolution", terrain.resolutionData); 
 		appState->renderer->DrawMesh(terrain.mesh.Get(), 484);
 		return true;
 	}

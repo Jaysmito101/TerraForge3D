@@ -33,5 +33,6 @@
 #include "Editors/Inspector.hpp"
 
 // Terrain
+#include "Terrain/Data.hpp"
 
 // Terrain/Generators

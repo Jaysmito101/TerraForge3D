@@ -43,10 +43,9 @@
 
 #define GET_SSB_INDEX(tc, out) \
 	{ \
-		int res_ssb_index = int(sqrt(tc.length())); \
-		int rX_ssb_index = int(tc.x * (res_ssb_index - 1)); \
-		int rY_ssb_index = int(tc.y * (res_ssb_index - 1)); \
-		out = rX_ssb_index * res_ssb_index + rY_ssb_index ; \
+		int rX_ssb_index = int(tc.x * (UNIFORM(_Resolution).x - 1)); \
+		int rY_ssb_index = int(tc.y * (UNIFORM(_Resolution).y - 1)); \
+		out = rY_ssb_index * int(UNIFORM(_Resolution).x) + rX_ssb_index ; \
 	}
 
 #endif // CORE_GLSL
