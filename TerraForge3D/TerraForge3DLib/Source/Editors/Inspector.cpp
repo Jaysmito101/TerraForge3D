@@ -36,6 +36,7 @@ namespace TerraForge3D
 	}
 
 	Inspector::Inspector(ApplicationState* as)
+		:UI::Editor("Inspector")
 	{
 		this->appState = as;
 	}
@@ -59,7 +60,7 @@ namespace TerraForge3D
 
 		terrain.dataBuffer = RendererAPI::SharedStorageBuffer::Create();
 		terrain.dataBuffer->UseForGraphics();
-		terrain.dataBuffer->SetSize(sizeof(TerrainPointData) * terrain.resolution * terrain.resolution);
+		terrain.dataBuffer->SetSize(sizeof(TerrainPointData) * 256 * 256);
 		terrain.dataBuffer->SetBinding(0);
 		terrain.dataBuffer->Setup();
 
@@ -85,7 +86,10 @@ namespace TerraForge3D
 			renderPipeline[i]->shader->Compile();
 			renderPipeline[i]->Setup();
 		}
-			
+
+		this->generatorSettings = new GeneratorSettings(this->appState);
+		this->generatorSettings->SetVisible(false);
+		this->GetSubEditorManager()->AddEditor(this->generatorSettings);			
 	}
 
 	void Inspector::OnShow()
@@ -137,7 +141,7 @@ namespace TerraForge3D
 		
 		Utils::ImGuiC::PushSubFont(appState->core.fonts["SemiHeader"].handle);
 		ImGui::Text("Preview Settings");
-		
+		Utils::ImGuiC::PopSubFont();
 
 		if(ImGui::Button("Reload Shaders"))
 		{
@@ -147,35 +151,26 @@ namespace TerraForge3D
 			renderPipeline[0]->ForceRequireRebuild();
 		}
 
-		static char tempBuffer[32];
-		static int oldResolution = 256; 
-		sprintf(tempBuffer, "%d", terrain.resolution);
-		if(ImGui::BeginCombo("Resolution", tempBuffer))
+		if(ImGui::Button("Generator Settings"))
+			this->generatorSettings->SetVisible(true);
+	}
+
+	void Inspector::OnUpdate()
+	{
+		static int oldResolution = 256; 		
+		if(appState->terrain.previewResolution != oldResolution)
 		{
-			for (int n = 64; n <= 4096; n *= 2)
-    		{
-				sprintf(tempBuffer, "%d", n);
-	        	bool isSelected = (terrain.resolution == n);
-    	    	if (ImGui::Selectable(tempBuffer, isSelected))
-        		    terrain.resolution = n;
-    	    	if (isSelected)
-	            	ImGui::SetItemDefaultFocus(); 
-		    }
-			ImGui::EndCombo();
-		}
-		if(terrain.resolution != oldResolution)
-		{
-			oldResolution = terrain.resolution;
-			terrain.resolutionData[0] = (float)terrain.resolution;
-			terrain.resolutionData[1] = (float)terrain.resolution;
+			oldResolution = appState->terrain.previewResolution;
+			terrain.resolutionData[0] = (float)oldResolution;
+			terrain.resolutionData[1] = (float)oldResolution;
 			JobSystem::Job* job = new JobSystem::Job("Resize Terrain");
 			job->excutionModel = JobSystem::JobExecutionModel_Async;
 			job->onRun = [this] (JobSystem::Job* context) -> bool {
 				appState->modals.manager->LoadingBox("Generating Mesh", &context->progress);
-				terrain.mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), terrain.resolution, 1.0f, &context->progress);
+				terrain.mesh->Plane(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), oldResolution, 1.0f, &context->progress);
 				terrain.mesh->RecalculateMatices();
 				terrain.mesh->RecalculateNormals();
-				GenerateTerrain(terrain.resolution);
+				GenerateTerrain(oldResolution);
 				return true;
 			};
 			job->onComplete = [this] (JobSystem::Job* context) -> bool {
@@ -183,7 +178,7 @@ namespace TerraForge3D
 				terrain.mesh->Clear();
 				terrain.dataBuffer->Destroy();
 				terrain.dataBuffer->UseForGraphics();
-				terrain.dataBuffer->SetSize(sizeof(TerrainPointData) * terrain.resolution * terrain.resolution);
+				terrain.dataBuffer->SetSize(sizeof(TerrainPointData) * oldResolution * oldResolution);
 				terrain.dataBuffer->SetBinding(0);
 				terrain.dataBuffer->Setup();
 				terrain.dataBuffer->SetData(ptd, terrain.dataBuffer->GetSize(), 0);
@@ -193,9 +188,6 @@ namespace TerraForge3D
 		}
 	}
 
-	void Inspector::OnUpdate()
-	{
-	}
 
 	void Inspector::OnEnd()
 	{

@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Base.hpp"
 #include "UI/Editor.hpp"
+#include "Editors/GeneratorSettings.hpp"
 
 namespace TerraForge3D
 {
@@ -12,7 +13,7 @@ namespace TerraForge3D
 	{
 	public:
 		Inspector(ApplicationState* appState);
-		~Inspector();
+		virtual ~Inspector();
 
 		virtual void OnStart() override;
 		virtual void OnShow() override;
@@ -36,20 +37,14 @@ namespace TerraForge3D
 
 	public:
 		bool isTerrainSelected = false;
-
+		SharedPtr<GeneratorSettings> generatorSettings;
 		struct
 		{
-			uint32_t resolution = 256;
-			float scale = 1.0f;
 			SharedPtr<Mesh> mesh;
 			SharedPtr<RendererAPI::SharedStorageBuffer> dataBuffer;
 			float resolutionData[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 		} terrain;
 
-
-		std::string vulkanGPUName = "";
-		std::string openCLGPUName = "";
-		std::string cpuName = "";
 	};
 
 

@@ -2,6 +2,7 @@
 #include "Base/Core/Core.hpp"
 #include "Base/Core/Application.hpp"
 #include "Utils/Utils.hpp"
+#include "Terrain/Data.hpp"
 
 #define VIEWPORT_COUNT 4
 
@@ -14,6 +15,7 @@ namespace TerraForge3D
 	class StartUpScreen;
 	class Preferences;
 	class Renderer;
+	class TerrainGenerator;
 	namespace UI 
 	{
 		class EditorManager;
@@ -112,7 +114,11 @@ namespace TerraForge3D
 
 		struct 
 		{
-			SharedPtr<Terrain::Manager> manager;
+			float globalScale[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+			float globalOffset[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+			std::vector<SharedPtr<TerrainGenerator>> generators;
+			TerrainGeneratorState generatorState;
+			uint32_t previewResolution = 256;
 		} terrain;
 
 		static ApplicationState* Create();
