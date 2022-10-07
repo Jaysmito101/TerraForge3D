@@ -22,6 +22,8 @@ namespace TerraForge3D
     {
         float offset[4];
         float size[4];
+        int outputResolution[4];
+        TerrainPointData* data;
         TerrainGeneratorDevice device;
     };
 

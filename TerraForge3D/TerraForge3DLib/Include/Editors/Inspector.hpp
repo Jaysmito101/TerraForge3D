@@ -23,12 +23,15 @@ namespace TerraForge3D
 
 		bool RenderItems(Viewport* viewport);
 
+		void UpdateTerrainData(TerrainGeneratorState* state);
+
 	private:
 		void ShowTerrainSettings();
 
 
 	private:
 		ApplicationState* appState = nullptr;
+		std::atomic<bool> isRemeshing = false;
 
 		float itemViewHeight = 100;
 		float separatorSliderWidth = 40.0f;

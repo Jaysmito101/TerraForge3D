@@ -163,6 +163,7 @@ namespace TerraForge3D
 			oldResolution = appState->terrain.previewResolution;
 			terrain.resolutionData[0] = (float)oldResolution;
 			terrain.resolutionData[1] = (float)oldResolution;
+			this->isRemeshing = true;
 			JobSystem::Job* job = new JobSystem::Job("Resize Terrain");
 			job->excutionModel = JobSystem::JobExecutionModel_Async;
 			job->onRun = [this] (JobSystem::Job* context) -> bool {
@@ -182,10 +183,17 @@ namespace TerraForge3D
 				terrain.dataBuffer->SetBinding(0);
 				terrain.dataBuffer->Setup();
 				terrain.dataBuffer->SetData(ptd, terrain.dataBuffer->GetSize(), 0);
+				this->isRemeshing = false;
 				return true;
 			};
 			appState->jobs.manager->AddJob(job);
 		}
+	}
+
+	void Inspector::UpdateTerrainData(TerrainGeneratorState* state)
+	{
+		if(state->outputResolution[0] * state->outputResolution[0] * sizeof(TerrainPointData) == terrain.dataBuffer->GetSize())
+			terrain.dataBuffer->SetData(state->data, terrain.dataBuffer->GetSize(), 0);
 	}
 
 

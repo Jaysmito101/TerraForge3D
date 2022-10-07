@@ -34,5 +34,7 @@
 
 // Terrain
 #include "Terrain/Data.hpp"
+#include "Terrain/Generator.hpp"
+
 
 // Terrain/Generators
