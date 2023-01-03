@@ -24,7 +24,7 @@
 
 TerraForge3D is a powerful cross platform procedural terrain generation and texturing tool. This is being maintained actively. This has got everything you need to bring your imagination to life.
 
-A huge benefit is that TerraForge3D is 100% free and opensource. It is the worlds best free terrain generator. TerraForge3D is very easy to get started with. There are also a series of tutorials(on youtube), documentations for your help.
+A huge benefit is that TerraForge3D is 100% free and opensource. TerraForge3D is very easy to get started with. There are also a series of tutorials(on youtube), documentations for your help.
 
 Also if you have any question or problem or suggestion you can directly reach out to me via my email jaysmito101@gmail.com . 
 Or you could join out official discord server with a charming community(including me) to help you out with anny issues.
