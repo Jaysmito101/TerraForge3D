@@ -74,7 +74,7 @@ inline void ShowHillMaskSettingS(GeneratorMask *mask, std::string id)
 	}
 }
 
-inline float EvaluateHillMask(GeneratorMask *mask, float x, float y, float z)
+inline float EvaluateHillMask(const GeneratorMask *mask, float x, float y, float z)
 {
 	float X;
 	float Y;
@@ -118,7 +118,7 @@ inline void ShowCratorMaskSettingS(GeneratorMask *mask, std::string id)
 	ImGui::DragFloat(MAKE_IMGUI_ID("Smoothness", id), &mask->d3[1], 0.01f);
 }
 
-inline float EvaluateCratorMask(GeneratorMask *mask, float x, float y, float z)
+inline float EvaluateCratorMask(const GeneratorMask *mask, float x, float y, float z)
 {
 	float X = (x - mask->pos[0]);
 	float Y = (z - mask->pos[2]);
@@ -155,7 +155,7 @@ inline void ShowCliffMaskSettingS(GeneratorMask *mask, std::string id)
 }
 
 
-inline float EvaluateCliffMask(GeneratorMask *mask, float x, float y, float z)
+inline float EvaluateCliffMask(const GeneratorMask *mask, float x, float y, float z)
 {
 	float X;
 	float Y;
@@ -202,7 +202,7 @@ inline void ShowPlatueMaskSettingS(GeneratorMask *mask, std::string id)
 	ImGui::DragFloat(MAKE_IMGUI_ID("Angle", id), &mask->d2[3], 0.01f);
 }
 
-inline float EvaluatePlataueMask(GeneratorMask *mask, float x, float y, float z)
+inline float EvaluatePlataueMask(const GeneratorMask *mask, float x, float y, float z)
 {
 	float X;
 	float Y;

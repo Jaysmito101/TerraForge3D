@@ -1,6 +1,6 @@
 #pragma once
 
-struct ApplicationState;
+class ApplicationState;
 class Model;
 class ClearMeshGenerator;
 class CPUNoiseLayersGenerator;
@@ -11,7 +11,10 @@ class CPUNodeEditor;
 
 
 #include "Base/OpenCL/ComputeKernel.h"
+#include "Generators/CPUGeneratorWorker.h"
 #include "json/json.hpp"
+
+#define CPU_GENERATOR_WORKER_COUNT_MAX 16
 
 
 #include <vector>
@@ -30,7 +33,6 @@ public:
 	void ShowSettings();
 
 	void GenerateForTerrain();
-	void GenerateForCustomBase();
 
 	void ExecuteKernels();
 	void ExecuteCPUGenerators();
@@ -49,7 +51,9 @@ private:
 	std::atomic<bool> *isRemeshing;
 	ComputeKernel *kernels;
 	ClearMeshGenerator *clearMeshGen;
-	std::vector<CPUNoiseLayersGenerator *> cpuNoiseLayers;
 	std::vector<GPUNoiseLayerGenerator *> gpuNoiseLayers;
+	std::vector<CPUNoiseLayersGenerator *> cpuNoiseLayers;
 	std::vector<CPUNodeEditor *> cpuNodeEditors;
+	int cpuWorkerCount = 0;
+	CPUGeneratorWorker* cpuGeneratorWorkers[CPU_GENERATOR_WORKER_COUNT_MAX];
 };

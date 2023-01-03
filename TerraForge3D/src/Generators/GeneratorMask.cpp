@@ -108,26 +108,15 @@ void GeneratorMaskManager::Load(nlohmann::json data)
 	}
 }
 
-float GeneratorMaskManager::EvaluateAt(float x, float y, float z, float value)
+float GeneratorMaskManager::EvaluateAt(float x, float y, float z, float value) const
 {
 	float m = 0.0f;
 
 	for(int i=0; i<masks.size(); i++)
 	{
-		if(masks[i].type == MASK_LAYER_HILL)
-		{
-			m += EvaluateHillMask(&masks[i], x, y, z);
-		}
-
-		else if(masks[i].type == MASK_LAYER_CRATOR)
-		{
-			m += EvaluateCratorMask(&masks[i], x, y, z);
-		}
-
-		else if(masks[i].type == MASK_LAYER_CLIFF)
-		{
-			m += EvaluateCliffMask(&masks[i], x, y, z);
-		}
+		if(masks[i].type == MASK_LAYER_HILL) m += EvaluateHillMask(&masks[i], x, y, z);
+		else if(masks[i].type == MASK_LAYER_CRATOR) m += EvaluateCratorMask(&masks[i], x, y, z);
+		else if(masks[i].type == MASK_LAYER_CLIFF) m += EvaluateCliffMask(&masks[i], x, y, z);
 	}
 
 	switch(type)
@@ -157,6 +146,13 @@ float GeneratorMaskManager::EvaluateAt(float x, float y, float z, float value)
 			value = value * m;
 			break;
 		}
+
+		case GeneratorMask_AddMul:
+		{
+			value = value * m + m;
+			break;
+		}
+
 
 		default:
 			break;

@@ -29,10 +29,11 @@ enum GeneratorMaskType
 	GeneratorMask_AverageAdditive,
 	GeneratorMask_Multiplicative,
 	GeneratorMask_AverageMultiplicative,
+	GeneratorMask_AddMul,
 	GeneratorMask_Count
 };
 
-static const char *generator_mask_type_names[] = {"Additive", "Average Additive", "Multiplicative", "Average Multiplicative"};
+static const char *generator_mask_type_names[] = {"Additive", "Average Additive", "Multiplicative", "Average Multiplicative", "Add Mul"};
 
 #define MASK_LAYER_HILL 0.0f
 #define MASK_LAYER_CRATOR 1.0f
@@ -52,7 +53,7 @@ public:
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 
-	float EvaluateAt(float x, float y, float z, float value);
+	float EvaluateAt(float x, float y, float z, float value) const;
 
 	void ShowSettings();
 

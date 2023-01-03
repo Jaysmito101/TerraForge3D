@@ -20,7 +20,7 @@ public:
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
-	float Evaluate(NoiseLayerInput input);
+	float Evaluate(const NoiseLayerInput& input) const;
 	void Render(int index);
 
 	std::string name;

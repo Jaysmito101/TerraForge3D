@@ -11,32 +11,24 @@
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
-#include "Filters/FiltersManager.h"
 #include "Foliage/FoliagePlacement.h"
 #include "Sky/SkySettings.h"
 #include "Misc/OSLiscences.h"
 #include "Shading/ShadingManager.h"
-#include "Exporters/TextureBaker.h"
+#include "Exporters/ExportManager.h"
 
 #include "json/json.hpp"
 
 struct ApplicationStateModels
 {
-	Model *coreTerrain;
-	Model *grid; // For future use
-	Model *screenQuad;
-
-	Model *customBase;
-	Model *customBaseCopy;
-
+	Model* screenQuad;
+	Model* mainModel;
 	ApplicationStateModels();
 	~ApplicationStateModels();
 };
 
 struct ApplicationStateFrameBuffers
 {
-	FrameBuffer *reflection = nullptr;
-	FrameBuffer *postProcess = nullptr;
 	FrameBuffer *main = nullptr;
 };
 
@@ -45,16 +37,12 @@ struct ApplicationStateShaders
 	Shader *terrain = nullptr;
 	Shader *wireframe = nullptr;
 	Shader *foliage = nullptr;
-	Shader *postProcess = nullptr;
 
-	// For future use
-	Shader *meshNormals = nullptr;
 };
 
 struct ApplicationStateCameras
 {
 	Camera main;
-	Camera postPorcess;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
@@ -64,21 +52,15 @@ struct ApplicationStateStatistics
 {
 	double deltatime = 1;
 	double frameRate = 1;
-	double meshGenerationTime = 0;
-	int triangles = 0;
-	int vertexCount = 0;
 };
 
 struct ApplicationStateWindows
 {
 	bool styleEditor = false;
 	bool statsWindow = false;
-	bool shaderEditorWindow = false;
-	bool texturEditorWindow = false;
 	bool seaEditor = false;
 	bool textureStore = false;
 	bool osLisc = false;
-	bool filtersManager = false;
 	bool foliageManager = false;
 	bool supportersTribute = false;
 	bool skySettings = false;
@@ -86,7 +68,7 @@ struct ApplicationStateWindows
 	bool lightControls = true;
 	bool cameraControls = true;
 	bool shadingManager = false;
-	bool textureBaker = false;
+	bool exportManager = false;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
@@ -102,20 +84,15 @@ struct ApplicationStateStates
 	bool usingBase = true;
 	bool skyboxEnabled = false;
 	bool vSync = true;
-	bool autoUpdate = false;
 	bool mouseButton1, mouseButton2, mouseButton3;
-	bool wireFrameMode = false;
-	bool reqTexRfrsh = false;
 	bool autoSave = false;
-	bool exploreMode = false;
-	bool iExploreMode = false;
 	bool showFoliage = true;
-	bool textureBake = false;
 	bool useGPUForNormals = false;
 	bool postProcess = false;
 	bool autoAspectCalcRatio = true;
 	std::atomic<bool> ruinning = true;
 	std::atomic<bool> remeshing = false;
+	std::atomic<bool> pauseUpdation = false;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
@@ -126,6 +103,7 @@ struct ApplicationStateTextures
 	Texture2D *grid;
 };
 
+
 struct ApplicationStateGlobals
 {
 	float mouseSpeed = 25;
@@ -133,15 +111,10 @@ struct ApplicationStateGlobals
 	float mouseScrollAmount = 0;
 	float viewportMousePosX = 0;
 	float viewportMousePosY = 0;
-	float scale = 1.0f;
-	float offset[3];
 
-
-	int resolution = 256;
 	int numberOfNoiseTypes = 3;
 	int secondCounter = 0;
-	int textureBakeMode = 0;
-	int texBakeRes = 1024;
+	int cpuWorkerThreadsActive = 1;
 
 	nlohmann::json appData;
 
@@ -181,15 +154,9 @@ struct ApplicationStateConstants
 
 };
 
-enum ApplicationMode
+class ApplicationState
 {
-	TERRAIN = 0,
-	CUSTOM_BASE,
-	CUBE_MARCHED
-};
-
-struct ApplicationState
-{
+public:
 	Application *mainApp;
 
 	ApplicationStateModels models;
@@ -211,18 +178,21 @@ struct ApplicationState
 	MainMenu *mainMenu = nullptr;
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;
-	FiltersManager *filtersManager = nullptr;
 	SkyManager *skyManager = nullptr;
 	OSLiscences *osLiscences = nullptr;
 	ProjectManager *projectManager = nullptr;
 	FoliageManager *foliageManager = nullptr;
 	ShadingManager *shadingManager = nullptr;
-	TextureBaker* textureBaker = nullptr;
+	ExportManager* exportManager = nullptr;
 
-	ApplicationMode mode = ApplicationMode::TERRAIN;
+	struct
+	{
+		DataTexture* currentTileDataLayers[6];
+		int mapResolution, tileResolution, tileCount, currentTileX, currentTileY;
+		float tileSize, tileOffsetX, tileOffsetY;
+	} mainMap;
 
 
 	ApplicationState();
-
 	~ApplicationState();
 };

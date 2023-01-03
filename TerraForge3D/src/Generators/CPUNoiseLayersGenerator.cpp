@@ -48,8 +48,10 @@ void CPUNoiseLayersGenerator::Load(nlohmann::json data)
 
 void CPUNoiseLayersGenerator::ShowSetting(int id)
 {
-	ImGui::InputText(("Name##CPUNL" + std::to_string(id)).c_str(), name.data(), 1024);
-	ImGui::Checkbox(("Enabled##CPUNL" + std::to_string(id)).c_str(), &enabled);
+	ImGui::PushID(id);
+	ImGui::InputText("Name##CPUNL", name.data(), 1024);
+	ImGui::Checkbox("Enabled##CPUNL", &enabled);
+	ShowLayerUpdationMethod("Set Method##CPUNL", &this->setMode);
 
 	if (ImGui::Button(("Edit##CPUNL" + std::to_string(id)).c_str()))
 	{
@@ -66,6 +68,7 @@ void CPUNoiseLayersGenerator::ShowSetting(int id)
 	ImGui::Separator();
 	ImGui::Text("UID : %s", uid.data());
 	ImGui::Text("Time : %lf ms", time);
+	ImGui::PopID();
 }
 
 void CPUNoiseLayersGenerator::Update()
@@ -83,15 +86,19 @@ void CPUNoiseLayersGenerator::Update()
 	}
 }
 
-float CPUNoiseLayersGenerator::EvaluateAt(float x, float y, float z)
+float CPUNoiseLayersGenerator::EvaluateAt(float x, float y, float z) const
 {
+	float result = 0.0f, pResult = y;
+	y = 0.0f;
+
 	if(maskManager->enabled)
 	{
-		return maskManager->EvaluateAt(x, y, z, noiseManager->Evaluate(x + noiseManager->offset[0], y + noiseManager->offset[1], z + noiseManager->offset[2]));
+		result = maskManager->EvaluateAt(x, y, z, noiseManager->Evaluate(x + noiseManager->offset[0], y + noiseManager->offset[1], z + noiseManager->offset[2]));
 	}
-
 	else
 	{
-		return noiseManager->Evaluate(x, y, z);
+		result = noiseManager->Evaluate(x, y, z);
 	}
+
+	return UpdateLayerWithUpdateMethod(pResult, result, this->setMode);
 }

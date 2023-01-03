@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-struct ApplicationState;
+class ApplicationState;
 
 //! Module Info
 /*!

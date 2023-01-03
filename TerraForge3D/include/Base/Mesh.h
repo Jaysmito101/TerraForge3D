@@ -30,7 +30,7 @@ public:
 
 	void GenerateScreenQuad(float dist = 0);
 
-	void GenerateIcoSphere(int resolution, float radius, float textureScale = 1.0f);
+	void GenerateSphere(int resolution, float radius);
 
 	void SetElevation(float elevation, int x, int y);
 

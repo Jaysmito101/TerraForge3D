@@ -183,7 +183,7 @@ void NoiseLayer::Load(nlohmann::json data)
 	SetDistanceFunc(noiseGen, distanceFunc);
 }
 
-float NoiseLayer::Evaluate(NoiseLayerInput input)
+float NoiseLayer::Evaluate(const NoiseLayerInput& input) const
 {
 	return enabled ? noiseGen->GetNoise(input.x + offset[0], input.y + offset[1], input.z + offset[2]) * strength : 0.0f;
 }

@@ -72,6 +72,10 @@ std::string GenerateId(uint32_t length);
 
 std::string FetchURL(std::string baseURL, std::string path);
 
+bool ShowLayerUpdationMethod(const char* label, int* method);
+
+float UpdateLayerWithUpdateMethod(float origv, float newv, int method);
+
 char *UChar2Char(unsigned char *data, int length);
 
 bool FileExists(std::string path, bool writeAccess = false);
@@ -79,6 +83,8 @@ bool FileExists(std::string path, bool writeAccess = false);
 bool PathExist(const std::string &s);
 
 bool IsNetWorkConnected();
+
+bool PowerOfTwoDropDown(const char* label, int32_t* value, int start, int end);
 
 char *ReadBinaryFile(std::string path, int *size, uint32_t sizeToLoad = -1);
 

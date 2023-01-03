@@ -67,6 +67,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "Texture2D.h"
+#include "DataTexture.h"
 #include "ExportTexture.h"
 #include "FrameBuffer.h"
 #include "ImGuiCurveEditor.h"

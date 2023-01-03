@@ -30,6 +30,6 @@ public:
 	float upf = 0.35f;
 	float cirrus = 0.4f;
 	float cumulus = 0.8f;
-	float fsun[3] = {0, 0.2, 0.1};
+	float fsun[3] = {0.0f, 0.2f, 0.1f};
 	ApplicationState *appState = nullptr;
 };

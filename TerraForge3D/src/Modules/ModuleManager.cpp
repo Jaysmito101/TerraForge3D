@@ -45,7 +45,7 @@ void ModuleManager::LoadModules()
 	UnloadModules();
 	// iterate through all directories in the modules folder
 	std::string modulesFolder = appState->constants.modulesDir + PATH_SEPARATOR;
-	for (auto &p : std::filesystem::directory_iterator(modulesFolder))
+	for (auto &p : std::filesystem::directory_iterator(modulesFolder))	
 	{
 		std::string path = p.path().string();
 		if (p.is_directory() && FileExists(path + PATH_SEPARATOR "module" MODULE_EXT ))

@@ -1,6 +1,7 @@
 .vs
 bin
 vendor/premake
+vendor/astyle
 scripts/__pycache__
 TerraForge3D/vendor/glad/bin
 TerraForge3D/vendor/glad/bin-int
@@ -11,6 +12,7 @@ TerraForge3D/vendor/lua/bin-int
 TerraForge3D/vendor/assimp/bin
 TerraForge3D/vendor/assimp/bin-int
 ghpages
+.vscode
 
 **.sln
 **.vcxproj

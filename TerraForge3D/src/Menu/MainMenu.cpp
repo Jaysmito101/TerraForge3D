@@ -4,7 +4,6 @@
 
 #include "Utils/Utils.h"
 #include "Misc/AppStyles.h"
-#include "Misc/ExportManager.h"
 #include "Data/ApplicationState.h"
 #include "Platform.h"
 
@@ -73,66 +72,10 @@ void MainMenu::ShowFileMenu()
 //		appState->modules.manager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
 	}
 
-	Model *modelToExport;
 
-	switch (appState->mode)
+	if (ImGui::MenuItem("Export ..."))
 	{
-		case ApplicationMode::TERRAIN:
-			modelToExport = appState->models.coreTerrain;
-			break;
-
-		case ApplicationMode::CUSTOM_BASE:
-			modelToExport = appState->models.customBase;
-			break;
-
-		default:
-			modelToExport = appState->models.coreTerrain;
-			break;
-	}
-
-	if (ImGui::BeginMenu("Export Mesh As"))
-	{
-		if (ImGui::MenuItem("Wavefont OBJ"))
-		{
-			ExportModelAssimp(modelToExport, "obj", ShowSaveFileDialog(".obj\0"), "obj");
-		}
-
-		if (ImGui::MenuItem("FBX"))
-		{
-			ExportModelAssimp(modelToExport, "fbx", ShowSaveFileDialog(".fbx\0"), "fbx");
-		}
-
-		if (ImGui::MenuItem("GLTF v2"))
-		{
-			ExportModelAssimp(modelToExport, "gltf2", ShowSaveFileDialog(".gltf\0"), "gltf");
-		}
-
-		if (ImGui::MenuItem("GLB v2"))
-		{
-			ExportModelAssimp(modelToExport, "glb2", ShowSaveFileDialog(".glb\0"), "glb");
-		}
-
-		if (ImGui::MenuItem("JSON"))
-		{
-			ExportModelAssimp(modelToExport, "json", ShowSaveFileDialog(".json\0"));
-		}
-
-		if (ImGui::MenuItem("STL"))
-		{
-			ExportModelAssimp(modelToExport, "stl", ShowSaveFileDialog(".stl\0"));
-		}
-
-		if (ImGui::MenuItem("PLY"))
-		{
-			ExportModelAssimp(modelToExport, "ply", ShowSaveFileDialog(".ply\0"));
-		}
-
-		if (ImGui::MenuItem("Collada"))
-		{
-			ExportModelAssimp(modelToExport, "collada", ShowSaveFileDialog(".dae\0"), "dae");
-		}
-
-		ImGui::EndMenu();
+		appState->windows.exportManager = true;
 	}
 
 	if (ImGui::MenuItem("Close"))
@@ -233,7 +176,7 @@ void MainMenu::ShowWindowsMenu()
 	ShowWindowMenuItem("Statistics", &appState->windows.statsWindow);
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
 	ShowWindowMenuItem("Foliage Manager", &appState->windows.foliageManager);
-	ShowWindowMenuItem("Texture Baker", &appState->windows.textureBaker);
+	ShowWindowMenuItem("Export Manager", &appState->windows.exportManager);
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
 	ShowWindowMenuItem("Sea Settings", &appState->windows.seaEditor);
 	ShowWindowMenuItem("Light Settings", &appState->windows.lightControls);
@@ -241,7 +184,6 @@ void MainMenu::ShowWindowsMenu()
 	ShowWindowMenuItem("Mesh Generators Settings", &appState->meshGenerator->windowStat);
 	ShowWindowMenuItem("Sky Settings", &appState->windows.skySettings);
 	ShowWindowMenuItem("Shading", &appState->windows.shadingManager);
-	ShowWindowMenuItem("Filters Manager", &appState->windows.filtersManager);
 	ShowWindowMenuItem("Module Manager", &appState->windows.modulesManager);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);
 	ShowWindowMenuItem("Open Source Liscenses", &appState->windows.osLisc);

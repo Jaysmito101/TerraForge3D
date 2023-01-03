@@ -83,50 +83,7 @@ Serializer::~Serializer()
 nlohmann::json Serializer::Serialize()
 {
 	nlohmann::json tmp = nlohmann::json();
-	data = nlohmann::json();
-	data["type"] = "SAVEFILE";
-	data["serailizerVersion"] = TERR3D_SERIALIZER_VERSION;
-	data["maxSerailizerVersion"] = TERR3D_MAX_SERIALIZER_VERSION;
-	data["minSerailizerVersion"] = TERR3D_MIN_SERIALIZER_VERSION;
-	data["versionHash"] = MD5File(GetExecutablePath()).ToString();
-	data["name"] = "TerraForge3D v2.2.0";
-	data["mode"] = appState->mode;
-	// SAVE NODE GENERATORS DATA
-	TRY_CATCH_ERR_SERIALIZE(data["appData"] = appState->globals.appData;, "Failed to save App Data");
-	TRY_CATCH_ERR_SERIALIZE(data["appStyles"] = GetStyleData();, "Failed to save app styles");
-	TRY_CATCH_ERR_SERIALIZE(data["imguiData"] = std::string(ImGui::SaveIniSettingsToMemory());, "Failed to save ImGui Data.");
-	TRY_CATCH_ERR_SERIALIZE(data["camera"] = appState->cameras.Save();, "Failed to save cameras.");
-	TRY_CATCH_ERR_SERIALIZE(data["windows"] = appState->windows.Save();, "Failed to save window states");
-	TRY_CATCH_ERR_SERIALIZE(data["states"] = appState->states.Save();, "Failed to save states.");
-	TRY_CATCH_ERR_SERIALIZE(data["globals"] = appState->globals.Save();, "Failed to save globals.");
-	TRY_CATCH_ERR_SERIALIZE(data["sea"] = appState->seaManager->Save();, "Failed to save Sea.");
-	TRY_CATCH_ERR_SERIALIZE(data["foliage"] = appState->foliageManager->Save();, "Failed to save foliage manager.");
-	TRY_CATCH_ERR_SERIALIZE(data["projectID"] = appState->projectManager->GetId();, "Failed to save project id.");
-	TRY_CATCH_ERR_SERIALIZE(data["textureBaker"] = appState->textureBaker->Save();, "Failed to save texture baker settings.");
-	TRY_CATCH_ERR_SERIALIZE(appState->projectManager->SaveDatabase(); data["projectDatabase"] = appState->projectManager->GetDatabase();, "Failed to save project database.");
-	TRY_CATCH_ERR_SERIALIZE(data["lighting"] = appState->lightManager->Save();, "Failed to save lighting data.");
-	TRY_CATCH_ERR_SERIALIZE(data["shading"] = appState->shadingManager->Save();, "Failed to save shading data.");
-	TRY_CATCH_ERR_SERIALIZE(data["generators"] = appState->meshGenerator->Save();, "Failed to save generators.");
-	TRY_CATCH_ERR_SERIALIZE(
-
-	    if (!appState->mode == ApplicationMode::CUSTOM_BASE)
-{
-	std::string baseHash = MD5File(appState->globals.currentBaseModelPath)
-		                       .ToString();
-		std::string projectAsset = appState->projectManager->GetAsset(baseHash);
-
-		if (projectAsset == "")
-		{
-			MkDir(appState->projectManager->GetResourcePath() + PATH_SEPARATOR "models");
-			CopyFileData(appState->globals.currentBaseModelPath, appState->projectManager->GetResourcePath() + PATH_SEPARATOR "models" PATH_SEPARATOR + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
-			appState->projectManager->RegisterAsset(baseHash, "models" PATH_SEPARATOR + baseHash + appState->globals.currentBaseModelPath.substr(appState->globals.currentBaseModelPath.find_last_of(".")));
-		}
-
-		data["baseid"] = baseHash;
-	}
-	, "Failed to save custom base model."
-	);
-	return data;
+	return tmp;
 }
 
 void Serializer::PackProject(std::string path)
@@ -293,97 +250,6 @@ void Serializer::LoadFile(std::string path)
 
 ApplicationState *Serializer::Deserialize(nlohmann::json d)
 {
-	data = d;
-	std::cout << "Wating for remesh cycle to finish ...\n";
-
-	while (appState->states.remeshing);
-
-	std::cout << "Finished remesing." << std::endl;
-	TRY_CATCH_ERR_DESERIALIZE(
-
-	    if (data["versionHash"] != MD5File(GetExecutablePath()).ToString())
-{
-	onError("The file you are tryng to open was made with a different version of TerraForge3D!\nTrying to check Serializer compatibility", false);
-	}
-	, "Failed to verify file version."
-	);
-	TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(
-	    int serializerVersion = data["serailizerVersion"];
-
-	    if (serializerVersion < TERR3D_MIN_SERIALIZER_VERSION)
-{
-	onError("This file cannot be opened as it was serialized using serializer V" + std::to_string(serializerVersion) + " but the minimum serializer version required is V" + std::to_string(TERR3D_MIN_SERIALIZER_VERSION), false);
-		return nullptr;
-	}
-
-	if (serializerVersion > TERR3D_MAX_SERIALIZER_VERSION)
-{
-	onError("This file cannot be opened as it was serialized using serializer V" + std::to_string(serializerVersion) + " but the maximum serializer version supported is V" + std::to_string(TERR3D_MAX_SERIALIZER_VERSION), false);
-		return nullptr;
-	}
-	, "Failed to verify Serializer",
 	return nullptr;
-	);
-
-	if (data["type"] != "SAVEFILE")
-	{
-		onError("This file is not a savefile.", false);
-		return nullptr;
-	}
-
-	TRY_CATCH_ERR_DESERIALIZE(LoadThemeFromStr(data["styleData"]);, "Failed to load theme.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->globals.appData = data["appData"];, "Failed to app data.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->globals.appData = data["appData"];, "Failed to app data.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->mode = data["mode"];, "Failed to app mode.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->projectManager->SetId(data["projectID"]);, "Failed to load Project ID.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->projectManager->SetDatabase(data["projectDatabase"]);, "Failed to load project database.");
-	std::cout << "Loaded Project ID : " << appState->projectManager->GetId() << std::endl;
-	TRY_CATCH_ERR_DESERIALIZE(appState->cameras.Load(data["camera"]);, "Failed to load camera.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->windows.Load(data["windows"]);, "Failed to load windows.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->states.Load(data["states"]);, "Failed to load states.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->globals.Load(data["globals"]);, "Failed to load globals.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->textureBaker->Load(data["textureBaker"]);, "Failed to load texture baker settings.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->seaManager->Load(data["sea"]);, "Failed to load sea.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->foliageManager->Load(data["foliage"]);, "Failed to load foliage.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->lightManager->Load(data["lighting"]);, "Failed to load lighting.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->meshGenerator->Load(data["generators"]);, "Failed to load generators.");
-	TRY_CATCH_ERR_DESERIALIZE(appState->shadingManager->Load(data["shading"]);, "Failed to load shading data.");
-	TRY_CATCH_ERR_DESERIALIZE_WITH_CODE(
-
-	    if (appState->mode == ApplicationMode::CUSTOM_BASE)
-{
-	std::string baseHash = data["baseid"];
-		std::string projectAsset = appState->projectManager->GetAsset(baseHash);
-
-		if (projectAsset == "")
-		{
-			std::cout << "Failed to load base model from save file!\n";
-			appState->states.usingBase = true;
-		}
-
-		else
-		{
-			if (!appState->models.customBase)
-			{
-				delete appState->models.customBase;
-				delete appState->models.customBaseCopy;
-			}
-
-			appState->globals.currentBaseModelPath = appState->projectManager->GetResourcePath() + PATH_SEPARATOR + projectAsset;
-			appState->models.customBase = LoadModel(appState->globals.currentBaseModelPath);
-			appState->models.customBaseCopy = LoadModel(appState->globals.currentBaseModelPath);
-			appState->states.usingBase = false;
-		}
-	}
-	, "Failed to load custom base model. Falling back to plane.",
-
-	if (!appState->models.customBase)
-{
-	delete appState->models.customBase;
-	delete appState->models.customBaseCopy;
-}
-appState->states.usingBase = true;
-);
-	return appState;
 }
 

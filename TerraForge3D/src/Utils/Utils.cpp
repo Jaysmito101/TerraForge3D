@@ -123,8 +123,8 @@ std::string ShowSaveFileDialog(std::string ext)
 	if (GetSaveFileName(&ofn))
 	{
 		std::wstring ws(ofn.lpstrFile);
-		// your new String
-		std::string str(ws.begin(), ws.end());
+		std::string str = "";
+		for (auto ch : ws) str += (char)ch;
 		return str;
 	}
 
@@ -143,6 +143,7 @@ std::string openfilename()
 {
 	return ShowOpenFileDialog(".obj");
 }
+
 
 bool DeleteFileT(std::string path)
 {
@@ -331,6 +332,59 @@ bool IsNetWorkConnected()
 	// Return true if internet connection is alive else false
 	return true;
 #endif
+}
+
+bool PowerOfTwoDropDown(const char* label, int32_t* value, int start, int end)
+{
+	if (!value) return false;
+	static char buffer[32];
+	int tmp = (int)(log((double)*value) / log(2.0));
+	sprintf(buffer, "%d", (int)pow(2, tmp));
+	if (ImGui::BeginCombo(label, buffer))
+	{
+		for (int i = start; i <= end; i++)
+		{
+			bool is_selected = (tmp == i);
+			sprintf(buffer, "%d", (int)pow(2, i));
+			if (ImGui::Selectable(buffer, is_selected)) tmp = i;
+			if (is_selected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+	tmp = (int)pow(2, tmp);
+	bool reslt = (*value != tmp);
+	*value = tmp;
+	return reslt;
+}
+
+
+bool ShowLayerUpdationMethod(const char* label, int* method)
+{
+	if (!method) return false;
+	static const char* items[] = {"Set", "Add", "Subtract", "Multiply"};
+	int selct = *method;
+	if (ImGui::BeginCombo(label, items[selct]))
+	{
+		for (int i = 0; i <= 4; i++)
+		{
+			bool is_selected = (selct == i);
+			if (ImGui::Selectable(items[i], is_selected)) selct= i;
+			if (is_selected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+	bool reslt = (*method != selct);
+	*method = selct;
+	return reslt;
+}
+
+float UpdateLayerWithUpdateMethod(float origv, float newv, int method)
+{
+	if (method == 0) return newv;
+	else if (method == 1) return origv + newv;
+	else if (method == 2) return origv - newv;
+	else if (method == 3) return origv * newv;
+	return origv;
 }
 
 char *ReadBinaryFile(std::string path, int *fSize, uint32_t sizeToLoad)

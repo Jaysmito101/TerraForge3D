@@ -1,6 +1,6 @@
 #pragma once
 
-struct ApplicationState;
+class ApplicationState;
 
 #include <string>
 #include <vector>

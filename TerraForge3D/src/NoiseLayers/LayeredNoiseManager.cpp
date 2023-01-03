@@ -136,24 +136,13 @@ nlohmann::json LayeredNoiseManager::Save()
 	return data;
 }
 
-float LayeredNoiseManager::Evaluate(float x, float y, float z)
+float LayeredNoiseManager::Evaluate(float x, float y, float z) const
 {
-	std::vector<NoiseLayer *> nl = noiseLayers;
+	const std::vector<NoiseLayer*>& nl = noiseLayers;
 	float noise = 0.0f;
-
-	for (NoiseLayer *n : nl)
-		noise += n->Evaluate({ x + offset[0], y + offset[1], z + offset[2] });
+	for (const NoiseLayer* n : nl) noise += n->Evaluate({ x + offset[0], y + offset[1], z + offset[2] });
 	noise *= strength;
-
-	if (absv)
-	{
-		noise = abs(noise);
-	}
-
-	if (sq)
-	{
-		noise = noise * noise;
-	}
-
+	if (absv) noise = abs(noise);
+	if (sq) noise = noise * noise;
 	return noise;
 }

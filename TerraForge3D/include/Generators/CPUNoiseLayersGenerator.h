@@ -22,7 +22,7 @@ public:
 
 	void Update();
 
-	float EvaluateAt(float x, float y, float z);
+	float EvaluateAt(float x, float y, float z) const;
 
 	bool windowStat = false;
 	bool uiActive = false;
@@ -30,6 +30,9 @@ public:
 	double time = 0;
 	std::string uid;
 	std::string name;
+
+	int setMode = 0; // 0 = set, 1 = add, 2 = sub, 3 = mul
+	
 	ApplicationState *appState;
 	LayeredNoiseManager *noiseManager;
 	GeneratorMaskManager *maskManager;

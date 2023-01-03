@@ -448,6 +448,7 @@ out DATA
 } data_out;
 )"));
 
+
 	vsh->AddUniform(GLSLUniform("_Model", "mat4"));
 	vsh->AddUniform(GLSLUniform("_PV", "mat4"));
 	vsh->AddUniform(GLSLUniform("_TextureBake", "float", "0.0f"));
@@ -456,27 +457,11 @@ out DATA
 	vsh->AddUniform(GLSLUniform("_NumTiles", "float", "0.0f"));
 	vsh->AddUniform(GLSLUniform("_TileX", "float", "0.0f"));
 	vsh->AddUniform(GLSLUniform("_TileY", "float", "0.0f"));
-	
-	GLSLFunction main("main");
-	main.AddLine(GLSLLine("", "TEMP"));
-	main.AddLine(GLSLLine(R"(
+	vsh->AddUniform(GLSLUniform("_MapDataLayers[6]", "sampler2D", ""));
 
-if(_TextureBake == 0.0f)
-	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
-else
-{
-	if(_Tiled == 0.0f)
-	{
-		gl_Position = vec4(aPos.x/_Scale, aPos.z/_Scale, 0.0f, 1.0f);
-	}
-	else
-	{
-		float factor = _NumTiles / _Scale;
-		gl_Position = vec4(aPos.x * factor + _TileX, aPos.z * factor + _TileY, 0.0f, 1.0f);
-	}
-}
-)"));
-	main.AddLine(GLSLLine("data_out.height = aExtras1.x;", "The actual generated noise value"));
+	GLSLFunction main("main");
+//	main.AddLine(GLSLLine("", "TEMP"));
+	main.AddLine(GLSLLine(R"(gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f) + vec4(aNorm.xyz * texture(_MapDataLayers[0], aTexCoord).r, 0.0f);)"));
 	main.AddLine(GLSLLine("data_out.FragPos = vec3(aPos.x, aPos.y, aPos.z);", "The world position"));
 	main.AddLine(GLSLLine("data_out.Normal = vec3(aNorm.x, aNorm.y, aNorm.z);", "The vertex normals"));
 	main.AddLine(GLSLLine("data_out.TexCoord = aTexCoord;", "The texture coordinates"));
@@ -513,7 +498,22 @@ in DATA
 
 	gsh->AddUniform(GLSLUniform("_PV", "mat4"));
 	gsh->AddUniform(GLSLUniform("_FlatShade", "float"));
-	
+	gsh->AddUniform(GLSLUniform("_MapDataLayers[6]", "sampler2D", ""));
+	gsh->AddUniform(GLSLUniform("_MapTileResolution", "float", ""));
+
+
+	GLSLFunction get_smooth_normal("get_smooth_normal", "vec2 tex_cord", "vec3");
+	get_smooth_normal.AddLine(GLSLLine("vec2 texel_size = vec2(1.0f, 0.0f) / _MapTileResolution;"));
+	get_smooth_normal.AddLine(GLSLLine("float T = texture(_MapDataLayers[0], tex_cord - texel_size.yx).r;"));
+	get_smooth_normal.AddLine(GLSLLine("float B = texture(_MapDataLayers[0], tex_cord + texel_size.yx).r;"));
+	get_smooth_normal.AddLine(GLSLLine("float L = texture(_MapDataLayers[0], tex_cord - texel_size.xy).r;"));
+	get_smooth_normal.AddLine(GLSLLine("float R = texture(_MapDataLayers[0], tex_cord + texel_size.xy).r;"));
+	//get_smooth_normal.AddLine(GLSLLine("float O = texture(_MapDataLayers[6], tex_cord).r;"));
+	get_smooth_normal.AddLine(GLSLLine("return normalize(vec3(2.0f*(R-L), 2.0f*(B-T), -4.0f));"));
+
+	gsh->AddFunction(get_smooth_normal);
+
+
 	GLSLFunction main("main");
 	main.AddLine(GLSLLine("vec3 a  = (_PV * gl_in[0].gl_Position).xyz;", "Vertex a of triangle"));
 	main.AddLine(GLSLLine("vec3 b  = (_PV * gl_in[1].gl_Position).xyz;", "Vertex b of triangle"));
@@ -548,18 +548,16 @@ in DATA
 		main.AddLine(GLSLLine("Extras1 = data_in[" + std::to_string(i) + "].Extras1;"));
 		main.AddLine(GLSLLine("FragPos = vec4(data_in[" + std::to_string(i) + "].FragPos, 1.0f);"));
 		main.AddLine(GLSLLine(R"(
-		if(_FlatShade > 0.5f)
-			Normal = n;
-		else
-			Normal = data_in[)" + std::to_string(i) + R"(].Normal;
+		if(_FlatShade > 0.5f) Normal = n;
+		else Normal = TBN * get_smooth_normal(data_in[)" + std::to_string(i) + R"(].TexCoord);
 		)"));
-	main.AddLine(GLSLLine("EmitVertex();", "Emit the vertex"));
-}
+		main.AddLine(GLSLLine("EmitVertex();", "Emit the vertex"));
+	}
 
-main.AddLine(GLSLLine("EndPrimitive();", "Emit the triangle"));
+	main.AddLine(GLSLLine("EndPrimitive();", "Emit the triangle"));
 
 
-gsh->AddFunction(main);
+	gsh->AddFunction(main);
 
 }
 

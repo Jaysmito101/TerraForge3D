@@ -15,7 +15,7 @@ public:
 	void Render();
 	void Load(nlohmann::json data);
 	nlohmann::json Save();
-	float Evaluate(float x, float y, float z);
+	float Evaluate(float x, float y, float z) const;
 
 	float offset[3];
 	float strength;

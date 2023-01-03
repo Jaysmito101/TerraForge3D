@@ -1,7 +1,5 @@
 #include "resource.h"
 
-#include <Misc/ExplorerControls.h>
-
 #include "Platform.h"
 
 
@@ -26,7 +24,7 @@
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
 #include "Foliage/FoliagePlacement.h"
-#include "Misc/ExportManager.h"
+#include "Exporters/ExportManager.h"
 #include "Misc/OSLiscences.h"
 #include "Sky/SkySettings.h"
 #include "Misc/AppStyles.h"
@@ -54,13 +52,13 @@
 
 #include "NoiseLayers/LayeredNoiseManager.h"
 
-static ApplicationState *appState;
-static Application *mainApp;
+static ApplicationState* appState;
+static Application* mainApp;
 
 
 void OnAppClose(int x, int y)
 {
-	Log("Close App");
+	Log("Shutting Down");
 	appState->mainApp->Close();
 }
 
@@ -68,8 +66,6 @@ void OnAppClose(int x, int y)
 static void ShowStats()
 {
 	ImGui::Begin("Statistics", &appState->windows.statsWindow);
-	ImGui::Text(("Vertex Count    :" + std::to_string(appState->stats.vertexCount)).c_str());
-	ImGui::Text(("Triangles Count :" + std::to_string(appState->stats.triangles)).c_str());
 	ImGui::Text(("Framerate       :" + std::to_string(appState->stats.frameRate)).c_str());
 	ImGui::End();
 }
@@ -95,7 +91,7 @@ static void ResetShader()
 {
 	bool res = false;
 
-	if(appState->shaders.foliage)
+	if (appState->shaders.foliage)
 	{
 		delete appState->shaders.foliage;
 	}
@@ -103,8 +99,8 @@ static void ResetShader()
 	if (!appState->shaders.wireframe)
 	{
 		appState->shaders.wireframe = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "default" PATH_SEPARATOR "vert.glsl", &res),
-		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "default" PATH_SEPARATOR "frag.glsl", &res),
-		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "default" PATH_SEPARATOR "geom.glsl", &res));
+			ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "default" PATH_SEPARATOR "frag.glsl", &res),
+			ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "default" PATH_SEPARATOR "geom.glsl", &res));
 	}
 
 	// appState->shaders.textureBake = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "texture_bake" PATH_SEPARATOR "vert.glsl", &res),
@@ -116,13 +112,8 @@ static void ResetShader()
 	//                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "default" PATH_SEPARATOR "geom.glsl", &res));
 
 	appState->shaders.foliage = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "vert.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "frag.glsl", &res),
-	                                       ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "geom.glsl", &res));
-}
-
-static void RegenerateMesh()
-{
-	appState->meshGenerator->Generate();
+		ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "frag.glsl", &res),
+		ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "foliage" PATH_SEPARATOR "geom.glsl", &res));
 }
 
 
@@ -131,41 +122,56 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 	static float time;
 	time += deltaTime;
 	appState->cameras.main.UpdateCamera();
-	Shader *shader;
+	Shader* shader = nullptr;
 
-	// Texture Bake
-	if (appState->states.textureBake)
+	if (appState->states.skyboxEnabled) appState->skyManager->RenderSky(appState->cameras.main.view, appState->cameras.main.pers);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	shader = appState->shaders.terrain;
+
+	shader->SetUniformf("_TextureBake", 0.0f);
+	shader->Bind();
+	shader->SetTime(&time);
+	shader->SetMPV(appState->cameras.main.pv);
+	appState->models.mainModel->Update();
+	shader->SetUniformMat4("_Model", appState->models.mainModel->modelMatrix);
+	shader->SetLightCol(appState->lightManager->color);
+	shader->SetLightPos(appState->lightManager->position);
+	shader->SetUniformf("_LightStrength", appState->lightManager->strength);
+	float tmp[3];
+	tmp[0] = appState->globals.viewportMousePosX;
+	tmp[1] = appState->globals.viewportMousePosY;
+	tmp[2] = ImGui::GetIO().MouseDown[0];
+	shader->SetUniform3f("_MousePos", tmp);
+	tmp[0] = appState->frameBuffers.main->GetWidth();
+	tmp[1] = appState->frameBuffers.main->GetHeight();
+	tmp[2] = 1;
+	shader->SetUniform3f("_Resolution", tmp);
+	shader->SetUniformf("_SeaLevel", appState->seaManager->level);
+	shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
+	shader->SetUniformf("_MapTileResolution", appState->mainMap.tileResolution);
+	shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
+	shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
+	shader->SetUniformf("_FlatShade", appState->states.useGPUForNormals ? 1.0f : 0.0f);
+	appState->shadingManager->UpdateShaders();
+
+	for (int i = 0; i < 6; i++)
 	{
-		
+		appState->mainMap.currentTileDataLayers[i]->Bind(7 + i);
+		shader->SetUniformi(std::string("_MapDataLayers[") + std::to_string(i) + "]", 7 + i);
 	}
 
-	else
+	appState->models.mainModel->Render();
+
+	if (appState->states.showFoliage)
 	{
-		if (appState->states.skyboxEnabled)
-		{
-			appState->skyManager->RenderSky(appState->cameras.main.view, appState->cameras.main.pers);
-		}
-
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		if (appState->states.wireFrameMode)
-		{
-			shader = appState->shaders.wireframe;
-		}
-
-		else
-		{
-			shader = appState->shaders.terrain;
-		}
-
-		shader->SetUniformf("_TextureBake", 0.0f);
+		shader = appState->shaders.foliage;
 		shader->Bind();
 		shader->SetTime(&time);
 		shader->SetMPV(appState->cameras.main.pv);
-		appState->models.coreTerrain->Update();
-		shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
 		shader->SetLightCol(appState->lightManager->color);
 		shader->SetLightPos(appState->lightManager->position);
 		shader->SetUniformf("_LightStrength", appState->lightManager->strength);
@@ -182,300 +188,154 @@ static void DoTheRederThing(float deltaTime, bool renderWater = false, bool bake
 		shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
 		shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
 		shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
-		shader->SetUniformf("_FlatShade", appState->states.useGPUForNormals ? 1.0f : 0.0f);
-		appState->shadingManager->UpdateShaders();
-
-		if(appState->mode == ApplicationMode::TERRAIN)
-		{
-			appState->models.coreTerrain->Render();
-		}
-
-		else if (appState->mode == ApplicationMode::CUSTOM_BASE)
-		{
-			appState->models.customBase->Render();
-		}
-
-		if (appState->states.showFoliage)
-		{
-			shader = appState->shaders.foliage;
-			shader->Bind();
-			shader->SetTime(&time);
-			shader->SetMPV(appState->cameras.main.pv);
-			shader->SetUniformMat4("_Model", appState->models.coreTerrain->modelMatrix);
-			shader->SetLightCol(appState->lightManager->color);
-			shader->SetLightPos(appState->lightManager->position);
-			shader->SetUniformf("_LightStrength", appState->lightManager->strength);
-			float tmp[3];
-			tmp[0] = appState->globals.viewportMousePosX;
-			tmp[1] = appState->globals.viewportMousePosY;
-			tmp[2] = ImGui::GetIO().MouseDown[0];
-			shader->SetUniform3f("_MousePos", tmp);
-			tmp[0] = appState->frameBuffers.main->GetWidth();
-			tmp[1] = appState->frameBuffers.main->GetHeight();
-			tmp[2] = 1;
-			shader->SetUniform3f("_Resolution", tmp);
-			shader->SetUniformf("_SeaLevel", appState->seaManager->level);
-			shader->SetUniform3f("_CameraPos", appState->cameras.main.position);
-			shader->SetUniformf("_CameraNear", appState->cameras.main.cNear);
-			shader->SetUniformf("_CameraFar", appState->cameras.main.cFar);
-			appState->foliageManager->RenderFoliage(appState->cameras.main);
-		}
-
-		// For Future
-		//gridTex->Bind(5);
-		//grid->Render();
-
-		if (appState->seaManager->enabled && renderWater)
-		{
-			appState->seaManager->Render(appState->cameras.main, appState->lightManager, appState->frameBuffers.reflection, time);
-		}
+		appState->foliageManager->RenderFoliage(appState->cameras.main);
 	}
-}
 
-void PostProcess(float deltatime)
-{
-	float pos[3] = { 0, 0, 1.8 };
-	float rot[3] = {0, 0, 0};
-	appState->cameras.postPorcess.aspect = 1;
-	appState->cameras.postPorcess.position[0] = 0.0f;
-	appState->cameras.postPorcess.position[0] = 0.0f;
-	appState->cameras.postPorcess.position[0] = 1.8f;
-	appState->cameras.postPorcess.rotation[0] = 0.0f;
-	appState->cameras.postPorcess.rotation[1] = 0.0f;
-	appState->cameras.postPorcess.rotation[2] = 0.0f;
-	appState->cameras.postPorcess.UpdateCamera();
-	float viewDir[3] = { glm::value_ptr(appState->cameras.main.pv)[2], glm::value_ptr(appState->cameras.main.pv)[6], glm::value_ptr(appState->cameras.main.pv)[10] };
-	appState->shaders.postProcess->Bind();
-	appState->shaders.postProcess->SetUniform3f("_CameraPosition", appState->cameras.main.position);
-	appState->shaders.postProcess->SetUniform3f("_ViewDir", viewDir);
-	float cloudsBoxMinMax[3] = {0.0f}; // Temporary
-	appState->shaders.postProcess->SetUniform3f("cloudsBoxBoundsMin", cloudsBoxMinMax);
-	appState->shaders.postProcess->SetUniform3f("cloudsBoxBoundsMax", cloudsBoxMinMax);
-	appState->shaders.postProcess->SetMPV(appState->cameras.postPorcess.pv);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, appState->frameBuffers.main->GetColorTexture());
-	appState->shaders.postProcess->SetUniformi("_ColorTexture", 5);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, appState->frameBuffers.main->GetDepthTexture());
-	appState->shaders.postProcess->SetUniformi("_DepthTexture", 6);
-	appState->models.screenQuad->Render();
-}
+	// For Future
+	//gridTex->Bind(5);
+	//grid->Render();
 
-static void ChangeCustomModel(std::string mdstr = ShowOpenFileDialog("*.obj"))
-{
-	while (appState->states.remeshing);
-
-	if(!appState->states.usingBase)
+	//if (appState->seaManager->enabled && renderWater)
 	{
-		delete appState->models.customBase;
-		delete appState->models.customBaseCopy;
+		//	appState->seaManager->Render(appState->cameras.main, appState->lightManager, appState->frameBuffers.reflection, time);
 	}
 
-	if(mdstr.size() > 3)
-	{
-		appState->globals.currentBaseModelPath = mdstr;
-		appState->states.usingBase = false;
-		appState->models.customBase = LoadModel(appState->globals.currentBaseModelPath);
-		appState->models.customBaseCopy = LoadModel(appState->globals.currentBaseModelPath); // Will Be Replaced with something efficient
-		appState->mode = ApplicationMode::CUSTOM_BASE;
-	}
 }
+
 
 static void ShowChooseBaseModelPopup()
 {
-	// TEMP
-	static std::shared_ptr<Texture2D> plane = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPARATOR "ui_thumbs" PATH_SEPARATOR "plane.png", false, false);
-	static std::shared_ptr<Texture2D> sphere = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPARATOR "ui_thumbs" PATH_SEPARATOR "sphere.png", false, false);
-	static std::shared_ptr<Texture2D> cube = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPARATOR "ui_thumbs" PATH_SEPARATOR "cube.png", false, false);
-	static std::shared_ptr<Texture2D> cone = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPARATOR "ui_thumbs" PATH_SEPARATOR "cone.png", false, false);
-	static std::shared_ptr<Texture2D> cyllinder = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPARATOR "ui_thumbs" PATH_SEPARATOR "cylinder.png", false, false);
-	static std::shared_ptr<Texture2D> torus = std::make_shared<Texture2D>(appState->constants.texturesDir + PATH_SEPARATOR "ui_thumbs" PATH_SEPARATOR "torus.png", false, false);
-	// TEMP
-
-	if (ImGui::BeginPopup("Choose Base Model"))
+	if (ImGui::BeginPopup("Choose Base Model##Main"))
 	{
 		if (ImGui::Button("Open From File"))
 		{
-			ChangeCustomModel();
+			std::string path = ShowOpenFileDialog("*.*");
+			if (FileExists(path))
+			{
+				Model* tmp = LoadModel(path);
+				if (tmp) { delete appState->models.mainModel; appState->models.mainModel = tmp; tmp->mesh->RecalculateNormals(); tmp->SetupMeshOnGPU(); tmp->UploadToGPU(); }
+			}
 			ImGui::CloseCurrentPopup();
 		}
-
-		if (ImGui::Button("Close"))
-		{
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::BeginChild("Choose Base Model##Child", ImVec2(650, 450));
-
-		if (ImGui::ImageButton((ImTextureID)plane->GetRendererID(), ImVec2(200, 200)) )
-		{
-			while (appState->states.remeshing);
-
-			delete appState->models.customBase;
-			delete appState->models.customBaseCopy;
-			appState->states.usingBase = true;
-			appState->mode = ApplicationMode::TERRAIN;
-			ImGui::CloseCurrentPopup();
-		}
-
 		ImGui::SameLine();
+		if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
 
-		if (ImGui::ImageButton((ImTextureID)sphere->GetRendererID(), ImVec2(200, 200)))
+		static const char* default_base_models[] = { "Plane", "Sphere", "Torus" };
+		static int selected_item = 0;
+		if (ImGui::BeginCombo("Gnerate Base Model##Choose Base Model Main", default_base_models[selected_item]))
 		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPARATOR "Sphere.obj");
-			ImGui::CloseCurrentPopup();
+			for (int i = 0; i < 3; i++)
+			{
+				bool is_selected = (selected_item == i);
+				if (ImGui::Selectable(default_base_models[i], is_selected)) selected_item = i;
+				if (is_selected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
 		}
-
-		ImGui::SameLine();
-
-		if (ImGui::ImageButton((ImTextureID)cube->GetRendererID(), ImVec2(200, 200)))
+		if (selected_item == 0)
 		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPARATOR "cube.obj");
-			ImGui::CloseCurrentPopup();
+			// plane
+			static int resolution = 256;
+			static float scale = 1.0f;
+			ImGui::DragFloat("Scale##GenBasePlane", &scale, 0.01f, 0.05f, 10000.0f);
+			ImGui::DragInt("Resolution##GenBasePlane", &resolution, 0.1f, 2, 100000);
+			if (ImGui::Button("Generate Plane##GenBasePlane"))
+			{
+				appState->models.mainModel->mesh->GeneratePlane(resolution, scale);
+				appState->models.mainModel->mesh->RecalculateNormals();
+				appState->models.mainModel->SetupMeshOnGPU();
+				appState->models.mainModel->UploadToGPU();
+			}
 		}
-
-		if (ImGui::ImageButton((ImTextureID)torus->GetRendererID(), ImVec2(200, 200)))
+		else if (selected_item == 1)
 		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPARATOR "Torus.obj");
-			ImGui::CloseCurrentPopup();
+			// sphere
+			static int resolution = 256;
+			static float scale = 1.0f;
+			ImGui::DragFloat("Radius##GenBaseSphere", &scale, 0.01f, 0.05f, 10000.0f);
+			ImGui::DragInt("Resolutione##GenBaseSphere", &resolution, 0.1f, 2, 100000);
+			if (ImGui::Button("Generate Sphere##GenBaseSphere"))
+			{
+				appState->models.mainModel->mesh->GenerateSphere(resolution, scale);
+				appState->models.mainModel->mesh->RecalculateNormals();
+				appState->models.mainModel->SetupMeshOnGPU();
+				appState->models.mainModel->UploadToGPU();
+			}
 		}
-
-		ImGui::SameLine();
-
-		if (ImGui::ImageButton((ImTextureID)cone->GetRendererID(), ImVec2(200, 200)))
+		else
 		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPARATOR "cone.obj");
-			ImGui::CloseCurrentPopup();
+			ImGui::Text("Not Yet Implemented");
 		}
-
-		ImGui::SameLine();
-
-		if (ImGui::ImageButton((ImTextureID)cyllinder->GetRendererID(), ImVec2(200, 200)))
-		{
-			ChangeCustomModel(appState->constants.modelsDir + PATH_SEPARATOR "cylinder.obj");
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndChild();
 		ImGui::EndPopup();
 	}
 }
 
+static void CalculateTileSizeAndOffset()
+{
+	appState->mainMap.tileCount = std::clamp(appState->mainMap.tileCount, 1, 1000000);
+	appState->mainMap.tileResolution = appState->mainMap.mapResolution / appState->mainMap.tileCount;
+	appState->mainMap.tileSize = (1.0f / appState->mainMap.tileCount);
+	appState->mainMap.currentTileX = std::clamp(appState->mainMap.currentTileX, 0, appState->mainMap.tileCount - 1);
+	appState->mainMap.currentTileY = std::clamp(appState->mainMap.currentTileY, 0, appState->mainMap.tileCount - 1);
+	appState->mainMap.tileOffsetX = appState->mainMap.currentTileX * appState->mainMap.tileSize;
+	appState->mainMap.tileOffsetY = appState->mainMap.currentTileY * appState->mainMap.tileSize;
+}
+
+
+//static void GenerateMap()
+//{
+//	float step = appState->mainMap.tileSize/ appState->mainMap.tileResolution;
+//	for (int i = 0; i < appState->mainMap.tileResolution; i++)
+//	{
+//		for (int j = 0; j < appState->mainMap.tileResolution; j++)
+//		{
+//			float y = (float)i * step + appState->mainMap.tileOffsetY;
+//			float x = (float)j * step + appState->mainMap.tileOffsetX;
+//			appState->mainMap.currentTileDataLayers[0]->SetPixelI(j, i, (sin(x) + cos(y)) * x, 0.0f, 0.0f, 0.0f);
+//		}
+//	}
+//}
+
+
 static void ShowTerrainControls()
 {
-	static bool exp = false;
+
 	ImGui::Begin("Dashboard");
 	ShowChooseBaseModelPopup();
+	if (ImGui::Button("Change Base Model")) ImGui::OpenPopup("Choose Base Model##Main");
 
-	if(appState->mode != ApplicationMode::TERRAIN)
+	if (ImGui::CollapsingHeader("Generator Resolution Settings"))
 	{
-		ImGui::Text(("Current Base Model : " + appState->globals.currentBaseModelPath).c_str());
+		bool changed = false;
+		changed = PowerOfTwoDropDown("Map Resolution##MainMapGen", &appState->mainMap.mapResolution, 4, 20) || changed;
+		changed = ImGui::DragInt("Tile Count##MainMapGen", &appState->mainMap.tileCount, 0.01f, 0, 1000000) || changed;
 
-		if(ImGui::Button("Change Current Base"))
+		if (changed)
 		{
-			ImGui::OpenPopup("Choose Base Model");
+			while (appState->states.remeshing);
+			appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
+			CalculateTileSizeAndOffset();
+			for (int i = 0; i < 6; i++) appState->mainMap.currentTileDataLayers[i]->Resize(appState->mainMap.tileResolution);
 		}
-
-		if(ImGui::Button("Switch to Plane"))
-		{
-			while(appState->states.remeshing);
-
-			delete appState->models.customBase;
-			delete appState->models.customBaseCopy;
-			appState->states.usingBase = true;
-			appState->mode = ApplicationMode::TERRAIN;
-		}
-	}
-
-	else
-	{
-		ImGui::Text("Current Base Model : Default Plane");
-
-		if (ImGui::Button("Change Current Base"))
-		{
-			ImGui::OpenPopup("Choose Base Model");
-		}
-	}
-
-	if(appState->mode == ApplicationMode::TERRAIN)
-	{
-		ImGui::DragInt("Mesh Resolution", &appState->globals.resolution, 1, 2, 16 * 4096);
-	}
-
-	if(appState->mode == ApplicationMode::TERRAIN || appState->mode == ApplicationMode::CUSTOM_BASE)
-	{
-		ImGui::DragFloat("Mesh Scale", &appState->globals.scale, 0.1f, 1.0f, 5000.0f);
+		ImGui::DragInt("Current Tile X##MainMapGen", &appState->mainMap.currentTileX, 0.01f, 0, appState->mainMap.tileCount);
+		ImGui::DragInt("Current Tile Y##MainMapGen", &appState->mainMap.currentTileY, 0.01f, 0, appState->mainMap.tileCount);
+		ImGui::Text("Tile Resolution: %d", appState->mainMap.tileResolution);
+		ImGui::Text("Tile Size: %f", appState->mainMap.tileSize);
+		ImGui::Text("Tile Offset: %f %f", appState->mainMap.tileOffsetX, appState->mainMap.tileOffsetY);
+		CalculateTileSizeAndOffset();
 	}
 
 	ImGui::NewLine();
-	ImGui::Checkbox("Auto Update", &appState->states.autoUpdate);
-	ImGui::Checkbox("Post Processing", &appState->states.postProcess);
 	ImGui::Checkbox("Auto Save", &appState->states.autoSave);
-	ImGui::Checkbox("Wireframe Mode", &appState->states.wireFrameMode);
 	ImGui::Checkbox("Show Skybox", &appState->states.skyboxEnabled);
 	ImGui::Checkbox("Show Sea", &appState->seaManager->enabled);
 	ImGui::Checkbox("Show Foliage", &appState->states.showFoliage);
-	ImGui::Checkbox("Infinite Explorer Mode", &appState->states.iExploreMode);
-	ImGui::Checkbox("Explorer Mode", &appState->states.exploreMode);
-	ImGui::Checkbox("Texture Bake Mode", &appState->states.textureBake);
 	ImGui::NewLine();
 
-	if (ImGui::Button("Update Mesh"))
-	{
-		RegenerateMesh();
-	}
-
-	if (ImGui::Button("Recalculate Normals"))
-	{
-		while (appState->states.remeshing);
-
-		if (appState->mode == ApplicationMode::TERRAIN)
-		{
-			appState->models.coreTerrain->mesh->RecalculateNormals();
-			appState->models.coreTerrain->UploadToGPU();
-		}
-
-		else if (appState->mode == ApplicationMode::CUSTOM_BASE)
-		{
-			appState->models.customBase->mesh->RecalculateNormals();
-			appState->models.customBase->UploadToGPU();
-		}
-
-		else
-		{
-			Log("Unsupported App Mode!");
-		}
-	}
-
-	if (ImGui::Button("Refresh Shaders"))
-	{
-		ResetShader();
-	}
-
-	if (ImGui::Button("Use Custom Shaders"))
-	{
-		appState->windows.shaderEditorWindow = true;
-	}
-
-	if (ImGui::Button("Texture Settings"))
-	{
-		appState->windows.texturEditorWindow = true;
-	}
-
-	if (ImGui::Button("Sea Settings"))
-	{
-		appState->windows.seaEditor = true;
-	}
-
-	if (ImGui::Button("Filter Settings"))
-	{
-		appState->windows.filtersManager = true;
-	}
+	if (ImGui::Button("Refresh Shaders")) ResetShader();
 
 	if (ImGui::Button("Export Frame"))
-	{
 		ExportTexture(appState->frameBuffers.main->GetRendererID(), ShowSaveFileDialog(".png"), appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
-	}
 
 	ImGui::Separator();
 	ImGui::NewLine();
@@ -557,16 +417,7 @@ static void ShowMainScene()
 		appState->globals.viewportSize[0] = wsize.x;
 		appState->globals.viewportSize[1] = wsize.y;
 
-
-		if (appState->states.postProcess)
-		{
-			ImGui::Image((ImTextureID)appState->frameBuffers.postProcess->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		}
-
-		else
-		{
-			ImGui::Image((ImTextureID)appState->frameBuffers.main->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
-		}
+		ImGui::Image((ImTextureID)appState->frameBuffers.main->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::EndChild();
 	}
@@ -610,7 +461,7 @@ static void OnBeforeImGuiRender()
 
 	if (opt_fullscreen)
 	{
-		ImGuiViewport *viewport = ImGui::GetMainViewport();
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(viewport->Pos);
 		ImGui::SetNextWindowSize(viewport->Size);
 		ImGui::SetNextWindowViewport(viewport->ID);
@@ -635,8 +486,8 @@ static void OnBeforeImGuiRender()
 	}
 
 	// DockSpace
-	ImGuiIO &io = ImGui::GetIO();
-	ImGuiStyle &style = ImGui::GetStyle();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
 	float minWinSizeX = style.WindowMinSize.x;
 	style.WindowMinSize.x = 370.0f;
 
@@ -674,6 +525,7 @@ static void SetUpIcon()
 }
 
 
+
 class MyApp : public Application
 {
 public:
@@ -694,144 +546,70 @@ public:
 			return;
 		}
 
-		if (!appState->states.exploreMode)
+		appState->meshGenerator->Generate();
+
+		// CTRL Shortcuts
+		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))
 		{
-			// CTRL Shortcuts
-			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))
+			// Open Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) OpenSaveFile();
+
+			// Exit Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) exit(0);
+
+			// Save Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S))
 			{
-				// Open Shortcut
-				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O))
+				if (appState->globals.currentOpenFilePath.size() > 3)
 				{
-					OpenSaveFile();
+					Log("Saved to " + appState->globals.currentOpenFilePath);
+					SaveFile(appState->globals.currentOpenFilePath);
+				}
+				else SaveFile();
+			}
+
+			// Close Shortcut
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_W))
+			{
+				if (appState->globals.currentOpenFilePath.size() > 3)
+				{
+					Log("CLosed file " + appState->globals.currentOpenFilePath);
+					appState->globals.currentOpenFilePath = "";
 				}
 
-				// Exit Shortcut
-				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q))
+				else
 				{
+					Log("Shutting Down");
 					exit(0);
 				}
+			}
 
-				// Save Shortcut
+			// CTRL + SHIFT Shortcuts
+			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT)))  // Save Shortcut
+			{
+				// Save As Shortcuts
 				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S))
 				{
-					if (appState->globals.currentOpenFilePath.size() > 3)
-					{
-						Log("Saved to " + appState->globals.currentOpenFilePath);
-						SaveFile(appState->globals.currentOpenFilePath);
-					}
-
-					else
-					{
-						SaveFile();
-					}
-				}
-
-				// Close Shortcut
-				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_W))
-				{
-					if (appState->globals.currentOpenFilePath.size() > 3)
-					{
-						Log("CLosed file " + appState->globals.currentOpenFilePath);
-						appState->globals.currentOpenFilePath = "";
-					}
-
-					else
-					{
-						Log("Shutting Down");
-						exit(0);
-					}
-				}
-
-				// CTRL + SHIFT Shortcuts
-				if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_SHIFT) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_SHIFT)))  // Save Shortcut
-				{
-					// Save As Shortcuts
-					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S))
-					{
-						appState->globals.currentOpenFilePath = "";
-						SaveFile();
-					}
-
-					// Explorer Mode Shortcut
-					if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_X))
-					{
-						Log("Toggle Explorer Mode");
-						appState->states.exploreMode = true;
-					}
+					appState->globals.currentOpenFilePath = "";
+					SaveFile();
 				}
 			}
-
-			appState->stats.deltatime = deltatime;
-			
-			{
-				appState->frameBuffers.reflection->Begin();
-				glViewport(0, 0, appState->frameBuffers.reflection->GetWidth(), appState->frameBuffers.reflection->GetHeight());
-				GetWindow()->Clear();
-				DoTheRederThing(deltatime);
-				glBindFramebuffer(GL_FRAMEBUFFER, appState->frameBuffers.main->GetRendererID());
-				glViewport(0, 0, appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
-				GetWindow()->Clear();
-				DoTheRederThing(deltatime, true);
-
-				if (appState->states.postProcess)
-				{
-					appState->frameBuffers.postProcess->Begin();
-					GetWindow()->Clear();
-					PostProcess(deltatime);
-				}
-			}
-
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			RenderImGui();
 		}
 
-		else
+		appState->stats.deltatime = deltatime;
+
+		// Render
 		{
-			static bool expH = false;
-
-			if (!expH)
-			{
-				GetWindow()->SetFullScreen(true);
-				glfwSetInputMode(GetWindow()->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-				ExPSaveCamera(appState->cameras.main.position, appState->cameras.main.rotation);
-			}
-
-			expH = appState->states.exploreMode;
-			appState->stats.deltatime = deltatime;
-			appState->frameBuffers.reflection->Begin();
-			glViewport(0, 0, appState->frameBuffers.reflection->GetWidth(), appState->frameBuffers.reflection->GetHeight());
+			glBindFramebuffer(GL_FRAMEBUFFER, appState->frameBuffers.main->GetRendererID());
+			glViewport(0, 0, appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
 			GetWindow()->Clear();
-			DoTheRederThing(deltatime);
-			appState->frameBuffers.reflection->End();
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			int w, h;
-			glfwGetWindowSize(GetWindow()->GetNativeWindow(), &w, &h);
-			glViewport(0, 0, w, h);
-			GetWindow()->Clear();
-			UpdateExplorerControls(appState->cameras.main.position, appState->cameras.main.rotation, appState->states.iExploreMode, &appState->globals.offset[0], &appState->globals.offset[1]);
 			DoTheRederThing(deltatime, true);
-
-			if (appState->states.postProcess)
-			{
-				appState->frameBuffers.postProcess->Begin();
-				PostProcess(deltatime);
-			}
-
-			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_ESCAPE)))
-			{
-				appState->states.exploreMode = false;
-				expH = false;
-				glfwSetInputMode(GetWindow()->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				GetWindow()->SetFullScreen(false);
-				ExPRestoreCamera(appState->cameras.main.position, appState->cameras.main.rotation);
-			}
 		}
 
-		if (appState->states.autoUpdate)
-		{
-			RegenerateMesh();
-		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		RenderImGui();
 
+		appState->exportManager->Update();
 		appState->modules.manager->UpdateModules();
 	}
 
@@ -887,62 +665,17 @@ public:
 
 		// Optional Windows
 
-		if (appState->windows.statsWindow)
-		{
-			ShowStats();
-		}
-
+		if (appState->windows.statsWindow) ShowStats();
 		appState->seaManager->ShowSettings(&appState->windows.seaEditor);
-
-		if (appState->windows.modulesManager)
-		{
-			ShowModuleManager();
-		}
-
-		if (appState->windows.styleEditor)
-		{
-			ShowStyleEditor(&appState->windows.styleEditor);
-		}
-
-		if (appState->windows.foliageManager)
-		{
-			appState->foliageManager->ShowSettings(&appState->windows.foliageManager);
-		}
-
-		if(appState->windows.textureStore)
-		{
-			appState->textureStore->ShowSettings(&appState->windows.textureStore);
-		}
-
-		if(appState->windows.shadingManager)
-		{
-			appState->shadingManager->ShowSettings(&appState->windows.shadingManager);
-		}
-
-		if (appState->windows.filtersManager)
-		{
-			appState->filtersManager->ShowSettings(&appState->windows.filtersManager);
-		}
-
-		if (appState->windows.osLisc)
-		{
-			appState->osLiscences->ShowSettings(&appState->windows.osLisc);
-		}
-
-		if (appState->windows.supportersTribute)
-		{
-			appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
-		}
-
-		if (appState->windows.skySettings)
-		{
-			appState->skyManager->ShowSettings(&appState->windows.skySettings);
-		}
-
-		if(appState->windows.textureBaker)
-		{
-			appState->textureBaker->ShowSettings(&appState->windows.textureBaker);
-		}
+		if (appState->windows.modulesManager) ShowModuleManager();
+		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
+		if (appState->windows.foliageManager) appState->foliageManager->ShowSettings(&appState->windows.foliageManager);
+		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
+		if (appState->windows.shadingManager) appState->shadingManager->ShowSettings(&appState->windows.shadingManager);
+		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
+		if (appState->windows.supportersTribute) appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
+		if (appState->windows.skySettings) appState->skyManager->ShowSettings(&appState->windows.skySettings);
+		if (appState->windows.exportManager) appState->exportManager->ShowSettings();
 
 		OnImGuiRenderEnd();
 	}
@@ -957,50 +690,66 @@ public:
 		appState->mainApp = mainApp;
 		appState->constants.executableDir = GetExecutableDir();
 		appState->constants.dataDir = appState->constants.executableDir + PATH_SEPARATOR "Data";
-		appState->constants.cacheDir = appState->constants.dataDir  	+ PATH_SEPARATOR "cache";
-		appState->constants.texturesDir = appState->constants.dataDir  	+ PATH_SEPARATOR "textures";
-		appState->constants.projectsDir = appState->constants.cacheDir  + PATH_SEPARATOR "project_data";
-		appState->constants.tempDir = appState->constants.dataDir  		+ PATH_SEPARATOR "temp";
-		appState->constants.shadersDir = appState->constants.dataDir  	+ PATH_SEPARATOR "shaders";
-		appState->constants.kernelsDir = appState->constants.dataDir  	+ PATH_SEPARATOR "kernels";
-		appState->constants.fontsDir = appState->constants.dataDir  	+ PATH_SEPARATOR "fonts";
-		appState->constants.liscensesDir = appState->constants.dataDir 	+ PATH_SEPARATOR "licenses";
-		appState->constants.skyboxDir = appState->constants.dataDir  	+ PATH_SEPARATOR "skybox";
-		appState->constants.modulesDir = appState->constants.dataDir  	+ PATH_SEPARATOR "modules";
-		appState->constants.configsDir = appState->constants.dataDir  	+ PATH_SEPARATOR "configs";
-		appState->constants.logsDir = appState->constants.dataDir  		+ PATH_SEPARATOR "logs";
-		appState->constants.modelsDir = appState->constants.dataDir  	+ PATH_SEPARATOR "models";
+		appState->constants.cacheDir = appState->constants.dataDir + PATH_SEPARATOR "cache";
+		appState->constants.texturesDir = appState->constants.dataDir + PATH_SEPARATOR "textures";
+		appState->constants.projectsDir = appState->constants.cacheDir + PATH_SEPARATOR "project_data";
+		appState->constants.tempDir = appState->constants.dataDir + PATH_SEPARATOR "temp";
+		appState->constants.shadersDir = appState->constants.dataDir + PATH_SEPARATOR "shaders";
+		appState->constants.kernelsDir = appState->constants.dataDir + PATH_SEPARATOR "kernels";
+		appState->constants.fontsDir = appState->constants.dataDir + PATH_SEPARATOR "fonts";
+		appState->constants.liscensesDir = appState->constants.dataDir + PATH_SEPARATOR "licenses";
+		appState->constants.skyboxDir = appState->constants.dataDir + PATH_SEPARATOR "skybox";
+		appState->constants.modulesDir = appState->constants.dataDir + PATH_SEPARATOR "modules";
+		appState->constants.configsDir = appState->constants.dataDir + PATH_SEPARATOR "configs";
+		appState->constants.logsDir = appState->constants.dataDir + PATH_SEPARATOR "logs";
+		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
+
 		appState->supportersTribute = new SupportersTribute();
-		SetupExplorerControls();
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
+
 		LoadDefaultStyle();
+
 		GetWindow()->SetShouldCloseCallback(OnAppClose);
-		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow* window, int w, int h)
-		{
-			glfwSwapBuffers(window);
-		});
-		glfwSetScrollCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow *, double x, double y)
-		{
-			ImGuiIO &io = ImGui::GetIO();
-			io.MouseWheel = (float)y;
-		});
-		glfwSetDropCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow *, int count, const char ** paths)
-		{
-			for (int i = 0; i < count; i++)
+
+		glfwSetFramebufferSizeCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow* window, int w, int h) {glfwSwapBuffers(window); });
+
+		glfwSetScrollCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, double x, double y) {ImGuiIO& io = ImGui::GetIO(); io.MouseWheel = (float)y; });
+
+		glfwSetDropCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, int count, const char** paths)
 			{
-				std::string path = paths[i];
-				if (path.find(".terr3d") != std::string::npos)
+				for (int i = 0; i < count; i++)
 				{
-					appState->serailizer->LoadFile(path);
+					std::string path = paths[i];
+					if (path.find(".terr3d") != std::string::npos)
+					{
+						appState->serailizer->LoadFile(path);
+						break;
+					}
+					else if (path.find(".terr3dpack") != std::string::npos)
+					{
+						appState->serailizer->LoadPackedProject(path);
+						break;
+					}
 				}
-				else if(path.find(".terr3dpack") != std::string::npos)
-				{
-					appState->serailizer->LoadPackedProject(path);
-				}
-			}
-		});
+			});
+
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
-		appState->globals.kernelsIncludeDir = "\""+ appState->constants.kernelsDir + "\"";
+
+		appState->models.mainModel->mesh->GeneratePlane(256, 1.0f);
+		appState->models.mainModel->mesh->RecalculateNormals();
+		appState->models.mainModel->SetupMeshOnGPU();
+		appState->models.mainModel->UploadToGPU();
+
+		appState->mainMap.tileCount = 1;
+		appState->mainMap.mapResolution = 256;
+		appState->mainMap.tileResolution = 256;
+		appState->mainMap.tileSize = 1.0f;
+		appState->mainMap.tileOffsetX = appState->mainMap.tileOffsetY = 0.0f;
+		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
+		for (int i = 0; i < 6; i++) { appState->mainMap.currentTileDataLayers[i] = new DataTexture(); appState->mainMap.currentTileDataLayers[i]->Resize(256); appState->mainMap.currentTileDataLayers[i]->UploadToGPU(); }
+
+
+		appState->globals.kernelsIncludeDir = "\"" + appState->constants.kernelsDir + "\"";
 		appState->modules.manager = new ModuleManager(appState);
 		appState->meshGenerator = new MeshGeneratorManager(appState);
 		appState->mainMenu = new MainMenu(appState);
@@ -1013,16 +762,18 @@ public:
 		appState->osLiscences = new OSLiscences(appState);
 		appState->textureStore = new TextureStore(appState);
 		appState->shadingManager = new ShadingManager(appState);
-		appState->textureBaker = new TextureBaker(appState);
+		appState->exportManager = new ExportManager(appState);
+
+
 		ResetShader();
-		appState->meshGenerator->GenerateSync();
-		appState->models.coreTerrain->SetupMeshOnGPU();
+
+		//appState->meshGenerator->GenerateSync();
+
 		appState->models.screenQuad->SetupMeshOnGPU();
 		appState->models.screenQuad->mesh->GenerateScreenQuad();
 		appState->models.screenQuad->mesh->RecalculateNormals();
 		appState->models.screenQuad->UploadToGPU();
 		glEnable(GL_DEPTH_TEST);
-		appState->globals.scale = 1;
 
 		if (loadFile.size() > 0)
 		{
@@ -1031,26 +782,18 @@ public:
 		}
 
 		appState->projectManager->SetId(GenerateId(32));
-		appState->filtersManager = new FiltersManager(appState);
+
 		float t = 1.0f;
 		// Load Fonts
 		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Regular.ttf");
 		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
 		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
-		// The framebuffer used for reflections in the sea
-		appState->frameBuffers.reflection = new FrameBuffer();
-		// The main frame buffer
 		appState->frameBuffers.main = new FrameBuffer(1280, 720);
-		// The Framebuffer used for post processing
-		appState->frameBuffers.postProcess = new FrameBuffer(1280, 720);
 		bool tpp = false;
-		appState->shaders.postProcess = new Shader(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "post_processing" PATH_SEPARATOR "vert.glsl", &tpp),
-		        ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "post_processing" PATH_SEPARATOR "frag.glsl", &tpp));
-		appState->states.autoUpdate = true;
 
-		if(IsNetWorkConnected())
+		if (IsNetWorkConnected())
 		{
-			if(FileExists(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d"))
+			if (FileExists(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d"))
 			{
 				bool ttmp = false;
 				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d", &ttmp);
@@ -1076,30 +819,29 @@ public:
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(500ms);
+		
+		for (int i = 0; i < 6; i++) delete appState->mainMap.currentTileDataLayers[i];
+
 		delete appState->shaders.terrain;
 		delete appState->shaders.foliage;
 		delete appState->shaders.wireframe;
-		delete appState->shaders.postProcess;
 		delete appState->supportersTribute;
 		delete appState->mainMenu;
 		delete appState->skyManager;
 		delete appState->frameBuffers.main;
-		delete appState->frameBuffers.postProcess;
-		delete appState->frameBuffers.reflection;
-		delete appState->filtersManager;
 		delete appState->osLiscences;
-		delete appState->textureBaker;
+		delete appState->exportManager;
 		delete appState->projectManager;
 		delete appState->foliageManager;
 		delete appState->shadingManager;
-//		delete appState->seaManager;
+		//		delete appState->seaManager;
 		delete appState->lightManager;
 		delete appState->serailizer;
 		delete appState;
 	}
 };
 
-Application *CreateApplication()
+Application* CreateApplication()
 {
 	mainApp = new MyApp();
 	return mainApp;

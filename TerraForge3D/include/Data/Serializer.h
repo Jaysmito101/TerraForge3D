@@ -4,7 +4,7 @@
 
 #include <functional>
 
-struct ApplicationState;
+class ApplicationState;
 
 class Serializer
 {

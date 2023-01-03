@@ -6,7 +6,7 @@
 
 #include "Module.h"
 
-struct ApplicationState;
+class ApplicationState;
 
 class ModuleManager
 {
