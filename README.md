@@ -15,8 +15,6 @@
     <br>
     <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2023?style=for-the-badge">
     <a href="https://patreon.com/jaysmito101"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djaysmito101%26type%3Dpledges&style=for-the-badge" alt="Support me on Patreon" /></a>
-    <br/>
-  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/Jaysmito101/TerraForge3D/MSBuild?label=Windows%20Build&style=for-the-badge">
 </p>
 
 <br/>
