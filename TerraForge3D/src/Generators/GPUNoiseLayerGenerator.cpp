@@ -5,6 +5,8 @@
 
 #include <regex>
 
+#define ADD_ST_CH(x) stateChanged = x || stateChanged;
+
 static int count = 1;
 
 GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as, ComputeKernel *kernels)
@@ -123,83 +125,87 @@ void GPUNoiseLayerGenerator::Load(nlohmann::json data)
 	}
 }
 
-void GPUNoiseLayerGenerator::ShowSetting(int id)
+bool GPUNoiseLayerGenerator::ShowSetting(int id)
 {
-	ImGui::Checkbox(("Enabled##GPUNL" + std::to_string(id)).c_str(), &enabled);
-	ImGui::DragInt(("Local Work Group Size##GPUNL" + std::to_string(id)).c_str(), &localSize);
+	bool stateChanged = false;
+	ImGui::PushID(id);
 
-	if (ImGui::Button(("Edit##GPUNL" + std::to_string(id)).c_str()))
-	{
-		windowStat = true;
-	}
+	ADD_ST_CH(ImGui::Checkbox("Enabled##GPUNL", &enabled));
+	ADD_ST_CH(ImGui::DragInt("Local Work Group Size##GPUNL", &localSize));
+
+	if (ImGui::Button("Edit Layers##GPUNL")) windowStat = true;
+
+	ImGui::PopID();
 
 	ImGui::Text("Vertices Processed : %d", vc);
 	ImGui::Text("Time : %lf ms", time);
+	return stateChanged;
 }
 
-void GPUNoiseLayerGenerator::Update()
+bool GPUNoiseLayerGenerator::Update()
 {
+	bool stateChanged = false;
 	if (windowStat)
 	{
 		ImGui::Begin((name + "##" + uid).c_str(), &windowStat);
 		ImGui::Text("Global Settings");
-		ImGui::DragFloat(("Offset X" + std::string("##GPUNL")).c_str(), &noiseLayers[0].offsetX, 0.01f);
-		ImGui::DragFloat(("Offset Y" + std::string("##GPUNL")).c_str(), &noiseLayers[0].offsetY, 0.01f);
-		ImGui::DragFloat(("Offset Z" + std::string("##GPUNL")).c_str(), &noiseLayers[0].offsetZ, 0.01f);
-		ImGui::DragFloat(("Strength" + std::string("##GPUNL")).c_str(), &noiseLayers[0].strength, 0.01f);
-		ImGui::DragFloat(("Frequency" + std::string("##GPUNL")).c_str(), &noiseLayers[0].frequency, 0.001f);
+		ADD_ST_CH(ImGui::DragFloat("Offset X", &noiseLayers[0].offsetX, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Offset Y", &noiseLayers[0].offsetY, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Offset Z", &noiseLayers[0].offsetZ, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Strength", &noiseLayers[0].strength, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Frequency", &noiseLayers[0].frequency, 0.001f));
 		ImGui::Separator();
 
 		for (int i = 1; i < noiseLayers.size(); i++)
 		{
+			ImGui::PushID(i);
 			if (ImGui::CollapsingHeader(("Noise Layer " + std::to_string(i + 1)).c_str()))
 			{
 				ImGui::Text("Noise Layer %d", (i + 1));
-				ImGui::DragFloat(("Offset X" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].offsetX, 0.01f);
-				ImGui::DragFloat(("Offset Y" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].offsetY, 0.01f);
-				ImGui::DragFloat(("Offset Z" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].offsetZ, 0.01f);
-				ImGui::DragFloat(("Strength" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].strength, 0.01f);
-				ImGui::DragFloat(("Frequency" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].frequency, 0.001f);
-				ImGui::DragFloat(("Domain Wrap Depth" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].domainWrapDepth, 0.1f);
+				ADD_ST_CH(ImGui::DragFloat("Offset X##GPUNL", &noiseLayers[i].offsetX, 0.01f));
+				ADD_ST_CH(ImGui::DragFloat("Offset Y##GPUNL", &noiseLayers[i].offsetY, 0.01f));
+				ADD_ST_CH(ImGui::DragFloat("Offset Z##GPUNL", &noiseLayers[i].offsetZ, 0.01f));
+				ADD_ST_CH(ImGui::DragFloat("Strength##GPUNL", &noiseLayers[i].strength, 0.01f));
+				ADD_ST_CH(ImGui::DragFloat("Frequency##GPUNL", &noiseLayers[i].frequency, 0.001f));
+				ADD_ST_CH(ImGui::DragFloat("Domain Wrap Depth##GPUNL", &noiseLayers[i].domainWrapDepth, 0.1f));
 
 				if (noiseLayers[i].fractal != 0)
 				{
-					ImGui::DragFloat(("Octaves" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].octaves, 0.01f, 1, 128);
-					ImGui::DragFloat(("Lacunarity" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].lacunarity, 0.01f);
-					ImGui::DragFloat(("Gain" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].gain, 0.01f);
-					ImGui::DragFloat(("Weighted Strength" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].weightedStrength, 0.01f);
-					ImGui::DragFloat(("Ping Pong Strength" + std::string("##GPUNL") + std::to_string(i)).c_str(), &noiseLayers[i].pingPongStrength, 0.01f);
+					ADD_ST_CH(ImGui::DragFloat("Octaves##GPUNL", &noiseLayers[i].octaves, 0.01f, 1, 128));
+					ADD_ST_CH(ImGui::DragFloat("Lacunarity##GPUNL", &noiseLayers[i].lacunarity, 0.01f));
+					ADD_ST_CH(ImGui::DragFloat("Gain##GPUNL", &noiseLayers[i].gain, 0.01f));
+					ADD_ST_CH(ImGui::DragFloat("Weighted Strength##GPUNL", &noiseLayers[i].weightedStrength, 0.01f));
+					ADD_ST_CH(ImGui::DragFloat("Ping Pong Strength##GPUNL", &noiseLayers[i].pingPongStrength, 0.01f));
 				}
 
 				ImGui::Text("Fractal Type %f", noiseLayers[i].fractal);
 
-				if (ImGui::Button(("Change Fractal Type##GPUNL" + std::to_string(i)).c_str()))
+				if (ImGui::Button("Change Fractal Type##GPUNL"))
 				{
 					noiseLayers[i].fractal += 1;
-
-					if (noiseLayers[i].fractal == 4)
-					{
-						noiseLayers[i].fractal = 0.0f;
-					}
+					if (noiseLayers[i].fractal == 4) noiseLayers[i].fractal = 0.0f;
+					stateChanged |= true;
 				}
 			}
 
-			if (ImGui::Button(("Delete" + std::string("##GPUNL") + std::to_string(i)).c_str()))
+			if (ImGui::Button("Delete##GPUNL"))
 			{
 				while (appState->states.remeshing);
-
 				noiseLayers.erase(noiseLayers.begin() + i);
+				stateChanged |= true;
 				break;
 			}
-
 			ImGui::Separator();
+			ImGui::PopID();
 		}
 
 		if (ImGui::Button("Add##GPUNL"))
 		{
 			noiseLayers.push_back(GPUNoiseLayer());
+			stateChanged |= true;
 		}
 
 		ImGui::End();
 	}
+	return stateChanged;
 }

@@ -9,27 +9,10 @@
 NodeOutput AbsNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 {
 	float x = 1;
-
-	if (inputPins[0]->IsLinked())
-	{
-		x = inputPins[0]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		x = value1;
-	}
-
-	if (inputPins[1]->IsLinked())
-	{
-		x *= inputPins[1]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		x *= value2;
-	}
-
+	if (inputPins[0]->IsLinked()) x = inputPins[0]->other->Evaluate(input).value;
+	else x = value1;
+	if (inputPins[1]->IsLinked()) x *= inputPins[1]->other->Evaluate(input).value;
+	else x *= value2;
 	return NodeOutput({ abs(x) });
 }
 
@@ -61,7 +44,7 @@ void AbsNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[0]->id)).c_str(), &value1, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[0]->id)).c_str(), &value1, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -70,15 +53,11 @@ void AbsNode::OnRender()
 	outputPins[0]->Render();
 	inputPins[1]->Render();
 
-	if (inputPins[1]->IsLinked())
-	{
-		ImGui::Text("k");
-	}
-
+	if (inputPins[1]->IsLinked()) ImGui::Text("k");
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &value2, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &value2, 0.01f));
 		ImGui::PopItemWidth();
 	}
 

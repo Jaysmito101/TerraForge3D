@@ -88,7 +88,7 @@ void MinValNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &thresholdf, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &thresholdf, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -102,7 +102,7 @@ void MinValNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[2]->id)).c_str(), &outputf, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[2]->id)).c_str(), &outputf, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -116,7 +116,7 @@ void MinValNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[3]->id)).c_str(), &outputr, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[3]->id)).c_str(), &outputr, 0.01f));
 		ImGui::PopItemWidth();
 	}
 }

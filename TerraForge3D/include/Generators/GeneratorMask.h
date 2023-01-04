@@ -39,7 +39,7 @@ static const char *generator_mask_type_names[] = {"Additive", "Average Additive"
 #define MASK_LAYER_CRATOR 1.0f
 #define MASK_LAYER_CLIFF 2.0f
 
-struct ApplicationState;
+class ApplicationState;
 
 class GeneratorMaskManager
 {
@@ -55,7 +55,7 @@ public:
 
 	float EvaluateAt(float x, float y, float z, float value) const;
 
-	void ShowSettings();
+	bool ShowSettings();
 
 //	void SetupForOpenCLEvaluation(ComputeKernel* kernel);
 

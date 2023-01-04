@@ -41,9 +41,9 @@ public:
 
 	virtual void Load(nlohmann::json data);
 
-	virtual void ShowSetting(int i);
+	virtual bool ShowSetting(int i);
 
-	void Update();
+	bool Update();
 
 
 

@@ -195,35 +195,37 @@ void HeightmapNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("Scale##" + std::to_string(inputPins[1]->id)).c_str(), &scale, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("Scale##" + std::to_string(inputPins[1]->id)).c_str(), &scale, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
-	ImGui::Checkbox(("Auto Tiled##tild" + std::to_string(id)).c_str(), &autoTiled);
-	ImGui::Checkbox(("Interpolated##intrp" + std::to_string(id)).c_str(), &interpolated);
-	ImGui::Checkbox(("Inverted##tinv" + std::to_string(id)).c_str(), &inv);
-	ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale);
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Auto Tiled##tild" + std::to_string(id)).c_str(), &autoTiled));
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Interpolated##intrp" + std::to_string(id)).c_str(), &interpolated));
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Inverted##tinv" + std::to_string(id)).c_str(), &inv));
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale));
 
 	if(!autoTiled)
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f));
 		ImGui::PopItemWidth();
 	}
-	ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f);
 	ImGui::PushItemWidth(100);
-	ImGui::DragFloat(("Rotation##rota" + std::to_string(id)).c_str(), &rota, 0.1f);
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f));
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat(("Rotation##rota" + std::to_string(id)).c_str(), &rota, 0.1f));
 	ImGui::PopItemWidth();
 	ImGui::NewLine();
 
 	if (ImGui::ImageButton((void*) heightmap->GetRendererID(), ImVec2(200, 200)))
 	{
 		ChangeHeightmap();
+		hasChanged = true;
 	}
 
 	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Heightmap")))
 	{
 		ChangeHeightmap();
+		hasChanged = true;
 	}
 }
 

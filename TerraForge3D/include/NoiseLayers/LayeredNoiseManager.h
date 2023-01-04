@@ -12,7 +12,7 @@ public:
 	LayeredNoiseManager();
 
 	void UpdateLayers();
-	void Render();
+	bool Render();
 	void Load(nlohmann::json data);
 	nlohmann::json Save();
 	float Evaluate(float x, float y, float z) const;

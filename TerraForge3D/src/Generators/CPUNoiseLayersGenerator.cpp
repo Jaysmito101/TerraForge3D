@@ -46,44 +46,39 @@ void CPUNoiseLayersGenerator::Load(nlohmann::json data)
 	noiseManager->Load(data["noise"]);
 }
 
-void CPUNoiseLayersGenerator::ShowSetting(int id)
+bool CPUNoiseLayersGenerator::ShowSetting(int id)
 {
+	bool stateChanged = false;
 	ImGui::PushID(id);
 	ImGui::InputText("Name##CPUNL", name.data(), 1024);
-	ImGui::Checkbox("Enabled##CPUNL", &enabled);
-	ShowLayerUpdationMethod("Set Method##CPUNL", &this->setMode);
+	stateChanged |= ImGui::Checkbox("Enabled##CPUNL", &enabled);
+	stateChanged |= ShowLayerUpdationMethod("Set Method##CPUNL", &this->setMode);
 
-	if (ImGui::Button(("Edit##CPUNL" + std::to_string(id)).c_str()))
-	{
-		windowStat = true;
-	}
+	if (ImGui::Button("Edit Layers##CPUNL")) windowStat = true;
 
-	ImGui::Separator();
 
-	if(ImGui::CollapsingHeader(("Custom Base Mask##GMSK" + uid).c_str() ) )
-	{
-		maskManager->ShowSettings();
-	}
+	if(ImGui::CollapsingHeader(("Custom Base Mask##GMSK" + uid).c_str() ) ) stateChanged |= maskManager->ShowSettings();
 
 	ImGui::Separator();
 	ImGui::Text("UID : %s", uid.data());
 	ImGui::Text("Time : %lf ms", time);
 	ImGui::PopID();
+	ImGui::NewLine();
+	
+	return stateChanged;
 }
 
-void CPUNoiseLayersGenerator::Update()
+bool CPUNoiseLayersGenerator::Update()
 {
+	bool stateChanged = false;
 	if (windowStat)
 	{
 		ImGui::Begin((name + "##" + uid).c_str(), &windowStat);
-		noiseManager->Render();
+		stateChanged = noiseManager->Render();
 		ImGui::End();
 	}
-
-	if (!appState->states.remeshing)
-	{
-		noiseManager->UpdateLayers();
-	}
+	if (!appState->states.remeshing) noiseManager->UpdateLayers();
+	return stateChanged;
 }
 
 float CPUNoiseLayersGenerator::EvaluateAt(float x, float y, float z) const

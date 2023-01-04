@@ -332,10 +332,9 @@ static void ShowTerrainControls()
 	ImGui::Checkbox("Show Foliage", &appState->states.showFoliage);
 	ImGui::NewLine();
 
+	if (ImGui::Button("Regenerate")) appState->states.requireRemesh = true;
 	if (ImGui::Button("Refresh Shaders")) ResetShader();
-
-	if (ImGui::Button("Export Frame"))
-		ExportTexture(appState->frameBuffers.main->GetRendererID(), ShowSaveFileDialog(".png"), appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
+	if (ImGui::Button("Export Frame")) ExportTexture(appState->frameBuffers.main->GetRendererID(), ShowSaveFileDialog(".png"), appState->frameBuffers.main->GetWidth(), appState->frameBuffers.main->GetHeight());
 
 	ImGui::Separator();
 	ImGui::NewLine();
@@ -353,23 +352,13 @@ static void MouseMoveCallback(float x, float y)
 	static glm::vec2 prevMousePos; // This is temporary
 	float deltaX = x - prevMousePos.x;
 	float deltaY = y - prevMousePos.y;
-
 	if (appState->states.mouseButton2)
 	{
-		if (deltaX > 200)
-		{
-			deltaX = 0;
-		}
-
-		if (deltaY > 200)
-		{
-			deltaY = 0;
-		}
-
+		deltaX = std::clamp(deltaX, -200.0f, 200.0f);
+		deltaY = std::clamp(deltaY, -200.0f, 200.0f);
 		appState->cameras.main.rotation[0] += deltaX * appState->globals.mouseSpeed;
 		appState->cameras.main.rotation[1] += deltaY * appState->globals.mouseSpeed;
 	}
-
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 }
@@ -624,6 +613,7 @@ public:
 
 		if (appState->globals.secondCounter % 5 == 0)
 		{
+			appState->states.requireRemesh = true;
 			if (appState->states.autoSave)
 			{
 				SaveFile(appState->constants.cacheDir + PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
@@ -747,6 +737,8 @@ public:
 		appState->mainMap.tileOffsetX = appState->mainMap.tileOffsetY = 0.0f;
 		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
 		for (int i = 0; i < 6; i++) { appState->mainMap.currentTileDataLayers[i] = new DataTexture(); appState->mainMap.currentTileDataLayers[i]->Resize(256); appState->mainMap.currentTileDataLayers[i]->UploadToGPU(); }
+		appState->globals.cpuWorkerThreadsActive = std::thread::hardware_concurrency();
+		appState->states.requireRemesh = true;
 
 
 		appState->globals.kernelsIncludeDir = "\"" + appState->constants.kernelsDir + "\"";

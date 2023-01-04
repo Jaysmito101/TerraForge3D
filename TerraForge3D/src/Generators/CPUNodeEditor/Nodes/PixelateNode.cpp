@@ -50,15 +50,11 @@ void PixelateNode::OnRender()
 	ImGui::Text("In");
 	inputPins[1]->Render();
 
-	if (inputPins[1]->IsLinked())
-	{
-		ImGui::Text("Pixel Size");
-	}
-
+	if (inputPins[1]->IsLinked()) ImGui::Text("Pixel Size");
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[0]->id)).c_str(), &pixelSize, 0.01f, 0.001f, 1);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[0]->id)).c_str(), &pixelSize, 0.01f, 0.001f, 1));
 		ImGui::PopItemWidth();
 	}
 

@@ -69,7 +69,7 @@ void DivNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[0]->id)).c_str(), &value1, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[0]->id)).c_str(), &value1, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -86,7 +86,7 @@ void DivNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &value2, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &value2, 0.01f));
 		ImGui::PopItemWidth();
 	}
 }

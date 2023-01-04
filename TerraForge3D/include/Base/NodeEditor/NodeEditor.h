@@ -12,6 +12,7 @@
 
 #define MAKE_IMGUI_ID(x) ("##" + std::to_string(x)).c_str()
 #define MAKE_IMGUI_LABEL(x, y) (y + std::string("##") + std::to_string(x)).c_str()
+#define UPDATE_HAS_CHHANGED(x) hasChanged = x || hasChanged;
 
 namespace ImGuiNodeEditor = ax::NodeEditor;
 
@@ -127,6 +128,7 @@ public:
 	std::string name;
 	ImU32 headerColor = ImColor(59, 29, 209);
 	std::mutex m;
+	bool hasChanged = false;
 
 	virtual NodeOutput Evaluate(NodeInputParam input, NodeEditorPin *pin) = 0;
 	virtual std::vector<NodeEditorPin *> GetPins();
@@ -162,7 +164,7 @@ public:
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
-	void Render();
+	bool Render();
 	void AddNode(NodeEditorNode *node);
 	void DeleteNode(NodeEditorNode *node);
 	void DeleteLink(NodeEditorLink *link);

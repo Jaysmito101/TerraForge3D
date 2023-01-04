@@ -2,12 +2,12 @@
 #include "FastNoiseLite.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
-static const char *fractalTypes[] = { "None", "FBm", "Ridged", "PingPong" };
-static const char *distFuncs[] = { "EuclideanSq", "Euclidean", "Manhattan", "Euclidean Manhattan Hybrid" };
+static const char* fractalTypes[] = { "None", "FBm", "Ridged", "PingPong" };
+static const char* distFuncs[] = { "EuclideanSq", "Euclidean", "Manhattan", "Euclidean Manhattan Hybrid" };
 
-NodeOutput NoiseCellularNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
+NodeOutput NoiseCellularNode::Evaluate(NodeInputParam input, NodeEditorPin* pin)
 {
-	if(!inputPins[0]->IsLinked())
+	if (!inputPins[0]->IsLinked())
 	{
 		noiseGen->SetSeed(seed);
 	}
@@ -27,7 +27,7 @@ NodeOutput NoiseCellularNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 		noiseGen->SetFrequency(inputPins[2]->other->Evaluate(input).value);
 	}
 
-	if(fractalType == 0)
+	if (fractalType == 0)
 	{
 		noiseGen->SetFractalType(FastNoiseLite::FractalType::FractalType_None);
 	}
@@ -170,7 +170,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragInt(MAKE_IMGUI_ID(inputPins[0]->id), &seed, 1);
+		UPDATE_HAS_CHHANGED(ImGui::DragInt(MAKE_IMGUI_ID(inputPins[0]->id), &seed, 1));
 		ImGui::PopItemWidth();
 	}
 
@@ -187,7 +187,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragInt(MAKE_IMGUI_ID(inputPins[1]->id), &octaves, 1);
+		UPDATE_HAS_CHHANGED(ImGui::DragInt(MAKE_IMGUI_ID(inputPins[1]->id), &octaves, 1));
 		ImGui::PopItemWidth();
 	}
 
@@ -204,7 +204,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[2]->id), &frequency, 0.001f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[2]->id), &frequency, 0.001f));
 		ImGui::PopItemWidth();
 	}
 
@@ -221,7 +221,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[3]->id), &lacunarity, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[3]->id), &lacunarity, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -238,7 +238,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[4]->id), &gain, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[4]->id), &gain, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -255,7 +255,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[5]->id), &weightedStrength, 0.01f, 0, 1);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[5]->id), &weightedStrength, 0.01f, 0, 1));
 		ImGui::PopItemWidth();
 	}
 
@@ -272,7 +272,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[6]->id), &pingPongStrength, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[6]->id), &pingPongStrength, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -289,7 +289,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[8]->id), &cellularJitter, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[8]->id), &cellularJitter, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -306,7 +306,7 @@ void NoiseCellularNode::OnRender()
 		ImGui::Dummy(ImVec2(30, 10));
 		ImGui::SameLine();
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[7]->id), &strength, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_ID(inputPins[7]->id), &strength, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -322,12 +322,8 @@ void NoiseCellularNode::OnRender()
 
 	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Fractal Type")))
 	{
-		fractalType++;
-
-		if (fractalType == 4)
-		{
-			fractalType = 0;
-		}
+		fractalType = (fractalType + 1) % 4;
+		hasChanged = true;
 	}
 
 	ImGui::NewLine();
@@ -337,12 +333,8 @@ void NoiseCellularNode::OnRender()
 
 	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Distance Function")))
 	{
-		distanceFunc++;
-
-		if (distanceFunc == 4)
-		{
-			distanceFunc = 0;
-		}
+		distanceFunc = (distanceFunc + 1) % 4;
+		hasChanged = true;
 	}
 }
 

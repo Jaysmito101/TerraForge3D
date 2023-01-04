@@ -3,7 +3,7 @@
 #include "json/json.hpp"
 #include <string>
 
-class FastNoiseLite;
+#include "FastNoiseLite/FastNoiseLite.h"
 
 struct NoiseLayerInput
 {
@@ -21,14 +21,14 @@ public:
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 	float Evaluate(const NoiseLayerInput& input) const;
-	void Render(int index);
+	bool Render(int index);
 
 	std::string name;
 	const char *noiseTypeStr, *distFuncStr, *fractalTypeStr;
 	int seed, octaves;
 	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength, cellularJitter;
 	int fractalType, distanceFunc, noiseType;
-	FastNoiseLite *noiseGen;
+	FastNoiseLite* noiseGen;
 	float offset[3];
 	bool enabled;
 };

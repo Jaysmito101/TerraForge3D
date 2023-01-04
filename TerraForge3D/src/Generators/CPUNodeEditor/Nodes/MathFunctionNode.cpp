@@ -169,6 +169,7 @@ void MathFunctionNode::OnRender()
 			catch (...)
 			{
 			}
+			hasChanged = true;
 		}
 	}
 }

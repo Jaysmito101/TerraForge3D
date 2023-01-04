@@ -102,10 +102,7 @@ void GeneratorMaskManager::Load(nlohmann::json data)
 	type = data["type"];
 	masks.clear();
 
-	for(int i=0; i<data["count"]; i++)
-	{
-		masks.push_back(LoadGeneratorMask(data["masks"][i]));
-	}
+	for(int i=0; i<data["count"]; i++) masks.push_back(LoadGeneratorMask(data["masks"][i]));
 }
 
 float GeneratorMaskManager::EvaluateAt(float x, float y, float z, float value) const
@@ -161,27 +158,23 @@ float GeneratorMaskManager::EvaluateAt(float x, float y, float z, float value) c
 	return value;
 }
 
-void GeneratorMaskManager::ShowSettings()
+bool GeneratorMaskManager::ShowSettings()
 {
-	ImGui::Checkbox(("Enabled##GMSK" + uid).c_str(), &enabled);
+	bool stateChanged = false;
+	stateChanged |= ImGui::Checkbox(("Enabled##GMSK" + uid).c_str(), &enabled);
 
 	if (ImGui::BeginCombo("Masking Mode##GMSK", generator_mask_type_names[type]))
 	{
 		for (int n = 0; n < IM_ARRAYSIZE(generator_mask_type_names); n++)
 		{
 			bool is_selected = (type == n);
-
 			if (ImGui::Selectable(generator_mask_type_names[n], is_selected))
 			{
 				type = (GeneratorMaskType)n;
+				stateChanged |= true;
 			}
-
-			if (is_selected)
-			{
-				ImGui::SetItemDefaultFocus();    // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-			}
+			if (is_selected) ImGui::SetItemDefaultFocus();			
 		}
-
 		ImGui::EndCombo();
 	}
 
@@ -189,30 +182,16 @@ void GeneratorMaskManager::ShowSettings()
 	{
 		if(ImGui::CollapsingHeader(("Custom Base Mask Layer " + std::to_string(i) + "##GMSK" + uid).c_str()))
 		{
-			if(masks[i].type == MASK_LAYER_HILL)
-			{
-				ShowHillMaskSettingS(&masks[i], uid + std::to_string(i));
-			}
-
-			else if(masks[i].type == MASK_LAYER_CRATOR)
-			{
-				ShowCratorMaskSettingS(&masks[i], uid + std::to_string(i));
-			}
-
-			else if(masks[i].type == MASK_LAYER_CLIFF)
-			{
-				ShowCliffMaskSettingS(&masks[i], uid + std::to_string(i));
-			}
-
+			if(masks[i].type == MASK_LAYER_HILL) stateChanged |= ShowHillMaskSettingS(&masks[i], uid + std::to_string(i));
+			else if(masks[i].type == MASK_LAYER_CRATOR) stateChanged |= ShowCratorMaskSettingS(&masks[i], uid + std::to_string(i));
+			else if(masks[i].type == MASK_LAYER_CLIFF) stateChanged |= ShowCliffMaskSettingS(&masks[i], uid + std::to_string(i));
 			if(ImGui::Button(("Delete##GMSK" + std::to_string(i) + uid).c_str()))
 			{
 				while(appState->states.remeshing);
-
 				masks.erase(masks.begin() + i);
 				break;
 			}
 		}
-
 		ImGui::Separator();
 	}
 
@@ -230,6 +209,7 @@ void GeneratorMaskManager::ShowSettings()
 			masks.back().d1[0] = masks.back().d1[1] = masks.back().d1[2] = 1.0f;
 			gmcount++;
 			ImGui::CloseCurrentPopup();
+			stateChanged |= true;
 		}
 
 		if(ImGui::Button(("Crater##GMSK" + uid).c_str()))
@@ -239,6 +219,7 @@ void GeneratorMaskManager::ShowSettings()
 			masks.back().d1[0] = masks.back().d3[0] = masks.back().d3[1] = 1.0f;
 			gmcount++;
 			ImGui::CloseCurrentPopup();
+			stateChanged |= true;
 		}
 
 		if(ImGui::Button(("Cliff##GMSK" + uid).c_str()))
@@ -248,8 +229,10 @@ void GeneratorMaskManager::ShowSettings()
 			masks.back().d1[2] = masks.back().d1[1] = 1.0f;
 			gmcount++;
 			ImGui::CloseCurrentPopup();
+			stateChanged |= true;
 		}
 
 		ImGui::EndPopup();
 	}
+	return stateChanged;
 }

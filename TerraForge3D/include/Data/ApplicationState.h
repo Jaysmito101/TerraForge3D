@@ -93,6 +93,7 @@ struct ApplicationStateStates
 	std::atomic<bool> ruinning = true;
 	std::atomic<bool> remeshing = false;
 	std::atomic<bool> pauseUpdation = false;
+	std::atomic<bool> requireRemesh = false;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

@@ -327,91 +327,65 @@ void CPUNodeEditor::Load(nlohmann::json data)
 	uid = data["uid"];
 }
 
-void CPUNodeEditor::Update()
+bool CPUNodeEditor::Update()
 {
+	bool stateChanged = false;
 	if(windowStat)
 	{
 		ImGui::Begin((name + "##" + uid).c_str(), &windowStat);
 
-		if (ImGui::Button(("Add Node##CPUNE" + uid).c_str()))
-		{
-			ImGui::OpenPopup("NodeMakerDropped");
-		}
-
+		if (ImGui::Button(("Add Node##CPUNE" + uid).c_str())) ImGui::OpenPopup("NodeMakerDropped");
 		ImGui::SameLine();
-
-		if (ImGui::Button(("Reset##CPUNE" + uid).c_str()))
-		{
-			editor->Reset();
-		}
-
+		if (ImGui::Button(("Reset##CPUNE" + uid).c_str())) { editor->Reset(); stateChanged = true; }
 		ImGui::SameLine();
-
 		if (ImGui::Button(("Export##CPUNE" + uid).c_str()))
 		{
 			std::string file = ShowSaveFileDialog("*.terr3d");
-
 			if (file.size() > 3)
 			{
-				if (file.find(".terr3d") == std::string::npos)
-				{
-					file += ".terr3d";
-				}
-
+				if (file.find(".terr3d") == std::string::npos) file += ".terr3d";
 				SaveToFile(file, editor->Save().dump(4));
 			}
 		}
-
 		ImGui::SameLine();
-
 		if (ImGui::Button(("Import##CPUNE" + uid).c_str()))
 		{
 			std::string file = ShowOpenFileDialog("*.terr3d");
-
 			if (file.size() > 3)
 			{
 				bool tmp = false;
 				editor->Reset();
 				editor->Load(nlohmann::json::parse(ReadShaderSourceFile(file, &tmp)));
+				stateChanged = true;
 			}
 		}
+		stateChanged = editor->Render() || stateChanged;
 
-		editor->Render();
-
-		if (ImGui::IsWindowFocused() && (((IsKeyDown(TERR3D_KEY_RIGHT_SHIFT) || IsKeyDown(TERR3D_KEY_LEFT_SHIFT)) && IsKeyDown(TERR3D_KEY_A)) || IsMouseButtonDown(TERR3D_MOUSE_BUTTON_MIDDLE)))
-		{
-			ImGui::OpenPopup("NodeMakerDropped");
-		}
+		if (ImGui::IsWindowFocused() && (((IsKeyDown(TERR3D_KEY_RIGHT_SHIFT) || IsKeyDown(TERR3D_KEY_LEFT_SHIFT)) && IsKeyDown(TERR3D_KEY_A)) || IsMouseButtonDown(TERR3D_MOUSE_BUTTON_MIDDLE))) ImGui::OpenPopup("NodeMakerDropped");
 
 		if(ImGui::BeginPopup("NodeMakerDropped"))
 		{
 			ShowNodeMaker(uid, editor);
-
-			if (ImGui::Button(("Close##CPUNE" + uid).c_str()))
-			{
-				ImGui::CloseCurrentPopup();
-			}
-
+			if (ImGui::Button(("Close##CPUNE" + uid).c_str())) ImGui::CloseCurrentPopup();
 			ImGui::EndPopup();
 		}
 
 		ImGui::End();
 	}
+
+	return stateChanged;
 }
 
 float CPUNodeEditor::EvaluateAt(NodeInputParam param)
 {
-	//m.lock();
-	//NodeOutput o;
 	return editor->outputNode->Evaluate(param, nullptr).value;
-	//m.unlock();
-	//return o.value;
 }
 
-void CPUNodeEditor::ShowSetting(int id)
+bool CPUNodeEditor::ShowSetting(int id)
 {
+	bool stateChanged = false;
 	ImGui::InputText(("Name##CPUNE" + uid).c_str(), name.data(), 1024);
-	ImGui::Checkbox(("Enabled##CPUNE" + uid).c_str(), &enabled);
+	stateChanged |= ImGui::Checkbox(("Enabled##CPUNE" + uid).c_str(), &enabled);
 
 	if (ImGui::Button(("Edit##CPUNE" + uid).c_str()))
 	{
@@ -420,4 +394,5 @@ void CPUNodeEditor::ShowSetting(int id)
 
 	ImGui::Text("UID : %s", uid.data());
 	ImGui::Text("Time : %lf ms", time);
+	return stateChanged;
 }

@@ -39,7 +39,7 @@ public:
 
 	void WaitForFinish();
 
-	inline int GetJobCount() { return this->jobs.size(); }
+	inline int GetJobCount() { return (int)this->jobs.size(); }
 	inline float GetProgress() { return this->progress; }
 	inline float GetJobTime() { return this->jobTime; }
 	inline bool IsIdle() { return this->current_state == CPUGeneratorWorkerState_Waiting; }

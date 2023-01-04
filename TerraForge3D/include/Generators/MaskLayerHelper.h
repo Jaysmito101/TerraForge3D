@@ -8,6 +8,7 @@
 
 #define MAKE_IMGUI_ID(label, id) (label + std::string("##GMSKNL") + id).c_str()
 
+
 // MATH UTILS
 
 #define SQUARE(x) (x) * (x)
@@ -52,26 +53,26 @@ inline float smoothMax(float a, float b, float k)
 
 static FastNoiseLite noiseGen;
 
-inline void ShowHillMaskSettingS(GeneratorMask *mask, std::string id)
+inline bool ShowHillMaskSettingS(GeneratorMask *mask, std::string id)
 {
+	bool stateChanged = false;
+
 	ImGui::Text("Mode : Hill");
-	ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Radius", id), &mask->d1[0], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f);
-	ImGui::DragFloat2(MAKE_IMGUI_ID("Noise Offset", id), &mask->d2[0], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Noise Strength", id), &mask->d2[3], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Noise Frequency", id), &mask->d2[2], 0.01f);
+	stateChanged = ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Radius", id), &mask->d1[0], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat2(MAKE_IMGUI_ID("Noise Offset", id), &mask->d2[0], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Noise Strength", id), &mask->d2[3], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Noise Frequency", id), &mask->d2[2], 0.01f) || stateChanged;
 	ImGui::Text("Axis (0:XZ, 1:YX, 2:XY) : %f", mask->d1[3]);
 
 	if(ImGui::Button( MAKE_IMGUI_ID("Change Axis", id) ) )
 	{
 		mask->d1[3] += 1.0f;
-
-		if(mask->d1[3] == 3.0f)
-		{
-			mask->d1[3] = 0.0f;
-		}
+		if(mask->d1[3] == 3.0f)mask->d1[3] = 0.0f;
+		stateChanged |= true;
 	}
+	return stateChanged;
 }
 
 inline float EvaluateHillMask(const GeneratorMask *mask, float x, float y, float z)
@@ -107,15 +108,17 @@ inline float EvaluateHillMask(const GeneratorMask *mask, float x, float y, float
 	return h * (mask->d1[1] + mask->pos[1]);
 }
 
-inline void ShowCratorMaskSettingS(GeneratorMask *mask, std::string id)
+inline bool ShowCratorMaskSettingS(GeneratorMask *mask, std::string id)
 {
+	bool stateChanged = false;
 	ImGui::Text("Mode : Crater");
-	ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Radius", id), &mask->d1[0], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Floor", id), &mask->d3[3], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Rim Width", id), &mask->d1[3], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Rim Steepness", id), &mask->d3[0], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Smoothness", id), &mask->d3[1], 0.01f);
+	stateChanged = ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Radius", id), &mask->d1[0], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Floor", id), &mask->d3[3], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Rim Width", id), &mask->d1[3], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Rim Steepness", id), &mask->d3[0], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Smoothness", id), &mask->d3[1], 0.01f) || stateChanged;
+	return stateChanged;
 }
 
 inline float EvaluateCratorMask(const GeneratorMask *mask, float x, float y, float z)
@@ -133,25 +136,24 @@ inline float EvaluateCratorMask(const GeneratorMask *mask, float x, float y, flo
 	return 0.0f;
 }
 
-inline void ShowCliffMaskSettingS(GeneratorMask *mask, std::string id)
+inline bool ShowCliffMaskSettingS(GeneratorMask *mask, std::string id)
 {
+	bool stateChanged = false;
 	ImGui::Text("Mode : Cliff");
-	ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Depth", id), &mask->d1[0], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Steepness", id), &mask->d1[2], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Angle", id), &mask->d2[3], 0.01f);
+	stateChanged = ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Depth", id), &mask->d1[0], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Steepness", id), &mask->d1[2], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Angle", id), &mask->d2[3], 0.01f) || stateChanged;
 	ImGui::Text("Axis (0:XY, 1:YZ, 2:ZX) : %f", mask->d1[3]);
 
 	if(ImGui::Button( MAKE_IMGUI_ID("Change Axis", id) ) )
 	{
 		mask->d1[3] += 1.0f;
-
-		if(mask->d1[3] == 3.0f)
-		{
-			mask->d1[3] = 0.0f;
-		}
+		if(mask->d1[3] == 3.0f) mask->d1[3] = 0.0f;
+		stateChanged = true;
 	}
+	return stateChanged;
 }
 
 
@@ -192,14 +194,16 @@ inline float EvaluateCliffMask(const GeneratorMask *mask, float x, float y, floa
 	return MAX(f, g);
 }
 
-inline void ShowPlatueMaskSettingS(GeneratorMask *mask, std::string id)
+inline bool ShowPlatueMaskSettingS(GeneratorMask *mask, std::string id)
 {
+	bool stateChanged = false;
 	ImGui::Text("Mode : Platue");
-	ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Depth", id), &mask->d1[0], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Steepness", id), &mask->d1[2], 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_ID("Angle", id), &mask->d2[3], 0.01f);
+	stateChanged = ImGui::DragFloat3(MAKE_IMGUI_ID("Position", id), mask->pos, 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Depth", id), &mask->d1[0], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Height", id), &mask->d1[1], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Steepness", id), &mask->d1[2], 0.01f) || stateChanged;
+	stateChanged = ImGui::DragFloat(MAKE_IMGUI_ID("Angle", id), &mask->d2[3], 0.01f) || stateChanged;
+	return stateChanged;
 }
 
 inline float EvaluatePlataueMask(const GeneratorMask *mask, float x, float y, float z)

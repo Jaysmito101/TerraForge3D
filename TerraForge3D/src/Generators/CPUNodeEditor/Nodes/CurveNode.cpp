@@ -104,6 +104,7 @@ void CurveNode::OnRender()
 
 	if (ImGui::DragInt(("##dI" + std::to_string(id)).c_str(), &maxPoints, 1, 10, 256))
 	{
+		hasChanged = true;
 		ReserveVector(curve, maxPoints);
 	}
 
@@ -112,6 +113,7 @@ void CurveNode::OnRender()
 
 	if (ImGui::Curve(("##" + std::to_string(id)).c_str(), ImVec2(200, 200), maxPoints, curve.data()))
 	{
+		hasChanged = true;
 	}
 
 	ImGui::Text("Current Axis: ");
@@ -120,12 +122,8 @@ void CurveNode::OnRender()
 
 	if (ImGui::Button(("Change Axis##" + std::to_string(id)).c_str()))
 	{
-		axis++;
-
-		if (axis == 3)
-		{
-			axis = 0;
-		}
+		axis = (axis + 1) % 3;
+		hasChanged = true;
 	}
 }
 

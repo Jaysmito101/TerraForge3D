@@ -22,5 +22,6 @@ public:
 	int seed, octaves;
 	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength, cellularJitter;
 	int fractalType, distanceFunc;
+	bool useY = false;
 	FastNoiseLite *noiseGen;
 };

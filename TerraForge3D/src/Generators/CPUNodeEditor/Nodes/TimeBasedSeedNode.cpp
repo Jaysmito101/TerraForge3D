@@ -32,13 +32,14 @@ void TimeBasedSeedNode::OnRender()
 	ImGui::Text("Current Seed : ");
 	ImGui::SameLine();
 	ImGui::PushItemWidth(200);
-	ImGui::InputInt(MAKE_IMGUI_ID(id), &val, 1);
+	UPDATE_HAS_CHHANGED(ImGui::InputInt(MAKE_IMGUI_ID(id), &val, 1));
 	ImGui::PopItemWidth();
 	ImGui::NewLine();
 
 	if (ImGui::Button("Regenerate Seed"))
 	{
 		val = time(NULL);
+		hasChanged = true;
 	}
 }
 

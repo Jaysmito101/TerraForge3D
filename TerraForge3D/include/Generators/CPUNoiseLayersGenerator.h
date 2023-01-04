@@ -18,9 +18,9 @@ public:
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 
-	void ShowSetting(int id);
+	bool ShowSetting(int id);
 
-	void Update();
+	bool Update();
 
 	float EvaluateAt(float x, float y, float z) const;
 

@@ -84,10 +84,10 @@ void HillNode::OnRender()
 	ImGui::Text("Out");
 	outputPins[0]->Render();
 	ImGui::PushItemWidth(150);
-	ImGui::DragFloat2(MAKE_IMGUI_LABEL(inputPins[0]->id, "Position"), pos, 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_LABEL(inputPins[1]->id, "Height"), &height, 0.01f);
-	ImGui::DragFloat(MAKE_IMGUI_LABEL(inputPins[2]->id, "Radius"), &radius, 0.01f, 0.00001f);
-	ImGui::DragFloat(MAKE_IMGUI_LABEL(inputPins[3]->id, "Plane Factor"), &p, 0.01f, 0.00001f);
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat2(MAKE_IMGUI_LABEL(inputPins[0]->id, "Position"), pos, 0.01f));
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_LABEL(inputPins[1]->id, "Height"), &height, 0.01f));
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_LABEL(inputPins[2]->id, "Radius"), &radius, 0.01f, 0.00001f));
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat(MAKE_IMGUI_LABEL(inputPins[3]->id, "Plane Factor"), &p, 0.01f, 0.00001f));
 	ImGui::PopItemWidth();
 }
 

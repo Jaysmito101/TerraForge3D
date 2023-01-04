@@ -26,50 +26,18 @@ NodeOutput TextureNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 	res = sc = x = y = 0.0f;
 	int channel = 0;
 
-	if (pin->id == outputPins[0]->id)
-	{
-		channel = 0;
-	}
+	if (pin->id == outputPins[0]->id) channel = 0;
+	else if (pin->id == outputPins[1]->id) channel = 1;
+	else if (pin->id == outputPins[2]->id) channel = 2;
 
-	else if (pin->id == outputPins[1]->id)
-	{
-		channel = 1;
-	}
+	if (inputPins[0]->IsLinked()) x = inputPins[0]->other->Evaluate(input).value;
+	else x = input.texX;
 
-	else if (pin->id == outputPins[2]->id)
-	{
-		channel = 2;
-	}
+	if (inputPins[1]->IsLinked()) y = inputPins[1]->other->Evaluate(input).value;
+	else y = input.texY;
 
-	if (inputPins[0]->IsLinked())
-	{
-		x = inputPins[0]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		x = input.texX;
-	}
-
-	if (inputPins[1]->IsLinked())
-	{
-		y = inputPins[1]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		y = input.texY;
-	}
-
-	if (inputPins[2]->IsLinked())
-	{
-		sc = inputPins[2]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		sc = scale;
-	}
+	if (inputPins[2]->IsLinked()) sc = inputPins[2]->other->Evaluate(input).value;
+	else sc = scale;
 
 	x = (x * 2.0f - 1.0f) * sc - posi[0];
 	y = (y * 2.0f - 1.0f) * sc - posi[1];
@@ -216,7 +184,7 @@ void TextureNode::OnRender()
 	else
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &scale, 0.01f);
+		UPDATE_HAS_CHHANGED(ImGui::DragFloat(("##" + std::to_string(inputPins[1]->id)).c_str(), &scale, 0.01f));
 		ImGui::PopItemWidth();
 	}
 
@@ -226,29 +194,28 @@ void TextureNode::OnRender()
 	ImGui::Text("B");
 	outputPins[2]->Render();
 	ImGui::NewLine();
-	ImGui::Checkbox(("Auto Tiled##tild" + std::to_string(id)).c_str(), &autoTiled);
-	ImGui::Checkbox(("Inverse Texture##tinv" + std::to_string(id)).c_str(), &inv);
-	ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale);
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Auto Tiled##tild" + std::to_string(id)).c_str(), &autoTiled));
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Inverse Texture##tinv" + std::to_string(id)).c_str(), &inv));
+	UPDATE_HAS_CHHANGED(ImGui::Checkbox(("Scale -1 To 1##tnpsc" + std::to_string(id)).c_str(), &npScale));
 
 
 	ImGui::PushItemWidth(100);
-	if(!autoTiled)
-	{
-		ImGui::DragFloat(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f);
-	}
-	ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f);
+	if(!autoTiled) UPDATE_HAS_CHHANGED(ImGui::DragFloat(("Num Tiles##nmtl" + std::to_string(id)).c_str(), &numTiles, 0.01f));
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat2(("Position##posi" + std::to_string(id)).c_str(), posi, 0.01f));
+	UPDATE_HAS_CHHANGED(ImGui::DragFloat(("Rotation##rota" + std::to_string(id)).c_str(), &rota, 0.1f));
 	ImGui::PopItemWidth();
-	ImGui::DragFloat(("Rotation##rota" + std::to_string(id)).c_str(), &rota, 0.1f);
 	ImGui::NewLine();
 
 	if (ImGui::ImageButton((ImTextureID)texture->GetRendererID(), ImVec2(200, 200)))
 	{
 		ChangeTexture();
+		hasChanged = true;
 	}
 
 	if (ImGui::Button(MAKE_IMGUI_LABEL(id, "Change Texture")))
 	{
 		ChangeTexture();
+		hasChanged = true;
 	}
 }
 

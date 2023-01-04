@@ -202,6 +202,7 @@ void NodeEditorNode::Render()
 {
 	ImGui::PushID(id);
 	ImGuiNodeEditor::BeginNode(id);
+	this->hasChanged = false;
 	OnRender();
 	ImGuiNodeEditor::EndNode();
 	ImGui::PopID();
@@ -212,6 +213,7 @@ NodeEditorNode::NodeEditorNode(int id)
 {
 	_id = id;
 	nodePosition = ImVec2(0, 0);
+	reqNodePosLoad = false;
 }
 
 NodeEditorNode::~NodeEditorNode()
@@ -367,29 +369,27 @@ void NodeEditor::Load(nlohmann::json data)
 	}
 }
 
-void NodeEditor::Render()
+bool NodeEditor::Render()
 {
 	bool windowFocused = ImGui::IsWindowFocused();
 	ImGuiNodeEditor::SetCurrentEditor(context);
 	ImGuiNodeEditor::Begin(name.c_str());
 	ImGuiNodeEditor::EnableShortcuts(windowFocused);
+	bool hasChanged = false;
 
 	for (auto &it : nodes)
 	{
-		it.second->Render();
+		it.second->Render(); hasChanged |= it.second->hasChanged; 
 	}
 
 	outputNode->Render();
+	hasChanged |= outputNode->hasChanged;
 
-	for (auto &it : links)
-	{
-		ImGuiNodeEditor::Link(it.second->id, it.second->from->id, it.second->to->id, it.second->color, it.second->thickness);
-	}
+	for (auto &it : links) ImGuiNodeEditor::Link(it.second->id, it.second->from->id, it.second->to->id, it.second->color, it.second->thickness);
 
 	if (ImGuiNodeEditor::BeginCreate())
 	{
 		ImGuiNodeEditor::PinId iPid, oPid;
-
 		if (ImGuiNodeEditor::QueryNewLink(&iPid, &oPid))
 		{
 			if (iPid && oPid)
@@ -407,6 +407,7 @@ void NodeEditor::Render()
 						link->from->Link(link);
 						link->to->Link(link);
 						links[link->_id.Get()] = link;
+						hasChanged = true;
 						ImGuiNodeEditor::Link(link->id, link->from->id, link->to->id);
 					}
 				}
@@ -415,20 +416,19 @@ void NodeEditor::Render()
 			else if(iPid)
 			{
 				NodeEditorPin *pin = pins[iPid.Get()];
-
 				if(pin->IsLinked())
 				{
 					DeleteLink(pin->link);
+					hasChanged = true;
 				}
 			}
-
 			else if (oPid)
 			{
 				NodeEditorPin *pin = pins[oPid.Get()];
-
 				if (pin->IsLinked())
 				{
 					DeleteLink(pin->link);
+					hasChanged = true;
 				}
 			}
 		}
@@ -444,8 +444,8 @@ void NodeEditor::Render()
 				if (pin->IsLinked())
 				{
 					DeleteLink(pin->link);
+					hasChanged = true;
 				}
-
 				else
 				{
 					config.makeNodeFunc();
@@ -468,20 +468,20 @@ void NodeEditor::Render()
 				{
 					NodeEditorNode *node = nodes[nId.Get()];
 					DeleteNode(node);
+					hasChanged = true;
 				}
 			}
 		}
-
 		else
 		{
 			ImGuiNodeEditor::LinkId lId;
-
 			if (ImGuiNodeEditor::QueryDeletedLink(&lId))
 			{
 				if (lId && ImGuiNodeEditor::AcceptDeletedItem())
 				{
 					NodeEditorLink *link = links[lId.Get()];
 					DeleteLink(link);
+					hasChanged = true;
 				}
 			}
 		}
@@ -506,6 +506,8 @@ void NodeEditor::Render()
 					ImGuiNodeEditor::SetNodePosition(node->_id, ImVec2(prePos.x + 10, prePos.y + 10));
 					ImGuiNodeEditor::DeselectNode(sNode);
 					AddNode(node);
+					ImGuiNodeEditor::CenterNodeOnScreen(node->_id);
+					hasChanged = true;
 				}
 			}
 		}
@@ -518,20 +520,16 @@ void NodeEditor::Render()
 			ImGuiNodeEditor::SetNodePosition(it.second->_id, it.second->nodePosition);
 			it.second->reqNodePosLoad = false;
 		}
-
-		else
-		{
-			it.second->nodePosition = ImGuiNodeEditor::GetNodePosition(it.second->_id);
-		}
+		else it.second->nodePosition = ImGuiNodeEditor::GetNodePosition(it.second->_id);
 	}
 
-	if (config.updateFunc)
-	{
-		config.updateFunc();
-	}
+	if (config.updateFunc) config.updateFunc();
 
 	ImGuiNodeEditor::End();
 	ImGuiNodeEditor::SetCurrentEditor(nullptr);
+
+
+	return hasChanged;
 }
 
 void NodeEditor::DeleteLink(NodeEditorLink *link)
@@ -553,10 +551,12 @@ void NodeEditor::AddNode(NodeEditorNode *node)
 
 	node->Setup();
 
-	if (nodes.size() > 2 && nodes.find(lastNodeId.Get()) != nodes.end() && !node->reqNodePosLoad)
+	if (nodes.size() > 1 && nodes.find(lastNodeId.Get()) != nodes.end() && !node->reqNodePosLoad)
 	{
 		NodeEditorNode *lastNode = nodes[lastNodeId.Get()];
 		node->nodePosition = lastNode->nodePosition;
+		node->nodePosition.x += 10;
+		node->nodePosition.y += 10;
 		node->reqNodePosLoad = true;
 	}
 

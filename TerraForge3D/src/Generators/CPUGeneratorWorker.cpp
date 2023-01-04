@@ -7,6 +7,7 @@
 
 #include "Generators/CPUNoiseLayersGenerator.h"
 #include "Generators/GPUNoiseLayerGenerator.h"
+#include "Base/NodeEditor/NodeEditor.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
 #include "Base/UIFontManager.h"
@@ -74,16 +75,15 @@ void CPUGeneratorWorker::Worker()
 			for (int j = 0; j < appState->mainMap.tileResolution; j++)
 			{
 				float elev = 0.0f;
-				NodeInputParam inp;
+				NodeInputParam inp{};
 				inp.x = appState->mainMap.tileOffsetX + j * stepD;
 				inp.y = elev;
 				inp.z = appState->mainMap.tileOffsetY + i * stepD;
-				inp.minX = 0.0f;
-				inp.minY = 0.0f;
-				inp.minZ = 0.0f;
+				inp.minX = 0.0f; inp.minY = 0.0f; inp.minZ = 0.0f;
+				inp.maxX = 1.0f; inp.maxY = 1.0f; inp.maxZ = 1.0f;
 				inp.texX = inp.x;
 				inp.texY = inp.z;
-				inp.userData3 = appState->mainMap.currentTileDataLayers;
+				inp.userData3 = appState->mainMap.currentTileDataLayers[1];
 				float el0 = 0.0f, el1 = 0.0f;
 
 

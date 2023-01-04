@@ -40,12 +40,7 @@ NodeOutput RandomNumberNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 		mx *= max;
 	}
 
-	if(mn > mx)
-	{
-		int t = mn;
-		mn = mx;
-		mx = t;
-	}
+	if(mn > mx) std::swap(mn, mx);
 
 	std::seed_seq seq{seed};
 	engine.seed(seq);
@@ -79,7 +74,7 @@ void RandomNumberNode::OnRender()
 	if (!inputPins[0]->IsLinked())
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragInt(("##" + std::to_string(inputPins[0]->id)).c_str(), &seed, 0.1f);
+		UPDATE_HAS_CHHANGED(ImGui::DragInt(("##" + std::to_string(inputPins[0]->id)).c_str(), &seed, 0.1f));
 		ImGui::PopItemWidth();
 	}
 
@@ -92,7 +87,7 @@ void RandomNumberNode::OnRender()
 	if (!inputPins[1]->IsLinked())
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragInt(("##" + std::to_string(inputPins[1]->id)).c_str(), &min, 0.1f);
+		UPDATE_HAS_CHHANGED(ImGui::DragInt(("##" + std::to_string(inputPins[1]->id)).c_str(), &min, 0.1f));
 		ImGui::PopItemWidth();
 	}
 
@@ -102,7 +97,7 @@ void RandomNumberNode::OnRender()
 	if (!inputPins[2]->IsLinked())
 	{
 		ImGui::PushItemWidth(100);
-		ImGui::DragInt(("##" + std::to_string(inputPins[2]->id)).c_str(), &max, 0.1f);
+		UPDATE_HAS_CHHANGED(ImGui::DragInt(("##" + std::to_string(inputPins[2]->id)).c_str(), &max, 0.1f));
 		ImGui::PopItemWidth();
 	}
 }

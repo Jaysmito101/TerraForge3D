@@ -41,7 +41,10 @@ void MeshGeneratorManager::Generate()
 
 	for (int i = 0; i < 6; i++) appState->mainMap.currentTileDataLayers[i]->UploadToGPU();
 
+	if (!appState->states.requireRemesh) return;
+
 	*isRemeshing = true;
+	appState->states.requireRemesh = false;
 	std::thread worker([this]
 		{
 			START_PROFILER();
@@ -61,7 +64,7 @@ void MeshGeneratorManager::GenerateSync()
 	*isRemeshing = true;
 	ExecuteKernels();
 	ExecuteCPUGenerators();
-	appState->mainMap.currentTileDataLayers[0]->UploadToGPU();
+	for(int i = 0 ; i < 6 ; i++) appState->mainMap.currentTileDataLayers[6]->UploadToGPU();
 	*isRemeshing = false;
 }
 
@@ -73,12 +76,6 @@ void MeshGeneratorManager::ShowSettings()
 		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
 		ImGui::Text("Base Mesh Generators");
 		ImGui::PopFont();
-
-
-		//if (ImGui::CollapsingHeader("Auto Base Mesh Gen (GPU)", clearMeshGen->uiActive))
-		//{
-		//	clearMeshGen->ShowSettings();
-		//}
 
 		if (ImGui::CollapsingHeader("CPU Worker Threads"))
 		{
@@ -104,8 +101,7 @@ void MeshGeneratorManager::ShowSettings()
 		{
 			if (ImGui::CollapsingHeader((cpuNoiseLayers[i]->name + "##CPUNL" + std::to_string(i)).c_str()))
 			{
-				cpuNoiseLayers[i]->ShowSetting(i);
-
+				appState->states.requireRemesh = cpuNoiseLayers[i]->ShowSetting(i) || appState->states.requireRemesh;
 				if (ImGui::Button(("Delete##CPUNOUSELAYER" + std::to_string(i)).c_str()))
 				{
 					while (*isRemeshing);
@@ -131,7 +127,7 @@ void MeshGeneratorManager::ShowSettings()
 		{
 			if (ImGui::CollapsingHeader((gpuNoiseLayers[i]->name + "##GPUNL" + std::to_string(i)).c_str()))
 			{
-				gpuNoiseLayers[i]->ShowSetting(i);
+				appState->states.requireRemesh = gpuNoiseLayers[i]->ShowSetting(i) || appState->states.requireRemesh;
 				if (ImGui::Button(("Delete##GPUNOUSELAYER" + std::to_string(i)).c_str()))
 				{
 					while (*isRemeshing);
@@ -157,12 +153,10 @@ void MeshGeneratorManager::ShowSettings()
 		{
 			if (ImGui::CollapsingHeader((cpuNodeEditors[i]->name + "##CPUNE" + std::to_string(i)).c_str()))
 			{
-				cpuNodeEditors[i]->ShowSetting(i);
-
+				appState->states.requireRemesh = cpuNodeEditors[i]->ShowSetting(i) || appState->states.requireRemesh;
 				if (ImGui::Button(("Delete##CPNE" + std::to_string(i)).c_str()))
 				{
 					while (*isRemeshing);
-
 					cpuNodeEditors.erase(cpuNodeEditors.begin() + i);
 					break;
 				}
@@ -183,38 +177,16 @@ void MeshGeneratorManager::ShowSettings()
 		ImGui::End();
 	}
 
-	for (int i = 0; i < cpuNoiseLayers.size(); i++)
-	{
-		cpuNoiseLayers[i]->Update();
-	}
-
-	for (int i = 0; i < gpuNoiseLayers.size(); i++)
-	{
-		gpuNoiseLayers[i]->Update();
-	}
-
-	for (int i = 0; i < cpuNodeEditors.size(); i++)
-	{
-		cpuNodeEditors[i]->Update();
-	}
+	for (int i = 0; i < cpuNoiseLayers.size(); i++) appState->states.requireRemesh = cpuNoiseLayers[i]->Update() || appState->states.requireRemesh;
+	for (int i = 0; i < gpuNoiseLayers.size(); i++) appState->states.requireRemesh = gpuNoiseLayers[i]->Update() || appState->states.requireRemesh;
+	for (int i = 0; i < cpuNodeEditors.size(); i++) appState->states.requireRemesh = cpuNodeEditors[i]->Update() || appState->states.requireRemesh;
 }
 
 void MeshGeneratorManager::GenerateForTerrain()
 {
-
 	int eachSize = appState->mainMap.tileResolution / cpuWorkerCount;
-
-	for (int i = 0; i < cpuWorkerCount; i++)
-	{
-		cpuGeneratorWorkers[i]->AddJob(cpuNoiseLayers, cpuNodeEditors, eachSize * i, eachSize);
-	}
-
-	for (int i = 0; i < cpuWorkerCount; i++)
-	{
-		cpuGeneratorWorkers[i]->WaitForFinish();
-	}
-
-
+	for (int i = 0; i < cpuWorkerCount; i++) cpuGeneratorWorkers[i]->AddJob(cpuNoiseLayers, cpuNodeEditors, eachSize * i, eachSize);
+	for (int i = 0; i < cpuWorkerCount; i++) cpuGeneratorWorkers[i]->WaitForFinish();
 }
 
 

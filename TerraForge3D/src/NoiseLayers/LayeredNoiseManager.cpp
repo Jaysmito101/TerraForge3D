@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#define ADD_ST_CH(x) stateChanged = x || stateChanged;
 #define MAKE_IMGUI_ID(x) ("##LayeredNoiseManager" + std::string(x)).c_str()
 
 
@@ -16,25 +17,23 @@ LayeredNoiseManager::LayeredNoiseManager()
 	noiseLayers.push_back(new NoiseLayer());
 }
 
-void LayeredNoiseManager::Render()
+bool LayeredNoiseManager::Render()
 {
+	bool stateChanged = false;
 	ImGui::Text("Global Offsets:");
-	ImGui::DragFloat3(MAKE_IMGUI_ID("Global Offsets"), offset, 0.1f);
-	ImGui::DragFloat("Global Strength##LayeredNoiseManager", &strength, 0.1f);
-	ImGui::Checkbox("Absolute Value##LayeredNoiseManager", &absv);
-	ImGui::Checkbox("Square Value##LayeredNoiseManager", &sq);
+	ADD_ST_CH(ImGui::DragFloat3(MAKE_IMGUI_ID("Global Offsets"), offset, 0.1f));
+	ADD_ST_CH(ImGui::DragFloat("Global Strength##LayeredNoiseManager", &strength, 0.1f));
+	ADD_ST_CH(ImGui::Checkbox("Absolute Value##LayeredNoiseManager", &absv));
+	ADD_ST_CH(ImGui::Checkbox("Square Value##LayeredNoiseManager", &sq));
 	ImGui::NewLine();
 	ImGui::Text("Noise Layers");
 	std::vector<NoiseLayer *> nl = noiseLayers;
-
 	for (int i = 0; i < nl.size(); i++)
 	{
 		bool state = ImGui::CollapsingHeader((std::string("##noiseLayerName") + std::to_string(i)).c_str());
-
 		if (state)
 		{
-			nl[i]->Render(i);
-
+			ADD_ST_CH(nl[i]->Render(i));
 			if (toAdd.size() == 0)
 			{
 				if (ImGui::Button("Duplicate"))
@@ -48,11 +47,7 @@ void LayeredNoiseManager::Render()
 			if (noiseLayers.size() > 1 && toDelete.size() == 0)
 			{
 				ImGui::SameLine();
-
-				if (ImGui::Button("Delete"))
-				{
-					toDelete.push_back(i);
-				}
+				if (ImGui::Button("Delete")) toDelete.push_back(i);
 			}
 		}
 
@@ -70,6 +65,7 @@ void LayeredNoiseManager::Render()
 			toAdd.push_back(new NoiseLayer());
 		}
 	}
+	return stateChanged;
 }
 
 void LayeredNoiseManager::UpdateLayers()
