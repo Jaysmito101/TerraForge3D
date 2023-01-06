@@ -23,8 +23,7 @@ ComputeKernel::~ComputeKernel()
 
 ComputeKernel::ComputeKernel(std::function<void(std::string)> errFunc, std::function<void(std::string)> statusFunc)
 {
-	onError = errFunc;
-	onStatus = statusFunc;
+	onError = errFunc; onStatus = statusFunc;
 	std::vector<cl::Platform> platforms;
 	cl::Platform::get(&platforms);
 
@@ -50,15 +49,10 @@ ComputeKernel::ComputeKernel(std::function<void(std::string)> errFunc, std::func
 	for (auto &d : devices)
 	{
 		tmp = (d.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU);
-
-		if (tmp)
-		{
-			device = d;
-			onStatus("Using GPU Device : " + device.getInfo<CL_DEVICE_NAME>());
-			break;
-		}
+		if (tmp) { device = d; onStatus("Using GPU Device : " + device.getInfo<CL_DEVICE_NAME>()); break; }
 	}
-
+	
+	// fallback to whatever device is available
 	if (!tmp)
 	{
 		device = devices[0];
@@ -77,7 +71,6 @@ void ComputeKernel::AddSoruce(std::string source)
 void ComputeKernel::BuildProgram(std::string options)
 {
 	program = cl::Program(context, sources);
-
 	if (program.build({ device }, options.c_str()) != CL_SUCCESS)
 	{
 		onStatus("Error Building : " + program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device));
@@ -98,21 +91,27 @@ void ComputeKernel::Clear()
 
 void ComputeKernel::ExecuteKernel(std::string name, cl::NDRange local, cl::NDRange global)
 {
-	queue.enqueueNDRangeKernel(kernels[name], cl::NullRange, global, local);
+	auto res = queue.enqueueNDRangeKernel(kernels[name], cl::NullRange, global, local);
 	queue.finish();
 }
 
 void ComputeKernel::CreateBuffer(std::string name, int type, size_t size)
 {
+	if (buffers.find(name) != buffers.end())
+	{
+		auto& buff = buffers[name];
+		if (buff.type == type && buff.size == size) return;
+	}
 	OpenCLBuffer buffer;
 	buffer.size = size;
+	buffer.type = type;
 	buffer.buffer = cl::Buffer(context, type, size);
 	buffers[name] = buffer;
 }
 
 void ComputeKernel::SetKernelArg(std::string name, int arg, std::string buffer)
 {
-	kernels[name].setArg(arg, buffers[buffer].buffer);
+	auto res = kernels[name].setArg(arg, buffers[buffer].buffer);
 }
 
 void ComputeKernel::ReadBuffer(std::string buffer, bool blocking, size_t size, void *data)

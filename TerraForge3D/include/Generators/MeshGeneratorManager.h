@@ -32,8 +32,6 @@ public:
 	void GenerateSync();
 	void ShowSettings();
 
-	void GenerateForTerrain();
-
 	void ExecuteKernels();
 	void ExecuteCPUGenerators();
 

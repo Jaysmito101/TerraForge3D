@@ -15,36 +15,38 @@ GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as, ComputeKern
 	appState = as;
 	uid = GenerateId(32);
 	name = "GPU Noise Layer " + std::to_string(count++);
-	kernels->CreateBuffer("noise_layers_size", CL_MEM_READ_WRITE, sizeof(int));
+	noiseLayers.push_back(GPUNoiseLayer());
 	noiseLayers.push_back(GPUNoiseLayer());
 }
 
 void GPUNoiseLayerGenerator::Generate(ComputeKernel *kernels)
 {
 	START_PROFILER();
-	kernels->CreateBuffer("noise_layers", CL_MEM_READ_WRITE, sizeof(GPUNoiseLayer) * noiseLayers.size() );
-	kernels->WriteBuffer("noise_layers", true, sizeof(GPUNoiseLayer) * noiseLayers.size(), noiseLayers.data());
-	int tmp = noiseLayers.size();
-	kernels->WriteBuffer("noise_layers_size", true, sizeof(int), &tmp);
 
-	{
-		kernels->SetKernelArg("noise_layer_terrain", 0, "mesh");
-		kernels->SetKernelArg("noise_layer_terrain", 1, "noise_layers");
-		kernels->SetKernelArg("noise_layer_terrain", 2, "noise_layers_size");
-		vc = appState->models.mainModel->mesh->vertexCount;
-		int ls = localSize;
+	noiseLayers[0].strength = appState->mainMap.tileSize / appState->mainMap.tileResolution;
+	noiseLayers[0].offsetX = appState->mainMap.tileOffsetX;
+	noiseLayers[0].offsetY = appState->mainMap.tileOffsetY;
+	noiseLayers[0].offsetZ = (float)appState->mainMap.tileResolution + 0.2f;
+	noiseLayers[0].offsetW = (float)this->setMode + 0.2f;
 
-		while(ls > 0 && vc % ls != 0)
-		{
-			ls = ls / 2;
-		}
+	kernels->CreateBuffer("noise_layers_data", CL_MEM_READ_WRITE, sizeof(GPUNoiseLayer) * noiseLayers.size());
+	kernels->WriteBuffer("noise_layers_data", true, sizeof(GPUNoiseLayer) * noiseLayers.size(), noiseLayers.data());
 
-		if(ls==0)
-		{
-			ls = 1;
-		}
+	int tmp = noiseLayers.size(); kernels->WriteBuffer("noise_layers_size", true, sizeof(int), &tmp);
 
-		kernels->ExecuteKernel("noise_layer_terrain", cl::NDRange(ls), cl::NDRange(vc));
+	
+	{		
+		kernels->SetKernelArg("process_map_noise_layer", 0, "noise_layers_data");
+		kernels->SetKernelArg("process_map_noise_layer", 1, "noise_layers_size");
+		kernels->SetKernelArg("process_map_noise_layer", 2, "data_layer_0");
+		kernels->SetKernelArg("process_map_noise_layer", 3, "data_layer_1");
+		kernels->SetKernelArg("process_map_noise_layer", 4, "data_layer_2");
+		kernels->SetKernelArg("process_map_noise_layer", 5, "data_layer_3");
+		kernels->SetKernelArg("process_map_noise_layer", 6, "data_layer_4");
+		kernels->SetKernelArg("process_map_noise_layer", 7, "data_layer_5");
+		vc = appState->mainMap.tileResolution;
+		int ls = max(localSize, 1); while (vc % ls != 0) ls--;
+		kernels->ExecuteKernel("process_map_noise_layer", cl::NDRange(ls, ls), cl::NDRange(vc, vc));
 	}
 
 	END_PROFILER(time);
@@ -148,15 +150,16 @@ bool GPUNoiseLayerGenerator::Update()
 	if (windowStat)
 	{
 		ImGui::Begin((name + "##" + uid).c_str(), &windowStat);
+		ADD_ST_CH(ShowLayerUpdationMethod("Set Method##GPUNL", &this->setMode));
 		ImGui::Text("Global Settings");
-		ADD_ST_CH(ImGui::DragFloat("Offset X", &noiseLayers[0].offsetX, 0.01f));
-		ADD_ST_CH(ImGui::DragFloat("Offset Y", &noiseLayers[0].offsetY, 0.01f));
-		ADD_ST_CH(ImGui::DragFloat("Offset Z", &noiseLayers[0].offsetZ, 0.01f));
-		ADD_ST_CH(ImGui::DragFloat("Strength", &noiseLayers[0].strength, 0.01f));
-		ADD_ST_CH(ImGui::DragFloat("Frequency", &noiseLayers[0].frequency, 0.001f));
+		ADD_ST_CH(ImGui::DragFloat("Offset X", &noiseLayers[1].offsetX, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Offset Y", &noiseLayers[1].offsetY, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Offset Z", &noiseLayers[1].offsetZ, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Strength", &noiseLayers[1].strength, 0.01f));
+		ADD_ST_CH(ImGui::DragFloat("Frequency", &noiseLayers[1].frequency, 0.001f));
 		ImGui::Separator();
 
-		for (int i = 1; i < noiseLayers.size(); i++)
+		for (int i = 2; i < noiseLayers.size(); i++)
 		{
 			ImGui::PushID(i);
 			if (ImGui::CollapsingHeader(("Noise Layer " + std::to_string(i + 1)).c_str()))

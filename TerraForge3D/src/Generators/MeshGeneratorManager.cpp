@@ -62,9 +62,9 @@ void MeshGeneratorManager::GenerateSync()
 {
 	while (appState->states.remeshing);
 	*isRemeshing = true;
-	ExecuteKernels();
-	ExecuteCPUGenerators();
-	for(int i = 0 ; i < 6 ; i++) appState->mainMap.currentTileDataLayers[6]->UploadToGPU();
+	//ExecuteCPUGenerators();
+	//ExecuteKernels();
+	for (int i = 0; i < 6; i++) appState->mainMap.currentTileDataLayers[6]->UploadToGPU();
 	*isRemeshing = false;
 }
 
@@ -119,7 +119,7 @@ void MeshGeneratorManager::ShowSettings()
 		}
 
 		ImGui::Separator();
-		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
+		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold")); 
 		ImGui::Text("GPU Noise Layer Generators");
 		ImGui::PopFont();
 
@@ -182,66 +182,25 @@ void MeshGeneratorManager::ShowSettings()
 	for (int i = 0; i < cpuNodeEditors.size(); i++) appState->states.requireRemesh = cpuNodeEditors[i]->Update() || appState->states.requireRemesh;
 }
 
-void MeshGeneratorManager::GenerateForTerrain()
-{
-	int eachSize = appState->mainMap.tileResolution / cpuWorkerCount;
-	for (int i = 0; i < cpuWorkerCount; i++) cpuGeneratorWorkers[i]->AddJob(cpuNoiseLayers, cpuNodeEditors, eachSize * i, eachSize);
-	for (int i = 0; i < cpuWorkerCount; i++) cpuGeneratorWorkers[i]->WaitForFinish();
-}
-
 
 void MeshGeneratorManager::ExecuteKernels()
 {
-	/*
-	if (appState->models.coreTerrain->mesh->res != appState->globals.resolution || appState->models.coreTerrain->mesh->sc != appState->globals.scale)
+	for (int i = 0; i < 6; i++)
 	{
-		appState->models.coreTerrain->mesh->res = appState->globals.resolution;
-		appState->models.coreTerrain->mesh->sc = appState->globals.scale;
-		appState->models.coreTerrain->mesh->GeneratePlane(appState->globals.resolution, appState->globals.scale);
+		kernels->CreateBuffer("data_layer_" + std::to_string(i), CL_MEM_READ_WRITE, appState->mainMap.currentTileDataLayers[i]->GetSize());
+		kernels->WriteBuffer("data_layer_" + std::to_string(i), true, appState->mainMap.currentTileDataLayers[i]->GetSize(), appState->mainMap.currentTileDataLayers[i]->GetDataPtr());
 	}
 
-	kernels->CreateBuffer("mesh", CL_MEM_READ_WRITE, appState->models.coreTerrain->mesh->vertexCount * sizeof(Vert));
-	kernels->WriteBuffer("mesh", true, appState->models.coreTerrain->mesh->vertexCount * sizeof(Vert), appState->models.coreTerrain->mesh->vert);
-
-	if (clearMeshGen->useGPU)
-	{
-		clearMeshGen->Generate(kernels);
-	}
-
-	for (int i = 0; i < gpuNoiseLayers.size(); i++)
-	{
-		if (gpuNoiseLayers[i]->enabled)
-		{
-			gpuNoiseLayers[i]->Generate(kernels);
-		}
-	}
-
-	if (clearMeshGen->useGPUForNormals)
-	{
-		kernels->CreateBuffer("indices", CL_MEM_READ_WRITE, appState->models.coreTerrain->mesh->indexCount * sizeof(int));
-		kernels->WriteBuffer("indices", true, appState->models.coreTerrain->mesh->indexCount * sizeof(int), appState->models.coreTerrain->mesh->indices);
-		kernels->SetKernelArg("gen_normals", 0, "mesh");
-		kernels->SetKernelArg("gen_normals", 1, "indices");
-		int ls = 512;
-		int ic = appState->models.coreTerrain->mesh->indexCount;
-
-		while (ic % ls != 0)
-		{
-			ls /= 2;
-		}
-
-		kernels->ExecuteKernel("gen_normals", cl::NDRange(ls), cl::NDRange(ic));
-		kernels->SetKernelArg("normalize_normals", 0, "mesh");
-		kernels->ExecuteKernel("normalize_normals", cl::NDRange(1), cl::NDRange(appState->models.coreTerrain->mesh->vertexCount));
-	}
-
-	kernels->ReadBuffer("mesh", true, appState->models.coreTerrain->mesh->vertexCount * sizeof(Vert), appState->models.coreTerrain->mesh->vert);
-	*/
+	for (int i = 0; i < gpuNoiseLayers.size(); i++) if (gpuNoiseLayers[i]->enabled) gpuNoiseLayers[i]->Generate(kernels);
+	
+	for (int i = 0; i < 6; i++) kernels->ReadBuffer("data_layer_" + std::to_string(i), true, appState->mainMap.currentTileDataLayers[i]->GetSize(), appState->mainMap.currentTileDataLayers[i]->GetDataPtr());
 }
 
 void MeshGeneratorManager::ExecuteCPUGenerators()
 {
-	GenerateForTerrain();
+	int eachSize = appState->mainMap.tileResolution / cpuWorkerCount;
+	for (int i = 0; i < cpuWorkerCount; i++) cpuGeneratorWorkers[i]->AddJob(cpuNoiseLayers, cpuNodeEditors, eachSize * i, eachSize);
+	for (int i = 0; i < cpuWorkerCount; i++) cpuGeneratorWorkers[i]->WaitForFinish();
 }
 
 void MeshGeneratorManager::LoadKernels()
@@ -250,12 +209,10 @@ void MeshGeneratorManager::LoadKernels()
 	std::string source = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "kernels" PATH_SEPARATOR "generators" PATH_SEPARATOR "generators.cl", &tmp);
 	kernels->AddSoruce(source);
 	kernels->BuildProgram("-I" + appState->globals.kernelsIncludeDir + " -cl-fast-relaxed-math -cl-mad-enable");
-	kernels->AddKernel("clear_mesh_terrain");
-	kernels->AddKernel("clear_mesh_custom_base");
-	kernels->AddKernel("noise_layer_terrain");
-	kernels->AddKernel("noise_layer_custom_base");
-	kernels->AddKernel("gen_normals");
-	kernels->AddKernel("normalize_normals");
+	kernels->AddKernel("process_map_noise_layer");
+	kernels->CreateBuffer("noise_layers_data", CL_MEM_READ_WRITE, sizeof(GPUNoiseLayer) * 2);
+	kernels->CreateBuffer("noise_layers_size", CL_MEM_READ_WRITE, sizeof(int));
+
 }
 
 nlohmann::json MeshGeneratorManager::Save()

@@ -365,7 +365,7 @@ bool ShowLayerUpdationMethod(const char* label, int* method)
 	int selct = *method;
 	if (ImGui::BeginCombo(label, items[selct]))
 	{
-		for (int i = 0; i <= 4; i++)
+		for (int i = 0; i < IM_ARRAYSIZE(items); i++)
 		{
 			bool is_selected = (selct == i);
 			if (ImGui::Selectable(items[i], is_selected)) selct= i;

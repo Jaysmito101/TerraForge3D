@@ -2,43 +2,37 @@
 #include "utils/noise.cl"
 
 #ifndef NOISE_LAYER_CL
-#define NOISE_LAYER_CL
+#define NOISE_LAYER_CL  
+ 
+__kernel void process_map_noise_layer(__global NoiseLayer* nl,
+					__global int* nls,
+					__global float4* data_layer_0,
+					__global float4* data_layer_1,
+					__global float4* data_layer_2,
+					__global float4* data_layer_3,
+					__global float4* data_layer_4,
+					__global float4* data_layer_5)
+{ 
+	int x_coord = get_global_id(0);
+	int y_coord = get_global_id(1);
+	int tileResolution = (int)nl[0].offset.z;
+	int size = *nls;
 
-__kernel void noise_layer_terrain(__global Vert* mesh, __global NoiseLayer* nl, __global int* nls)
-{
-	int i = get_global_id(0);
-	int size=*nls;
-	float n = 0.0f;
-	float4 position = mesh[i].position * nl[0].frequency + nl[0].offset;
-	position.y = 0.0f;
-	NoiseLayer noiseLayer;
-	for(int j=1;j<size;j++)
+	float4 position = (float4){x_coord * nl[0].strength + nl[0].offset.x, 0.0f,  y_coord * nl[0].strength + nl[0].offset.y, 0.0f};
+	position = position * nl[1].frequency + nl[1].offset;
+
+	NoiseLayer noiseLayer; float n = 0.0f;
+	for(int j = 2; j < size ; j++)
 	{
 		noiseLayer = nl[j];
 		noiseLayer.value = position;
 		n += get_noise(noiseLayer);
 	}
-	n = n * nl[0].strength;
-	mesh[i].position.y += n;
-	mesh[i].extras1.x += n;
+
+	n = n * nl[1].strength;
+
+	data_layer_0[y_coord * tileResolution + x_coord].x = UpdateLayerWithUpdateMethod(data_layer_0[y_coord * tileResolution + x_coord].x, n, (int)nl[0].offset.w);
 }
 
-__kernel void noise_layer_custom_base(__global Vert* mesh, __global Vert* mesh_copy, __global NoiseLayer* nl, __global int* nls)
-{
-	int i = get_global_id(0);
-	int size=*nls;
-	float n = 0.0f;
-	float4 position = mesh_copy[i].position * nl[0].frequency + nl[0].offset;	
-	NoiseLayer noiseLayer;
-	for(int j=1;j<size;j++)
-	{
-		noiseLayer = nl[j];
-		noiseLayer.value = position;
-		n += get_noise(noiseLayer);
-	}
-	n = n * nl[0].strength;
-	mesh[i].position += mesh_copy[i].normal * n;
-	mesh[i].extras1.x += n;
-}
 
 #endif // NOISE_LAYER_CL

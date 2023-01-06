@@ -29,6 +29,8 @@ public:
 		if (pData) delete[] pData;
 		this->size = resolution;
 		pData = new float[size * size * 4];
+		memset(pData, 0, sizeof(float) * size * size * 4);
+		this->UploadToGPU();
 	}
 
 	inline void SetData(float* data_, size_t size_, size_t offset_)
@@ -83,6 +85,9 @@ public:
 		if (a) *a = pixel[3];
 	}
 
+	inline float* GetDataPtr() { return pData; }
+
+	inline size_t GetSize() { return sizeof(float) * 4 * size * size; }
 
 private:
 

@@ -11,6 +11,7 @@ struct OpenCLBuffer
 {
 	cl::Buffer buffer;
 	size_t size;
+	int type;
 };
 
 class ComputeKernel

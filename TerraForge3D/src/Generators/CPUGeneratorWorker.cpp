@@ -75,6 +75,7 @@ void CPUGeneratorWorker::Worker()
 			for (int j = 0; j < appState->mainMap.tileResolution; j++)
 			{
 				float elev = 0.0f;
+				appState->mainMap.currentTileDataLayers[0]->GetPixelI(j, i, &elev);
 				NodeInputParam inp{};
 				inp.x = appState->mainMap.tileOffsetX + j * stepD;
 				inp.y = elev;
