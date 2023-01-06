@@ -20,8 +20,7 @@ public:
 	~NoiseCellularNode();
 
 	int seed, octaves;
-	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength, cellularJitter;
+	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength, cellularJitter, yVal;
 	int fractalType, distanceFunc;
-	bool useY = false;
 	FastNoiseLite *noiseGen;
 };

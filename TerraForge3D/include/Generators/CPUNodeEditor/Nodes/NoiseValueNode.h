@@ -20,7 +20,7 @@ public:
 	~NoiseValueNode();
 
 	int seed, octaves;
-	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength;
+	float frequency, lacunarity, gain, weightedStrength, pingPongStrength, strength, yVal;
 	int fractalType;
 	FastNoiseLite *noiseGen;
 };

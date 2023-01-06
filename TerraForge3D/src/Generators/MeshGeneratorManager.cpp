@@ -94,6 +94,32 @@ void MeshGeneratorManager::ShowSettings()
 
 		ImGui::Separator();
 		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
+		ImGui::Text("GPU Noise Layer Generators");
+		ImGui::PopFont();
+
+		for (int i = 0; i < gpuNoiseLayers.size(); i++)
+		{
+			if (ImGui::CollapsingHeader((gpuNoiseLayers[i]->name + "##GPUNL" + std::to_string(i)).c_str()))
+			{
+				appState->states.requireRemesh = gpuNoiseLayers[i]->ShowSetting(i) || appState->states.requireRemesh;
+				if (ImGui::Button(("Delete##GPUNOUSELAYER" + std::to_string(i)).c_str()))
+				{
+					while (*isRemeshing);
+					gpuNoiseLayers.erase(gpuNoiseLayers.begin() + i);
+					break;
+				}
+			}
+			ImGui::Separator();
+		}
+
+		if (ImGui::Button("Add##GPUNL"))
+		{
+			while (*isRemeshing);
+			gpuNoiseLayers.push_back(new GPUNoiseLayerGenerator(appState, kernels));
+		}
+
+		ImGui::Separator();
+		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
 		ImGui::Text("CPU Noise Layer Generators");
 		ImGui::PopFont();
 
@@ -118,31 +144,7 @@ void MeshGeneratorManager::ShowSettings()
 			cpuNoiseLayers.push_back(new CPUNoiseLayersGenerator(appState));
 		}
 
-		ImGui::Separator();
-		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold")); 
-		ImGui::Text("GPU Noise Layer Generators");
-		ImGui::PopFont();
-
-		for (int i = 0; i < gpuNoiseLayers.size(); i++)
-		{
-			if (ImGui::CollapsingHeader((gpuNoiseLayers[i]->name + "##GPUNL" + std::to_string(i)).c_str()))
-			{
-				appState->states.requireRemesh = gpuNoiseLayers[i]->ShowSetting(i) || appState->states.requireRemesh;
-				if (ImGui::Button(("Delete##GPUNOUSELAYER" + std::to_string(i)).c_str()))
-				{
-					while (*isRemeshing);
-					gpuNoiseLayers.erase(gpuNoiseLayers.begin() + i);
-					break;
-				}
-			}
-			ImGui::Separator();
-		}
-
-		if (ImGui::Button("Add##GPUNL"))
-		{
-			while (*isRemeshing);
-			gpuNoiseLayers.push_back(new GPUNoiseLayerGenerator(appState, kernels));
-		}
+		
 
 		ImGui::Separator();
 		ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
