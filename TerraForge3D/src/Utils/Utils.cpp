@@ -275,6 +275,21 @@ std::string FetchURL(std::string baseURL, std::string path)
 	return "";
 }
 
+// From : https://stackoverflow.com/a/10467633/14911094
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+std::string GetTimeStamp()
+{
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	// Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+	// for more information about date/time format
+	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+	return buf;
+}
+
 char *UChar2Char(unsigned char *data, int length)
 {
 	char *odata = new char[length];

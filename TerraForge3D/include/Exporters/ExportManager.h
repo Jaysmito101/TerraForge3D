@@ -3,6 +3,10 @@
 #include <thread>
 #include <string>
 
+#include "Exporters/OBJExporter.h"
+#include "Exporters/STLExporter.h"
+#include "Exporters/PLYExporter.h"
+
 class ApplicationState;
 class Model;
 class Mesh;
@@ -36,4 +40,7 @@ private:
 	ApplicationState* appState = nullptr;
 	std::thread worker_th;
 	int exportMeshFormat = 0; 
+	OBJExporter objExporter;
+	STLExporter stlExporter;
+	PLYExporter plyExporter;
 };

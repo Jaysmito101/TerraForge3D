@@ -72,6 +72,8 @@ std::string GenerateId(uint32_t length);
 
 std::string FetchURL(std::string baseURL, std::string path);
 
+std::string GetTimeStamp();
+
 bool ShowLayerUpdationMethod(const char* label, int* method);
 
 float UpdateLayerWithUpdateMethod(float origv, float newv, int method);
