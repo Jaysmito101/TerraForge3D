@@ -27,7 +27,7 @@ TerraForge3D is a powerful cross platform procedural terrain generation and text
 A huge benefit is that TerraForge3D is 100% free and opensource. TerraForge3D is very easy to get started with. There are also a series of tutorials(on youtube), documentations for your help.
 
 Also if you have any question or problem or suggestion you can directly reach out to me via my email jaysmito101@gmail.com . 
-Or you could join out official discord server with a charming community(including me) to help you out with anny issues.
+Or you could join our official discord server with a charming community(including me) to help you out with any issues.
 
 ## Discord Server : https://discord.gg/9ebyYwSktZ
 
@@ -75,15 +75,15 @@ TerraForge3D utilizes the power of your GPU to generate the terrains blazing fas
 
 ### CPU Powered Terrain Generation
 
-There are somethings which cannot possible be done on a GPU as efficiently(like the node editor) so you can optionally mix GPU generation with CPU generation to get more control. Also if you GPU doesnt support OpenCL 2.0 you can still use the CPU mesh Generation. Also TerraForge's CPU Mesh Generation algorithms are made keeping efficiency and speed in mind thus they are extremely fast.
+There are somethings which cannot be done on a GPU as efficiently(like the node editor) so you can optionally mix GPU generation with CPU generation to get more control. Also if your GPU doesnt support OpenCL 2.0 you can still use the CPU mesh Generation. Also TerraForge's CPU Mesh Generation algorithms are made keeping efficiency and speed in mind thus they are extremely fast.
 
 ### No Limit on Resolution
 
-Most terrain generation applications limit you to a certain maximum resolution or only certain resolutions like (128, 256, ...) but not TerraForge3D! TerraForge3D Allows you to work with any resolution you can imagine of.
+Most terrain generation applications limit you to a certain maximum resolution or only certain resolutions like (128, 256, ...) but not TerraForge3D! TerraForge3D allows you to work with any resolution you can imagine.
 
 ### Dedicated Texture Baker
 
-Bake any node output, the heightmap, anything you want to a high quality texture! Bake a huge resulution texture at once or bake it in tiles!
+Bake any node output, the heightmap, anything you want to a high quality texture! Bake a huge resolution texture at once or bake it in tiles!
 
 ### Shader Nodes
 
@@ -107,7 +107,7 @@ TerraForge3D has several erosion algorithms(hydraulic, wind, ...) which lets you
 
 ### Custom Shape Generation
 
-Procedural is great! But sometimes there must be a human touch! Thus TerraForge3D lets you customize your terrain by pmanyally placing terrrain features like hills, caters, cliffs, etc and combine it with procedural terrain.
+Procedural is great! But sometimes there must be a human touch! Thus TerraForge3D lets you customize your terrain by manually placing terrrain features like hills, caters, cliffs, etc and combine it with procedural terrain.
 
 ### Custom Sky
 
@@ -119,7 +119,7 @@ TerraForge3D also lets you visualize a sea to give you a idea of the sea level.
 
 ### Custom Shaders
 
-TerraForge3D allows you to have a custom shader(in GLSL). TerraForge3D also provides a inbuilt editor for writing your shaders!
+TerraForge3D allows you to have a custom shader(in GLSL). TerraForge3D also provides an inbuilt editor for writing your shaders!
 
 ### Texture Store & Texture Settings
 
@@ -127,12 +127,12 @@ TerraForge3D gives you a huge collection of textures to download and use free of
 
 ### Universal
 
-TerraForge3D can export to a whole lot of 3D file formats like OBJ, GLTF, GLB, STL, ... . Also you can export heightmaps as PNG, JPG, ... . This makes TerraForge3D totally compitable with any program you can think of! Be it Blender, Unreal Engine, Uniy, Maya, anything.
+TerraForge3D can export to a whole lot of 3D file formats like OBJ, GLTF, GLB, STL, ... . Also you can export heightmaps as PNG, JPG, ... . This makes TerraForge3D totally compatible with any program you can think of! Be it Blender, Unreal Engine, Uniy, Maya, anything.
 
 
 # Some Advices
 
-* When you are stating up the app for first time it will need to download some things and cache them you can see the console for deails
+* When you are starting up the app for first time it will need to download some things and cache them.You can see the console for details
 * You can Show/Hide the console from Menu > Options > Toggle System Console.
 * Whenever you feel that something is wrong or the app is slow check the console for updates
 
@@ -143,8 +143,8 @@ For a guide on how to get started developing TerraForge3D https://terraforge3d.g
 
 # Support
 
-Any support is highly appretiated!
-Please considering tweeting about this to spread the word and help this project grow.
+Any support is highly appreciated!
+Please consider tweeting about this to spread the word and help this project grow.
 You could join my patreon and get early access to TerraForge3D builds, some great terrain files, many more things (<a href="https://patreon.com/jaysmito101">Patreon</a>)
 
 ## Download TerraForge3D : https://github.com/Jaysmito101/TerraForge3D/releases/tag/v2.3
