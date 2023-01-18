@@ -6,6 +6,8 @@
 #include "Exporters/OBJExporter.h"
 #include "Exporters/STLExporter.h"
 #include "Exporters/PLYExporter.h"
+#include "Exporters/GLTFExporter.h"
+#include "Exporters/ColladaExporter.h"
 
 class ApplicationState;
 class Model;
@@ -43,4 +45,6 @@ private:
 	OBJExporter objExporter;
 	STLExporter stlExporter;
 	PLYExporter plyExporter;
+	GLTFExporter gltfExporter;
+	ColladaExporter daeExporter;
 };
