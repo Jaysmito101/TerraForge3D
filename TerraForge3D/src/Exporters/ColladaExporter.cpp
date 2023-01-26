@@ -86,8 +86,9 @@ ColladaExporter::~ColladaExporter()
 
 bool ColladaExporter::Export(const std::string& path, Mesh* mesh, float* progress)
 {
-	if (!progress) progress = &m_Progress; *progress = 0.0f;
+	if (!progress) progress = &m_Progress;
 	std::stringstream vts, txs, ind;
+    *progress = 0.0f;
 	if (!PrepareVertices(mesh, vts)) return false; *progress = 0.3f;
     if (!PrepareTexCoords(mesh, txs)) return false; *progress = 0.6f;
     if (!PrepareIndices(mesh, ind)) return false; *progress = 0.9f;

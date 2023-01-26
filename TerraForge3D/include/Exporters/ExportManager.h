@@ -21,19 +21,18 @@ public:
 
 	void ShowSettings();
 
-	void Update();	
+	void Update();
+	
+	void ExportMeshCurrentTile(std::string path, bool* exporting, int format);
+	void ExportMeshAllTiles(std::string path, bool* exporting, int format);
 
-
-private:
+public:
 	void ShowMeshExportSettings();
 	void ShowTextureExportSettings();
-	void ExportMeshOBJ(std::string path, Mesh* mesh);
-	void ExportMeshSTLASCII(std::string path, Mesh* mesh);
-	void ExportMeshSTLBinary(std::string path, Mesh* mesh);
-	void ExportMeshPLYASCII(std::string path, Mesh* mesh);
-	void ExportMeshPLYBinary(std::string path, Mesh* mesh);
-	void ExportMeshCollada(std::string path, Mesh* mesh);
-	void ExportMeshGLTF(std::string path, Mesh* mesh);
+	Mesh* ApplyMeshTransform(Mesh* mesh);
+	bool ExportMesh(std::string path, Mesh* mesh, int format);
+
+	inline void SetStatusMessage(std::string msg) { this->statusMessage = msg; }
 
 public:
 	float exportProgress = 0.0f;
@@ -41,7 +40,9 @@ public:
 private:
 	ApplicationState* appState = nullptr;
 	std::thread worker_th;
+	std::string statusMessage = "";
 	int exportMeshFormat = 0; 
+	bool hideExportControls = false;
 	OBJExporter objExporter;
 	STLExporter stlExporter;
 	PLYExporter plyExporter;

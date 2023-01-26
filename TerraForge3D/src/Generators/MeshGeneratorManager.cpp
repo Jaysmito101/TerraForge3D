@@ -38,24 +38,22 @@ void MeshGeneratorManager::Generate()
 {
 	if (*isRemeshing) return;
 	if (appState->states.pauseUpdation) return;
-
 	for (int i = 0; i < 6; i++) appState->mainMap.currentTileDataLayers[i]->UploadToGPU();
-
 	if (!appState->states.requireRemesh) return;
+	this->StartGeneration();
+}
 
+void MeshGeneratorManager::StartGeneration()
+{
 	*isRemeshing = true;
 	appState->states.requireRemesh = false;
-	std::thread worker([this]
-		{
-			START_PROFILER();
-
-			ExecuteKernels();
-			ExecuteCPUGenerators();
-
-			END_PROFILER(time);
-			*isRemeshing = false;
-		});
-	worker.detach();
+	std::thread([this] ()->void {
+		START_PROFILER();
+		ExecuteKernels();
+		ExecuteCPUGenerators();
+		END_PROFILER(time);
+		*isRemeshing = false;
+	}).detach();
 }
 
 void MeshGeneratorManager::GenerateSync()

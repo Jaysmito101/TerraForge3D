@@ -32,6 +32,8 @@ public:
 	void GenerateSync();
 	void ShowSettings();
 
+	void StartGeneration();
+
 	void ExecuteKernels();
 	void ExecuteCPUGenerators();
 

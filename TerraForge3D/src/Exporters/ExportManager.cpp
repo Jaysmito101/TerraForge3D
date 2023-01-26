@@ -18,8 +18,9 @@ void ExportManager::ShowSettings()
 {
 	ImGui::Begin("Export Manager##RootWindow", &appState->windows.exportManager);
 
-	if (this->exportProgress > 0.0f)
+	if (this->exportProgress > 0.0f || hideExportControls)
 	{
+		if (this->statusMessage.size() > 0) ImGui::Text(this->statusMessage.data());
 		ImGui::ProgressBar(this->exportProgress);
 	}
 	else
@@ -73,17 +74,17 @@ void ExportManager::ShowMeshExportSettings()
 		ImGui::EndCombo();
 	}
 
-	if (ImGui::Button("Export"))
+	if (ImGui::Button("Export Current Tile"))
 	{
 		std::string output_file_path = ShowSaveFileDialog("*.*");
 		if (output_file_path.size() < 3) return;
-		if (this->exportMeshFormat == 0) ExportMeshOBJ(output_file_path, appState->models.mainModel->mesh->Clone());
-		if (this->exportMeshFormat == 1) ExportMeshSTLASCII(output_file_path, appState->models.mainModel->mesh->Clone());
-		if (this->exportMeshFormat == 2) ExportMeshSTLBinary(output_file_path, appState->models.mainModel->mesh->Clone());
-		if (this->exportMeshFormat == 3) ExportMeshPLYASCII(output_file_path, appState->models.mainModel->mesh->Clone());
-		if (this->exportMeshFormat == 4) ExportMeshPLYBinary(output_file_path, appState->models.mainModel->mesh->Clone());
-		if (this->exportMeshFormat == 5) ExportMeshCollada(output_file_path, appState->models.mainModel->mesh->Clone());
-		if (this->exportMeshFormat == 6) ExportMeshGLTF(output_file_path, appState->models.mainModel->mesh->Clone());
+		this->ExportMeshCurrentTile(output_file_path, nullptr, this->exportMeshFormat);
+	}
+	if (ImGui::Button("Export All Tiles"))
+	{
+		std::string output_file_path = ShowSaveFileDialog("*.*");
+		if (output_file_path.size() < 3) return;
+		this->ExportMeshAllTiles(output_file_path, nullptr, this->exportMeshFormat);
 	}
 }
 
@@ -91,4 +92,3 @@ void ExportManager::ShowTextureExportSettings()
 {
 	ImGui::Text("TODO");
 }
-
