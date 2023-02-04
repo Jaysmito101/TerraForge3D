@@ -110,11 +110,15 @@ public:
 	bool isEnabled; /*!< If the module is enabled or not */
 };
 
+// Define the module API export/import macro
+
 #ifdef TERR3D_WIN32
 #define TERR3D_MODULE_API __declspec(dllexport)
 #else
 #define TERR3D_MODULE_API
 #endif
+
+// Macro to define the entry point function for the module
 
 #define MAKE_MODULE_ENTRYPOINT(module) \
 	extern "C" { \
