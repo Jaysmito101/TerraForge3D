@@ -9,7 +9,7 @@
 #include "Exporters/GLTFExporter.h"
 #include "Exporters/ColladaExporter.h"
 
-class ApplicationState;
+class ApplicationState; 
 class Model;
 class Mesh;
 
@@ -33,6 +33,9 @@ public:
 	bool ExportMesh(std::string path, Mesh* mesh, int format);
 
 	inline void SetStatusMessage(std::string msg) { this->statusMessage = msg; }
+	inline bool IsWindowOpen() { return this->isWindowOpen; }
+	inline bool* IsWindowOpenPtr() { return &this->isWindowOpen; }
+	inline void SetVisible(bool visible) { this->isWindowOpen = visible; }
 
 public:
 	float exportProgress = 0.0f;
@@ -43,6 +46,7 @@ private:
 	std::string statusMessage = "";
 	int exportMeshFormat = 0; 
 	bool hideExportControls = false;
+	bool isWindowOpen = false;
 	OBJExporter objExporter;
 	STLExporter stlExporter;
 	PLYExporter plyExporter;

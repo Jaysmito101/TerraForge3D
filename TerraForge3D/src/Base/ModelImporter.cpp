@@ -26,7 +26,7 @@ Mesh *LoadMesh(aiMesh *paiMesh)
 		tmp.position.x = pPos->x;
 		tmp.position.y = pPos->y;
 		tmp.position.z = pPos->z;
-		tmp.texCoord = glm::vec2(1.0f);
+		tmp.texCoord = glm::vec4(1.0f);
 
 		if (pTexCoord)
 		{

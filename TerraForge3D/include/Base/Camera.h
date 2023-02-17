@@ -40,5 +40,5 @@ public:
 
 	void ShowSettings(bool renderWindow = false, bool *pOpen = nullptr);
 
-	void UpdateCamera(float xmax = 800.0f, float ymax=600.0f);
+	void UpdateCamera();
 };

@@ -3,50 +3,22 @@
 #include "Base/Base.h"
 
 #include "Data/ProjectData.h"
-#include "Modules/ModuleManager.h"
-#include "Sea/SeaManager.h"
-#include "Lighting/LightManager.h"
 #include "Data/Serializer.h"
 #include "Menu/MainMenu.h"
 #include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
-#include "Foliage/FoliagePlacement.h"
-#include "Sky/SkySettings.h"
 #include "Misc/OSLiscences.h"
-#include "Shading/ShadingManager.h"
 #include "Exporters/ExportManager.h"
+#include "Misc/ViewportManager.h"
+#include "Renderer/RendererManager.h"
+#include "Platform.h"
 
 #include "json/json.hpp"
 
-struct ApplicationStateModels
-{
-	Model* screenQuad;
-	Model* mainModel;
-	ApplicationStateModels();
-	~ApplicationStateModels();
-};
-
-struct ApplicationStateFrameBuffers
-{
-	FrameBuffer *main = nullptr;
-};
-
-struct ApplicationStateShaders
-{
-	Shader *terrain = nullptr;
-	Shader *wireframe = nullptr;
-	Shader *foliage = nullptr;
-
-};
-
-struct ApplicationStateCameras
-{
-	Camera main;
-
-	nlohmann::json Save();
-	void Load(nlohmann::json data);
-};
+#ifndef MAX_VIEWPORT_COUNT
+#define MAX_VIEWPORT_COUNT 8
+#endif
 
 struct ApplicationStateStatistics
 {
@@ -57,26 +29,12 @@ struct ApplicationStateStatistics
 struct ApplicationStateWindows
 {
 	bool styleEditor = false;
-	bool statsWindow = false;
-	bool seaEditor = false;
 	bool textureStore = false;
 	bool osLisc = false;
-	bool foliageManager = false;
 	bool supportersTribute = false;
-	bool skySettings = false;
-	bool modulesManager = false;
-	bool lightControls = true;
-	bool cameraControls = true;
-	bool shadingManager = false;
-	bool exportManager = false;
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
-};
-
-struct ApplicationStateModules
-{
-	ModuleManager *manager;
 };
 
 struct ApplicationStateStates
@@ -98,12 +56,6 @@ struct ApplicationStateStates
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 };
-
-struct ApplicationStateTextures
-{
-	Texture2D *grid;
-};
-
 
 struct ApplicationStateGlobals
 {
@@ -160,31 +112,23 @@ class ApplicationState
 public:
 	Application *mainApp;
 
-	ApplicationStateModels models;
-	ApplicationStateFrameBuffers frameBuffers;
-	ApplicationStateShaders shaders;
-	ApplicationStateCameras cameras;
 	ApplicationStateStatistics stats;
 	ApplicationStateWindows windows;
-	ApplicationStateModules modules;
 	ApplicationStateStates states;
-	ApplicationStateTextures textures;
 	ApplicationStateGlobals globals;
 	ApplicationStateConstants constants;
 
-	SeaManager *seaManager = nullptr;
-	LightManager *lightManager = nullptr;
 	Serializer *serailizer = nullptr;
 	MeshGeneratorManager *meshGenerator = nullptr;
 	MainMenu *mainMenu = nullptr;
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;
-	SkyManager *skyManager = nullptr;
 	OSLiscences *osLiscences = nullptr;
 	ProjectManager *projectManager = nullptr;
-	FoliageManager *foliageManager = nullptr;
-	ShadingManager *shadingManager = nullptr;
 	ExportManager* exportManager = nullptr;
+	Model* mainModel;
+	ViewportManager* viewportManagers[MAX_VIEWPORT_COUNT];
+	RendererManager* rendererManager;
 
 	struct
 	{

@@ -196,6 +196,7 @@ bool GPUNoiseLayerGenerator::Update()
 				while (appState->states.remeshing);
 				noiseLayers.erase(noiseLayers.begin() + i);
 				stateChanged |= true;
+				ImGui::PopID();
 				break;
 			}
 			ImGui::Separator();

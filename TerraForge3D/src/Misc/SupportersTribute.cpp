@@ -80,7 +80,7 @@ SupportersTribute::SupportersTribute()
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
 		{
 			std::string repoDataStr = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D");
-			nlohmann::json repoData = nlohmann::json::parse(repoDataStr);
+ 			nlohmann::json repoData = nlohmann::json::parse(repoDataStr);
 			int stargazerCount = repoData["stargazers_count"];
 			int perPage = 30;
 			int lastPage = stargazerCount / perPage;

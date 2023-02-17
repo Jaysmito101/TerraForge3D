@@ -125,6 +125,18 @@ bool LoadTexture(Texture2D *texture, bool loadToAssets = false, bool preserveDat
 
 void ToggleSystemConsole();
 
+void OnBeforeImGuiRender();
+
+void OnImGuiRenderEnd();
+
+bool ShowComboBox(const char* label, int* selected, const char** values, int count);
+
+#define SHOW_COMBO_BOX(label, selected, values, count) \
+{ \
+	int p_VPModeCopy##__LINE__ = static_cast<int>(selected); \
+	ShowComboBox(label, &p_VPModeCopy##__LINE__, values, count); \
+	selected = static_cast<decltype(selected)>(p_VPModeCopy##__LINE__); \
+}
 
 // KEY DEFINES
 /* The unknown key */

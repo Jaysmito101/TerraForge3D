@@ -57,65 +57,20 @@ void MainMenu::ShowMainMenu()
 
 void MainMenu::ShowFileMenu()
 {
-	if (ImGui::MenuItem("Open"))
-	{
-		appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
-	}
-
-	if (ImGui::MenuItem("Save"))
-	{
-		appState->serailizer->LoadFile(ShowSaveFileDialog("*.terr3d"));
-	}
-
-	if (ImGui::MenuItem("Install Module"))
-	{
-//		appState->modules.manager->InstallModule(ShowOpenFileDialog("*.terr3dmodule"));
-	}
-
-
-	if (ImGui::MenuItem("Export ..."))
-	{
-		appState->windows.exportManager = true;
-	}
-
-	if (ImGui::MenuItem("Close"))
-	{
-		appState->globals.currentOpenFilePath = "";
-	}
-
-	if (ImGui::MenuItem("Pack Project"))
-	{
-		appState->serailizer->PackProject(ShowSaveFileDialog("*.terr3dpack"));
-	}
-
-	if (ImGui::MenuItem("Load Packed Project"))
-	{
-		appState->serailizer->LoadPackedProject(ShowOpenFileDialog("*.terr3dpack"));
-	}
-
-	if (ImGui::MenuItem("Load Auto Saved Project"))
-	{
-		appState->serailizer->LoadFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
-	}
-
-	if (ImGui::MenuItem("Exit"))
-	{
-		exit(0);
-	}
+	if (ImGui::MenuItem("Open")) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
+	if (ImGui::MenuItem("Save")) appState->serailizer->LoadFile(ShowSaveFileDialog("*.terr3d"));
+	if (ImGui::MenuItem("Export ...")) appState->exportManager->SetVisible(true);
+	if (ImGui::MenuItem("Close")) appState->globals.currentOpenFilePath = "";
+	if (ImGui::MenuItem("Pack Project")) appState->serailizer->PackProject(ShowSaveFileDialog("*.terr3dpack"));
+	if (ImGui::MenuItem("Load Packed Project")) appState->serailizer->LoadPackedProject(ShowOpenFileDialog("*.terr3dpack"));
+	if (ImGui::MenuItem("Load Auto Saved Project")) appState->serailizer->LoadFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
+	if (ImGui::MenuItem("Exit")) exit(0);
 }
 
 void MainMenu::ShowOptionsMenu()
 {
-	if (ImGui::MenuItem("Toggle System Console"))
-	{
-		ToggleSystemConsole();
-	}
-
-	if (ImGui::MenuItem("Associate (.terr3d) File Type"))
-	{
-		AccocFileType();
-	}
-
+	if (ImGui::MenuItem("Toggle System Console")) ToggleSystemConsole();
+	if (ImGui::MenuItem("Associate (.terr3d) File Type")) AccocFileType();
 	if (ImGui::MenuItem("Copy Version Hash"))
 	{
 		char *output = new char[MD5File(GetExecutablePath()).ToString().size() + 1];
@@ -137,87 +92,45 @@ void MainMenu::ShowOptionsMenu()
 
 	if (ImGui::BeginMenu("Themes"))
 	{
-		if (ImGui::MenuItem("Default"))
-		{
-			LoadDefaultStyle();
-		}
-
-		if(ImGui::MenuItem("Maya Theme"))
-		{
-			LoadMayaStyle();
-		}
-
-		if (ImGui::MenuItem("Black & White"))
-		{
-			LoadBlackAndWhite();
-		}
-
-		if (ImGui::MenuItem("Cool Dark"))
-		{
-			LoadDarkCoolStyle();
-		}
-
-		if (ImGui::MenuItem("Light Orange"))
-		{
-			LoadLightOrngeStyle();
-		}
-
-		if (ImGui::MenuItem("Load Theme From File"))
-		{
-			LoadThemeFromFile(openfilename());
-		}
-
+		if (ImGui::MenuItem("Default")) LoadDefaultStyle();
+		if(ImGui::MenuItem("Maya Theme")) LoadMayaStyle();
+		if (ImGui::MenuItem("Black & White")) LoadBlackAndWhite();
+		if (ImGui::MenuItem("Cool Dark")) LoadDarkCoolStyle();
+		if (ImGui::MenuItem("Light Orange")) LoadLightOrngeStyle();
+		if (ImGui::MenuItem("Load Theme From File")) LoadThemeFromFile(openfilename());
 		ImGui::EndMenu();
 	}
 }
 
 void MainMenu::ShowWindowsMenu()
 {
-	ShowWindowMenuItem("Statistics", &appState->windows.statsWindow);
+	if (ImGui::BeginMenu("Viewports"))
+	{
+		static bool s_IsViewportOpen = false;
+		for (auto& vp : appState->viewportManagers)
+		{
+			s_IsViewportOpen = vp->IsVisible();
+			ShowWindowMenuItem(("Viewport " + std::to_string(vp->GetID())).data(), &s_IsViewportOpen);
+			vp->SetVisible(s_IsViewportOpen);
+		}
+		ImGui::EndMenu();
+	}
+	ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
+	ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
-	ShowWindowMenuItem("Foliage Manager", &appState->windows.foliageManager);
-	ShowWindowMenuItem("Export Manager", &appState->windows.exportManager);
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
-	ShowWindowMenuItem("Sea Settings", &appState->windows.seaEditor);
-	ShowWindowMenuItem("Light Settings", &appState->windows.lightControls);
-	ShowWindowMenuItem("Camera Settings", &appState->windows.cameraControls);
 	ShowWindowMenuItem("Mesh Generators Settings", &appState->meshGenerator->windowStat);
-	ShowWindowMenuItem("Sky Settings", &appState->windows.skySettings);
-	ShowWindowMenuItem("Shading", &appState->windows.shadingManager);
-	ShowWindowMenuItem("Module Manager", &appState->windows.modulesManager);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);
 	ShowWindowMenuItem("Open Source Liscenses", &appState->windows.osLisc);
+
 }
 
 void MainMenu::ShowHelpMenu()
 {
-	if (ImGui::MenuItem("Tutorial"))
-	{
-		OpenURL("https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ");
-	}
-
-	if (ImGui::MenuItem("Social Handle"))
-	{
-		OpenURL("https://twitter.com/jaysmito101");
-	}
-
-	if (ImGui::MenuItem("Discord Server"))
-	{
-		OpenURL("https://discord.gg/AcgRafSfyB");
-	}
-
-	if (ImGui::MenuItem("GitHub Page"))
-	{
-		OpenURL("https://github.com/Jaysmito101/TerraForge3D");
-	}
-
-	if (ImGui::MenuItem("Documentation"))
-	{
-		OpenURL("https://github.com/Jaysmito101/TerraForge3D/wiki");
-	}
-
-	if (ImGui::MenuItem("Open Source Liscenses"))
-	{
-		appState->windows.osLisc = !appState->windows.osLisc;
-	}
+	if (ImGui::MenuItem("Tutorial")) OpenURL("https://www.youtube.com/playlist?list=PLl3xhxX__M4A74aaTj8fvqApu7vo3cOiZ");
+	if (ImGui::MenuItem("Social Handle")) OpenURL("https://twitter.com/jaysmito101");
+	if (ImGui::MenuItem("Discord Server")) OpenURL("https://discord.gg/AcgRafSfyB");
+	if (ImGui::MenuItem("GitHub Page")) OpenURL("https://github.com/Jaysmito101/TerraForge3D");
+	if (ImGui::MenuItem("Documentation")) OpenURL("https://github.com/Jaysmito101/TerraForge3D/wiki");
+	if (ImGui::MenuItem("Open Source Liscenses")) appState->windows.osLisc = !appState->windows.osLisc;
 }

@@ -71,36 +71,17 @@ void Camera::Load(nlohmann::json data)
 	rotation[2] = data["rotation"]["z"];
 }
 
-void Camera::UpdateCamera(float xmax, float ymax)
+void Camera::UpdateCamera()
 {
-	mposition.x = position[0];
-	mposition.y = position[1];
-	mposition.z = position[2];
-	mrotation.x = glm::radians(rotation[0]);
-	mrotation.y = glm::radians(rotation[1]);
-	mrotation.z = glm::radians(rotation[2]);
-	pitch = mrotation.x;
-	yaw = mrotation.y;
-	roll = mrotation.z;
+	mposition.x = position[0]; mposition.y = position[1]; mposition.z = position[2];
+	mrotation.x = glm::radians(rotation[0]); mrotation.y = glm::radians(rotation[1]); mrotation.z = glm::radians(rotation[2]);
+	pitch = mrotation.x; yaw = mrotation.y; roll = mrotation.z;
 	view = glm::lookAt(mposition, mposition + cameraFront, cameraUp);
 	view = glm::rotate(view, glm::radians(mrotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
 	view = glm::rotate(view, glm::radians(mrotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	if (aspect > 200 || aspect < -200)
-	{
-		aspect = 16.0 / 9.0f;
-	}
-
-	if(perspective)
-	{
-		pers = glm::perspective(fov, (float)(fabs(aspect) < 100 ? fabs(aspect) : 1.0f), cNear, cFar);
-	}
-
-	else
-	{
-		pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
-	}
-
+	if (aspect > 200 || aspect < -200) aspect = 16.0 / 9.0f;
+	if(perspective) pers = glm::perspective(glm::radians(fov), (float)(fabs(aspect) < 100 ? fabs(aspect) : 1.0f), cNear, cFar);
+	else pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
 	pv = pers * view;
 }
 
@@ -108,18 +89,12 @@ void Camera::ShowSettings(bool renderWindow, bool *pOpen)
 {
 	if(pOpen == nullptr || *pOpen)
 	{
-		if (renderWindow)
-		{
-			ImGui::Begin(("Camera Controls##" + std::to_string(camID)).c_str(), pOpen);
-		}
-
+		if (renderWindow) ImGui::Begin(("Camera Controls##" + std::to_string(camID)).c_str(), pOpen);
 		ImGui::Text("Camera Position");
 		ImGui::DragFloat3("##cameraPosition", position, 0.1f);
 		ImGui::Separator();
-		ImGui::Separator();
 		ImGui::Text("Camera Rotation");
 		ImGui::DragFloat3("##cameraRotation", rotation, 10);
-		ImGui::Separator();
 		ImGui::Separator();
 		ImGui::Text("Projection Settings");
 		ImGui::Separator();
@@ -127,10 +102,7 @@ void Camera::ShowSettings(bool renderWindow, bool *pOpen)
 		ImGui::DragFloat("Aspect Ratio", &aspect, 0.01f);
 		ImGui::DragFloat("Near Clipping", &cNear, 0.01f);
 		ImGui::DragFloat("Far Clipping", &cFar, 0.01f);
-
-		if (renderWindow)
-		{
-			ImGui::End();
-		}
+		if (renderWindow) ImGui::End();
 	}
 }
+ 

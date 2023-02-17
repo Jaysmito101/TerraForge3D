@@ -1,6 +1,6 @@
 #include "Exporters/ExportManager.h"
 #include "Data/ApplicationState.h"
-#include "Base/Base.h"
+#include "Utils/Utils.h"
 
 #include <sstream>
 #include <fstream>
@@ -16,7 +16,8 @@ ExportManager::~ExportManager()
 
 void ExportManager::ShowSettings()
 {
-	ImGui::Begin("Export Manager##RootWindow", &appState->windows.exportManager);
+	if (!this->isWindowOpen) return;
+	ImGui::Begin("Export Manager##RootWindow", &this->isWindowOpen);
 
 	if (this->exportProgress > 0.0f || hideExportControls)
 	{

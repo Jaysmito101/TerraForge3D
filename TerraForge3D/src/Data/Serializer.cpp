@@ -5,7 +5,6 @@
 #include "Data/VersionInfo.h"
 #include "Data/ApplicationState.h"
 #include "Misc/AppStyles.h"
-#include "Shading/ShadingManager.h"
 #include "Platform.h"
 
 #ifdef TERR3D_WIN32

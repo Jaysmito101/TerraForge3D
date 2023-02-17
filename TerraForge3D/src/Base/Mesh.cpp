@@ -140,15 +140,8 @@ Mesh::~Mesh()
 {
 	if (deleteOnDestruction)
 	{
-		if (vert)
-		{
-			delete vert;
-		}
-
-		if (indices)
-		{
-			delete indices;
-		}
+		if (vert) delete vert;
+		if (indices) delete indices;
 	}
 }
 
@@ -168,7 +161,6 @@ void Mesh::RecalculateNormals()
 	glm::vec3 e2;
 	glm::vec3 no;
 	int iabc[3];
-
 	for (int i = 0; i < indexCount; i += 3)
 	{
 		iabc[0] = indices[i];
@@ -184,10 +176,9 @@ void Mesh::RecalculateNormals()
 		VEC3_ADD(vert[iabc[1]].normal, no, vert[iabc[1]].normal);
 		VEC3_ADD(vert[iabc[2]].normal, no, vert[iabc[2]].normal);
 	}
-
 	for (int i = 0; i < vertexCount; i++)
 	{
-		VEC3_NORMALIZE(vert[i].normal, vert[i].normal);
+		VEC3_NORMALIZE(-vert[i].normal, vert[i].normal);
 	}
 }
 
@@ -198,12 +189,9 @@ void Mesh::GenerateSphere(int resolution, float radius)
 	minHeight = 100;
 	res = resolution;
 	sc = radius;
-
 	Vert* vertices = new Vert[resolution * resolution * 6];
 	int* inds = new int[(resolution - 1) * (resolution - 1) * 6 * 6];
-
 	int triIndex = 0;
-
 	const std::vector<glm::vec3> right_vs = {
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 0.0f, 0.0f),
@@ -212,7 +200,6 @@ void Mesh::GenerateSphere(int resolution, float radius)
 		glm::vec3(0.0f, 0.0f, 1.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f)
 	};
-
 	const std::vector<glm::vec3> front_vs = {
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
@@ -240,7 +227,7 @@ void Mesh::GenerateSphere(int resolution, float radius)
 				vertices[i].position.x = (float)pointOnPlane.x;
 				vertices[i].position.y = (float)pointOnPlane.y;
 				vertices[i].position.z = (float)pointOnPlane.z;
-				vertices[i].texCoord = glm::vec2(percent.x, percent.y);
+				vertices[i].texCoord = glm::vec4(percent.x, percent.y, 0.0f, 0.0f);
 				vertices[i].normal = glm::vec4(nor, 0.0f);
 
 				if (x != resolution - 1 && y != resolution - 1)
@@ -298,7 +285,7 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 			vertices[i].position.x = (float)pointOnPlane.x;
 			vertices[i].position.y = (float)pointOnPlane.y;
 			vertices[i].position.z = (float)pointOnPlane.z;
-			vertices[i].texCoord = glm::vec2(percent.x, percent.y) * textureScale;
+			vertices[i].texCoord = glm::vec4(percent.x, percent.y, 0.0f, 0.0f) * textureScale;
 			vertices[i].normal = glm::vec4(0.0f);
 
 			if (x != resolution - 1 && y != resolution - 1)
@@ -338,19 +325,19 @@ void Mesh::GenerateScreenQuad(float dist)
 	vert = new Vert[4];
 
 	v.position = glm::vec4(-1, -1, dist, 0);
-	v.texCoord = glm::vec2(0, 0);
+	v.texCoord = glm::vec4(0, 0, 0, 0);
 	vert[0] = v;
 
 	v.position = glm::vec4(-1, 1, dist, 0);
-	v.texCoord = glm::vec2(0, 1);
+	v.texCoord = glm::vec4(0, 1, 0, 0);
 	vert[1] = v;
 
 	v.position = glm::vec4(1, 1, dist, 0);
-	v.texCoord = glm::vec2(1, 1);
+	v.texCoord = glm::vec4(1, 1, 0, 0);
 	vert[2] = v;
 
 	v.position = glm::vec4(1, -1, dist, 0);
-	v.texCoord = glm::vec2(1, 0);
+	v.texCoord = glm::vec4(1, 0, 0, 0);
 	vert[3] = v;
 
 	vertexCount = 4;
@@ -368,94 +355,43 @@ void Mesh::GenerateScreenQuad(float dist)
 
 void Mesh::SetElevation(float elevation, int x, int y)
 {
-	if (!vert)
-	{
-		return;
-	}
-
+	if (!vert) return;
 	int i = x + y * res;
-
-	if (i > vertexCount)
-	{
-		return;
-	}
-
-	if (elevation > maxHeight)
-	{
-		maxHeight = elevation;
-	}
-
-	if (elevation < minHeight)
-	{
-		minHeight = elevation;
-	}
-
+	if (i > vertexCount) return;
+	if (elevation > maxHeight) maxHeight = elevation;
+	if (elevation < minHeight) minHeight = elevation;
 	vert[i].position.y = elevation;
 	vert[i].extras1.x = elevation;
 }
 
 float Mesh::GetElevation(int x, int y)
 {
-	if (!vert)
-	{
-		return 0;
-	}
-
+	if (!vert) return 0;
 	int i = x + y * res;
-
-	if (i > vertexCount)
-	{
-		return 0;
-	}
-
+	if (i > vertexCount) return 0;
 	return vert[i].position.y;
 }
 
 glm::vec3 Mesh::GetNormals(int x, int y)
 {
-	if (!vert)
-	{
-		return glm::vec3(0);
-	}
-
+	if (!vert) return glm::vec3(0);
 	int i = x + y * res;
-
-	if (i > vertexCount)
-	{
-		return glm::vec3(0);
-	}
-
+	if (i > vertexCount) return glm::vec3(0);
 	return glm::vec3(vert[i].normal.x, vert[i].normal.y, vert[i].normal.z);
 }
 
 void Mesh::AddElevation(float elevation, int x, int y)
 {
-	if (!vert)
-	{
-		return;
-	}
-
+	if (!vert) return;
 	int i = x + y * res;
-
-	if (i > vertexCount)
-	{
-		return;
-	}
-
+	if (i > vertexCount) return;
 	vert[i].position.y += elevation;
 }
 
 glm::vec2 Mesh::GetTexCoord(float x, float y, float z)
 {
-	if (currType == MeshType::Plane)
-	{
-		return (glm::vec2(x, y) / ((float)res - 1)) * texSc;
-	}
-
-	else
-	{
-		return glm::vec2(1.0f);
-	}
+	if (currType == MeshType::Plane) return (glm::vec2(x, y) / ((float)res - 1)) * texSc;
+	else return glm::vec2(1.0f);
 }
 
 Mesh* Mesh::Clone()
@@ -475,10 +411,5 @@ Mesh* Mesh::Clone()
 
 bool Mesh::IsValid()
 {
-	if (vert && indices)
-	{
-		return true;
-	}
-
-	return false;
+	return (vert && indices);
 }

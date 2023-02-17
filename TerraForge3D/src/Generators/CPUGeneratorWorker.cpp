@@ -54,12 +54,13 @@ void CPUGeneratorWorker::WaitForFinish()
 
 void CPUGeneratorWorker::Worker()
 {
-	std::cout << "Worker [ID:" << id << "] started\n";
+	//std::cout << "Worker [ID:" << id << "] started\n";
 
 	while (!this->request_quit)
 	{
 		this->current_state = CPUGeneratorWorkerState_Waiting;
 		while (!(jobs.size() > 0 && jobs.size() == jobs_sizes.size())) { using namespace std::chrono_literals; std::this_thread::sleep_for((id < this->appState->globals.cpuWorkerThreadsActive) ? 10ms : 1000ms); }
+		if (this->request_quit) break;
 		this->current_state = CPUGeneratorWorkerState_Working;
 		this->progress = 0.0f;
 
@@ -121,6 +122,5 @@ void CPUGeneratorWorker::Worker()
 
 	}
 
-	std::cout << "Worker [ID:" << id << "] terminated\n";
 	this->current_state = CPUGeneratorWorkerState_Dead;
 }

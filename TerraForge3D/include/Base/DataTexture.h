@@ -7,20 +7,18 @@
 class DataTexture
 {
 public:
-	DataTexture()
+	DataTexture(int binding)
 	{
-		glGenTextures(1, &m_RendererID);
-		glBindTexture(GL_TEXTURE_2D, m_RendererID);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//glGenerateMipmap(GL_TEXTURE_2D);
+		glGenBuffers(1, &m_RendererID);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+		m_Binding = binding;
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_Binding, m_RendererID);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	virtual ~DataTexture()
 	{
-		glDeleteTextures(1, &m_RendererID);
+		glDeleteBuffers(1, &m_RendererID);
 		if (pData) delete[] pData;
 	}
 
@@ -38,17 +36,18 @@ public:
 		memcpy(pData + offset_, data_, size_);
 	}
 
-	inline void Bind(int slot)
+	inline void Bind(int binding = -1)
 	{
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, m_RendererID);
+		if (binding >= 0) m_Binding = binding;
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_Binding, m_RendererID);
 	}
 
 	inline void UploadToGPU()
 	{
-		glBindTexture(GL_TEXTURE_2D, m_RendererID);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, size, size, 0, GL_RGBA, GL_FLOAT, pData);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * size * size * 4, pData, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	inline void SetPixelI(int x, int y, float r, float g, float b, float a)
@@ -94,5 +93,6 @@ private:
 	float* pData = nullptr;
 	int size = 0;
 	GLuint m_RendererID = 0;
+	int m_Binding = 0;
 };
 
