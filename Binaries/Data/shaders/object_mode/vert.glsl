@@ -27,7 +27,7 @@ uniform mat4 u_ProjectionView;
 void main()
 {
     vec2 texCoord = aTexCoord.xy;
-    ivec2 pointCoord = ivec2(texCoord * u_Resolution);
+    ivec2 pointCoord = ivec2(texCoord * 0.975f * u_Resolution);
     vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
     vertexOutput.position = position;
     vertexOutput.normal = aNormal.xyz;
