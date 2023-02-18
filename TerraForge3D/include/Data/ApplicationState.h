@@ -12,6 +12,7 @@
 #include "Exporters/ExportManager.h"
 #include "Misc/ViewportManager.h"
 #include "Renderer/RendererManager.h"
+#include "Misc/Dashboard.h"
 #include "Platform.h"
 
 #include "json/json.hpp"
@@ -39,15 +40,9 @@ struct ApplicationStateWindows
 
 struct ApplicationStateStates
 {
-	bool usingBase = true;
-	bool skyboxEnabled = false;
 	bool vSync = true;
-	bool mouseButton1, mouseButton2, mouseButton3;
 	bool autoSave = false;
-	bool showFoliage = true;
-	bool useGPUForNormals = false;
-	bool postProcess = false;
-	bool autoAspectCalcRatio = true;
+	bool forceUpdate = false;
 	std::atomic<bool> ruinning = true;
 	std::atomic<bool> remeshing = false;
 	std::atomic<bool> pauseUpdation = false;
@@ -126,9 +121,10 @@ public:
 	OSLiscences *osLiscences = nullptr;
 	ProjectManager *projectManager = nullptr;
 	ExportManager* exportManager = nullptr;
-	Model* mainModel;
+	Model* mainModel = nullptr;
+	RendererManager* rendererManager = nullptr;
+	Dashboard* dashboard = nullptr;
 	ViewportManager* viewportManagers[MAX_VIEWPORT_COUNT];
-	RendererManager* rendererManager;
 
 	struct
 	{

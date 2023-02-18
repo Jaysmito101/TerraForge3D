@@ -6,8 +6,9 @@ RendererLights::RendererLights(ApplicationState* appState)
 	m_AppState = appState;
 	RendererLightData defaultLight;
 	defaultLight.type = RendererLightType_Directional;
-	defaultLight.position = glm::vec3(0.0f, -1.0f, 0.0f);
+	defaultLight.position = glm::vec3(-1.0f, -1.0f, -1.0f);
 	std::sprintf(defaultLight.name, "Sun");
+	defaultLight.intensity = 0.5f;
 	m_RendererLights.push_back(defaultLight);
 }
 

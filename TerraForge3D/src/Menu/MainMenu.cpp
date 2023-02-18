@@ -115,6 +115,7 @@ void MainMenu::ShowWindowsMenu()
 		}
 		ImGui::EndMenu();
 	}
+	ShowWindowMenuItem("Dashboard", appState->dashboard->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);

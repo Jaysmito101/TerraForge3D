@@ -52,26 +52,19 @@ static void SetDistanceFunc(FastNoiseLite *noiseGen, int func)
 
 NoiseLayer::NoiseLayer()
 {
-	enabled = false;
-	seed = 42;
-	frequency = 1.0f;
-	fractalType = 0;
-	distanceFunc = 0;
-	octaves = 8;
-	lacunarity = 2.0f;
-	gain = 0.5f;
+	enabled = false; seed = 42;
+	frequency = 1.0f; fractalType = 0;
+	distanceFunc = 0; octaves = 8;
+	lacunarity = 2.0f; gain = 0.5f;
 	weightedStrength = 0.0f; // should be within 0 to 1
-	pingPongStrength = 2.0f;
-	strength = 1.0f;
-	cellularJitter = 1.0f;
-	noiseGen = new FastNoiseLite();
-	name.reserve(1000);
-	name = "Noise Layer\0                                        ";
+	pingPongStrength = 2.0f; strength = 1.0f;
+	cellularJitter = 1.0f; noiseGen = new FastNoiseLite();
+	name.reserve(1000); name = "Noise Layer\0                                        ";
 	offset[0] = offset[1] = offset[2] = 0.0f;
-	noiseType = 0;
-	noiseTypeStr = noiseTypes[0];
+	noiseType = 0; noiseTypeStr = noiseTypes[0];
 	fractalTypeStr = fractalTypes[0];
 	distFuncStr = distFuncs[0];
+	noiseGen->SetFrequency(frequency);
 }
 
 NoiseLayer::~NoiseLayer()
