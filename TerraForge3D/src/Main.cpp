@@ -29,6 +29,8 @@
 #include <dirent.h>
 #endif
 
+#include "Base/OpenCL/OpenCLPlatform.h"
+
 static ApplicationState* appState;
 static Application* mainApp;
 
@@ -162,6 +164,10 @@ public:
 
 	virtual void OnStart(std::string loadFile) override
 	{
+		OpenCLPlatform::GetPlatforms();
+		while (1);
+		exit(0);
+
 		srand((uint32_t)time(NULL));
 		SetUpIcon();
 		appState = new ApplicationState();
