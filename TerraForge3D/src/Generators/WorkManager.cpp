@@ -2,6 +2,10 @@
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
 
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
 WorkManager::WorkManager(ApplicationState* appState)
 {
 	m_AppState = appState;
@@ -14,7 +18,7 @@ WorkManager::WorkManager(ApplicationState* appState)
 	m_Alive = true;
 	this->Resize();
 	this->LoadGPUInfo();
-	m_GPUGeneratorWorkerCount = m_OpenCLDevices.size();
+	m_GPUGeneratorWorkerCount = (int)m_OpenCLDevices.size();
 }
 
 WorkManager::~WorkManager()
@@ -190,7 +194,7 @@ void WorkManager::Resize()
 	delete m_WorkStatusMatrix;
 	m_WorkResolution = min(512, m_AppState->mainMap.tileResolution);
 	m_WorkSize = m_AppState->mainMap.tileResolution / m_WorkResolution;
-	m_WorkStatusMatrix = new WorkManagerWorkStatus[m_WorkSize * m_WorkSize];
+	m_WorkStatusMatrix = new WorkManagerWorkStatus[(uint64_t)m_WorkSize * m_WorkSize];
 	this->ResetWorkStatus();
 }
 

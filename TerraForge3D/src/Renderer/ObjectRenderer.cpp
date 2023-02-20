@@ -29,7 +29,7 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
 	auto& rendererLights = m_AppState->rendererManager->GetRendererLights()->m_RendererLights; auto renderLightsCount = min(rendererLights.size(), OBJECT_RENDERER_MAX_LIGHTS);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_LightCount"), renderLightsCount);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_LightCount"), (int)renderLightsCount);
 	for (int i = 0; i < rendererLights.size(); i++)
 	{  
 		glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_Lights[" + std::to_string(i) + "].position").c_str()), rendererLights[i].position.x, rendererLights[i].position.y, rendererLights[i].position.z);

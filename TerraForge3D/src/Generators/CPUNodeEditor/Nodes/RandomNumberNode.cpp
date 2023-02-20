@@ -10,35 +10,14 @@ NodeOutput RandomNumberNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 	int s, mx, mn;
 	s = mx = mn = 0;
 
-	if (inputPins[0]->IsLinked())
-	{
-		s = inputPins[0]->other->Evaluate(input).value;
-	}
+	if (inputPins[0]->IsLinked()) s = (int)inputPins[0]->other->Evaluate(input).value;
+	else s = seed;
 
-	else
-	{
-		s = seed;
-	}
+	if (inputPins[1]->IsLinked()) mn = (int)(mn * inputPins[1]->other->Evaluate(input).value);
+	else mn *= min;
 
-	if (inputPins[1]->IsLinked())
-	{
-		mn *= inputPins[1]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		mn *= min;
-	}
-
-	if (inputPins[2]->IsLinked())
-	{
-		mx *= inputPins[2]->other->Evaluate(input).value;
-	}
-
-	else
-	{
-		mx *= max;
-	}
+	if (inputPins[2]->IsLinked()) mx = (int)(mn * inputPins[2]->other->Evaluate(input).value);
+	else mx *= max;
 
 	if(mn > mx) std::swap(mn, mx);
 

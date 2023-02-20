@@ -9,7 +9,7 @@ void ImGui::DrawCircle(float radius, ImU32 color, float segments, float thicknes
 {
 	ImDrawList *list = ImGui::GetWindowDrawList();
 	ImVec2 pos = ImGui::GetCursorPos() + ImGui::GetWindowPos();
-	list->AddCircle(ImVec2(pos.x + radius, pos.y + radius), radius, color, segments, thickness);
+	list->AddCircle(ImVec2(pos.x + radius, pos.y + radius), radius, color, (int)segments, thickness);
 	//ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(2*radius , 2*radius));
 }
 
@@ -17,7 +17,7 @@ void ImGui::DrawFilledCircle(float radius, ImU32 color, float segments)
 {
 	ImDrawList *list = ImGui::GetWindowDrawList();
 	ImVec2 pos = ImGui::GetCursorPos() + ImGui::GetWindowPos();
-	list->AddCircleFilled(ImVec2(pos.x + radius, pos.y + radius), radius, color, segments);
+	list->AddCircleFilled(ImVec2(pos.x + radius, pos.y + radius), radius, color, (int)segments);
 	//ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(2*radius , 2*radius));
 }
 

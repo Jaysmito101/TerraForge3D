@@ -1,6 +1,6 @@
 #pragma once
 
-struct ApplicationState;
+class ApplicationState;
 
 #include "NoiseLayers/LayeredNoiseManager.h"
 #include "GeneratorMask.h"

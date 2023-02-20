@@ -1,3 +1,6 @@
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
+
 #include "Generators/CPUNodeEditor/Nodes/MathFunctionNode.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
 
@@ -82,7 +85,7 @@ nlohmann::json MathFunctionNode::Save()
 void MathFunctionNode::OnRender()
 {
 	DrawHeader("Custom Math Function");
-	ImGui::Dummy(ImVec2(mathInputWidth + 20, 10));
+	ImGui::Dummy(ImVec2(mathInputWidth + 20.0f, 10.0f));
 	ImGui::SameLine();
 	ImGui::Text("Out");
 	outputPins[0]->Render();
@@ -140,7 +143,7 @@ void MathFunctionNode::OnRender()
 	*/
 	ImGui::Text("Expression : ");
 	ImGui::SameLine();
-	ImGui::PushItemWidth(mathInputWidth);
+	ImGui::PushItemWidth((float)mathInputWidth);
 
 	if (ImGui::InputText(MAKE_IMGUI_ID(id), inputExpression, 1024*4))
 	{

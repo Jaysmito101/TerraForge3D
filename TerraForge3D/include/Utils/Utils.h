@@ -16,6 +16,8 @@ struct Hash
 
 	Hash()
 	{
+		data = nullptr;
+		length = 0;
 	}
 
 	Hash(unsigned char *d, int l)

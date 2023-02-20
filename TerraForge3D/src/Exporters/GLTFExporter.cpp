@@ -138,7 +138,7 @@ void GLTFExporter::PrepareMeta(Mesh* mesh, const std::string& bin_path)
 
 void GLTFExporter::WriteBinaryData(Mesh* mesh, BinaryFileWriter* writer, float* progress)
 {
-	for (auto i = 0u; i < mesh->vertexCount; i++)
+	for (auto i = 0; i < mesh->vertexCount; i++)
 	{
 		const auto& pos = mesh->vert[i].position;
 		float f_buffer[3] = { pos.x, pos.y, pos.z };
@@ -162,7 +162,7 @@ void GLTFExporter::WriteBinaryData(Mesh* mesh, BinaryFileWriter* writer, float* 
 	}
 	*progress = 0.6f;
 
-	for (auto i = 0u; i < mesh->indexCount; i++)
+	for (auto i = 0; i < mesh->indexCount; i++)
 	{
 		uint32_t index = (uint32_t)mesh->indices[i];
 		writer->Write(&index, sizeof(uint32_t));

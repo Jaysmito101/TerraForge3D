@@ -29,7 +29,7 @@ public:
 	{
 		if (pData) delete[] pData;
 		this->size = resolution;
-		pData = new float[size * size * 4];
+		pData = new float[(uint64_t)size * size * 4];
 		tileSize = min(size, 512);
 		tileCount = size / tileSize;
 		memset(pData, 0, sizeof(float) * size * size * 4);

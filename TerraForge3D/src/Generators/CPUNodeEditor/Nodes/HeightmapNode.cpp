@@ -72,7 +72,7 @@ NodeOutput HeightmapNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 
 	mutex.lock();
 
-	res = heightmap->Sample(x, y, interpolated) / 65536.0;
+	res = heightmap->Sample(x, y, interpolated) / 65536.0f;
 	if (!autoTiled)
 	{
 		if(x > numTiles || y > numTiles || x < 0 || y < 0)
@@ -216,7 +216,7 @@ void HeightmapNode::OnRender()
 	ImGui::PopItemWidth();
 	ImGui::NewLine();
 
-	if (ImGui::ImageButton((void*) heightmap->GetRendererID(), ImVec2(200, 200)))
+	if (ImGui::ImageButton((ImTextureID)(uint64_t)heightmap->GetRendererID(), ImVec2(200, 200)))
 	{
 		ChangeHeightmap();
 		hasChanged = true;

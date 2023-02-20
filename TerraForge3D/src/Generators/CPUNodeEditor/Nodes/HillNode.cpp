@@ -49,7 +49,7 @@ NodeOutput HillNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 	xN = xN * 2 - 1;
 	yN = yN * 2 - 1;
 	float h = 1 - (SQUARE((yN - yC) / radius) + SQUARE((xN - xC) / radius));
-	h *= pow(2.71828, -p * (SQUARE(xN - xC) + SQUARE(yN - yC)));
+	h *= powf(2.71828f, - p * (SQUARE(xN - xC) + SQUARE(yN - yC)));
 	return NodeOutput({ h * height });
 }
 

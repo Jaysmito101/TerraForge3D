@@ -69,7 +69,11 @@ Application *Application::s_App;
 
 Application::Application()
 {
+	isActive = false;
+	m_Window = nullptr;
+	previousTime = 0.0f;
 }
+
 
 void Application::SetWindowConfigPath(std::string path)
 {
@@ -146,7 +150,7 @@ void Application::Run(std::string loadFile)
 
 	while (isActive)
 	{
-		float currentTime = glfwGetTime();
+		float currentTime = (float)glfwGetTime();
 		float deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 		oneSecCounter += deltaTime;

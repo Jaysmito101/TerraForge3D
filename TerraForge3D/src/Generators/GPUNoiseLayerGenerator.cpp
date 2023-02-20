@@ -5,6 +5,10 @@
 
 #include <regex>
 
+#ifndef max 
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
 #define ADD_ST_CH(x) stateChanged = x || stateChanged;
 
 static int count = 1;
@@ -30,13 +34,13 @@ void GPUNoiseLayerGenerator::Generate(OpenCLContext* kernels, int tx, int ty)
 	noiseLayers[0].offsetW = (float)this->setMode + 0.2f;
 	noiseLayers[0].valueX = (float)(appState->workManager->GetWorkResolution() + 0.1f); // tile size
 	noiseLayers[0].valueY = appState->mainMap.tileResolution / noiseLayers[0].valueX; // tile count
-	noiseLayers[0].valueZ = tx; // tile x
-	noiseLayers[0].valueW = ty; // tile y
+	noiseLayers[0].valueZ = (float)tx; // tile x
+	noiseLayers[0].valueW = (float)ty; // tile y
 
 	kernels->CreateBuffer("noise_layers_data", CL_MEM_READ_WRITE, sizeof(GPUNoiseLayer) * noiseLayers.size());
 	kernels->WriteBuffer("noise_layers_data", true, 0, sizeof(GPUNoiseLayer) * noiseLayers.size(), noiseLayers.data());
 	kernels->CreateBuffer("noise_layers_size", CL_MEM_READ_WRITE, sizeof(int));
-	int tmp = noiseLayers.size(); kernels->WriteBuffer("noise_layers_size", true, 0, sizeof(int), &tmp);
+	int tmp = (int)noiseLayers.size(); kernels->WriteBuffer("noise_layers_size", true, 0, sizeof(int), &tmp);
 	
 	{		
 		kernels->SetKernelArg("process_map_noise_layer", 0, "noise_layers_data");

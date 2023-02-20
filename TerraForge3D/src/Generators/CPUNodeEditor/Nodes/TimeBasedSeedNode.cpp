@@ -38,7 +38,7 @@ void TimeBasedSeedNode::OnRender()
 
 	if (ImGui::Button("Regenerate Seed"))
 	{
-		val = time(NULL);
+		val = (int)time(NULL);
 		hasChanged = true;
 	}
 }

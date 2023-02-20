@@ -15,7 +15,7 @@
 #define IMAGE_NODE_COLOR          143, 95, 0
 #define NOISE_NODE_COLOR          115, 90, 17
 
-struct ApplicationState;
+class ApplicationState;
 
 namespace CPUNodeEditorE
 {

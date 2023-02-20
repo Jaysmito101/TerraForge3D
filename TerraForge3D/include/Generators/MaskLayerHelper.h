@@ -16,13 +16,13 @@
 #define MIN(x, y) ((x) < (y)) ? (x) : (y)
 #define MAX(x, y) ((x) > (y)) ? (x) : (y)
 
-#define MATH_E 2.718281828459045
-#define MATH_PI 3.1415926535897932384626433832795
+#define MATH_E 2.718281828459f
+#define MATH_PI 3.14159265358f
 
-#define M_PI_4 (MATH_PI/4.0)
+#define M_PI_4 (MATH_PI/4.0f)
 
-#define Aatan 0.0776509570923569
-#define Batan -0.287434475393028
+#define Aatan 0.0776509570923569f
+#define Batan -0.287434475393028f
 #define Catan (M_PI_4 - Aatan - Batan)
 
 inline float Fast2ArcTan(float x)
@@ -77,8 +77,8 @@ inline bool ShowHillMaskSettingS(GeneratorMask *mask, std::string id)
 
 inline float EvaluateHillMask(const GeneratorMask *mask, float x, float y, float z)
 {
-	float X;
-	float Y;
+	float X = 0.0f;
+	float Y = 0.0f;
 
 	if(mask->d1[3] == 0.0f)
 	{
@@ -104,7 +104,7 @@ inline float EvaluateHillMask(const GeneratorMask *mask, float x, float y, float
 	Y = Y * Y;
 	noiseGen.SetFrequency(mask->d2[2]);
 	float invR = 1.0f / (mask->d1[0] + noiseGen.GetNoise(sin(theta) + mask->d2[0], cos(theta) + mask->d2[1]) * mask->d2[3]);
-	float h = pow(MATH_E, -(X + Y) * invR);
+	float h = powf(MATH_E, -(X + Y) * invR);
 	return h * (mask->d1[1] + mask->pos[1]);
 }
 
@@ -159,8 +159,8 @@ inline bool ShowCliffMaskSettingS(GeneratorMask *mask, std::string id)
 
 inline float EvaluateCliffMask(const GeneratorMask *mask, float x, float y, float z)
 {
-	float X;
-	float Y;
+	float X = 0.0f;
+	float Y = 0.0f;
 
 	if(mask->d1[3] == 0.0f)
 	{
@@ -208,8 +208,8 @@ inline bool ShowPlatueMaskSettingS(GeneratorMask *mask, std::string id)
 
 inline float EvaluatePlataueMask(const GeneratorMask *mask, float x, float y, float z)
 {
-	float X;
-	float Y;
+	float X = 0.0f;
+	float Y = 0.0f;
 
 	if(mask->d1[3] == 0.0f)
 	{

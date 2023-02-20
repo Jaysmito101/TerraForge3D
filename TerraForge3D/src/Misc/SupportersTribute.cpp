@@ -165,7 +165,7 @@ void SupportersTribute::ShowSettings(bool *pOpen)
 			avTexId = st.avatar->GetRendererID();
 		}
 
-		ImGui::Image((ImTextureID)avTexId, ImVec2(30, 30));
+		ImGui::Image((ImTextureID)(uint64_t)avTexId, ImVec2(30, 30));
 		ImGui::SameLine();
 		ImGui::Text(st.name.c_str());
 	}
@@ -183,7 +183,7 @@ void SupportersTribute::ShowSettings(bool *pOpen)
 			avTexId = st.avatar->GetRendererID();
 		}
 
-		ImGui::Image((ImTextureID)avTexId, ImVec2(30, 30));
+		ImGui::Image((ImTextureID)(uint64_t)avTexId, ImVec2(30, 30));
 		ImGui::SameLine();
 		ImGui::Text(st.name.c_str());
 	}

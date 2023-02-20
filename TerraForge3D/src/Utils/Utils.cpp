@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib/httplib.h>
 #include <openssl/md5.h>
@@ -117,7 +115,7 @@ std::string ShowSaveFileDialog(std::string ext)
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
+	ofn.lpstrDefExt = L"";
 	std::string fileNameStr;
 
 	if (GetSaveFileName(&ofn))
@@ -184,7 +182,7 @@ std::string ShowOpenFileDialog(std::string ext)
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = (LPWSTR)"";
+	ofn.lpstrDefExt = L"";
 	std::string fileNameStr;
 
 	if (GetOpenFileName(&ofn))
@@ -242,9 +240,9 @@ std::string GetExecutableDir()
 std::string GenerateId(uint32_t length)
 {
 	std::string id;
-	srand(time(NULL));
+	srand((uint32_t)time(NULL));
 
-	for (int i = 0; i < length; i++)
+	for (uint32_t i = 0; i < length; i++)
 	{
 		id += std::to_string(rand() % 9);
 	}
@@ -434,12 +432,12 @@ float UpdateLayerWithUpdateMethod(float origv, float newv, int method)
 char *ReadBinaryFile(std::string path, int *fSize, uint32_t sizeToLoad)
 {
 	std::ifstream in(path, std::ifstream::ate | std::ifstream::binary);
-	int size = in.tellg();
+	int size = (int)in.tellg();
 	in.close();
 
 	if(sizeToLoad > 0)
 	{
-		size = size < sizeToLoad ? size : sizeToLoad;
+		size = size < (int)sizeToLoad ? size : (int)sizeToLoad;
 	}
 
 	std::ifstream f1(path, std::fstream::binary);
@@ -485,7 +483,7 @@ void DownloadFile(std::string baseURL, std::string urlPath, std::string path, in
 		auto res = cli.Get(urlPath.c_str(),
 		                   [&](const char *data, size_t data_length)
 		{
-			done = done + data_length;
+			done = done + (int)data_length;
 
 			if (size > 0)
 			{
@@ -561,7 +559,7 @@ void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue)
 		Log("RegSetValue( " + std::string(pszVar) + " ) Failed : " + strerror(iRC));
 	}
 
-	iRC = RegSetValueEx(hkey, L"", 0, REG_SZ, (BYTE *)pszValue, strlen(pszValue) + 1);
+	iRC = RegSetValueEx(hkey, L"", 0, REG_SZ, (BYTE *)pszValue, (int)strlen(pszValue) + 1);
 
 	if (iRC != ERROR_SUCCESS)
 	{

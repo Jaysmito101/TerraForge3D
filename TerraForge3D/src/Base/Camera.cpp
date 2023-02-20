@@ -79,7 +79,7 @@ void Camera::UpdateCamera()
 	view = glm::lookAt(mposition, mposition + cameraFront, cameraUp);
 	view = glm::rotate(view, glm::radians(mrotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
 	view = glm::rotate(view, glm::radians(mrotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-	if (aspect > 200 || aspect < -200) aspect = 16.0 / 9.0f;
+	if (aspect > 200 || aspect < -200) aspect = 16.0f / 9.0f;
 	if(perspective) pers = glm::perspective(glm::radians(fov), (float)(fabs(aspect) < 100 ? fabs(aspect) : 1.0f), cNear, cFar);
 	else pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
 	pv = pers * view;

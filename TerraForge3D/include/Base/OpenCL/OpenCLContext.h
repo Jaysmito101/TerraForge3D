@@ -43,7 +43,7 @@ public:
 	inline bool IsReady() const { return m_Kernels.size() > 0; }
 	inline const OpenCLDevice& GetDevice() const { return m_Device; }
 	inline OpenCLDevice& GetDevice() { return m_Device; }
-	inline int GetSourceCount() const { return m_Sources.size(); }
+	inline int GetSourceCount() const { return (int)m_Sources.size(); }
 	inline bool HasKernel(std::string name) const { return m_Kernels.find(name) != m_Kernels.end(); }
 	inline bool HasBuffer(std::string name) const { return m_Buffers.find(name) != m_Buffers.end(); }
 	inline const OpenCLBuffer* GetBuffer(std::string name) const { return &m_Buffers.at(name); }

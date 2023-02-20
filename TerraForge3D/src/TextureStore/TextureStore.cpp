@@ -15,7 +15,7 @@
 					if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) \
 					{	\
 						ImGui::SetDragDropPayload("TerraForge3D_Texture", item.var.data(), sizeof(char) * item.var.size()); \
-						ImGui::Image((ImTextureID)item.texThumbnail->GetRendererID(), ImVec2(128, 128)); \
+						ImGui::Image((ImTextureID)(uint64_t)item.texThumbnail->GetRendererID(), ImVec2(128, 128)); \
 						ImGui::Text("%s", item.name.c_str()); \
 						ImGui::EndDragDropSource(); \
 					} \
@@ -87,7 +87,7 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 			return nlohmann::json::parse(tmpStr);
 		}
 
-		catch(nlohmann::json::parse_error &e)
+		catch(...)
 		{
 			Log("Failed to parse texture database from file");
 			return nlohmann::json();
@@ -154,7 +154,7 @@ nlohmann::json TextureStore::LoadDownloadedTextureDatabaseJ()
 		tmpJ = nlohmann::json::parse(tmpStr);
 	}
 
-	catch(nlohmann::json::parse_error &e)
+	catch(...)
 	{
 		Log("Failed to parse downloaded texture database from file");
 		return nlohmann::json();
@@ -195,7 +195,7 @@ void TextureStore::LoadTextureDatabase()
 			item.ao = downloadedTextureDatabaseJ[item.name]["ao"];
 			item.arm = downloadedTextureDatabaseJ[item.name]["arm"];
 			item.baseDir = downloadedTextureDatabaseJ[item.name]["baseDir"];
-			downloadedTextureStoreItems.push_back(textureStoreItems.size());
+			downloadedTextureStoreItems.push_back((int)textureStoreItems.size());
 		}
 
 		textureStoreItems.push_back(item);
@@ -314,7 +314,7 @@ void TextureStore::DownloadTexture(int id, int res)
 
 void TextureStore::ShowAllTexturesSettings()
 {
-	int searchLength = strlen(searchStr);
+	int searchLength = (int)strlen(searchStr);
 	ImGui::Columns(4, NULL);
 	float width = ImGui::GetContentRegionAvail().x;
 
@@ -342,7 +342,7 @@ void TextureStore::ShowAllTexturesSettings()
 
 			ImGui::PushID(item.name.data());
 			ImGui::BeginChild("##texture_thumb", ImVec2(width, 300), true);
-			ImGui::Image((ImTextureID)item.texThumbnail->GetRendererID(), ImVec2(width, 150));
+			ImGui::Image((ImTextureID)(uint64_t)item.texThumbnail->GetRendererID(), ImVec2(width, 150));
 			ImGui::Text(item.name.data());
 
 			if(!item.downloaded)
@@ -424,7 +424,7 @@ void TextureStore::ShowDownloadedTexturesSettings()
 		TextureStoreItem &item = textureStoreItems[downloadedTextureStoreItems[i]];
 		ImGui::PushID(i);
 		ImGui::BeginChild("##texture_thumb", ImVec2(width, 300), true);
-		ImGui::Image((ImTextureID)item.texThumbnail->GetRendererID(), ImVec2(width, 120));
+		ImGui::Image((ImTextureID)(uint64_t)item.texThumbnail->GetRendererID(), ImVec2(width, 120));
 		ImGui::Text(item.name.c_str());
 
 		if(ImGui::Button("Delete##DTS"))

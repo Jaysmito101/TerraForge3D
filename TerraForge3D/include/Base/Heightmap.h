@@ -6,7 +6,7 @@
 class Heightmap
 {
 public:
-	Heightmap(uint32_t width, uint32_t height) : m_Width(width), m_Height(height) {}
+	Heightmap(uint32_t width, uint32_t height) : m_Width(width), m_Height(height), m_Data(nullptr), m_RendererID(0) {}
 	Heightmap(const std::string path);
 	~Heightmap();
 

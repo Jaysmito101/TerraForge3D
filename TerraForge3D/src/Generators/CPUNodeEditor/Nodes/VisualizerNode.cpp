@@ -57,16 +57,10 @@ void VisualizerNode::OnRender()
 				{
 					if (isIl)
 					{
-						p = inputC;
-						p.y = i;
-						p.x = j;
+						p = inputC; p.y = (float)i; p.x = (float)j;
 						map.push_back(inputPins[0]->other->Evaluate(p).value);
 					}
-
-					else
-					{
-						map.push_back(0.0f);
-					}
+					else map.push_back(0.0f);
 				}
 			}
 
@@ -92,7 +86,7 @@ void VisualizerNode::OnRender()
 
 			if (ImPlot::BeginPlot(MAKE_IMGUI_ID(id)))
 			{
-				ImPlot::PlotHeatmap<float>(MAKE_IMGUI_ID(outputPins[0]->id), map.data(), inputC.maxY, inputC.maxX);
+				ImPlot::PlotHeatmap<float>(MAKE_IMGUI_ID(outputPins[0]->id), map.data(), (int)inputC.maxY, (int)inputC.maxX);
 				ImPlot::EndPlot();
 			}
 

@@ -4,7 +4,7 @@
 
 #include "json/json.hpp"
 
-struct ApplicationState;
+class ApplicationState;
 
 
 #pragma pack(push, 1)
@@ -21,7 +21,7 @@ struct  GPUNoiseLayer
 	float domainWrapDepth = 0.0f ;
 	float offsetX = 0.0f, offsetY = 0.0f, offsetZ = 0.0f, offsetW = 0.0f;
 
-	float valueX, valueY, valueZ, valueW; // Ony for internal use on GPU side
+	float valueX = 0.0f, valueY = 0.0f, valueZ = 0.0f, valueW = 0.0f; // Ony for internal use on GPU side
 };
 #pragma pack(pop)
 

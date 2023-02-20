@@ -1,8 +1,6 @@
 #pragma once
 
 #include <string>
-#include <glad/glad.h>
-
 
 class Texture2D
 {
@@ -47,6 +45,6 @@ private:
 	bool m_IsLoaded = false;
 	uint32_t m_Width, m_Height;
 	uint32_t m_RendererID;
-	GLenum m_InternalFormat, m_DataFormat;
+	uint32_t m_InternalFormat, m_DataFormat;
 };
 

@@ -1,19 +1,18 @@
 #include "Generators/CPUGeneratorWorker.h"
 #include "Generators/MeshGeneratorManager.h"
-
-#include "Utils/Utils.h"
-#include "Base/Base.h"
-#include "Data/ApplicationState.h"
-
 #include "Generators/CPUNoiseLayersGenerator.h"
 #include "Generators/GPUNoiseLayerGenerator.h"
 #include "Base/NodeEditor/NodeEditor.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
-
 #include "Base/UIFontManager.h"
-
 #include "Profiler.h"
 #include "Platform.h"
+#include "Base/Base.h"
+#include "Utils/Utils.h"
+#include "Data/ApplicationState.h" 
+
+
+
 
 
 CPUGeneratorWorker::CPUGeneratorWorker(ApplicationState* appState, int id)

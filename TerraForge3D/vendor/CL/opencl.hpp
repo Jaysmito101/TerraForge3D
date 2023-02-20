@@ -396,6 +396,11 @@
 #ifndef CL_HPP_
 #define CL_HPP_
 
+// disable warning C26819
+#pragma warning(push)
+#pragma warning(disable: 26819)
+#pragma warning(disable: 26439)
+
 /* Handle deprecated preprocessor definitions. In each case, we only check for
  * the old name if the new name is not defined, so that user code can define
  * both and hence work with either version of the bindings.
@@ -10348,5 +10353,7 @@ namespace compatibility {
 #undef CL_HPP_DEFINE_STATIC_MEMBER_
 
 } // namespace cl
+
+#pragma warning(pop)
 
 #endif // CL_HPP_

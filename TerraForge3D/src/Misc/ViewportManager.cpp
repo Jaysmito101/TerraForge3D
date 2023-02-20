@@ -20,7 +20,7 @@ ViewportManager::~ViewportManager()
 
 void ViewportManager::Update()
 {
-	if (m_AutoCalculateAspectRatio) m_RendererViewport->m_Camera.aspect = (m_Width / (m_Height + 0.000000001));
+	if (m_AutoCalculateAspectRatio) m_RendererViewport->m_Camera.aspect = (m_Width / (m_Height + 0.000000001f));
 	if (m_IsVisible) this->m_AppState->rendererManager->Render(this->m_RendererViewport);
 }
 
@@ -64,7 +64,7 @@ void ViewportManager::Show()
 	}
 	ImVec2 wsize = ImGui::GetWindowSize();
 	m_Width = wsize.x; m_Height = wsize.y;
-	ImGui::Image((ImTextureID)m_RendererViewport->m_FrameBuffer->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->m_FrameBuffer->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::EndChild();
 	this->ShowSettingPopUp();
 	ImGui::End();

@@ -28,7 +28,7 @@ Heightmap::Heightmap(const std::string path)
     std::vector<uint8_t> texData;
     for (int i = 0; i < width * height; ++i)
     {
-        uint8_t value = static_cast<float>(m_Data[i]) / (2 << 15) * 255;
+        uint8_t value = (uint8_t)(static_cast<float>(m_Data[i]) / (2 << 15) * 255);
         texData.push_back(value);
         texData.push_back(value);
         texData.push_back(value);
@@ -54,7 +54,7 @@ Heightmap::~Heightmap()
 
 uint16_t Heightmap::Sample(float x, float y, bool interpolated) const 
 {
-    auto lerp = [](float a, float b, double t) { return a + (b - a) * t; };
+    auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
     auto clamp = [](float x, float min, float max) { 
         return x > max ? max : (x < min) ? min : x;
     };
@@ -63,7 +63,7 @@ uint16_t Heightmap::Sample(float x, float y, bool interpolated) const
     clamp(y, 0, 1);
 
     if (!interpolated)
-        return Get(x * (m_Width - 1), y * (m_Height - 1));
+        return Get((uint32_t)(x * (m_Width - 1)), (uint32_t)(y * (m_Height - 1)));
 
     float x1 = std::floor(x * (m_Width - 1));
     float y1 = std::floor(y * (m_Height - 1));
@@ -73,10 +73,10 @@ uint16_t Heightmap::Sample(float x, float y, bool interpolated) const
     float xp = x * m_Width - x1;
     float yp = y * m_Height - y1;
 
-    float h11 = Get(x1, y1);
-    float h21 = Get(x2, y1);
-    float h12 = Get(x1, y2);
-    float h22 = Get(x2, y2);
+    float h11 = Get(static_cast<uint32_t>(x1), static_cast<uint32_t>(y1));
+    float h21 = Get(static_cast<uint32_t>(x2), static_cast<uint32_t>(y1));
+    float h12 = Get(static_cast<uint32_t>(x1), static_cast<uint32_t>(y2));
+    float h22 = Get(static_cast<uint32_t>(x2), static_cast<uint32_t>(y2));
 
     auto v1 = lerp(h11, h21, xp);
     auto v2 = lerp(h12, h22, xp);

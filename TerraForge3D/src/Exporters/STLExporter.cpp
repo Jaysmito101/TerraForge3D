@@ -33,7 +33,7 @@ bool STLExporter::ExportBinary(const std::string& path, Mesh* mesh, float* progr
 		const float data[12] = { normal.x, normal.y, normal.z, pa.x, pa.y, pa.z, pb.x, pb.y, pb.z, pc.x, pc.y, pc.z };
 		writer.Write(data, sizeof(float) * 12);
 		writer.Write(buffer, 2);
-		*progress = tmpp * i * 0.95 + 0.01f;
+		*progress = tmpp * i * 0.95f + 0.01f;
 	}
 	*progress = 1.0f;
 	return true;

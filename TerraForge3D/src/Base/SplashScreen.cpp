@@ -10,7 +10,6 @@
 #include <iostream>
 #include <string>
 
-#define _CRT_SECURE_NO_WARNINGS
 
 namespace SplashScreen
 {
@@ -31,8 +30,6 @@ static int commandPtr;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	int wmId, wmEvent;
-
 	if (!isRunning)
 	{
 		DeleteObject(hBitmap);
@@ -43,7 +40,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 		case WM_CREATE:
-			srand(time(NULL));
+			srand((uint32_t)time(NULL));
 
 			if(rand()%2==0)
 			{
@@ -97,7 +94,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 void SetSplashMessage(std::string message)
 {
 	strcpy_s(splashMessage, message.c_str());
-	splashMessageLength = message.size();
+	splashMessageLength = (int)message.size();
 }
 
 void ShowSplashScreen()

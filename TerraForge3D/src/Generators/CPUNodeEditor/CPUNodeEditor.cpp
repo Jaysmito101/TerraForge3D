@@ -92,7 +92,7 @@ static void ShowNodeMaker(std::string &uid, NodeEditor *editor)
 {
 	static char data[1000];
 	ImGui::InputTextWithHint("##SearchMeshNodes", "Search ...", data, sizeof(data));
-	int length = strlen(data);
+	int length = (int)strlen(data);
 	ImGui::BeginChild(("##CPUNE" + uid).c_str(), ImVec2(200, 250));
 	NODE_MAKER_SHOW(DummyNode, "Dummy");
 	NODE_MAKER_SHOW(MeshCoordinatesNode, "Mesh Coordinates");

@@ -1,13 +1,14 @@
-
 #include "Texture2D.h"
 #include <iostream>
+
+#pragma warning(push, 0)
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
-
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
-
 #include <avir/avir.h>
+#include <glad/glad.h>
+#pragma warning(pop)
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)
 	: m_Width(width), m_Height(height)
@@ -26,7 +27,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 }
 
 Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
-	: m_Path(path)
+	: m_Path(path), m_RendererID(0), m_Width(0), m_Height(0), m_InternalFormat(0), m_DataFormat(0)
 {
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(0);
@@ -136,6 +137,7 @@ void Texture2D::Resize(int width, int height, bool resetOpenGL)
 	}
 
 	unsigned char *data = (unsigned char *)malloc(width * height * 3 * sizeof(unsigned char));
+	if (!data) return; // TODO: error handling
 	memset(data, 0, width * height * 3 * sizeof(unsigned char));
 	avir::CImageResizer<> ImageResizer(8);
 	ImageResizer.resizeImage(m_Data, m_Width, m_Height, 0, data, width, height, 3, 0);

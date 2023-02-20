@@ -11,7 +11,7 @@
 template <typename t>
 static void ReserveVector(std::vector<t> &vec, int amount)
 {
-	int size = vec.size();
+	int size = (int)vec.size();
 
 	for (int i = size; i <= amount; i++)
 	{

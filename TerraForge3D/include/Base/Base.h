@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef TERR3D_WIN32
+#include <Windows.h>
+#endif
+
 
 // STL Libs
 
@@ -26,17 +30,6 @@
 #include <filesystem>
 
 // OS Dependent Libraries
-
-
-// GLFW
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-
-// GLAD
-
-#include <glad/glad.h>
 
 // GLM
 
@@ -78,3 +71,13 @@
 #include "ComputeShader.h"
 #include "TextureCubemap.h"
 #include "UIFontManager.h"
+
+// GLFW
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+
+// GLAD
+
+#include <glad/glad.h>

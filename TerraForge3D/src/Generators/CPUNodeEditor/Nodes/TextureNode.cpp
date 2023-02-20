@@ -206,7 +206,7 @@ void TextureNode::OnRender()
 	ImGui::PopItemWidth();
 	ImGui::NewLine();
 
-	if (ImGui::ImageButton((ImTextureID)texture->GetRendererID(), ImVec2(200, 200)))
+	if (ImGui::ImageButton((ImTextureID)(uint64_t)texture->GetRendererID(), ImVec2(200, 200)))
 	{
 		ChangeTexture();
 		hasChanged = true;
