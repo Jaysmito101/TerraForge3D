@@ -34,6 +34,16 @@ uniform float u_TileSize;
 uniform bool u_InvertNormals;
 uniform vec3 u_CameraPosition;
 
+int PixelCoordToDataOffset(int x, int y)
+{
+	int tileSize = min(u_Resolution, 512);
+	int tileCount = u_Resolution / tileSize;
+	int tileX = x / tileSize, tileY = y / tileSize;
+	int tileXOffset = x % tileSize, tileYOffset = y % tileSize;
+	int tileOffset = (tileY * tileCount + tileX) * (tileSize * tileSize);
+	return (tileOffset + (tileYOffset * tileSize + tileXOffset));
+}
+
 // From : https://stackoverflow.com/a/5261402/14911094
 mat3 calculateTBN()
 {

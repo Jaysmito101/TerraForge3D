@@ -318,7 +318,7 @@ nlohmann::json CPUNodeEditor::Save()
 
 void CPUNodeEditor::Load(nlohmann::json data)
 {
-	while(appState->states.remeshing);
+	appState->workManager->WaitForFinish();
 
 	editor->Load(data["nodeEditor"]);
 	windowStat = data["windowStat"];

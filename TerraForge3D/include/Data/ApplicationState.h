@@ -6,6 +6,7 @@
 #include "Data/Serializer.h"
 #include "Menu/MainMenu.h"
 #include "Generators/MeshGeneratorManager.h"
+#include "Generators/WorkManager.h"
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
 #include "Misc/OSLiscences.h"
@@ -21,12 +22,6 @@
 #define MAX_VIEWPORT_COUNT 8
 #endif
 
-struct ApplicationStateStatistics
-{
-	double deltatime = 1;
-	double frameRate = 1;
-};
-
 struct ApplicationStateWindows
 {
 	bool styleEditor = false;
@@ -40,39 +35,20 @@ struct ApplicationStateWindows
 
 struct ApplicationStateStates
 {
-	bool vSync = true;
 	bool autoSave = false;
-	bool forceUpdate = false;
 	std::atomic<bool> ruinning = true;
-	std::atomic<bool> remeshing = false;
-	std::atomic<bool> pauseUpdation = false;
-	std::atomic<bool> requireRemesh = false;
-
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 };
 
 struct ApplicationStateGlobals
 {
-	float mouseSpeed = 25;
-	float scrollSpeed = 0.5f;
-	float mouseScrollAmount = 0;
-	float viewportMousePosX = 0;
-	float viewportMousePosY = 0;
-
-	int numberOfNoiseTypes = 3;
 	int secondCounter = 0;
-	int cpuWorkerThreadsActive = 1;
-
 	nlohmann::json appData;
-
 	std::string currentOpenFilePath = "";
 	std::string currentBaseModelPath = "";
 	std::string kernelsIncludeDir = "";
-
-	float viewportSize[4];
-	float hMapC[4];
-
+	
 	nlohmann::json Save();
 	void Load(nlohmann::json data);
 };
@@ -107,7 +83,6 @@ class ApplicationState
 public:
 	Application *mainApp;
 
-	ApplicationStateStatistics stats;
 	ApplicationStateWindows windows;
 	ApplicationStateStates states;
 	ApplicationStateGlobals globals;
@@ -124,6 +99,7 @@ public:
 	Model* mainModel = nullptr;
 	RendererManager* rendererManager = nullptr;
 	Dashboard* dashboard = nullptr;
+	WorkManager* workManager = nullptr;
 	ViewportManager* viewportManagers[MAX_VIEWPORT_COUNT];
 
 	struct

@@ -56,13 +56,13 @@ void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int
 	auto& worker = std::thread([path, format, exporting, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
-		appState->states.pauseUpdation = true; // disable updation from main thread
-		while (appState->states.remeshing) std::this_thread::sleep_for(100ms); // wait for current generation to finish
+		appState->workManager->SetUpdationPaused(true); // disable updation from main thread
+		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for current generation to finish
 		appState->meshGenerator->StartGeneration(); // restart fresh generation 
-		while (appState->states.remeshing) std::this_thread::sleep_for(100ms); // wait for fresh generation to finish
+		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for fresh generation to finish
 		if (!this->ExportMesh(path, this->ApplyMeshTransform(appState->mainModel->mesh->Clone()), format)) this->SetStatusMessage("Failed to export : " + path);
 		else this->SetStatusMessage("");
-		appState->states.pauseUpdation = false; // enable updation from main thread
+		appState->workManager->SetUpdationPaused(false); // enable updation from main thread
 		this->exportProgress = 1.1f;
 		if (exporting) *exporting = false;
 		});

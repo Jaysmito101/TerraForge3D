@@ -69,9 +69,10 @@ public:
 	virtual void OnUpdate(float deltatime) override
 	{
 		if (!appState->states.ruinning) return;
-		appState->meshGenerator->Generate();
-		appState->exportManager->Update(); 
 		appState->dashboard->Update();
+		appState->workManager->Update();
+		appState->exportManager->Update(); 
+		appState->meshGenerator->Generate();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
 
 
@@ -123,7 +124,6 @@ public:
 			}
 		}
 
-		appState->stats.deltatime = deltatime;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		RenderImGui();
@@ -135,15 +135,12 @@ public:
 		appState->globals.secondCounter++;
 		if (appState->globals.secondCounter % 5 == 0)
 		{
-			appState->states.requireRemesh = true;
 			if (appState->states.autoSave)
 			{
 				appState->serailizer->SaveFile(appState->constants.cacheDir + PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
 				if (appState->globals.currentOpenFilePath.size() > 3) appState->serailizer->SaveFile(appState->globals.currentOpenFilePath);
 			}
 		}
-		GetWindow()->SetVSync(appState->states.vSync);
-		appState->stats.frameRate = 1 / appState->stats.deltatime;
 	}
 
 	virtual void OnImGuiRender() override
@@ -155,6 +152,7 @@ public:
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Show();
 		appState->exportManager->ShowSettings();
 		appState->rendererManager->ShowSettings();
+		appState->workManager->ShowSettings();
 		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
@@ -164,10 +162,6 @@ public:
 
 	virtual void OnStart(std::string loadFile) override
 	{
-		OpenCLPlatform::GetPlatforms();
-		while (1);
-		exit(0);
-
 		srand((uint32_t)time(NULL));
 		SetUpIcon();
 		appState = new ApplicationState();
@@ -212,14 +206,13 @@ public:
 		appState->mainMap.tileOffsetX = appState->mainMap.tileOffsetY = 0.0f;
 		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
 		for (int i = 0; i < 6; i++) { appState->mainMap.currentTileDataLayers[i] = new DataTexture(i); appState->mainMap.currentTileDataLayers[i]->Resize(256); appState->mainMap.currentTileDataLayers[i]->UploadToGPU(); }
-		appState->globals.cpuWorkerThreadsActive = std::thread::hardware_concurrency();
-		appState->states.requireRemesh = true;
-
+		
 
 		appState->globals.kernelsIncludeDir = "\"" + appState->constants.kernelsDir + "\"";
+		appState->workManager = new WorkManager(appState); appState->workManager->StartThread();
+		appState->meshGenerator = new MeshGeneratorManager(appState);
 		appState->supportersTribute = new SupportersTribute();
 		appState->rendererManager = new RendererManager(appState);
-		appState->meshGenerator = new MeshGeneratorManager(appState);
 		appState->mainMenu = new MainMenu(appState);
 		appState->projectManager = new ProjectManager(appState);
 		appState->serailizer = new Serializer(appState);
@@ -263,7 +256,7 @@ public:
 
 	void OnEnd()
 	{
-		while (appState->states.remeshing);
+		appState->workManager->WaitForFinish();
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(500ms);
@@ -274,6 +267,7 @@ public:
 		delete appState->dashboard;
 		delete appState->rendererManager;
 		delete appState->meshGenerator;
+		delete appState->workManager;
 		delete appState->mainModel;
 		delete appState->supportersTribute;
 		delete appState->mainMenu;

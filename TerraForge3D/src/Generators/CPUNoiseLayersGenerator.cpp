@@ -3,6 +3,7 @@
 #include "Utils/Utils.h"
 #include "Profiler.h"
 #include "Data/ApplicationState.h"
+#include "Base/OpenCL/OpenCLContext.h"
 
 int count = 1;
 
@@ -77,7 +78,7 @@ bool CPUNoiseLayersGenerator::Update()
 		stateChanged = noiseManager->Render();
 		ImGui::End();
 	}
-	if (!appState->states.remeshing) noiseManager->UpdateLayers();
+	if (!appState->workManager->IsWorking()) noiseManager->UpdateLayers();
 	return stateChanged;
 }
 

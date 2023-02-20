@@ -23,4 +23,5 @@ private:
 private:
 	ApplicationState* m_AppState = nullptr;
 	bool m_IsWindowVisible = true;
+	bool m_ForceUpdate = false;
 };

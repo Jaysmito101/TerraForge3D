@@ -21,8 +21,8 @@ bool LayeredNoiseManager::Render()
 {
 	bool stateChanged = false;
 	ImGui::Text("Global Offsets:");
-	ADD_ST_CH(ImGui::DragFloat3(MAKE_IMGUI_ID("Global Offsets"), offset, 0.1f));
-	ADD_ST_CH(ImGui::DragFloat("Global Strength##LayeredNoiseManager", &strength, 0.1f));
+	ADD_ST_CH(ImGui::DragFloat3(MAKE_IMGUI_ID("Global Offsets"), offset, 0.01f));
+	ADD_ST_CH(ImGui::DragFloat("Global Strength##LayeredNoiseManager", &strength, 0.01f));
 	ADD_ST_CH(ImGui::Checkbox("Absolute Value##LayeredNoiseManager", &absv));
 	ADD_ST_CH(ImGui::Checkbox("Square Value##LayeredNoiseManager", &sq));
 	ImGui::NewLine();
@@ -79,7 +79,7 @@ void LayeredNoiseManager::UpdateLayers()
 	if (toAdd.size() > 0)
 	{
 		noiseLayers.push_back(toAdd[0]);
-		toAdd.clear();
+		toAdd.clear(); 
 	}
 }
 

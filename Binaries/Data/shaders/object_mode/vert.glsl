@@ -24,11 +24,24 @@ uniform mat4 u_Projection;
 uniform mat4 u_View;
 uniform mat4 u_ProjectionView;
 
+
+int PixelCoordToDataOffset(int x, int y)
+{
+	int tileSize = min(u_Resolution, 512);
+	int tileCount = u_Resolution / tileSize;
+	int tileX = x / tileSize, tileY = y / tileSize;
+	int tileXOffset = int(mod(x, tileSize)), tileYOffset = int(mod(y, tileSize));
+	int tileOffset = (tileY * tileCount + tileX) * (tileSize * tileSize);
+	return (tileOffset + (tileYOffset * tileSize + tileXOffset));
+}
+
 void main()
 {
     vec2 texCoord = aTexCoord.xy;
     ivec2 pointCoord = ivec2(texCoord * 0.975f * u_Resolution);
-    vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
+    vec3 position = aPosition.xyz + aNormal.xyz * position_normals[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)].x;
+    //vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
+    //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;
     vertexOutput.normal = aNormal.xyz;
     vertexOutput.texCoord = texCoord;

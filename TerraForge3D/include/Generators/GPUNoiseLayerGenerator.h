@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenCL/ComputeKernel.h"
+#include "OpenCL/OpenCLContext.h"
 
 #include "json/json.hpp"
 
@@ -29,23 +29,14 @@ struct  GPUNoiseLayer
 class GPUNoiseLayerGenerator
 {
 public:
-	GPUNoiseLayerGenerator(ApplicationState *appState, ComputeKernel *kernel);
-
-	virtual void Generate(ComputeKernel *kernels);
-
+	GPUNoiseLayerGenerator(ApplicationState *appState);
+	virtual void Generate(OpenCLContext *context, int tx, int ty);
 	virtual nlohmann::json Save();
-
 	virtual nlohmann::json SaveNoiseLayer(GPUNoiseLayer nl);
-
 	virtual GPUNoiseLayer LoadNoiseLayer(nlohmann::json data);
-
 	virtual void Load(nlohmann::json data);
-
 	virtual bool ShowSetting(int i);
-
 	bool Update();
-
-
 
 	bool windowStat = false;
 	bool uiActive = false;

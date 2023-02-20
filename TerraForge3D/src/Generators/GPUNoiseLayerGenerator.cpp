@@ -9,7 +9,7 @@
 
 static int count = 1;
 
-GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as, ComputeKernel *kernels)
+GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as)
 {
 	bool tmp = false;
 	appState = as;
@@ -19,7 +19,7 @@ GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as, ComputeKern
 	noiseLayers.push_back(GPUNoiseLayer());
 }
 
-void GPUNoiseLayerGenerator::Generate(ComputeKernel *kernels)
+void GPUNoiseLayerGenerator::Generate(OpenCLContext* kernels, int tx, int ty)
 {
 	START_PROFILER();
 
@@ -28,23 +28,22 @@ void GPUNoiseLayerGenerator::Generate(ComputeKernel *kernels)
 	noiseLayers[0].offsetY = appState->mainMap.tileOffsetY;
 	noiseLayers[0].offsetZ = (float)appState->mainMap.tileResolution + 0.2f;
 	noiseLayers[0].offsetW = (float)this->setMode + 0.2f;
+	noiseLayers[0].valueX = (float)(appState->workManager->GetWorkResolution() + 0.1f); // tile size
+	noiseLayers[0].valueY = appState->mainMap.tileResolution / noiseLayers[0].valueX; // tile count
+	noiseLayers[0].valueZ = tx; // tile x
+	noiseLayers[0].valueW = ty; // tile y
 
 	kernels->CreateBuffer("noise_layers_data", CL_MEM_READ_WRITE, sizeof(GPUNoiseLayer) * noiseLayers.size());
-	kernels->WriteBuffer("noise_layers_data", true, sizeof(GPUNoiseLayer) * noiseLayers.size(), noiseLayers.data());
-
-	int tmp = noiseLayers.size(); kernels->WriteBuffer("noise_layers_size", true, sizeof(int), &tmp);
-
+	kernels->WriteBuffer("noise_layers_data", true, 0, sizeof(GPUNoiseLayer) * noiseLayers.size(), noiseLayers.data());
+	kernels->CreateBuffer("noise_layers_size", CL_MEM_READ_WRITE, sizeof(int));
+	int tmp = noiseLayers.size(); kernels->WriteBuffer("noise_layers_size", true, 0, sizeof(int), &tmp);
 	
 	{		
 		kernels->SetKernelArg("process_map_noise_layer", 0, "noise_layers_data");
 		kernels->SetKernelArg("process_map_noise_layer", 1, "noise_layers_size");
 		kernels->SetKernelArg("process_map_noise_layer", 2, "data_layer_0");
 		kernels->SetKernelArg("process_map_noise_layer", 3, "data_layer_1");
-		kernels->SetKernelArg("process_map_noise_layer", 4, "data_layer_2");
-		kernels->SetKernelArg("process_map_noise_layer", 5, "data_layer_3");
-		kernels->SetKernelArg("process_map_noise_layer", 6, "data_layer_4");
-		kernels->SetKernelArg("process_map_noise_layer", 7, "data_layer_5");
-		vc = appState->mainMap.tileResolution;
+		vc = appState->workManager->GetWorkResolution();
 		int ls = max(localSize, 1); while (vc % ls != 0) ls--;
 		kernels->ExecuteKernel("process_map_noise_layer", cl::NDRange(ls, ls), cl::NDRange(vc, vc));
 	}
@@ -116,7 +115,7 @@ void GPUNoiseLayerGenerator::Load(nlohmann::json data)
 	enabled = data["enabled"];
 	localSize = data["ls"];
 
-	while (appState->states.remeshing);
+	appState->workManager->WaitForFinish();
 
 	noiseLayers.clear();
 	nlohmann::json tmp = data["nl"];
@@ -193,7 +192,7 @@ bool GPUNoiseLayerGenerator::Update()
 
 			if (ImGui::Button("Delete##GPUNL"))
 			{
-				while (appState->states.remeshing);
+				appState->workManager->WaitForFinish();
 				noiseLayers.erase(noiseLayers.begin() + i);
 				stateChanged |= true;
 				ImGui::PopID();

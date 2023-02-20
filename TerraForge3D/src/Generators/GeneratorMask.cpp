@@ -3,10 +3,10 @@
 #include "Data/ApplicationState.h"
 
 #include "imgui/imgui.h"
+#include "OpenCL/OpenCLContext.h"
 
 
-
-GeneratorMaskManager::GeneratorMaskManager(ComputeKernel *kernel, std::string id, ApplicationState *as)
+GeneratorMaskManager::GeneratorMaskManager(OpenCLContext* kernel, std::string id, ApplicationState *as)
 {
 	uid = id;
 	appState = as;
@@ -187,7 +187,7 @@ bool GeneratorMaskManager::ShowSettings()
 			else if(masks[i].type == MASK_LAYER_CLIFF) stateChanged |= ShowCliffMaskSettingS(&masks[i], uid + std::to_string(i));
 			if(ImGui::Button(("Delete##GMSK" + std::to_string(i) + uid).c_str()))
 			{
-				while(appState->states.remeshing);
+				appState->workManager->WaitForFinish();
 				masks.erase(masks.begin() + i);
 				break;
 			}

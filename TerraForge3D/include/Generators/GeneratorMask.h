@@ -5,7 +5,7 @@
 
 #include "json/json.hpp"
 
-#include "Base/OpenCL/ComputeKernel.h"
+#include "Base/OpenCL/OpenCLContext.h"
 
 #define MAX_GENERATOR_MASKS 128
 
@@ -44,7 +44,7 @@ class ApplicationState;
 class GeneratorMaskManager
 {
 public:
-	GeneratorMaskManager(ComputeKernel *kernel, std::string uid, ApplicationState *appState);
+	GeneratorMaskManager(OpenCLContext *kernel, std::string uid, ApplicationState *appState);
 	~GeneratorMaskManager();
 
 	nlohmann::json SaveGeneratorMask(GeneratorMask mask);

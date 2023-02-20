@@ -13,7 +13,7 @@ Dashboard::~Dashboard()
 
 void Dashboard::Update()
 {
-	if(m_AppState->states.forceUpdate) m_AppState->states.requireRemesh = true;
+	if(m_ForceUpdate) m_AppState->workManager->SetRequireRemesh(true);
 }
 
 void Dashboard::ShowSettings()
@@ -25,30 +25,31 @@ void Dashboard::ShowSettings()
 	if (ImGui::CollapsingHeader("Generator Resolution Settings"))
 	{
 		bool changed = false;
-		changed = PowerOfTwoDropDown("Map Resolution##MainMapGen", &m_AppState->mainMap.mapResolution, 4, 20) || changed;
+		changed = PowerOfTwoDropDown("Tile Resolution##MainMapGen", &m_AppState->mainMap.tileResolution, 4, 20) || changed;
 		changed = ImGui::DragInt("Tile Count##MainMapGen", &m_AppState->mainMap.tileCount, 0.01f, 0, 1000000) || changed;
 
 		if (changed)
 		{
-			while (m_AppState->states.remeshing);
+			m_AppState->workManager->WaitForFinish();
 			m_AppState->mainMap.currentTileX = m_AppState->mainMap.currentTileY = 0;
 			CalculateTileSizeAndOffset();
 			for (int i = 0; i < 6; i++) m_AppState->mainMap.currentTileDataLayers[i]->Resize(m_AppState->mainMap.tileResolution);
+			m_AppState->workManager->Resize();
 		}
 		ImGui::DragInt("Current Tile X##MainMapGen", &m_AppState->mainMap.currentTileX, 0.01f, 0, m_AppState->mainMap.tileCount);
 		ImGui::DragInt("Current Tile Y##MainMapGen", &m_AppState->mainMap.currentTileY, 0.01f, 0, m_AppState->mainMap.tileCount);
-		ImGui::Text("Tile Resolution: %d", m_AppState->mainMap.tileResolution);
+		ImGui::Text("Map Resolution: %d", m_AppState->mainMap.mapResolution);
 		ImGui::Text("Tile Size: %f", m_AppState->mainMap.tileSize);
 		ImGui::Text("Tile Offset: %f %f", m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
 		CalculateTileSizeAndOffset();
 	}
 
 	ImGui::NewLine();
-	ImGui::Checkbox("Force Update", &m_AppState->states.forceUpdate);
+	ImGui::Checkbox("Force Update", &m_ForceUpdate);
 	ImGui::Checkbox("Auto Save", &m_AppState->states.autoSave);
 	ImGui::NewLine();
 
-	if (ImGui::Button("Regenerate")) m_AppState->states.requireRemesh = true;
+	if (ImGui::Button("Regenerate")) m_AppState->workManager->SetRequireRemesh(true);
 
 	ImGui::Separator();
 	ImGui::NewLine();
@@ -127,7 +128,7 @@ void Dashboard::ShowChooseBaseModelPopup()
 void Dashboard::CalculateTileSizeAndOffset()
 {
 	m_AppState->mainMap.tileCount = std::clamp(m_AppState->mainMap.tileCount, 1, 1000000);
-	m_AppState->mainMap.tileResolution = m_AppState->mainMap.mapResolution / m_AppState->mainMap.tileCount;
+	m_AppState->mainMap.mapResolution = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileCount;
 	m_AppState->mainMap.tileSize = (1.0f / m_AppState->mainMap.tileCount);
 	m_AppState->mainMap.currentTileX = std::clamp(m_AppState->mainMap.currentTileX, 0, m_AppState->mainMap.tileCount - 1);
 	m_AppState->mainMap.currentTileY = std::clamp(m_AppState->mainMap.currentTileY, 0, m_AppState->mainMap.tileCount - 1);

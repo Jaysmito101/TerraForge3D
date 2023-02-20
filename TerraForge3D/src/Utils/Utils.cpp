@@ -391,6 +391,17 @@ bool ShowComboBox(const char* label, int* selected, const char** values, int cou
 	return reslt;
 }
 
+std::string FormatMemoryToString(uint64_t size)
+{
+	std::string result = "";
+	if (size <= 1000)  return std::to_string(size) + " B";
+	else if (size <= 1000000) return std::to_string(size / 1000.0) + " KB";
+	else if (size <= 1000000000) return std::to_string(size / (1000000.0)) + " MB";
+	else if (size <= 1000000000000) return std::to_string(size / (1000000000.0)) + " GB";
+	else if (size <= 1000000000000000) return std::to_string(size / (1000000000000.0)) + " TB";
+	return std::to_string(size) + " B";
+}
+
 bool ShowLayerUpdationMethod(const char* label, int* method)
 {
 	if (!method) return false;

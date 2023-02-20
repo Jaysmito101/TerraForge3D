@@ -131,6 +131,8 @@ void OnImGuiRenderEnd();
 
 bool ShowComboBox(const char* label, int* selected, const char** values, int count);
 
+std::string FormatMemoryToString(uint64_t size);
+
 #define SHOW_COMBO_BOX(label, selected, values, count) \
 { \
 	int p_VPModeCopy##__LINE__ = static_cast<int>(selected); \
