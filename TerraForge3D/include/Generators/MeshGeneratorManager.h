@@ -6,7 +6,6 @@ class GPUNoiseLayerGenerator;
 class CPUNodeEditor;
 
 
-#include "Base/OpenCL/ComputeKernel.h"
 #include "Generators/CPUGeneratorWorker.h"
 #include "json/json.hpp"
 

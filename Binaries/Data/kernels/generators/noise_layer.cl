@@ -12,8 +12,8 @@ __kernel void process_map_noise_layer(__global NoiseLayer* nl,
 	int tileX = (int)nl[0].value.z;
 	int tileY = (int)nl[0].value.w;
 	int tileRes = (int)nl[0].value.x;
-	int x_coord = get_global_id(0) + tileX * tileRes;
-	int y_coord = get_global_id(1) + tileY * tileRes;
+	int x_coord = get_global_id(0) + tileX * 215;
+	int y_coord = get_global_id(1) + tileY * 215;
 	int tileResolution = (int)nl[0].offset.z;
 	int size = *nls;
 

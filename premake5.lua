@@ -27,7 +27,6 @@ IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
 IncludeDir["Lua"] = "TerraForge3D/vendor/lua"
 IncludeDir["MuParser"] = "TerraForge3D/vendor/muparser/include"
 IncludeDir["JSON"] = "TerraForge3D/vendor/json"
--- IncludeDir["GLSLOptimizer"] = "TerraForge3D/vendor/glsl-optimizer/src/glsl"
 IncludeDir["FastNoiseLite"] = "TerraForge3D/vendor/FastNoiseLite"
 
 include "TerraForge3D/vendor/glfw"
@@ -39,9 +38,7 @@ include "TerraForge3D/vendor/imgui-node-editor"
 include "TerraForge3D/vendor/zip"
 include "TerraForge3D/vendor/text-editor"
 include "TerraForge3D/vendor/lua"
-include "TerraForge3D/vendor/assimp"
 include "TerraForge3D/vendor/muparser"
--- include "TerraForge3D/vendor/glsl-optimizer"
 
 
 project "TerraForge3DLib"
@@ -68,7 +65,6 @@ project "TerraForge3DLib"
 	}
 
 	includedirs {
-		"./TerraForge3D/vendor/assimp/include",
 		"./TerraForge3D/include",
 		"./TerraForge3D/include/Utils",
 		"./TerraForge3D/include/Base",
@@ -83,7 +79,6 @@ project "TerraForge3DLib"
 		"%{IncludeDir.Lua}",
 		"%{IncludeDir.MuParser}",
 		"%{IncludeDir.JSON}",
---		"%{IncludeDir.GLSLOptimizer}",
 		"%{IncludeDir.FastNoiseLite}",
 		"%{IncludeDir.ImGuiNodeEditor}"
 	}
@@ -105,9 +100,7 @@ project "TerraForge3DLib"
 		"ImGuiNodeEditor",
 		"ImColorTextEdit",
 		"Lua",
-		"MuParser",
---		"GLSLOptimizer",
-		"Assimp"
+		"MuParser"
 	}
 
 	excludes {
@@ -189,7 +182,6 @@ project "TerraForge3D"
 	}
 
 	includedirs {
-		"./TerraForge3D/vendor/assimp/include",
 		"./TerraForge3D/include",
 		"./TerraForge3D/vendor",
 		"./TerraForge3D/openssl",
@@ -254,9 +246,7 @@ project "TerraForge3D"
 			"ImGuiNodeEditor",
 			"ImColorTextEdit",
 			"Lua",
---			"GLSLOptimizer",
 			"MuParser",
-			"Assimp",
 			"dl",
 			"pthread"
 		}

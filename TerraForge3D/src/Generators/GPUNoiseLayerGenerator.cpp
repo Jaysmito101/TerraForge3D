@@ -16,7 +16,7 @@ GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as)
 	uid = GenerateId(32);
 	name = "GPU Noise Layer " + std::to_string(count++);
 	noiseLayers.push_back(GPUNoiseLayer());
-	noiseLayers.push_back(GPUNoiseLayer());
+	noiseLayers.push_back(GPUNoiseLayer()); 
 }
 
 void GPUNoiseLayerGenerator::Generate(OpenCLContext* kernels, int tx, int ty)

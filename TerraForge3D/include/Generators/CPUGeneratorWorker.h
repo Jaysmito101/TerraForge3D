@@ -10,13 +10,13 @@ class CPUNodeEditor;
 
 
 
-#include "Base/OpenCL/ComputeKernel.h"
 #include "json/json.hpp"
 
 
 #include <vector>
 #include <queue>
 #include <atomic>
+#include <thread>
 
 enum CPUGeneratorWorkerState
 {
