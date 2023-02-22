@@ -33,15 +33,8 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 	stbi_set_flip_vertically_on_load(0);
 	unsigned char *data = nullptr;
 
-	if(readAlpha)
-	{
-		data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-	}
-
-	else
-	{
-		data = stbi_load(path.c_str(), &width, &height, &channels, 3);
-	}
+	if(readAlpha)data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+	else data = stbi_load(path.c_str(), &width, &height, &channels, 3);
 
 	if (data)
 	{
@@ -52,15 +45,8 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 		glBindTexture(GL_TEXTURE_2D, m_RendererID);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		if(readAlpha)
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		}
-
-		else
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		}
+		if(readAlpha) glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -68,17 +54,9 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		if (preserveData)
-		{
-			m_Data = data;
-		}
-
-		else
-		{
-			stbi_image_free(data);
-		}
+		if (preserveData) m_Data = data;
+		else stbi_image_free(data);
 	}
-
 	else
 	{
 		std::cout << "Failed to load texture : " << path << std::endl;
@@ -87,10 +65,7 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 
 Texture2D::~Texture2D()
 {
-	if (m_Data)
-	{
-		glDeleteTextures(1, &m_RendererID);
-	}
+	if (m_Data) glDeleteTextures(1, &m_RendererID);
 }
 
 void Texture2D::SetData(void *data, uint32_t size, bool alpha)

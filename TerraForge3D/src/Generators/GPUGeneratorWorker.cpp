@@ -85,7 +85,7 @@ void GPUGeneratorWorker::Worker()
 		this->currentY = job_sz.second;
 
 		int tileSize = appState->workManager->GetWorkResolution();
-		size_t tileDataSize = tileSize * tileSize * 4 * sizeof(float);
+		size_t tileDataSize = (tileSize * tileSize * 4) * sizeof(float);
 
 
 		auto& gpuNoiseLayers = appState->meshGenerator->GetGPUNoiseLayers();
@@ -95,15 +95,15 @@ void GPUGeneratorWorker::Worker()
 		for (int i = 0; i < 2; i++)
 		{
 			m_OpenCLContexts[m_OpenCLContextToUse]->CreateBuffer("data_layer_" + std::to_string(i), CL_MEM_READ_WRITE, tileDataSize);
-			m_OpenCLContexts[m_OpenCLContextToUse]->WriteBuffer("data_layer_" + std::to_string(i), true, 0, tileDataSize, appState->mainMap.currentTileDataLayers[i]->GetTilePointer(job_sz.first, job_sz.second));
+			// m_OpenCLContexts[m_OpenCLContextToUse]->WriteBuffer("data_layer_" + std::to_string(i), true, 0, tileDataSize, appState->mainMap.currentTileDataLayers[i]->GetTilePointer(job_sz.first, job_sz.second));
 		}
-
+		 
 		for (int i = 0; i < gpuNoiseLayers.size(); i++)
 			if (gpuNoiseLayers[i]->enabled) 
 				gpuNoiseLayers[i]->Generate(m_OpenCLContexts[m_OpenCLContextToUse], job_sz.first, job_sz.second);
 
 		for (int i = 0; i < 2; i++)
-			m_OpenCLContexts[m_OpenCLContextToUse]->ReadBuffer("data_layer_" + std::to_string(i), true, 0, tileDataSize, appState->mainMap.currentTileDataLayers[i]->GetTilePointer(job_sz.first, job_sz.second));
+			m_OpenCLContexts[m_OpenCLContextToUse]->ReadBuffer("data_layer_" + std::to_string(i), false , 0, tileDataSize, appState->mainMap.currentTileDataLayers[i]->GetTilePointer(job_sz.first, job_sz.second));
 
 		END_PROFILER(jobTime);
 		this->progress = 1.0f;

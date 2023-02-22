@@ -30,10 +30,17 @@ public:
 		if (pData) delete[] pData;
 		this->size = resolution;
 		pData = new float[(uint64_t)size * size * 4];
-		tileSize = min(size, 512);
-		tileCount = size / tileSize;
 		memset(pData, 0, sizeof(float) * size * size * 4);
-		this->UploadToGPU();
+		this->SetTileSize(512);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * size * size * 4, pData, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+	
+	inline void SetTileSize(int tSize)
+	{
+		tileSize = min(size, tSize);
+		tileCount = size / tileSize;
 	}
 
 //	inline void SetData(float* data_, size_t size_, size_t offset_)
@@ -57,12 +64,14 @@ public:
 
 	inline float* GetTilePointer(int x, int y)
 	{
-		return pData + (y * tileCount + x) * (tileSize * tileSize * 4);
+		return (float*)((uint8_t*)pData + (y * tileCount + x) * (tileSize * tileSize * 4) * sizeof(float));
 	}
 
 	inline void UploadTileToGPU(int x, int y)
 	{
-		UploadToGPU((y * tileCount + x) * (tileSize * tileSize * 4) * sizeof(float), (tileSize * tileSize * 4) * sizeof(float));
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, (y * tileCount + x) * (tileSize * tileSize * 4) * sizeof(float), (tileSize * tileSize * 4) * sizeof(float), &pData[(y * tileCount + x) * (tileSize * tileSize * 4)]);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	inline void UploadToGPU()

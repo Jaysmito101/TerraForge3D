@@ -72,7 +72,6 @@ public:
 		appState->dashboard->Update();
 		appState->workManager->Update();
 		appState->exportManager->Update(); 
-		appState->meshGenerator->Generate();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
 
 

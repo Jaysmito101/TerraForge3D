@@ -90,7 +90,7 @@ void CPUGeneratorWorker::Worker()
 		if (job_layers.first.size() > 0 || job_layers.second.size() > 0)
 		{
 
-			auto workSize = min(512, appState->mainMap.tileResolution);
+			auto workSize = appState->workManager->GetWorkResolution();
 			for (int i = job_sz.second * workSize; i < (job_sz.second + 1) * workSize; i++)
 			{
 				for (int j = job_sz.first * workSize; j < (job_sz.first + 1) * workSize; j++)

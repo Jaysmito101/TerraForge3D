@@ -12,8 +12,8 @@ __kernel void process_map_noise_layer(__global NoiseLayer* nl,
 	int tileX = (int)nl[0].value.z;
 	int tileY = (int)nl[0].value.w;
 	int tileRes = (int)nl[0].value.x;
-	int x_coord = get_global_id(0) + tileX * 215;
-	int y_coord = get_global_id(1) + tileY * 215;
+	int x_coord = get_global_id(0) + tileX * tileRes;
+	int y_coord = get_global_id(1) + tileY * tileRes;
 	int tileResolution = (int)nl[0].offset.z;
 	int size = *nls;
 
@@ -30,7 +30,7 @@ __kernel void process_map_noise_layer(__global NoiseLayer* nl,
 
 	n = n * nl[1].strength;
 
-	data_layer_0[y_coord * tileResolution + x_coord].x = UpdateLayerWithUpdateMethod(data_layer_0[y_coord * tileResolution + x_coord].x, n, (int)nl[0].offset.w);
+	data_layer_0[get_global_id(1) * tileRes + get_global_id(0)].x = UpdateLayerWithUpdateMethod(data_layer_0[y_coord * tileResolution + x_coord].x, n, (int)nl[0].offset.w);
 }
 
 

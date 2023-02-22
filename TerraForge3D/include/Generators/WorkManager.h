@@ -1,7 +1,7 @@
 #pragma once
 
-#define WORK_MANAGER_MAX_CPU_WORKERS 32
-#define WORK_MANAGER_MAX_GPU_WORKERS 16
+#define WORK_MANAGER_MAX_CPU_WORKERS 64
+#define WORK_MANAGER_MAX_GPU_WORKERS 4
 
 #include "Base/OpenCL/OpenCLPlatform.h"
 #include "Generators/CPUGeneratorWorker.h"
@@ -76,6 +76,11 @@ private:
 	int32_t m_GPUGeneratorWorkerCount = 0;
 	int32_t m_WorkResolution = 0;
 	int32_t m_WorkSize = 0;
+	int32_t m_SubTileSize = 256;
+	float m_CPUGeneratorsTime = 0.0f;
+	float m_GPUGeneratorsTime = 0.0f;
+	float m_UploadTime = 0.0f;
+	float m_TempTime = 0.0f;
 	WorkManagerWorkStatus* m_WorkStatusMatrix = nullptr;
 	bool m_IsWindowVisible = false;
 	std::vector<OpenCLDevice> m_OpenCLDevices;

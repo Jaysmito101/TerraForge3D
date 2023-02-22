@@ -1,6 +1,7 @@
 #include "Generators/WorkManager.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
+#include "Profiler.h"
 
 #ifndef max
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
@@ -82,8 +83,16 @@ void WorkManager::ShowSettings()
 	if (workerStatusPanel)
 	{
 		static char tp_Buffer[256];
-		ImGui::Text("Grid Size : %d x %d", m_WorkSize, m_WorkSize);
-		ImGui::Text("Work Completed : %d / %d", (int)m_WorkCompleted, (m_WorkSize * m_WorkSize));
+		if (PowerOfTwoDropDown("Subtile Size", &m_SubTileSize, 4, 32))
+		{
+			this->WaitForFinish();
+			this->Resize();
+		}
+		ImGui::Text("Grid Size         : %d x %d", m_WorkSize, m_WorkSize);
+		ImGui::Text("Work Completed    : %d / %d", (int)m_WorkCompleted, (m_WorkSize * m_WorkSize));
+		ImGui::Text("Total GPU Time    : %f", m_GPUGeneratorsTime);
+		ImGui::Text("Total CPU Time    : %f", m_CPUGeneratorsTime);
+		ImGui::Text("Total Upload Time : %f", m_UploadTime);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0.0f, 0.0f));
@@ -162,7 +171,10 @@ void WorkManager::Update()
 		{
 			if (m_WorkStatusMatrix[i * m_WorkSize + j] == WorkManagerWorkStatus_CPUGeneratorsFinished)
 			{
-				for (int k = 0; k < 6; k++) m_AppState->mainMap.currentTileDataLayers[k]->UploadTileToGPU(j, i);
+				START_PROFILER();
+				for (int k = 0; k < 2; k++) m_AppState->mainMap.currentTileDataLayers[k]->UploadTileToGPU(j, i);
+				END_PROFILER(m_TempTime);
+				m_UploadTime += m_TempTime;
 				m_WorkStatusMatrix[i * m_WorkSize + j] = WorkManagerWorkStatus_Uploaded;
 			}
 			if (m_WorkStatusMatrix[i * m_WorkSize + j] == WorkManagerWorkStatus_Uploaded) m_WorkUploaded += 1;
@@ -192,9 +204,10 @@ void WorkManager::Resize()
 {
 	//this->WaitForFinish();
 	delete m_WorkStatusMatrix;
-	m_WorkResolution = min(512, m_AppState->mainMap.tileResolution);
+	m_WorkResolution = min(m_SubTileSize, m_AppState->mainMap.tileResolution);
 	m_WorkSize = m_AppState->mainMap.tileResolution / m_WorkResolution;
 	m_WorkStatusMatrix = new WorkManagerWorkStatus[(uint64_t)m_WorkSize * m_WorkSize];
+	for (int i = 0; i < 6; i++) m_AppState->mainMap.currentTileDataLayers[i]->SetTileSize(m_WorkResolution);
 	this->ResetWorkStatus();
 }
 
@@ -220,14 +233,15 @@ void WorkManager::UpdateWork()
 	m_WorkerThreadActive = true;
 	while (m_Alive)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		if(!IsWorking()) continue;
+		
+		if (!IsWorking()) { std::this_thread::sleep_for(std::chrono::milliseconds(10)); continue; }
 
 		for (int i = 0; i < m_GPUGeneratorWorkerCount; i++)
 		{
 			if (m_GPUGeneratorWorkers[i]->HasFinishedJob())
 			{
 				auto [tx, ty] = m_GPUGeneratorWorkers[i]->GetFinishedJob();
+				m_GPUGeneratorsTime += m_GPUGeneratorWorkers[i]->GetJobTime();
 				m_WorkStatusMatrix[ty * m_WorkSize + tx] = WorkManagerWorkStatus_GPUGeneratorsFinished;
 			}
 		}
@@ -237,6 +251,7 @@ void WorkManager::UpdateWork()
 			if (m_CPUGeneratorWorkers[i]->HasFinishedJob())
 			{
 				auto [tx, ty] = m_CPUGeneratorWorkers[i]->GetFinishedJob();
+				m_CPUGeneratorsTime += m_CPUGeneratorWorkers[i]->GetJobTime();
 				m_WorkStatusMatrix[ty * m_WorkSize + tx] = WorkManagerWorkStatus_CPUGeneratorsFinished;
 		 		m_WorkCompleted += 1;
 			}
@@ -282,5 +297,6 @@ int WorkManager::FindFreeCPUWorker()
 void WorkManager::ResetWorkStatus()
  {
 	m_WorkCompleted = 0; m_WorkUploaded = 0;
+	m_GPUGeneratorsTime = 0.0f; m_CPUGeneratorsTime = 0.0f; m_TempTime = 0.0f; m_UploadTime = 0.0f;
 	for (auto i = 0; i < m_WorkSize * m_WorkSize; i++) m_WorkStatusMatrix[i] = WorkManagerWorkStatus_None;
 }

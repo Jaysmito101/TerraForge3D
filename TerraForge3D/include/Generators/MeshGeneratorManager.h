@@ -19,16 +19,8 @@ public:
 	MeshGeneratorManager(ApplicationState *appState);
 	~MeshGeneratorManager();
 
-	void Generate();
-	void GenerateSync();
 	void ShowSettings();
 
-	void StartGeneration();
-
-	void ExecuteKernels();
-	void ExecuteCPUGenerators();
-
-	void LoadKernels();
 
 	nlohmann::json Save();
 	void Load(nlohmann::json data);

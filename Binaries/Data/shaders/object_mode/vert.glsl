@@ -18,6 +18,7 @@ layout(std430, binding = 0) buffer DataBuffer0
 };
 
 uniform int u_Resolution;
+uniform int u_SubTileSize;
 uniform float u_TileSize;
 uniform vec2 u_TileOffset;
 uniform mat4 u_Projection;
@@ -27,7 +28,7 @@ uniform mat4 u_ProjectionView;
 
 int PixelCoordToDataOffset(int x, int y)
 {
-	int tileSize = min(u_Resolution, 512);
+	int tileSize = u_SubTileSize;
 	int tileCount = u_Resolution / tileSize;
 	int tileX = x / tileSize, tileY = y / tileSize;
 	int tileXOffset = int(mod(x, tileSize)), tileYOffset = int(mod(y, tileSize));

@@ -58,7 +58,7 @@ void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int
 		this->SetStatusMessage("Exporting : " + path);
 		appState->workManager->SetUpdationPaused(true); // disable updation from main thread
 		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for current generation to finish
-		appState->meshGenerator->StartGeneration(); // restart fresh generation 
+		appState->workManager->StartWork(); // restart fresh generation 
 		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for fresh generation to finish
 		if (!this->ExportMesh(path, this->ApplyMeshTransform(appState->mainModel->mesh->Clone()), format)) this->SetStatusMessage("Failed to export : " + path);
 		else this->SetStatusMessage("");

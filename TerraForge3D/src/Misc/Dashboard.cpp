@@ -25,7 +25,7 @@ void Dashboard::ShowSettings()
 	if (ImGui::CollapsingHeader("Generator Resolution Settings"))
 	{
 		bool changed = false;
-		changed = PowerOfTwoDropDown("Tile Resolution##MainMapGen", &m_AppState->mainMap.tileResolution, 4, 20) || changed;
+		changed = PowerOfTwoDropDown("Tile Resolution##MainMapGen", &m_AppState->mainMap.tileResolution, 4, 32) || changed;
 		changed = ImGui::DragInt("Tile Count##MainMapGen", &m_AppState->mainMap.tileCount, 0.01f, 0, 1000000) || changed;
 
 		if (changed)

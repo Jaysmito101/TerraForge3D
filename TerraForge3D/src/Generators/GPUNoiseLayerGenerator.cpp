@@ -24,7 +24,7 @@ GPUNoiseLayerGenerator::GPUNoiseLayerGenerator(ApplicationState *as)
 }
 
 void GPUNoiseLayerGenerator::Generate(OpenCLContext* kernels, int tx, int ty)
-{
+{  
 	START_PROFILER();
 
 	noiseLayers[0].strength = appState->mainMap.tileSize / appState->mainMap.tileResolution;
