@@ -166,7 +166,6 @@ void WorkManager::Update()
 {
 	
 	{
-		m_WorkUploaded = 0;
 		for (int i = 0; i < m_WorkSize; i++) for (int j = 0; j < m_WorkSize; j++)
 		{
 			if (m_WorkStatusMatrix[i * m_WorkSize + j] == WorkManagerWorkStatus_CPUGeneratorsFinished)
@@ -176,15 +175,15 @@ void WorkManager::Update()
 				END_PROFILER(m_TempTime);
 				m_UploadTime += m_TempTime;
 				m_WorkStatusMatrix[i * m_WorkSize + j] = WorkManagerWorkStatus_Uploaded;
+				m_WorkUploaded += 1;
+				break;
 			}
-			if (m_WorkStatusMatrix[i * m_WorkSize + j] == WorkManagerWorkStatus_Uploaded) m_WorkUploaded += 1;
 		}
 	}
 
 	if (IsWorking()) return;
 	if (m_UpdationPaused) return;
-	if (!m_RequireRemesh) return;
-	m_RequireRemesh = false;
+	if (!m_RequireRemesh) return; m_RequireRemesh = false;
 	this->StartWork();
 }
 

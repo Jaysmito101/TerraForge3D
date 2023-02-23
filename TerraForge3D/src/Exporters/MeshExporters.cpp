@@ -50,19 +50,19 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 }
 
 
-void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int format)
+void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation)
 {
 	if (exporting) *exporting = true;
-	auto& worker = std::thread([path, format, exporting, this]()->void {
+	auto& worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
-		appState->workManager->SetUpdationPaused(true); // disable updation from main thread
+		if(updateWorkerUpdation) appState->workManager->SetUpdationPaused(true); // disable updation from main thread
 		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for current generation to finish
 		appState->workManager->StartWork(); // restart fresh generation 
 		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for fresh generation to finish
 		if (!this->ExportMesh(path, this->ApplyMeshTransform(appState->mainModel->mesh->Clone()), format)) this->SetStatusMessage("Failed to export : " + path);
 		else this->SetStatusMessage("");
-		appState->workManager->SetUpdationPaused(false); // enable updation from main thread
+		if (updateWorkerUpdation) appState->workManager->SetUpdationPaused(false); // enable updation from main thread
 		this->exportProgress = 1.1f;
 		if (exporting) *exporting = false;
 		});
@@ -89,6 +89,7 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 		auto previousTileX = appState->mainMap.currentTileX;
 		auto previousTileY = appState->mainMap.currentTileY;
 		this->SetStatusMessage("");
+		appState->workManager->SetUpdationPaused(true); // disable updation from main thread
 		for(auto tx = 0; tx < appState->mainMap.tileCount; tx++)
 		{
 			for (auto ty = 0; ty < appState->mainMap.tileCount; ty++)
@@ -96,10 +97,11 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 				appState->mainMap.currentTileX = tx;
 				appState->mainMap.currentTileY = ty;
 				outFilename = parentDir + "/" + filename + "_" + std::to_string(tx) + "_" + std::to_string(ty) + extension;
-				exportingTile = false; this->ExportMeshCurrentTile(outFilename, &exportingTile, format); // export tile mesh
+				exportingTile = false; this->ExportMeshCurrentTile(outFilename, &exportingTile, format, false); // export tile mesh
 				while (exportingTile) std::this_thread::sleep_for(100ms); // wait for the tile export to finish
 			}
 		}
+		appState->workManager->SetUpdationPaused(false); // enable updation from main thread
 		this->SetStatusMessage("");
 		appState->mainMap.currentTileX = previousTileX;
 		appState->mainMap.currentTileY = previousTileY;

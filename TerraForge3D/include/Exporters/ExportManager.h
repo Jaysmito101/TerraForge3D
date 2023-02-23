@@ -23,7 +23,7 @@ public:
 
 	void Update();
 	
-	void ExportMeshCurrentTile(std::string path, bool* exporting, int format);
+	void ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation = true);
 	void ExportMeshAllTiles(std::string path, bool* exporting, int format);
 
 public:
