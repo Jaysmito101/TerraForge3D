@@ -151,14 +151,21 @@ void WorkManager::ShowSettings()
 				ImGui::Text("Status     : %s", m_GPUGeneratorWorkers[i]->IsIdle() ? "Idle" : (m_GPUGeneratorWorkers[i]->HasFinishedJob() ? "Finished Job" : "Working"));
 				ImGui::Text("Job Time   : %f ms", m_GPUGeneratorWorkers[i]->GetJobTime());
 				ImGui::ProgressBar(m_GPUGeneratorWorkers[i]->GetProgress());
+				ImGui::Selectable("Change Device");
+				if (ImGui::BeginPopupContextItem())
+				{
+					for (int j = 0; j < m_GPUGeneratorWorkers[i]->GetContexts().size(); j++)
+					{
+						if (ImGui::Button(m_GPUGeneratorWorkers[i]->GetContexts()[j]->GetDevice().GetName().data()))
+							m_GPUGeneratorWorkers[i]->SetContextInUse(j);
+					}
+					ImGui::EndPopup();
+				}
 				ImGui::Separator();
 				ImGui::PopID();
 			}
 		}
 	}
-
-
-
 	ImGui::End();
 }
 

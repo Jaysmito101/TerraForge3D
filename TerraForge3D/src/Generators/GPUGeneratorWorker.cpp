@@ -89,11 +89,11 @@ void GPUGeneratorWorker::Worker()
 
 
 		auto& gpuNoiseLayers = appState->meshGenerator->GetGPUNoiseLayers();
-
+		 
 		START_PROFILER();
 
 		for (int i = 0; i < 2; i++)
-		{
+		{ 
 			m_OpenCLContexts[m_OpenCLContextToUse]->CreateBuffer("data_layer_" + std::to_string(i), CL_MEM_READ_WRITE, tileDataSize);
 			// m_OpenCLContexts[m_OpenCLContextToUse]->WriteBuffer("data_layer_" + std::to_string(i), true, 0, tileDataSize, appState->mainMap.currentTileDataLayers[i]->GetTilePointer(job_sz.first, job_sz.second));
 		}

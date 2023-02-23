@@ -43,6 +43,9 @@ public:
 	inline std::pair<int, int> GetCurrentWork() { return { currentX, currentY }; }
 	inline bool IsIdle() { return this->current_state == GPUGeneratorWorkerState_Waiting && this->jobs_sizes.size() == 0 && this->jobs_sizes_finished.size() == 0; }
 	inline const OpenCLContext* GetContextInUse() const { return m_OpenCLContexts[m_OpenCLContextToUse]; }
+	inline const std::vector<OpenCLContext*>& GetContexts() const { return m_OpenCLContexts; }
+	inline std::vector<OpenCLContext*>& GetContexts() { return m_OpenCLContexts; }
+	inline void SetContextInUse(int index) { m_OpenCLContextToUse = index; }
 
 private:
 	void Worker();

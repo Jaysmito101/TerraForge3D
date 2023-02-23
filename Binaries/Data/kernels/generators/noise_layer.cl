@@ -29,8 +29,8 @@ __kernel void process_map_noise_layer(__global NoiseLayer* nl,
 	}
 
 	n = n * nl[1].strength;
-
-	data_layer_0[get_global_id(1) * tileRes + get_global_id(0)].x = UpdateLayerWithUpdateMethod(data_layer_0[y_coord * tileResolution + x_coord].x, n, (int)nl[0].offset.w);
+	float previous_data = data_layer_0[get_global_id(1) * tileRes + get_global_id(0)].x;
+	data_layer_0[get_global_id(1) * tileRes + get_global_id(0)].x = UpdateLayerWithUpdateMethod(previous_data, n, (int)nl[0].offset.w);
 }
 
 

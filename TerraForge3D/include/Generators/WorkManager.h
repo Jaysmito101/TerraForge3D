@@ -60,6 +60,7 @@ public:
 	inline int32_t GetGPUGeneratorWorkerCount() const { return m_GPUGeneratorWorkerCount; }
 	inline int32_t GetWorkSize() const { return m_WorkSize; }
 	inline int32_t GetWorkResolution() const { return m_WorkResolution; }
+
 	
 private:
 	void ResetWorkStatus();
