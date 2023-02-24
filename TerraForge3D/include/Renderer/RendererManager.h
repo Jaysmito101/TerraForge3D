@@ -2,7 +2,7 @@
 
 #include "Renderer/RendererViewport.h"
 #include "Renderer/ObjectRenderer.h"
-//#include "Renderer/HeightmapRenderer.h"
+#include "Renderer/HeightmapRenderer.h"
 //#include "Renderer/ShadedRenderer.h"
 //#include "Renderer/TextureSlotRenderer.h"
 #include "Renderer/WireframeRenderer.h"
@@ -27,7 +27,7 @@ private:
 	ApplicationState* m_AppState = nullptr;
 	bool m_IsWindowVisible = true;
 	ObjectRenderer* m_ObjectRenderer = nullptr;
-	//HeightmapRenderer* m_HeightmapRenderer = nullptr;
+	HeightmapRenderer* m_HeightmapRenderer = nullptr;
 	//ShadedRenderer* m_ShadedRenderer = nullptr;
 	//TextureSlotRenderer* m_TextureSlotRenderer = nullptr;
 	WireframeRenderer* m_WireframeRenderer = nullptr;

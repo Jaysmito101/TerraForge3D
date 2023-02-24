@@ -4,7 +4,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 {
 	this->m_AppState = appState;
 	this->m_ObjectRenderer = new ObjectRenderer(appState);
-	//this->m_HeightmapRenderer = new HeightmapRenderer(appState);
+	this->m_HeightmapRenderer = new HeightmapRenderer(appState);
 	//this->m_ShadedRenderer = new ShadedRenderer(appState);
 	//this->m_TextureSlotRenderer = new TextureSlotRenderer(appState);
 	this->m_WireframeRenderer = new WireframeRenderer(appState);
@@ -15,7 +15,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 RendererManager::~RendererManager()
 {
 	delete m_ObjectRenderer;
-	//delete m_HeightmapRenderer;
+	delete m_HeightmapRenderer;
 	//delete m_ShadedRenderer;
 	//delete m_TextureSlotRenderer;
 	delete m_WireframeRenderer;
@@ -29,7 +29,7 @@ void RendererManager::Render(RendererViewport* viewport)
 	{
 	case RendererViewportMode_Object: m_ObjectRenderer->Render(viewport); break;
 	case RendererViewportMode_Wireframe: m_WireframeRenderer->Render(viewport); break;
-	//case RendererViewportMode_Heightmap: m_HeightmapRenderer->Render(viewport); break;
+	case RendererViewportMode_Heightmap: m_HeightmapRenderer->Render(viewport); break;
 	//case RendererViewportMode_Shaded: m_ShadedRenderer->Render(viewport); break;
 	//case RendererViewportMode_TextureSlot: m_TextureSlotRenderer->Render(viewport); break;
 	default: break;
@@ -62,7 +62,7 @@ void RendererManager::ShowSettings()
 			if (ImGui::BeginTabItem("Heightmap"))
 			{
 				ImGui::PushID("Core Settings Type->Heightmap");
-				// m_HeightRenderer->ShowSettings();
+				m_HeightmapRenderer->ShowSettings();
 				ImGui::PopID();
 				ImGui::EndTabItem();
 			}

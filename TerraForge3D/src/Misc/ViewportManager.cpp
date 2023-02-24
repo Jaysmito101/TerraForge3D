@@ -44,17 +44,23 @@ void ViewportManager::Show()
 		{
 			m_RendererViewport->m_Camera.position[0] += m_MovementSpeed * (- io.MouseDelta.x * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(m_RendererViewport->m_Camera.position[0], m_RendererViewport->m_Camera.position[1], m_RendererViewport->m_Camera.position[2])));
 			m_RendererViewport->m_Camera.position[1] += m_MovementSpeed * (io.MouseDelta.y * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(m_RendererViewport->m_Camera.position[0], m_RendererViewport->m_Camera.position[1], m_RendererViewport->m_Camera.position[2])));
+			m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
+			m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
 		}
 		if (io.MouseDown[ImGuiMouseButton_Middle] && !(ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)))
 		{
 			m_RendererViewport->m_Camera.rotation[0] += io.MouseDelta.x * m_RotationSpeed * 10.0f;
 			m_RendererViewport->m_Camera.rotation[1] += io.MouseDelta.y * m_RotationSpeed * 10.0f;
+			m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
+			m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
 		}
 		if (fabs(io.MouseWheel) > 0.000001f)
 		{
 			m_RendererViewport->m_Camera.position[0] += m_AppState->constants.FRONT.x * m_ZoomSpeed * 0.06f * io.MouseWheel;
 			m_RendererViewport->m_Camera.position[1] += m_AppState->constants.FRONT.y * m_ZoomSpeed * 0.06f * io.MouseWheel;
 			m_RendererViewport->m_Camera.position[2] += m_AppState->constants.FRONT.z * m_ZoomSpeed * 0.06f * io.MouseWheel;
+			m_RendererViewport->m_Scale += m_ZoomSpeed * 0.06f * io.MouseWheel;
+			m_RendererViewport->m_Scale = glm::clamp(m_RendererViewport->m_Scale, 0.0000001f, 1000000.0f);
 		}
 
 
@@ -64,6 +70,7 @@ void ViewportManager::Show()
 	}
 	ImVec2 wsize = ImGui::GetWindowSize();
 	m_Width = wsize.x; m_Height = wsize.y;
+	m_RendererViewport->m_AspectRatio = m_Width / (m_Height + 0.000000001f);
 	ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->m_FrameBuffer->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::EndChild();
 	this->ShowSettingPopUp();

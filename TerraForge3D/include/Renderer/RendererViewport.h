@@ -27,4 +27,5 @@ public:
 	RendererViewportMode m_ViewportMode = RendererViewportMode_Object; // Viewport mode
 	uint32_t m_TextureSlot = 1;
 	float m_OffsetX = 0.0f, m_OffsetY = 0.0f, m_Scale = 1.0;
+	float m_AspectRatio = 1.0f;
 };
