@@ -5,7 +5,7 @@
 //#include "Renderer/HeightmapRenderer.h"
 //#include "Renderer/ShadedRenderer.h"
 //#include "Renderer/TextureSlotRenderer.h"
-//#include "Renderer/WireframeRenderer.h"
+#include "Renderer/WireframeRenderer.h"
 
 #include "Renderer/RendererLights.h"
 
@@ -30,7 +30,7 @@ private:
 	//HeightmapRenderer* m_HeightmapRenderer = nullptr;
 	//ShadedRenderer* m_ShadedRenderer = nullptr;
 	//TextureSlotRenderer* m_TextureSlotRenderer = nullptr;
-	//WireframeRenderer* m_WireframeRenderer = nullptr;
+	WireframeRenderer* m_WireframeRenderer = nullptr;
 
 	RendererLights* m_RendererLights = nullptr;
 };

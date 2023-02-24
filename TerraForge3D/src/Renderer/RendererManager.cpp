@@ -7,7 +7,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 	//this->m_HeightmapRenderer = new HeightmapRenderer(appState);
 	//this->m_ShadedRenderer = new ShadedRenderer(appState);
 	//this->m_TextureSlotRenderer = new TextureSlotRenderer(appState);
-	//this->m_WireframeRenderer = new WireframeRenderer(appState);
+	this->m_WireframeRenderer = new WireframeRenderer(appState);
 
 	this->m_RendererLights = new RendererLights(appState);
 }
@@ -18,7 +18,7 @@ RendererManager::~RendererManager()
 	//delete m_HeightmapRenderer;
 	//delete m_ShadedRenderer;
 	//delete m_TextureSlotRenderer;
-	//delete m_WireframeRenderer;
+	delete m_WireframeRenderer;
 
 	delete m_RendererLights;
 }
@@ -28,7 +28,7 @@ void RendererManager::Render(RendererViewport* viewport)
 	switch (viewport->m_ViewportMode)
 	{
 	case RendererViewportMode_Object: m_ObjectRenderer->Render(viewport); break;
-	//case RendererViewportMode_Wireframe: m_WireframeRenderer->Render(viewport); break;
+	case RendererViewportMode_Wireframe: m_WireframeRenderer->Render(viewport); break;
 	//case RendererViewportMode_Heightmap: m_HeightmapRenderer->Render(viewport); break;
 	//case RendererViewportMode_Shaded: m_ShadedRenderer->Render(viewport); break;
 	//case RendererViewportMode_TextureSlot: m_TextureSlotRenderer->Render(viewport); break;
@@ -55,7 +55,7 @@ void RendererManager::ShowSettings()
 			if (ImGui::BeginTabItem("Wireframe")) 
 			{
 				ImGui::PushID("Core Settings Type->Wireframe");
-				// m_WireframeRenderer->ShowSettings();
+				m_WireframeRenderer->ShowSettings();
 				ImGui::PopID();
 				ImGui::EndTabItem();
 			}
@@ -86,7 +86,7 @@ void RendererManager::ShowSettings()
 	ImGui::PopID();
 	ImGui::Separator();
 	ImGui::PushID("Items Settings");
-	if (ImGui::CollapsingHeader("Items"))
+	if (ImGui::CollapsingHeader("Items")) 
 	{
 		if (ImGui::BeginTabBar("Items Settings"))
 		{

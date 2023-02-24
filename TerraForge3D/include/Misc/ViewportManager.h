@@ -28,6 +28,7 @@ private:
 	uint32_t m_ID = 0;
 	float m_Width = 512.0f, m_Height = 512.0f;
 	float m_MousePosX = 0.0f, m_MousePosY = 0.0f;
+	float m_ZoomSpeed = 1.0f, m_MovementSpeed = 1.0f, m_RotationSpeed = 1.0f;
 	bool m_IsVisible = true;
 	bool m_AutoCalculateAspectRatio = true;
 };
