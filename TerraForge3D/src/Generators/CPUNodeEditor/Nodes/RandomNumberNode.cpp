@@ -7,6 +7,12 @@
 #include "Generators/CPUNodeEditor/Nodes/RandomNumberNode.h"
 
 
+static uint32_t fastRandomNumber(int seed)
+{
+	seed = (214013 * seed + 2531011);
+	return (seed >> 16) & 0x7FFF;
+}
+
 NodeOutput RandomNumberNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 {
 	int s, mx, mn;
@@ -23,10 +29,11 @@ NodeOutput RandomNumberNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 
 	if(mn > mx) std::swap(mn, mx);
 
-	std::seed_seq seq{seed};
-	engine.seed(seq);
-	std::uniform_int_distribution<int> dist(mn, mx);
-	return NodeOutput({(float)dist(engine)});
+	//std::seed_seq seq{seed};
+	//engine.seed(seq);
+	//std::uniform_int_distribution<int> dist(mn, mx);
+	//return NodeOutput({(float)dist(engine)});
+	return NodeOutput({(float)fastRandomNumber(s) / 32767.0f});
 }
 
 void RandomNumberNode::Load(nlohmann::json data)
