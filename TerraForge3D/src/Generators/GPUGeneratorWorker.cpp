@@ -115,12 +115,12 @@ void GPUGeneratorWorker::Worker()
 void GPUGeneratorWorker::SetupOpenCL()
 {
 	// Get Platforms
-	auto& platforms = OpenCLPlatform::GetPlatforms();
+	auto platforms = OpenCLPlatform::GetPlatforms();
 	m_OpenCLContexts.clear();
 	for (auto& platform : platforms)
 	{
 		// Get Devices
-		auto& devices = platform.GetDevices();
+		auto devices = platform.GetDevices();
 		for (auto& device : devices)
 		{
 			// Create Context

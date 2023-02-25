@@ -13,6 +13,7 @@ class GPUNoiseLayerGenerator;
 #include <vector>
 #include <queue>
 #include <atomic>
+#include <thread>
 
 enum GPUGeneratorWorkerState
 {
