@@ -1,10 +1,15 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <glad/glad.h>
 
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#ifdef min 
+#undef min
+#endif
+
+#ifdef max
+#undef max
 #endif
 
 class DataTexture
@@ -39,7 +44,7 @@ public:
 	
 	inline void SetTileSize(int tSize)
 	{
-		tileSize = min(size, tSize);
+		tileSize = std::min(size, tSize);
 		tileCount = size / tileSize;
 	}
 

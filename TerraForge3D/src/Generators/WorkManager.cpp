@@ -210,7 +210,7 @@ void WorkManager::Resize()
 {
 	//this->WaitForFinish();
 	delete m_WorkStatusMatrix;
-	m_WorkResolution = min(m_SubTileSize, m_AppState->mainMap.tileResolution);
+	m_WorkResolution = std::min(m_SubTileSize, m_AppState->mainMap.tileResolution);
 	m_WorkSize = m_AppState->mainMap.tileResolution / m_WorkResolution;
 	m_WorkStatusMatrix = new WorkManagerWorkStatus[(uint64_t)m_WorkSize * m_WorkSize];
 	for (int i = 0; i < 6; i++) m_AppState->mainMap.currentTileDataLayers[i]->SetTileSize(m_WorkResolution);

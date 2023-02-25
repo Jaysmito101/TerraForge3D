@@ -33,7 +33,7 @@ void HeightmapRenderer::Render(RendererViewport* viewport)
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_AspectRatio"), ((float)viewport->m_AspectRatio));
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Offset"), viewport->m_OffsetX, viewport->m_OffsetY);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Scale"), viewport->m_Scale);
-	auto& rendererLights = m_AppState->rendererManager->GetRendererLights()->m_RendererLights; auto renderLightsCount = min(rendererLights.size(), OBJECT_RENDERER_MAX_LIGHTS);
+	auto& rendererLights = m_AppState->rendererManager->GetRendererLights()->m_RendererLights; auto renderLightsCount = std::min((int)rendererLights.size(), OBJECT_RENDERER_MAX_LIGHTS);
 	m_ScreenQuad->Render();
 }
 
