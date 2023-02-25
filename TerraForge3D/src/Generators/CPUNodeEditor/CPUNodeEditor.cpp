@@ -52,6 +52,13 @@
 #include <iostream>
 #include <mutex>
 
+#ifdef min 
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+
 static char *stristr4(const char *str, const char *pattern)
 {
 	size_t i;

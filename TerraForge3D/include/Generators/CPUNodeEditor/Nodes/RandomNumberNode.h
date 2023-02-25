@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Base/NodeEditor/NodeEditor.h"
 #include <vector>
 #include <random>
 
@@ -8,12 +7,15 @@
 #include<bits/stdc++.h>
 #endif
 
+#include "Base/NodeEditor/NodeEditor.h"
+
 #ifdef min 
 #undef min
 #endif
 #ifdef max
 #undef max
 #endif
+
 
 class RandomNumberNode : public NodeEditorNode
 {
