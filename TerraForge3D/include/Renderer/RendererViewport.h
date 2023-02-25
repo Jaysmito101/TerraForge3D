@@ -25,7 +25,9 @@ public:
 	FrameBuffer* m_FrameBuffer = nullptr; // Framebuffer for this viewport
 	Camera m_Camera; // Camera for this viewport
 	RendererViewportMode m_ViewportMode = RendererViewportMode_Object; // Viewport mode
-	uint32_t m_TextureSlot = 1;
+	bool m_TextureSlotDetailedMode = false; // Detailed mode for texture slot renderer
+	int32_t m_TextureSlot = 0; // Texture slot to render
+	std::pair<int32_t, int32_t> m_TextureSlotDetailed[4];
 	float m_OffsetX = 0.0f, m_OffsetY = 0.0f, m_Scale = 1.0;
 	float m_AspectRatio = 1.0f;
 };

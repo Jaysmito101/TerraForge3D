@@ -24,8 +24,6 @@ void ViewportManager::Update()
 	if (m_IsVisible) this->m_AppState->rendererManager->Render(this->m_RendererViewport);
 }
 
-
-
 void ViewportManager::Show()
 {
 	static char s_TempBuffer[1024]; 
@@ -92,6 +90,7 @@ void ViewportManager::ShowSettingPopUp()
 		
 		SHOW_COMBO_BOX("Viewport Mode", m_RendererViewport->m_ViewportMode, viewportModesText, IM_ARRAYSIZE(viewportModesText));
 		ImGui::NewLine();
+
 		if (m_RendererViewport->m_ViewportMode != RendererViewportMode_Heightmap && m_RendererViewport->m_ViewportMode != RendererViewportMode_TextureSlot)
 		{
 			ImGui::Text("Camera Settings");
@@ -105,12 +104,54 @@ void ViewportManager::ShowSettingPopUp()
 			ImGui::DragFloat("Offset Y", &m_RendererViewport->m_OffsetY, 0.01f);
 			ImGui::DragFloat("Scale", &m_RendererViewport->m_Scale, 0.01f);
 		}
+
+		if (m_RendererViewport->m_ViewportMode == RendererViewportMode_TextureSlot)
+		{
+			ImGui::Checkbox("Texture Slot Detailed Mode", &m_RendererViewport->m_TextureSlotDetailedMode);
+			if (m_RendererViewport->m_TextureSlotDetailedMode)
+			{
+				static const char* s_TextureSlotChannels[] = { "R", "G", "B", "A" };
+				for (int i = 0; i < 4; i++)
+				{
+					ImGui::PushID(i);
+					ImGui::Text("Viewport Channel %s :", s_TextureSlotChannels[i]);
+					if(ImGui::DragInt("Texture Slot", &m_RendererViewport->m_TextureSlotDetailed[i].first, 0.1f, 0, 5))
+						m_RendererViewport->m_TextureSlotDetailed[i].first = glm::clamp(m_RendererViewport->m_TextureSlotDetailed[i].first, 0, 5);
+					ShowTextureSlotDetailsPopup();
+					if (ImGui::DragInt("Texture Slot Channel", &m_RendererViewport->m_TextureSlotDetailed[i].second, 0.1f, 0, 3))
+						m_RendererViewport->m_TextureSlotDetailed[i].first = glm::clamp(m_RendererViewport->m_TextureSlotDetailed[i].first, 0, 3);
+					ImGui::PopID();
+				}
+
+			}
+			else
+			{
+				if (ImGui::DragInt("Texture Slot", &m_RendererViewport->m_TextureSlot, 0.1f, 0, 5))
+					m_RendererViewport->m_TextureSlot = glm::clamp(m_RendererViewport->m_TextureSlot, 0, 5);
+				ShowTextureSlotDetailsPopup();
+			}
+		}
+		ImGui::Text("Speed Settings");
 		ImGui::DragFloat("Movement Speed", &m_MovementSpeed, 0.01f);
 		ImGui::DragFloat("Rotation Speed", &m_RotationSpeed, 0.01f);
 		ImGui::DragFloat("Zoom Speed", &m_ZoomSpeed, 0.01f);
 		ImGui::NewLine();
 
 
+		ImGui::EndPopup();
+	}
+}
+
+void ViewportManager::ShowTextureSlotDetailsPopup()
+{
+	if (ImGui::BeginPopupContextItem())
+	{
+		ImGui::Text("0 : [Heightmap, Custom, Custom, Custom]");
+		ImGui::Text("1 : [Custom, Custom, Custom, Custom]");
+		ImGui::Text("2 : [Custom, Custom, Custom, Custom]");
+		ImGui::Text("3 : Albedo");
+		ImGui::Text("4 : Normal");
+		ImGui::Text("5 : [AO, Roughness, Metallic, Unused]");
 		ImGui::EndPopup();
 	}
 }

@@ -3,8 +3,8 @@
 #include "Renderer/RendererViewport.h"
 #include "Renderer/ObjectRenderer.h"
 #include "Renderer/HeightmapRenderer.h"
-//#include "Renderer/ShadedRenderer.h"
-//#include "Renderer/TextureSlotRenderer.h"
+#include "Renderer/ShadedRenderer.h"
+#include "Renderer/TextureSlotRenderer.h"
 #include "Renderer/WireframeRenderer.h"
 
 #include "Renderer/RendererLights.h"
@@ -28,8 +28,8 @@ private:
 	bool m_IsWindowVisible = true;
 	ObjectRenderer* m_ObjectRenderer = nullptr;
 	HeightmapRenderer* m_HeightmapRenderer = nullptr;
-	//ShadedRenderer* m_ShadedRenderer = nullptr;
-	//TextureSlotRenderer* m_TextureSlotRenderer = nullptr;
+	ShadedRenderer* m_ShadedRenderer = nullptr;
+	TextureSlotRenderer* m_TextureSlotRenderer = nullptr;
 	WireframeRenderer* m_WireframeRenderer = nullptr;
 
 	RendererLights* m_RendererLights = nullptr;

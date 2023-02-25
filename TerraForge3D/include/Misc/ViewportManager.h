@@ -21,6 +21,7 @@ public:
 
 private:
 	void ShowSettingPopUp();
+	void ShowTextureSlotDetailsPopup();
 
 private:
 	ApplicationState* m_AppState = nullptr;

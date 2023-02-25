@@ -178,7 +178,7 @@ void WorkManager::Update()
 			if (m_WorkStatusMatrix[i * m_WorkSize + j] == WorkManagerWorkStatus_CPUGeneratorsFinished)
 			{
 				START_PROFILER();
-				for (int k = 0; k < 2; k++) m_AppState->mainMap.currentTileDataLayers[k]->UploadTileToGPU(j, i);
+				for (int k = 0; k < 3; k++) m_AppState->mainMap.currentTileDataLayers[k]->UploadTileToGPU(j, i);
 				END_PROFILER(m_TempTime);
 				m_UploadTime += m_TempTime;
 				m_WorkStatusMatrix[i * m_WorkSize + j] = WorkManagerWorkStatus_Uploaded;
