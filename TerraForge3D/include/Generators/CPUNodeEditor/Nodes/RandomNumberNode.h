@@ -4,6 +4,17 @@
 #include <vector>
 #include <random>
 
+#ifndef _WIN32
+#include<bits/stdc++.h>
+#endif
+
+#ifdef min 
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+
 class RandomNumberNode : public NodeEditorNode
 {
 public:

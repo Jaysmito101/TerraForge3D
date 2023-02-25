@@ -1,9 +1,11 @@
-#include "Generators/CPUNodeEditor/Nodes/RandomNumberNode.h"
 #include "Base/ImGuiShapes.h"
 #include "Generators/CPUNodeEditor/CPUNodeEditor.h"
-#include <iostream>
 
+#include <iostream>
 #include <mutex>
+
+#include "Generators/CPUNodeEditor/Nodes/RandomNumberNode.h"
+
 
 NodeOutput RandomNumberNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 {
