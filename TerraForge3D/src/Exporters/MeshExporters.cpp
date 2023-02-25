@@ -29,8 +29,8 @@ Mesh* ExportManager::ApplyMeshTransform(Mesh* mesh)
 
 bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 {
-	auto& fsPath = std::filesystem::path(path);
-	auto& filename0 = fsPath.filename().u8string();
+	auto fsPath = std::filesystem::path(path);
+	auto filename0 = fsPath.filename().u8string();
 	auto filename = std::string("");
 	for (auto ch : filename0) if (std::isalnum(ch) || ch == ' ' || ch == '_') filename += ch;
 	path = fsPath.parent_path().u8string() + "/" + filename;
@@ -53,7 +53,7 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation)
 {
 	if (exporting) *exporting = true;
-	auto& worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
+	auto worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
 		if(updateWorkerUpdation) appState->workManager->SetUpdationPaused(true); // disable updation from main thread
@@ -73,13 +73,13 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 {
 	if (exporting) *exporting = true;
 	this->hideExportControls = true;
-	auto& worker = std::thread([pathStr, format, exporting, this]()->void {
+	auto worker = std::thread([pathStr, format, exporting, this]()->void {
 		using namespace std::chrono_literals;
-		auto& path = std::filesystem::path(pathStr);
-		auto& parentDir = path.parent_path().u8string();
-		auto& filename = path.filename().u8string();
-		auto& extension = std::string("");
-		auto& outFilename = std::string("");
+		auto path = std::filesystem::path(pathStr);
+		auto parentDir = path.parent_path().u8string();
+		auto filename = path.filename().u8string();
+		auto extension = std::string("");
+		auto outFilename = std::string("");
 		bool exportingTile = false;
 		if (path.has_extension())
 		{
