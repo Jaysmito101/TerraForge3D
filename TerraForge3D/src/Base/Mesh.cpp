@@ -353,6 +353,64 @@ void Mesh::GenerateScreenQuad(float dist)
 	indices[5] = 3;
 }
 
+void Mesh::GenerateCube()
+{
+	float skyboxVertices[][3] = {
+		{-1.0f,  1.0f, -1.0f},
+		{-1.0f, -1.0f, -1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{ 1.0f,  1.0f, -1.0f},
+		{-1.0f,  1.0f, -1.0f},
+		{-1.0f, -1.0f,  1.0f},
+		{-1.0f, -1.0f, -1.0f},
+		{-1.0f,  1.0f, -1.0f},
+		{-1.0f,  1.0f, -1.0f},
+		{-1.0f,  1.0f,  1.0f},
+		{-1.0f, -1.0f,  1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{ 1.0f, -1.0f,  1.0f},
+		{ 1.0f,  1.0f,  1.0f},
+		{ 1.0f,  1.0f,  1.0f},
+		{ 1.0f,  1.0f, -1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{-1.0f, -1.0f,  1.0f},
+		{-1.0f,  1.0f,  1.0f},
+		{ 1.0f,  1.0f,  1.0f},
+		{ 1.0f,  1.0f,  1.0f},
+		{ 1.0f, -1.0f,  1.0f},
+		{-1.0f, -1.0f,  1.0f},
+		{-1.0f,  1.0f, -1.0f},
+		{ 1.0f,  1.0f, -1.0f},
+		{ 1.0f,  1.0f,  1.0f},
+		{ 1.0f,  1.0f,  1.0f},
+		{-1.0f,  1.0f,  1.0f},
+		{-1.0f,  1.0f, -1.0f},
+		{-1.0f, -1.0f, -1.0f},
+		{-1.0f, -1.0f,  1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{-1.0f, -1.0f,  1.0f},
+		{ 1.0f, -1.0f,  1.0f}
+	};
+
+	if (vert) delete[] vert;
+	if (indices) delete[] indices;
+
+	Vert* vertices = new Vert[36];
+	int* inds = new int[36];
+	for (auto i = 0; i < 36; i++)
+	{
+		vertices[i].position = glm::vec4(skyboxVertices[i][0], skyboxVertices[i][1], skyboxVertices[i][2], 0);
+		inds[i] = i;
+	}
+
+	this->vert = vertices;
+	this->indices = inds;
+	this->indexCount = 36;
+	this->vertexCount = 36;
+}
+
 void Mesh::SetElevation(float elevation, int x, int y)
 {
 	if (!vert) return;

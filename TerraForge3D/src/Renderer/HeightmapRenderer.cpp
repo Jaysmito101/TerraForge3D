@@ -20,9 +20,6 @@ HeightmapRenderer::~HeightmapRenderer()
 
 void HeightmapRenderer::Render(RendererViewport* viewport)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
-	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_Shader->Bind();
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);

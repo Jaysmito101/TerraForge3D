@@ -30,6 +30,7 @@ public:
 
 public:
 	std::vector<RendererLightData> m_RendererLights;
+	bool m_UseSkyLight = false;
 
 private:
 	ApplicationState* m_AppState = nullptr;

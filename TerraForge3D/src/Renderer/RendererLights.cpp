@@ -19,6 +19,12 @@ RendererLights::~RendererLights()
 void RendererLights::ShowSettings()
 {
 	ImGui::Text("Light Settings");
+	ImGui::Checkbox("Use Sky Light", &m_UseSkyLight);
+	if (ImGui::BeginPopupContextItem())
+	{
+		ImGui::Text("Enabling this will mean using environment lighting from the loaded skybox.");
+		ImGui::EndPopup();
+	}
 	ImGui::Separator();
 	for (int i = 0; i < m_RendererLights.size(); i++)
 	{

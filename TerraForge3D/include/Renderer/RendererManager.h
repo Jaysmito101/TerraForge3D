@@ -8,6 +8,7 @@
 #include "Renderer/WireframeRenderer.h"
 
 #include "Renderer/RendererLights.h"
+#include "Renderer/RendererSky.h"
 
 class ApplicationState;
 
@@ -21,7 +22,9 @@ public:
 	void ShowSettings();
 	inline bool IsWindowVisible() { return this->m_IsWindowVisible; }
 	inline bool* IsWindowVisiblePtr() { return &this->m_IsWindowVisible; }
+
 	inline RendererLights* GetRendererLights() { return this->m_RendererLights; }
+	inline RendererSky* GetSkyRenderer() { return this->m_RendererSky; }
 
 private:
 	ApplicationState* m_AppState = nullptr;
@@ -33,5 +36,6 @@ private:
 	WireframeRenderer* m_WireframeRenderer = nullptr;
 
 	RendererLights* m_RendererLights = nullptr;
+	RendererSky* m_RendererSky = nullptr;
 };
 

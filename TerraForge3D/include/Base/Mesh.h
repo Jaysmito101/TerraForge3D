@@ -32,6 +32,8 @@ public:
 
 	void GenerateSphere(int resolution, float radius);
 
+	void GenerateCube();
+
 	void SetElevation(float elevation, int x, int y);
 
 	float GetElevation(int x, int y);

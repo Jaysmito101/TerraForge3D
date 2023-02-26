@@ -15,9 +15,6 @@ WireframeRenderer::~WireframeRenderer()
 
 void WireframeRenderer::Render(RendererViewport* viewport)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
-	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LESS); glDepthMask(GL_TRUE); glDepthRange(0.0f, 1.0f);
 	viewport->m_Camera.UpdateCamera();
 	m_Shader->Bind();
