@@ -235,7 +235,7 @@ void Mesh::GenerateScreenQuad(float dist)
 	Vert v;
 
 
-	v.position = glm::vec4(-1, -1, dist, 0);
+	v.position = glm::vec4(-1, -1, dist, 0); 
 	v.texCoord = glm::vec4(0, 0, 0, 0);
 	m_Vertices.push_back(v);
 
@@ -251,15 +251,11 @@ void Mesh::GenerateScreenQuad(float dist)
 	v.texCoord = glm::vec4(1, 0, 0, 0);
 	m_Vertices.push_back(v);
 
-
-	for (int i = 0; i < 2; i++)
-	{
-		Face f;
-		f.a = i * 3 + 0;
-		f.b = i * 3 + 1;
-		f.c = i * 3 + 2;
-		m_Faces.push_back(f);
-	}
+	 
+	Face f0 = {0, 1, 2};
+	m_Faces.push_back(f0);
+	Face f1 = {0, 2, 3};
+	m_Faces.push_back(f1);
 }
 
 void Mesh::GenerateCube()

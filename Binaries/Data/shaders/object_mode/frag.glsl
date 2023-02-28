@@ -103,7 +103,8 @@ void main()
 		}
 	}
 	vec3 irradiance = texture(u_IrradianceMap, normal).rgb;
-	outputColor = aces(outputColor + irradiance * 0.4f);
+	if(u_EnableSkyLight) outputColor = outputColor + irradiance * 0.4f;
+	outputColor = aces(outputColor);
 	outputColor = pow(outputColor, vec3(1.0f/2.2f));
 	FragColor = vec4(outputColor, 1.0f);
 }
