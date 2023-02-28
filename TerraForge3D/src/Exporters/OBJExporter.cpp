@@ -40,9 +40,9 @@ bool OBJExporter::WriteHeader(std::stringstream& out_strm, Mesh* mesh, float* pr
 bool OBJExporter::WriteVertices(std::stringstream& out_strm, Mesh* mesh, float* progress)
 {
 	out_strm << "# Vertices\n";
-	for (size_t i = 0; i < mesh->vertexCount; i++)
+	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& pos = mesh->vert[i].position;
+		const auto& pos = mesh->GetPosition(i);
 		sprintf(buffer, "v %f %f %f\n", pos.x, pos.y, pos.z);
 		out_strm << buffer;
 	}
@@ -53,9 +53,9 @@ bool OBJExporter::WriteVertices(std::stringstream& out_strm, Mesh* mesh, float* 
 bool OBJExporter::WriteNormals(std::stringstream& out_strm, Mesh* mesh, float* progress)
 {
 	out_strm << "# Normals\n";
-	for (size_t i = 0; i < mesh->vertexCount; i++)
+	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& nor = mesh->vert[i].normal;
+		const auto& nor = mesh->GetNormal(i);
 		sprintf(buffer, "vn %f %f %f\n", nor.x, nor.y, nor.z);
 		out_strm << buffer;
 	}
@@ -66,9 +66,9 @@ bool OBJExporter::WriteNormals(std::stringstream& out_strm, Mesh* mesh, float* p
 bool OBJExporter::WriteTextureCoordinates(std::stringstream& out_strm, Mesh* mesh, float* progress)
 {
 	out_strm << "# Texture Coordinates\n";
-	for (size_t i = 0; i < mesh->vertexCount; i++)
+	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& tex = mesh->vert[i].texCoord;
+		const auto& tex = mesh->GetTexCoord(i);
 		sprintf(buffer, "vt %f %f\n", tex.x, tex.y);
 		out_strm << buffer;
 	}
@@ -79,11 +79,12 @@ bool OBJExporter::WriteTextureCoordinates(std::stringstream& out_strm, Mesh* mes
 bool OBJExporter::WriteFaces(std::stringstream& out_strm, Mesh* mesh, float* progress)
 {
 	out_strm << "# Faces\n";
-	for (size_t i = 0; i < mesh->indexCount; i+=3)
+	for (int i = 0; i < mesh->GetFaceCount(); i++)
 	{
-		auto index_a = mesh->indices[i + 0] + 1;
-		auto index_b = mesh->indices[i + 1] + 1;
-		auto index_c = mesh->indices[i + 2] + 1;
+		const auto& face = mesh->GetFace(i);
+		const auto& index_a = face.a + 1;
+		const auto& index_b = face.b + 1;
+		const auto& index_c = face.c + 1;
 		sprintf(buffer, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
 						index_a, index_a, index_a,
 						index_b, index_b, index_b,

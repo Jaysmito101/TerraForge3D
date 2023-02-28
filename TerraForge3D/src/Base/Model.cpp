@@ -26,7 +26,7 @@ void Model::SetupMeshOnGPU()
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, position)); glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal)); glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord)); glEnableVertexAttribArray(2);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1));glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1));glEnableVertexAttribArray(3);
 	std::cout << "Setup Model " << name << " on GPU.\n";
 }
 
@@ -45,13 +45,13 @@ void Model::UploadToGPU()
 	}
 
 	glBindVertexArray(vao); glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh->vertexCount, mesh->vert, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh->GetVertexCount(), mesh->GetVerticesPTR(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh->indexCount, mesh->indices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh->GetIndexCount(), mesh->GetIndicesPTR(), GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, position)); glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal)); glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord)); glEnableVertexAttribArray(2);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1)); glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1)); glEnableVertexAttribArray(3);
 }
 
 void Model::Update()
@@ -71,15 +71,12 @@ void Model::Render()
 	}
 
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
 
 Model::~Model()
 {
-	if (mesh)
-	{
-		delete mesh;
-	}
+	if (mesh) delete mesh;
 }

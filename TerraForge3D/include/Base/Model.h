@@ -26,5 +26,4 @@ public:
 	uint32_t vbo;
 	uint32_t ebo;
 	std::string path = "";
-	Texture2D *diffuse;
 };

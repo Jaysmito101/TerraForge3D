@@ -78,25 +78,25 @@ void GLTFExporter::PrepareMeta(Mesh* mesh, const std::string& bin_path)
 
 	tmp_js["bufferView"] = 0;
 	tmp_js["componentType"] = 5126;
-	tmp_js["count"] = mesh->vertexCount;
+	tmp_js["count"] = mesh->GetVertexCount();
 	tmp_js["type"] = "VEC3";
 	gltf_js["accessors"].push_back(tmp_js); tmp_js = nlohmann::json();
 
 	tmp_js["bufferView"] = 1;
 	tmp_js["componentType"] = 5126;
-	tmp_js["count"] = mesh->vertexCount;
+	tmp_js["count"] = mesh->GetVertexCount();
 	tmp_js["type"] = "VEC3";
 	gltf_js["accessors"].push_back(tmp_js); tmp_js = nlohmann::json();
 
 	tmp_js["bufferView"] = 2;
 	tmp_js["componentType"] = 5126;
-	tmp_js["count"] = mesh->vertexCount;
+	tmp_js["count"] = mesh->GetVertexCount();
 	tmp_js["type"] = "VEC2";
 	gltf_js["accessors"].push_back(tmp_js); tmp_js = nlohmann::json();
 
 	tmp_js["bufferView"] = 3;
 	tmp_js["componentType"] = 5125;
-	tmp_js["count"] = mesh->indexCount;
+	tmp_js["count"] = mesh->GetIndexCount();
 	tmp_js["type"] = "SCALAR";
 	gltf_js["accessors"].push_back(tmp_js); tmp_js = nlohmann::json();
 
@@ -104,28 +104,28 @@ void GLTFExporter::PrepareMeta(Mesh* mesh, const std::string& bin_path)
 
 	auto byte_offset = 0u;
 	tmp_js["buffer"] = 0;
-	tmp_js["byteLength"] = sizeof(float) * 3 * mesh->vertexCount;
+	tmp_js["byteLength"] = sizeof(float) * 3 * mesh->GetVertexCount();
 	tmp_js["byteOffset"] = byte_offset;
 	gltf_js["bufferViews"].push_back(tmp_js); tmp_js = nlohmann::json();
-	byte_offset += sizeof(float) * 3 * mesh->vertexCount;
+	byte_offset += sizeof(float) * 3 * mesh->GetVertexCount();
 
 	tmp_js["buffer"] = 0;
-	tmp_js["byteLength"] = sizeof(float) * 3 * mesh->vertexCount;
+	tmp_js["byteLength"] = sizeof(float) * 3 * mesh->GetVertexCount();
 	tmp_js["byteOffset"] = byte_offset;
 	gltf_js["bufferViews"].push_back(tmp_js); tmp_js = nlohmann::json();
-	byte_offset += sizeof(float) * 3 * mesh->vertexCount;
+	byte_offset += sizeof(float) * 3 * mesh->GetVertexCount();
 
 	tmp_js["buffer"] = 0;
-	tmp_js["byteLength"] = sizeof(float) * 2 * mesh->vertexCount;
+	tmp_js["byteLength"] = sizeof(float) * 2 * mesh->GetVertexCount();
 	tmp_js["byteOffset"] = byte_offset;
 	gltf_js["bufferViews"].push_back(tmp_js); tmp_js = nlohmann::json();
-	byte_offset += sizeof(float) * 2 * mesh->vertexCount;
+	byte_offset += sizeof(float) * 2 * mesh->GetVertexCount();
 
 	tmp_js["buffer"] = 0;
-	tmp_js["byteLength"] = sizeof(uint32_t) * mesh->indexCount;
+	tmp_js["byteLength"] = sizeof(uint32_t) * mesh->GetVertexCount();
 	tmp_js["byteOffset"] = byte_offset;
 	gltf_js["bufferViews"].push_back(tmp_js); tmp_js = nlohmann::json();
-	byte_offset += sizeof(uint32_t) * mesh->indexCount;
+	byte_offset += sizeof(uint32_t) * mesh->GetIndexCount();
 
 	gltf_js["buffers"] = nlohmann::json();
 
@@ -138,34 +138,38 @@ void GLTFExporter::PrepareMeta(Mesh* mesh, const std::string& bin_path)
 
 void GLTFExporter::WriteBinaryData(Mesh* mesh, BinaryFileWriter* writer, float* progress)
 {
-	for (auto i = 0; i < mesh->vertexCount; i++)
+	for (auto i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& pos = mesh->vert[i].position;
+		const auto& pos = mesh->GetPosition(i);
 		float f_buffer[3] = { pos.x, pos.y, pos.z };
 		writer->Write(f_buffer, sizeof(float) * 3);
 	}
 	*progress = 0.4f;
 
-	for (auto i = 0; i < mesh->vertexCount; i++)
+	for (auto i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		auto& normal = mesh->vert[i].normal;
+		const auto& normal = mesh->GetNormal(i);
 		float f_buffer[3] = { normal.x, normal.y, normal.z };
 		writer->Write(f_buffer, sizeof(float) * 3);
 	}
 	*progress = 0.5f;
 
-	for (auto i = 0; i < mesh->vertexCount; i++)
+	for (auto i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		auto& texCoord = mesh->vert[i].texCoord;
+		const auto& texCoord = mesh->GetTexCoord(i);
 		float f_buffer[2] = { texCoord.x, texCoord.y };
 		writer->Write(f_buffer, sizeof(float) * 2);
 	}
 	*progress = 0.6f;
 
-	for (auto i = 0; i < mesh->indexCount; i++)
+	for (auto i = 0; i < mesh->GetFaceCount(); i++)
 	{
-		uint32_t index = (uint32_t)mesh->indices[i];
-		writer->Write(&index, sizeof(uint32_t));
+		const auto& face = mesh->GetFace(i);
+		for (int j = 0; j < 3; j++)
+		{
+			uint32_t index = (uint32_t)face.indices[j];
+			writer->Write(&index, sizeof(uint32_t));
+		}
 	}
 	*progress = 0.9f;
 }

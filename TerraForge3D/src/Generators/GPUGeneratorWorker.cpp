@@ -22,7 +22,8 @@ GPUGeneratorWorker::GPUGeneratorWorker(ApplicationState* appState, int id)
 	this->id = id;
 	this->current_state = GPUGeneratorWorkerState_Dead;
 	this->SetupOpenCL();
-	this->m_OpenCLContextToUse = id % m_OpenCLContexts.size();
+	// this->m_OpenCLContextToUse = id % m_OpenCLContexts.size(); // For future maybe
+	this->m_OpenCLContextToUse = 0;
 }
 
 GPUGeneratorWorker::~GPUGeneratorWorker()

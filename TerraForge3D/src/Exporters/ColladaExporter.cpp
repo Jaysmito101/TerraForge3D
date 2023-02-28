@@ -95,9 +95,9 @@ bool ColladaExporter::Export(const std::string& path, Mesh* mesh, float* progres
     std::ofstream out_file; out_file.open(path);
 	if (!out_file.is_open()) return false;
     out_file << PART_0 << GetTimeStamp() << PART_1 << GetTimeStamp() << PART_2;
-	out_file << (mesh->vertexCount * 3) << R"(">)" << vts.str() << PART_3;
-    out_file << mesh->vertexCount << PART_4 << (mesh->vertexCount * 2) << R"(">)";
-    out_file << txs.str() << PART_5 << mesh->vertexCount << PART_6 << (mesh->indexCount / 3);
+	out_file << (mesh->GetVertexCount() * 3) << R"(">)" << vts.str() << PART_3;
+    out_file << mesh->GetVertexCount() << PART_4 << (mesh->GetVertexCount() * 2) << R"(">)";
+    out_file << txs.str() << PART_5 << mesh->GetVertexCount() << PART_6 << (mesh->GetFaceCount());
     out_file << PART_7 << ind.str() << PART_8;
 	out_file.close();
 	*progress = 1.0f;
@@ -106,9 +106,9 @@ bool ColladaExporter::Export(const std::string& path, Mesh* mesh, float* progres
 
 bool ColladaExporter::PrepareTexCoords(Mesh* mesh, std::stringstream& strm)
 {
-    for (int i = 0; i < mesh->vertexCount; i++)
+    for (int i = 0; i < mesh->GetVertexCount(); i++)
     {
-        const auto& texCoord = mesh->vert[i].texCoord;
+        const auto& texCoord = mesh->GetTexCoord(i);
         strm << texCoord.x << ' ' << texCoord.y << ' ';
     }
 	return true;
@@ -116,9 +116,9 @@ bool ColladaExporter::PrepareTexCoords(Mesh* mesh, std::stringstream& strm)
 
 bool ColladaExporter::PrepareVertices(Mesh* mesh, std::stringstream& strm)
 {
-    for (int i = 0; i < mesh->vertexCount; i++)
+    for (int i = 0; i < mesh->GetVertexCount(); i++)
     {
-        const auto& pos = mesh->vert[i].position;
+        const auto& pos = mesh->GetPosition(i);
         strm << pos.x << ' ' << pos.y << ' ' << pos.z << ' ';
     }
     return true;
@@ -126,8 +126,11 @@ bool ColladaExporter::PrepareVertices(Mesh* mesh, std::stringstream& strm)
 
 bool ColladaExporter::PrepareIndices(Mesh* mesh, std::stringstream& strm)
 {
-    for (int i = 0; i < mesh->indexCount; i++) 
-        strm << mesh->indices[i] << ' ' << mesh->indices[i] << ' ';
+    for (int i = 0; i < mesh->GetFaceCount(); i++)
+    {
+        const auto& face = mesh->GetFace(i);
+        strm << face.a << ' ' << face.a << ' ' << face.b << ' ' << face.b << ' ' << face.c << ' ' << face.c << ' ';
+    }
 	return true;
 }
 

@@ -22,22 +22,20 @@ bool PLYExporter::ExportBinary(const std::string& path, Mesh* mesh, float* progr
 	if (*(char*)&num == 1) format = "binary_little_endian"; else format = "binary_big_endian";
 	if (!this->WriteHeader(&writer, format, mesh)) return false;
 	static uint8_t faceVertexCount = 3;
-	float tmpp = 1.0f / mesh->vertexCount;
-	for (int i = 0; i < mesh->vertexCount; i++)
+	float tmpp = 1.0f / mesh->GetVertexCount();
+	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& va = mesh->vert[i];
+		const auto& va = mesh->GetVertex(i);
 		const float data[8] = {va.position.x, va.position.y, va.position.z, va.normal.x, va.normal.y, va.normal.z, va.texCoord.x, va.texCoord.y};
 		writer.Write(data, sizeof(float) * 8);
 		*progress = tmpp * i * 0.70f + 0.01f;
 	}
-	tmpp = 1.0f / mesh->indexCount;
-	for (int i = 0; i < mesh->indexCount; i += 3)
+	tmpp = 1.0f / mesh->GetIndexCount();
+	for (int i = 0; i < mesh->GetFaceCount(); i++)
 	{
-		int ia = mesh->indices[i + 0];
-		int ib = mesh->indices[i + 1];
-		int ic = mesh->indices[i + 2];
+		const auto& face = mesh->GetFace(i);
 		writer.Write(faceVertexCount);
-		const int32_t data[3] = { ia, ib, ic };
+		const int32_t data[3] = { face.a, face.b, face.c };
 		writer.Write(data, sizeof(int32_t) * 3);
 		*progress = tmpp * i * 0.25f + 0.70f;
 	}
@@ -53,10 +51,10 @@ bool PLYExporter::ExportASCII(const std::string& path, Mesh* mesh, float* progre
 	if (!writer.IsOpen()) return false;
 	if (!this->WriteHeader(&writer, "ascii", mesh)) return false;
 	std::stringstream out_strm;
-	float tmpp = 1.0f / mesh->vertexCount;
-	for (int i = 0; i < mesh->vertexCount; i++)
+	float tmpp = 1.0f / mesh->GetVertexCount();
+	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& va = mesh->vert[i];
+		const auto& va = mesh->GetVertex(i);
 		sprintf(buffer,
 			"%f %f %f %f %f %f %f %f\n",
 			va.position.x, va.position.y, va.position.z,
@@ -66,13 +64,11 @@ bool PLYExporter::ExportASCII(const std::string& path, Mesh* mesh, float* progre
 		out_strm << buffer;
 		*progress = tmpp * i * 0.70f + 0.01f;
 	}
-	tmpp = 1.0f / mesh->indexCount;
-	for (int i = 0; i < mesh->indexCount; i += 3)
+	tmpp = 1.0f / mesh->GetIndexCount();
+	for (int i = 0; i < mesh->GetFaceCount(); i++)
 	{
-		int ia = mesh->indices[i + 0];
-		int ib = mesh->indices[i + 1];
-		int ic = mesh->indices[i + 2];
-		sprintf(buffer, "3 %d %d %d\n", ia, ib, ic);
+		const auto& face = mesh->GetFace(i);
+		sprintf(buffer, "3 %d %d %d\n", face.a, face.b, face.c);
 		out_strm << buffer;
 		*progress = tmpp * i * 0.25f + 0.70f;
 	}
@@ -103,8 +99,8 @@ bool PLYExporter::WriteHeader(BinaryFileWriter* writer, const std::string& forma
 		"end_header" "\n",
 		format.data(),
 		GetTimeStamp().data(),
-		mesh->vertexCount,
-		(mesh->indexCount / 3)
+		mesh->GetVertexCount(),
+		(mesh->GetFaceCount())
 	);
 	writer->Write(buffer, std::strlen(buffer));
 	return true;

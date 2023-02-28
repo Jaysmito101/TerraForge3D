@@ -3,7 +3,6 @@
 layout (location = 0) in vec4 aPosition;
 layout (location = 1) in vec4 aNormal;
 layout (location = 2) in vec4 aTexCoord;
-layout (location = 3) in vec4 aExtras1;
 
 out VertexData
 {

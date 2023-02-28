@@ -73,7 +73,7 @@ void Dashboard::ShowChooseBaseModelPopup()
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
-
+		
 		static const char* default_base_models[] = { "Plane", "Sphere", "Torus" };
 		static int selected_item = 0;
 		if (ImGui::BeginCombo("Gnerate Base Model##Choose Base Model Main", default_base_models[selected_item]))
@@ -108,7 +108,8 @@ void Dashboard::ShowChooseBaseModelPopup()
 			static int resolution = 256;
 			static float scale = 1.0f;
 			ImGui::DragFloat("Radius##GenBaseSphere", &scale, 0.01f, 0.05f, 10000.0f);
-			ImGui::DragInt("Resolutione##GenBaseSphere", &resolution, 0.1f, 2, 100000);
+			ImGui::DragInt("Resolutione##GenBaseSphere", &resolution, 0.1f, 1, 100000);
+			resolution = std::clamp(resolution, 1, 100000);
 			if (ImGui::Button("Generate Sphere##GenBaseSphere"))
 			{
 				m_AppState->mainModel->mesh->GenerateSphere(resolution, scale);
@@ -119,7 +120,21 @@ void Dashboard::ShowChooseBaseModelPopup()
 		}
 		else
 		{
-			ImGui::Text("Not Yet Implemented");
+			static float outerRadius = 1.0f;
+			static float innerRadius = 0.5f;
+			static int numSegments = 256;
+			static int numRings = 32;
+			ImGui::DragFloat("Outer Radius##GenBaseTorus", &outerRadius, 0.01f, 0.05f, 10000.0f);
+			ImGui::DragFloat("Inner Radius##GenBaseTorus", &innerRadius, 0.01f, 0.05f, 10000.0f);
+			if(ImGui::DragInt("Segments##GenBaseTorus", &numSegments, 0.1f, 1, 100000)) numSegments = std::clamp(numSegments, 1, 100000);
+			if(ImGui::DragInt("Rings##GenBaseTorus", &numRings, 0.1f, 1, 100000)) numRings = std::clamp(numRings, 1, 100000);
+			if (ImGui::Button("Generate Torus##GenBaseTorus"))
+			{
+				m_AppState->mainModel->mesh->GenerateTorus(outerRadius, innerRadius, numSegments, numRings);
+				m_AppState->mainModel->mesh->RecalculateNormals();
+				m_AppState->mainModel->SetupMeshOnGPU();
+				m_AppState->mainModel->UploadToGPU();
+			}
 		}
 		ImGui::EndPopup();
 	}

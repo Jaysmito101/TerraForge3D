@@ -19,7 +19,8 @@ WorkManager::WorkManager(ApplicationState* appState)
 	m_Alive = true;
 	this->Resize();
 	this->LoadGPUInfo();
-	m_GPUGeneratorWorkerCount = (int)m_OpenCLDevices.size();
+	// m_GPUGeneratorWorkerCount = (int)m_OpenCLDevices.size(); // For future maybe
+	m_GPUGeneratorWorkerCount = std::min((int)m_OpenCLDevices.size(), 1);
 }
 
 WorkManager::~WorkManager()

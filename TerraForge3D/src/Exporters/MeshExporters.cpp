@@ -18,11 +18,11 @@
 
 Mesh* ExportManager::ApplyMeshTransform(Mesh* mesh)
 {
-	for (int i = 0; i < mesh->vertexCount; i++)
+	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
-		const auto& vert = mesh->vert[i];
+		const auto& vert = mesh->GetVertex(i);
 		auto tmp = 0.0f; appState->mainMap.currentTileDataLayers[0]->GetPixelF(vert.texCoord.x, vert.texCoord.y, &tmp);
-		mesh->vert[i].position = vert.position + vert.normal * tmp;
+		mesh->SetPosition(vert.position + vert.normal * tmp, i);
 	}
 	return mesh;
 }
@@ -56,6 +56,7 @@ void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int
 	auto worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
+		this->exportProgress = 0.01f;
 		if(updateWorkerUpdation) appState->workManager->SetUpdationPaused(true); // disable updation from main thread
 		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for current generation to finish
 		appState->workManager->StartWork(); // restart fresh generation 
