@@ -92,12 +92,21 @@ void MainMenu::ShowOptionsMenu()
 
 	if (ImGui::BeginMenu("Themes"))
 	{
-		if (ImGui::MenuItem("Default")) LoadDefaultStyle();
-		if(ImGui::MenuItem("Maya Theme")) LoadMayaStyle();
-		if (ImGui::MenuItem("Black & White")) LoadBlackAndWhite();
-		if (ImGui::MenuItem("Cool Dark")) LoadDarkCoolStyle();
-		if (ImGui::MenuItem("Light Orange")) LoadLightOrngeStyle();
-		if (ImGui::MenuItem("Load Theme From File")) LoadThemeFromFile(openfilename());
+		if (ImGui::MenuItem("Default"))
+		{
+			appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
+			appState->styleManager->Apply();
+		}
+
+		if (ImGui::MenuItem("Load Theme From File"))
+		{
+			std::string path = ShowOpenFileDialog("*.json");
+			if (path.size() > 3)
+			{
+				appState->styleManager->LoadFromFile(path);
+				appState->styleManager->Apply();
+			}
+		}
 		ImGui::EndMenu();
 	}
 }

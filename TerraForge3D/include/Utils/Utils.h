@@ -57,51 +57,29 @@ std::wstring s2ws(const std::string &s);
 #endif
 
 void OpenURL(std::string url);
-
 std::string ShowSaveFileDialog(std::string ext = ".terr3d");
-
 std::string openfilename();
-
 std::string ShowOpenFileDialog(std::string ext = "*.glsl");
-
 std::string ReadShaderSourceFile(std::string path, bool *result);
-
+bool WriteShaderSourceFile(const std::string& path, const std::string& content);
 std::string GetExecutablePath();
-
 std::string GetExecutableDir();
-
 std::string GenerateId(uint32_t length);
-
 std::string FetchURL(std::string baseURL, std::string path);
-
 std::string GetTimeStamp();
-
 bool ShowLayerUpdationMethod(const char* label, int* method);
-
 float UpdateLayerWithUpdateMethod(float origv, float newv, int method);
-
 char *UChar2Char(unsigned char *data, int length);
-
 bool FileExists(std::string path, bool writeAccess = false);
-
 bool PathExist(const std::string &s);
-
 bool IsNetWorkConnected();
-
 bool PowerOfTwoDropDown(const char* label, int32_t* value, int start, int end);
-
 char *ReadBinaryFile(std::string path, int *size, uint32_t sizeToLoad = -1);
-
 char *ReadBinaryFile(std::string path, uint32_t sizeToLoad = -1);
-
 Hash MD5File(std::string path);
-
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
-
 void SaveToFile(std::string filename, std::string content = "");
-
 void Log(const char *log);
-
 void Log(std::string log);
 
 #ifdef TERR3D_WIN32

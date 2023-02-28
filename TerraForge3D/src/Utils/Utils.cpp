@@ -208,7 +208,6 @@ std::string ReadShaderSourceFile(std::string path, bool *result)
 {
 	std::fstream newfile;
 	newfile.open(path.c_str(), std::ios::in);
-
 	if (newfile.is_open())
 	{
 		std::string tp;
@@ -218,13 +217,19 @@ std::string ReadShaderSourceFile(std::string path, bool *result)
 		*result = true;
 		return res;
 	}
-
-	else
-	{
-		*result = false;
-	}
+	else *result = false;
 
 	return std::string("");
+}
+
+bool WriteShaderSourceFile(const std::string& path, const std::string& content)
+{
+	std::ofstream file;
+	file.open(path);
+	if (!file.is_open()) return false;
+	file << content;
+	file.close();
+	return true;
 }
 
 std::string GetExecutablePath()

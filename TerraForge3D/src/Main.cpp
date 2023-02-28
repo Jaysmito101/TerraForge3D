@@ -180,8 +180,13 @@ public:
 		appState->constants.configsDir = appState->constants.dataDir + PATH_SEPARATOR "configs";
 		appState->constants.logsDir = appState->constants.dataDir + PATH_SEPARATOR "logs";
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
+		appState->constants.stylesDir = appState->constants.dataDir + PATH_SEPARATOR "styles";
+
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
-		LoadDefaultStyle();
+		
+		// LoadDefaultStyle();
+
+
 		GetWindow()->SetShouldCloseCallback([&](int x, int y) -> void { Log("Shutting Down"); appState->mainApp->Close(); });
 		glfwSetDropCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, int count, const char** paths) {
 				for (int i = 0; i < count; i++)
@@ -219,8 +224,13 @@ public:
 		appState->textureStore = new TextureStore(appState);
 		appState->exportManager = new ExportManager(appState);
 		appState->dashboard = new Dashboard(appState);
+		appState->styleManager = new Style();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i] = new ViewportManager(appState);
-		glEnable(GL_DEPTH_TEST);
+		
+		appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
+		appState->styleManager->Apply();
+
+
 		if (loadFile.size() > 0)
 		{
 			Log("Loading File from " + loadFile);

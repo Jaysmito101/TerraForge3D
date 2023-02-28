@@ -14,7 +14,9 @@
 #include "Misc/ViewportManager.h"
 #include "Renderer/RendererManager.h"
 #include "Misc/Dashboard.h"
+#include "Misc/Style.h"
 #include "Platform.h"
+
 
 #include "json/json.hpp"
 
@@ -75,7 +77,7 @@ struct ApplicationStateConstants
 	std::string modelsDir = "";
 	std::string configsDir = "";
 	std::string logsDir = "";
-
+	std::string stylesDir = "";
 };
 
 class ApplicationState
@@ -101,6 +103,7 @@ public:
 	Dashboard* dashboard = nullptr;
 	WorkManager* workManager = nullptr;
 	ViewportManager* viewportManagers[MAX_VIEWPORT_COUNT];
+	Style* styleManager = nullptr;
 
 	struct
 	{

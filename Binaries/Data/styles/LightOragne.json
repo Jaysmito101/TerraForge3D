@@ -1,0 +1,631 @@
+{
+	"Alpha": 1.0,
+	"AntiAliasedFill": true,
+	"AntiAliasedLines": true,
+	"AntiAliasedLinesUseTex": true,
+	"ButtonTextAlign": {
+		"X": 0.5,
+		"Y": 0.5
+	},
+	"CellPadding": {
+		"X": 4.0,
+		"Y": 2.0
+	},
+	"ChildBorderSize": 1.0,
+	"ChildRounding": 0.0,
+	"CircleTessellationMaxError": 0.30000001192092896,
+	"ColorButtonPosition": 1,
+	"Colors": {
+		"Border": {
+			"Index": 5,
+			"Name": "Border",
+			"Value": {
+				"A": 0.30000001192092896,
+				"B": 0.0,
+				"G": 0.0,
+				"R": 0.0
+			}
+		},
+		"BorderShadow": {
+			"Index": 6,
+			"Name": "BorderShadow",
+			"Value": {
+				"A": 0.0,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"Button": {
+			"Index": 21,
+			"Name": "Button",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 0.7699999809265137,
+				"R": 1.0
+			}
+		},
+		"ButtonActive": {
+			"Index": 23,
+			"Name": "ButtonActive",
+			"Value": {
+				"A": 1.0,
+				"B": 0.009999999776482582,
+				"G": 0.9700000286102295,
+				"R": 0.8399999737739563
+			}
+		},
+		"ButtonHovered": {
+			"Index": 22,
+			"Name": "ButtonHovered",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"CheckMark": {
+			"Index": 18,
+			"Name": "CheckMark",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 0.0,
+				"R": 0.0
+			}
+		},
+		"ChildBg": {
+			"Index": 3,
+			"Name": "ChildBg",
+			"Value": {
+				"A": 0.0,
+				"B": 0.0,
+				"G": 0.0,
+				"R": 0.0
+			}
+		},
+		"DockingEmptyBg": {
+			"Index": 39,
+			"Name": "DockingEmptyBg",
+			"Value": {
+				"A": 1.0,
+				"B": 0.20000000298023224,
+				"G": 0.20000000298023224,
+				"R": 0.20000000298023224
+			}
+		},
+		"DockingPreview": {
+			"Index": 38,
+			"Name": "DockingPreview",
+			"Value": {
+				"A": 0.699999988079071,
+				"B": 0.9800000190734863,
+				"G": 0.5899999737739563,
+				"R": 0.25999999046325684
+			}
+		},
+		"DragDropTarget": {
+			"Index": 50,
+			"Name": "DragDropTarget",
+			"Value": {
+				"A": 0.949999988079071,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"FrameBg": {
+			"Index": 7,
+			"Name": "FrameBg",
+			"Value": {
+				"A": 1.0,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"FrameBgActive": {
+			"Index": 9,
+			"Name": "FrameBgActive",
+			"Value": {
+				"A": 0.6700000166893005,
+				"B": 0.6600000262260437,
+				"G": 0.6600000262260437,
+				"R": 0.6600000262260437
+			}
+		},
+		"FrameBgHovered": {
+			"Index": 8,
+			"Name": "FrameBgHovered",
+			"Value": {
+				"A": 0.30000001192092896,
+				"B": 0.949999988079071,
+				"G": 0.949999988079071,
+				"R": 0.949999988079071
+			}
+		},
+		"Header": {
+			"Index": 24,
+			"Name": "Header",
+			"Value": {
+				"A": 0.3100000023841858,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"HeaderActive": {
+			"Index": 26,
+			"Name": "HeaderActive",
+			"Value": {
+				"A": 1.0,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"HeaderHovered": {
+			"Index": 25,
+			"Name": "HeaderHovered",
+			"Value": {
+				"A": 0.800000011920929,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"MenuBarBg": {
+			"Index": 13,
+			"Name": "MenuBarBg",
+			"Value": {
+				"A": 1.0,
+				"B": 0.8600000143051147,
+				"G": 0.8600000143051147,
+				"R": 0.8600000143051147
+			}
+		},
+		"ModalWindowDimBg": {
+			"Index": 54,
+			"Name": "ModalWindowDimBg",
+			"Value": {
+				"A": 0.3499999940395355,
+				"B": 0.20000000298023224,
+				"G": 0.20000000298023224,
+				"R": 0.20000000298023224
+			}
+		},
+		"NavHighlight": {
+			"Index": 51,
+			"Name": "NavHighlight",
+			"Value": {
+				"A": 0.800000011920929,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"NavWindowingDimBg": {
+			"Index": 53,
+			"Name": "NavWindowingDimBg",
+			"Value": {
+				"A": 0.20000000298023224,
+				"B": 0.20000000298023224,
+				"G": 0.20000000298023224,
+				"R": 0.20000000298023224
+			}
+		},
+		"NavWindowingHighlight": {
+			"Index": 52,
+			"Name": "NavWindowingHighlight",
+			"Value": {
+				"A": 0.699999988079071,
+				"B": 0.699999988079071,
+				"G": 0.699999988079071,
+				"R": 0.699999988079071
+			}
+		},
+		"PlotHistogram": {
+			"Index": 42,
+			"Name": "PlotHistogram",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 0.699999988079071,
+				"R": 0.8999999761581421
+			}
+		},
+		"PlotHistogramHovered": {
+			"Index": 43,
+			"Name": "PlotHistogramHovered",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 0.44999998807907104,
+				"R": 1.0
+			}
+		},
+		"PlotLines": {
+			"Index": 40,
+			"Name": "PlotLines",
+			"Value": {
+				"A": 1.0,
+				"B": 0.38999998569488525,
+				"G": 0.38999998569488525,
+				"R": 0.38999998569488525
+			}
+		},
+		"PlotLinesHovered": {
+			"Index": 41,
+			"Name": "PlotLinesHovered",
+			"Value": {
+				"A": 1.0,
+				"B": 0.3499999940395355,
+				"G": 0.4300000071525574,
+				"R": 1.0
+			}
+		},
+		"PopupBg": {
+			"Index": 4,
+			"Name": "PopupBg",
+			"Value": {
+				"A": 0.9800000190734863,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"ResizeGrip": {
+			"Index": 30,
+			"Name": "ResizeGrip",
+			"Value": {
+				"A": 0.5600000023841858,
+				"B": 0.800000011920929,
+				"G": 0.800000011920929,
+				"R": 0.800000011920929
+			}
+		},
+		"ResizeGripActive": {
+			"Index": 32,
+			"Name": "ResizeGripActive",
+			"Value": {
+				"A": 0.949999988079071,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"ResizeGripHovered": {
+			"Index": 31,
+			"Name": "ResizeGripHovered",
+			"Value": {
+				"A": 0.6700000166893005,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"ScrollbarBg": {
+			"Index": 14,
+			"Name": "ScrollbarBg",
+			"Value": {
+				"A": 0.5299999713897705,
+				"B": 0.9800000190734863,
+				"G": 0.9800000190734863,
+				"R": 0.9800000190734863
+			}
+		},
+		"ScrollbarGrab": {
+			"Index": 15,
+			"Name": "ScrollbarGrab",
+			"Value": {
+				"A": 0.800000011920929,
+				"B": 0.6899999976158142,
+				"G": 0.6899999976158142,
+				"R": 0.6899999976158142
+			}
+		},
+		"ScrollbarGrabActive": {
+			"Index": 17,
+			"Name": "ScrollbarGrabActive",
+			"Value": {
+				"A": 1.0,
+				"B": 0.49000000953674316,
+				"G": 0.49000000953674316,
+				"R": 0.49000000953674316
+			}
+		},
+		"ScrollbarGrabHovered": {
+			"Index": 16,
+			"Name": "ScrollbarGrabHovered",
+			"Value": {
+				"A": 0.800000011920929,
+				"B": 0.49000000953674316,
+				"G": 0.49000000953674316,
+				"R": 0.49000000953674316
+			}
+		},
+		"Separator": {
+			"Index": 27,
+			"Name": "Separator",
+			"Value": {
+				"A": 1.0,
+				"B": 0.38999998569488525,
+				"G": 0.38999998569488525,
+				"R": 0.38999998569488525
+			}
+		},
+		"SeparatorActive": {
+			"Index": 29,
+			"Name": "SeparatorActive",
+			"Value": {
+				"A": 1.0,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"SeparatorHovered": {
+			"Index": 28,
+			"Name": "SeparatorHovered",
+			"Value": {
+				"A": 0.7799999713897705,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"SliderGrab": {
+			"Index": 19,
+			"Name": "SliderGrab",
+			"Value": {
+				"A": 0.7799999713897705,
+				"B": 0.578000009059906,
+				"G": 0.7770000100135803,
+				"R": 1.0
+			}
+		},
+		"SliderGrabActive": {
+			"Index": 20,
+			"Name": "SliderGrabActive",
+			"Value": {
+				"A": 0.6000000238418579,
+				"B": 0.6110000014305115,
+				"G": 0.9869999885559082,
+				"R": 1.0
+			}
+		},
+		"Tab": {
+			"Index": 33,
+			"Name": "Tab",
+			"Value": {
+				"A": 0.7099999785423279,
+				"B": 0.009999999776482582,
+				"G": 0.5400000214576721,
+				"R": 1.0
+			}
+		},
+		"TabActive": {
+			"Index": 35,
+			"Name": "TabActive",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 0.9700000286102295,
+				"R": 1.0
+			}
+		},
+		"TabHovered": {
+			"Index": 34,
+			"Name": "TabHovered",
+			"Value": {
+				"A": 0.8999999761581421,
+				"B": 0.09000000357627869,
+				"G": 0.7300000190734863,
+				"R": 0.9599999785423279
+			}
+		},
+		"TabUnfocused": {
+			"Index": 36,
+			"Name": "TabUnfocused",
+			"Value": {
+				"A": 0.9900000095367432,
+				"B": 0.9399999976158142,
+				"G": 0.9300000071525574,
+				"R": 0.9200000166893005
+			}
+		},
+		"TabUnfocusedActive": {
+			"Index": 37,
+			"Name": "TabUnfocusedActive",
+			"Value": {
+				"A": 1.0,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"TableBorderLight": {
+			"Index": 46,
+			"Name": "TableBorderLight",
+			"Value": {
+				"A": 1.0,
+				"B": 0.25,
+				"G": 0.23000000417232513,
+				"R": 0.23000000417232513
+			}
+		},
+		"TableBorderStrong": {
+			"Index": 45,
+			"Name": "TableBorderStrong",
+			"Value": {
+				"A": 1.0,
+				"B": 0.3499999940395355,
+				"G": 0.3100000023841858,
+				"R": 0.3100000023841858
+			}
+		},
+		"TableHeaderBg": {
+			"Index": 44,
+			"Name": "TableHeaderBg",
+			"Value": {
+				"A": 1.0,
+				"B": 0.20000000298023224,
+				"G": 0.1899999976158142,
+				"R": 0.1899999976158142
+			}
+		},
+		"TableRowBg": {
+			"Index": 47,
+			"Name": "TableRowBg",
+			"Value": {
+				"A": 0.0,
+				"B": 0.0,
+				"G": 0.0,
+				"R": 0.0
+			}
+		},
+		"TableRowBgAlt": {
+			"Index": 48,
+			"Name": "TableRowBgAlt",
+			"Value": {
+				"A": 0.05999999865889549,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"Text": {
+			"Index": 0,
+			"Name": "Text",
+			"Value": {
+				"A": 1.0,
+				"B": 0.0,
+				"G": 0.0,
+				"R": 0.0
+			}
+		},
+		"TextDisabled": {
+			"Index": 1,
+			"Name": "TextDisabled",
+			"Value": {
+				"A": 1.0,
+				"B": 0.3199999928474426,
+				"G": 0.3199999928474426,
+				"R": 0.3199999928474426
+			}
+		},
+		"TextSelectedBg": {
+			"Index": 49,
+			"Name": "TextSelectedBg",
+			"Value": {
+				"A": 0.3499999940395355,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"TitleBg": {
+			"Index": 10,
+			"Name": "TitleBg",
+			"Value": {
+				"A": 1.0,
+				"B": 0.9599999785423279,
+				"G": 0.9599999785423279,
+				"R": 0.9599999785423279
+			}
+		},
+		"TitleBgActive": {
+			"Index": 11,
+			"Name": "TitleBgActive",
+			"Value": {
+				"A": 1.0,
+				"B": 0.8199999928474426,
+				"G": 0.8199999928474426,
+				"R": 0.8199999928474426
+			}
+		},
+		"TitleBgCollapsed": {
+			"Index": 12,
+			"Name": "TitleBgCollapsed",
+			"Value": {
+				"A": 0.5099999904632568,
+				"B": 1.0,
+				"G": 1.0,
+				"R": 1.0
+			}
+		},
+		"WindowBg": {
+			"Index": 2,
+			"Name": "WindowBg",
+			"Value": {
+				"A": 1.0,
+				"B": 0.8500000238418579,
+				"G": 0.8500000238418579,
+				"R": 0.8500000238418579
+			}
+		}
+	},
+	"ColumnsMinSpacing": 6.0,
+	"CurveTessellationTol": 1.25,
+	"DisabledAlpha": 0.6000000238418579,
+	"DisplaySafeAreaPadding": {
+		"X": 3.0,
+		"Y": 3.0
+	},
+	"DisplayWindowPadding": {
+		"X": 19.0,
+		"Y": 19.0
+	},
+	"FrameBorderSize": 0.0,
+	"FramePadding": {
+		"X": 5.0,
+		"Y": 5.0
+	},
+	"FrameRounding": 4.0,
+	"GrabMinSize": 20.0,
+	"GrabRounding": 5.0,
+	"IndentSpacing": 25.0,
+	"ItemInnerSpacing": {
+		"X": 8.0,
+		"Y": 6.0
+	},
+	"ItemSpacing": {
+		"X": 12.0,
+		"Y": 8.0
+	},
+	"LogSliderDeadzone": 4.0,
+	"MouseCursorScale": 1.0,
+	"Name": "LightOragne",
+	"PopupBorderSize": 1.0,
+	"PopupRounding": 7.0,
+	"ScrollbarRounding": 8.0,
+	"ScrollbarSize": 15.0,
+	"SelectableTextAlign": {
+		"X": 0.0,
+		"Y": 0.0
+	},
+	"TabBorderSize": 0.0,
+	"TabMinWidthForCloseButton": 0.0,
+	"TabRounding": 2.0,
+	"TouchExtraPadding": {
+		"X": 0.0,
+		"Y": 0.0
+	},
+	"WindowBorderSize": 1.0,
+	"WindowMenuButtonPosition": -1,
+	"WindowMinSize": {
+		"X": 32.0,
+		"Y": 32.0
+	},
+	"WindowPadding": {
+		"X": 15.0,
+		"Y": 15.0
+	},
+	"WindowRounding": 7.0,
+	"WindowTitleAlign": {
+		"X": 0.5,
+		"Y": 0.5
+	}
+}
