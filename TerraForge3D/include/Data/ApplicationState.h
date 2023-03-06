@@ -5,8 +5,6 @@
 #include "Data/ProjectData.h"
 #include "Data/Serializer.h"
 #include "Menu/MainMenu.h"
-#include "Generators/MeshGeneratorManager.h"
-#include "Generators/WorkManager.h"
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
 #include "Misc/OSLiscences.h"
@@ -16,6 +14,9 @@
 #include "Misc/Dashboard.h"
 #include "Misc/Style.h"
 #include "Platform.h"
+
+
+#include "Generators/GenerationManager.h"
 
 
 #include "json/json.hpp"
@@ -69,11 +70,8 @@ struct ApplicationStateConstants
 	std::string projectsDir = "";
 	std::string tempDir = "";
 	std::string shadersDir = "";
-	std::string kernelsDir = "";
 	std::string fontsDir = "";
 	std::string liscensesDir = "";
-	std::string skyboxDir = "";
-	std::string modulesDir = "";
 	std::string modelsDir = "";
 	std::string configsDir = "";
 	std::string logsDir = "";
@@ -90,8 +88,8 @@ public:
 	ApplicationStateGlobals globals;
 	ApplicationStateConstants constants;
 
+	EventManager* eventManager = nullptr;
 	Serializer *serailizer = nullptr;
-	MeshGeneratorManager *meshGenerator = nullptr;
 	MainMenu *mainMenu = nullptr;
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;
@@ -101,9 +99,9 @@ public:
 	Model* mainModel = nullptr;
 	RendererManager* rendererManager = nullptr;
 	Dashboard* dashboard = nullptr;
-	WorkManager* workManager = nullptr;
 	ViewportManager* viewportManagers[MAX_VIEWPORT_COUNT];
 	Style* styleManager = nullptr;
+	GenerationManager* generationManager = nullptr;
 
 	struct
 	{

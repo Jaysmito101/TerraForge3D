@@ -39,12 +39,7 @@ uniform samplerCube u_IrradianceMap;
 
 int PixelCoordToDataOffset(int x, int y)
 {
-	int tileSize = u_SubTileSize;
-	int tileCount = u_Resolution / tileSize;
-	int tileX = x / tileSize, tileY = y / tileSize;
-	int tileXOffset = x % tileSize, tileYOffset = y % tileSize;
-	int tileOffset = (tileY * tileCount + tileX) * (tileSize * tileSize);
-	return (tileOffset + (tileYOffset * tileSize + tileXOffset));
+	return y * u_Resolution + x;
 }
 
 // From : https://stackoverflow.com/a/5261402/14911094

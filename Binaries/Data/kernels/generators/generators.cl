@@ -1,1 +1,0 @@
-#include "generators/noise_layer.cl"

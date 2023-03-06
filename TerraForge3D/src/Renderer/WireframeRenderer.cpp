@@ -25,7 +25,6 @@ void WireframeRenderer::Render(RendererViewport* viewport)
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertNormals"), m_InvertNormals);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SubTileSize"), m_AppState->workManager->GetWorkResolution());
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	m_AppState->mainModel->Render();

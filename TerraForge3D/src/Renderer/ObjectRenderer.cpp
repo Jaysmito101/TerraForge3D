@@ -26,14 +26,13 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertNormals"), m_InvertNormals);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SubTileSize"), m_AppState->workManager->GetWorkResolution());
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
 	auto& rendererLights = m_AppState->rendererManager->GetRendererLights()->m_RendererLights; auto renderLightsCount = std::min((int)rendererLights.size(), OBJECT_RENDERER_MAX_LIGHTS);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_EnableSkyLight"), (m_AppState->rendererManager->GetRendererLights()->m_UseSkyLight && m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady()) ? GL_TRUE : GL_FALSE);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap());
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IrradianceMap"), 1);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_LightCount"), (int)renderLightsCount);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_LightCount"), (int)renderLightsCount); 
 	for (int i = 0; i < rendererLights.size(); i++) 
 	{  
 		glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_Lights[" + std::to_string(i) + "].position").c_str()), rendererLights[i].position.x, rendererLights[i].position.y, rendererLights[i].position.z);

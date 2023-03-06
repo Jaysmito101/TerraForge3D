@@ -70,6 +70,7 @@
 #include "ComputeShader.h"
 #include "TextureCubemap.h"
 #include "UIFontManager.h"
+#include "EventManager.h"
 
 // GLFW
 

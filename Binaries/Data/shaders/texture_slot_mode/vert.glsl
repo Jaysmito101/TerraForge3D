@@ -26,12 +26,7 @@ uniform float u_Scale;
 
 int PixelCoordToDataOffset(int x, int y)
 {
-	int tileSize = u_SubTileSize;
-	int tileCount = u_Resolution / tileSize;
-	int tileX = x / tileSize, tileY = y / tileSize;
-	int tileXOffset = int(mod(x, tileSize)), tileYOffset = int(mod(y, tileSize));
-	int tileOffset = (tileY * tileCount + tileX) * (tileSize * tileSize);
-	return (tileOffset + (tileYOffset * tileSize + tileXOffset));
+	return y * u_Resolution + x;
 }
 
 void main()

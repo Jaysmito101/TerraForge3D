@@ -13,7 +13,10 @@ Dashboard::~Dashboard()
 
 void Dashboard::Update()
 {
-	if(m_ForceUpdate) m_AppState->workManager->SetRequireRemesh(true);
+	if (m_ForceUpdate)
+	{
+
+	}
 }
 
 void Dashboard::ShowSettings()
@@ -25,16 +28,13 @@ void Dashboard::ShowSettings()
 	if (ImGui::CollapsingHeader("Generator Resolution Settings"))
 	{
 		bool changed = false;
-		changed = PowerOfTwoDropDown("Tile Resolution##MainMapGen", &m_AppState->mainMap.tileResolution, 4, 32) || changed;
+		changed = PowerOfTwoDropDown("Tile Resolution##MainMapGen", &m_AppState->mainMap.tileResolution, 4, 20) || changed;
 		changed = ImGui::DragInt("Tile Count##MainMapGen", &m_AppState->mainMap.tileCount, 0.01f, 0, 1000000) || changed;
 
 		if (changed)
 		{
-			m_AppState->workManager->WaitForFinish();
-			m_AppState->mainMap.currentTileX = m_AppState->mainMap.currentTileY = 0;
-			CalculateTileSizeAndOffset();
 			for (int i = 0; i < 6; i++) m_AppState->mainMap.currentTileDataLayers[i]->Resize(m_AppState->mainMap.tileResolution);
-			m_AppState->workManager->Resize();
+			m_AppState->eventManager->RaiseEvent("TileResolutionChanged", std::to_string(m_AppState->mainMap.tileResolution));
 		}
 		ImGui::DragInt("Current Tile X##MainMapGen", &m_AppState->mainMap.currentTileX, 0.01f, 0, m_AppState->mainMap.tileCount);
 		ImGui::DragInt("Current Tile Y##MainMapGen", &m_AppState->mainMap.currentTileY, 0.01f, 0, m_AppState->mainMap.tileCount);
@@ -49,7 +49,10 @@ void Dashboard::ShowSettings()
 	ImGui::Checkbox("Auto Save", &m_AppState->states.autoSave);
 	ImGui::NewLine();
 
-	if (ImGui::Button("Regenerate")) m_AppState->workManager->SetRequireRemesh(true);
+	if (ImGui::Button("Regenerate"))
+	{
+
+	}
 
 	ImGui::Separator();
 	ImGui::NewLine();

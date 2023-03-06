@@ -17,7 +17,6 @@ layout(std430, binding = 0) buffer DataBuffer0
 };
 
 uniform int u_Resolution;
-uniform int u_SubTileSize;
 uniform float u_TileSize;
 uniform vec2 u_TileOffset;
 uniform mat4 u_Projection;
@@ -27,18 +26,13 @@ uniform mat4 u_ProjectionView;
 
 int PixelCoordToDataOffset(int x, int y)
 {
-	int tileSize = u_SubTileSize;
-	int tileCount = u_Resolution / tileSize;
-	int tileX = x / tileSize, tileY = y / tileSize;
-	int tileXOffset = int(mod(x, tileSize)), tileYOffset = int(mod(y, tileSize));
-	int tileOffset = (tileY * tileCount + tileX) * (tileSize * tileSize);
-	return (tileOffset + (tileYOffset * tileSize + tileXOffset));
+	return y * u_Resolution + x;
 }
 
 void main()
 {
     vec2 texCoord = aTexCoord.xy;
-    ivec2 pointCoord = ivec2(texCoord * 0.975f * u_Resolution);
+    ivec2 pointCoord = ivec2(texCoord * 0.975 * u_Resolution);
     vec3 position = aPosition.xyz + aNormal.xyz * position_normals[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);

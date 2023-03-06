@@ -19,22 +19,15 @@ IncludeDir["GLFW"] = "TerraForge3D/vendor/glfw/include"
 IncludeDir["Glad"] = "TerraForge3D/vendor/glad/include"
 IncludeDir["glm"] = "TerraForge3D/vendor/glm"
 IncludeDir["ImGui"] = "TerraForge3D/vendor/imgui"
-IncludeDir["ImPlot"] = "TerraForge3D/vendor/implot"
 IncludeDir["ImGuiNodeEditor"] = "TerraForge3D/vendor/imgui-node-editor"
 IncludeDir["Zip"] = "TerraForge3D/vendor/zip"
-IncludeDir["ImColorTextEdit"] = "TerraForge3D/vendor/text-editor"
-IncludeDir["MuParser"] = "TerraForge3D/vendor/muparser/include"
 IncludeDir["JSON"] = "TerraForge3D/vendor/json"
-IncludeDir["FastNoiseLite"] = "TerraForge3D/vendor/FastNoiseLite"
 
 include "TerraForge3D/vendor/glfw"
 include "TerraForge3D/vendor/glad"
 include "TerraForge3D/vendor/imgui"
-include "TerraForge3D/vendor/implot"
 include "TerraForge3D/vendor/imgui-node-editor"
 include "TerraForge3D/vendor/zip"
-include "TerraForge3D/vendor/text-editor"
-include "TerraForge3D/vendor/muparser"
 
 
 project "TerraForge3DLib"
@@ -71,10 +64,7 @@ project "TerraForge3DLib"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.Zip}/src",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.ImPlot}",
-		"%{IncludeDir.MuParser}",
 		"%{IncludeDir.JSON}",
-		"%{IncludeDir.FastNoiseLite}",
 		"%{IncludeDir.ImGuiNodeEditor}"
 	}
 
@@ -85,15 +75,11 @@ project "TerraForge3DLib"
 		"ws2_32",
 		"Pathcch",
 		"opengl32",
-		"OpenCL",
 		"GLFW",
 		"Glad",
 		"Zip",
 		"ImGui",
-		"ImPlot",
-		"ImGuiNodeEditor",
-		"ImColorTextEdit",
-		"MuParser"
+		"ImGuiNodeEditor"
 	}
 
 	excludes {
@@ -183,8 +169,6 @@ project "TerraForge3D"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.Zip}/src",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.ImPlot}",
-		"%{IncludeDir.MuParser}",
 		"%{IncludeDir.ImGuiNodeEditor}"
 	}
 
@@ -227,7 +211,6 @@ project "TerraForge3D"
 		links {
 			"GLFW",
 			"GL",
-			"OpenCL",
 			"ssl",
 			"crypto",
 			"Glad",
@@ -235,8 +218,6 @@ project "TerraForge3D"
 			"ImGui",
 			"ImPlot",
 			"ImGuiNodeEditor",
-			"ImColorTextEdit",
-			"MuParser",
 			"dl",
 			"pthread"
 		}

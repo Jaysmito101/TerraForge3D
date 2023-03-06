@@ -125,12 +125,11 @@ void MainMenu::ShowWindowsMenu()
 		ImGui::EndMenu();
 	}
 	ShowWindowMenuItem("Dashboard", appState->dashboard->IsWindowVisiblePtr());
+	ShowWindowMenuItem("Generation Manager", appState->generationManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
-	ShowWindowMenuItem("Work Manager", appState->workManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
-	ShowWindowMenuItem("Mesh Generators Settings", &appState->meshGenerator->windowStat);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);
 	ShowWindowMenuItem("Open Source Liscenses", &appState->windows.osLisc);
 

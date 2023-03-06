@@ -100,7 +100,7 @@ void RendererManager::ShowSettings()
 			if (ImGui::BeginTabItem("Terrain"))
 			{
 				ImGui::PushID("Terrain");
-				if (ImGui::Button("Generator Settings")) m_AppState->meshGenerator->windowStat = true;
+				
 				ImGui::PopID();
 				ImGui::EndTabItem();
 			}

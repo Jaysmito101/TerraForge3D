@@ -10,7 +10,6 @@
 #include "Data/ProjectData.h"
 #include "Data/ApplicationState.h"
 #include "Data/VersionInfo.h"
-#include "Generators/MeshGeneratorManager.h"
 #include "TextureStore/TextureStore.h"
 #include "Exporters/ExportManager.h"
 #include "Misc/OSLiscences.h"
@@ -29,7 +28,6 @@
 #include <dirent.h>
 #endif
 
-#include "Base/OpenCL/OpenCLPlatform.h"
 
 static ApplicationState* appState;
 static Application* mainApp;
@@ -70,8 +68,8 @@ public:
 	{
 		if (!appState->states.ruinning) return;
 		appState->dashboard->Update();
-		appState->workManager->Update();
 		appState->exportManager->Update(); 
+		appState->generationManager->Update();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
 
 
@@ -144,14 +142,13 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		OnBeforeImGuiRender();
+		OnBeforeImGuiRender(); 
 		appState->mainMenu->ShowMainMenu();
-		appState->meshGenerator->ShowSettings();
-		appState->dashboard->ShowSettings();
+		appState->dashboard->ShowSettings(); 
+		appState->generationManager->ShowSettings();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Show();
 		appState->exportManager->ShowSettings();
 		appState->rendererManager->ShowSettings();
-		appState->workManager->ShowSettings();
 		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
@@ -165,18 +162,15 @@ public:
 		SetUpIcon();
 		appState = new ApplicationState();
 		appState->mainApp = mainApp;
-		appState->constants.executableDir = GetExecutableDir();
+		appState->constants.executableDir = GetExecutableDir(); 
 		appState->constants.dataDir = appState->constants.executableDir + PATH_SEPARATOR "Data";
 		appState->constants.cacheDir = appState->constants.dataDir + PATH_SEPARATOR "cache";
 		appState->constants.texturesDir = appState->constants.dataDir + PATH_SEPARATOR "textures";
 		appState->constants.projectsDir = appState->constants.cacheDir + PATH_SEPARATOR "project_data";
 		appState->constants.tempDir = appState->constants.dataDir + PATH_SEPARATOR "temp";
 		appState->constants.shadersDir = appState->constants.dataDir + PATH_SEPARATOR "shaders";
-		appState->constants.kernelsDir = appState->constants.dataDir + PATH_SEPARATOR "kernels";
 		appState->constants.fontsDir = appState->constants.dataDir + PATH_SEPARATOR "fonts";
 		appState->constants.liscensesDir = appState->constants.dataDir + PATH_SEPARATOR "licenses";
-		appState->constants.skyboxDir = appState->constants.dataDir + PATH_SEPARATOR "skybox";
-		appState->constants.modulesDir = appState->constants.dataDir + PATH_SEPARATOR "modules";
 		appState->constants.configsDir = appState->constants.dataDir + PATH_SEPARATOR "configs";
 		appState->constants.logsDir = appState->constants.dataDir + PATH_SEPARATOR "logs";
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
@@ -211,10 +205,9 @@ public:
 		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
 		for (int i = 0; i < 6; i++) { appState->mainMap.currentTileDataLayers[i] = new DataTexture(i); appState->mainMap.currentTileDataLayers[i]->Resize(256); appState->mainMap.currentTileDataLayers[i]->UploadToGPU(); }
 		
-
-		appState->globals.kernelsIncludeDir = "\"" + appState->constants.kernelsDir + "\"";
-		appState->workManager = new WorkManager(appState); appState->workManager->StartThread();
-		appState->meshGenerator = new MeshGeneratorManager(appState);
+		appState->eventManager = new EventManager();
+		appState->dashboard = new Dashboard(appState);
+		appState->generationManager = new GenerationManager(appState);
 		appState->supportersTribute = new SupportersTribute();
 		appState->rendererManager = new RendererManager(appState);
 		appState->mainMenu = new MainMenu(appState);
@@ -223,7 +216,6 @@ public:
 		appState->osLiscences = new OSLiscences(appState);
 		appState->textureStore = new TextureStore(appState);
 		appState->exportManager = new ExportManager(appState);
-		appState->dashboard = new Dashboard(appState);
 		appState->styleManager = new Style();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i] = new ViewportManager(appState);
 		
@@ -265,7 +257,6 @@ public:
 
 	void OnEnd()
 	{
-		appState->workManager->WaitForFinish();
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(500ms);
@@ -273,10 +264,12 @@ public:
 		for (int i = 0; i < 6; i++) delete appState->mainMap.currentTileDataLayers[i];
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) delete appState->viewportManagers[i];
 
+		delete appState->eventManager;
+		delete appState->textureStore;
+		delete appState->styleManager;
+		delete appState->generationManager;
 		delete appState->dashboard;
 		delete appState->rendererManager;
-		delete appState->meshGenerator;
-		delete appState->workManager;
 		delete appState->mainModel;
 		delete appState->supportersTribute;
 		delete appState->mainMenu;

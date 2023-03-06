@@ -1,5 +1,4 @@
 #include "Exporters/ExportManager.h"
-#include "Generators/MeshGeneratorManager.h"
 #include "Data/ApplicationState.h"
 #include "Base/Base.h"
 
@@ -52,6 +51,7 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 
 void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation)
 {
+	/*/
 	if (exporting) *exporting = true;
 	auto worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
 		using namespace std::chrono_literals;
@@ -65,9 +65,10 @@ void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int
 		else this->SetStatusMessage("");
 		if (updateWorkerUpdation) appState->workManager->SetUpdationPaused(false); // enable updation from main thread
 		this->exportProgress = 1.1f;
-		if (exporting) *exporting = false;
+		if (exporting) *exporting = false; 
 		});
 	worker.detach();
+	*/
 }
 
 void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int format)
@@ -90,7 +91,7 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 		auto previousTileX = appState->mainMap.currentTileX;
 		auto previousTileY = appState->mainMap.currentTileY;
 		this->SetStatusMessage("");
-		appState->workManager->SetUpdationPaused(true); // disable updation from main thread
+		//appState->workManager->SetUpdationPaused(true); // disable updation from main thread
 		for(auto tx = 0; tx < appState->mainMap.tileCount; tx++)
 		{
 			for (auto ty = 0; ty < appState->mainMap.tileCount; ty++)
@@ -102,7 +103,7 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 				while (exportingTile) std::this_thread::sleep_for(100ms); // wait for the tile export to finish
 			}
 		}
-		appState->workManager->SetUpdationPaused(false); // enable updation from main thread
+		//appState->workManager->SetUpdationPaused(false); // enable updation from main thread
 		this->SetStatusMessage("");
 		appState->mainMap.currentTileX = previousTileX;
 		appState->mainMap.currentTileY = previousTileY;

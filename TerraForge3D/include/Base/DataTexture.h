@@ -32,26 +32,21 @@ public:
 
 	inline void Resize(int resolution)
 	{
-		if (pData) delete[] pData;
 		this->size = resolution;
-		pData = new float[(uint64_t)size * size * 4];
-		memset(pData, 0, sizeof(float) * size * size * 4);
-		this->SetTileSize(512);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * size * size * 4, pData, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * size * size * 4, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
-	
-	inline void SetTileSize(int tSize)
-	{
-		tileSize = std::min(size, tSize);
-		tileCount = size / tileSize;
-	}
 
-//	inline void SetData(float* data_, size_t size_, size_t offset_)
-//	{
-//		memcpy(pData + offset_, data_, size_);
-//	}
+	inline void PullBackToCPU()
+	{
+		if (pData) delete[] pData;
+		pData = new float[(uint64_t)size * size * 4];
+		memset(pData, 0, sizeof(float) * size * size * 4);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(float) * size * size * 4, pData);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
 
 	inline void Bind(int binding = -1)
 	{
@@ -67,18 +62,6 @@ public:
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
-	inline float* GetTilePointer(int x, int y)
-	{
-		return (float*)((uint8_t*)pData + (y * tileCount + x) * (tileSize * tileSize * 4) * sizeof(float));
-	}
-
-	inline void UploadTileToGPU(int x, int y)
-	{
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, (y * tileCount + x) * (tileSize * tileSize * 4) * sizeof(float), (tileSize * tileSize * 4) * sizeof(float), &pData[(y * tileCount + x) * (tileSize * tileSize * 4)]);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-	}
-
 	inline void UploadToGPU()
 	{
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
@@ -88,10 +71,7 @@ public:
 
 	inline size_t PixelCoordToDataOffset(int x, int y)
 	{
-		int tileX = x / tileSize, tileY = y / tileSize;
-		int tileXOffset = x % tileSize, tileYOffset = y % tileSize;
-		int tileOffset = (tileY * tileCount + tileX) * (tileSize * tileSize);
-		return (tileOffset + (tileYOffset * tileSize + tileXOffset)) * 4;
+		return (uint64_t)(x + y * size) * 4;
 	}
 
 	inline void SetPixelI(int x, int y, float r, float g, float b, float a)
@@ -129,8 +109,6 @@ private:
 
 	float* pData = nullptr;
 	int size = 0;
-	int tileSize = 0;
-	int tileCount = 0;
 	GLuint m_RendererID = 0;
 	int m_Binding = 0;
 };
