@@ -216,7 +216,6 @@ project "TerraForge3D"
 			"Glad",
 			"Zip",
 			"ImGui",
-			"ImPlot",
 			"ImGuiNodeEditor",
 			"dl",
 			"pthread"
