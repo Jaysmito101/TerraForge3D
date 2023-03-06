@@ -47,7 +47,7 @@ void Style::LoadFormString(std::string contents)
 	{
 		auto& value = it.value()["Value"];
 		int index = it.value()["Index"].get<int>();
-		assert(index >= 0 && index < ImGuiCol_COUNT, std::string("Invalid ImGuiCol Index ") + std::to_string(index));
+		//assert(index >= 0 && index < ImGuiCol_COUNT, std::string("Invalid ImGuiCol Index ") + std::to_string(index));
 		TF3D_HANDLE_EXCEPTION_MSG(style.Colors[index] = ImVec4(value["R"], value["G"], value["B"], value["A"]); , std::string("Error in loading color forom : ") + value.dump(4));
 	}
 
