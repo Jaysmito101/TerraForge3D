@@ -12,7 +12,7 @@ in VertexData
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    vec4 position_normals[];
+    float data0[];
 };
 
 #define MAX_LIGHTS 16

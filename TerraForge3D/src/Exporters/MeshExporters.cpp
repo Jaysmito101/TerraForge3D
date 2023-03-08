@@ -15,12 +15,15 @@
 
 
 
-Mesh* ExportManager::ApplyMeshTransform(Mesh* mesh)
+Mesh* ExportManager::ApplyMeshTransform(Mesh* mesh, float* data)
 {
+	int size = appState->mainMap.tileResolution, x = 0, y = 0;
+	float tmp = 0.0f;
 	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
 		const auto& vert = mesh->GetVertex(i);
-		auto tmp = 0.0f; appState->mainMap.currentTileDataLayers[0]->GetPixelF(vert.texCoord.x, vert.texCoord.y, &tmp);
+		x = std::clamp((int)(vert.texCoord.x * size), 0, size - 1); y = std::clamp((int)(vert.texCoord.y * size), 0, size - 1);
+		tmp = data[y * size + x];
 		mesh->SetPosition(vert.position + vert.normal * tmp, i);
 	}
 	return mesh;
@@ -51,14 +54,13 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 
 void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation)
 {
-	/*/
+	/*
 	if (exporting) *exporting = true;
 	auto worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
 		this->exportProgress = 0.01f;
-		if(updateWorkerUpdation) appState->workManager->SetUpdationPaused(true); // disable updation from main thread
-		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for current generation to finish
+		if(updateWorkerUpdation) appState->generationManager->SetUpdationPaused(true);
 		appState->workManager->StartWork(); // restart fresh generation 
 		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for fresh generation to finish
 		if (!this->ExportMesh(path, this->ApplyMeshTransform(appState->mainModel->mesh->Clone()), format)) this->SetStatusMessage("Failed to export : " + path);

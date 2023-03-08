@@ -11,7 +11,7 @@ uniform float c;
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    vec4 data0[];
+    float data0[];
 };
 
 uint PixelCoordToDataOffset(uint x, uint y)
@@ -51,14 +51,14 @@ void main(void)
 	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
 	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
 	vec2 uv = offsetv2 / vec2(r, r);
-	vec4 color = data0[offset];
-	color.x = 0.0f;
-	color.x += noise(uv * 1.0f) * a / 1.0f;
-	color.x += noise(uv * 2.0f) * b / 2.0f;
-	color.x += noise(uv * 4.0f) * c / 4.0f;
+	float color = data0[offset];
+	color = 0.0f;
+	color += noise(uv * 1.0f) * a / 1.0f;
+	color += noise(uv * 2.0f) * b / 2.0f;
+	color += noise(uv * 4.0f) * c / 4.0f;
 	for(int i = 3 ; i < 32 ; i++)
 	{
-		color.x += noise(uv * pow(2.0f, i)) / pow(2.0f, i);
+		color += noise(uv * pow(2.0f, i)) / pow(2.0f, i);
 	}
 	data0[offset] = color;
 }

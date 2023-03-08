@@ -13,7 +13,7 @@ out VertexData
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    vec4 position_normals[];
+    float data0[];
 };
 
 uniform int u_Resolution;
@@ -33,8 +33,8 @@ void main()
 {
     vec2 texCoord = aTexCoord.xy;
     ivec2 pointCoord = ivec2(texCoord * 0.975 * u_Resolution);
-    vec3 position = aPosition.xyz + aNormal.xyz * position_normals[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)].x;
-    //vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
+    vec3 position = aPosition.xyz + aNormal.xyz * data0[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)];
+    //vec3 position = aPosition.xyz + aNormal.xyz * data0[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;
     vertexOutput.normal = aNormal.xyz;

@@ -13,7 +13,7 @@ out VertexData
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    vec4 position_normals[];
+    float data0[];
 };
 
 uniform int u_Resolution;

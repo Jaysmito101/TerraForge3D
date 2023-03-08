@@ -81,3 +81,6 @@
 // GLAD
 
 #include <glad/glad.h>
+
+// Macros
+

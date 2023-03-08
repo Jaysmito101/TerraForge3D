@@ -16,6 +16,7 @@
 #include "Platform.h"
 
 
+#include "Generators/GeneratatorData.h"
 #include "Generators/GenerationManager.h"
 
 
@@ -105,7 +106,6 @@ public:
 
 	struct
 	{
-		DataTexture* currentTileDataLayers[6];
 		int mapResolution, tileResolution, tileCount, currentTileX, currentTileY;
 		float tileSize, tileOffsetX, tileOffsetY;
 	} mainMap;

@@ -12,7 +12,7 @@ in VertexData
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    vec4 position_normals[];
+    float data0[];
 };
 
 
@@ -35,6 +35,5 @@ float mapInRange(float value, float minV, float maxV, float newMin, float newMax
 void main()
 {
     int index = PixelCoordToDataOffset(int(fragmentInput.texCoord.x * u_Resolution), int(fragmentInput.texCoord.y * u_Resolution));
-	vec4 position_normal = position_normals[index];	
-	FragColor = vec4(vec3(mapInRange(position_normal.x, u_HeightmapMin, u_HeightmapMax, 0.0, 1.0)), 1.0);	
+	FragColor = vec4(vec3(mapInRange(data0[index], u_HeightmapMin, u_HeightmapMax, 0.0, 1.0)), 1.0);	
 }

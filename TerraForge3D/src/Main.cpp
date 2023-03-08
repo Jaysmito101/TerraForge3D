@@ -203,7 +203,6 @@ public:
 		appState->mainMap.tileSize = 1.0f;
 		appState->mainMap.tileOffsetX = appState->mainMap.tileOffsetY = 0.0f;
 		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
-		for (int i = 0; i < 6; i++) { appState->mainMap.currentTileDataLayers[i] = new DataTexture(i); appState->mainMap.currentTileDataLayers[i]->Resize(256); appState->mainMap.currentTileDataLayers[i]->UploadToGPU(); }
 		
 		appState->eventManager = new EventManager();
 		appState->dashboard = new Dashboard(appState);
@@ -218,6 +217,7 @@ public:
 		appState->exportManager = new ExportManager(appState);
 		appState->styleManager = new Style();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i] = new ViewportManager(appState);
+
 		
 		appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
 		appState->styleManager->Apply();
@@ -241,6 +241,7 @@ public:
 			{
 				bool ttmp = false;
 				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d", &ttmp);
+				appState->eventManager->RaiseEvent("ConnectedToBackend");
 				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
 			}
 			else
@@ -253,17 +254,14 @@ public:
 		}
 
 		Log("Started Up App!");
+		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
+		appState->eventManager->RaiseEvent("OnStartUpComplete");
 	}
 
 	void OnEnd()
 	{
-
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(500ms);
-		
-		for (int i = 0; i < 6; i++) delete appState->mainMap.currentTileDataLayers[i];
+		appState->eventManager->RaiseEvent("OnEnd");
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) delete appState->viewportManagers[i];
-
 		delete appState->eventManager;
 		delete appState->textureStore;
 		delete appState->styleManager;

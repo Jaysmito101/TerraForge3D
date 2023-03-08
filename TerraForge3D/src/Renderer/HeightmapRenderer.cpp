@@ -21,6 +21,7 @@ HeightmapRenderer::~HeightmapRenderer()
 void HeightmapRenderer::Render(RendererViewport* viewport)
 {
 	m_Shader->Bind();
+	m_AppState->generationManager->GetHeightmapData()->Bind(0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);

@@ -12,7 +12,7 @@ in VertexData
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    vec4 position_normals[];
+    float data0[];
 };
 
 #define MAX_LIGHTS 16
@@ -58,10 +58,10 @@ mat3 calculateTBN()
 vec3 calculateNormal()
 {
 	ivec2 pointCoord = ivec2(fragmentInput.texCoord * u_Resolution);
-	float T = position_normals[(pointCoord.y - 1) * u_Resolution + pointCoord.x].x;
-	float B = position_normals[(pointCoord.y + 1) * u_Resolution + pointCoord.x].x;
-	float R = position_normals[pointCoord.y * u_Resolution + (pointCoord.x + 1)].x;
-	float L = position_normals[pointCoord.y * u_Resolution + (pointCoord.x - 1)].x;
+	float T = data0[(pointCoord.y - 1) * u_Resolution + pointCoord.x];
+	float B = data0[(pointCoord.y + 1) * u_Resolution + pointCoord.x];
+	float R = data0[pointCoord.y * u_Resolution + (pointCoord.x + 1)];
+	float L = data0[pointCoord.y * u_Resolution + (pointCoord.x - 1)];
 	return normalize(vec3(2*(R-L), 2*(B-T), -4)) * (u_InvertNormals ? 1.0f : -1.0f);
 }
 

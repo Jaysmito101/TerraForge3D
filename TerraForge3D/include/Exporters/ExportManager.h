@@ -29,7 +29,7 @@ public:
 public:
 	void ShowMeshExportSettings();
 	void ShowTextureExportSettings();
-	Mesh* ApplyMeshTransform(Mesh* mesh);
+	Mesh* ApplyMeshTransform(Mesh* mesh, float* data);
 	bool ExportMesh(std::string path, Mesh* mesh, int format);
 
 	inline void SetStatusMessage(std::string msg) { this->statusMessage = msg; }

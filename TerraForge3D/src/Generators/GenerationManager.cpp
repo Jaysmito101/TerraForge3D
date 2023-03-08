@@ -10,32 +10,34 @@ static bool ch = false;
 GenerationManager::GenerationManager(ApplicationState* appState)
 {
 	m_AppState = appState;
-	a = 0.0f;
-	b = 0.0f;
+	a = 1.0f;
+	b = 1.0f;
 	c = 1.0f;
-	bool success = false;
-	m_GenerationShader = new ComputeShader(ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "dummy.glsl", &success));
+	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
+	m_HeightmapData = new GeneratorData();
+	m_SwapBuffer = new GeneratorData();
+	m_BiomeManagers.push_back(new BiomeManager(m_AppState));
 }
 
 GenerationManager::~GenerationManager()
 {
-	delete m_GenerationShader;
+	
 }
 
 void GenerationManager::Update()
 {
-	if (ch)
+	if (m_UpdationPaused) return;
+	if (m_RequireUpdation)
 	{
-		START_PROFILER();
-		m_GenerationShader->Bind();
-		m_GenerationShader->SetUniform1f("a", a);
-		m_GenerationShader->SetUniform1f("b", b);
-		m_GenerationShader->SetUniform1f("c", c);
-		m_GenerationShader->SetUniform1i("r", m_AppState->mainMap.tileResolution);
-		m_GenerationShader->Dispatch(m_AppState->mainMap.tileResolution / 16, m_AppState->mainMap.tileResolution / 16, 1);
-		END_PROFILER(d);
-		e = d;
-		ch = false;
+		for (auto biome : m_BiomeManagers)
+		{
+			if (biome->IsUpdationRequired())
+			{
+				biome->Update(m_SwapBuffer);
+			}
+		}
+		if(m_SelectedBiome != -1) m_BiomeManagers[m_SelectedBiome]->GetBiomeData()->CopyTo(m_HeightmapData);
+		m_RequireUpdation = false;
 	}
 }
 
@@ -43,10 +45,23 @@ void GenerationManager::ShowSettings()
 {
 	ImGui::Begin("Generation Manager", &m_IsWindowVisible);
 	ImGui::Text("Generation Manager");
-	ch = ImGui::SliderFloat("a", &a, 0.0f, 1.0f) || ch;
-	ch = ImGui::SliderFloat("b", &b, 0.0f, 1.0f) || ch; 
-	ch = ImGui::SliderFloat("c", &c, 0.0f, 1.0f) || ch;
-	ImGui::Text("Time: %f", e);
+	ImGui::Checkbox("Enabled", &m_UpdationPaused);
+	ImGui::Separator();
+	for (int i = 0; i < m_BiomeManagers.size(); i++)
+	{
+		auto biome = m_BiomeManagers[i];
+		if (ImGui::Selectable(biome->GetBiomeName(), m_SelectedBiome == i))
+		{
+			m_SelectedBiome = i;
+		}
+	}
+
+	ImGui::Separator();
+	if (m_SelectedBiome != -1)
+	{
+		m_RequireUpdation = m_BiomeManagers[m_SelectedBiome]->ShowSettings() || m_RequireUpdation;
+	}
+
 	ImGui::End();
 }
 
@@ -58,3 +73,17 @@ bool GenerationManager::IsWorking()
 {
 	return false;
 }
+
+bool GenerationManager::OnTileResolutionChange(const std::string params, void* paramsPtr)
+{
+	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
+	m_HeightmapData->Resize(size);
+	m_SwapBuffer->Resize(size);
+	m_RequireUpdation = true;
+	for (auto biome : m_BiomeManagers)
+	{
+		biome->Resize();
+	}
+	return false;
+}
+
