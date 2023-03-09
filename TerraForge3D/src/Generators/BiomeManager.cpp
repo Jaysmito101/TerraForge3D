@@ -34,6 +34,7 @@ void BiomeManager::Resize()
 
 void BiomeManager::Update(GeneratorData* swapBuffer)
 {
+	if (!m_IsEnabled) return;
 	START_PROFILER();
 	m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data);
 	END_PROFILER(m_CalculationTime);

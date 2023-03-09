@@ -14,6 +14,7 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	b = 1.0f;
 	c = 1.0f;
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
+	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = new GeneratorData();
 	m_SwapBuffer = new GeneratorData();
 	m_BiomeManagers.push_back(new BiomeManager(m_AppState));
@@ -27,19 +28,28 @@ GenerationManager::~GenerationManager()
 void GenerationManager::Update()
 {
 	if (m_UpdationPaused) return;
+	
 	if (m_RequireUpdation)
 	{
-		for (auto biome : m_BiomeManagers)
-		{
-			if (biome->IsUpdationRequired())
-			{
-				biome->Update(m_SwapBuffer);
-			}
-		}
-		if(m_SelectedBiome != -1) m_BiomeManagers[m_SelectedBiome]->GetBiomeData()->CopyTo(m_HeightmapData);
-		m_RequireUpdation = false;
+		UpdateInternal();
 	}
 }
+
+bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPtr)
+{
+	auto forceUpdate = params == "ForceUpdate";
+	for (auto biome : m_BiomeManagers)
+	{
+		if (biome->IsUpdationRequired() || forceUpdate)
+		{
+			biome->Update(m_SwapBuffer);
+		}
+	}
+	if (m_SelectedBiome != -1) m_BiomeManagers[m_SelectedBiome]->GetBiomeData()->CopyTo(m_HeightmapData);
+	m_RequireUpdation = false;
+	return false;
+}
+
 
 void GenerationManager::ShowSettings()
 {
@@ -55,6 +65,7 @@ void GenerationManager::ShowSettings()
 		if (ImGui::Selectable(biome->GetBiomeName(), m_SelectedBiome == i))
 		{
 			m_SelectedBiome = i;
+			m_AppState->eventManager->RaiseEvent("ForceUpdate", "ForceUpdate");
 		}
 	}
 

@@ -13,5 +13,11 @@ public:
 	virtual void OnLoad(nlohmann::json data) override;
 
 private:
-	float m_Height = 0.0f;
+	float m_Height = 0.5f;
+	float m_Radius = 1.0f;
+	float m_Frequency[2] = {1.0f, 1.0f};
+	float m_Offset[2] = {0.0f, 0.0f};
+	float m_Rotation = 0.0f;
+	int m_SinWaveType = 0;
+	int m_SubStyle = 0;
 };

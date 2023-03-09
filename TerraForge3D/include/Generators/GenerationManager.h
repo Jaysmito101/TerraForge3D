@@ -26,7 +26,7 @@ public:
 	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
 	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData; }
 
-private:
+	bool UpdateInternal(const std::string& params = "", void* paramsPtr = nullptr);
 
 private:
 	GeneratorData* m_HeightmapData = nullptr;
