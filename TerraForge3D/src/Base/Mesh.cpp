@@ -153,6 +153,7 @@ void Mesh::RecalculateNormals()
 	for (auto& v : m_Vertices)
 	{
 		VEC3_NORMALIZE(v.normal, v.normal);
+		v.normal = -v.normal;
 	}
 }
 

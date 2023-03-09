@@ -44,9 +44,11 @@ void GenerationManager::Update()
 void GenerationManager::ShowSettings()
 {
 	ImGui::Begin("Generation Manager", &m_IsWindowVisible);
-	ImGui::Text("Generation Manager");
-	ImGui::Checkbox("Enabled", &m_UpdationPaused);
+	ImGui::Checkbox("Updation Paused", &m_UpdationPaused);
 	ImGui::Separator();
+	ImGui::PushFont(GetUIFont("OpenSans-Bold"));
+	ImGui::Text("Biomes");
+	ImGui::PopFont();
 	for (int i = 0; i < m_BiomeManagers.size(); i++)
 	{
 		auto biome = m_BiomeManagers[i];
@@ -56,9 +58,12 @@ void GenerationManager::ShowSettings()
 		}
 	}
 
-	ImGui::Separator();
+	ImGui::NewLine();
 	if (m_SelectedBiome != -1)
 	{
+		ImGui::PushFont(GetUIFont("OpenSans-Bold"));
+		ImGui::Text(m_BiomeManagers[m_SelectedBiome]->GetBiomeName());
+		ImGui::PopFont();
 		m_RequireUpdation = m_BiomeManagers[m_SelectedBiome]->ShowSettings() || m_RequireUpdation;
 	}
 

@@ -4,41 +4,38 @@
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
 
+#include "Generators/BiomeBaseShape/BiomeBaseShape_Flat.h"
+
 BiomeManager::BiomeManager(ApplicationState* appState)
 {
 	m_AppState = appState;
 	m_BiomeID = GenerateId(8);
+	m_Color = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
 	bool success = false;
-	m_BiomeData = new GeneratorData();
-	m_Shader = new ComputeShader(ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "dummy.glsl", &success));
-	sprintf(m_BiomeName, "Default");
+	m_Data = new GeneratorData();
+	static int s_BiomeID = 1;
+	sprintf(m_BiomeName, "Biome %d", s_BiomeID++);
+	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Flat(m_AppState));
 }
 
 BiomeManager::~BiomeManager()
 {
-	delete m_BiomeData;
-	delete m_Shader;
+	delete m_Data;
+	for (auto& generator : m_BaseShapeGenerators) delete generator;
+
 }
 
 void BiomeManager::Resize()
 {
 	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
-	m_BiomeData->Resize(size);
+	m_Data->Resize(size);
 	m_RequireUpdation = true;
 }
-
-static float a = 1.0f, b = 1.0f, c = 1.0f;
 
 void BiomeManager::Update(GeneratorData* swapBuffer)
 {
 	START_PROFILER();
-	m_BiomeData->Bind(0);
-	m_Shader->Bind();
-	m_Shader->SetUniform1f("a", a);
-	m_Shader->SetUniform1f("b", b);
-	m_Shader->SetUniform1f("c", c);
-	m_Shader->SetUniform1i("r", m_AppState->mainMap.tileResolution);
-	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / 16, m_AppState->mainMap.tileResolution / 16, 1);
+	m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data);
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
@@ -47,9 +44,26 @@ bool BiomeManager::ShowSettings()
 {
 	ImGui::PushID(m_BiomeID.data());
 	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
-	BIOME_UI_PROPERTY(ImGui::DragFloat("a", &a, 0.01f));
-	BIOME_UI_PROPERTY(ImGui::DragFloat("b", &b, 0.01f));
-	BIOME_UI_PROPERTY(ImGui::DragFloat("c", &c, 0.01f));
+	ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color));
+	ImGui::BeginChild("Base Shape Settings", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysUseWindowPadding);
+	ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
+	ImGui::Text("Base Shape Settings");
+	ImGui::PopFont();
+	ImGui::PushID("Base Shape Settings"); 
+	if (ImGui::BeginCombo("Style", m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
+	{
+		for (int i = 0; i < (int)m_BaseShapeGenerators.size(); i++)
+		{
+			bool is_selected = m_SelectedBaseShapeGenerator == i;
+			if (ImGui::Selectable(m_BaseShapeGenerators[i]->GetName().c_str(), is_selected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
+			if (is_selected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	BIOME_UI_PROPERTY(m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
+	ImGui::PopID();
+	ImGui::EndChild();
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
 		ImGui::Text("Time Taken: %f", m_CalculationTime);
@@ -57,3 +71,4 @@ bool BiomeManager::ShowSettings()
 	ImGui::PopID();
 	return m_RequireUpdation;
 }
+

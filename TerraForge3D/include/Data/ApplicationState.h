@@ -77,6 +77,8 @@ struct ApplicationStateConstants
 	std::string configsDir = "";
 	std::string logsDir = "";
 	std::string stylesDir = "";
+
+	int gpuWorkgroupSize = 16;
 };
 
 class ApplicationState

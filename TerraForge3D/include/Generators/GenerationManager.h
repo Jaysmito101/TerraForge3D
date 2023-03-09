@@ -36,6 +36,6 @@ private:
 	std::vector<BiomeManager*> m_BiomeManagers;
 	bool m_IsWindowVisible = true;
 	bool m_UpdationPaused = false;
-	bool m_RequireUpdation = false;
+	bool m_RequireUpdation = true;
 	int m_SelectedBiome = -1;
 };
