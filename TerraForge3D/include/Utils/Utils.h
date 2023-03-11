@@ -56,6 +56,7 @@ struct Hash
 std::wstring s2ws(const std::string &s);
 #endif
 
+bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& historyStack);
 void OpenURL(std::string url);
 std::string ShowSaveFileDialog(std::string ext = ".terr3d");
 std::string openfilename();

@@ -5,6 +5,7 @@
 #include "Profiler.h"
 
 #include "Generators/BiomeBaseShape/BiomeBaseShape_Flat.h"
+#include "Generators/BiomeBaseShape/BiomeBaseShape_Classic.h"
 
 BiomeManager::BiomeManager(ApplicationState* appState)
 {
@@ -16,6 +17,7 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 	static int s_BiomeID = 1;
 	sprintf(m_BiomeName, "Biome %d", s_BiomeID++);
 	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Flat(m_AppState));
+	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Classic(m_AppState));
 }
 
 BiomeManager::~BiomeManager()

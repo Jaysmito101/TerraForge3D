@@ -700,6 +700,59 @@ void ToggleSystemConsole()
 #endif
 }
 
+bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& historyStack)
+{
+	static char s_Buffer[256];
+	bool changed = false;
+	changed = ImGui::InputInt(label.c_str(), seed) || changed;
+	ImGui::SameLine();
+	if (ImGui::Button("R"))
+	{
+		*seed = rand();
+		changed = true;
+	}
+	ImGui::SameLine();
+	auto iteratorIndex = std::find(historyStack.begin(), historyStack.end(), *seed);
+	if (iteratorIndex == historyStack.end())
+	{
+		if (ImGui::Button("S")) historyStack.push_back(*seed);
+	}
+	else
+	{
+		if (ImGui::Button("D")) historyStack.erase(iteratorIndex);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("H"))
+	{
+		if (historyStack.size() > 0)
+		{
+			*seed = historyStack.back();
+			historyStack.pop_back();
+			changed = true;
+		}
+	}
+	if (ImGui::BeginPopupContextItem())
+	{
+		if (ImGui::Button("Clear History"))
+		{
+			historyStack.clear();
+		}
+		ImGui::PushID(label.c_str());
+		for (auto i : historyStack)
+		{
+			sprintf(s_Buffer, "%d", i);
+			if (ImGui::Selectable(s_Buffer, *seed == i))
+			{
+				*seed = i;
+				changed = true;
+			}
+		}
+		ImGui::PopID();
+		ImGui::EndPopup();
+	}
+	return changed;
+}
+
 void OpenURL(std::string url)
 {
 #ifdef  TERR3D_WIN32

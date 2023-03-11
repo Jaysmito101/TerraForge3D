@@ -5,10 +5,11 @@ BiomeBaseShape_Flat::BiomeBaseShape_Flat(ApplicationState* appState)
 	: BiomeBaseShapeGenerator(appState, "Basic") 
 {
 	s_TempBool = false;
-	auto source = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "flat.glsl", &s_TempBool);
+	auto path = m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "flat.glsl";
+	auto source = ReadShaderSourceFile(path, &s_TempBool);
 	if (!s_TempBool)
 	{
-		Log("Failed to load shader source file: %s" + m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "flat.glsl");
+		Log("Failed to load shader source file: %s" + path);
 		return;
 	}
 	m_Shader = new ComputeShader(source);
@@ -54,9 +55,25 @@ void BiomeBaseShape_Flat::Update(GeneratorData* buffer, GeneratorTexture* seedTe
 
 nlohmann::json BiomeBaseShape_Flat::OnSave()
 {
-	return nlohmann::json();
+	nlohmann::json data;
+	data["m_Height"] = m_Height;
+	data["m_Radius"] = m_Radius;
+	data["m_Frequency"] = { m_Frequency[0], m_Frequency[1] };
+	data["m_Offset"] = { m_Offset[0], m_Offset[1] };
+	data["m_Rotation"] = m_Rotation;
+	data["m_SinWaveType"] = m_SinWaveType;
+	data["m_SubStyle"] = m_SubStyle;
+	return data;
 }
 
 void BiomeBaseShape_Flat::OnLoad(nlohmann::json data)
 {
+	if(data.contains("m_Height")) m_Height = data["m_Height"]; else m_Height = 0.5f;
+	if(data.contains("m_Radius")) m_Radius = data["m_Radius"]; else m_Radius = 1.0f;
+	if(data.contains("m_Frequency")) { m_Frequency[0] = data["m_Frequency"][0]; m_Frequency[1] = data["m_Frequency"][1]; } else { m_Frequency[0] = 1.0f; m_Frequency[1] = 1.0f; }
+	if(data.contains("m_Offset")) { m_Offset[0] = data["m_Offset"][0]; m_Offset[1] = data["m_Offset"][1]; } else { m_Offset[0] = 0.0f; m_Offset[1] = 0.0f; }
+	if(data.contains("m_Rotation")) m_Rotation = data["m_Rotation"]; else m_Rotation = 0.0f;
+	if(data.contains("m_SinWaveType")) m_SinWaveType = data["m_SinWaveType"]; else m_SinWaveType = 0;
+	if(data.contains("m_SubStyle")) m_SubStyle = data["m_SubStyle"]; else m_SubStyle = 0;
+	m_RequireUpdation = true;
 }

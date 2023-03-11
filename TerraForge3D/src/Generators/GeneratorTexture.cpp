@@ -77,7 +77,8 @@ void GeneratorTexture::SetPixel(float x, float y, float r, float g, float b, flo
     {
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, pixelX, pixelY, 1, 1, m_Format, GL_FLOAT, &glm::vec4(r, g, b, a));
+        float data[] = {r, g, b, a};
+        glTexSubImage2D(GL_TEXTURE_2D, 0, pixelX, pixelY, 1, 1, m_Format, GL_FLOAT, data);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
     else
