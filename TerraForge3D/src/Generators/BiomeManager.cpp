@@ -32,11 +32,11 @@ void BiomeManager::Resize()
 	m_RequireUpdation = true;
 }
 
-void BiomeManager::Update(GeneratorData* swapBuffer)
+void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTexture)
 {
 	if (!m_IsEnabled) return;
 	START_PROFILER();
-	m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data);
+	m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }

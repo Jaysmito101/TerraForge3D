@@ -1,5 +1,6 @@
 #pragma once
-#include "Generators/GeneratatorData.h"
+#include "Generators/GeneratorData.h"
+#include "Generators/GeneratorTexture.h"
 #include "Generators/BiomeManager.h"
 #include "Base/Base.h"
 
@@ -25,17 +26,23 @@ public:
 	inline void SetWindowVisible(bool visible) { m_IsWindowVisible = visible; }
 	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
 	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData; }
-
 	bool UpdateInternal(const std::string& params = "", void* paramsPtr = nullptr);
+
+private:
+	void PullSeedTextureFromActiveMesh();
+
 
 private:
 	GeneratorData* m_HeightmapData = nullptr;
 	GeneratorData* m_SwapBuffer = nullptr;
+	GeneratorTexture* m_SeedTexture = nullptr;
 	ApplicationState* m_AppState = nullptr;
-	ComputeShader* m_GenerationShader = nullptr;
+	ComputeShader* m_BlurrShader = nullptr;
 	std::vector<BiomeManager*> m_BiomeManagers;
 	bool m_IsWindowVisible = true;
 	bool m_UpdationPaused = false;
 	bool m_RequireUpdation = true;
 	int m_SelectedBiome = -1;
+	bool m_UseSeedFromActiveMesh = false;
+	int32_t m_SeedTextureResolution = 256;
 };

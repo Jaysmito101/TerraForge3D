@@ -26,14 +26,14 @@ bool BiomeBaseShape_Flat::ShowSettings()
 	BASE_SHAPE_UI_PROPERTY(ShowComboBox("Sub Style", &m_SubStyle, s_SubStyleNames, IM_ARRAYSIZE(s_SubStyleNames)));
 	BASE_SHAPE_UI_PROPERTY(ImGui::DragFloat("Height", &m_Height, 0.01f));
 	if(m_SubStyle == 3) BASE_SHAPE_UI_PROPERTY(ShowComboBox("Sin Wave Type", &m_SinWaveType, s_SinWaveTypeNames, IM_ARRAYSIZE(s_SinWaveTypeNames)));
-	if(m_SubStyle == 1) BASE_SHAPE_UI_PROPERTY(ImGui::DragFloat("Radius", &m_Radius, 0.01f));
+	if(m_SubStyle == 1) BASE_SHAPE_UI_PROPERTY(ImGui::DragFloat("Radius", &m_Radius, 0.001f, 0.01f, 100.0f));
 	if(m_SubStyle == 3) BASE_SHAPE_UI_PROPERTY(ImGui::DragFloat2("Frequency", m_Frequency, 0.01f));
 	if(m_SubStyle == 3) BASE_SHAPE_UI_PROPERTY(ImGui::DragFloat2("Offset", m_Offset, 0.01f));
 	if(m_SubStyle == 2 || m_SubStyle == 3) BASE_SHAPE_UI_PROPERTY(ImGui::DragFloat("Rotation", &m_Rotation, 0.01f));
 	return m_RequireUpdation;
 }
 
-void BiomeBaseShape_Flat::Update(GeneratorData* buffer)
+void BiomeBaseShape_Flat::Update(GeneratorData* buffer, GeneratorTexture* seedTexture)
 {
 	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	buffer->Bind(0);
@@ -46,6 +46,8 @@ void BiomeBaseShape_Flat::Update(GeneratorData* buffer)
 	m_Shader->SetUniform1i("u_SubStyle", m_SubStyle);
 	m_Shader->SetUniform1i("u_SinWaveType", m_SinWaveType);
 	m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
+	m_Shader->SetUniform1i("u_UseSeedTexture", seedTexture != nullptr);
+	if (seedTexture) m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
 	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
 	m_RequireUpdation = false;
 }

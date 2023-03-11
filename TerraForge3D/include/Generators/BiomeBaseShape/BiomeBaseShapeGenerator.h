@@ -3,7 +3,8 @@
 #include <json/json.hpp>
 #include "Base/Base.h"
 #include "Utils/Utils.h"
-#include "Generators/GeneratatorData.h"
+#include "Generators/GeneratorData.h"
+#include "Generators/GeneratorTexture.h"
 
 #define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
@@ -18,7 +19,7 @@ public:
 	BiomeBaseShapeGenerator(ApplicationState* appState, const std::string& name) : m_AppState(appState), m_Name(name) { m_ID = GenerateId(8); }
 	virtual ~BiomeBaseShapeGenerator() = default;
 	virtual bool ShowSettings() = 0;
-	virtual void Update(GeneratorData* buffer) = 0;
+	virtual void Update(GeneratorData* buffer, GeneratorTexture* seedTexture) = 0;
 	virtual nlohmann::json OnSave() = 0;
 	virtual void OnLoad(nlohmann::json data) = 0;
 	inline nlohmann::json Save() { return OnSave(); }

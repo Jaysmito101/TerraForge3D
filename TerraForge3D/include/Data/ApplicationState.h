@@ -16,7 +16,7 @@
 #include "Platform.h"
 
 
-#include "Generators/GeneratatorData.h"
+#include "Generators/GeneratorData.h"
 #include "Generators/GenerationManager.h"
 
 

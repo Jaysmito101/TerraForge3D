@@ -1,14 +1,14 @@
 #pragma once
 
 #include "BiomeBaseShape/BiomeBaseShapeGenerator.h"
-#include "GeneratatorData.h"
+#include "Generators/GeneratorData.h"
+#include "Generators/GeneratorTexture.h"
 #include "Base/Base.h"
 
 class ApplicationState;
 
 enum BiomeBaseShapeStyle
 {
-	BiomeBaseShapeStyle_Flat,
 	BiomeBaseShapeStyle_Classic,
 	BiomeBaseShapeStyle_Cliff,
 	BiomeBaseShapeStyle_Cracks,
@@ -17,18 +17,6 @@ enum BiomeBaseShapeStyle
 	BiomeBaseShapeStyle_Volcano,
 	BiomeBaseShapeStyle_SingleCrack,
 	BiomeBaseShapeStyle_Count
-};
-
-static const char* s_BiomeBaseShapeStyleNames[] =
-{
-	"Flat",
-	"Classic",
-	"Cliff",
-	"Cracks",
-	"Crater",
-	"Dunes",
-	"Volcano",
-	"SingleCrack"
 };
 
 #define BIOME_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
@@ -40,7 +28,7 @@ public:
 	~BiomeManager();
 
 	void Resize();
-	void Update(GeneratorData* swapBuffer);
+	void Update(GeneratorData* swapBuffer, GeneratorTexture* seedTexture);
 	bool ShowSettings();
 
 	inline const bool IsEnabled() const { return m_IsEnabled; }

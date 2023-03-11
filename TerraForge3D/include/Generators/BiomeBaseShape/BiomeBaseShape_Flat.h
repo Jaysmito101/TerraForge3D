@@ -8,7 +8,7 @@ public:
 	~BiomeBaseShape_Flat();
 
 	virtual bool ShowSettings() override;
-	virtual void Update(GeneratorData* buffer) override;
+	virtual void Update(GeneratorData* buffer, GeneratorTexture* seedTexture) override;
 	virtual nlohmann::json OnSave() override;
 	virtual void OnLoad(nlohmann::json data) override;
 

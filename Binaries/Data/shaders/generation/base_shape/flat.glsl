@@ -19,6 +19,8 @@ uniform int u_SinWaveType;
 uniform float u_Height;
 uniform float u_Radius;
 uniform float u_Rotation;
+uniform bool u_UseSeedTexture;
+uniform sampler2D u_SeedTexture;
 
 
 layout(std430, binding = 0) buffer DataBuffer
@@ -41,24 +43,29 @@ vec2 rotate(vec2 v, float a) {
 void main(void)
 {
 	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
-	vec2 uv = offsetv2 / float(u_Resolution);
 	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
-	if(u_SubStyle == SUB_STYLE_FLAT)
+	vec2 uv = offsetv2 / float(u_Resolution);
+	vec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);
+	if(u_UseSeedTexture)
 	{
-		data[offset] = u_Height;		
+		seed = texture(u_SeedTexture, uv).rgb;
 	}
-	else if(u_SubStyle == SUB_STYLE_DOME)
+	if(u_SubStyle == SUB_STYLE_FLAT)
 	{
 		data[offset] = u_Height;
 	}
+	else if(u_SubStyle == SUB_STYLE_DOME)
+	{
+		data[offset] = u_Height * exp(-(seed.x * seed.x + seed.y * seed.y + seed.z * seed.z) / u_Radius);
+	}
 	else if(u_SubStyle == SUB_STYLE_SLOPE)
 	{
-		vec2 pos = rotate(uv, u_Rotation);
+		vec2 pos = rotate(seed.xy, u_Rotation);
 		data[offset] = pos.x * u_Height;
 	}
 	else if(u_SubStyle == SUB_STYLE_SINE)
 	{
-		vec2 pos = rotate(uv, u_Rotation) * u_Frequency + u_Offset;
+		vec2 pos = rotate(seed.xy, u_Rotation) * u_Frequency + u_Offset;
 		if(u_SinWaveType == SIN_WAVE_TYPE_X)
 		{
 			data[offset] = sin(pos.x) * u_Height;

@@ -1,4 +1,4 @@
-#include "Generators/GeneratatorData.h"
+#include "Generators/GeneratorData.h"
 #include "Base/Base.h"
 
 GeneratorData::GeneratorData()

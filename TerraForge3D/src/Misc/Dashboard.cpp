@@ -29,8 +29,8 @@ void Dashboard::ShowSettings()
 	{
 		bool changed = false;
 		changed = PowerOfTwoDropDown("Tile Resolution##MainMapGen", &m_AppState->mainMap.tileResolution, 4, 20) || changed;
+		ImGui::BeginDisabled();
 		changed = ImGui::DragInt("Tile Count##MainMapGen", &m_AppState->mainMap.tileCount, 0.1f, 0, 1000000) || changed;
-
 		if (changed)
 		{
 			CalculateTileSizeAndOffset();
@@ -41,7 +41,7 @@ void Dashboard::ShowSettings()
 		ImGui::Text("Map Resolution: %d", m_AppState->mainMap.mapResolution);
 		ImGui::Text("Tile Size: %f", m_AppState->mainMap.tileSize);
 		ImGui::Text("Tile Offset: %f %f", m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
-		CalculateTileSizeAndOffset();
+		ImGui::EndDisabled();
 	}
 
 	ImGui::NewLine();
@@ -51,7 +51,7 @@ void Dashboard::ShowSettings()
 
 	if (ImGui::Button("Regenerate"))
 	{
-
+		m_AppState->generationManager->UpdateInternal();
 	}
 
 	ImGui::Separator();
