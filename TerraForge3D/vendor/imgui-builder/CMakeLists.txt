@@ -1,6 +1,7 @@
 include_directories(
-	../ImGui
-	../ImGui/backends
+	../imgui
+	../imgui/backends
+	../imgui-node-editor
 	)
 
 
@@ -22,3 +23,5 @@ set(SOURCES
 	)
 
 add_library(ImGui ${SOURCES})
+
+target_compile_definitions(ImGui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)

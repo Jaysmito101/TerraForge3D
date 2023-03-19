@@ -18,14 +18,8 @@
 #include "Utils/Utils.h"
 #undef cNear
 #undef cFar
-#include "json/json.hpp"
+#include "json.hpp"
 #include <sys/stat.h>
-#ifdef TERR3D_WIN32
-#include <dirent/dirent.h>
-#else
-#include <dirent.h>
-#endif
-
 
 static ApplicationState* appState;
 static Application* mainApp;

@@ -18,7 +18,7 @@
 #include "Generators/GenerationManager.h"
 
 
-#include "json/json.hpp"
+#include "json.hpp"
 
 #ifndef MAX_VIEWPORT_COUNT
 #define MAX_VIEWPORT_COUNT 8

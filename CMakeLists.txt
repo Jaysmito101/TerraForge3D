@@ -19,14 +19,14 @@ include_directories(
     ./TerraForge3D/include/Base
     ./TerraForge3D/vendor
     ./TerraForge3D/vendor/avir
-    ./TerraForge3D/vendor/delaunator
+    ./TerraForge3D/vendor/delaunator/include
     ./TerraForge3D/vendor/glad/include
     ./TerraForge3D/vendor/glfw/include
     ./TerraForge3D/vendor/glm
     ./TerraForge3D/vendor/httplib
     ./TerraForge3D/vendor/imgui
     ./TerraForge3D/vendor/imgui-node-editor
-    ./TerraForge3D/vendor/json
+    ./TerraForge3D/vendor/json/single_include/nlohmann
     ./TerraForge3D/vendor/stb
     ${OPENSSL_INCLUDE_DIR}
 )
@@ -66,6 +66,7 @@ if(WIN32)
         PUBLIC TERR3D_WIN32
     )
 endif()
+
 
 target_link_libraries(TerraForge3D OpenSSL::SSL)
 target_link_libraries(TerraForge3D OpenSSL::Crypto)
