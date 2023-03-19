@@ -6,8 +6,6 @@ import sys
 import Utils
 
 from SetupPython import PythonConfiguration as PythonRequirements
-
-
 from SetupPremake import PremakeConfiguration as PremakeRequirements
 
 
