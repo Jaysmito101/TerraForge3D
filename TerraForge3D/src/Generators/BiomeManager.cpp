@@ -7,6 +7,7 @@
 #include "Generators/BiomeBaseShape/BiomeBaseShape_Flat.h"
 #include "Generators/BiomeBaseShape/BiomeBaseShape_Classic.h"
 #include "Generators/BiomeBaseShape/BiomeBaseShape_Cracks.h"
+#include "Generators/BiomeBaseShape/BiomeBaseShape_Cliff.h"
 
 BiomeManager::BiomeManager(ApplicationState* appState)
 {
@@ -20,6 +21,7 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Flat(m_AppState));
 	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Classic(m_AppState));
 	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Cracks(m_AppState));
+	m_BaseShapeGenerators.push_back(new BiomeBaseShape_Cliff(m_AppState));
 }
 
 BiomeManager::~BiomeManager()

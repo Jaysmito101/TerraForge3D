@@ -16,7 +16,8 @@ public:
 	inline void SetMemoryBarrier() { glMemoryBarrier(GL_ALL_BARRIER_BITS); }
 	inline int GetUniformLocation(const std::string& name)
 	{
-		if (m_UniformIds.find(name) != m_UniformIds.end()) return m_UniformIds[name];
+		auto dt = m_UniformIds.find(name);
+		if (dt != m_UniformIds.end()) return dt->second;
 		auto location = glGetUniformLocation(m_Shader, name.c_str());
 		m_UniformIds[name] = location;
 		return location;
