@@ -22,10 +22,10 @@ OSLiscences::OSLiscences(ApplicationState *as)
 	appState = as;
 	std::string path = appState->constants.liscensesDir;
 
-	for (const auto &entry : fs::directory_iterator(path))
+	for (const auto entry : fs::directory_iterator(path))
 	{
-		std::string path{ entry.path().u8string() };
-		std::string name{ entry.path().filename().u8string()};
+		std::string path = entry.path().string();
+		std::string name = entry.path().filename().string();
 		bool tmp = false;
 		name = name.substr(0, name.size() - 3);
 		osls.push_back(std::make_pair(name, ReadShaderSourceFile(path, &tmp)));

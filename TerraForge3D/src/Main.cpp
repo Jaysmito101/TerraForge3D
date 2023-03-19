@@ -19,7 +19,6 @@
 #undef cNear
 #undef cFar
 #include "json/json.hpp"
-#include <zip.h>
 #include <sys/stat.h>
 #ifdef TERR3D_WIN32
 #include <dirent/dirent.h>
