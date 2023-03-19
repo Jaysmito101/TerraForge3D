@@ -115,8 +115,8 @@ void main(void)
 	}
 	float sx = cos(u_Rotation) * seed.x - sin(u_Rotation) * seed.y;
 	float sy = cos(u_Rotation) * seed.x + sin(u_Rotation) * seed.y;
-	seed.x = sx; seed.y = sy;
 	vec3 seed2 = seed + vec3(u_Seed);
+  seed.x = sx; seed.y = sy;
 	float posVal = seed.x + snoise(seed2 * u_NoiseScale) * u_NoiseStrength;
 	float n = smoothstep(posVal, posVal - u_Thickness, u_Position);
 	

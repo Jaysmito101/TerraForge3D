@@ -2,7 +2,6 @@
 #include "Data/ApplicationState.h"
 #include "Base/Base.h"
 
-#include "Data/Serializer.h"
 
 #include <sstream>
 #include <fstream>

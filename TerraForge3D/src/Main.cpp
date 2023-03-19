@@ -7,7 +7,6 @@
 #endif
 #include "Base/Base.h"
 #include "Base/EntryPoint.h"
-#include "Data/ProjectData.h"
 #include "Data/ApplicationState.h"
 #include "Data/VersionInfo.h"
 #include "TextureStore/TextureStore.h"
@@ -77,7 +76,7 @@ public:
 		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))
 		{
 			// Open Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
+			// if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
 
 			// Exit Shortcut
 			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) exit(0);
@@ -88,9 +87,9 @@ public:
 				if (appState->globals.currentOpenFilePath.size() > 3)
 				{
 					Log("Saved to " + appState->globals.currentOpenFilePath);
-					appState->serailizer->SaveFile(appState->globals.currentOpenFilePath);
+					// appState->serailizer->SaveFile(appState->globals.currentOpenFilePath);
 				}
-				else appState->serailizer->SaveFile(ShowSaveFileDialog("*.terr3d"));
+				// else appState->serailizer->SaveFile(ShowSaveFileDialog("*.terr3d"));
 			}
 
 			// Close Shortcut
@@ -116,7 +115,7 @@ public:
 				if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S))
 				{
 					appState->globals.currentOpenFilePath = "";
-					appState->serailizer->SaveFile(ShowSaveFileDialog("*.terr3d"));
+					// appState->serailizer->SaveFile(ShowSaveFileDialog("*.terr3d"));
 				}
 			}
 		}
@@ -134,8 +133,8 @@ public:
 		{
 			if (appState->states.autoSave)
 			{
-				appState->serailizer->SaveFile(appState->constants.cacheDir + PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
-				if (appState->globals.currentOpenFilePath.size() > 3) appState->serailizer->SaveFile(appState->globals.currentOpenFilePath);
+				// appState->serailizer->SaveFile(appState->constants.cacheDir + PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
+				// if (appState->globals.currentOpenFilePath.size() > 3) appState->serailizer->SaveFile(appState->globals.currentOpenFilePath);
 			}
 		}
 	}
@@ -186,8 +185,8 @@ public:
 				for (int i = 0; i < count; i++)
 				{
 					std::string path = paths[i];
-					if (path.find(".terr3d") != std::string::npos) { appState->serailizer->LoadFile(path); break; }
-					else if (path.find(".terr3dpack") != std::string::npos) { appState->serailizer->LoadPackedProject(path); break; }
+					// if (path.find(".terr3d") != std::string::npos) { appState->serailizer->LoadFile(path); break; }
+					// else if (path.find(".terr3dpack") != std::string::npos) { appState->serailizer->LoadPackedProject(path); break; }
 				}
 		});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
@@ -210,8 +209,8 @@ public:
 		appState->supportersTribute = new SupportersTribute();
 		appState->rendererManager = new RendererManager(appState);
 		appState->mainMenu = new MainMenu(appState);
-		appState->projectManager = new ProjectManager(appState);
-		appState->serailizer = new Serializer(appState);
+		// appState->projectManager = new ProjectManager(appState);
+		// appState->serailizer = new Serializer(appState);
 		appState->osLiscences = new OSLiscences(appState);
 		appState->textureStore = new TextureStore(appState);
 		appState->exportManager = new ExportManager(appState);
@@ -226,9 +225,9 @@ public:
 		if (loadFile.size() > 0)
 		{
 			Log("Loading File from " + loadFile);
-			appState->serailizer->LoadFile(loadFile);
+			// appState->serailizer->LoadFile(loadFile);
 		}
-		appState->projectManager->SetId(GenerateId(32));
+		// appState->projectManager->SetId(GenerateId(32));
 		float t = 1.0f;
 		// Load Fonts
 		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Regular.ttf");
@@ -274,7 +273,7 @@ public:
 		delete appState->osLiscences;
 		delete appState->exportManager;
 		delete appState->projectManager;
-		delete appState->serailizer;
+		// delete appState->serailizer;
 		delete appState;
 	}
 };

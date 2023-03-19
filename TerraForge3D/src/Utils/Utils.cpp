@@ -32,7 +32,6 @@
 
 #include "GLFW/glfw3.h"
 #include "Application.h"
-#include "Data/ProjectData.h"
 
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
@@ -658,35 +657,6 @@ void ShowMessageBox(std::string message, std::string title)
 #else
 	system(("zenity --info --text=" + message + " --title="+title + "").c_str());
 #endif
-}
-
-bool LoadTexture(Texture2D *texture, bool loadToAssets, bool preserveData, bool readAlpha, ProjectManager *projectManager)
-{
-	std::string fileName = ShowOpenFileDialog(".png");
-
-	if (fileName.size() > 3)
-	{
-		if (texture)
-		{
-			delete texture;
-		}
-
-		texture = new Texture2D(fileName, preserveData, readAlpha);
-
-		if(projectManager == nullptr)
-		{
-			projectManager = ProjectManager::Get();
-		}
-
-		if (loadToAssets)
-		{
-			projectManager->SaveTexture(texture);
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 void ToggleSystemConsole()
