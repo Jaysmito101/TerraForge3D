@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "json/json.hpp"
+#include "json.hpp"
 
 
 class Camera

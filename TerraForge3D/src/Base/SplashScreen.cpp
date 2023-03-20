@@ -1,5 +1,4 @@
 #ifdef TERR3D_WIN32
-
 #include <SplashScreen.h>
 #include <resource.h>
 #include <windows.h>
@@ -10,11 +9,8 @@
 #include <iostream>
 #include <string>
 
-
 namespace SplashScreen
 {
-
-
 HBITMAP hBitmap = NULL;
 HINSTANCE hInstance;
 HWND splashWindow;
@@ -125,7 +121,7 @@ DWORD WINAPI SetUpSplashWindow(LPVOID par)
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = (LPCWSTR)classname.c_str();
+	wc.lpszClassName = classname.c_str();
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
 	if (!RegisterClassEx(&wc))
@@ -137,8 +133,8 @@ DWORD WINAPI SetUpSplashWindow(LPVOID par)
 	// Step 2: Creating the Window
 	hwnd = CreateWindowEx(
 	           0,
-	           (LPCWSTR)classname.c_str(),
-	           L"The title of my window",
+	           classname.c_str(),
+	           "SplashWindow",
 	           ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU),
 	           GetSystemMetrics(SM_CXSCREEN) / 2 - 300,
 	           GetSystemMetrics(SM_CYSCREEN) / 2 - 225,
@@ -168,11 +164,11 @@ DWORD WINAPI SetUpSplashWindow(LPVOID par)
 	return 0;
 }
 
-void Init(HINSTANCE hIn)
+void Init()
 {
 	isRunning = true;
 	commandPtr = 0;
-	hInstance = hIn;
+	hInstance = GetModuleHandle(NULL);
 	memset(splashMessage, 0, 256);
 	memcpy(splashMessage, (char *)"Loading...\0", 11);
 	splashMessageLength = 10;
@@ -187,5 +183,9 @@ void Destory()
 }
 
 }
+
+#else
+
+namespace SplashScreen { void Init(){} void Destory(){} }
 
 #endif

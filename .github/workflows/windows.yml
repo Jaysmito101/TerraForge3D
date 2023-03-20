@@ -1,0 +1,35 @@
+name: Windows Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    
+    - name: Generate Solution
+      run: cmake -S ./ -B ./build
+      
+    - name: Build Debug
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: cmake --build ./build
+      
+    - name: Upload Debug Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: TerraForge3D Windows Debug Build
+        path: build\Debug
+
+    - name: Build Release
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: cmake --build ./build --config=Release
+      
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: TerraForge3D Windows Release Build
+        path: build\Release

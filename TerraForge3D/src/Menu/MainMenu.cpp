@@ -57,13 +57,13 @@ void MainMenu::ShowMainMenu()
 
 void MainMenu::ShowFileMenu()
 {
-	if (ImGui::MenuItem("Open")) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
-	if (ImGui::MenuItem("Save")) appState->serailizer->LoadFile(ShowSaveFileDialog("*.terr3d"));
+	// if (ImGui::MenuItem("Open")) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
+	// if (ImGui::MenuItem("Save")) appState->serailizer->LoadFile(ShowSaveFileDialog("*.terr3d"));
 	if (ImGui::MenuItem("Export ...")) appState->exportManager->SetVisible(true);
 	if (ImGui::MenuItem("Close")) appState->globals.currentOpenFilePath = "";
-	if (ImGui::MenuItem("Pack Project")) appState->serailizer->PackProject(ShowSaveFileDialog("*.terr3dpack"));
-	if (ImGui::MenuItem("Load Packed Project")) appState->serailizer->LoadPackedProject(ShowOpenFileDialog("*.terr3dpack"));
-	if (ImGui::MenuItem("Load Auto Saved Project")) appState->serailizer->LoadFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
+	// if (ImGui::MenuItem("Pack Project")) appState->serailizer->PackProject(ShowSaveFileDialog("*.terr3dpack"));
+	// if (ImGui::MenuItem("Load Packed Project")) appState->serailizer->LoadPackedProject(ShowOpenFileDialog("*.terr3dpack"));
+	// if (ImGui::MenuItem("Load Auto Saved Project")) appState->serailizer->LoadFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
 	if (ImGui::MenuItem("Exit")) exit(0);
 }
 

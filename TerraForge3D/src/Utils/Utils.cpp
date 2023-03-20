@@ -2,7 +2,7 @@
 #include <httplib/httplib.h>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
-#include <Utils.h>
+#include "Utils/Utils.h"
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
@@ -32,7 +32,6 @@
 
 #include "GLFW/glfw3.h"
 #include "Application.h"
-#include "Data/ProjectData.h"
 
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
@@ -105,24 +104,24 @@ std::string ShowSaveFileDialog(std::string ext)
 {
 #ifdef TERR3D_WIN32
 	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
+	CHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = NULL;
 	//ofn.lpstrFilter = s2ws(ext).c_str();
-	ofn.lpstrFilter = L"*.*\0";
+	ofn.lpstrFilter = "*.*\0";
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = L"";
+	ofn.lpstrDefExt = "";
 	std::string fileNameStr;
 
 	if (GetSaveFileName(&ofn))
 	{
-		std::wstring ws(ofn.lpstrFile);
-		std::string str = "";
-		for (auto ch : ws) str += (char)ch;
+		//std::wstring ws(ofn.lpstrFile);
+		std::string str = std::string(ofn.lpstrFile);
+		//for (auto ch : ws) str += (char)ch;
 		return str;
 	}
 
@@ -172,25 +171,25 @@ std::string ShowOpenFileDialog(std::string ext)
 {
 #ifdef TERR3D_WIN32
 	OPENFILENAME ofn;
-	WCHAR fileName[MAX_PATH];
+	CHAR fileName[MAX_PATH];
 	ZeroMemory(fileName, MAX_PATH);
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = NULL;
 	//ofn.lpstrFilter = s2ws(ext).c_str();
-	ofn.lpstrFilter = L"*.*\0";
+	ofn.lpstrFilter = "*.*\0";
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = L"";
+	ofn.lpstrDefExt = "";
 	std::string fileNameStr;
 
 	if (GetOpenFileName(&ofn))
 	{
-		std::wstring ws(ofn.lpstrFile);
+		//std::wstring ws(ofn.lpstrFile);
 		// your new String
-		std::string str(ws.begin(), ws.end());
-		return str;
+		//std::string str(ws.begin(), ws.end());
+		return std::string(ofn.lpstrFile);
 	}
 
 	return std::string("");
@@ -564,7 +563,7 @@ void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue)
 		Log("RegSetValue( " + std::string(pszVar) + " ) Failed : " + strerror(iRC));
 	}
 
-	iRC = RegSetValueEx(hkey, L"", 0, REG_SZ, (BYTE *)pszValue, (int)strlen(pszValue) + 1);
+	iRC = RegSetValueEx(hkey, "", 0, REG_SZ, (BYTE *)pszValue, (int)strlen(pszValue) + 1);
 
 	if (iRC != ERROR_SUCCESS)
 	{
@@ -627,7 +626,8 @@ int get_file_size(char *source)
 void CopyFileData(std::string source, std::string destination)
 {
 #ifdef TERR3D_WIN32
-	CopyFileW(CString(source.c_str()), CString(destination.c_str()), false);
+	// CopyFileW(CString(source.c_str()), CString(destination.c_str()), false);
+	CopyFile(source.c_str(), destination.c_str(), false);
 #else
 	int srcsize = get_file_size(source.data());
 	char *data = (char *)malloc(srcsize);
@@ -654,39 +654,11 @@ bool IsMouseButtonDown(int button)
 void ShowMessageBox(std::string message, std::string title)
 {
 #ifdef TERR3D_WIN32
-	MessageBox(NULL, s2ws(message).c_str(), s2ws(title).c_str(), 0);
+	//MessageBox(NULL, s2ws(message).c_str(), s2ws(title).c_str(), 0);
+	MessageBox(NULL, message.c_str(), title.c_str(), 0);
 #else
 	system(("zenity --info --text=" + message + " --title="+title + "").c_str());
 #endif
-}
-
-bool LoadTexture(Texture2D *texture, bool loadToAssets, bool preserveData, bool readAlpha, ProjectManager *projectManager)
-{
-	std::string fileName = ShowOpenFileDialog(".png");
-
-	if (fileName.size() > 3)
-	{
-		if (texture)
-		{
-			delete texture;
-		}
-
-		texture = new Texture2D(fileName, preserveData, readAlpha);
-
-		if(projectManager == nullptr)
-		{
-			projectManager = ProjectManager::Get();
-		}
-
-		if (loadToAssets)
-		{
-			projectManager->SaveTexture(texture);
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 void ToggleSystemConsole()

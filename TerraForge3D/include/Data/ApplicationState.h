@@ -2,8 +2,6 @@
 
 #include "Base/Base.h"
 
-#include "Data/ProjectData.h"
-#include "Data/Serializer.h"
 #include "Menu/MainMenu.h"
 #include "TextureStore/TextureStore.h"
 #include "Misc/SupportersTribute.h"
@@ -20,7 +18,7 @@
 #include "Generators/GenerationManager.h"
 
 
-#include "json/json.hpp"
+#include "json.hpp"
 
 #ifndef MAX_VIEWPORT_COUNT
 #define MAX_VIEWPORT_COUNT 8
@@ -92,7 +90,6 @@ public:
 	ApplicationStateConstants constants;
 
 	EventManager* eventManager = nullptr;
-	Serializer *serailizer = nullptr;
 	MainMenu *mainMenu = nullptr;
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;

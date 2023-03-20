@@ -2,7 +2,7 @@
 #include "Utils/Utils.h"
 
 #include "imgui/imgui.h"
-#include "json/json.hpp"
+#include "json.hpp"
 
 
 #define TF3D_HANDLE_EXCEPTION_MSG(x, message) { try {x;} catch(std::exception& e){ Log(std::string(message) + " [ " + e.what() + " ]" + message);} }

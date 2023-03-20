@@ -1,0 +1,55 @@
+name: Linux Build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master, gen3 ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+         submodules: true
+
+      - name: Generate Solution
+        run: cmake -S ./ -B ./build
+      
+      - name: Install Libs
+        run: sudo apt install mesa-common-dev libxcursor-dev libxrandr-dev libxi-dev libx11-dev libxinerama-dev
+        
+      - name: Setup OpenGL
+        uses: openrndr/setup-opengl@v1.1
+      
+      - name: Build Debug
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cmake --build ./build
+
+      - name: Upload Debug Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: TerraForge3D Linux Debug Build
+          path: build\Debug
+
+      - name: Build Release
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cmake --build ./build --config=Release
+
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: TerraForge3D Linux Release Build
+          path: build\Release

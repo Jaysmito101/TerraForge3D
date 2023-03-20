@@ -2,7 +2,6 @@
 #include "Data/ApplicationState.h"
 #include "Base/Base.h"
 
-#include "Data/Serializer.h"
 
 #include <sstream>
 #include <fstream>
@@ -35,7 +34,7 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 	auto filename0 = fsPath.filename().u8string();
 	auto filename = std::string("");
 	for (auto ch : filename0) if (std::isalnum(ch) || ch == ' ' || ch == '_') filename += ch;
-	path = fsPath.parent_path().u8string() + "/" + filename;
+	path = fsPath.parent_path().string() + "/" + filename;
 	bool add_extension = fsPath.has_extension();
 	switch (format)
 	{
@@ -80,15 +79,15 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 	auto worker = std::thread([pathStr, format, exporting, this]()->void {
 		using namespace std::chrono_literals;
 		auto path = std::filesystem::path(pathStr);
-		auto parentDir = path.parent_path().u8string();
-		auto filename = path.filename().u8string();
+		auto parentDir = path.parent_path().string();
+		auto filename = path.filename().string();
 		auto extension = std::string("");
 		auto outFilename = std::string("");
 		bool exportingTile = false;
 		if (path.has_extension())
 		{
 			filename = filename.substr(0, filename.find_last_of("."));
-			extension = path.extension().u8string();
+			extension = path.extension().string();
 		}
 		auto previousTileX = appState->mainMap.currentTileX;
 		auto previousTileY = appState->mainMap.currentTileY;

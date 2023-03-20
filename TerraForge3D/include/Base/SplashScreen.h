@@ -10,11 +10,15 @@ namespace SplashScreen
 {
 
 
-void Init(HINSTANCE hInstance);
+void Init();
 void Destory();
 void SetSplashMessage(std::string message);
 void HideSplashScreen();
 void ShowSplashScreen();
 }
+
+#else
+
+namespace SplashScreen { void Init(){} void Destory(){} }
 
 #endif

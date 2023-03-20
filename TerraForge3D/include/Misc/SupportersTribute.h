@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "json/json.hpp"
+#include "json.hpp"
 
 class Texture2D;
 

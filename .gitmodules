@@ -1,0 +1,30 @@
+[submodule "TerraForge3D/vendor/glfw"]
+	path = TerraForge3D/vendor/glfw
+	url = https://github.com/glfw/glfw
+[submodule "TerraForge3D/vendor/imgui"]
+	path = TerraForge3D/vendor/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "TerraForge3D/vendor/imgui-node-editor"]
+	path = TerraForge3D/vendor/imgui-node-editor
+	url = https://github.com/thedmd/imgui-node-editor
+[submodule "TerraForge3D/vendor/glm"]
+	path = TerraForge3D/vendor/glm
+	url = https://github.com/g-truc/glm
+[submodule "TerraForge3D/vendor/avir"]
+	path = TerraForge3D/vendor/avir
+	url = https://github.com/avaneev/avir
+[submodule "TerraForge3D/vendor/delaunator"]
+	path = TerraForge3D/vendor/delaunator
+	url = https://github.com/delfrrr/delaunator-cpp
+[submodule "TerraForge3D/vendor/dirent"]
+	path = TerraForge3D/vendor/dirent
+	url = https://github.com/tronkko/dirent
+[submodule "TerraForge3D/vendor/httplib"]
+	path = TerraForge3D/vendor/httplib
+	url = https://github.com/yhirose/cpp-httplib
+[submodule "TerraForge3D/vendor/json"]
+	path = TerraForge3D/vendor/json
+	url = https://github.com/nlohmann/json
+[submodule "TerraForge3D/vendor/stb"]
+	path = TerraForge3D/vendor/stb
+	url = https://github.com/nothings/stb
