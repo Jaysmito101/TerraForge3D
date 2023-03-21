@@ -3,14 +3,6 @@ bin
 vendor/premake
 vendor/astyle
 scripts/__pycache__
-TerraForge3D/vendor/glad/bin
-TerraForge3D/vendor/glad/bin-int
-TerraForge3D/vendor/text-editor/bin
-TerraForge3D/vendor/text-editor/bin-int
-TerraForge3D/vendor/lua/bin
-TerraForge3D/vendor/lua/bin-int
-TerraForge3D/vendor/assimp/bin
-TerraForge3D/vendor/assimp/bin-int
 ghpages
 .vscode
 
@@ -23,13 +15,6 @@ ghpages
 **.orig
 **.make
 
-TerraForge3D/**.exe
-TerraForge3D/**.obj
-TerraForge3D/**.lib
-TerraForge3D/**.pdb
-
-Docs/html
-Docs/latex
 
 Makefile
 **/Makefile
@@ -47,3 +32,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 build
+Release
+Debug
+[*].dir
