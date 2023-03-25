@@ -21,6 +21,8 @@
 #include "json.hpp"
 #include <sys/stat.h>
 
+#include "Exporters/Serializer.h"
+
 static ApplicationState* appState;
 static Application* mainApp;
 
