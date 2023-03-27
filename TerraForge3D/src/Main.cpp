@@ -21,7 +21,7 @@
 #include "json.hpp"
 #include <sys/stat.h>
 
-#include "Exporters/Serializer.h"
+#include "Misc/CustomInspector.h"
 
 static ApplicationState* appState;
 static Application* mainApp;
@@ -250,6 +250,32 @@ public:
 		Log("Started Up App!");
 		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
 		appState->eventManager->RaiseEvent("OnStartUpComplete");
+
+
+		//CustomInspector inspector;
+
+		//inspector.AddStringVariable("Name", "Basic");
+		//inspector.AddBoolVariable("SquareValue");
+		//inspector.AddBoolVariable("AbsoluteValue");
+		//inspector.AddIntegerVariable("SubStyle");
+		//inspector.AddFloatVariable("Height");
+
+		//inspector.AddDropdownWidget("Sub Style", "SubStyle", {"Flat", "Dome", "Slope", "Sine Wave"});
+		//inspector.AddSliderWidget("Height", "Height");
+		//inspector.AddSeperatorWidget();
+		//inspector.AddDragWidget("Height_2", "Height", 0.0f, 100.0f, 5.0f);
+		//inspector.SetWidgetTooltip("Sub Style", "The style of basic generation to use");
+		//inspector.AddSeperatorWidget();
+		//inspector.AddNewLineWidget();
+
+		//auto json = inspector.Save()->ToJson();
+
+		//std::cout << json.dump(4) << "\n\n\n\n\n";
+
+		//inspector.Load(CreateSerializerNodeFromJson(json));
+
+
+
 	}
 
 	void OnEnd()

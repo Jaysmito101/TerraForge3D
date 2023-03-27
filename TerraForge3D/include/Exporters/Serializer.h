@@ -21,7 +21,7 @@ private:
 	}
 
 	template <typename T>
-	inline const T& GetSimple(const std::string& key, const std::string& valueTypeName, const T& defaultValue)
+	inline T GetSimple(const std::string& key, const std::string& valueTypeName, const T& defaultValue)
 	{
 		// if(!HasKey(key)) return defaultValue;
 		if (GetKeyType(key) != valueTypeName) return defaultValue;
@@ -87,14 +87,14 @@ public:
 
 	inline int GetInteger(const std::string& key, int defaultValue = 0) { return GetSimple<int>(key, "Integer", defaultValue); }
 	inline float GetFloat(const std::string& key, float defaultValue = 0.0f) { return GetSimple<float>(key, "Float", defaultValue); }
-	inline const std::string& GetString(const std::string& key, const std::string& defaultValue = "") { return GetSimple<std::string>(key, "String", defaultValue); }
-	inline const std::shared_ptr<SerializerNodeInternal>& GetChildNode(const std::string& key, std::shared_ptr<SerializerNodeInternal> defaultValue = nullptr) { const auto& it = m_Children.find(key); if (it != m_Children.end()) return it->second; return defaultValue; }
-	inline const std::string& GetFile(const std::string& key, const std::string& defaultValue = "") { return GetSimple<std::string>(key, "File", defaultValue); }
+	inline std::string GetString(const std::string& key, const std::string& defaultValue = "") { return GetSimple<std::string>(key, "String", defaultValue); }
+	inline std::shared_ptr<SerializerNodeInternal> GetChildNode(const std::string& key, std::shared_ptr<SerializerNodeInternal> defaultValue = nullptr) { const auto& it = m_Children.find(key); if (it != m_Children.end()) return it->second; return defaultValue; }
+	inline std::string GetFile(const std::string& key, const std::string& defaultValue = "") { return GetSimple<std::string>(key, "File", defaultValue); }
 
-	inline const std::vector<int>& GetIntegerArray(const std::string& key, const std::vector<int>& defaultValue = std::vector<int>()) { return GetSimple<std::vector<int>>(key, "IntegerArray", defaultValue); }
-	inline const std::vector<float>& GetFloatArray(const std::string& key, const std::vector<float>& defaultValue = std::vector<float>()) { return GetSimple<std::vector<float>>(key, "FloatArray", defaultValue); }
-	inline const std::vector<std::string>& GetStringArray(const std::string& key, const std::vector<std::string>& defaultValue = std::vector<std::string>()) { return GetSimple<std::vector<std::string>>(key, "StringArray", defaultValue); }
-	inline const std::vector<std::shared_ptr<SerializerNodeInternal>>& GetNodeArray(const std::string& key, const std::vector<std::shared_ptr<SerializerNodeInternal>>& defaultValue = std::vector<std::shared_ptr<SerializerNodeInternal>>()) { const auto& it = m_Arrays.find(key); if (it != m_Arrays.end()) return it->second; return defaultValue; }
+	inline std::vector<int> GetIntegerArray(const std::string& key, const std::vector<int>& defaultValue = std::vector<int>()) { return GetSimple<std::vector<int>>(key, "IntegerArray", defaultValue); }
+	inline std::vector<float> GetFloatArray(const std::string& key, const std::vector<float>& defaultValue = std::vector<float>()) { return GetSimple<std::vector<float>>(key, "FloatArray", defaultValue); }
+	inline std::vector<std::string> GetStringArray(const std::string& key, const std::vector<std::string>& defaultValue = std::vector<std::string>()) { return GetSimple<std::vector<std::string>>(key, "StringArray", defaultValue); }
+	inline std::vector<std::shared_ptr<SerializerNodeInternal>> GetNodeArray(const std::string& key, const std::vector<std::shared_ptr<SerializerNodeInternal>>& defaultValue = std::vector<std::shared_ptr<SerializerNodeInternal>>()) { const auto& it = m_Arrays.find(key); if (it != m_Arrays.end()) return it->second; return defaultValue; }
 
 	inline int GetArraySize(const std::string& key)
 	{
