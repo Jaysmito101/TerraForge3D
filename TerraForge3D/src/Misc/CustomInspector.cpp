@@ -1,5 +1,14 @@
 #include "Misc/CustomInspector.h"
+#include "Base/Base.h"
+#include "Utils/Utils.h"
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
 
 std::string CustomInspectorValue::CustomInspectorValueTypeToString(CustomInspectorValueType type)
 {
@@ -142,6 +151,15 @@ void CustomInspectorValue::Load(const SerializerNode& node)
 	}
 }
 
+CustomInspectorWidget::CustomInspectorWidget(CustomInspectorWidgetType type)
+{
+	m_Type = type;
+	m_ID = GenerateId(16);
+}
+
+CustomInspectorWidget::~CustomInspectorWidget()
+{
+}
 
 std::string CustomInspectorWidget::CustomInspectorWidgetTypeToString(CustomInspectorWidgetType type)
 {
@@ -189,11 +207,12 @@ SerializerNode CustomInspectorWidget::Save() const
 	if (m_Type == CustomInspectorWidgetType_Seed) node->SetIntegerArray("SeedHistory", m_SeedHistory);
 	node->SetInteger("ISpeed", m_ISpeed);
 	node->SetFloat("FSeed", m_FSpeed);
+	node->SetString("ID", m_ID);
 	node->GetFloat("Contraints_0", m_Constratins[0]);
 	node->GetFloat("Contraints_1", m_Constratins[1]);
 	node->GetFloat("Contraints_2", m_Constratins[2]);
 	node->GetFloat("Contraints_3", m_Constratins[3]);
-	if(m_Tooltip.size() > 0) node->SetString("Tooltip", m_Tooltip);
+	if (m_Tooltip.size() > 0) node->SetString("Tooltip", m_Tooltip);
 	return node;
 }
 
@@ -202,6 +221,7 @@ void CustomInspectorWidget::Load(SerializerNode node)
 	m_Type = CustomInspectorWidgetTypeFromString(node->GetString("TypeName", CustomInspectorWidgetTypeToString(m_Type)));
 	m_VariableName = node->GetString("TargetVariable", m_VariableName);
 	m_Label = node->GetString("Label", m_Label);
+	m_ID = node->GetString("ID", m_ID);
 	if (m_Type == CustomInspectorWidgetType_Seed) m_SeedHistory = node->GetIntegerArray("SeedHistory", m_SeedHistory);
 	m_ISpeed = node->GetInteger("ISpeed", m_ISpeed);
 	m_FSpeed = node->GetFloat("FSeed", m_FSpeed);
@@ -215,6 +235,7 @@ void CustomInspectorWidget::Load(SerializerNode node)
 
 CustomInspector::CustomInspector()
 {
+	m_ID = GenerateId(16);
 	AddWidget("Seperator", CustomInspectorWidget(CustomInspectorWidgetType_Seperator));
 	AddWidget("NewLine", CustomInspectorWidget(CustomInspectorWidgetType_NewLine));
 }
@@ -452,6 +473,7 @@ void CustomInspector::LoadData(SerializerNode node)
 SerializerNode CustomInspector::Save() const
 {
 	SerializerNode node = CreateSerializerNode();
+	node->SetString("ID", m_ID);
 	node->SetChildNode("Data", SaveData());
 	node->SetStringArray("WidgetsOrder", m_WidgetsOrder);
 	node->SetInteger("WidgetsCount", static_cast<int32_t>(m_Widgets.size()));
@@ -469,6 +491,7 @@ void CustomInspector::Load(SerializerNode node)
 {
 	LoadData(node->GetChildNode("Data"));
 	m_Widgets.clear();
+	m_ID = node->GetString("ID", m_ID);
 	int valueCount = node->GetInteger("WidgetsCount");
 	auto subNodes = node->GetNodeArray("Widgets");
 	if (subNodes.size() != valueCount) std::cout << ("Warning: Data might be corrupted.\n");
@@ -479,11 +502,6 @@ void CustomInspector::Load(SerializerNode node)
 		widget.Load(subNode);
 		m_Widgets[name] = widget;
 	}
-}
-
-void CustomInspector::Render()
-{
-	// TODO
 }
 
 CustomInspectorWidget& CustomInspector::SetWidgetConstraints(const std::string& label, float a, float b, float c, float d)
@@ -509,4 +527,146 @@ CustomInspectorWidget& CustomInspector::SetWidgetSpeed(const std::string& label,
 	widget.m_FSpeed = speed;
 	widget.m_ISpeed = static_cast<int32_t>(speed);
 	return widget;
+}
+
+bool CustomInspector::Render()
+{
+	bool hasChanged = false;
+	ImGui::PushID(m_ID.c_str());
+	for (const auto& widgetLabel : m_WidgetsOrder)
+	{
+		const auto& widget = m_Widgets[widgetLabel];
+		if (widget.m_Type == CustomInspectorWidgetType_Slider) hasChanged = RenderSlider(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Drag) hasChanged = RenderDrag(widget);
+		// else if (widget.m_Type == CustomInspectorWidgetType_Color)
+		// else if (widget.m_Type == CustomInspectorWidgetType_Texture) 
+		// else if (widget.m_Type == CustomInspectorWidgetType_Button)
+		// else if (widget.m_Type == CustomInspectorWidgetType_Checkbox)
+		// else if (widget.m_Type == CustomInspectorWidgetType_Input)
+		// else if (widget.m_Type == CustomInspectorWidgetType_Seed)
+		else if (widget.m_Type == CustomInspectorWidgetType_Dropdown) hasChanged = RenderDropdown(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Seperator) ImGui::Separator();
+		else if (widget.m_Type == CustomInspectorWidgetType_NewLine) ImGui::NewLine();
+	}
+	if (ImGui::Button("Reset to Defaults"))
+	{
+		for (auto& it : m_Values) it.second.ResetValue();
+		hasChanged = true;
+	}
+	ImGui::PopID();
+	return hasChanged;
+}
+
+bool CustomInspector::RenderSlider(const CustomInspectorWidget& widget)
+{
+	bool hasChanged = false;
+	auto& value = m_Values[widget.m_VariableName];
+	ImGui::PushID(widget.m_ID.c_str());
+	switch (value.GetType())
+	{
+	case CustomInspectorValueType_Int: 
+		hasChanged = ImGui::SliderInt(widget.m_Label.c_str(), &value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
+		break;
+	case CustomInspectorValueType_Float:
+		hasChanged = ImGui::SliderFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_Vector2:
+		hasChanged = ImGui::SliderFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_Vector3:
+		hasChanged = ImGui::SliderFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_Vector4:
+		hasChanged = ImGui::SliderFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_String:
+	case CustomInspectorValueType_Bool:
+	case CustomInspectorValueType_Texture:
+		throw std::exception("Invalid data type for Slider");
+	}
+	if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip(widget.m_Tooltip.c_str());
+	if (ImGui::BeginPopupContextItem())
+	{
+		if (ImGui::Button("Reset Value")) value.ResetValue();
+		ImGui::EndPopup();
+	}
+	ImGui::PopID();
+	return hasChanged;
+}
+
+bool CustomInspector::RenderDrag(const CustomInspectorWidget& widget)
+{
+	bool hasChanged = false;
+	auto& value = m_Values[widget.m_VariableName];
+	ImGui::PushID(widget.m_ID.c_str());
+	switch (value.GetType())
+	{
+	case CustomInspectorValueType_Int:
+		hasChanged = ImGui::DragInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_FSpeed, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
+		break;
+	case CustomInspectorValueType_Float:
+		hasChanged = ImGui::DragFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_Vector2:
+		hasChanged = ImGui::DragFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_Vector3:
+		hasChanged = ImGui::DragFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_Vector4:
+		hasChanged = ImGui::DragFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		break;
+	case CustomInspectorValueType_String:
+	case CustomInspectorValueType_Bool:
+	case CustomInspectorValueType_Texture:
+		throw std::exception("Invalid data type for Drag");
+	}
+	if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip(widget.m_Tooltip.c_str());
+	if (ImGui::BeginPopupContextItem())
+	{
+		if (ImGui::Button("Reset Value")) value.ResetValue();
+		ImGui::EndPopup();
+	}
+	ImGui::PopID();
+	return hasChanged;
+}
+
+bool CustomInspector::RenderDropdown(const CustomInspectorWidget& widget)
+{
+	bool hasChanged = false;
+	auto& value = m_Values[widget.m_VariableName];
+	ImGui::PushID(widget.m_ID.c_str());
+	switch (value.GetType())
+	{
+	case CustomInspectorValueType_Int: 
+		break;
+	case CustomInspectorValueType_Float:
+	case CustomInspectorValueType_Vector2:
+	case CustomInspectorValueType_Vector3:
+	case CustomInspectorValueType_Vector4:
+	case CustomInspectorValueType_String:
+	case CustomInspectorValueType_Bool:
+	case CustomInspectorValueType_Texture:
+		throw std::exception("Invalid data type for Dropdown");
+	}
+
+	if (ImGui::BeginCombo(widget.m_Label.c_str(), widget.m_DropdownOptions[value.m_IntValue].c_str()))
+	{
+		for (int i = 0; i < static_cast<int32_t>(widget.m_DropdownOptions.size()); i++)
+		{
+			bool isSelected = (value.m_IntValue == i);
+			if (ImGui::Selectable(widget.m_DropdownOptions[i].c_str(), isSelected)) { value.m_IntValue = i; hasChanged = true; }
+			if (isSelected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip(widget.m_Tooltip.c_str());
+	if (ImGui::BeginPopupContextItem())
+	{
+		if (ImGui::Button("Reset Value")) value.ResetValue();
+		ImGui::EndPopup();
+	}
+	ImGui::PopID();
+	return hasChanged;
 }

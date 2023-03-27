@@ -172,6 +172,19 @@ public:
 		return nullptr;
 	}
 
+	inline void ResetValue()
+	{
+		m_IntValue = m_DefaultIntValue;
+		m_FloatValue = m_DefaultFloatValue;
+		m_BoolValue = m_DefaultBoolValue;
+		m_StringValue = m_DefaultStringValue;
+		m_TextureValue = m_DefaultTextureValue;
+		m_VectorValue[0] = m_DefaultVectorValue[0];
+		m_VectorValue[1] = m_DefaultVectorValue[1];
+		m_VectorValue[2] = m_DefaultVectorValue[2];
+		m_VectorValue[3] = m_DefaultVectorValue[3];
+	}
+
 	SerializerNode Save() const;
 	void Load(const SerializerNode& node);
 
@@ -209,8 +222,8 @@ enum CustomInspectorWidgetType
 class CustomInspectorWidget
 {
 public:
-	CustomInspectorWidget(CustomInspectorWidgetType type = CustomInspectorWidgetType_Unknown) : m_Type(type) {}
-	~CustomInspectorWidget() = default;
+	CustomInspectorWidget(CustomInspectorWidgetType type = CustomInspectorWidgetType_Unknown);
+	~CustomInspectorWidget();
 
 	inline CustomInspectorWidgetType GetType() const { return m_Type; }
 	inline std::string GetTypeName() const { return CustomInspectorWidgetTypeToString(m_Type); }
@@ -237,6 +250,7 @@ private:
 	std::string m_Tooltip = "";
 	std::vector<int32_t> m_SeedHistory;
 	std::vector<std::string> m_DropdownOptions;
+	std::string m_ID = "";
 };
 
 class CustomInspector
@@ -283,7 +297,7 @@ public:
 	SerializerNode Save() const;
 	void Load(SerializerNode node);
 
-	void Render();
+	bool Render();
 
 
 	inline const std::unordered_map<std::string, CustomInspectorValue>& GetValues() const { return m_Values; }
@@ -291,7 +305,14 @@ public:
 	inline const std::vector<std::string>& GetWidgetsOrder() const { return m_WidgetsOrder; }
 
 private:
+
+	bool RenderSlider(const CustomInspectorWidget& widget);
+	bool RenderDrag(const CustomInspectorWidget& widget);
+	bool RenderDropdown(const CustomInspectorWidget& widget);
+
+private:
 	std::unordered_map<std::string, CustomInspectorValue> m_Values;
 	std::unordered_map<std::string, CustomInspectorWidget> m_Widgets;
 	std::vector<std::string> m_WidgetsOrder;
+	std::string m_ID = "";
 };

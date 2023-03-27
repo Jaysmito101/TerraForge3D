@@ -47,6 +47,8 @@ void SetUpIcon()
 
 class MyApp : public Application
 {
+	CustomInspector inspector;
+
 public:
 	virtual void OnPreload() override
 	{
@@ -147,6 +149,11 @@ public:
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
 		if (appState->windows.supportersTribute) appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
+
+		ImGui::Begin("CustomInspectorTest");
+		inspector.Render();
+		ImGui::End();
+
 		OnImGuiRenderEnd();
 	}
 
@@ -169,6 +176,23 @@ public:
 		appState->constants.logsDir = appState->constants.dataDir + PATH_SEPARATOR "logs";
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
 		appState->constants.stylesDir = appState->constants.dataDir + PATH_SEPARATOR "styles";
+
+
+
+		inspector.AddStringVariable("Name", "Basic");
+		inspector.AddBoolVariable("SquareValue");
+		inspector.AddBoolVariable("AbsoluteValue");
+		inspector.AddIntegerVariable("SubStyle");
+		inspector.AddFloatVariable("Height");
+		inspector.AddDropdownWidget("Sub Style", "SubStyle", { "Flat", "Dome", "Slope", "Sine Wave" });
+		inspector.AddSliderWidget("Height", "Height");
+		inspector.AddSeperatorWidget();
+		inspector.AddDragWidget("Height_2", "Height", 0.0f, 100.0f, 5.0f);
+		inspector.SetWidgetTooltip("Sub Style", "The style of basic generation to use");
+		inspector.SetWidgetTooltip("Height_2", "Maximum height of terrain");
+		inspector.AddSeperatorWidget();
+		inspector.AddNewLineWidget();
+
 
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		
@@ -250,30 +274,6 @@ public:
 		Log("Started Up App!");
 		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
 		appState->eventManager->RaiseEvent("OnStartUpComplete");
-
-
-		//CustomInspector inspector;
-
-		//inspector.AddStringVariable("Name", "Basic");
-		//inspector.AddBoolVariable("SquareValue");
-		//inspector.AddBoolVariable("AbsoluteValue");
-		//inspector.AddIntegerVariable("SubStyle");
-		//inspector.AddFloatVariable("Height");
-
-		//inspector.AddDropdownWidget("Sub Style", "SubStyle", {"Flat", "Dome", "Slope", "Sine Wave"});
-		//inspector.AddSliderWidget("Height", "Height");
-		//inspector.AddSeperatorWidget();
-		//inspector.AddDragWidget("Height_2", "Height", 0.0f, 100.0f, 5.0f);
-		//inspector.SetWidgetTooltip("Sub Style", "The style of basic generation to use");
-		//inspector.AddSeperatorWidget();
-		//inspector.AddNewLineWidget();
-
-		//auto json = inspector.Save()->ToJson();
-
-		//std::cout << json.dump(4) << "\n\n\n\n\n";
-
-		//inspector.Load(CreateSerializerNodeFromJson(json));
-
 
 
 	}
