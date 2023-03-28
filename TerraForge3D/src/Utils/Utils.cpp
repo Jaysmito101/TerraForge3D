@@ -672,6 +672,24 @@ void ToggleSystemConsole()
 #endif
 }
 
+std::string ColorConvertToHexString(float r, float g, float b, float a)
+{
+	// Multiply each color component by 255 and round
+	int ir = static_cast<int>(r * 255.0f + 0.5f);
+	int ig = static_cast<int>(g * 255.0f + 0.5f);
+	int ib = static_cast<int>(b * 255.0f + 0.5f);
+	int ia = static_cast<int>(a * 255.0f + 0.5f);
+
+	// Convert each component to a hex string
+	std::stringstream stream;
+	stream << std::setfill('0') << std::setw(2) << std::hex << ir;
+	stream << std::setfill('0') << std::setw(2) << std::hex << ig;
+	stream << std::setfill('0') << std::setw(2) << std::hex << ib;
+	stream << std::setfill('0') << std::setw(2) << std::hex << ia;
+
+	return stream.str();
+}
+
 bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& historyStack)
 {
 	static char s_Buffer[256];

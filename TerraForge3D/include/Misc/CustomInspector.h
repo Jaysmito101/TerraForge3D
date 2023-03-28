@@ -216,7 +216,8 @@ enum CustomInspectorWidgetType
 	CustomInspectorWidgetType_Seed,
 	CustomInspectorWidgetType_Dropdown,
 	CustomInspectorWidgetType_Seperator,
-	CustomInspectorWidgetType_NewLine
+	CustomInspectorWidgetType_NewLine,
+	CustomInspectorWidgetType_Text
 };
 
 class CustomInspectorWidget
@@ -243,6 +244,7 @@ public:
 private:
 	std::string m_Label = "";
 	std::string m_VariableName = "";
+	std::string m_FontName = "";
 	CustomInspectorWidgetType m_Type = CustomInspectorWidgetType_Unknown;
 	float m_Constratins[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
 	float m_FSpeed = 1.0f;
@@ -279,18 +281,20 @@ public:
 	CustomInspectorWidget& AddSliderWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 1.0f);
 	CustomInspectorWidget& AddDragWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 1.0f, float speed = 1.0f);
 	CustomInspectorWidget& AddColorWidget(const std::string& label, const std::string& variableName);
-	CustomInspectorWidget& AddTextureWidget(const std::string& label, const std::string& variableName);
+	CustomInspectorWidget& AddTextureWidget(const std::string& label, const std::string& variableName, float width = 100.0f, float height = 100.0f);
 	CustomInspectorWidget& AddButtonWidget(const std::string& label, const std::string& actionName); // for future
 	CustomInspectorWidget& AddCheckboxWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddInputWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddSeedWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddDropdownWidget(const std::string& label, const std::string& variableName, const std::vector<std::string>& options);
+	CustomInspectorWidget& AddTextWidget(const std::string& label, const std::string& font = "");
 	CustomInspectorWidget& AddSeperatorWidget();
 	CustomInspectorWidget& AddNewLineWidget();
 
 	CustomInspectorWidget& SetWidgetConstraints(const std::string& label, float a = 0.0f, float b = 0.0f, float c = 0.0f, float d = 0.0f);
 	CustomInspectorWidget& SetWidgetSpeed(const std::string& label, float speed = 1.0f);
 	CustomInspectorWidget& SetWidgetTooltip(const std::string& label, const std::string& value = "Default Tooltip");
+	CustomInspectorWidget& SetWidgetFont(const std::string& label, const std::string& value = "");
 
 	SerializerNode SaveData() const;
 	void LoadData(SerializerNode node);
@@ -308,7 +312,14 @@ private:
 
 	bool RenderSlider(const CustomInspectorWidget& widget);
 	bool RenderDrag(const CustomInspectorWidget& widget);
+	bool RenderColor(const CustomInspectorWidget& widget);
+	bool RenderTexture(const CustomInspectorWidget& widget);
+	bool RenderButton(const CustomInspectorWidget& widget);
+	bool RenderCheckbox(const CustomInspectorWidget& widget);
+	bool RenderInput(const CustomInspectorWidget& widget);
+	bool RenderSeed(CustomInspectorWidget& widget);
 	bool RenderDropdown(const CustomInspectorWidget& widget);
+
 
 private:
 	std::unordered_map<std::string, CustomInspectorValue> m_Values;

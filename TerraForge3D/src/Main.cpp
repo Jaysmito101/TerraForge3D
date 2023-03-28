@@ -192,6 +192,9 @@ public:
 		inspector.SetWidgetTooltip("Height_2", "Maximum height of terrain");
 		inspector.AddSeperatorWidget();
 		inspector.AddNewLineWidget();
+		inspector.AddTextureVariable("SomeMap");
+		inspector.AddTextureWidget("Select Some Map", "SomeMap");
+
 
 
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
