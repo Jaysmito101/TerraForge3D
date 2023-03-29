@@ -17,8 +17,9 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = new GeneratorData();
 	m_SwapBuffer = new GeneratorData();
-	m_BiomeManagers.push_back(new BiomeManager(m_AppState));
-	
+	m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
+	m_BiomeManagers.back()->SetName("Default Global");
+
 	auto source = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "texture" PATH_SEPARATOR "blurr.glsl", &s_TempBool);
 	if (!s_TempBool)
 	{
@@ -34,10 +35,6 @@ GenerationManager::~GenerationManager()
 	delete m_SwapBuffer;
 	//delete m_BlurrShader;
 	if (m_SeedTexture) delete m_SeedTexture;
-	for (auto biome : m_BiomeManagers)
-	{
-		delete biome;
-	}
 }
 
 void GenerationManager::Update()
@@ -60,14 +57,14 @@ bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPt
 			biome->Update(m_SwapBuffer, m_SeedTexture);
 		}
 	}
-	if (m_SelectedBiome != -1) m_BiomeManagers[m_SelectedBiome]->GetBiomeData()->CopyTo(m_HeightmapData);
+	if(m_BiomeManagers.size() > 0) m_BiomeManagers[0]->GetBiomeData()->CopyTo(m_HeightmapData);
 	m_RequireUpdation = false;
 	return false;
 }
 
 void GenerationManager::PullSeedTextureFromActiveMesh()
 {
-	if(!m_UseSeedFromActiveMesh) return;
+	if (!m_UseSeedFromActiveMesh) return;
 	m_SeedTexture->MakeCPUCopy();
 	m_SeedTexture->ZeroCPUCopy();
 	auto mesh = m_AppState->mainModel->mesh;
@@ -83,10 +80,100 @@ void GenerationManager::PullSeedTextureFromActiveMesh()
 
 void GenerationManager::ShowSettings()
 {
-	ImGui::Begin("Generation Manager", &m_IsWindowVisible);
+	ShowSettingsInspector();
+	ShowSettingsDetailed();
+}
+
+void GenerationManager::ShowSettingsInspector()
+{
+	static bool s_TempBoolean = false;
+	ImGui::Begin("Global Inspector", &m_IsWindowVisible);
+
+	if (ImGui::Selectable("Options", m_SelectedNodeUI.m_ID == "GlobalOptions"))
+	{
+		m_SelectedNodeUI.m_ID = "GlobalOptions";
+		m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_GlobalOptions;
+	}
+
+	s_TempBoolean = ImGui::TreeNodeEx("Biomes", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
+	ImGui::SameLine();
+	if (ImGui::Button("Add##BiomeAdd"))
+	{
+		m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
+		m_BiomeManagers.back()->SetName("Biome " + std::to_string(m_BiomeManagers.size()));
+	}
+	if (s_TempBoolean)
+	{
+		if (m_BiomeManagers.size() == 0) ImGui::Text("No Biomes Added!");
+		for (int i = 0; i < m_BiomeManagers.size(); i++)
+		{
+			auto biome = m_BiomeManagers[i];
+			ImGui::PushID(biome->GetBiomeID().c_str());
+			s_TempBoolean = ImGui::TreeNodeEx(biome->GetBiomeName(), ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
+			ImGui::SameLine();
+			if (ImGui::Button("Delete"))
+			{
+				m_BiomeManagers.erase(m_BiomeManagers.begin() + i);
+				SetUINodeData(-1, None);
+			}
+			if (s_TempBoolean)
+			{
+				if (ImGui::Selectable("General", m_SelectedNodeUI.m_ID == MakeUINodeID(i, General)))
+				{
+					SetUINodeData(i, General);
+				}
+				if (ImGui::Selectable("Base Shape", m_SelectedNodeUI.m_ID == MakeUINodeID(i, BaseShape)))
+				{
+					SetUINodeData(i, BaseShape);
+				}
+				if (ImGui::Selectable("Custom Base Shape", m_SelectedNodeUI.m_ID == MakeUINodeID(i, CustomBaseShape)))
+				{
+					SetUINodeData(i, CustomBaseShape);
+				}
+				if (ImGui::Selectable("Base Noise", m_SelectedNodeUI.m_ID == MakeUINodeID(i, BaseNoise)))
+				{
+					SetUINodeData(i, BaseNoise);
+				}
+				s_TempBoolean = ImGui::TreeNodeEx("Filters", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
+				ImGui::SameLine();
+				if (ImGui::Button("Add##BiomeFilterAdd"))
+				{
+					// TODO
+				}
+				if (s_TempBoolean)
+				{
+					const auto& filters = biome->GetFilters();
+					if (filters.size() == 0) ImGui::Text("No Filters Added!");
+					ImGui::TreePop();
+				}
+				ImGui::TreePop();
+			}
+			ImGui::PopID();
+		}
+		ImGui::TreePop();
+	}
+
+	ImGui::End();
+}
+
+void GenerationManager::ShowSettingsDetailed()
+{
+	ImGui::Begin("Generation Settings", &m_IsWindowVisible);
+
+	if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_GlobalOptions) ShowSettingsGlobalOptions();
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_General) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowGeneralSettings();
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseShape) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseShapeSettings();
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowCustomBaseShapeSettings();
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseNoiseSettings();
+
+	ImGui::End();
+}
+
+void GenerationManager::ShowSettingsGlobalOptions()
+{
 	ImGui::Checkbox("Use Seed Texture", &m_UseSeedFromActiveMesh);
 	ImGui::Checkbox("Auto Updation Paused", &m_UpdationPaused);
-	
+
 	if (m_UseSeedFromActiveMesh && m_SeedTexture == nullptr)
 	{
 		m_SeedTexture = new GeneratorTexture(m_SeedTextureResolution, m_SeedTextureResolution);
@@ -97,7 +184,7 @@ void GenerationManager::ShowSettings()
 		delete m_SeedTexture;
 		m_SeedTexture = nullptr;
 		m_RequireUpdation = true;
-	} 
+	}
 
 	if (m_UseSeedFromActiveMesh)
 	{
@@ -120,40 +207,8 @@ void GenerationManager::ShowSettings()
 			ImGui::EndChild();
 		}
 	}
-	ImGui::Separator();
-	ImGui::PushFont(GetUIFont("OpenSans-Bold"));
-	ImGui::Text("Biomes");
-	ImGui::PopFont();
-	for (int i = 0; i < m_BiomeManagers.size(); i++)
-	{
-		auto biome = m_BiomeManagers[i];
-		if (ImGui::Selectable(biome->GetBiomeName(), m_SelectedBiome == i))
-		{
-			m_SelectedBiome = i;
-			m_AppState->eventManager->RaiseEvent("ForceUpdate", "ForceUpdate");
-		}
-	}
-
-	ImGui::NewLine();
-	if (m_SelectedBiome != -1)
-	{
-		ImGui::PushFont(GetUIFont("OpenSans-Bold"));
-		ImGui::Text(m_BiomeManagers[m_SelectedBiome]->GetBiomeName());
-		ImGui::PopFont();
-		m_RequireUpdation = m_BiomeManagers[m_SelectedBiome]->ShowSettings() || m_RequireUpdation;
-	}
-
-	ImGui::End();
 }
 
-void GenerationManager::InvalidateWorkInProgress()
-{
-}
-
-bool GenerationManager::IsWorking()
-{
-	return false;
-}
 
 bool GenerationManager::OnTileResolutionChange(const std::string params, void* paramsPtr)
 {

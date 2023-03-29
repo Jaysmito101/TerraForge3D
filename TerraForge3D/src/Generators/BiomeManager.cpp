@@ -47,16 +47,17 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	m_RequireUpdation = false;
 }
 
-bool BiomeManager::ShowSettings()
+bool BiomeManager::ShowCustomBaseShapeSettings()
 {
 	ImGui::PushID(m_BiomeID.data());
-	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
-	ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color));
-	ImGui::BeginChild("Base Shape Settings", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysUseWindowPadding);
-	ImGui::PushFont(GetUIFont("OpenSans-Semi-Bold"));
-	ImGui::Text("Base Shape Settings");
-	ImGui::PopFont();
-	ImGui::PushID("Base Shape Settings"); 
+	ImGui::Text("Yet to be implemented!");
+	ImGui::PopID();
+	return m_RequireUpdation;
+}
+
+bool BiomeManager::ShowBaseShapeSettings()
+{
+	ImGui::PushID(m_BiomeID.data());
 	if (ImGui::BeginCombo("Style", m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
 	{
 		for (int i = 0; i < (int)m_BaseShapeGenerators.size(); i++)
@@ -70,7 +71,15 @@ bool BiomeManager::ShowSettings()
 
 	BIOME_UI_PROPERTY(m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
 	ImGui::PopID();
-	ImGui::EndChild();
+	return m_RequireUpdation;
+}
+
+bool BiomeManager::ShowGeneralSettings()
+{
+	ImGui::PushID(m_BiomeID.data());
+	ImGui::InputText("Biome Name", m_BiomeName, sizeof(m_BiomeName));
+	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
+	ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color));
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
 		ImGui::Text("Time Taken: %f", m_CalculationTime);
@@ -79,3 +88,10 @@ bool BiomeManager::ShowSettings()
 	return m_RequireUpdation;
 }
 
+bool BiomeManager::ShowBaseNoiseSettings()
+{
+	ImGui::PushID(m_BiomeID.data());
+	ImGui::Text("Yet to be implemented!");
+	ImGui::PopID();
+	return m_RequireUpdation;
+}

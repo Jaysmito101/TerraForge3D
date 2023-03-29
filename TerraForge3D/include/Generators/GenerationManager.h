@@ -7,6 +7,36 @@
 class ApplicationState;
 class ComputeShader;
 
+enum SelectedUINodeObjectType
+{
+	SelectedUINodeObjectType_None = 0,
+	SelectedUINodeObjectType_GlobalOptions,
+	SelectedUINodeObjectType_General,
+	SelectedUINodeObjectType_Filters,
+	SelectedUINodeObjectType_BaseNoise,
+	SelectedUINodeObjectType_BaseShape,
+	SelectedUINodeObjectType_CustomBaseShape,
+	SelectedUINodeObjectType_Material
+};
+
+struct SelectedUINode
+{
+	int m_BiomeIndex;
+	std::string m_BiomeID;
+	SelectedUINodeObjectType m_ObjectName;
+	std::string m_ID;
+};
+
+#define MakeUINodeID(index1, objectname) (std::to_string(index1) + "_Biome" ###objectname )
+
+
+#define SetUINodeData(index, objectname) \
+{ \
+	m_SelectedNodeUI.m_BiomeIndex = index; \
+	m_SelectedNodeUI.m_ID = MakeUINodeID(index, objectname); \
+	m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_##objectname; \
+}
+
 class GenerationManager
 {
 public:
@@ -15,8 +45,6 @@ public:
 
 	void Update();
 	void ShowSettings();
-	void InvalidateWorkInProgress();
-	bool IsWorking();
 
 	bool OnTileResolutionChange(const std::string params, void* paramsPtr);
 
@@ -30,19 +58,21 @@ public:
 
 private:
 	void PullSeedTextureFromActiveMesh();
-
+	void ShowSettingsInspector();
+	void ShowSettingsDetailed();
+	void ShowSettingsGlobalOptions();
 
 private:
 	GeneratorData* m_HeightmapData = nullptr;
 	GeneratorData* m_SwapBuffer = nullptr;
 	GeneratorTexture* m_SeedTexture = nullptr;
 	ApplicationState* m_AppState = nullptr;
-	ComputeShader* m_BlurrShader = nullptr;
-	std::vector<BiomeManager*> m_BiomeManagers;
+	// ComputeShader* m_BlurrShader = nullptr;
+	std::vector<std::shared_ptr<BiomeManager>> m_BiomeManagers;
 	bool m_IsWindowVisible = true;
 	bool m_UpdationPaused = false;
 	bool m_RequireUpdation = true;
-	int m_SelectedBiome = -1;
 	bool m_UseSeedFromActiveMesh = false;
 	int32_t m_SeedTextureResolution = 256;
+	SelectedUINode m_SelectedNodeUI;
 };
