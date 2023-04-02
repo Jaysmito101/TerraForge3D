@@ -31,7 +31,7 @@ public:
 	virtual void SetData(void *data, uint32_t size, bool c = false);
 	virtual void DeleteData();
 
-	virtual void Bind(uint32_t slot = 0) const ;
+	virtual int32_t Bind(uint32_t slot = 0) const ;
 	unsigned char *GetData();
 
 	virtual bool IsLoaded() const

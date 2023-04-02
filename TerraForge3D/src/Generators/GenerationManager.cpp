@@ -4,15 +4,9 @@
 #include "Utils/Utils.h"
 #include "Profiler.h"
 
-static float a, b, c, d, e;
-static bool ch = false;
-
 GenerationManager::GenerationManager(ApplicationState* appState)
 {
 	m_AppState = appState;
-	a = 1.0f;
-	b = 1.0f;
-	c = 1.0f;
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = new GeneratorData();
@@ -20,12 +14,6 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
 	m_BiomeManagers.back()->SetName("Default Global");
 
-	auto source = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "texture" PATH_SEPARATOR "blurr.glsl", &s_TempBool);
-	if (!s_TempBool)
-	{
-		Log("Failed to load shader source file: %s" + m_AppState->constants.shadersDir + PATH_SEPARATOR "texture" PATH_SEPARATOR "blurr.glsl");
-		return;
-	}
 	//m_BlurrShader = new ComputeShader(source);
 }
 
@@ -87,7 +75,7 @@ void GenerationManager::ShowSettings()
 void GenerationManager::ShowSettingsInspector()
 {
 	static bool s_TempBoolean = false;
-	ImGui::Begin("Global Inspector", &m_IsWindowVisible);
+	ImGui::Begin("Generator Inspector", &m_IsWindowVisible);
 
 	if (ImGui::Selectable("Options", m_SelectedNodeUI.m_ID == "GlobalOptions"))
 	{

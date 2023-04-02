@@ -93,10 +93,11 @@ void Texture2D::DeleteData()
 	}
 }
 
-void Texture2D::Bind(uint32_t slot) const
+int32_t Texture2D::Bind(uint32_t slot) const
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
+	return static_cast<int32_t>(slot);
 }
 
 void Texture2D::Resize(int width, int height, bool resetOpenGL)

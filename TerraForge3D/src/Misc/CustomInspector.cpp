@@ -335,6 +335,29 @@ CustomInspectorValue& CustomInspector::AddTextureVariable(const std::string& nam
 	return AddVariable(name, value);
 }
 
+CustomInspectorValue& CustomInspector::AddVairableFromConfig(const nlohmann::json& config)
+{
+	std::string name = config.contains("Name") ? config["Name"].get<std::string>() : "Unnamed";
+	std::string valueTypeName = "Float";
+	if(config.contains("Type")) valueTypeName = config["Type"];
+	auto valueType = CustomInspectorValue::CustomInspectorValueTypeFromString(valueTypeName);
+	bool hasDefaultValue = config.contains("Default");
+	switch (valueType)
+	{
+	case CustomInspectorValueType_Int:		{ auto& var = AddIntegerVariable(name, hasDefaultValue ? config["Default"].get<int32_t>() : 0); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Float:	{ auto& var = AddFloatVariable(name, hasDefaultValue ? config["Default"].get<float>() : 0.0f); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Bool:		{ auto& var = AddBoolVariable(name, hasDefaultValue ? config["Default"].get<bool>() : false); var.m_Name = name; return var; }
+	case CustomInspectorValueType_String:	{ auto& var = AddStringVariable(name, hasDefaultValue ? config["Default"].get<std::string>() : ""); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Vector2:	{ auto& var = AddVector2Variable(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f)); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Vector3:	{ auto& var = AddVector3Variable(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f)); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Vector4:	{ auto& var = AddVector4Variable(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f)); var.m_Name = name; return var; }
+ 	case CustomInspectorValueType_Texture:  { auto& var = AddTextureVariable(name, hasDefaultValue ? std::make_shared<Texture2D>(config["Default"].get<std::string>()) : nullptr); var.m_Name = name; return var; }
+	default:
+		throw std::runtime_error("Unknown value type");
+	}
+	throw std::runtime_error("Unknown value type");
+}
+
 bool CustomInspector::HasWidget(const std::string& name)
 {
 	return m_Widgets.find(name) != m_Widgets.end();
@@ -454,6 +477,29 @@ CustomInspectorWidget& CustomInspector::AddTextWidget(const std::string& label, 
 	return AddWidget(label, widget);
 }
 
+CustomInspectorWidget& CustomInspector::AddWidgetFromString(const std::string& label, const std::string& type, const std::string& variableName)
+{
+	auto widgetType = CustomInspectorWidget::CustomInspectorWidgetTypeFromString(type);
+	switch (widgetType)
+	{
+	case CustomInspectorWidgetType_Slider:		return AddSliderWidget(label, variableName);
+	case CustomInspectorWidgetType_Drag:		return AddDragWidget(label, variableName);
+	case CustomInspectorWidgetType_Color:		return AddColorWidget(label, variableName);
+	case CustomInspectorWidgetType_Texture:		return AddTextureWidget(label, variableName);
+	case CustomInspectorWidgetType_Button:		return AddButtonWidget(label, variableName);
+	case CustomInspectorWidgetType_Checkbox:	return AddCheckboxWidget(label, variableName);
+	case CustomInspectorWidgetType_Input:		return AddInputWidget(label, variableName);
+	case CustomInspectorWidgetType_Seed:		return AddSeedWidget(label, variableName);
+	case CustomInspectorWidgetType_Dropdown:	return AddDropdownWidget(label, variableName, {});
+	case CustomInspectorWidgetType_Seperator:	return AddSeperatorWidget();
+	case CustomInspectorWidgetType_NewLine:		return AddNewLineWidget();
+	case CustomInspectorWidgetType_Text: 		return AddTextWidget(label, variableName);
+	case CustomInspectorWidgetType_Unknown:
+	default:
+		throw std::exception("Invalid data type for Drag");
+	}
+}
+
 SerializerNode CustomInspector::SaveData() const
 {
 	SerializerNode node = CreateSerializerNode();
@@ -517,6 +563,13 @@ void CustomInspector::Load(SerializerNode node)
 	}
 }
 
+CustomInspectorWidget& CustomInspector::SetWidgetDropdownOptions(const std::string& label, const std::vector<std::string>& options)
+{
+	auto& widget = m_Widgets[label];
+	widget.m_DropdownOptions = options;
+	return widget;
+}
+
 CustomInspectorWidget& CustomInspector::SetWidgetConstraints(const std::string& label, float a, float b, float c, float d)
 {
 	auto& widget = m_Widgets[label];
@@ -541,6 +594,7 @@ CustomInspectorWidget& CustomInspector::SetWidgetFont(const std::string& label, 
 	return widget;
 }
 
+
 CustomInspectorWidget& CustomInspector::SetWidgetSpeed(const std::string& label, float speed)
 {
 	auto& widget = m_Widgets[label];
@@ -558,23 +612,26 @@ bool CustomInspector::Render()
 		const auto& widget = m_Widgets[widgetLabel];
 		ImGui::PushID(widget.m_ID.c_str());
 		if (widget.m_FontName.size() > 0) ImGui::PushFont(GetUIFont(widget.m_FontName));
-		if (widget.m_Type == CustomInspectorWidgetType_Slider) hasChanged = RenderSlider(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Drag) hasChanged = RenderDrag(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Color) hasChanged = RenderColor(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Texture) hasChanged = RenderTexture(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Button) hasChanged = RenderButton(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Checkbox) hasChanged = RenderCheckbox(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Input) hasChanged = RenderInput(widget);
-		else if (widget.m_Type == CustomInspectorWidgetType_Seed) hasChanged = RenderSeed(m_Widgets[widgetLabel]);
-		else if (widget.m_Type == CustomInspectorWidgetType_Dropdown) hasChanged = RenderDropdown(widget);
+		if (widget.m_Type == CustomInspectorWidgetType_Slider) hasChanged = RenderSlider(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Drag) hasChanged = RenderDrag(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Color) hasChanged = RenderColor(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Texture) hasChanged = RenderTexture(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Button) hasChanged = RenderButton(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Checkbox) hasChanged = RenderCheckbox(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Input) hasChanged = RenderInput(widget) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Seed) hasChanged = RenderSeed(m_Widgets[widgetLabel]) || hasChanged;
+		else if (widget.m_Type == CustomInspectorWidgetType_Dropdown) hasChanged = RenderDropdown(widget) || hasChanged;
 		else if (widget.m_Type == CustomInspectorWidgetType_Seperator) ImGui::Separator();
 		else if (widget.m_Type == CustomInspectorWidgetType_NewLine) ImGui::NewLine();
 		if (widget.m_FontName.size() > 0) ImGui::PopFont();
 		if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip(widget.m_Tooltip.c_str());
-		if (ImGui::BeginPopupContextItem())
+		if (widget.m_Type != CustomInspectorWidgetType_Seed)
 		{
-			if (ImGui::Button("Reset Value")) m_Values[widget.m_VariableName].ResetValue();
-			ImGui::EndPopup();
+			if (ImGui::BeginPopupContextItem(widget.m_ID.c_str()))
+			{
+				if (ImGui::Button("Reset Value")) m_Values[widget.m_VariableName].ResetValue();
+				ImGui::EndPopup();
+			}
 		}
 		ImGui::PopID();
 	}
@@ -624,18 +681,34 @@ bool CustomInspector::RenderDrag(const CustomInspectorWidget& widget)
 	{
 	case CustomInspectorValueType_Int:
 		hasChanged = ImGui::DragInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_FSpeed, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
+		if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f) break; // no constraints
+		value.m_IntValue = std::clamp(value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
 		break;
 	case CustomInspectorValueType_Float:
 		hasChanged = ImGui::DragFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f) break; // no constraints
+		value.m_FloatValue = std::clamp(value.m_FloatValue, widget.m_Constratins[0], widget.m_Constratins[1]);
 		break;
 	case CustomInspectorValueType_Vector2:
 		hasChanged = ImGui::DragFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
-		break;
+		if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f) break; // no constraints
+		value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
+		value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
+		break; 
 	case CustomInspectorValueType_Vector3:
 		hasChanged = ImGui::DragFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f) break; // no constraints
+		value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
+		value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
+		value.m_VectorValue[2] = std::clamp(value.m_VectorValue[2], widget.m_Constratins[0], widget.m_Constratins[1]);
 		break;
 	case CustomInspectorValueType_Vector4:
 		hasChanged = ImGui::DragFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+		if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f) break; // no constraints
+		value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
+		value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
+		value.m_VectorValue[2] = std::clamp(value.m_VectorValue[2], widget.m_Constratins[0], widget.m_Constratins[1]);
+		value.m_VectorValue[3] = std::clamp(value.m_VectorValue[3], widget.m_Constratins[0], widget.m_Constratins[1]);
 		break;
 	case CustomInspectorValueType_String:
 	case CustomInspectorValueType_Bool:
@@ -834,5 +907,5 @@ bool CustomInspector::RenderSeed(CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Texture: // todo: add seed texture here too
 		throw std::exception("Invalid data type for Seed");
 	}
-	return false;
+	return hasChanged;
 }

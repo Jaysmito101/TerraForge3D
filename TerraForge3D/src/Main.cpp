@@ -47,8 +47,6 @@ void SetUpIcon()
 
 class MyApp : public Application
 {
-	CustomInspector inspector;
-
 public:
 	virtual void OnPreload() override
 	{
@@ -144,15 +142,12 @@ public:
 		appState->generationManager->ShowSettings();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Show();
 		appState->exportManager->ShowSettings();
-		appState->rendererManager->ShowSettings();
+		//appState->rendererManager->ShowSettings();
 		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
 		if (appState->windows.supportersTribute) appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
 
-		ImGui::Begin("CustomInspectorTest");
-		inspector.Render();
-		ImGui::End();
 
 		OnImGuiRenderEnd();
 	}
@@ -177,27 +172,7 @@ public:
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
 		appState->constants.stylesDir = appState->constants.dataDir + PATH_SEPARATOR "styles";
 
-
-
-		inspector.AddStringVariable("Name", "Basic");
-		inspector.AddBoolVariable("SquareValue");
-		inspector.AddBoolVariable("AbsoluteValue");
-		inspector.AddIntegerVariable("SubStyle");
-		inspector.AddFloatVariable("Height");
-		inspector.AddDropdownWidget("Sub Style", "SubStyle", { "Flat", "Dome", "Slope", "Sine Wave" });
-		inspector.AddSliderWidget("Height", "Height");
-		inspector.AddSeperatorWidget();
-		inspector.AddDragWidget("Height_2", "Height", 0.0f, 100.0f, 5.0f);
-		inspector.SetWidgetTooltip("Sub Style", "The style of basic generation to use");
-		inspector.SetWidgetTooltip("Height_2", "Maximum height of terrain");
-		inspector.AddSeperatorWidget();
-		inspector.AddNewLineWidget();
-		inspector.AddTextureVariable("SomeMap");
-		inspector.AddTextureWidget("Select Some Map", "SomeMap");
-
-
-
-		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
+				ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		
 		// LoadDefaultStyle();
 

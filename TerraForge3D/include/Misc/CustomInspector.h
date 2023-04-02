@@ -34,7 +34,7 @@ public:
 		{
 		case CustomInspectorValueType_Int:     return m_IntValue;
 		case CustomInspectorValueType_Float:   return static_cast<int32_t>(m_FloatValue);
-		case CustomInspectorValueType_Bool:	   return static_cast<int32_t>(m_BoolValue);
+		case CustomInspectorValueType_Bool:	   return m_BoolValue ? 1 : 0;
 		case CustomInspectorValueType_String:  return std::atoi(m_StringValue.c_str());
 		case CustomInspectorValueType_Vector2:
 		case CustomInspectorValueType_Vector3:
@@ -52,8 +52,8 @@ public:
 		{
 		case CustomInspectorValueType_Int:     return static_cast<float>(m_IntValue);
 		case CustomInspectorValueType_Float:   return (m_FloatValue);
-		case CustomInspectorValueType_Bool:	   return static_cast<float>(m_BoolValue);
-		case CustomInspectorValueType_String:  return std::atof(m_StringValue.c_str());
+		case CustomInspectorValueType_Bool:	   return m_BoolValue ? 1.0f : 0.0f;
+		case CustomInspectorValueType_String:  return static_cast<float>(std::atof(m_StringValue.c_str()));
 		case CustomInspectorValueType_Vector2:
 		case CustomInspectorValueType_Vector3:
 		case CustomInspectorValueType_Vector4: return (m_VectorValue[0]);
@@ -70,7 +70,7 @@ public:
 		{
 		case CustomInspectorValueType_Int:     return static_cast<bool>(m_IntValue);
 		case CustomInspectorValueType_Float:   return static_cast<bool>(m_FloatValue);
-		case CustomInspectorValueType_Bool:	   return (m_BoolValue);
+		case CustomInspectorValueType_Bool:	   return m_BoolValue;
 		case CustomInspectorValueType_String:  return m_StringValue == "true";
 		case CustomInspectorValueType_Vector2:
 		case CustomInspectorValueType_Vector3:
@@ -100,13 +100,13 @@ public:
 		return "";
 	}
 
-	inline glm::vec2 GetVector2()
+	inline glm::vec2 GetVector2() const
 	{
 		switch (m_Type)
 		{
 		case CustomInspectorValueType_Int:     return glm::vec2(static_cast<float>(m_IntValue));
 		case CustomInspectorValueType_Float:   return glm::vec2(static_cast<float>(m_FloatValue));
-		case CustomInspectorValueType_Bool:	   return glm::vec2(static_cast<float>(m_BoolValue));
+		case CustomInspectorValueType_Bool:	   return glm::vec2(m_BoolValue ? 1.0f : 0.0f);
 		case CustomInspectorValueType_Vector2:
 		case CustomInspectorValueType_Vector3:
 		case CustomInspectorValueType_Vector4: return glm::vec2(m_VectorValue[0], m_VectorValue[1]);
@@ -118,13 +118,13 @@ public:
 		return glm::vec2(0.0f);
 	}
 
-	inline glm::vec3 GetVector3()
+	inline glm::vec3 GetVector3() const
 	{
 		switch (m_Type)
 		{
 		case CustomInspectorValueType_Int:     return glm::vec3(static_cast<float>(m_IntValue));
 		case CustomInspectorValueType_Float:   return glm::vec3(static_cast<float>(m_FloatValue));
-		case CustomInspectorValueType_Bool:	   return glm::vec3(static_cast<float>(m_BoolValue));
+		case CustomInspectorValueType_Bool:	   return glm::vec3(m_BoolValue ? 1.0f : 0.0f);
 		case CustomInspectorValueType_Vector2: return glm::vec3(m_VectorValue[0], m_VectorValue[1], 0.0f);
 		case CustomInspectorValueType_Vector3:
 		case CustomInspectorValueType_Vector4: return glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]);
@@ -136,13 +136,13 @@ public:
 		return glm::vec3(0.0f);
 	}
 
-	inline glm::vec4 GetVector4()
+	inline glm::vec4 GetVector4() const
 	{
 		switch (m_Type)
 		{
 		case CustomInspectorValueType_Int:     return glm::vec4(static_cast<float>(m_IntValue));
 		case CustomInspectorValueType_Float:   return glm::vec4(static_cast<float>(m_FloatValue));
-		case CustomInspectorValueType_Bool:	   return glm::vec4(static_cast<float>(m_BoolValue));
+		case CustomInspectorValueType_Bool:	   return glm::vec4(m_BoolValue ? 1.0f : 0.0f);
 		case CustomInspectorValueType_Vector2: return glm::vec4(m_VectorValue[0], m_VectorValue[1], 0.0f, 0.0f);
 		case CustomInspectorValueType_Vector3: return glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], 0.0f);
 		case CustomInspectorValueType_Vector4: return glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]);
@@ -195,7 +195,7 @@ public:
 private:
 	std::string m_Name = "";
 	CustomInspectorValueType m_Type = CustomInspectorValueType_Unknown;
-	int m_IntValue = 0, m_DefaultIntValue = 0;
+	int32_t m_IntValue = 0, m_DefaultIntValue = 0;
 	float m_FloatValue = 0.0f, m_DefaultFloatValue = 0.0f;
 	bool m_BoolValue = false, m_DefaultBoolValue = false;
 	std::string m_StringValue = "", m_DefaultStringValue = "";
@@ -233,6 +233,10 @@ public:
 	inline void SetLabel(const std::string& label) { m_Label = label; }
 	inline void SetVariableName(const std::string& variableName) { m_VariableName = variableName; }
 	inline void SetTooltip(const std::string& tooltip) { m_Tooltip = tooltip; }
+	inline void SetConstraints(float a = 0.0f, float b = 0.0f, float c = 0.0f, float d = 0.0f) { m_Constratins[0] = a; m_Constratins[1] = b; m_Constratins[2] = c; m_Constratins[3] = d; }
+	inline void SetFontName(const std::string& fontName) { m_FontName = fontName; }
+	inline void SetDropdownOptions(const std::vector<std::string>& options) { m_DropdownOptions = options; }
+	inline void SetSpeed(float speed) { m_FSpeed = speed; m_ISpeed = static_cast<int32_t>(speed); }
 
 	SerializerNode Save() const;
 	void Load(SerializerNode node);
@@ -246,9 +250,9 @@ private:
 	std::string m_VariableName = "";
 	std::string m_FontName = "";
 	CustomInspectorWidgetType m_Type = CustomInspectorWidgetType_Unknown;
-	float m_Constratins[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+	float m_Constratins[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	float m_FSpeed = 1.0f;
-	int m_ISpeed = 1;
+	int32_t m_ISpeed = 1;
 	std::string m_Tooltip = "";
 	std::vector<int32_t> m_SeedHistory;
 	std::vector<std::string> m_DropdownOptions;
@@ -273,13 +277,14 @@ public:
 	CustomInspectorValue& AddVector3Variable(const std::string& name, glm::vec3 defaultValue = glm::vec3(0.0f));
 	CustomInspectorValue& AddVector4Variable(const std::string& name, glm::vec4 defaultValue = glm::vec4(0.0f));
 	CustomInspectorValue& AddTextureVariable(const std::string& name, std::shared_ptr<Texture2D> defaultValue = nullptr);
+	CustomInspectorValue& AddVairableFromConfig(const nlohmann::json& config);
 
 	bool HasWidget(const std::string& name);
 	CustomInspectorWidget& GetWidget(const std::string& name);
 	void RemoveWidget(const std::string& name);
 	CustomInspectorWidget& AddWidget(const std::string& name, const CustomInspectorWidget& widget);
-	CustomInspectorWidget& AddSliderWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 1.0f);
-	CustomInspectorWidget& AddDragWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 1.0f, float speed = 1.0f);
+	CustomInspectorWidget& AddSliderWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 0.0f);
+	CustomInspectorWidget& AddDragWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 0.0f, float speed = 1.0f);
 	CustomInspectorWidget& AddColorWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddTextureWidget(const std::string& label, const std::string& variableName, float width = 100.0f, float height = 100.0f);
 	CustomInspectorWidget& AddButtonWidget(const std::string& label, const std::string& actionName); // for future
@@ -290,7 +295,10 @@ public:
 	CustomInspectorWidget& AddTextWidget(const std::string& label, const std::string& font = "");
 	CustomInspectorWidget& AddSeperatorWidget();
 	CustomInspectorWidget& AddNewLineWidget();
+	CustomInspectorWidget& AddWidgetFromString(const std::string& label, const std::string& type, const std::string& variableName);
 
+	
+	CustomInspectorWidget& SetWidgetDropdownOptions(const std::string& label, const std::vector<std::string>& options);
 	CustomInspectorWidget& SetWidgetConstraints(const std::string& label, float a = 0.0f, float b = 0.0f, float c = 0.0f, float d = 0.0f);
 	CustomInspectorWidget& SetWidgetSpeed(const std::string& label, float speed = 1.0f);
 	CustomInspectorWidget& SetWidgetTooltip(const std::string& label, const std::string& value = "Default Tooltip");
@@ -303,7 +311,7 @@ public:
 
 	bool Render();
 
-
+	inline void Clear() { m_Values.clear(); m_Widgets.clear(); m_WidgetsOrder.clear(); }
 	inline const std::unordered_map<std::string, CustomInspectorValue>& GetValues() const { return m_Values; }
 	inline const std::unordered_map<std::string, CustomInspectorWidget>& GetWidgets() const { return m_Widgets; }
 	inline const std::vector<std::string>& GetWidgetsOrder() const { return m_WidgetsOrder; }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BiomeBaseShape/BiomeBaseShapeGenerator.h"
+#include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Base/Base.h"
@@ -57,7 +57,6 @@ private:
 	std::string m_BiomeID = "";
 	ApplicationState* m_AppState = nullptr;
 	GeneratorData* m_Data = nullptr;
-	std::vector<BiomeBaseShapeGenerator*> m_BaseShapeGenerators;
+	std::shared_ptr<BiomeBaseShapeGenerator> m_BaseShapeGenerator;
 	std::vector<int> m_Filters;
-	int m_SelectedBaseShapeGenerator = 0;
 };

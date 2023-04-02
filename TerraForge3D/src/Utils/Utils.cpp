@@ -698,7 +698,7 @@ bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& his
 	ImGui::SameLine();
 	if (ImGui::Button("R"))
 	{
-		*seed = rand();
+		*seed = rand() % 500;
 		changed = true;
 	}
 	ImGui::SameLine();
