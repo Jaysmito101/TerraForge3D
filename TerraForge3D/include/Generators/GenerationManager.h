@@ -53,7 +53,7 @@ public:
 	inline const bool IsWindowVisible() const { return m_IsWindowVisible; }
 	inline void SetWindowVisible(bool visible) { m_IsWindowVisible = visible; }
 	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
-	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData; }
+	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData.get(); }
 	bool UpdateInternal(const std::string& params = "", void* paramsPtr = nullptr);
 
 private:
@@ -63,10 +63,10 @@ private:
 	void ShowSettingsGlobalOptions();
 
 private:
-	GeneratorData* m_HeightmapData = nullptr;
-	GeneratorData* m_SwapBuffer = nullptr;
-	GeneratorTexture* m_SeedTexture = nullptr;
 	ApplicationState* m_AppState = nullptr;
+	std::shared_ptr<GeneratorData> m_HeightmapData;
+	std::shared_ptr<GeneratorData> m_SwapBuffer;
+	std::shared_ptr<GeneratorTexture> m_SeedTexture;
 	// ComputeShader* m_BlurrShader = nullptr;
 	std::vector<std::shared_ptr<BiomeManager>> m_BiomeManagers;
 	bool m_IsWindowVisible = true;

@@ -10,29 +10,43 @@
 //#include "Generators/BiomeBaseShape/BiomeBaseShape_Cliff.h"
 #include "Generators/BiomeBaseShapeGenerator.h"
 
+std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> BiomeManager::s_BaseShapeGenerators;
+
+bool BiomeManager::AddBaseShapeGenerator(const std::string& config, ApplicationState* appState)
+{
+	s_BaseShapeGenerators.push_back(std::make_shared<BiomeBaseShapeGenerator>(appState));
+	return s_BaseShapeGenerators.back()->LoadConfig(config);
+}
+
+bool BiomeManager::BiomeManager::LoadBaseShapeGenerators(ApplicationState* appState)
+{
+	static bool s_Success = false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "classic2.glsl", &s_Success), appState)) return false;
+	return true;
+}
+
+void BiomeManager::FreeBaseShapeGenerators()
+{
+	s_BaseShapeGenerators.clear();
+}
+
 BiomeManager::BiomeManager(ApplicationState* appState)
 {
 	m_AppState = appState;
 	m_BiomeID = GenerateId(8);
 	m_Color = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
 	bool success = false;
-	m_Data = new GeneratorData();
+	m_Data = std::make_shared<GeneratorData>();
 	static int s_BiomeID = 1;
 	sprintf(m_BiomeName, "Biome %d", s_BiomeID++);
 	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Flat(m_AppState));
 	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Classic(m_AppState));
 	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Cracks(m_AppState));
 	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Cliff(m_AppState));
-	
-	m_BaseShapeGenerator = std::make_shared<BiomeBaseShapeGenerator>(m_AppState);
-	m_BaseShapeGenerator->LoadConfig(ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "classic2.glsl", &s_TempBool));
 }
 
 BiomeManager::~BiomeManager()
 {
-	delete m_Data;
-// 	for (auto& generator : m_BaseShapeGenerators) delete generator;
-
 }
 
 void BiomeManager::Resize()
@@ -47,7 +61,7 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	if (!m_IsEnabled) return;
 	START_PROFILER();
 	// m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
-	m_BaseShapeGenerator->Update(m_Data, seedTexture);
+	s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
@@ -63,21 +77,17 @@ bool BiomeManager::ShowCustomBaseShapeSettings()
 bool BiomeManager::ShowBaseShapeSettings()
 {
 	ImGui::PushID(m_BiomeID.data());
-	/*
-	if (ImGui::BeginCombo("Style", m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
+	if (ImGui::BeginCombo("Style", s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
 	{
-		for (int i = 0; i < (int)m_BaseShapeGenerators.size(); i++)
+		for (int i = 0; i < static_cast<int32_t>(s_BaseShapeGenerators.size()); i++)
 		{
 			bool is_selected = m_SelectedBaseShapeGenerator == i;
-			if (ImGui::Selectable(m_BaseShapeGenerators[i]->GetName().c_str(), is_selected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
+			if (ImGui::Selectable(s_BaseShapeGenerators[i]->GetName().c_str(), is_selected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
 			if (is_selected) ImGui::SetItemDefaultFocus();
 		}
 		ImGui::EndCombo();
 	}
-	*/
-
-	// BIOME_UI_PROPERTY(m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
-	BIOME_UI_PROPERTY(m_BaseShapeGenerator->ShowSettings());
+	BIOME_UI_PROPERTY(s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
 	ImGui::PopID();
 	return m_RequireUpdation;
 }

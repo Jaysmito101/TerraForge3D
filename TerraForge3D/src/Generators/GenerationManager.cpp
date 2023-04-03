@@ -6,11 +6,12 @@
 
 GenerationManager::GenerationManager(ApplicationState* appState)
 {
+	if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
 	m_AppState = appState;
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
-	m_HeightmapData = new GeneratorData();
-	m_SwapBuffer = new GeneratorData();
+	m_HeightmapData = std::make_shared<GeneratorData>();
+	m_SwapBuffer = std::make_shared<GeneratorData>();
 	m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
 	m_BiomeManagers.back()->SetName("Default Global");
 
@@ -19,10 +20,7 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 
 GenerationManager::~GenerationManager()
 {
-	delete m_HeightmapData;
-	delete m_SwapBuffer;
-	//delete m_BlurrShader;
-	if (m_SeedTexture) delete m_SeedTexture;
+	BiomeManager::FreeBaseShapeGenerators();
 }
 
 void GenerationManager::Update()
@@ -42,10 +40,10 @@ bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPt
 	{
 		if (biome->IsUpdationRequired() || forceUpdate)
 		{
-			biome->Update(m_SwapBuffer, m_SeedTexture);
+			biome->Update(m_SwapBuffer.get(), m_SeedTexture.get());
 		}
 	}
-	if(m_BiomeManagers.size() > 0) m_BiomeManagers[0]->GetBiomeData()->CopyTo(m_HeightmapData);
+	if(m_BiomeManagers.size() > 0) m_BiomeManagers[0]->GetBiomeData()->CopyTo(m_HeightmapData.get());
 	m_RequireUpdation = false;
 	return false;
 }
@@ -164,12 +162,11 @@ void GenerationManager::ShowSettingsGlobalOptions()
 
 	if (m_UseSeedFromActiveMesh && m_SeedTexture == nullptr)
 	{
-		m_SeedTexture = new GeneratorTexture(m_SeedTextureResolution, m_SeedTextureResolution);
+		m_SeedTexture = std::make_shared<GeneratorTexture>(m_SeedTextureResolution, m_SeedTextureResolution);
 		m_RequireUpdation = true;
 	}
 	else if (!m_UseSeedFromActiveMesh && m_SeedTexture != nullptr)
 	{
-		delete m_SeedTexture;
 		m_SeedTexture = nullptr;
 		m_RequireUpdation = true;
 	}
