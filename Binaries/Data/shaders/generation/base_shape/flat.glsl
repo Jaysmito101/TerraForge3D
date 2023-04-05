@@ -1,86 +1,119 @@
-#version 430 core
-
-layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+{
+	"Name": "Basic",
+	"Params": [
+		{
+			"Name": "SubStyle",
+			"Type": "Int",
+			"Default": 0,
+			"Widget": "Dropdown",
+			"Options": ["Flat", "Dome", "Slope", "Sine Wave"]
+		},
+		{
+			"Name": "SinWaveType",
+			"Type": "Int",
+			"Default": 0,
+			"Widget": "Dropdown",
+			"Options": ["X", "Y", "X + Y", "X * Y"],
+			"Conditional": "SubStyle",
+			"ConditionalValue": 3
+		},		
+		{
+			"Name": "Frequency",
+			"Type": "Float",
+			"Default": 1.0,
+			"Conditional": "SubStyle",
+			"ConditionalValue": 3,
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "Height",
+			"Type": "Float",
+			"Default": 1.0,
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "Radius",
+			"Type": "Float",
+			"Default": 0.5,
+			"Conditional": "SubStyle",
+			"ConditionalValue": 1,
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "Rotation",
+			"Type": "Float",
+			"Default": 0.0,
+			"Widget": "Slider",
+			"Constraints": [-180.0, 180.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Offset",
+			"Type": "Vector2",
+			"Default": [0.0, 0.0],
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		}
+	]
+}
+// CODE
 
 #define SUB_STYLE_FLAT		0
 #define SUB_STYLE_DOME		1
 #define SUB_STYLE_SLOPE		2
 #define SUB_STYLE_SINE		3
+
 #define SIN_WAVE_TYPE_X 	0
 #define SIN_WAVE_TYPE_Y 	1
 #define SIN_WAVE_TYPE_XPY	2
 #define SIN_WAVE_TYPE_XMY	3
 
-uniform int u_Resolution;
-uniform vec2 u_Frequency;
-uniform vec2 u_Offset;
-uniform int u_SubStyle;
-uniform int u_SinWaveType;
-uniform float u_Height;
-uniform float u_Radius;
-uniform float u_Rotation;
-uniform bool u_UseSeedTexture;
-uniform sampler2D u_SeedTexture;
 
-
-layout(std430, binding = 0) buffer DataBuffer
+vec2 rotate(vec2 v, float a) 
 {
-    float data[];
-};
-
-uint PixelCoordToDataOffset(uint x, uint y)
-{
-	return y * u_Resolution + x;
-}
-
-vec2 rotate(vec2 v, float a) {
+	a = 3.141f * a / 180.0f;
 	float s = sin(a);
 	float c = cos(a);
 	mat2 m = mat2(c, -s, s, c);
 	return m * v;
 }
 
-void main(void)
+float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
-	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
-	vec2 uv = offsetv2 / float(u_Resolution);
-	vec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);
-	if(u_UseSeedTexture)
-	{
-		seed = texture(u_SeedTexture, uv).rgb;
-	}
 	if(u_SubStyle == SUB_STYLE_FLAT)
 	{
-		data[offset] = u_Height;
+		return u_Height;
 	}
 	else if(u_SubStyle == SUB_STYLE_DOME)
 	{
-		data[offset] = u_Height * exp(-(seed.x * seed.x + seed.y * seed.y + seed.z * seed.z) / u_Radius);
+		return u_Height * exp(-(seed.x * seed.x + seed.y * seed.y + seed.z * seed.z) / u_Radius);
 	}
 	else if(u_SubStyle == SUB_STYLE_SLOPE)
 	{
 		vec2 pos = rotate(seed.xy, u_Rotation);
-		data[offset] = pos.x * u_Height;
+		return pos.x * u_Height;
 	}
 	else if(u_SubStyle == SUB_STYLE_SINE)
 	{
 		vec2 pos = rotate(seed.xy, u_Rotation) * u_Frequency + u_Offset;
 		if(u_SinWaveType == SIN_WAVE_TYPE_X)
 		{
-			data[offset] = sin(pos.x) * u_Height;
+			return sin(pos.x) * u_Height;
 		}
 		else if(u_SinWaveType == SIN_WAVE_TYPE_Y)
 		{
-			data[offset] = sin(pos.y) * u_Height;
+			return sin(pos.y) * u_Height;
 		}
 		else if(u_SinWaveType == SIN_WAVE_TYPE_XPY)
 		{
-			data[offset] = (sin(pos.x) + sin(pos.y)) * u_Height;
+			return (sin(pos.x) + sin(pos.y)) * u_Height;
 		}
 		else if(u_SinWaveType == SIN_WAVE_TYPE_XMY)
 		{
-			data[offset] = (sin(pos.x) * sin(pos.y)) * u_Height;
+			return (sin(pos.x) * sin(pos.y)) * u_Height;
 		}
 	}
+	return 0.0f;
 }

@@ -61,7 +61,7 @@ private:
 	std::string m_BiomeID = "";
 	ApplicationState* m_AppState = nullptr;
 	std::shared_ptr<GeneratorData> m_Data;
-	int32_t m_SelectedBaseShapeGenerator = 0;
+	int32_t m_SelectedBaseShapeGenerator = 1;
 	std::vector<int> m_Filters;
 
 	static std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> s_BaseShapeGenerators;

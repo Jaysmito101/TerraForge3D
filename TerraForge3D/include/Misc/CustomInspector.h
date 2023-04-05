@@ -237,6 +237,8 @@ public:
 	inline void SetFontName(const std::string& fontName) { m_FontName = fontName; }
 	inline void SetDropdownOptions(const std::vector<std::string>& options) { m_DropdownOptions = options; }
 	inline void SetSpeed(float speed) { m_FSpeed = speed; m_ISpeed = static_cast<int32_t>(speed); }
+	inline void SetRenderOnCondition(const std::string condtionName, int32_t conditionValue) { m_UseRenderOnCondition = true; m_RenderOnConditionName = condtionName; m_RenderOnConditionValue = conditionValue; }
+	inline void ClearCondition() { m_UseRenderOnCondition = false; m_RenderOnConditionName = ""; m_RenderOnConditionValue = 0; }
 
 	SerializerNode Save() const;
 	void Load(SerializerNode node);
@@ -257,6 +259,9 @@ private:
 	std::vector<int32_t> m_SeedHistory;
 	std::vector<std::string> m_DropdownOptions;
 	std::string m_ID = "";
+	bool m_UseRenderOnCondition = false;
+	std::string m_RenderOnConditionName = "";
+	int32_t m_RenderOnConditionValue = 0;
 };
 
 class CustomInspector

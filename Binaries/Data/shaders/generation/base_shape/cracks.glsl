@@ -1,48 +1,109 @@
-#version 430 core
-
-layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
-
-uniform int u_Resolution;
-uniform bool u_UseSeedTexture;
-uniform sampler2D u_SeedTexture;
-uniform float u_Strength;
-uniform float u_CrackShapeDistortion;
-uniform float u_Scale;
-uniform float u_Smoothness;
-uniform float u_RandomHeights;
-uniform float u_NoiseStrength;
-uniform float u_NoiseScale;
-uniform int u_Seed;
-uniform vec3 u_Offset;
-uniform bool u_SquareValue;
-uniform bool u_AbsoluteValue;
-uniform vec2 u_MinMaxHeight;
-
-layout(std430, binding = 0) buffer DataBuffer
 {
-    float data[];
-};
-
-uint PixelCoordToDataOffset(uint x, uint y)
-{
-	return y * u_Resolution + x;
+	"Name": "Cracks",
+	"Params": [
+		{
+			"Name": "Strength",
+			"Type": "Float",
+			"Default": 0.58,
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "Scale",
+			"Type": "Float",
+			"Default": 1.4,
+			"Widget": "Drag",
+			"Sensitivity": 0.001
+		},
+		{
+			"Name": "CrackShapeDistortion",
+			"Type": "Float",
+			"Default": 0.680,
+			"Widget": "Slider",
+			"Constraints": [0.0, 3.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Smoothness",
+			"Type": "Float",
+			"Default": 0.03,
+			"Widget": "Slider",
+			"Constraints": [0.0, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "RandomHeights",
+			"Type": "Float",
+			"Default": 2.8,
+			"Widget": "Drag",
+			"Sensitivity": 0.001
+		},		
+		{
+			"Name": "NoiseStrength",
+			"Type": "Float",
+			"Default": 1.0,
+			"Widget": "Drag",
+			"Sensitivity": 0.001
+		},		
+		{
+			"Name": "NoiseScale",
+			"Type": "Float",
+			"Default": 1.0,
+			"Widget": "Drag",
+			"Sensitivity": 0.001
+		},
+		{
+			"Name": "Seed",
+			"Type": "Int",
+			"Default": 42,
+			"Widget": "Seed"
+		},
+		{
+			"Name": "Offset",
+			"Type": "Vector3",
+			"Default": [0.0, 0.0, 0.0],
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "SquareValue",
+			"Type": "Bool",
+			"Default": false,
+			"Widget": "Checkbox",
+			"Label": "Square Value"
+		},
+		{
+			"Name": "AbsoluteValue",
+			"Type": "Bool",
+			"Default": false,
+			"Widget": "Checkbox",
+			"Label": "Absolute Value"
+		},
+		{
+			"Name": "MinMaxHeight",
+			"Type": "Vector2",
+			"Default": [0.1, 0.16],
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		}
+	]
 }
+// CODE
 
 // IQ's polynomial-based smooth minimum function.
-float smin( float a, float b, float k ){
-
+float smin( float a, float b, float k )
+{
     float h = clamp(.5 + .5*(b - a)/k, 0., 1.);
     return mix(b, a, h) - k*h*(1. - h);
 }
 
-float smax( float a, float b, float k ){
-
+float smax( float a, float b, float k )
+{
 	float h = clamp(.5 + .5*(a - b)/k, 0., 1.);
 	return mix(b, a, h) + k*h*(1. - h);
 }
 
 /* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
-vec3 random3(vec3 c) {
+vec3 random3(vec3 c) 
+{
 	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
 	vec3 r;
 	r.z = fract(512.0*j);
@@ -58,7 +119,8 @@ const float F3 =  0.3333333;
 const float G3 =  0.1666667;
 
 /* 3d simplex noise */
-float simplex3d(vec3 p) {
+float simplex3d(vec3 p) 
+{
 	 /* 1. find current tetrahedron T and it's four vertices */
 	 /* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
 	 /* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/
@@ -154,27 +216,17 @@ vec4 voronoi(vec3 sd)
 	return vec4(nearestPoint, nearestDistance);
 }
 
-void main(void)
+float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
-	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
-	vec2 uv = offsetv2 / float(u_Resolution);
-	vec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);
-	if(u_UseSeedTexture)
-	{
-		seed = texture(u_SeedTexture, uv).rgb;
-	}
 	seed += u_Offset + vec3(u_Seed);
 	seed *= u_Scale;
 	float n = 0.0f;
-
 	vec4 voronoiResult = voronoi(seed);
 	if(u_AbsoluteValue) voronoiResult.w  = abs(voronoiResult.w);
 	if(u_SquareValue) voronoiResult.w  = voronoiResult.w  * voronoiResult.w ;
-
 	float randomHeightFactor = rand(voronoiResult.xyz) * smin(voronoiResult.w * u_Strength, u_MinMaxHeight.y, u_Smoothness);
 	float heightFactor = randomHeightFactor * u_RandomHeights;
 	n = smin(smax(voronoiResult.w * u_Strength, u_MinMaxHeight.x, u_Smoothness), u_MinMaxHeight.y, u_Smoothness) + heightFactor;
 	n += simplex3d(seed * 2.0f * u_NoiseScale) * 0.06f * u_NoiseStrength;
-	data[offset] = n;
+	return n;
 }

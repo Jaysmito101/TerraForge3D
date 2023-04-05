@@ -119,6 +119,12 @@ bool BiomeBaseShapeGenerator::LoadInspectorFromConfig(const nlohmann::json& conf
 			if (parameter.contains("Options")) widget.SetDropdownOptions(parameter["Options"].get<std::vector<std::string>>());
 			if (parameter.contains("Constraints")) widget.SetConstraints(parameter["Constraints"][0].get<float>(), parameter["Constraints"][1].get<float>(), parameter["Constraints"][2].get<float>(), parameter["Constraints"][3].get<float>());
 		    if (parameter.contains("Tooltip")) widget.SetTooltip(parameter["Tooltip"].get<std::string>());
+			if (parameter.contains("Conditional"))
+			{
+				int32_t conditionValue = 1;
+				LOAD_VALUE_FROM_CONFIG(parameter, conditionValue, "ConditionalValue", 1);
+				widget.SetRenderOnCondition(parameter["Conditional"].get<std::string>(), conditionValue);
+			}
 		}
 	}
 	else

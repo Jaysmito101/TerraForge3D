@@ -1,122 +1,136 @@
-#version 430 core
-
-layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
-
-uniform int u_Resolution;
-uniform bool u_UseSeedTexture;
-uniform sampler2D u_SeedTexture;
-uniform float u_Strength;
-uniform float u_Scale;
-uniform int u_Levels;
-uniform int u_Seed;
-uniform vec3 u_Offset;
-uniform bool u_SquareValue;
-uniform bool u_AbsoluteValue;
-
-layout(std430, binding = 0) buffer DataBuffer
 {
-    float data[];
-};
+	"Name": "Classic",
+	"Params": [
+		{
+			"Name": "Strength",
+			"Type": "Float",
+			"Default": 1.84,
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "Scale",
+			"Type": "Float",
+			"Default": 0.04,
+			"Widget": "Drag",
+			"Sensitivity": 0.001
+		},
+		{
+			"Name": "Levels",
+			"Type": "Int",
+			"Default": 2,
+			"Widget": "Slider",
+			"Constraints": [1.0, 6.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Seed",
+			"Type": "Int",
+			"Default": 42,
+			"Widget": "Seed"
+		},
+		{
+			"Name": "Offset",
+			"Type": "Vector3",
+			"Default": [0.0, 0.0, 0.0],
+			"Widget": "Drag",
+			"Sensitivity": 0.01
+		},
+		{
+			"Name": "SquareValue",
+			"Type": "Bool",
+			"Default": false,
+			"Widget": "Checkbox",
+			"Label": "Square Value"
+		},
+		{
+			"Name": "AbsoluteValue",
+			"Type": "Bool",
+			"Default": false,
+			"Widget": "Checkbox",
+			"Label": "Absolute Value"
+		}
+	]
+}
+// CODE
 
-uint PixelCoordToDataOffset(uint x, uint y)
+/* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
+vec3 random3(vec3 c) 
 {
-	return y * u_Resolution + x;
+	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
+	vec3 r;
+	r.z = fract(512.0*j);
+	j *= .125;
+	r.x = fract(512.0*j);
+	j *= .125;
+	r.y = fract(512.0*j);
+	return r-0.5;
 }
 
+/* skew constants for 3d simplex functions */
+const float F3 =  0.3333333;
+const float G3 =  0.1666667;
 
-//	Simplex 3D Noise 
-//	by Ian McEwan, Ashima Arts
-//
-vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-
-float snoise(vec3 v){ 
-  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-
-// First corner
-  vec3 i  = floor(v + dot(v, C.yyy) );
-  vec3 x0 =   v - i + dot(i, C.xxx) ;
-
-// Other corners
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min( g.xyz, l.zxy );
-  vec3 i2 = max( g.xyz, l.zxy );
-
-  //  x0 = x0 - 0. + 0.0 * C 
-  vec3 x1 = x0 - i1 + 1.0 * C.xxx;
-  vec3 x2 = x0 - i2 + 2.0 * C.xxx;
-  vec3 x3 = x0 - 1. + 3.0 * C.xxx;
-
-// Permutations
-  i = mod(i, 289.0 ); 
-  vec4 p = permute( permute( permute( 
-             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
-           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-
-// Gradients
-// ( N*N points uniformly over a square, mapped onto an octahedron.)
-  float n_ = 1.0/7.0; // N=7
-  vec3  ns = n_ * D.wyz - D.xzx;
-
-  vec4 j = p - 49.0 * floor(p * ns.z *ns.z);  //  mod(p,N*N)
-
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
-
-  vec4 x = x_ *ns.x + ns.yyyy;
-  vec4 y = y_ *ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-
-  vec4 b0 = vec4( x.xy, y.xy );
-  vec4 b1 = vec4( x.zw, y.zw );
-
-  vec4 s0 = floor(b0)*2.0 + 1.0;
-  vec4 s1 = floor(b1)*2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-
-  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-
-  vec3 p0 = vec3(a0.xy,h.x);
-  vec3 p1 = vec3(a0.zw,h.y);
-  vec3 p2 = vec3(a1.xy,h.z);
-  vec3 p3 = vec3(a1.zw,h.w);
-
-//Normalise gradients
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-  p0 *= norm.x;
-  p1 *= norm.y;
-  p2 *= norm.z;
-  p3 *= norm.w;
-
-// Mix final noise value
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-  m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
-                                dot(p2,x2), dot(p3,x3) ) );
+/* 3d simplex noise */
+float simplex3d(vec3 p) 
+{
+	 /* 1. find current tetrahedron T and it's four vertices */
+	 /* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
+	 /* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/
+	 
+	 /* calculate s and x */
+	 vec3 s = floor(p + dot(p, vec3(F3)));
+	 vec3 x = p - s + dot(s, vec3(G3));
+	 
+	 /* calculate i1 and i2 */
+	 vec3 e = step(vec3(0.0), x - x.yzx);
+	 vec3 i1 = e*(1.0 - e.zxy);
+	 vec3 i2 = 1.0 - e.zxy*(1.0 - e);
+	 	
+	 /* x1, x2, x3 */
+	 vec3 x1 = x - i1 + G3;
+	 vec3 x2 = x - i2 + 2.0*G3;
+	 vec3 x3 = x - 1.0 + 3.0*G3;
+	 
+	 /* 2. find four surflets and store them in d */
+	 vec4 w, d;
+	 
+	 /* calculate surflet weights */
+	 w.x = dot(x, x);
+	 w.y = dot(x1, x1);
+	 w.z = dot(x2, x2);
+	 w.w = dot(x3, x3);
+	 
+	 /* w fades from 0.6 at the center of the surflet to 0.0 at the margin */
+	 w = max(0.6 - w, 0.0);
+	 
+	 /* calculate surflet components */
+	 d.x = dot(random3(s), x);
+	 d.y = dot(random3(s + i1), x1);
+	 d.z = dot(random3(s + i2), x2);
+	 d.w = dot(random3(s + 1.0), x3);
+	 
+	 /* multiply d by w^4 */
+	 w *= w;
+	 w *= w;
+	 d *= w;
+	 
+	 /* 3. return the sum of the four surflets */
+	 return dot(d, vec4(52.0));
 }
 
-void main(void)
+float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
-	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
-	vec2 uv = offsetv2 / float(u_Resolution);
-	vec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);
-	if(u_UseSeedTexture)
-	{
-		seed = texture(u_SeedTexture, uv).rgb;
-	}
-	seed += u_Offset + vec3(u_Seed);
+	seed += u_Offset;
 	float n = 0.0f;
 	for(int i = 0 ; i < u_Levels ; i++)
 	{
-		n = snoise(seed * u_Scale * 0.4f);
-	    seed += vec3(n * 0.05f);
+		seed = vec3(simplex3d(seed + vec3(0.0f, 0.0f, 0.0f)),
+					simplex3d(seed + vec3(1.0f, 2.0f, 0.0f)),
+					simplex3d(seed + vec3(3.0f, 4.0f, 0.0f))
+					);
 	}
+	n = simplex3d(seed * u_Scale + vec3(u_Seed));
 	if(u_AbsoluteValue) n = abs(n);
-	if(u_SquareValue) n = n * n;
-	data[offset] = n * u_Strength;
+	if(u_SquareValue) n = n * n;	
+	return n * u_Strength;
 }

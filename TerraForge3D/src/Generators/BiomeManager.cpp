@@ -4,10 +4,6 @@
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
 
-//#include "Generators/BiomeBaseShape/BiomeBaseShape_Flat.h"
-//#include "Generators/BiomeBaseShape/BiomeBaseShape_Classic.h"
-//#include "Generators/BiomeBaseShape/BiomeBaseShape_Cracks.h"
-//#include "Generators/BiomeBaseShape/BiomeBaseShape_Cliff.h"
 #include "Generators/BiomeBaseShapeGenerator.h"
 
 std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> BiomeManager::s_BaseShapeGenerators;
@@ -21,7 +17,11 @@ bool BiomeManager::AddBaseShapeGenerator(const std::string& config, ApplicationS
 bool BiomeManager::BiomeManager::LoadBaseShapeGenerators(ApplicationState* appState)
 {
 	static bool s_Success = false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "classic2.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "flat.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "classic.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "cliff.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "cracks.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "crater.glsl", &s_Success), appState)) return false;
 	return true;
 }
 
@@ -39,10 +39,6 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 	m_Data = std::make_shared<GeneratorData>();
 	static int s_BiomeID = 1;
 	sprintf(m_BiomeName, "Biome %d", s_BiomeID++);
-	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Flat(m_AppState));
-	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Classic(m_AppState));
-	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Cracks(m_AppState));
-	//m_BaseShapeGenerators.push_back(new BiomeBaseShape_Cliff(m_AppState));
 }
 
 BiomeManager::~BiomeManager()

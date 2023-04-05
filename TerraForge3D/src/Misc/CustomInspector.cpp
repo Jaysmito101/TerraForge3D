@@ -210,10 +210,16 @@ SerializerNode CustomInspectorWidget::Save() const
 	node->SetInteger("ISpeed", m_ISpeed);
 	node->SetFloat("FSeed", m_FSpeed);
 	node->SetString("ID", m_ID);
-	node->GetFloat("Contraints_0", m_Constratins[0]);
-	node->GetFloat("Contraints_1", m_Constratins[1]);
-	node->GetFloat("Contraints_2", m_Constratins[2]);
-	node->GetFloat("Contraints_3", m_Constratins[3]);
+	node->SetFloat("Contraints_0", m_Constratins[0]);
+	node->SetFloat("Contraints_1", m_Constratins[1]);
+	node->SetFloat("Contraints_2", m_Constratins[2]);
+	node->SetFloat("Contraints_3", m_Constratins[3]);
+	if (m_UseRenderOnCondition)
+	{
+		node->SetInteger("RenderOnConditionValue", m_RenderOnConditionValue);
+		node->SetString("RenderOnConditionName", m_RenderOnConditionName);
+		node->SetInteger("UseRenderOnCondition", m_UseRenderOnCondition ? 1 : 0);
+	}
 	if (m_FontName.size() > 0) node->SetString("FontName", m_FontName);
 	if (m_Tooltip.size() > 0) node->SetString("Tooltip", m_Tooltip);
 	return node;
@@ -232,6 +238,12 @@ void CustomInspectorWidget::Load(SerializerNode node)
 	m_Constratins[1] = node->GetFloat("Contraints_1", m_Constratins[1]);
 	m_Constratins[2] = node->GetFloat("Contraints_2", m_Constratins[2]);
 	m_Constratins[3] = node->GetFloat("Contraints_3", m_Constratins[3]);
+	m_UseRenderOnCondition = node->GetInteger("UseRenderOnCondition", 0) == 1;
+	if (m_UseRenderOnCondition)
+	{
+		m_RenderOnConditionValue = node->GetInteger("RenderOnConditionValue", m_RenderOnConditionValue);
+		m_RenderOnConditionName = node->GetString("RenderOnConditionName", m_RenderOnConditionName);
+	}
 	m_Tooltip = node->GetString("Tooltip", m_Tooltip);
 	m_FontName = node->GetString("FontName", m_FontName);
 }
@@ -304,27 +316,27 @@ CustomInspectorValue& CustomInspector::AddBoolVariable(const std::string& name, 
 CustomInspectorValue& CustomInspector::AddVector2Variable(const std::string& name, glm::vec2 defaultValue)
 {
 	CustomInspectorValue value(CustomInspectorValueType_Vector2);
-	value.m_VectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
-	value.m_VectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
+	value.m_DefaultVectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
+	value.m_DefaultVectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
 	return AddVariable(name, value);
 }
 
 CustomInspectorValue& CustomInspector::AddVector3Variable(const std::string& name, glm::vec3 defaultValue)
 {
 	CustomInspectorValue value(CustomInspectorValueType_Vector3);
-	value.m_VectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
-	value.m_VectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
-	value.m_VectorValue[2] = value.m_VectorValue[2] = defaultValue.z;
+	value.m_DefaultVectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
+	value.m_DefaultVectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
+	value.m_DefaultVectorValue[2] = value.m_VectorValue[2] = defaultValue.z;
 	return AddVariable(name, value);
 }
 
 CustomInspectorValue& CustomInspector::AddVector4Variable(const std::string& name, glm::vec4 defaultValue)
 {
 	CustomInspectorValue value(CustomInspectorValueType_Vector4);
-	value.m_VectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
-	value.m_VectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
-	value.m_VectorValue[2] = value.m_VectorValue[2] = defaultValue.z;
-	value.m_VectorValue[3] = value.m_VectorValue[3] = defaultValue.w;
+	value.m_DefaultVectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
+	value.m_DefaultVectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
+	value.m_DefaultVectorValue[2] = value.m_VectorValue[2] = defaultValue.z;
+	value.m_DefaultVectorValue[3] = value.m_VectorValue[3] = defaultValue.w;
 	return AddVariable(name, value);
 }
 
@@ -610,6 +622,11 @@ bool CustomInspector::Render()
 	for (const auto& widgetLabel : m_WidgetsOrder)
 	{
 		const auto& widget = m_Widgets[widgetLabel];
+		if (widget.m_UseRenderOnCondition)
+		{
+			const auto& condition = m_Values[widget.m_RenderOnConditionName];
+			if (condition.GetInt() != widget.m_RenderOnConditionValue) continue;
+		}
 		ImGui::PushID(widget.m_ID.c_str());
 		if (widget.m_FontName.size() > 0) ImGui::PushFont(GetUIFont(widget.m_FontName));
 		if (widget.m_Type == CustomInspectorWidgetType_Slider) hasChanged = RenderSlider(widget) || hasChanged;
@@ -629,7 +646,10 @@ bool CustomInspector::Render()
 		{
 			if (ImGui::BeginPopupContextItem(widget.m_ID.c_str()))
 			{
-				if (ImGui::Button("Reset Value")) m_Values[widget.m_VariableName].ResetValue();
+				static char s_ResetButtonName[1024];
+				sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
+				// BUG: This doesn't work for some reason!
+				if (ImGui::Button(s_ResetButtonName)) m_Values[widget.m_VariableName].ResetValue();
 				ImGui::EndPopup();
 			}
 		}
