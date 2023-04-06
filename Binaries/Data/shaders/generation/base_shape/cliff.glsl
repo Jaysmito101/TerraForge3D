@@ -55,7 +55,7 @@
       "Name": "NoiseScale",
       "Type": "Float",
       "Default": 0.7,
-      "Label": "Distortion Scale",
+      "Label": "Noise Scale",
       "Widget": "Drag",
       "Sensitivity": 0.001,
       "Constraints": [-2.0, 2.0, 0.0, 0.0]
