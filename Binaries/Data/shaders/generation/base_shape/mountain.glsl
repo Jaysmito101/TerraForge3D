@@ -1,32 +1,31 @@
 {
-	"Name": "Dunes",
+	"Name": "Mountain",
 	"Params": [
 		{
 			"Name": "Strength",
 			"Type": "Float",
-			"Default": 0.5,
+			"Default": 0.3,
 			"Widget": "Drag",
 			"Sensitivity": 0.01
 		},
 		{
 			"Name": "Scale",
 			"Type": "Float",
-			"Default": 1.0,
+			"Default": 1.33,
 			"Widget": "Drag",
 			"Sensitivity": 0.01
 		},    
 		{
-			"Name": "Smoothness",
-			"Type": "Float",
-			"Default": 0.14,
+			"Name": "Levels",
+			"Type": "Int",
+			"Default": 12,
 			"Widget": "Slider",
-			"Label": "Edge Smoothness",
-			"Constraints": [0.001, 1.0, 0.0, 0.0]
+			"Constraints": [1.0, 32.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Seed",
 			"Type": "Int",
-			"Default": 42,
+			"Default": 12,
 			"Widget": "Seed"
 		},
 		{
@@ -37,19 +36,12 @@
 			"Sensitivity": 0.01
 		},
 		{
-			"Name": "Distortion",
+			"Name": "DampingFactor",
 			"Type": "Float",
-			"Default": 0.2,
+			"Label": "Damping Factor",
+			"Default": 0.335,
 			"Widget": "Slider",
 			"Constraints": [0.0, 1.0, 0.0, 0.0]
-		},
-		{
-			"Name": "DistortionScale",
-			"Type": "Float",
-			"Default": 0.4,
-			"Widget": "Slider",
-			"Label": "Distortion Scale",
-			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		}
 	]
 }
@@ -102,23 +94,22 @@ float noise(vec2 uv)
 	return f;
 }
 
+float rnoise(vec2 uv)
+{
+	float ns = abs(snoise(uv));
+	return ns * -2.0f + 1.0f;
+}
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	vec2 p = uv * u_Scale * 4.0f + u_Offset;
-	vec2 n = floor( p );
-    vec2 f = fract( p );
-
-    float ns = 1.0;
-    for( int j= -1; j <= 1; j++ ) for( int i=-1; i <= 1; i++ )
-	{	
-        vec2  g = vec2(i,j);
-        vec2  o = random2( n + g );
-        vec2  delta = g + o - f + vec2(snoise(uv * u_DistortionScale) * u_Distortion);
-        float d = smoothstep(0.01f, 1.0f, length(delta));
-        ns = smin(ns, d, u_Smoothness);
-    }
-
-	//float n = fabs(noise(val, nl.depth));
+	const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+	vec2 p = uv * u_Scale + u_Offset;
+	float ns = 0.0f, fr = 1.0f, amp = 1.0f;
+	for(int i = 0 ; i < u_Levels ; i++)
+	{
+		ns += rnoise(p) * amp;
+		p = m * p;
+		amp = amp * u_DampingFactor;
+	}
 	return ns * u_Strength;
 }

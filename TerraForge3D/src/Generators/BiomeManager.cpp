@@ -23,6 +23,8 @@ bool BiomeManager::BiomeManager::LoadBaseShapeGenerators(ApplicationState* appSt
 	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "cracks.glsl", &s_Success), appState)) return false;
 	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "crater.glsl", &s_Success), appState)) return false;
 	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "dunes.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "mountain.glsl", &s_Success), appState)) return false;
+	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "volcano.glsl", &s_Success), appState)) return false;
 	return true;
 }
 

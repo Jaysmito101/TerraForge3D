@@ -1,5 +1,5 @@
 {
-	"Name": "Dunes",
+	"Name": "Volcano",
 	"Params": [
 		{
 			"Name": "Strength",
@@ -9,24 +9,46 @@
 			"Sensitivity": 0.01
 		},
 		{
-			"Name": "Scale",
+			"Name": "Height",
 			"Type": "Float",
-			"Default": 1.0,
+			"Default": 1.5,
 			"Widget": "Drag",
 			"Sensitivity": 0.01
 		},    
 		{
-			"Name": "Smoothness",
+			"Name": "Radius",
 			"Type": "Float",
-			"Default": 0.14,
+			"Default": 0.7,
 			"Widget": "Slider",
-			"Label": "Edge Smoothness",
-			"Constraints": [0.001, 1.0, 0.0, 0.0]
+			"Constraints": [0.2, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "MountainFalloff",
+			"Type": "Float",
+			"Default": 0.2,
+			"Label": "Mountain Falloff",
+			"Widget": "Slider",
+			"Constraints": [0.01, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Distortion",
+			"Type": "Float",
+			"Default": 0.1,
+			"Widget": "Slider",
+			"Constraints": [0.0, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "DistortionScale",
+			"Type": "Float",
+			"Default": 1.0,
+			"Label": "Distortion Scale",
+			"Widget": "Slider",
+			"Constraints": [0.0, 8.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Seed",
 			"Type": "Int",
-			"Default": 42,
+			"Default": 12,
 			"Widget": "Seed"
 		},
 		{
@@ -37,18 +59,35 @@
 			"Sensitivity": 0.01
 		},
 		{
-			"Name": "Distortion",
+			"Name": "OutsideNoise",
 			"Type": "Float",
 			"Default": 0.2,
+			"Label": "Outside Noise",
 			"Widget": "Slider",
 			"Constraints": [0.0, 1.0, 0.0, 0.0]
 		},
 		{
-			"Name": "DistortionScale",
+			"Name": "OutsideNoiseScale",
 			"Type": "Float",
-			"Default": 0.4,
+			"Default": 5.0,
+			"Label": "Outside Noise Scale",
 			"Widget": "Slider",
-			"Label": "Distortion Scale",
+			"Constraints": [0.0, 16.0, 0.0, 0.0]
+		},
+		{
+			"Name": "CraterRadius",
+			"Type": "Float",
+			"Default": 1.0,
+			"Label": "Crater Radius",
+			"Widget": "Slider",
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
+		},
+		{
+			"Name": "CraterDepth",
+			"Type": "Float",
+			"Default": 2.0,
+			"Label": "Crater Depth",
+			"Widget": "Slider",
 			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		}
 	]
@@ -102,23 +141,13 @@ float noise(vec2 uv)
 	return f;
 }
 
-
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	vec2 p = uv * u_Scale * 4.0f + u_Offset;
-	vec2 n = floor( p );
-    vec2 f = fract( p );
-
-    float ns = 1.0;
-    for( int j= -1; j <= 1; j++ ) for( int i=-1; i <= 1; i++ )
-	{	
-        vec2  g = vec2(i,j);
-        vec2  o = random2( n + g );
-        vec2  delta = g + o - f + vec2(snoise(uv * u_DistortionScale) * u_Distortion);
-        float d = smoothstep(0.01f, 1.0f, length(delta));
-        ns = smin(ns, d, u_Smoothness);
-    }
-
-	//float n = fabs(noise(val, nl.depth));
+	uv = uv * 2.0f - vec2(1.0) + u_Offset;
+	float distortion = noise(uv * u_DistortionScale) * u_Distortion;
+	float r = length(uv) + distortion;
+	float craterRadius = u_Radius * u_CraterRadius * 0.3f;
+	float ns = u_Height * smoothstep(u_Radius + u_MountainFalloff, craterRadius * 0.5f, r) - u_Height * u_CraterDepth * 0.3f * smoothstep(craterRadius, 0.0f, r);
+	ns += snoise(uv * u_OutsideNoiseScale) * 0.2f * u_OutsideNoise * smoothstep(0.0, craterRadius, r);
 	return ns * u_Strength;
 }
