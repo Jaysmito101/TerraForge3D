@@ -5,7 +5,7 @@
 #include "Base/Base.h"
 
 class SerializerNodeInternal;
-std::shared_ptr<SerializerNodeInternal> CreateSerializerNode();
+static std::shared_ptr<SerializerNodeInternal> CreateSerializerNode();
 
 class SerializerNodeInternal
 {
@@ -237,7 +237,7 @@ private:
 
 using SerializerNode = std::shared_ptr<SerializerNodeInternal>;
 
-inline static SerializerNode CreateSerializerNode()
+static SerializerNode CreateSerializerNode()
 {
 	return std::make_shared<SerializerNodeInternal>();
 }
