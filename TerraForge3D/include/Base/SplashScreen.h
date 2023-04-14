@@ -1,7 +1,7 @@
 #pragma once
 
 // Splash screen not supported on linux
-#ifdef TERR3D_WIN32
+#ifdef _WIN32
 
 #include <windows.h>
 #include <string>
@@ -19,6 +19,6 @@ void ShowSplashScreen();
 
 #else
 
-namespace SplashScreen { void Init(){} void Destory(){} }
+namespace SplashScreen { void Init(); void Destory(); }
 
 #endif
