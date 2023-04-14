@@ -1,4 +1,4 @@
-#ifdef TERR3D_WIN32
+#ifdef _WIN32
 #include <SplashScreen.h>
 #include <resource.h>
 #include <windows.h>
