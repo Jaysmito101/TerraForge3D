@@ -55,7 +55,7 @@ add_executable(terraforge3d ${SOURCES})
 target_link_libraries(terraforge3d 
     glfw
     ${GLFW_LIBRARIES}
-    opengl32
+    ${OPENGL_LIBRARIES}
     Glad
     ImGui
 )
