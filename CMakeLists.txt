@@ -50,9 +50,9 @@ file(GLOB_RECURSE SOURCES
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_glfw.cpp)
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_opengl3.cpp)
 
-add_executable(TerraForge3D ${SOURCES})
+add_executable(terraforge3d ${SOURCES})
 
-target_link_libraries(TerraForge3D
+target_link_libraries(terraforge3d 
     glfw
     ${GLFW_LIBRARIES}
     opengl32
@@ -61,15 +61,15 @@ target_link_libraries(TerraForge3D
 )
 
 if(WIN32)
-    target_compile_definitions(TerraForge3D
+    target_compile_definitions(terraforge3d 
         PUBLIC _CRT_SECURE_NO_WARNINGS
         PUBLIC TERR3D_WIN32
     )
 endif()
 
 
-target_link_libraries(TerraForge3D OpenSSL::SSL)
-target_link_libraries(TerraForge3D OpenSSL::Crypto)
+target_link_libraries(terraforge3d  OpenSSL::SSL)
+target_link_libraries(terraforge3d  OpenSSL::Crypto)
 
 
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.12.25835)
@@ -81,6 +81,6 @@ if( MSVC )
     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
         message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'GLFW-CMake-starter' as StartUp Project in Visual Studio.\n" )
     else()
-        set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT TerraForge3D)
+        set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT terraforge3d )
     endif()
 endif()
