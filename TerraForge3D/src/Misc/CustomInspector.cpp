@@ -508,7 +508,7 @@ CustomInspectorWidget& CustomInspector::AddWidgetFromString(const std::string& l
 	case CustomInspectorWidgetType_Text: 		return AddTextWidget(label, variableName);
 	case CustomInspectorWidgetType_Unknown:
 	default:
-		throw std::exception("Invalid data type for Drag");
+		throw std::runtime_error(std::string("Invalid data type for Drag"));
 	}
 }
 
@@ -688,7 +688,7 @@ bool CustomInspector::RenderSlider(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_String:
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
-		throw std::exception("Invalid data type for Slider");
+		throw std::runtime_error(std::string("Invalid data type for Slider"));
 	}
 	return hasChanged;
 }
@@ -733,7 +733,7 @@ bool CustomInspector::RenderDrag(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_String:
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
-		throw std::exception("Invalid data type for Drag");
+		throw std::runtime_error(std::string("Invalid data type for Drag"));
 	}
 	return hasChanged;
 }
@@ -762,7 +762,7 @@ bool CustomInspector::RenderColor(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Vector2:
 	case CustomInspectorValueType_Texture:
-		throw std::exception("Invalid data type for Color");
+		throw std::runtime_error(std::string("Invalid data type for Color"));
 	}
 	return hasChanged;
 }
@@ -782,7 +782,7 @@ bool CustomInspector::RenderTexture(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Vector3:
 	case CustomInspectorValueType_Vector4:
 	case CustomInspectorValueType_Bool:
-		throw std::exception("Invalid data type for Drag");
+		throw std::runtime_error(std::string("Invalid data type for Drag"));
 	}
 	ImTextureID textureID = value.m_TextureValue ? (ImTextureID)(int64_t)value.m_TextureValue->GetRendererID() : static_cast<ImTextureID>(0);
 	if (ImGui::ImageButton(textureID, ImVec2(widget.m_Constratins[0], widget.m_Constratins[1])))
@@ -812,7 +812,7 @@ bool CustomInspector::RenderDropdown(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_String:
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
-		throw std::exception("Invalid data type for Dropdown");
+		throw std::runtime_error(std::string("Invalid data type for Dropdown"));
 	}
 
 	if (ImGui::BeginCombo(widget.m_Label.c_str(), widget.m_DropdownOptions[value.m_IntValue].c_str()))
@@ -861,7 +861,7 @@ bool CustomInspector::RenderCheckbox(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Bool:
 		break;
 	case CustomInspectorValueType_Texture:
-		throw std::exception("Invalid data type for Checkbox");
+		throw std::runtime_error(std::string("Invalid data type for Checkbox"));
 	}
 	return hasChanged;
 }
@@ -895,7 +895,7 @@ bool CustomInspector::RenderInput(const CustomInspectorWidget& widget)
 		break;
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
-		throw std::exception("Invalid data type for Input");
+		throw std::runtime_error(std::string("Invalid data type for Input"));
 	}
 	return hasChanged;
 }
@@ -925,7 +925,7 @@ bool CustomInspector::RenderSeed(CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Vector4:
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture: // todo: add seed texture here too
-		throw std::exception("Invalid data type for Seed");
+		throw std::runtime_error(std::string("Invalid data type for Seed"));
 	}
 	return hasChanged;
 }
