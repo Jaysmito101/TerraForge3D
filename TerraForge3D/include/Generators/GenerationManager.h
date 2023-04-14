@@ -27,7 +27,7 @@ struct SelectedUINode
 	std::string m_ID;
 };
 
-#define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + ###objectname )
+#define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + std::string(#objectname))
 
 
 #define SetUINodeData(index, objectname) \
