@@ -81,12 +81,15 @@ void ExportManager::ShowMeshExportSettings()
 		if (output_file_path.size() < 3) return;
 		this->ExportMeshCurrentTile(output_file_path, nullptr, this->exportMeshFormat);
 	}
+
+	ImGui::BeginDisabled();
 	if (ImGui::Button("Export All Tiles"))
 	{
 		std::string output_file_path = ShowSaveFileDialog("*.*");
 		if (output_file_path.size() < 3) return;
 		this->ExportMeshAllTiles(output_file_path, nullptr, this->exportMeshFormat);
 	}
+	ImGui::EndDisabled();
 }
 
 void ExportManager::ShowTextureExportSettings()

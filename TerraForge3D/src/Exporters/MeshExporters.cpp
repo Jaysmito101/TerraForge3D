@@ -25,6 +25,7 @@ Mesh* ExportManager::ApplyMeshTransform(Mesh* mesh, float* data)
 		tmp = data[y * size + x];
 		mesh->SetPosition(vert.position + vert.normal * tmp, i);
 	}
+	mesh->RecalculateNormals();
 	return mesh;
 }
 
@@ -53,27 +54,27 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 
 void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation)
 {
-	/*
 	if (exporting) *exporting = true;
-	auto worker = std::thread([path, format, exporting, updateWorkerUpdation, this]()->void {
+	appState->eventManager->RaiseEvent("ForceUpdate"); // force regenerate the mesh before exporting once
+	auto heightMapData = appState->generationManager->GetHeightmapData()->GetCPUCopy();
+	auto meshClone = appState->mainModel->mesh->Clone();
+	auto worker = std::thread([path, format, exporting, meshClone, heightMapData, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
 		this->exportProgress = 0.01f;
-		if(updateWorkerUpdation) appState->generationManager->SetUpdationPaused(true);
-		appState->workManager->StartWork(); // restart fresh generation 
-		while (appState->workManager->IsWorking()) std::this_thread::sleep_for(100ms); // wait for fresh generation to finish
-		if (!this->ExportMesh(path, this->ApplyMeshTransform(appState->mainModel->mesh->Clone()), format)) this->SetStatusMessage("Failed to export : " + path);
+		if (!this->ExportMesh(path, this->ApplyMeshTransform(meshClone, heightMapData), format)) this->SetStatusMessage("Failed to export : " + path);
 		else this->SetStatusMessage("");
-		if (updateWorkerUpdation) appState->workManager->SetUpdationPaused(false); // enable updation from main thread
 		this->exportProgress = 1.1f;
+		delete meshClone;
+		delete[] heightMapData;
 		if (exporting) *exporting = false; 
 		});
 	worker.detach();
-	*/
 }
 
 void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int format)
 {
+	/*
 	if (exporting) *exporting = true;
 	this->hideExportControls = true;
 	auto worker = std::thread([pathStr, format, exporting, this]()->void {
@@ -112,4 +113,5 @@ void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int
 		this->hideExportControls = false;
 		});
 	worker.detach();
+	*/
 }

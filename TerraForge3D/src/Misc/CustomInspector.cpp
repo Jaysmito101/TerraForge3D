@@ -649,7 +649,11 @@ bool CustomInspector::Render()
 				static char s_ResetButtonName[1024];
 				sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
 				// BUG: This doesn't work for some reason!
-				if (ImGui::Button(s_ResetButtonName)) m_Values[widget.m_VariableName].ResetValue();
+				if (ImGui::Button(s_ResetButtonName)) 
+				{
+					m_Values[widget.m_VariableName].ResetValue(); 
+					hasChanged = true;
+				}
 				ImGui::EndPopup();
 			}
 		}

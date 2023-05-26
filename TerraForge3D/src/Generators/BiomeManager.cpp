@@ -17,14 +17,16 @@ bool BiomeManager::AddBaseShapeGenerator(const std::string& config, ApplicationS
 bool BiomeManager::BiomeManager::LoadBaseShapeGenerators(ApplicationState* appState)
 {
 	static bool s_Success = false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "flat.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "classic.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "cliff.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "cracks.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "crater.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "dunes.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "mountain.glsl", &s_Success), appState)) return false;
-	if (!AddBaseShapeGenerator(ReadShaderSourceFile(appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape" PATH_SEPARATOR "volcano.glsl", &s_Success), appState)) return false;
+	const std::string baseShapeGeneratorsDir = appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape";
+	for (auto& directoryEntry : std::filesystem::recursive_directory_iterator(baseShapeGeneratorsDir))
+	{
+		if (!directoryEntry.is_directory() && directoryEntry.path().extension() == ".glsl")
+		{
+			const std::string config = ReadShaderSourceFile(directoryEntry.path().string(), &s_Success);
+			if (!s_Success) continue;
+			if (!AddBaseShapeGenerator(config, appState)) Log("ERROR: Failed to load base shape generator " + directoryEntry.path().string());
+		}
+	}
 	return true;
 }
 
