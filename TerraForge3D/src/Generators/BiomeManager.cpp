@@ -14,7 +14,7 @@ bool BiomeManager::AddBaseShapeGenerator(const std::string& config, ApplicationS
 	return s_BaseShapeGenerators.back()->LoadConfig(config);
 }
 
-bool BiomeManager::BiomeManager::LoadBaseShapeGenerators(ApplicationState* appState)
+bool BiomeManager::LoadBaseShapeGenerators(ApplicationState* appState)
 {
 	static bool s_Success = false;
 	const std::string baseShapeGeneratorsDir = appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape";
@@ -44,6 +44,18 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 	m_Data = std::make_shared<GeneratorData>();
 	static int s_BiomeID = 1;
 	sprintf(m_BiomeName, "Biome %d", s_BiomeID++);
+	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
+
+	// m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_GlobalElevation;
+
+	for (auto i = 0; i < static_cast<int32_t>(s_BaseShapeGenerators.size()); i++)
+	{
+		if (s_BaseShapeGenerators[i]->GetName() == "Classic")
+		{
+			m_SelectedBaseShapeGenerator = i;
+			break;
+		}
+	}
 }
 
 BiomeManager::~BiomeManager()
@@ -62,7 +74,8 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	if (!m_IsEnabled) return;
 	START_PROFILER();
 	// m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
-	s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
+	if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
+	else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation) m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture);
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
@@ -78,17 +91,38 @@ bool BiomeManager::ShowCustomBaseShapeSettings()
 bool BiomeManager::ShowBaseShapeSettings()
 {
 	ImGui::PushID(m_BiomeID.data());
-	if (ImGui::BeginCombo("Style", s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
+
+	if (ImGui::BeginCombo("Base Shape Generator Mode", s_BaseShapeGeneratorModeNames[m_SelectedBaseShapeGeneratorMode].c_str()))
 	{
-		for (int i = 0; i < static_cast<int32_t>(s_BaseShapeGenerators.size()); i++)
+		for (int i = 0; i < static_cast<int32_t>(s_BaseShapeGeneratorModeNames.size()); i++)
 		{
-			bool is_selected = m_SelectedBaseShapeGenerator == i;
-			if (ImGui::Selectable(s_BaseShapeGenerators[i]->GetName().c_str(), is_selected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
-			if (is_selected) ImGui::SetItemDefaultFocus();
+			bool isSelected = m_SelectedBaseShapeGeneratorMode == i;
+			if (ImGui::Selectable(s_BaseShapeGeneratorModeNames[i].c_str(), isSelected)) { m_SelectedBaseShapeGeneratorMode = static_cast<BiomeBaseShapeGeneratorMode>(i); m_RequireUpdation = true; }
+			if (isSelected) ImGui::SetItemDefaultFocus();
 		}
 		ImGui::EndCombo();
 	}
-	BIOME_UI_PROPERTY(s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
+
+	if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm)
+	{
+		if (ImGui::BeginCombo("Style", s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
+		{
+			for (int i = 0; i < static_cast<int32_t>(s_BaseShapeGenerators.size()); i++)
+			{
+				bool isSelected = m_SelectedBaseShapeGenerator == i;
+				if (ImGui::Selectable(s_BaseShapeGenerators[i]->GetName().c_str(), isSelected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
+				if (isSelected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+		BIOME_UI_PROPERTY(s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
+	}
+	else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation)
+	{
+		BIOME_UI_PROPERTY(m_DEMBaseShapeGenerator->ShowSettings());
+	}
+
+
 	ImGui::PopID();
 	return m_RequireUpdation;
 }

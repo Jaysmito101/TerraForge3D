@@ -37,6 +37,7 @@ set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 add_subdirectory(./TerraForge3D/vendor/glfw)
 add_subdirectory(./TerraForge3D/vendor/glad)
 add_subdirectory(./TerraForge3D/vendor/imgui-builder)
+add_subdirectory(./TerraForge3D/vendor/libwebp)
 
 if( MSVC )
     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
@@ -68,9 +69,10 @@ if(WIN32)
 endif()
 
 
-target_link_libraries(terraforge3d  OpenSSL::SSL)
-target_link_libraries(terraforge3d  OpenSSL::Crypto)
+target_link_libraries(terraforge3d OpenSSL::SSL)
+target_link_libraries(terraforge3d OpenSSL::Crypto)
 
+target_link_libraries(terraforge3d webp)
 
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.12.25835)
     set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")

@@ -69,6 +69,13 @@ int32_t GeneratorTexture::Bind(int32_t slot)
     return slot;
 }
 
+int32_t GeneratorTexture::BindForCompute(int32_t binding)
+{
+    // glBindTexture(GL_TEXTURE_2D, m_RendererID);
+    glBindImageTexture(binding, m_RendererID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+    return binding;
+}
+
 void GeneratorTexture::SetPixel(float x, float y, float r, float g, float b, float a)
 {
     int32_t pixelX = std::clamp((int32_t)(x * m_Width), 0, m_Width - 1);

@@ -72,9 +72,11 @@ void Texture2D::SetData(void *data, uint32_t size, bool alpha)
 {
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	if(alpha)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	}
 
 	else

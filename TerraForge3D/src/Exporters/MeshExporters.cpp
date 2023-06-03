@@ -58,7 +58,7 @@ void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int
 	appState->eventManager->RaiseEvent("ForceUpdate"); // force regenerate the mesh before exporting once
 	auto heightMapData = appState->generationManager->GetHeightmapData()->GetCPUCopy();
 	auto meshClone = appState->mainModel->mesh->Clone();
-	auto worker = std::thread([path, format, exporting, meshClone, heightMapData, this]()->void {
+	auto worker = ([path, format, exporting, meshClone, heightMapData, this]()->void {
 		using namespace std::chrono_literals;
 		this->SetStatusMessage("Exporting : " + path);
 		this->exportProgress = 0.01f;
@@ -69,7 +69,7 @@ void ExportManager::ExportMeshCurrentTile(std::string path, bool* exporting, int
 		delete[] heightMapData;
 		if (exporting) *exporting = false; 
 		});
-	worker.detach();
+	appState->jobSystem->AddFunctionWorker(worker);
 }
 
 void ExportManager::ExportMeshAllTiles(std::string pathStr, bool* exporting, int format)

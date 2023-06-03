@@ -44,6 +44,7 @@ bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPt
 		}
 	}
 	if(m_BiomeManagers.size() > 0) m_BiomeManagers[0]->GetBiomeData()->CopyTo(m_HeightmapData.get());
+
 	m_RequireUpdation = false;
 	return false;
 }

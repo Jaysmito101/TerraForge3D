@@ -12,6 +12,9 @@
 #include "Misc/Dashboard.h"
 #include "Misc/Style.h"
 #include "Platform.h"
+#include "Job/Job.h"
+#include "Job/JobSystem.h"
+#include "Job/JobManager.h"
 
 
 #include "Generators/GeneratorData.h"
@@ -89,7 +92,6 @@ public:
 	ApplicationStateGlobals globals;
 	ApplicationStateConstants constants;
 
-	EventManager* eventManager = nullptr;
 	MainMenu *mainMenu = nullptr;
 	TextureStore *textureStore = nullptr;
 	SupportersTribute *supportersTribute = nullptr;
@@ -102,6 +104,9 @@ public:
 	ViewportManager* viewportManagers[MAX_VIEWPORT_COUNT];
 	Style* styleManager = nullptr;
 	GenerationManager* generationManager = nullptr;
+	JobSystem::JobSystem* jobSystem = nullptr;
+	JobSystem::JobManager* jobManager = nullptr;
+	EventManager* eventManager = nullptr;
 
 	struct
 	{

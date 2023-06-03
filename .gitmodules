@@ -28,3 +28,6 @@
 [submodule "TerraForge3D/vendor/stb"]
 	path = TerraForge3D/vendor/stb
 	url = https://github.com/nothings/stb
+[submodule "TerraForge3D/vendor/libwebp"]
+	path = TerraForge3D/vendor/libwebp
+	url = https://chromium.googlesource.com/webm/libwebp

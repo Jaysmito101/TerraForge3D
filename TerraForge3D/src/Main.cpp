@@ -61,6 +61,7 @@ public:
 	virtual void OnUpdate(float deltatime) override
 	{
 		if (!appState->states.ruinning) return;
+		appState->jobSystem->Update();
 		appState->dashboard->Update();
 		appState->exportManager->Update(); 
 		appState->generationManager->Update();
@@ -142,12 +143,12 @@ public:
 		appState->generationManager->ShowSettings();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Show();
 		appState->exportManager->ShowSettings();
-		//appState->rendererManager->ShowSettings();
+		appState->jobManager->ShowSettings();
+		appState->rendererManager->ShowSettings(); 
 		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
 		if (appState->windows.supportersTribute) appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
-
 
 		OnImGuiRenderEnd();
 	}
@@ -172,7 +173,7 @@ public:
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
 		appState->constants.stylesDir = appState->constants.dataDir + PATH_SEPARATOR "styles";
 
-				ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
+		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		
 		// LoadDefaultStyle();
 
@@ -193,6 +194,7 @@ public:
 		appState->mainModel->SetupMeshOnGPU();
 		appState->mainModel->UploadToGPU();
 
+
 		appState->mainMap.tileCount = 1;
 		appState->mainMap.mapResolution = 256;
 		appState->mainMap.tileResolution = 256;
@@ -200,6 +202,8 @@ public:
 		appState->mainMap.tileOffsetX = appState->mainMap.tileOffsetY = 0.0f;
 		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
 		
+		appState->jobSystem = new JobSystem::JobSystem(appState);
+		appState->jobManager = new JobSystem::JobManager(appState);
 		appState->eventManager = new EventManager();
 		appState->dashboard = new Dashboard(appState);
 		appState->generationManager = new GenerationManager(appState);
@@ -231,23 +235,6 @@ public:
 		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
 		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
 		bool tpp = false;
-		if (IsNetWorkConnected())
-		{
-			if (FileExists(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d"))
-			{
-				bool ttmp = false;
-				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d", &ttmp);
-				appState->eventManager->RaiseEvent("ConnectedToBackend");
-				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
-			}
-			else
-			{
-				DownloadFile("https://terraforge3d.maxalpha.repl.co", "/register", appState->constants.configsDir + PATH_SEPARATOR "server.terr3d");
-				bool ttmp = false;
-				std::string uid = ReadShaderSourceFile(appState->constants.configsDir + PATH_SEPARATOR "server.terr3d", &ttmp);
-				Log("Connection to Backend : " + FetchURL("https://terraforge3d.maxalpha.repl.co", "/startup/" + uid));
-			}
-		}
 
 		Log("Started Up App!");
 		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
@@ -260,6 +247,9 @@ public:
 	{
 		appState->eventManager->RaiseEvent("OnEnd");
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) delete appState->viewportManagers[i];
+		appState->jobSystem->WaitAll();
+		delete appState->jobManager;
+		delete appState->jobSystem;
 		delete appState->eventManager;
 		delete appState->textureStore;
 		delete appState->styleManager;

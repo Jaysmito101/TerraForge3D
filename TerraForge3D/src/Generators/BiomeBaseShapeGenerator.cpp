@@ -140,7 +140,7 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	std::string source = "";
 	source += "#version 430 core\n\n";
 	source += "// work group size\n";
-	source += "layout(local_size_x = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_y = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_z = 1) in;\n\n";
+	source += "layout (local_size_x = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_y = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_z = 1) in;\n\n";
 	source += "// output data buffer\n";
 	source += "layout(std430, binding = 0) buffer DataBuffer\n";
 	source += "{\n\tfloat data[];\n};\n\n";
@@ -177,7 +177,7 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	source += m_Source;
 	source += "\n\n";
 	source += "// main\n";
-	source += "void main(void)\n{\n";
+	source += "void main()\n{\n";
 	source += "\tuvec2 offsetv2 = gl_GlobalInvocationID.xy;\n";
 	source += "\tuint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);\n";
 	source += "\tvec2 uv = offsetv2 / float(u_Resolution);\n";

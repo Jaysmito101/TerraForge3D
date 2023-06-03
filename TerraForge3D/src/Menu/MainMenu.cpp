@@ -128,6 +128,7 @@ void MainMenu::ShowWindowsMenu()
 	ShowWindowMenuItem("Generation Manager", appState->generationManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
+	ShowWindowMenuItem("Job Manager", appState->jobManager->IsWindowOpenPtr());
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);

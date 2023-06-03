@@ -9,6 +9,7 @@ public:
 
 	void Resize(int32_t width, int32_t height);
 	int32_t Bind(int32_t slot);
+	int32_t BindForCompute(int32_t binding);
 	void SetPixel(float x, float y, float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
 	float* MakeCPUCopy();
 	void FreeCPUCopy();

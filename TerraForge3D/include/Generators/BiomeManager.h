@@ -1,23 +1,21 @@
 #pragma once
 
 #include "Generators/BiomeBaseShapeGenerator.h"
+#include "Generators/DEMBaseShapeGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Base/Base.h"
 
 class ApplicationState;
 
-enum BiomeBaseShapeStyle
+enum BiomeBaseShapeGeneratorMode
 {
-	BiomeBaseShapeStyle_Classic,
-	BiomeBaseShapeStyle_Cliff,
-	BiomeBaseShapeStyle_Cracks,
-	BiomeBaseShapeStyle_Crater,
-	BiomeBaseShapeStyle_Dunes,
-	BiomeBaseShapeStyle_Volcano,
-	BiomeBaseShapeStyle_SingleCrack,
-	BiomeBaseShapeStyle_Count
+	BiomeBaseShapeGeneratorMode_Algorithm = 0,
+	BiomeBaseShapeGeneratorMode_GlobalElevation,
+	BiomeBaseShapeGeneratorMode_Count
 };
+
+static std::vector<std::string> s_BaseShapeGeneratorModeNames = { "Algorithm", "Global Elevation" };
 
 #define BIOME_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
@@ -61,8 +59,10 @@ private:
 	std::string m_BiomeID = "";
 	ApplicationState* m_AppState = nullptr;
 	std::shared_ptr<GeneratorData> m_Data;
-	int32_t m_SelectedBaseShapeGenerator = 1;
+	int32_t m_SelectedBaseShapeGenerator = 0;
+	BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
 	std::vector<int> m_Filters;
+	std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
 
 	static std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> s_BaseShapeGenerators;
 };

@@ -433,7 +433,7 @@ float UpdateLayerWithUpdateMethod(float origv, float newv, int method)
 	return origv;
 }
 
-char *ReadBinaryFile(std::string path, int *fSize, uint32_t sizeToLoad)
+char* ReadBinaryFile(std::string path, int *fSize, int32_t sizeToLoad)
 {
 	std::ifstream in(path, std::ifstream::ate | std::ifstream::binary);
 	int size = (int)in.tellg();
@@ -441,7 +441,7 @@ char *ReadBinaryFile(std::string path, int *fSize, uint32_t sizeToLoad)
 
 	if(sizeToLoad > 0)
 	{
-		size = size < (int)sizeToLoad ? size : (int)sizeToLoad;
+		size = size < sizeToLoad ? size : sizeToLoad;
 	}
 
 	std::ifstream f1(path, std::fstream::binary);
@@ -458,7 +458,7 @@ char *ReadBinaryFile(std::string path, int *fSize, uint32_t sizeToLoad)
 	return buffer;
 }
 
-char *ReadBinaryFile(std::string path, uint32_t sizeToLoad)
+char* ReadBinaryFile(std::string path, int32_t sizeToLoad)
 {
 	int size;
 	return ReadBinaryFile(path, &size, sizeToLoad);
