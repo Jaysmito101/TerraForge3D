@@ -60,7 +60,7 @@ bool DEMBaseShapeGenerator::ShowSettings()
 		SaveToFile(m_APIKeyConfigPath, m_APIKey);
 		m_RequireUpdation = true;
 	}
-	BIOME_UI_PROPERTY(ImGui::SliderInt("Zoom Resolution", &m_ZoomResolution, 0, 12));
+	BIOME_UI_PROPERTY(ImGui::SliderInt("Zoom Resolution", &m_ZoomResolution, 0, 14));
 
 	BIOME_UI_PROPERTY(ImGui::DragFloat("Strength", &m_MapStrength, 0.01f));
 
@@ -71,7 +71,7 @@ bool DEMBaseShapeGenerator::ShowSettings()
 
 	if (ImGui::IsItemHovered() && (std::abs(ImGui::GetIO().MouseWheel) > 0.05 || ( ImGui::IsMouseDown(ImGuiMouseButton_Middle) && (std::abs(ImGui::GetIO().MouseDelta.x) > 0.001f || std::abs(ImGui::GetIO().MouseDelta.y) > 0.01f))))
 	{
-		m_ZoomOnMap = std::clamp(m_ZoomOnMap + ImGui::GetIO().MouseWheel * 0.1f * std::exp(std::pow(m_ZoomOnMap - 1.0f, 0.2f)), 1.0f, 12.0f * 200.0f);
+		m_ZoomOnMap = m_ZoomOnMap + ImGui::GetIO().MouseWheel * 0.1f * std::exp(std::pow(m_ZoomOnMap - 1.0f, 0.2f));
 		m_MapCenter.x += ImGui::GetIO().MouseDelta.x * 0.006f / m_ZoomOnMap;
 		m_MapCenter.y += ImGui::GetIO().MouseDelta.y * 0.006f / m_ZoomOnMap;
 		m_RequireUpdation = true;
@@ -79,6 +79,7 @@ bool DEMBaseShapeGenerator::ShowSettings()
 
 	BIOME_UI_PROPERTY(ImGui::DragFloat("Zoom", &m_ZoomOnMap, 0.01f, 1.0f));
 	BIOME_UI_PROPERTY(ImGui::DragFloat2("Center Position", glm::value_ptr(m_MapCenter), 0.01f));
+	if(m_RequireUpdation) m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 12.0f * 200.0f);
 
 
 	return m_RequireUpdation;
@@ -126,17 +127,26 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	m_Shader->SetUniform1i("u_Mode", 2);
 	m_MapVisualzeTexture->BindForCompute(1);
 	m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
-
 	m_RequireUpdation = false;
 }
 
 void DEMBaseShapeGenerator::Load(SerializerNode data)
 {
+	m_ZoomOnMap = data->GetInteger("ZoomOnMap", 1.0f);
+	m_MapStrength = data->GetFloat("MapStrength", 1.0f);
+	m_MapCenter.x = data->GetFloat("MapCenter_X", 0.0f);
+	m_MapCenter.y = data->GetFloat("MapCenter_Y", 0.0f);
+	m_RequireUpdation = true;
 }
 
 SerializerNode DEMBaseShapeGenerator::Save()
 {
-	return SerializerNode();
+	auto node = CreateSerializerNode();
+	node->SetInteger("ZoomOnMap", m_ZoomOnMap);
+	node->SetFloat("MapStrength", m_MapStrength);
+	node->SetFloat("MapCenter_X", m_MapCenter.x);
+	node->SetFloat("MapCenter_Y", m_MapCenter.y);
+	return node;
 }
 
 bool DEMBaseShapeGenerator::IsTileValid(uint32_t x, uint32_t y, uint32_t z)

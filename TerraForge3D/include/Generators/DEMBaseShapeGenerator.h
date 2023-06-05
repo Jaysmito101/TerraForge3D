@@ -65,7 +65,6 @@ private:
 	std::shared_ptr<Texture2D> m_LoadingTexture;
 	std::shared_ptr<Texture2D> m_NullTexture;
 	std::vector<TextureCacheKey> m_TextureDownloadQueue;
-	std::mutex m_TextureDownloadQueueMutex;
 	std::shared_ptr<ComputeShader> m_Shader;
 
 
