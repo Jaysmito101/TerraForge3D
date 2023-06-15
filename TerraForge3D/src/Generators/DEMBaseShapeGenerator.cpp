@@ -1,8 +1,8 @@
 #include "Generators/DEMBaseShapeGenerator.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
+#include "Profiler.h"
 #include "imgui/imgui_internal.h"
-
 #include "webp/decode.h"
 
 static bool AABBContains01(const glm::vec2& minA, const glm::vec2& maxA) 
@@ -52,6 +52,11 @@ DEMBaseShapeGenerator::~DEMBaseShapeGenerator()
 
 bool DEMBaseShapeGenerator::ShowSettings()
 {
+	if (ImGui::CollapsingHeader("Statistics"))
+	{
+		ImGui::Text("Time Taken : %f", m_CalculationTime);
+		ImGui::Text("Tiles Using : %d", m_TilesUsingCount);
+	}
 	ImGui::InputText("API Key", m_APIKeyInput, 1024);
 	if (m_APIKey != m_APIKeyInput && strlen(m_APIKeyInput) > 0 && ImGui::Button("Apply"))
 	{
@@ -77,7 +82,7 @@ bool DEMBaseShapeGenerator::ShowSettings()
 		m_RequireUpdation = true;
 	}
 
-	BIOME_UI_PROPERTY(ImGui::DragFloat("Zoom", &m_ZoomOnMap, 0.01f, 1.0f));
+	BIOME_UI_PROPERTY(ImGui::DragFloat("Zoom", &m_ZoomOnMap, 1.0f, 1.0f));
 	BIOME_UI_PROPERTY(ImGui::DragFloat2("Center Position", glm::value_ptr(m_MapCenter), 0.01f));
 	if(m_RequireUpdation) m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 12.0f * 200.0f);
 
@@ -87,6 +92,7 @@ bool DEMBaseShapeGenerator::ShowSettings()
 
 void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seedTexture)
 {
+	START_PROFILER();
 	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	auto tileSize = 1.0f / (1 << m_ZoomResolution);
 
@@ -106,7 +112,7 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	m_Shader->SetUniform1f("u_RegionTileSize", tileSize * m_ZoomOnMap);
 
 	
-
+	m_TilesUsingCount = 0;
 	for (int yi = 0; yi < static_cast<int>(1 << m_ZoomResolution); yi++)
 //	for (int yi = tileStartY; yi < tileEndY; yi++)
 	{
@@ -118,15 +124,17 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 			if (!AABBContains01(startPos, endPos)) continue;
 			m_Shader->SetUniform1i("u_DEMTexture", GetTile(xi, yi, m_ZoomResolution)->Bind(0));
 			m_Shader->SetUniform4f("u_RegionToUpdate", glm::vec4(startPos, endPos));
+			// TODO: [PLAN] do not dispatch based on map tile but texture tile
 			m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+			m_TilesUsingCount++;
 		}
 	}
-
 
 	// update the visualizer map
 	m_Shader->SetUniform1i("u_Mode", 2);
 	m_MapVisualzeTexture->BindForCompute(1);
 	m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
+	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
 

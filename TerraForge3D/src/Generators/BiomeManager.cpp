@@ -6,33 +6,27 @@
 
 #include "Generators/BiomeBaseShapeGenerator.h"
 
-std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> BiomeManager::s_BaseShapeGenerators;
-
-bool BiomeManager::AddBaseShapeGenerator(const std::string& config, ApplicationState* appState)
+bool BiomeManager::AddBaseShapeGenerator(const std::string& config)
 {
-	s_BaseShapeGenerators.push_back(std::make_shared<BiomeBaseShapeGenerator>(appState));
-	return s_BaseShapeGenerators.back()->LoadConfig(config);
+	m_BaseShapeGenerators.push_back(std::make_shared<BiomeBaseShapeGenerator>(m_AppState));
+	return m_BaseShapeGenerators.back()->LoadConfig(config);
 }
 
-bool BiomeManager::LoadBaseShapeGenerators(ApplicationState* appState)
+bool BiomeManager::LoadUpResources()
 {
-	static bool s_Success = false;
-	const std::string baseShapeGeneratorsDir = appState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape";
+	const std::string baseShapeGeneratorsDir = m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape";
 	for (auto& directoryEntry : std::filesystem::recursive_directory_iterator(baseShapeGeneratorsDir))
 	{
 		if (!directoryEntry.is_directory() && directoryEntry.path().extension() == ".glsl")
 		{
-			const std::string config = ReadShaderSourceFile(directoryEntry.path().string(), &s_Success);
-			if (!s_Success) continue;
-			if (!AddBaseShapeGenerator(config, appState)) Log("ERROR: Failed to load base shape generator " + directoryEntry.path().string());
+			const std::string config = ReadShaderSourceFile(directoryEntry.path().string(), &s_TempBool);
+			if (!s_TempBool) continue;
+			if (!AddBaseShapeGenerator(config)) Log("ERROR: Failed to load base shape generator " + directoryEntry.path().string());
 		}
 	}
+	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
+	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
 	return true;
-}
-
-void BiomeManager::FreeBaseShapeGenerators()
-{
-	s_BaseShapeGenerators.clear();
 }
 
 BiomeManager::BiomeManager(ApplicationState* appState)
@@ -44,13 +38,11 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 	m_Data = std::make_shared<GeneratorData>();
 	static int s_BiomeID = 1;
 	sprintf(m_BiomeName, "Biome %d", s_BiomeID++);
-	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
-
+	LoadUpResources();
 	// m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_GlobalElevation;
-
-	for (auto i = 0; i < static_cast<int32_t>(s_BaseShapeGenerators.size()); i++)
+	for (auto i = 0; i < static_cast<int32_t>(m_BaseShapeGenerators.size()); i++)
 	{
-		if (s_BaseShapeGenerators[i]->GetName() == "Classic")
+		if (m_BaseShapeGenerators[i]->GetName() == "Classic")
 		{
 			m_SelectedBaseShapeGenerator = i;
 			break;
@@ -74,8 +66,15 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	if (!m_IsEnabled) return;
 	START_PROFILER();
 	// m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
-	if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
+	if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
 	else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation) m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture);
+
+	m_Data->CopyTo(swapBuffer);	 // temporary will later be 
+	// optimized when filters are implemented
+
+	m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture);
+
+
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
@@ -105,17 +104,17 @@ bool BiomeManager::ShowBaseShapeSettings()
 
 	if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm)
 	{
-		if (ImGui::BeginCombo("Style", s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
+		if (ImGui::BeginCombo("Style", m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->GetName().c_str()))
 		{
-			for (int i = 0; i < static_cast<int32_t>(s_BaseShapeGenerators.size()); i++)
+			for (int i = 0; i < static_cast<int32_t>(m_BaseShapeGenerators.size()); i++)
 			{
 				bool isSelected = m_SelectedBaseShapeGenerator == i;
-				if (ImGui::Selectable(s_BaseShapeGenerators[i]->GetName().c_str(), isSelected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
+				if (ImGui::Selectable(m_BaseShapeGenerators[i]->GetName().c_str(), isSelected)) { m_SelectedBaseShapeGenerator = i; m_RequireUpdation = true; }
 				if (isSelected) ImGui::SetItemDefaultFocus();
 			}
 			ImGui::EndCombo();
 		}
-		BIOME_UI_PROPERTY(s_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
+		BIOME_UI_PROPERTY(m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->ShowSettings());
 	}
 	else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation)
 	{
@@ -144,7 +143,7 @@ bool BiomeManager::ShowGeneralSettings()
 bool BiomeManager::ShowBaseNoiseSettings()
 {
 	ImGui::PushID(m_BiomeID.data());
-	ImGui::Text("Yet to be implemented!");
+	BIOME_UI_PROPERTY(m_BaseNoiseGenerator->ShowSettings());
 	ImGui::PopID();
 	return m_RequireUpdation;
 }

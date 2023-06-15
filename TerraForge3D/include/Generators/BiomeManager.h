@@ -2,6 +2,7 @@
 
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/DEMBaseShapeGenerator.h"
+#include "Generators/BiomeBaseNoiseGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Base/Base.h"
@@ -45,9 +46,8 @@ public:
 	inline const std::string& GetBiomeID() const { return m_BiomeID; }
 	inline void SetName(const std::string& name) { strcpy(m_BiomeName, name.c_str()); }
 
-	static bool AddBaseShapeGenerator(const std::string& config, ApplicationState* appState);
-	static bool LoadBaseShapeGenerators(ApplicationState* appState);
-	static void FreeBaseShapeGenerators();
+	bool AddBaseShapeGenerator(const std::string& config);
+	bool LoadUpResources();
 
 private:
 	char m_BiomeName[64];
@@ -64,5 +64,6 @@ private:
 	std::vector<int> m_Filters;
 	std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
 
-	static std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> s_BaseShapeGenerators;
+	std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
+	std::shared_ptr<BiomeBaseNoiseGenerator> m_BaseNoiseGenerator;
 };

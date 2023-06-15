@@ -57,6 +57,8 @@ private:
 	int32_t m_ZoomResolution = 0;
 	float m_ZoomOnMap = 1.0f;
 	float m_MapStrength = 1.0f;
+	float m_CalculationTime = 0.0f;
+	int m_TilesUsingCount = 0;
 	glm::vec2 m_MapCenter = glm::vec2(0.0f);
 	
 	

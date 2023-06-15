@@ -6,7 +6,7 @@
 
 GenerationManager::GenerationManager(ApplicationState* appState)
 {
-	if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
+	// if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
 	m_AppState = appState;
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
@@ -20,7 +20,6 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 
 GenerationManager::~GenerationManager()
 {
-	BiomeManager::FreeBaseShapeGenerators();
 }
 
 void GenerationManager::Update()

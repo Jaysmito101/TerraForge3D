@@ -53,7 +53,7 @@ void BiomeBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* se
 	m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
 	m_Shader->SetUniform1i("u_UseSeedTexture", seedTexture != nullptr ? 1 : 0);
 	if (seedTexture) m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
-	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
+	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
 	m_RequireUpdation = false;
 }
