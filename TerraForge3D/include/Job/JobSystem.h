@@ -49,7 +49,7 @@ namespace JobSystem
 		ApplicationState* appState;
 
 		// AsyncOnMainThreadJobs data
-		std::chrono::steady_clock::time_point prevTime = std::chrono::high_resolution_clock::now();
+		std::chrono::time_point<std::chrono::high_resolution_clock> prevTime = std::chrono::high_resolution_clock::now();
 		double deltaTime = 0.0;
 		double totalTime = 0.0;
 

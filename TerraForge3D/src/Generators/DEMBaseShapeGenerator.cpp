@@ -179,7 +179,7 @@ std::shared_ptr<Texture2D> DEMBaseShapeGenerator::LoadTile(uint32_t x, uint32_t 
 	// check if tile is valid
 	if (!IsTileValid(x, y, z))
 	{
-		Log(std::format("Tile {} {} {} is not valid", x, y, z));
+		Log(fmt::format("Tile {} {} {} is not valid", x, y, z));
 		return m_NullTexture;
 	}
 
@@ -193,7 +193,7 @@ std::shared_ptr<Texture2D> DEMBaseShapeGenerator::LoadTile(uint32_t x, uint32_t 
 
 
 	// check if tile is already downloaded
-	auto path = std::vformat(m_TerrainRGBDataCacheFileFormat, std::make_format_args(x, y, z));
+	auto path = fmt::vformat(m_TerrainRGBDataCacheFileFormat, fmt::make_format_args(x, y, z));
 
 	// check is the texture is downloading
 	if (std::find(m_TextureDownloadQueue.begin(), m_TextureDownloadQueue.end(), textureCacheKey) != m_TextureDownloadQueue.end())
@@ -230,8 +230,8 @@ void DEMBaseShapeGenerator::DownloadTerrainRGBTexture(TextureCacheKey key)
 	auto downloadWorker = [this, key]()
 	{
 		auto [x, y, z] = key;
-		auto path = std::vformat(m_TerrainRGBDataCacheFileFormat, std::make_format_args(x, y, z));
-		auto urlPath = std::vformat(m_APIPathURLFormat, std::make_format_args(z, x, y, m_APIKey));
+		auto path = fmt::vformat(m_TerrainRGBDataCacheFileFormat, fmt::make_format_args(x, y, z));
+		auto urlPath = fmt::vformat(m_APIPathURLFormat, fmt::make_format_args(z, x, y, m_APIKey));
 		DownloadFile(m_APIHostURL, urlPath, path);
 	};
 	m_AppState->jobSystem->AddFunctionWorker(downloadWorker)->onComplete = [this, key](auto*)->void { m_TextureDownloadQueue.erase(std::find(m_TextureDownloadQueue.begin(), m_TextureDownloadQueue.end(), key)); m_RequireUpdation = true; m_AppState->eventManager->RaiseEvent("ForceUpdate", "ForceUpdate"); };

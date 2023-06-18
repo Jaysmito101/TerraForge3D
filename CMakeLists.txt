@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project(TerraForge3D C CXX)
@@ -22,6 +23,7 @@ include_directories(
     ./TerraForge3D/vendor/delaunator/include
     ./TerraForge3D/vendor/glad/include
     ./TerraForge3D/vendor/glfw/include
+    ./TerraForge3D/vendor/fmt/include
     ./TerraForge3D/vendor/glm
     ./TerraForge3D/vendor/httplib
     ./TerraForge3D/vendor/imgui
@@ -38,6 +40,7 @@ add_subdirectory(./TerraForge3D/vendor/glfw)
 add_subdirectory(./TerraForge3D/vendor/glad)
 add_subdirectory(./TerraForge3D/vendor/imgui-builder)
 add_subdirectory(./TerraForge3D/vendor/libwebp)
+add_subdirectory(./TerraForge3D/vendor/fmt)
 
 if( MSVC )
     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
@@ -71,7 +74,7 @@ endif()
 
 target_link_libraries(terraforge3d OpenSSL::SSL)
 target_link_libraries(terraforge3d OpenSSL::Crypto)
-
+target_link_libraries(terraforge3d fmt::fmt)
 target_link_libraries(terraforge3d webp)
 
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.12.25835)

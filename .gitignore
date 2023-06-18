@@ -14,7 +14,7 @@ ghpages
 **.ini
 **.orig
 **.make
-
+**.a
 
 Makefile
 **/Makefile
