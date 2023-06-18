@@ -42,10 +42,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: TerraForge3D Linux Debug Build
-          path: build
+          path: build/terraforge3d
 
       - name: Clean Workspace
-        run: git reset --hard
+        run: rm -rfv build
 
       - name: Generate Solution fot Release
         run: cmake -S ./ -B ./build  -DCMAKE_BUILD_TYPE=Release
@@ -58,4 +58,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: TerraForge3D Linux Release Build
-          path: build
+          path: build/terraforge3d
