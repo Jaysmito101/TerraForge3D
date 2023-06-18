@@ -31,8 +31,8 @@ jobs:
       - name: Setup OpenGL
         uses: openrndr/setup-opengl@v1.1
         
-      - name: Generate Solution
-        run: cmake -S ./ -B ./build
+      - name: Generate Solution fot Debug
+        run: cmake -S ./ -B ./build  -DCMAKE_BUILD_TYPE=Debug
       
       - name: Build Debug
         working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -42,14 +42,20 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: TerraForge3D Linux Debug Build
-          path: build\Debug
+          path: build
+
+      - name: Clean Workspace
+        run: git reset --hard
+
+      - name: Generate Solution fot Release
+        run: cmake -S ./ -B ./build  -DCMAKE_BUILD_TYPE=Release
 
       - name: Build Release
         working-directory: ${{env.GITHUB_WORKSPACE}}
-        run: cmake --build ./build --config=Release
+        run: cmake --build ./build --config Release
 
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v2
         with:
           name: TerraForge3D Linux Release Build
-          path: build\Release
+          path: build
