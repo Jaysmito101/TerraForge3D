@@ -31,3 +31,6 @@
 [submodule "TerraForge3D/vendor/libwebp"]
 	path = TerraForge3D/vendor/libwebp
 	url = https://chromium.googlesource.com/webm/libwebp
+[submodule "TerraForge3D/vendor/fmt"]
+	path = TerraForge3D/vendor/fmt
+	url = https://github.com/fmtlib/fmt
