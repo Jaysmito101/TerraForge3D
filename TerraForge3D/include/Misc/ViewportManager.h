@@ -18,6 +18,8 @@ public:
 	inline uint32_t GetID() { return this->m_ID; }
 
 	inline RendererViewport* GetRendererViewport() { return this->m_RendererViewport; }
+	inline bool IsActive() { return this->m_IsActive; }
+	inline const glm::vec2 GetPositionOnTerrain() { return m_IsActive ? glm::vec2(m_RendererViewport->m_PosOnTerrain[0], m_RendererViewport->m_PosOnTerrain[1]) : glm::vec2(-1.0f); }
 
 private:
 	void ShowSettingPopUp();
@@ -32,4 +34,5 @@ private:
 	float m_ZoomSpeed = 1.0f, m_MovementSpeed = 1.0f, m_RotationSpeed = 1.0f;
 	bool m_IsVisible = true;
 	bool m_AutoCalculateAspectRatio = true;
+	bool m_IsActive = false;
 };

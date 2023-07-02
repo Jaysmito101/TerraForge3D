@@ -4,26 +4,26 @@
 RendererManager::RendererManager(ApplicationState* appState)
 {
 	m_AppState = appState;
-	m_ObjectRenderer = new ObjectRenderer(appState);
-	m_HeightmapRenderer = new HeightmapRenderer(appState);
-	m_ShadedRenderer = new ShadedRenderer(appState);
-	m_TextureSlotRenderer = new TextureSlotRenderer(appState);
-	m_WireframeRenderer = new WireframeRenderer(appState);
+	m_ObjectRenderer = std::make_shared<ObjectRenderer>(appState);
+	m_HeightmapRenderer = std::make_shared<HeightmapRenderer>(appState);
+	m_ShadedRenderer = std::make_shared<ShadedRenderer>(appState);
+	m_TextureSlotRenderer = std::make_shared<TextureSlotRenderer>(appState);
+	m_WireframeRenderer = std::make_shared<WireframeRenderer>(appState);
 
-	m_RendererLights = new RendererLights(appState);
-	m_RendererSky = new RendererSky(appState);
+	m_RendererLights = std::make_shared<RendererLights>(appState);
+	m_RendererSky = std::make_shared<RendererSky>(appState);
 }
 
 RendererManager::~RendererManager()
 {
-	delete m_ObjectRenderer;
+	/*delete m_ObjectRenderer;
 	delete m_HeightmapRenderer;
 	delete m_ShadedRenderer;
 	delete m_TextureSlotRenderer;
 	delete m_WireframeRenderer;
 
 	delete m_RendererLights;
-	delete m_RendererSky;
+	delete m_RendererSky;*/
 }
 
 void RendererManager::Render(RendererViewport* viewport)
@@ -32,6 +32,7 @@ void RendererManager::Render(RendererViewport* viewport)
 	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_RendererSky->Render(viewport);
+	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
 	switch (viewport->m_ViewportMode)
 	{
 	case RendererViewportMode_Object: m_ObjectRenderer->Render(viewport); break;

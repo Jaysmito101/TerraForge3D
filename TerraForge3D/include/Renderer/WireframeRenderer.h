@@ -1,24 +1,20 @@
 #pragma once
 
-#include "Base/Base.h"
-#include "Renderer/RendererViewport.h"
 
-class ApplicationState;
+#include "Renderer/RendererBase.h"
 
-class WireframeRenderer
+class WireframeRenderer : public RendererBase
 {
 public:
 	WireframeRenderer(ApplicationState* appState);
-	~WireframeRenderer();
+	virtual ~WireframeRenderer();
 
-	void Render(RendererViewport* viewport);
-	void ShowSettings();
+	virtual void Render(RendererViewport* viewport) override;
+	virtual void ShowSettings() override;
+
+protected:
+	virtual void ReloadShaders() override;
 
 private:
-	void ReloadShaders();
-
-private:
-	ApplicationState* m_AppState = nullptr;
-	Shader* m_Shader = nullptr;
 	bool m_InvertNormals = false;
 };

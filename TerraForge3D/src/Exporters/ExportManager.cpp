@@ -94,5 +94,54 @@ void ExportManager::ShowMeshExportSettings()
 
 void ExportManager::ShowTextureExportSettings()
 {
-	ImGui::Text("TODO");
+	static const char* exportTypes[] = {
+		"PNG",
+		"JPG",
+		"BMP",
+		"TGA"
+	};
+
+	static const char* exportBitDepths[] = {
+		"8-bit",
+		"16-bit",
+		"32-bit"
+	};
+
+	if (ImGui::BeginCombo("Export Format", exportTypes[this->exportTextureFormat]))
+	{
+		for (int i = 0; i < IM_ARRAYSIZE(exportTypes); i++)
+		{
+			bool is_selected = (this->exportTextureFormat == i);
+			if (ImGui::Selectable(exportTypes[i], is_selected)) this->exportTextureFormat = i;
+			if (is_selected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	if (ImGui::BeginCombo("Bit Depth", exportBitDepths[this->exportTextureBitDepth]))
+	{
+		for (int i = 0; i < IM_ARRAYSIZE(exportBitDepths); i++)
+		{
+			bool is_selected = (this->exportTextureBitDepth == i);
+			if (ImGui::Selectable(exportBitDepths[i], is_selected)) this->exportTextureBitDepth = i;
+			if (is_selected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	if (ImGui::Button("Export Current Tile"))
+	{
+		std::string output_file_path = ShowSaveFileDialog("*.*");
+		if (output_file_path.size() < 3) return;
+		this->ExportTextureCurrentTile(output_file_path, this->exportTextureFormat, this->exportTextureBitDepth, nullptr);
+	}
+
+	ImGui::BeginDisabled();
+	if (ImGui::Button("Export All Tiles"))
+	{
+		std::string output_file_path = ShowSaveFileDialog("*.*");
+		if (output_file_path.size() < 3) return;
+		// this->ExportTextureAllTiles(output_file_path, nullptr, this->exportTextureFormat, this->exportTextureBitDepth);
+	}
+	ImGui::EndDisabled();
 }

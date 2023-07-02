@@ -1,6 +1,9 @@
 #include "Generators/GeneratorData.h"
 #include "Base/Base.h"
 
+static const char* s_GeneratorDataSaveFileHeader = "TF3D.3.0.GENDATA";
+
+
 GeneratorData::GeneratorData()
 {
 	glGenBuffers(1, &m_RendererID);
@@ -56,4 +59,60 @@ float* GeneratorData::GetCPUCopy()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	return data;
 }
+
+bool GeneratorData::SaveToFile(const std::string& path)
+{
+	FILE* fd = fopen(path.c_str(), "wb");
+	if (!fd)
+	{
+		return false;
+	}
+
+	float* data = GetCPUCopy();	
+
+	fwrite(s_GeneratorDataSaveFileHeader, sizeof(char), strlen(s_GeneratorDataSaveFileHeader), fd);
+
+	fwrite(&m_Size, sizeof(size_t), 1, fd);
+	fwrite(data, sizeof(float), m_Size / sizeof(float), fd);
+
+	fclose(fd);
+	delete[] data;
+
+	return true;
+}
+
+bool GeneratorData::LoadFromFile(const std::string& path)
+{
+	FILE* fd = fopen(path.c_str(), "rb");
+	if (!fd)
+	{
+		return false;
+	}
+
+	char header[sizeof(s_GeneratorDataSaveFileHeader) + 1];
+	
+	fread(header, sizeof(char), strlen(s_GeneratorDataSaveFileHeader), fd);
+
+	header[strlen(s_GeneratorDataSaveFileHeader)] = '\0';
+
+	if (strcmp(header, s_GeneratorDataSaveFileHeader) != 0)
+	{
+		fclose(fd);
+		return false;
+	}
+
+	size_t size = 0;
+	fread(&size, sizeof(size_t), 1, fd);
+
+	Resize(size);
+
+	float* data = new float[size / sizeof(float)];
+	fread(data, sizeof(float), size / sizeof(float), fd);
+	SetData(data, 0, size);
+	delete[] data;
+
+	return true;
+}
+
+
 

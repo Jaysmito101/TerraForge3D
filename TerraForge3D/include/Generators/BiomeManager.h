@@ -3,6 +3,7 @@
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/DEMBaseShapeGenerator.h"
 #include "Generators/BiomeBaseNoiseGenerator.h"
+#include "Generators/BiomeCustomBaseShape.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Base/Base.h"
@@ -66,4 +67,5 @@ private:
 
 	std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
 	std::shared_ptr<BiomeBaseNoiseGenerator> m_BaseNoiseGenerator;
+	std::shared_ptr< BiomeCustomBaseShape> m_CustomBaseShape;
 };

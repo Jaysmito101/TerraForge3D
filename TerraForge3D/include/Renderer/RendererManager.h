@@ -20,22 +20,31 @@ public:
 
 	void Render(RendererViewport* viewport);
 	void ShowSettings();
-	inline bool IsWindowVisible() { return this->m_IsWindowVisible; }
-	inline bool* IsWindowVisiblePtr() { return &this->m_IsWindowVisible; }
+	inline bool IsWindowVisible() { return m_IsWindowVisible; }
+	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
 
-	inline RendererLights* GetRendererLights() { return this->m_RendererLights; }
-	inline RendererSky* GetSkyRenderer() { return this->m_RendererSky; }
+	inline RendererLights* GetRendererLights() { return m_RendererLights.get(); }
+	inline RendererSky* GetSkyRenderer() { return m_RendererSky.get(); }
+
+	inline ObjectRenderer* GetObjectRenderer() { return static_cast<ObjectRenderer*>(m_ObjectRenderer.get()); }
+	inline HeightmapRenderer* GetHeightmapRenderer() { return static_cast<HeightmapRenderer*>(m_HeightmapRenderer.get()); }
+	inline ShadedRenderer* GetShadedRenderer() { return static_cast<ShadedRenderer*>(m_ShadedRenderer.get()); }
+	inline TextureSlotRenderer* GetTextureSlotRenderer() { return static_cast<TextureSlotRenderer*>(m_TextureSlotRenderer.get()); }
+	inline WireframeRenderer* GetWireframeRenderer() { return static_cast<WireframeRenderer*>(m_WireframeRenderer.get()); }
+
+
 
 private:
 	ApplicationState* m_AppState = nullptr;
 	bool m_IsWindowVisible = true;
-	ObjectRenderer* m_ObjectRenderer = nullptr;
-	HeightmapRenderer* m_HeightmapRenderer = nullptr;
-	ShadedRenderer* m_ShadedRenderer = nullptr;
-	TextureSlotRenderer* m_TextureSlotRenderer = nullptr;
-	WireframeRenderer* m_WireframeRenderer = nullptr;
+	// std::shared_ptr<ObjectRenderer> m_ObjectRenderer;
+	// std::shared_ptr<HeightmapRenderer> m_HeightmapRenderer;
+	// std::shared_ptr<ShadedRenderer> m_ShadedRenderer;
+	// std::shared_ptr<TextureSlotRenderer> m_TextureSlotRenderer;
+	// std::shared_ptr<WireframeRenderer> m_WireframeRenderer;
+	std::shared_ptr<RendererBase> m_ObjectRenderer, m_HeightmapRenderer, m_ShadedRenderer, m_TextureSlotRenderer, m_WireframeRenderer;
 
-	RendererLights* m_RendererLights = nullptr;
-	RendererSky* m_RendererSky = nullptr;
+	std::shared_ptr<RendererLights> m_RendererLights;
+	std::shared_ptr<RendererSky> m_RendererSky;
 };
 

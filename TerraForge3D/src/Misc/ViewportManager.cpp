@@ -29,10 +29,13 @@ void ViewportManager::Show()
 	static char s_TempBuffer[1024]; 
 	std::sprintf(s_TempBuffer, "Viewport %d", this->m_ID);
 	if(!this->m_IsVisible) return;
-	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-	auto viewportOffset = ImGui::GetWindowPos();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin(s_TempBuffer, &m_IsVisible);	
+	ImGui::PopStyleVar();
+	// auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+	// auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+	auto viewportOffset = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMin();
+	m_IsActive = ImGui::IsWindowFocused();
 	ImGui::BeginChild("MainRender");
 	if (ImGui::IsWindowHovered())
 	{
@@ -61,15 +64,23 @@ void ViewportManager::Show()
 			m_RendererViewport->m_Scale = glm::clamp(m_RendererViewport->m_Scale, 0.0000001f, 1000000.0f);
 		}
 
-
-		m_MousePosX = ImGui::GetIO().MousePos.x - viewportOffset.x;
-		m_MousePosY = ImGui::GetIO().MousePos.y - viewportOffset.y;
 		if(ImGui::IsKeyDown(ImGuiKey_Space) && io.MouseDown[ImGuiMouseButton_Right]) ImGui::OpenPopup((std::string("Viewport Settings##") + std::to_string(this->m_ID)).c_str());
+
+		m_RendererViewport->m_MousePosition[0] = m_MousePosX = (ImGui::GetIO().MousePos.x - viewportOffset.x) / m_Width;
+		m_RendererViewport->m_MousePosition[1] = m_MousePosY = (ImGui::GetIO().MousePos.y - viewportOffset.y) / m_Height;
+		m_RendererViewport->m_MousePosition[1] = 1.0f - m_RendererViewport->m_MousePosition[1];
+
 	}
-	ImVec2 wsize = ImGui::GetWindowSize();
-	m_Width = wsize.x; m_Height = wsize.y;
+	else
+	{
+		m_RendererViewport->m_MousePosition[0] = m_MousePosX = -1.0f;
+		m_RendererViewport->m_MousePosition[1] = m_MousePosY = -1.0f;
+	}
+
+	ImVec2 imageSize = ImGui::GetWindowSize();
+	m_Width = imageSize.x; m_Height = imageSize.y;
 	m_RendererViewport->m_AspectRatio = m_Width / (m_Height + 0.000000001f);
-	ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->m_FrameBuffer->GetColorTexture(), wsize, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->m_FrameBuffer->GetColorTexture(), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::EndChild();
 	this->ShowSettingPopUp();
 	ImGui::End();

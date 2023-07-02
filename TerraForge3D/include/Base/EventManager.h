@@ -14,9 +14,10 @@ class EventManager
 public:
 	EventManager();
 	~EventManager();
-	void Subscribe(const std::string& eventName, EventReciever callback);
+	void Subscribe(const std::string& eventName, EventReciever callback, const std::string& callbackID = "");
+	void Unsubscribe(const std::string& recieverName, const std::string& callbackName);
 	void UnsubscribeAll(const std::string& recieverName);
 	void RaiseEvent(const std::string& eventName, const std::string& params = "", void* paramsPtr = nullptr);
 private:
-	std::unordered_map<std::string, std::vector<EventReciever>> m_EventSubscribers;
+	std::unordered_map<std::string, std::unordered_map<std::string, EventReciever>> m_EventSubscribers;
 };

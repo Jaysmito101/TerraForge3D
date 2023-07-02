@@ -1,26 +1,22 @@
 #pragma once
 
-#include "Base/Base.h"
-#include "Renderer/RendererViewport.h"
-
-class ApplicationState;
+#include "Renderer/RendererBase.h"
 
 #define OBJECT_RENDERER_MAX_LIGHTS 16
 
-class ObjectRenderer
+class ObjectRenderer : public RendererBase 
 {
 public:
 	ObjectRenderer(ApplicationState* appState);
-	~ObjectRenderer();
+	virtual ~ObjectRenderer();
 
-	void Render(RendererViewport* viewport);
-	void ShowSettings();
-
-private:
-	void ReloadShaders();
+	virtual void Render(RendererViewport* viewport) override;
+	virtual void ShowSettings() override;
 
 private:
-	ApplicationState* m_AppState = nullptr;
-	Shader* m_Shader = nullptr;
+	virtual void ReloadShaders() override;
+
+private:
 	bool m_InvertNormals = false;
+	std::shared_ptr<ShaderStorageBuffer> m_SharedMemoryBuffer;
 };

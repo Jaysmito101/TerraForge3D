@@ -2,16 +2,17 @@
 
 RendererViewport::RendererViewport()
 {
-	this->m_FrameBuffer = new FrameBuffer(512, 512);
+	m_FrameBuffer = std::make_shared<FrameBuffer>(512, 512);
+	m_Width = m_Height = 512;
 }
 
 RendererViewport::~RendererViewport()
 {
-	delete this->m_FrameBuffer;
 }
 
 void RendererViewport::ResizeTo(uint32_t width, uint32_t height)
 {
-	delete this->m_FrameBuffer;
-	this->m_FrameBuffer = new FrameBuffer(width, height);
+	m_Width = width; 
+	m_Height = height;
+	m_FrameBuffer = std::make_shared<FrameBuffer>(width, height);
 }

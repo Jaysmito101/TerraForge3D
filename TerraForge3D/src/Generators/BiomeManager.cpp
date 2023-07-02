@@ -26,6 +26,7 @@ bool BiomeManager::LoadUpResources()
 	}
 	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
 	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
+	m_CustomBaseShape = std::make_shared<BiomeCustomBaseShape>(m_AppState);
 	return true;
 }
 
@@ -58,6 +59,7 @@ void BiomeManager::Resize()
 {
 	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
 	m_Data->Resize(size);
+	m_CustomBaseShape->Resize();
 	m_RequireUpdation = true;
 }
 
@@ -66,8 +68,23 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	if (!m_IsEnabled) return;
 	START_PROFILER();
 	// m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
-	if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
-	else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation) m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture);
+
+	if (!m_CustomBaseShape->IsEnabled() || m_CustomBaseShape->RequiresBaseShapeUpdate())
+	{
+		if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) 
+		{
+			m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
+		}
+		else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation)
+		{
+			m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture);
+		}
+	}
+
+	if (m_CustomBaseShape->IsEnabled())
+	{
+		m_CustomBaseShape->Update(m_Data.get(), m_Data.get(), swapBuffer);
+	}
 
 	m_Data->CopyTo(swapBuffer);	 // temporary will later be 
 	// optimized when filters are implemented
@@ -82,7 +99,7 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 bool BiomeManager::ShowCustomBaseShapeSettings()
 {
 	ImGui::PushID(m_BiomeID.data());
-	ImGui::Text("Yet to be implemented!");
+	BIOME_UI_PROPERTY(m_CustomBaseShape->ShowShettings());
 	ImGui::PopID();
 	return m_RequireUpdation;
 }

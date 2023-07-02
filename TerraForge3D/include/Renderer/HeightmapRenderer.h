@@ -1,25 +1,21 @@
 #pragma once
 
-#include "Base/Base.h"
-#include "Renderer/RendererViewport.h"
 
-class ApplicationState;
+#include "Renderer/RendererBase.h"
 
-class HeightmapRenderer
+class HeightmapRenderer : public RendererBase
 {
 public:
 	HeightmapRenderer(ApplicationState* appState);
-	~HeightmapRenderer();
+	virtual ~HeightmapRenderer();
 
-	void Render(RendererViewport* viewport);
-	void ShowSettings();
-
-private:
-	void ReloadShaders();
+	virtual void Render(RendererViewport* viewport) override;
+	virtual void ShowSettings() override;
 
 private:
-	ApplicationState* m_AppState = nullptr;
-	Shader* m_Shader = nullptr;
+	virtual void ReloadShaders() override;
+
+private:
 	Model* m_ScreenQuad = nullptr;
 	float m_HeightmapMin = -1.0f;
 	float m_HeightmapMax = 1.0f;

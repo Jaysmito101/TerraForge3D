@@ -1,26 +1,21 @@
 #pragma once
 
-#include "Base/Base.h"
-#include "Renderer/RendererViewport.h"
-
-class ApplicationState;
+#include "Renderer/RendererBase.h"
 
 #define S_RENDERER_MAX_LIGHTS 16
 
-class ShadedRenderer
+class ShadedRenderer : public RendererBase
 {
 public:
 	ShadedRenderer(ApplicationState* appState);
-	~ShadedRenderer();
+	virtual ~ShadedRenderer();
 
-	void Render(RendererViewport* viewport);
-	void ShowSettings();
-
-private:
-	void ReloadShaders();
+	virtual void Render(RendererViewport* viewport) override;
+	virtual void ShowSettings() override;
 
 private:
-	ApplicationState* m_AppState = nullptr;
-	Shader* m_Shader = nullptr;
+	virtual void ReloadShaders() override;
+
+private:
 	bool m_InvertNormals = false;
 };

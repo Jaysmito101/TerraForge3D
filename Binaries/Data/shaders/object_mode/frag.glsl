@@ -15,6 +15,12 @@ layout(std430, binding = 0) buffer DataBuffer0
     float data0[];
 };
 
+
+layout(std430, binding = 1) buffer SharedDataBuffer1
+{
+    vec4 sharedData1;
+};
+
 #define MAX_LIGHTS 16
 #define LIGHT_TYPE_DIRECTIONAL 0
 #define LIGHT_TYPE_POINT	   1
@@ -35,6 +41,9 @@ uniform bool u_InvertNormals;
 uniform vec3 u_CameraPosition;
 uniform bool u_EnableSkyLight;
 uniform samplerCube u_IrradianceMap;
+uniform bool u_IsViewportActive;
+uniform vec2 u_MousePos;
+uniform vec2 u_ViewportResolution;
 
 int PixelCoordToDataOffset(int x, int y)
 {
@@ -76,9 +85,17 @@ vec3 aces(vec3 x) {
 
 void main()
 {
+	float distanceVal = length(gl_FragCoord.xy / u_ViewportResolution - u_MousePos);
+
+
 	mat3 TBN = calculateTBN();
 	vec3 normal  = calculateNormal(); normal = normalize(TBN * normal);
 	vec3 outputColor = vec3(0.0f);
+	if(distanceVal <  2 / u_ViewportResolution.x)
+	{
+		sharedData1 = vec4(fragmentInput.texCoord, 0.0f, distanceVal);
+		outputColor = vec3(1, 0,  0.3f);
+	}
 	float diff = 0.0f, spec = 0.0f, atten = 0.0f;
 	for(int i = 0 ; i < u_LightCount ; i ++)
 	{

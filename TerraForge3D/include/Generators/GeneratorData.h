@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <cstdint>
 
 class GeneratorData
@@ -13,6 +14,8 @@ public:
 	void SetData(const void* data, size_t offset = 0, size_t size = 0);
 	bool CopyTo(const GeneratorData* other);
 	float* GetCPUCopy();
+	bool SaveToFile(const std::string& path);
+	bool LoadFromFile(const std::string& path);
 
 private:
 	uint32_t m_RendererID = 0;

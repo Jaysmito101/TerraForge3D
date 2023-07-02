@@ -25,6 +25,7 @@ public:
 	
 	void ExportMeshCurrentTile(std::string path, bool* exporting, int format, bool updateWorkerUpdation = true);
 	void ExportMeshAllTiles(std::string path, bool* exporting, int format);
+	void ExportTextureCurrentTile(std::string path, int format, int bitDepth, bool* exporting);
 
 public:
 	void ShowMeshExportSettings();
@@ -45,6 +46,8 @@ private:
 	std::thread worker_th;
 	std::string statusMessage = "";
 	int exportMeshFormat = 0; 
+	int exportTextureFormat = 0;
+	int exportTextureBitDepth = 0;
 	bool hideExportControls = false;
 	bool isWindowOpen = false;
 	OBJExporter objExporter;
