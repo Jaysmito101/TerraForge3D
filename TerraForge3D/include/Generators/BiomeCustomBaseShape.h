@@ -15,6 +15,16 @@ enum BiomeCustomBaseShapeEditMode
 	BiomeCustomBaseShapeEditMode_Count
 };
 
+struct BiomeCustomBaseShapeDrawSettings
+{
+	float m_BrushSize = 0.1f;
+	float m_BrushStrength = 0.1f;
+	float m_BrushFalloff = 0.1f;
+	float m_BrushPositionX = 0.0f;
+	float m_BrushPositionY = 0.0f;
+	float m_BrushRotation = 0.0f;
+};
+
 class BiomeCustomBaseShape
 {
 public:
@@ -46,9 +56,5 @@ private:
 	std::shared_ptr<GeneratorTexture> m_PreviewTexture;
 	BiomeCustomBaseShapeEditMode m_EditMode = BiomeCustomBaseShapeEditMode_Draw;
 	float m_CalculationTime = 0.0f;
-	struct {
-		float m_BrushSize = 0.1f;
-		float m_BrushStrength = 0.1f;
-		float m_BrushFalloff = 0.1f;
-	} m_DrawSettings;
+	BiomeCustomBaseShapeDrawSettings m_DrawSettings;
 };

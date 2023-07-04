@@ -110,12 +110,35 @@ bool BiomeCustomBaseShape::ShowDrawEditor()
 	if (activeViewport)
 	{
 		auto posOnTerrain = activeViewport->GetPositionOnTerrain();
+		m_DrawSettings.m_BrushPositionX = posOnTerrain.x;
+		m_DrawSettings.m_BrushPositionY = posOnTerrain.y;
+		m_AppState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(&m_DrawSettings);
 		// m_AppState->rendererManager->GetObjectRenderer()->Set
 		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 		{
-			Log("Left mouse button is down");
+			//Log("Left mouse button is down");
 		}
+
+		if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+		{
+			activeViewport->SetControlEnabled(false);
+			if (ImGui::IsKeyDown(ImGuiKey_S))
+			{
+				m_DrawSettings.m_BrushSize += ImGui::GetIO().MouseWheel * 0.1f;
+				m_DrawSettings.m_BrushSize = glm::clamp(m_DrawSettings.m_BrushSize, 0.0f, 2.0f);
+			}
+			else if (ImGui::IsKeyDown(ImGuiKey_F))
+			{
+				m_DrawSettings.m_BrushFalloff += ImGui::GetIO().MouseWheel * 0.1f;
+				m_DrawSettings.m_BrushFalloff = glm::clamp(m_DrawSettings.m_BrushFalloff, 0.0f, 1.0f);
+			}
+		}
+		 
 	}
+
+	ImGui::SliderFloat("Brush Size", &m_DrawSettings.m_BrushSize, 0.0f, 2.0f);
+	ImGui::SliderFloat("Brush Strength", &m_DrawSettings.m_BrushStrength, 0.0f, 1.0f);
+	ImGui::SliderFloat("Brush Fall Off", &m_DrawSettings.m_BrushFalloff, 0.0f, 1.0f);
 
 	return m_RequireUpdation;
 }

@@ -22,6 +22,7 @@ void ViewportManager::Update()
 {
 	if (m_AutoCalculateAspectRatio) m_RendererViewport->m_Camera.aspect = (m_Width / (m_Height + 0.000000001f));
 	if (m_IsVisible) this->m_AppState->rendererManager->Render(this->m_RendererViewport);
+	m_IsActive &= m_IsVisible;
 }
 
 void ViewportManager::Show()
@@ -35,36 +36,38 @@ void ViewportManager::Show()
 	// auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 	// auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 	auto viewportOffset = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMin();
-	m_IsActive = ImGui::IsWindowFocused();
 	ImGui::BeginChild("MainRender");
-	if (ImGui::IsWindowHovered())
+	if (ImGui::IsWindowHovered() )
 	{
 		ImGuiIO io = ImGui::GetIO();
 
-		if (io.MouseDown[ImGuiMouseButton_Middle] && (ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)))
+		if (m_IsControlEnabled)
 		{
-			m_RendererViewport->m_Camera.position[0] += m_MovementSpeed * (- io.MouseDelta.x * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(m_RendererViewport->m_Camera.position[0], m_RendererViewport->m_Camera.position[1], m_RendererViewport->m_Camera.position[2])));
-			m_RendererViewport->m_Camera.position[1] += m_MovementSpeed * (io.MouseDelta.y * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(m_RendererViewport->m_Camera.position[0], m_RendererViewport->m_Camera.position[1], m_RendererViewport->m_Camera.position[2])));
-			m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
-			m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
-		}
-		if (io.MouseDown[ImGuiMouseButton_Middle] && !(ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)))
-		{
-			m_RendererViewport->m_Camera.rotation[0] += io.MouseDelta.x * m_RotationSpeed * 10.0f;
-			m_RendererViewport->m_Camera.rotation[1] += io.MouseDelta.y * m_RotationSpeed * 10.0f;
-			m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
-			m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
-		}
-		if (fabs(io.MouseWheel) > 0.000001f)
-		{
-			m_RendererViewport->m_Camera.position[0] += m_AppState->constants.FRONT.x * m_ZoomSpeed * 0.06f * io.MouseWheel;
-			m_RendererViewport->m_Camera.position[1] += m_AppState->constants.FRONT.y * m_ZoomSpeed * 0.06f * io.MouseWheel;
-			m_RendererViewport->m_Camera.position[2] += m_AppState->constants.FRONT.z * m_ZoomSpeed * 0.06f * io.MouseWheel;
-			m_RendererViewport->m_Scale += m_ZoomSpeed * 0.06f * io.MouseWheel;
-			m_RendererViewport->m_Scale = glm::clamp(m_RendererViewport->m_Scale, 0.0000001f, 1000000.0f);
-		}
+			if (io.MouseDown[ImGuiMouseButton_Middle] && (ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)))
+			{
+				m_RendererViewport->m_Camera.position[0] += m_MovementSpeed * (-io.MouseDelta.x * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(m_RendererViewport->m_Camera.position[0], m_RendererViewport->m_Camera.position[1], m_RendererViewport->m_Camera.position[2])));
+				m_RendererViewport->m_Camera.position[1] += m_MovementSpeed * (io.MouseDelta.y * 0.005f * glm::distance(glm::vec3(0.0f), glm::vec3(m_RendererViewport->m_Camera.position[0], m_RendererViewport->m_Camera.position[1], m_RendererViewport->m_Camera.position[2])));
+				m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
+				m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
+			}
+			if (io.MouseDown[ImGuiMouseButton_Middle] && !(ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)))
+			{
+				m_RendererViewport->m_Camera.rotation[0] += io.MouseDelta.x * m_RotationSpeed * 10.0f;
+				m_RendererViewport->m_Camera.rotation[1] += io.MouseDelta.y * m_RotationSpeed * 10.0f;
+				m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
+				m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
+			}
+			if (fabs(io.MouseWheel) > 0.000001f)
+			{
+				m_RendererViewport->m_Camera.position[0] += m_AppState->constants.FRONT.x * m_ZoomSpeed * 0.06f * io.MouseWheel;
+				m_RendererViewport->m_Camera.position[1] += m_AppState->constants.FRONT.y * m_ZoomSpeed * 0.06f * io.MouseWheel;
+				m_RendererViewport->m_Camera.position[2] += m_AppState->constants.FRONT.z * m_ZoomSpeed * 0.06f * io.MouseWheel;
+				m_RendererViewport->m_Scale += m_ZoomSpeed * 0.06f * io.MouseWheel;
+				m_RendererViewport->m_Scale = glm::clamp(m_RendererViewport->m_Scale, 0.0000001f, 1000000.0f);
+			}
 
-		if(ImGui::IsKeyDown(ImGuiKey_Space) && io.MouseDown[ImGuiMouseButton_Right]) ImGui::OpenPopup((std::string("Viewport Settings##") + std::to_string(this->m_ID)).c_str());
+			if(ImGui::IsKeyDown(ImGuiKey_Space) && io.MouseDown[ImGuiMouseButton_Right]) ImGui::OpenPopup((std::string("Viewport Settings##") + std::to_string(this->m_ID)).c_str());
+		}
 
 		m_RendererViewport->m_MousePosition[0] = m_MousePosX = (ImGui::GetIO().MousePos.x - viewportOffset.x) / m_Width;
 		m_RendererViewport->m_MousePosition[1] = m_MousePosY = (ImGui::GetIO().MousePos.y - viewportOffset.y) / m_Height;
@@ -81,9 +84,12 @@ void ViewportManager::Show()
 	m_Width = imageSize.x; m_Height = imageSize.y;
 	m_RendererViewport->m_AspectRatio = m_Width / (m_Height + 0.000000001f);
 	ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->m_FrameBuffer->GetColorTexture(), imageSize, ImVec2(0, 1), ImVec2(1, 0));
+	m_IsActive = ImGui::IsItemHovered();
 	ImGui::EndChild();
 	this->ShowSettingPopUp();
 	ImGui::End();
+
+	m_IsControlEnabled = true; // temp
 }
 
 void ViewportManager::ShowSettingPopUp()

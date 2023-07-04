@@ -12,13 +12,13 @@ in VertexData
 
 layout(std430, binding = 0) buffer DataBuffer0
 {
-    float data0[];
+	float data0[];
 };
 
 
 layout(std430, binding = 1) buffer SharedDataBuffer1
 {
-    vec4 sharedData1;
+	vec4 sharedData1;
 };
 
 #define MAX_LIGHTS 16
@@ -44,6 +44,8 @@ uniform samplerCube u_IrradianceMap;
 uniform bool u_IsViewportActive;
 uniform vec2 u_MousePos;
 uniform vec2 u_ViewportResolution;
+uniform bool u_RequiresDrawBrush;
+uniform vec4 u_BrushSettings0;
 
 int PixelCoordToDataOffset(int x, int y)
 {
@@ -74,28 +76,32 @@ vec3 calculateNormal()
 }
 
 // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
-vec3 aces(vec3 x) {
-  const float a = 2.51;
-  const float b = 0.03;
-  const float c = 2.43;
-  const float d = 0.59;
-  const float e = 0.14;
-  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+vec3 aces(vec3 x) 
+{
+	const float a = 2.51;
+	const float b = 0.03;
+	const float c = 2.43;
+	const float d = 0.59;
+	const float e = 0.14;
+	return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
 }
 
 void main()
 {
-	float distanceVal = length(gl_FragCoord.xy / u_ViewportResolution - u_MousePos);
 
+	
+	if(u_IsViewportActive)
+	{
+		float distanceVal = length(gl_FragCoord.xy / u_ViewportResolution - u_MousePos);
+		if(distanceVal <  1 / u_ViewportResolution.x)
+		{
+			sharedData1 = vec4(fragmentInput.texCoord, 0.0f, distanceVal);
+		}
+	}
 
 	mat3 TBN = calculateTBN();
 	vec3 normal  = calculateNormal(); normal = normalize(TBN * normal);
-	vec3 outputColor = vec3(0.0f);
-	if(distanceVal <  2 / u_ViewportResolution.x)
-	{
-		sharedData1 = vec4(fragmentInput.texCoord, 0.0f, distanceVal);
-		outputColor = vec3(1, 0,  0.3f);
-	}
+	vec3 outputColor = vec3(0.0f);	
 	float diff = 0.0f, spec = 0.0f, atten = 0.0f;
 	for(int i = 0 ; i < u_LightCount ; i ++)
 	{
@@ -117,5 +123,13 @@ void main()
 	if(u_EnableSkyLight) outputColor = outputColor + irradiance * 0.4f;
 	outputColor = aces(outputColor);
 	outputColor = pow(outputColor, vec3(1.0f/2.2f));
+	if(u_RequiresDrawBrush)
+	{
+		const vec3 brushColor = vec3(1.0f, 0.0f, 0.0f);
+		// u_BrushSettings0.z = radius, u_BrushSettings0.w = hardness
+		float distanceVal = length(fragmentInput.texCoord - u_BrushSettings0.xy);
+		float falloff = smoothstep(u_BrushSettings0.z * (1.0f - u_BrushSettings0.w), u_BrushSettings0.z, distanceVal);
+		outputColor *= mix(brushColor, vec3(1.0), falloff);
+	}
 	FragColor = vec4(outputColor, 1.0f);
 }

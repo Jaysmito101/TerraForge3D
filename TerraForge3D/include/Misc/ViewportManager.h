@@ -20,6 +20,8 @@ public:
 	inline RendererViewport* GetRendererViewport() { return this->m_RendererViewport; }
 	inline bool IsActive() { return this->m_IsActive; }
 	inline const glm::vec2 GetPositionOnTerrain() { return m_IsActive ? glm::vec2(m_RendererViewport->m_PosOnTerrain[0], m_RendererViewport->m_PosOnTerrain[1]) : glm::vec2(-1.0f); }
+	inline bool IsControlEnabled() { return m_IsControlEnabled; }
+	inline void SetControlEnabled(bool enabled) { m_IsControlEnabled = enabled; }
 
 private:
 	void ShowSettingPopUp();
@@ -35,4 +37,5 @@ private:
 	bool m_IsVisible = true;
 	bool m_AutoCalculateAspectRatio = true;
 	bool m_IsActive = false;
+	bool m_IsControlEnabled = true;
 };
