@@ -29,6 +29,7 @@ public:
 	void SetUniform3f(const std::string& name, const glm::vec3& value) { glUniform3f(GetUniformLocation(name), value.x, value.y, value.z); }
 	void SetUniform3f(const std::string& name, float value0, float value1, float value2) { glUniform3f(GetUniformLocation(name), value0, value1, value2); }
 	void SetUniform4f(const std::string& name, const glm::vec4& value) { glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w); }
+	void SetUniform4f(const std::string& name, float value0, float value1, float value2, float value3) { glUniform4f(GetUniformLocation(name), value0, value1, value2, value3); }
 	void SetUniformMat4f(const std::string& name, const glm::mat4& matrix) { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]); }
 	inline int GetNativeShader() { return m_Shader; }
 private:

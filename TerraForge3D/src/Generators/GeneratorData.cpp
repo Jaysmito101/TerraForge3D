@@ -40,6 +40,7 @@ void GeneratorData::SetData(const void* data, size_t offset, size_t size)
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+
 bool GeneratorData::CopyTo(const GeneratorData* other)
 {
 	if (m_Size != other->m_Size) return false;
@@ -52,12 +53,17 @@ bool GeneratorData::CopyTo(const GeneratorData* other)
 float* GeneratorData::GetCPUCopy()
 {
 	float* data = new float[m_Size / sizeof(float)];
+	this->GetData(data, 0, m_Size);
+	return data;
+}
+
+void GeneratorData::GetData(void* data, size_t offset, size_t size)
+{
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
-	float* ptr = (float*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, m_Size, GL_MAP_READ_BIT);
-	memcpy(data, ptr, m_Size);
+	float* ptr = (float*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, offset, size, GL_MAP_READ_BIT);
+	memcpy(data, ptr, size);
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-	return data;
 }
 
 bool GeneratorData::SaveToFile(const std::string& path)
