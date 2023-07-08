@@ -6,7 +6,7 @@ on:
   push:
     branches: [ master, gen3 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, gen3 ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,8 +28,11 @@ jobs:
       - name: Install Libs
         run: sudo apt install mesa-common-dev libxcursor-dev libxrandr-dev libxi-dev libx11-dev libxinerama-dev
         
-      - name: Setup OpenGL
-        uses: openrndr/setup-opengl@v1.1
+      - name: Test glxinfo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-utils xvfb
+          xvfb-run glxinfo
         
       - name: Generate Solution fot Debug
         run: cmake -S ./ -B ./build  -DCMAKE_BUILD_TYPE=Debug
