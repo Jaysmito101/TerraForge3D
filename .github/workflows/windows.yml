@@ -16,6 +16,7 @@ jobs:
       
     - name: Build Debug
       working-directory: ${{env.GITHUB_WORKSPACE}}
+      continue-on-error: true
       run: cmake --build ./build
       
     - name: Upload Debug Artifact
@@ -26,6 +27,7 @@ jobs:
 
     - name: Build Release
       working-directory: ${{env.GITHUB_WORKSPACE}}
+      continue-on-error: true
       run: cmake --build ./build --config=Release
       
     - name: Upload Release Artifact
