@@ -3,11 +3,21 @@
 #include <thread>
 #include <string>
 
+#include "Base/Base.h"
+
+#include "Generators/GeneratorTexture.h"
+
 #include "Exporters/OBJExporter.h"
 #include "Exporters/STLExporter.h"
 #include "Exporters/PLYExporter.h"
 #include "Exporters/GLTFExporter.h"
 #include "Exporters/ColladaExporter.h"
+
+#include "Exporters/RawTextureExporter.h"
+#include "Exporters/ExrTextureExporter.h"
+#include "Exporters/WebpTextureExporter.h"
+#include "Exporters/PngTextureExporter.h"
+
 
 class ApplicationState; 
 class Model;
@@ -33,26 +43,40 @@ public:
 	Mesh* ApplyMeshTransform(Mesh* mesh, float* data);
 	bool ExportMesh(std::string path, Mesh* mesh, int format);
 
-	inline void SetStatusMessage(std::string msg) { this->statusMessage = msg; }
-	inline bool IsWindowOpen() { return this->isWindowOpen; }
-	inline bool* IsWindowOpenPtr() { return &this->isWindowOpen; }
-	inline void SetVisible(bool visible) { this->isWindowOpen = visible; }
+	void UpdateHeightmapVisualizer();
+	float* ApplyHeightmapTextureTransform(float* data, float* minMax);
+	bool ExportHeightmapTexture(std::string path, float* data, int format, int bitDepth, int resolution);
+	
+	
+	inline void SetStatusMessage(std::string msg) { this->m_StatusMessage = msg; }
+	inline bool IsWindowOpen() { return this->m_IsWindowOpen; }
+	inline bool* IsWindowOpenPtr() { return &this->m_IsWindowOpen; }
+	inline void SetVisible(bool visible) { this->m_IsWindowOpen = visible; }
 
 public:
-	float exportProgress = 0.0f;
+	float m_ExportProgress = 0.0f;
 
 private:
-	ApplicationState* appState = nullptr;
-	std::thread worker_th;
-	std::string statusMessage = "";
-	int exportMeshFormat = 0; 
-	int exportTextureFormat = 0;
-	int exportTextureBitDepth = 0;
-	bool hideExportControls = false;
-	bool isWindowOpen = false;
-	OBJExporter objExporter;
-	STLExporter stlExporter;
-	PLYExporter plyExporter;
-	GLTFExporter gltfExporter;
-	ColladaExporter daeExporter;
+	ApplicationState* m_AppState = nullptr;
+	std::string m_StatusMessage = "";
+	int m_ExportMeshFormat = 0;
+	int m_ExportTextureFormat = 0;
+	int m_ExportTextureBitDepth = 0;
+	float m_ExportHeightmapMinMaxHeight[2] = { -1.0f, 1.0f };
+	bool m_HideExportControls = false;
+	bool m_IsWindowOpen = false;
+
+	std::shared_ptr<GeneratorTexture> m_VisualzeTexture;
+	std::shared_ptr<ComputeShader> m_VisualzeShader;
+
+	OBJExporter m_ObjExporter;
+	STLExporter m_StlExporter;
+	PLYExporter m_PlyExporter;
+	GLTFExporter m_GltfExporter;
+	ColladaExporter m_DaeExporter;
+
+	RawTextureExporter m_RawTextureExporter;
+	ExrTextureExporter m_ExrTextureExporter;
+	WebpTextureExporter m_WebpTextureExporter;
+	PngTextureExporter m_PngTextureExporter;
 };

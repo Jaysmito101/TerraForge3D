@@ -34,3 +34,6 @@
 [submodule "TerraForge3D/vendor/fmt"]
 	path = TerraForge3D/vendor/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "TerraForge3D/vendor/tinyexr"]
+	path = TerraForge3D/vendor/tinyexr
+	url = https://github.com/syoyo/tinyexr

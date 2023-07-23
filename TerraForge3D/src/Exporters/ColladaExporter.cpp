@@ -5,9 +5,9 @@
 #include <string>
 #include <sstream>
 
-// This is not really a good way to do this but i dont really want to take the pains
+// This is not really a good way to do this but I dont really want to take the pains
 // of implementing this with a proper XML writer as of now if you are interesed in improving
-// this please go ahead and send a Pull Request
+// this please go ahead and create a Pull Request
 static const std::string PART_0 = R"(<?xml version="1.0" encoding="utf-8"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <asset>

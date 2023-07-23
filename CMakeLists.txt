@@ -19,6 +19,7 @@ include_directories(
     ./TerraForge3D/include
     ./TerraForge3D/include/Base
     ./TerraForge3D/vendor
+    ./TerraForge3D/vendor/tinyexr
     ./TerraForge3D/vendor/avir
     ./TerraForge3D/vendor/delaunator/include
     ./TerraForge3D/vendor/glad/include
@@ -30,6 +31,7 @@ include_directories(
     ./TerraForge3D/vendor/imgui-node-editor
     ./TerraForge3D/vendor/json/single_include/nlohmann
     ./TerraForge3D/vendor/stb
+    ./TerraForge3D/vendor/libpng
     ${OPENSSL_INCLUDE_DIR}
 )
 
