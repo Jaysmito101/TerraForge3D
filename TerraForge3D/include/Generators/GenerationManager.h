@@ -2,6 +2,7 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Generators/BiomeManager.h"
+#include "Generators/BiomeMixer.h"
 #include "Base/Base.h"
 
 class ApplicationState;
@@ -11,6 +12,7 @@ enum SelectedUINodeObjectType
 {
 	SelectedUINodeObjectType_None = 0,
 	SelectedUINodeObjectType_GlobalOptions,
+	SelectedUINodeObjectType_GlobalBiomeMixer,
 	SelectedUINodeObjectType_General,
 	SelectedUINodeObjectType_Filters,
 	SelectedUINodeObjectType_BaseNoise,
@@ -55,6 +57,7 @@ public:
 	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
 	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData.get(); }
 	bool UpdateInternal(const std::string& params = "", void* paramsPtr = nullptr);
+	inline const std::vector<std::shared_ptr<BiomeManager>>& GetBiomeManagers() const { return m_BiomeManagers; }
 
 private:
 	void PullSeedTextureFromActiveMesh();
@@ -67,6 +70,7 @@ private:
 	std::shared_ptr<GeneratorData> m_HeightmapData;
 	std::shared_ptr<GeneratorData> m_SwapBuffer;
 	std::shared_ptr<GeneratorTexture> m_SeedTexture;
+	std::shared_ptr<BiomeMixer> m_BiomeMixer;
 	// ComputeShader* m_BlurrShader = nullptr;
 	std::vector<std::shared_ptr<BiomeManager>> m_BiomeManagers;
 	bool m_IsWindowVisible = true;

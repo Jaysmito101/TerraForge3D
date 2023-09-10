@@ -12,6 +12,7 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = std::make_shared<GeneratorData>();
 	m_SwapBuffer = std::make_shared<GeneratorData>();
+	m_BiomeMixer = std::make_shared<BiomeMixer>(m_AppState);
 	m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
 	m_BiomeManagers.back()->SetName("Default Global");
 
@@ -35,15 +36,19 @@ void GenerationManager::Update()
 bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPtr)
 {
 	auto forceUpdate = (params == "ForceUpdate") || m_RequireUpdation;
+	auto hasAnythingUpdated = false;
 	for (auto biome : m_BiomeManagers)
 	{
 		if (biome->IsUpdationRequired() || forceUpdate)
 		{
 			biome->Update(m_SwapBuffer.get(), m_SeedTexture.get());
+			hasAnythingUpdated = true;
 		}
 	}
-	if(m_BiomeManagers.size() > 0) m_BiomeManagers[0]->GetBiomeData()->CopyTo(m_HeightmapData.get());
-
+	if (hasAnythingUpdated || m_BiomeMixer->RequireUpdation() || forceUpdate)
+	{
+		m_BiomeMixer->Update(m_HeightmapData.get(), m_SwapBuffer.get());
+	}
 	m_RequireUpdation = false;
 	return false;
 }
@@ -81,6 +86,12 @@ void GenerationManager::ShowSettingsInspector()
 		m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_GlobalOptions;
 	}
 
+	if (ImGui::Selectable("Biome Mixer", m_SelectedNodeUI.m_ID == "GlobalBiomeMixer"))
+	{
+		m_SelectedNodeUI.m_ID = "GlobalBiomeMixer";
+		m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_GlobalBiomeMixer;
+	}
+
 	s_TempBoolean = ImGui::TreeNodeEx("Biomes", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
 	ImGui::SameLine();
 	if (ImGui::Button("Add##BiomeAdd"))
@@ -100,6 +111,7 @@ void GenerationManager::ShowSettingsInspector()
 			if (ImGui::Button("Delete"))
 			{
 				m_BiomeManagers.erase(m_BiomeManagers.begin() + i);
+				m_RequireUpdation = true;
 				SetUINodeData(-1, None);
 			}
 			if (s_TempBoolean)
@@ -147,10 +159,11 @@ void GenerationManager::ShowSettingsDetailed()
 	ImGui::Begin("Generation Settings", &m_IsWindowVisible);
 
 	if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_GlobalOptions) ShowSettingsGlobalOptions();
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_General) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowGeneralSettings();
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseShape) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseShapeSettings();
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowCustomBaseShapeSettings();
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseNoiseSettings();
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_GlobalBiomeMixer) m_RequireUpdation = m_BiomeMixer->ShowSettings() || m_RequireUpdation;
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_General) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowGeneralSettings() || m_RequireUpdation;
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseShapeSettings() || m_RequireUpdation;
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowCustomBaseShapeSettings() || m_RequireUpdation;
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseNoiseSettings() || m_RequireUpdation;
 
 	ImGui::End();
 }
