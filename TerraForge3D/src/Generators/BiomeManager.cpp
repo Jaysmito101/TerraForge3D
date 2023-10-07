@@ -49,6 +49,8 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 			break;
 		}
 	}
+
+	this->Resize();
 }
 
 BiomeManager::~BiomeManager()

@@ -16,7 +16,7 @@ void BiomeMixer::Update(GeneratorData* heightmapData, GeneratorData* m_SwapBuffe
 
 	if (biomeManagers.size() > 1)
 	{
-		biomeManagers[1]->GetBiomeData()->CopyTo(heightmapData);
+		biomeManagers[0]->GetBiomeData()->CopyTo(heightmapData);
 	}
 	else {
 		// TODO: Remove this hack
