@@ -97,7 +97,6 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	auto tileSize = 1.0f / (1 << m_ZoomResolution);
 
 	buffer->Bind(0);
-	
 	m_Shader->Bind();
 	
 	// clear the buffer
@@ -126,6 +125,7 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 			m_Shader->SetUniform4f("u_RegionToUpdate", glm::vec4(startPos, endPos));
 			// TODO: [PLAN] do not dispatch based on map tile but texture tile
 			m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+			// m_Shader->SetMemoryBarrier(); // maybe if this is not very required we can skip this
 			m_TilesUsingCount++;
 		}
 	}
@@ -134,6 +134,7 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	m_Shader->SetUniform1i("u_Mode", 2);
 	m_MapVisualzeTexture->BindForCompute(1);
 	m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
+	m_Shader->SetMemoryBarrier();
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }

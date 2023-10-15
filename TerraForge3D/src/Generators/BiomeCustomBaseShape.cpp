@@ -97,6 +97,7 @@ void BiomeCustomBaseShape::Update(GeneratorData* sourceBuffer, GeneratorData* ta
 	m_Shader->SetUniform1f("u_MixFactor", 1.0f);
 	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+	m_Shader->SetMemoryBarrier();
 
 	// m_WorkingDataBuffer->CopyTo(sourceBuffer);
 

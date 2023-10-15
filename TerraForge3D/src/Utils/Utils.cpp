@@ -244,7 +244,6 @@ std::string GetExecutableDir()
 std::string GenerateId(uint32_t length)
 {
 	std::string id;
-	srand((uint32_t)time(NULL));
 
 	for (uint32_t i = 0; i < length; i++)
 	{
