@@ -16,7 +16,7 @@ private:
 	virtual void ReloadShaders() override;
 
 private:
-	Model* m_ScreenQuad = nullptr;
+	std::shared_ptr<Model> m_ScreenQuad = nullptr;
 	float m_HeightmapMin = -1.0f;
 	float m_HeightmapMax = 1.0f;
 };

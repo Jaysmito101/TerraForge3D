@@ -41,9 +41,9 @@ DEMBaseShapeGenerator::DEMBaseShapeGenerator(ApplicationState* appState)
 	//       this might be configurable through UI
 	m_MapVisualzeTexture = std::make_shared<GeneratorTexture>(512, 512);
 
-	const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "dem" PATH_SEPARATOR "map_gen.glsl", &s_TempBool);
-	m_Shader = std::make_shared<ComputeShader>(shaderSource);
-
+	// const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "dem" PATH_SEPARATOR "map_gen.glsl", &s_TempBool);
+	// m_Shader = std::make_shared<ComputeShader>(shaderSource);
+	m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/dem/map_gen");
 }
 
 DEMBaseShapeGenerator::~DEMBaseShapeGenerator()

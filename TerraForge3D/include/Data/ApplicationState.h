@@ -11,6 +11,7 @@
 #include "Renderer/RendererManager.h"
 #include "Misc/Dashboard.h"
 #include "Misc/Style.h"
+#include "Data/ResourceManager.h"
 #include "Platform.h"
 #include "Job/Job.h"
 #include "Job/JobSystem.h"
@@ -107,6 +108,7 @@ public:
 	JobSystem::JobSystem* jobSystem = nullptr;
 	JobSystem::JobManager* jobManager = nullptr;
 	EventManager* eventManager = nullptr;
+	ResourceManager* resourceManager = nullptr;
 
 	struct
 	{

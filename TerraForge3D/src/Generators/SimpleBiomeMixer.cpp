@@ -5,8 +5,9 @@ SimpleBiomeMixer::SimpleBiomeMixer(ApplicationState* appState)
 {
 	m_AppState = appState;
 	m_RequireUpdation = true;
-	const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "biome_mixer" PATH_SEPARATOR "simple_mixer.glsl", &s_TempBool);
-	m_Shader = std::make_shared<ComputeShader>(shaderSource);
+	// const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "biome_mixer" PATH_SEPARATOR "simple_mixer.glsl", &s_TempBool);
+	// m_Shader = std::make_shared<ComputeShader>(shaderSource);
+	m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/biome_mixer/simple_mixer");
 }
 
 SimpleBiomeMixer::~SimpleBiomeMixer()

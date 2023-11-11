@@ -10,7 +10,6 @@ WireframeRenderer::WireframeRenderer(ApplicationState* appState)
 
 WireframeRenderer::~WireframeRenderer()
 {
-	if (m_Shader) delete m_Shader;
 }
 
 void WireframeRenderer::Render(RendererViewport* viewport)
@@ -40,10 +39,5 @@ void WireframeRenderer::ShowSettings()
 
 void WireframeRenderer::ReloadShaders()
 {
-	if (m_Shader) delete m_Shader;
-	bool success = false;
-	m_Shader = new Shader(
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "wireframe_mode" PATH_SEPARATOR "vert.glsl", &success),
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "wireframe_mode" PATH_SEPARATOR "frag.glsl", &success)
-	);
+	m_Shader = m_AppState->resourceManager->LoadShader("wireframe_mode", true);
 }

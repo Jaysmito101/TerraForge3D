@@ -10,7 +10,6 @@ ShadedRenderer::ShadedRenderer(ApplicationState* appState)
 
 ShadedRenderer::~ShadedRenderer()
 {
-	if (m_Shader) delete m_Shader;
 }
 
 void ShadedRenderer::Render(RendererViewport* viewport)
@@ -52,10 +51,5 @@ void ShadedRenderer::ShowSettings()
 
 void ShadedRenderer::ReloadShaders()
 {
-	if (m_Shader) delete m_Shader;
-	bool success = false;
-	m_Shader = new Shader(
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "pbr_mode" PATH_SEPARATOR "vert.glsl", &success),
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "pbr_mode" PATH_SEPARATOR "frag.glsl", &success)
-	);
+	m_Shader = m_AppState->resourceManager->LoadShader("pbr_mode", true);
 }

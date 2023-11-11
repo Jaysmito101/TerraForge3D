@@ -67,7 +67,8 @@ void BiomeBaseShapeGenerator::Load(SerializerNode data)
 	auto inspector = data->GetChildNode("Inspector");
 	if (inspector) m_Inspector->Load(inspector);
 	else Log("Failed to load inspector data for generator: " + m_Name);
-	m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
+	// m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
+	m_Shader = m_AppState->resourceManager->GetComputeShader("BaseShapeGen_" + m_Name, BuildShaderSource());
 	m_RequireUpdation = true;
 }
 
@@ -197,6 +198,7 @@ bool BiomeBaseShapeGenerator::LoadConfig(const std::string& config)
 		return false;
 	}
 	if (!LoadInspectorFromConfig(metaData)) return false;
-	m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
+	// m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
+	m_Shader = m_AppState->resourceManager->GetComputeShader("BaseShapeGen_" + m_Name, BuildShaderSource());
 	return true;
 }

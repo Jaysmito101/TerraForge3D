@@ -20,5 +20,5 @@ protected:
 
 protected:
 	ApplicationState* m_AppState = nullptr;
-	Shader* m_Shader = nullptr;
+	std::shared_ptr<Shader> m_Shader = nullptr;
 };

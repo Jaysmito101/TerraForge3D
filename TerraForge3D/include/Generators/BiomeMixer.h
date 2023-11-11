@@ -25,7 +25,7 @@ public:
 	void Update(GeneratorData* heightmapData, GeneratorData* m_SwapBuffer);
 	bool ShowSettings();
 
-	inline bool RequireUpdation() { return m_RequireUpdation; }
+	inline bool IsUpdationRequired() { return m_RequireUpdation; }
 
 private:
 	ApplicationState* m_AppState = nullptr;

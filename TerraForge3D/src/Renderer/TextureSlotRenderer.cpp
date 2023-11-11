@@ -5,7 +5,7 @@
 TextureSlotRenderer::TextureSlotRenderer(ApplicationState* appState)
 {
 	m_AppState = appState;
-	m_ScreenQuad = new Model("Heightmap-Renderer-Screen-Quad");
+	m_ScreenQuad = std::make_shared<Model>("Heightmap-Renderer-Screen-Quad");
 	m_ScreenQuad->mesh->GenerateScreenQuad();
 	m_ScreenQuad->SetupMeshOnGPU();
 	m_ScreenQuad->UploadToGPU();
@@ -14,8 +14,6 @@ TextureSlotRenderer::TextureSlotRenderer(ApplicationState* appState)
 
 TextureSlotRenderer::~TextureSlotRenderer()
 {
-	delete m_ScreenQuad;
-	if (m_Shader) delete m_Shader;
 }
 
 void TextureSlotRenderer::Render(RendererViewport* viewport)
@@ -43,10 +41,5 @@ void TextureSlotRenderer::ShowSettings()
 
 void TextureSlotRenderer::ReloadShaders()
 {
-	if (m_Shader) delete m_Shader;
-	bool success = false;
-	m_Shader = new Shader(
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "texture_slot_mode" PATH_SEPARATOR "vert.glsl", &success),
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "texture_slot_mode" PATH_SEPARATOR "frag.glsl", &success)
-	);
+	m_Shader = m_AppState->resourceManager->LoadShader("texture_slot_mode", true);
 }

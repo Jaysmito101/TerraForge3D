@@ -1,4 +1,4 @@
-#include "Generators/BiomeCustomBaseShape.h"
+ #include "Generators/BiomeCustomBaseShape.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
 #include "Profiler.h"
@@ -14,8 +14,8 @@ BiomeCustomBaseShape::BiomeCustomBaseShape(ApplicationState* appState)
 	// so its ok for it to be low resolution
 	m_PreviewTexture = std::make_shared<GeneratorTexture>(512, 512);
 
-	const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "custom_base_shape" PATH_SEPARATOR "custom_base_shape.glsl", &s_TempBool);
-	m_Shader = std::make_shared<ComputeShader>(shaderSource);
+	// m_Shader = std::make_shared<ComputeShader>(appState->resourceManager->LoadShaderSource("generation/custom_base_shape/custom_base_shape"));
+	m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/custom_base_shape/custom_base_shape");
 
 
 	m_RequireBaseShapeUpdate = true;

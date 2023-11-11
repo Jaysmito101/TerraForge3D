@@ -67,16 +67,19 @@ private:
 
 private:
 	ApplicationState* m_AppState = nullptr;
+
 	std::shared_ptr<GeneratorData> m_HeightmapData;
 	std::shared_ptr<GeneratorData> m_SwapBuffer;
 	std::shared_ptr<GeneratorTexture> m_SeedTexture;
 	std::shared_ptr<BiomeMixer> m_BiomeMixer;
-	// ComputeShader* m_BlurrShader = nullptr;
+
 	std::vector<std::shared_ptr<BiomeManager>> m_BiomeManagers;
+
 	bool m_IsWindowVisible = true;
 	bool m_UpdationPaused = false;
 	bool m_RequireUpdation = true;
 	bool m_UseSeedFromActiveMesh = false;
+
 	int32_t m_SeedTextureResolution = 256;
 	SelectedUINode m_SelectedNodeUI;
 };

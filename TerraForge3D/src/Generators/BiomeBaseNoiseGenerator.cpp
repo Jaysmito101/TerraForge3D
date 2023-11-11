@@ -7,42 +7,49 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 {
 	m_AppState = appState;
 
-	const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_noise" PATH_SEPARATOR "noise_gen.glsl", &s_TempBool);
-	m_Shader = std::make_shared<ComputeShader>(shaderSource);
+	// const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_noise" PATH_SEPARATOR "noise_gen.glsl", &s_TempBool);
+	// m_Shader = std::make_shared<ComputeShader>(shaderSource);
+	m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/base_noise/noise_gen");
+
 	m_Inspector = std::make_shared<CustomInspector>();
+
 
 	std::fill_n(m_NoiseOctaveStrengths, BIOME_BASE_NOISE_OCTAVE_COUNT, 1.0f);
 	m_NoiseOctaveStrengths[0] = m_NoiseOctaveStrengths[1] = 0.0f;
 
-	m_Inspector->AddIntegerVariable("Seed", 152);
-	m_Inspector->AddSeedWidget("Seed", "Seed");
+	{
 
-	m_Inspector->AddFloatVariable("Influence", 0.5f);
-	m_Inspector->AddSliderWidget("Influence", "Influence", 0.0f, 1.0f);
+		m_Inspector->AddIntegerVariable("Seed", 152);
+		m_Inspector->AddSeedWidget("Seed", "Seed");
 
-	m_Inspector->AddFloatVariable("Strength", 1.0f);
-	m_Inspector->AddDragWidget("Strength", "Strength", 0.0f, 0.0f, 0.01f);
+		m_Inspector->AddFloatVariable("Influence", 0.5f);
+		m_Inspector->AddSliderWidget("Influence", "Influence", 0.0f, 1.0f);
 
-	m_Inspector->AddFloatVariable("Frequency", 0.45f);
-	m_Inspector->AddDragWidget("Frequency", "Frequency", 0.0f, 0.0f, 0.01f);
+		m_Inspector->AddFloatVariable("Strength", 1.0f);
+		m_Inspector->AddDragWidget("Strength", "Strength", 0.0f, 0.0f, 0.01f);
 
-	m_Inspector->AddFloatVariable("Lacunarity", 1.8f);
-	m_Inspector->AddDragWidget("Lacunarity", "Lacunarity", 0.0f, 0.0f, 0.01f);
+		m_Inspector->AddFloatVariable("Frequency", 0.45f);
+		m_Inspector->AddDragWidget("Frequency", "Frequency", 0.0f, 0.0f, 0.01f);
 
-	m_Inspector->AddFloatVariable("Persistence", 0.55f);
-	m_Inspector->AddDragWidget("Persistence", "Persistence", 0.0f, 0.0f, 0.01f);
+		m_Inspector->AddFloatVariable("Lacunarity", 1.8f);
+		m_Inspector->AddDragWidget("Lacunarity", "Lacunarity", 0.0f, 0.0f, 0.01f);
 
-	m_Inspector->AddBoolVariable("AutoUseSeedTexture", true);
-	m_Inspector->AddCheckboxWidget("Auto Use Seed Texture", "AutoUseSeedTexture").SetTooltip("Setting this to true will cause seed texture to be ignored");
+		m_Inspector->AddFloatVariable("Persistence", 0.55f);
+		m_Inspector->AddDragWidget("Persistence", "Persistence", 0.0f, 0.0f, 0.01f);
 
-	m_Inspector->AddVector3Variable("Offset");
-	m_Inspector->AddDragWidget("Offset", "Offset", 0.0f, 0.0f, 0.01f);
+		m_Inspector->AddBoolVariable("AutoUseSeedTexture", true);
+		m_Inspector->AddCheckboxWidget("Auto Use Seed Texture", "AutoUseSeedTexture").SetTooltip("Setting this to true will cause seed texture to be ignored");
 
-	m_Inspector->AddIntegerVariable("MixMethod");
-	m_Inspector->AddDropdownWidget("Mix Method", "MixMethod", { "Add", "Multiply", "Add & Multiply"});
+		m_Inspector->AddVector3Variable("Offset");
+		m_Inspector->AddDragWidget("Offset", "Offset", 0.0f, 0.0f, 0.01f);
 
-	m_Inspector->AddIntegerVariable("TransformFactor", 1);
-	m_Inspector->AddDropdownWidget("Transform Factor", "TransformFactor", { "None", "Slope", "Height" });
+		m_Inspector->AddIntegerVariable("MixMethod");
+		m_Inspector->AddDropdownWidget("Mix Method", "MixMethod", { "Add", "Multiply", "Add & Multiply" });
+
+		m_Inspector->AddIntegerVariable("TransformFactor", 1);
+		m_Inspector->AddDropdownWidget("Transform Factor", "TransformFactor", { "None", "Slope", "Height" });
+
+	}
 }
 
 BiomeBaseNoiseGenerator::~BiomeBaseNoiseGenerator()

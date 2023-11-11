@@ -22,7 +22,7 @@ bool ExrTextureExporter::ExportHeightmap(const std::string& path, float* data, i
 {
 	if (bitDepth != 8 && bitDepth != 16 && bitDepth != 32) return false;
 	if (!progress) progress = &m_Progress; *progress = 0.0f;
-	if (bitDepth)
+	if (bitDepth != 32 && bitDepth != 16)
 	{
 		ShowMessageBox("Exporting to EXR with bit depth other than 32 or 16 is not supported yet!");
 		return false;

@@ -205,6 +205,7 @@ public:
 		appState->jobSystem = new JobSystem::JobSystem(appState);
 		appState->jobManager = new JobSystem::JobManager(appState);
 		appState->eventManager = new EventManager();
+		appState->resourceManager = ResourceManager::GetInstance(appState);
 		appState->dashboard = new Dashboard(appState);
 		appState->generationManager = new GenerationManager(appState);
 		appState->supportersTribute = new SupportersTribute();
@@ -262,6 +263,7 @@ public:
 		delete appState->osLiscences;
 		delete appState->exportManager;
 		delete appState->projectManager;
+		delete appState->resourceManager;
 		// delete appState->serailizer;
 		delete appState;
 	}

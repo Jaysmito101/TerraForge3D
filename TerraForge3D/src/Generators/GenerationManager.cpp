@@ -35,7 +35,7 @@ void GenerationManager::Update()
 
 bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPtr)
 {
-	auto forceUpdate = (params == "ForceUpdate") || m_RequireUpdation;
+	auto forceUpdate = (params == "ForceUpdate");
 	auto hasAnythingUpdated = false;
 	for (auto biome : m_BiomeManagers)
 	{
@@ -45,7 +45,7 @@ bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPt
 			hasAnythingUpdated = true;
 		}
 	}
-	if (hasAnythingUpdated || m_BiomeMixer->RequireUpdation() || forceUpdate)
+	if (hasAnythingUpdated || m_BiomeMixer->IsUpdationRequired() || forceUpdate)
 	{
 		m_BiomeMixer->Update(m_HeightmapData.get(), m_SwapBuffer.get());
 	}
