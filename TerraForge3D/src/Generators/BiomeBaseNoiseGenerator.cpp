@@ -49,6 +49,8 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 		m_Inspector->AddIntegerVariable("TransformFactor", 1);
 		m_Inspector->AddDropdownWidget("Transform Factor", "TransformFactor", { "None", "Slope", "Height" });
 
+		m_Inspector->AddIntegerVariable("SlopeSmoothingRadius", 3);
+		m_Inspector->AddSliderWidget("Slope Smoothing Radius", "SlopeSmoothingRadius", 0, 10).SetRenderOnCondition("TransformFactor", 1);
 	}
 }
 
@@ -102,6 +104,7 @@ void BiomeBaseNoiseGenerator::Update(GeneratorData* sourceBuffer, GeneratorData*
 	m_Shader->SetUniform3f("u_Offset", values.at("Offset").GetVector3());
 	m_Shader->SetUniform1i("u_MixMethod", values.at("MixMethod").GetInt());
 	m_Shader->SetUniform1i("u_TransformFactor", values.at("TransformFactor").GetInt());
+	m_Shader->SetUniform1i("u_SlopeSmoothingRadius", values.at("SlopeSmoothingRadius").GetInt());
 	m_Shader->SetUniform1i("u_Seed", values.at("Seed").GetInt());
 	for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++)
 	{

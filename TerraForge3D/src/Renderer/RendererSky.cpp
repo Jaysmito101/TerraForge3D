@@ -20,11 +20,7 @@ RendererSky::~RendererSky()
 {
 	if (m_SkyboxTextureID > -1) glDeleteTextures(1, &m_SkyboxTextureID);
 	if (m_IrradianceMapTextureID > -1) glDeleteTextures(1, &m_IrradianceMapTextureID);
-	delete m_EquirectToCube;
-	delete m_SpecularMap;
-	delete m_IrradianceMap;
 	delete m_SkyboxModel;
-	delete m_SkyboxShader;
 }
 
 void RendererSky::ShowSettings()
@@ -57,16 +53,10 @@ void RendererSky::Render(RendererViewport* viewport)
 
 void RendererSky::ReloadShaders()
 {
-	if (m_EquirectToCube) delete m_EquirectToCube;
-	if (m_SpecularMap) delete m_SpecularMap;
-	if (m_IrradianceMap) delete m_IrradianceMap;
-	bool tmp = false;
-	m_EquirectToCube = new ComputeShader(ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "equirect_to_cube" PATH_SEPARATOR "compute.glsl", &tmp));
-	m_SpecularMap = new ComputeShader(ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "sky_specular_map" PATH_SEPARATOR "compute.glsl", &tmp));
-	m_IrradianceMap = new ComputeShader(ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "sky_irradiance_map" PATH_SEPARATOR "compute.glsl", &tmp));
-	m_SkyboxShader = new Shader(
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "skybox" PATH_SEPARATOR "vert.glsl", &tmp),
-		ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "skybox" PATH_SEPARATOR "frag.glsl", &tmp));
+	m_EquirectToCube = m_AppState->resourceManager->LoadComputeShader("equirect_to_cube/compute", true);
+	m_SpecularMap = m_AppState->resourceManager->LoadComputeShader("sky_specular_map/compute", true);
+	m_IrradianceMap = m_AppState->resourceManager->LoadComputeShader("sky_irradiance_map/compute", true);
+	m_SkyboxShader = m_AppState->resourceManager->LoadShader("skybox", true);
 }
 
 // From : https://github.com/Nadrin/PBR/blob/master/src/opengl.cpp

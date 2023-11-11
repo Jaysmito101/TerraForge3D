@@ -24,10 +24,10 @@ private:
 
 private:
 	ApplicationState* m_AppState = nullptr;
-	ComputeShader* m_EquirectToCube = nullptr;
-	ComputeShader* m_SpecularMap = nullptr;
-	ComputeShader* m_IrradianceMap = nullptr;
-	Shader* m_SkyboxShader = nullptr;
+	std::shared_ptr<ComputeShader> m_EquirectToCube = nullptr;
+	std::shared_ptr<ComputeShader> m_SpecularMap = nullptr;
+	std::shared_ptr<ComputeShader> m_IrradianceMap = nullptr;
+	std::shared_ptr<Shader> m_SkyboxShader = nullptr;
 	Model* m_SkyboxModel = nullptr;
 	bool m_RenderSky = false;
 	bool m_IsSkyReady = false;
