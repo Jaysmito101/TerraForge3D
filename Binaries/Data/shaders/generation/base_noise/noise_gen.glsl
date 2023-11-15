@@ -30,6 +30,7 @@ uniform vec3 u_Offset;
 uniform float u_NoiseOctaveStrengths[16];
 uniform int u_NoiseOctaveStrengthsCount;
 uniform int u_SlopeSmoothingRadius;
+uniform vec2 u_TransformRange;
 
 //
 // GLSL textureless classic 3D noise "cnoise",
@@ -188,6 +189,8 @@ float calculateSlopeFactor()
 
 	factor /= (u_SlopeSmoothingRadius * 2 + 1) * (u_SlopeSmoothingRadius * 2 + 1);
 
+	factor = smoothstep(u_TransformRange.x, u_TransformRange.y, factor);
+
 	return factor;
 }
 
@@ -216,13 +219,14 @@ void main(void)
 
 
 	if ( u_TransformFactor == 1) n = n * calculateSlopeFactor();
-	else if ( u_TransformFactor == 2) n = clamp(dataSource[offset] * n, 0, 1);
+	else if ( u_TransformFactor == 2) n = n * smoothstep(u_TransformRange.x, u_TransformRange.y, dataSource[offset]);
 
 	n = n * u_Strength * u_Influence;
 
 	if ( u_MixMethod == 0 ) dataTarget[offset] = dataSource[offset] + n;
 	else if ( u_MixMethod == 1 ) dataTarget[offset] = dataSource[offset] * n;
 	else if ( u_MixMethod == 2 ) dataTarget[offset] = dataSource[offset] * n + n;
+	else if ( u_MixMethod == 3 ) dataTarget[offset] = n;
 	else dataTarget[offset] = dataSource[offset];
 
 }
