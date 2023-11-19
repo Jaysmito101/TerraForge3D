@@ -55,7 +55,7 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 		m_Inspector->AddSliderWidget("Slope Sampling Radius", "SlopeSamplingRadius", 1.0, 10.0).SetRenderOnCondition("TransformFactor", 1);
 
 		m_Inspector->AddVector2Variable("TransformRange", { 0.0f, 1.0f });
-		m_Inspector->AddDragWidget("Transform Range", "TransformRange", 0.0f, 0.0f, 0.01f);
+		m_Inspector->AddDragWidget("Transform Range", "TransformRange", 0.0f, 0.0f, 0.001f);
 
 		m_Inspector->AddBoolVariable("UseGaussianPreFilter", false);
 		m_Inspector->AddCheckboxWidget("Use Gaussian Pre Filter", "UseGaussianPreFilter");

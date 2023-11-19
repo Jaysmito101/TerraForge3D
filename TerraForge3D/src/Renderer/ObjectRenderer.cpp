@@ -34,7 +34,7 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IsViewportActive"), (viewport->m_MousePosition[0] >= 0.0f && viewport->m_MousePosition[1] >= 0.0f) ? 1 : 0);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MousePos"), viewport->m_MousePosition[0], viewport->m_MousePosition[1]);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewportResolution"), viewport->m_Width, viewport->m_Height);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_CustomBaseShapeDrawSettings != nullptr ? 1 : 0);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_CustomBaseShapeDrawSettings != nullptr && viewport->m_IsHovered ? 1 : 0);
 	if (m_CustomBaseShapeDrawSettings)
 	{
 		glUniform4f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrushSettings0"), m_CustomBaseShapeDrawSettings->m_BrushPositionX, m_CustomBaseShapeDrawSettings->m_BrushPositionY, m_CustomBaseShapeDrawSettings->m_BrushSize, m_CustomBaseShapeDrawSettings->m_BrushFalloff);
@@ -43,6 +43,8 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 
 	auto& rendererLights = m_AppState->rendererManager->GetRendererLights()->m_RendererLights; auto renderLightsCount = std::min((int)rendererLights.size(), OBJECT_RENDERER_MAX_LIGHTS);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_EnableSkyLight"), (m_AppState->rendererManager->GetRendererLights()->m_UseSkyLight && m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady()) ? GL_TRUE : GL_FALSE);
+	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SkyLightIntensity"), (m_AppState->rendererManager->GetRendererLights()->m_SkyLightIntensity));
+
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap());
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IrradianceMap"), 1);
@@ -59,7 +61,7 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 
 	m_SharedMemoryBuffer->GetData(viewport->m_PosOnTerrain, sizeof(float) * 4);
 
-	m_CustomBaseShapeDrawSettings = nullptr;
+	// m_CustomBaseShapeDrawSettings = nullptr;
 }
 
 void ObjectRenderer::ShowSettings()

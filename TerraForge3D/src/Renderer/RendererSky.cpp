@@ -14,6 +14,9 @@ RendererSky::RendererSky(ApplicationState* appState)
 	m_SkyboxModel->SetupMeshOnGPU();
 	m_SkyboxModel->UploadToGPU();
 	ReloadShaders();
+
+
+	LoadSkyboxTexture(m_AppState->constants.texturesDir + PATH_SEPARATOR "default_sky.hdr");
 }
 
 RendererSky::~RendererSky()
@@ -65,6 +68,8 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	if (path.size() < 3) return false;
 	if (m_SkyboxTextureID > -1) glDeleteTextures(1, &m_SkyboxTextureID);
 	if (m_IrradianceMapTextureID > -1) glDeleteTextures(1, &m_IrradianceMapTextureID); 
+
+	std::cout << "Loading skybox texture : " << path << std::endl;
 
 	int32_t skyboxTextureEquirectWidth = 0, skyboxTextureEquirectHeight = 0;
 	unsigned char* skyboxTextureEquirectData = stbi_load(path.c_str(), &skyboxTextureEquirectWidth, &skyboxTextureEquirectHeight, nullptr, 3);

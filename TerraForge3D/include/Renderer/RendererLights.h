@@ -30,7 +30,8 @@ public:
 
 public:
 	std::vector<RendererLightData> m_RendererLights;
-	bool m_UseSkyLight = false;
+	bool m_UseSkyLight = true;
+	float m_SkyLightIntensity = 0.6f;
 
 private:
 	ApplicationState* m_AppState = nullptr;

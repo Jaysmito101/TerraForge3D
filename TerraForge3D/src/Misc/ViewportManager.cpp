@@ -37,7 +37,7 @@ void ViewportManager::Show()
 	// auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 	auto viewportOffset = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMin();
 	ImGui::BeginChild("MainRender");
-	if (ImGui::IsWindowHovered() )
+	if (m_RendererViewport->m_IsHovered = ImGui::IsWindowHovered())
 	{
 		ImGuiIO io = ImGui::GetIO();
 

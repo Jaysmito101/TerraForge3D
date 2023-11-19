@@ -38,7 +38,7 @@ public:
 	inline const bool IsEnabled() const { return m_IsEnabled; }
 	inline const char* GetBiomeName() const { return m_BiomeName; }
 	inline const float GetCalculationTime() const { return m_CalculationTime; }
-	inline const bool IsUpdationRequired() const { return m_RequireUpdation; }
+	inline const bool IsUpdationRequired() const { return m_RequireUpdation && m_IsEnabled; }
 	inline const bool IsUsingCustomBaseShape() const { return m_UseCustomBaseShape; }
 	inline GeneratorData* GetBiomeData() const { return m_Data.get(); }
 	inline const ImVec4& GetColor() const { return m_Color; }

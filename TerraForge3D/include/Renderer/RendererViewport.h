@@ -33,4 +33,5 @@ public:
 	float m_AspectRatio = 1.0f;
 	float m_MousePosition[2] = { 0.0f, 0.0f };
 	int32_t m_Width = 0, m_Height = 0;
+	bool m_IsHovered = false;
 };

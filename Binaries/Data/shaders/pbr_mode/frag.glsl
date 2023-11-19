@@ -35,6 +35,7 @@ uniform float u_TileSize;
 uniform bool u_InvertNormals;
 uniform vec3 u_CameraPosition;
 uniform bool u_EnableSkyLight;
+uniform float u_SkyLightIntensity;
 uniform samplerCube u_IrradianceMap;
 
 int PixelCoordToDataOffset(int x, int y)
@@ -98,7 +99,7 @@ void main()
 		}
 	}
 	vec3 irradiance = texture(u_IrradianceMap, normal).rgb;
-	if(u_EnableSkyLight) outputColor = outputColor + irradiance * 0.4f;
+	if(u_EnableSkyLight) outputColor = outputColor + irradiance * 0.4f * u_SkyLightIntensity;
 	outputColor = aces(outputColor);
 	outputColor = pow(outputColor, vec3(1.0f/2.2f));
 	FragColor = vec4(outputColor, 1.0f);

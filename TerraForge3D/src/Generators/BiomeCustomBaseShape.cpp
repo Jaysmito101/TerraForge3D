@@ -34,7 +34,7 @@ bool BiomeCustomBaseShape::ShowShettings()
 		ImGui::Text("Time Taken: %f ms", m_CalculationTime);
 	}
 
-	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_Enabled));
+	bool enabledSwitch = (ImGui::Checkbox("Enabled", &m_Enabled));
 
 	if (ImGui::Button("Reload Base Shape"))
 	{
@@ -68,7 +68,7 @@ bool BiomeCustomBaseShape::ShowShettings()
 		ImGui::EndTabBar();
 	}
 
-	return m_RequireUpdation && m_Enabled;
+	return m_RequireUpdation && m_Enabled || enabledSwitch;
 }
 
 void BiomeCustomBaseShape::Update(GeneratorData* sourceBuffer, GeneratorData* targetBuffer, GeneratorData* swapBuffer)

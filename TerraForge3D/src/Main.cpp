@@ -67,6 +67,10 @@ public:
 		appState->generationManager->Update();
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
 
+		// NOTE: This is a temporary hack to fix the brush not working on all viewports
+		appState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(nullptr);
+
+
 
 		// CTRL Shortcuts
 		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))

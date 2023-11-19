@@ -20,6 +20,7 @@ void RendererLights::ShowSettings()
 {
 	ImGui::Text("Light Settings");
 	ImGui::Checkbox("Use Sky Light", &m_UseSkyLight);
+	ImGui::SliderFloat("Sky Light Intensity", &m_SkyLightIntensity, 0.0f, 1.0f);
 	if (ImGui::BeginPopupContextItem())
 	{
 		ImGui::Text("Enabling this will mean using environment lighting from the loaded skybox.");

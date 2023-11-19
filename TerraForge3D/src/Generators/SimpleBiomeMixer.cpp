@@ -40,7 +40,7 @@ void SimpleBiomeMixer::Update(GeneratorData* heightmapData, GeneratorData* m_Swa
 		auto& biomeSettings = m_BiomeSettings[biomeManager->GetBiomeID()];
 		biomeSettingsMap[biomeManager->GetBiomeID()] = biomeSettings;		
 
-		if (!biomeSettings.enabled) continue;
+		if (!biomeSettings.enabled || !biomeManager->IsEnabled()) continue;
 
 		biomeManager->GetBiomeData()->Bind(0);
 		m_Shader->SetUniform1f("u_Strength", biomeSettings.strength);

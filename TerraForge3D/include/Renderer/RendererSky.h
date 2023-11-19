@@ -29,7 +29,7 @@ private:
 	std::shared_ptr<ComputeShader> m_IrradianceMap = nullptr;
 	std::shared_ptr<Shader> m_SkyboxShader = nullptr;
 	Model* m_SkyboxModel = nullptr;
-	bool m_RenderSky = false;
+	bool m_RenderSky = true;
 	bool m_IsSkyReady = false;
 	std::string m_SkyboxTexturePath = "";
 	uint32_t m_SkyboxTextureID = -1;
