@@ -4,23 +4,23 @@
 		{
 			"Name": "Strength",
 			"Type": "Float",
-			"Default": 1.84,
+			"Default": 1.0,
 			"Widget": "Drag",
 			"Sensitivity": 0.01
 		},
 		{
 			"Name": "Scale",
 			"Type": "Float",
-			"Default": 0.04,
+			"Default": 1.0,
 			"Widget": "Drag",
 			"Sensitivity": 0.001
 		},
 		{
 			"Name": "Levels",
 			"Type": "Int",
-			"Default": 2,
+			"Default": 1,
 			"Widget": "Slider",
-			"Constraints": [1.0, 6.0, 0.0, 0.0]
+			"Constraints": [0.0, 6.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Seed",
@@ -164,7 +164,7 @@ float cnoise(vec3 P)
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	seed += u_Offset;
+	seed = (seed + u_Offset) * u_Scale + vec3(u_Seed);
 	float n = 0.0f;
 	for(int i = 0 ; i < u_Levels ; i++)
 	{
@@ -173,8 +173,8 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 			cnoise(seed + vec3(3.0f, 4.0f, 0.0f))
 					);
 	}
-	n = cnoise(seed * u_Scale + vec3(u_Seed));
+	n = cnoise(seed);
 	if(u_AbsoluteValue) n = abs(n);
 	if(u_SquareValue) n = n * n;	
-	return n * u_Strength * 10.0f;
+	return n * u_Strength;
 }

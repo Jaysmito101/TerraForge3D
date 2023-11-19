@@ -31,6 +31,8 @@ uniform float u_NoiseOctaveStrengths[16];
 uniform int u_NoiseOctaveStrengthsCount;
 uniform int u_SlopeSmoothingRadius;
 uniform vec2 u_TransformRange;
+uniform float u_SlopeSamplingRadius;
+uniform bool m_UseGaussianPreFilter;
 
 //
 // GLSL textureless classic 3D noise "cnoise",
@@ -146,31 +148,67 @@ uint PixelCoordToDataOffset(uint x, uint y)
 	return y * u_Resolution + x;
 }
 
-float calculateSlopeFactorAtCoord(uvec2 offsetv2)
+float gaussianSample(uvec2 offset)
 {
-	/*
+	const float filterMask[5][5] = {
+		{ 0.000229, 0.005977, 0.060598, 0.005977, 0.000229 },
+		{ 0.005977, 0.156150, 1.579180, 0.156150, 0.005977 },
+		{ 0.060598, 1.579180, 15.961800, 1.579180, 0.060598 },
+		{ 0.005977, 0.156150, 1.579180, 0.156150, 0.005977 },
+		{ 0.000229, 0.005977, 0.060598, 0.005977, 0.000229 }
+	};
+
+	float sum = 0.0;
+	
+	for (int i = -2; i <= 2; i++)
+	{
+		for (int j = -2; j <= 2; j++)
+		{
+			ivec2 offsetiv2 = ivec2(offset.x + i, offset.y + j);
+			if (offsetiv2.x < 0 || offsetiv2.x >= u_Resolution || offsetiv2.y < 0 || offsetiv2.y >= u_Resolution) continue;
+			sum += dataSource[PixelCoordToDataOffset(offsetiv2.x, offsetiv2.y)] * filterMask[i + 2][j + 2];
+		}
+	}
+
+	return sum;
+}
+
+float calculateSlopeFactorAtCoord(uvec2 offsetb, uvec2 offsetc, float radius)
+{
+	uvec2 offsetv2 = offsetb + offsetc;
+	
 	if (offsetv2.x == 0) offsetv2.x = 1;
 	if (offsetv2.y == 0) offsetv2.y = 1;
 	if (offsetv2.x == u_Resolution - 1) offsetv2.x = u_Resolution - 2;
 	if (offsetv2.y == u_Resolution - 1) offsetv2.y = u_Resolution - 2;
-	*/
+	
 
+	float T = 0.0f, B = 0.0f, L = 0.0f, R = 0.0f;
 
-	float C = dataSource[PixelCoordToDataOffset(offsetv2.x, offsetv2.y)];
-	float T = dataSource[PixelCoordToDataOffset(offsetv2.x, offsetv2.y - 1)];
-	float B = dataSource[PixelCoordToDataOffset(offsetv2.x, offsetv2.y + 1)];
-	float L = dataSource[PixelCoordToDataOffset(offsetv2.x - 1, offsetv2.y)];
-	float R = dataSource[PixelCoordToDataOffset(offsetv2.x + 1, offsetv2.y)];
+	if (m_UseGaussianPreFilter)
+	{
+		T = gaussianSample(offsetv2 + uvec2(0, -1));
+		B = gaussianSample(offsetv2 + uvec2(0, 1));
+		L = gaussianSample(offsetv2 + uvec2(-1, 0));
+		R = gaussianSample(offsetv2 + uvec2(1, 0));
+	}
+	else
+	{
+		T = dataSource[PixelCoordToDataOffset(offsetv2.x, offsetv2.y - 1)];
+		B = dataSource[PixelCoordToDataOffset(offsetv2.x, offsetv2.y + 1)];
+		L = dataSource[PixelCoordToDataOffset(offsetv2.x - 1, offsetv2.y)];
+		R = dataSource[PixelCoordToDataOffset(offsetv2.x + 1, offsetv2.y)];
+	}
 
 	float slopeFactor = 0.0f;
 
 	// calculate the slope factor
+	
+	float dX = (R - L);
+	float dY = (B - T);
+	slopeFactor = sqrt(dX * dX + dY * dY);
 
-	float dX = (R - L) / 2.0f;
-	float dY = (B - T) / 2.0f;
-	 slopeFactor = sqrt(dX * dX + dY * dY);
-
-	return clamp(slopeFactor * u_Resolution, 0.0, 1.0);
+	return slopeFactor * u_Resolution / radius;
 }
 
 float calculateSlopeFactor()
@@ -183,7 +221,7 @@ float calculateSlopeFactor()
 	{
 		for (int j = -u_SlopeSmoothingRadius; j <= u_SlopeSmoothingRadius; j++)
 		{
-			factor += calculateSlopeFactorAtCoord(offsetv2 + uvec2(i, j));
+			factor += calculateSlopeFactorAtCoord(offsetv2, uvec2(vec2(i, j) * u_SlopeSamplingRadius), u_SlopeSamplingRadius);
 		}
 	}
 
@@ -205,7 +243,7 @@ void main(void)
 	{
 		seed = texture(u_SeedTexture, uv).rgb; 
 	}
-	seed = seed * u_Frequency + u_Offset + vec3(u_Seed);
+	seed = seed * u_Frequency + u_Offset + vec3(u_Seed % 100);
 
 	float n = 0.0f;
 	float frequency = 1.0f;
@@ -225,7 +263,7 @@ void main(void)
 
 	if ( u_MixMethod == 0 ) dataTarget[offset] = dataSource[offset] + n;
 	else if ( u_MixMethod == 1 ) dataTarget[offset] = dataSource[offset] * n;
-	else if ( u_MixMethod == 2 ) dataTarget[offset] = dataSource[offset] * n + n;
+	else if ( u_MixMethod == 2 ) dataTarget[offset] = dataSource[offset] * n + dataSource[offset];
 	else if ( u_MixMethod == 3 ) dataTarget[offset] = n;
 	else dataTarget[offset] = dataSource[offset];
 

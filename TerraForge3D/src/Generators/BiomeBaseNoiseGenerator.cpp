@@ -18,7 +18,6 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 	m_NoiseOctaveStrengths[0] = m_NoiseOctaveStrengths[1] = 0.0f;
 
 	{
-
 		m_Inspector->AddIntegerVariable("Seed", 152);
 		m_Inspector->AddSeedWidget("Seed", "Seed");
 
@@ -44,16 +43,22 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 		m_Inspector->AddDragWidget("Offset", "Offset", 0.0f, 0.0f, 0.01f);
 
 		m_Inspector->AddIntegerVariable("MixMethod");
-		m_Inspector->AddDropdownWidget("Mix Method", "MixMethod", { "Add", "Multiply", "Add & Multiply", "Set" });
+		m_Inspector->AddDropdownWidget("Mix Method", "MixMethod", { "Add", "Multiply", "Add & Multiply", "Set", "None"});
 
 		m_Inspector->AddIntegerVariable("TransformFactor", 1);
 		m_Inspector->AddDropdownWidget("Transform Factor", "TransformFactor", { "None", "Slope", "Height" });
 
 		m_Inspector->AddIntegerVariable("SlopeSmoothingRadius", 3);
-		m_Inspector->AddSliderWidget("Slope Smoothing Radius", "SlopeSmoothingRadius", 0, 10).SetRenderOnCondition("TransformFactor", 1);
+		m_Inspector->AddSliderWidget("Slope Smoothing Radius", "SlopeSmoothingRadius", 0, 20).SetRenderOnCondition("TransformFactor", 1);
+
+		m_Inspector->AddFloatVariable("SlopeSamplingRadius", 3);
+		m_Inspector->AddSliderWidget("Slope Sampling Radius", "SlopeSamplingRadius", 1.0, 10.0).SetRenderOnCondition("TransformFactor", 1);
 
 		m_Inspector->AddVector2Variable("TransformRange", { 0.0f, 1.0f });
 		m_Inspector->AddDragWidget("Transform Range", "TransformRange", 0.0f, 0.0f, 0.01f);
+
+		m_Inspector->AddBoolVariable("UseGaussianPreFilter", false);
+		m_Inspector->AddCheckboxWidget("Use Gaussian Pre Filter", "UseGaussianPreFilter");
 	}
 }
 
@@ -110,6 +115,8 @@ void BiomeBaseNoiseGenerator::Update(GeneratorData* sourceBuffer, GeneratorData*
 	m_Shader->SetUniform1i("u_SlopeSmoothingRadius", values.at("SlopeSmoothingRadius").GetInt());
 	m_Shader->SetUniform2f("u_TransformRange", values.at("TransformRange").GetVector2());
 	m_Shader->SetUniform1i("u_Seed", values.at("Seed").GetInt());
+	m_Shader->SetUniform1f("u_SlopeSamplingRadius", values.at("SlopeSamplingRadius").GetFloat());
+	m_Shader->SetUniform1i("u_UseGaussianPreFilter", values.at("UseGaussianPreFilter").GetInt());
 	for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++)
 	{
 		m_Shader->SetUniform1f("u_NoiseOctaveStrengths[" + std::to_string(i) + "]", m_NoiseOctaveStrengths[i]);
