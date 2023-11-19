@@ -27,6 +27,7 @@ bool BiomeManager::LoadUpResources()
 	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
 	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
 	m_CustomBaseShape = std::make_shared<BiomeCustomBaseShape>(m_AppState);
+	m_MaskEditor = std::make_shared<MaskEditor>(m_AppState);
 	return true;
 }
 
@@ -62,6 +63,7 @@ void BiomeManager::Resize()
 	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
 	m_Data->Resize(size);
 	m_CustomBaseShape->Resize();
+	m_MaskEditor->Resize(m_AppState->mainMap.tileResolution);
 	m_RequireUpdation = true;
 }
 
@@ -151,6 +153,10 @@ bool BiomeManager::ShowGeneralSettings()
 	ImGui::InputText("Biome Name", m_BiomeName, sizeof(m_BiomeName));
 	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
 	ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color));
+
+	BIOME_UI_PROPERTY(m_MaskEditor->ShowSettings());
+
+
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
 		ImGui::Text("Time Taken: %f", m_CalculationTime);

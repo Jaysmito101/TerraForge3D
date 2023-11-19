@@ -6,6 +6,7 @@
 #include "Generators/BiomeCustomBaseShape.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/MaskEditor.h"
 #include "Base/Base.h"
 
 class ApplicationState;
@@ -64,6 +65,8 @@ private:
 	BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
 	std::vector<int> m_Filters;
 	std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
+
+	std::shared_ptr<MaskEditor> m_MaskEditor;
 
 	std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
 	std::shared_ptr<BiomeBaseNoiseGenerator> m_BaseNoiseGenerator;
