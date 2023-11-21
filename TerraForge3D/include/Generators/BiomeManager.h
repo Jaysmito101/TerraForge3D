@@ -39,7 +39,7 @@ public:
 	inline const bool IsEnabled() const { return m_IsEnabled; }
 	inline const char* GetBiomeName() const { return m_BiomeName; }
 	inline const float GetCalculationTime() const { return m_CalculationTime; }
-	inline const bool IsUpdationRequired() const { return m_RequireUpdation && m_IsEnabled; }
+	inline const bool IsUpdationRequired() const { return m_RequireUpdation; }
 	inline const bool IsUsingCustomBaseShape() const { return m_UseCustomBaseShape; }
 	inline GeneratorData* GetBiomeData() const { return m_Data.get(); }
 	inline const ImVec4& GetColor() const { return m_Color; }
@@ -47,6 +47,7 @@ public:
 	inline const std::vector<int>& GetFilters() const { return m_Filters; }
 	inline const std::string& GetBiomeID() const { return m_BiomeID; }
 	inline void SetName(const std::string& name) { strcpy(m_BiomeName, name.c_str()); }
+	inline GeneratorTexture* GetMaskTexture() const { return m_MaskEditor->GetTexture(); }
 
 	bool AddBaseShapeGenerator(const std::string& config);
 	bool LoadUpResources();

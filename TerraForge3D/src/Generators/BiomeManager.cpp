@@ -27,7 +27,7 @@ bool BiomeManager::LoadUpResources()
 	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
 	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
 	m_CustomBaseShape = std::make_shared<BiomeCustomBaseShape>(m_AppState);
-	m_MaskEditor = std::make_shared<MaskEditor>(m_AppState);
+	m_MaskEditor = std::make_shared<MaskEditor>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
 	return true;
 }
 
@@ -152,7 +152,10 @@ bool BiomeManager::ShowGeneralSettings()
 	ImGui::PushID(m_BiomeID.data());
 	ImGui::InputText("Biome Name", m_BiomeName, sizeof(m_BiomeName));
 	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
-	ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color));
+	if (ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color)))
+	{
+		m_MaskEditor->SetVizColor(m_Color.x, m_Color.y, m_Color.z);
+	}
 
 	BIOME_UI_PROPERTY(m_MaskEditor->ShowSettings());
 

@@ -34,10 +34,19 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IsViewportActive"), (viewport->m_MousePosition[0] >= 0.0f && viewport->m_MousePosition[1] >= 0.0f) ? 1 : 0);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MousePos"), viewport->m_MousePosition[0], viewport->m_MousePosition[1]);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewportResolution"), viewport->m_Width, viewport->m_Height);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_CustomBaseShapeDrawSettings != nullptr && viewport->m_IsHovered ? 1 : 0);
-	if (m_CustomBaseShapeDrawSettings)
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_DrawBrushSettings && viewport->m_IsHovered);	
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_DrawMask"), m_DrawBrushSettings && m_DrawBrushSettings->m_MaskTexture != -1);
+	if (m_DrawBrushSettings)
 	{
-		glUniform4f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrushSettings0"), m_CustomBaseShapeDrawSettings->m_BrushPositionX, m_CustomBaseShapeDrawSettings->m_BrushPositionY, m_CustomBaseShapeDrawSettings->m_BrushSize, m_CustomBaseShapeDrawSettings->m_BrushFalloff);
+		glUniform4f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrushSettings0"), m_DrawBrushSettings->m_BrushPositionX, m_DrawBrushSettings->m_BrushPositionY, m_DrawBrushSettings->m_BrushSize, m_DrawBrushSettings->m_BrushFalloff);
+		glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskColor"), m_DrawBrushSettings->m_MaskColor.x, m_DrawBrushSettings->m_MaskColor.y, m_DrawBrushSettings->m_MaskColor.z);
+
+		if (m_DrawBrushSettings->m_MaskTexture != -1)
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, m_DrawBrushSettings->m_MaskTexture);
+			glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskTexture"), 2);
+		}
 	}
 
 

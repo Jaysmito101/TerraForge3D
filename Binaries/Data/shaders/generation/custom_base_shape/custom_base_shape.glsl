@@ -33,7 +33,6 @@ uint PixelCoordToDataOffset(uint x, uint y)
 	return y * u_Resolution + x;
 }
 
-
 void transferData()
 {
 	uvec2 offsetv2 = gl_GlobalInvocationID.xy;

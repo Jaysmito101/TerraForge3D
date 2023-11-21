@@ -11,6 +11,7 @@ struct SimpleBiomeMixerSettings
 {
 	bool enabled = true;
 	float strength = 1.0f;
+	bool useBiomeMask = false;
 };
 
 class SimpleBiomeMixer

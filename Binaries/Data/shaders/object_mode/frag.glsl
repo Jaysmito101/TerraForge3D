@@ -47,6 +47,9 @@ uniform vec2 u_MousePos;
 uniform vec2 u_ViewportResolution;
 uniform bool u_RequiresDrawBrush;
 uniform vec4 u_BrushSettings0;
+uniform vec3 u_MaskColor;
+uniform bool u_DrawMask;
+uniform sampler2D u_MaskTexture;
 
 int PixelCoordToDataOffset(int x, int y)
 {
@@ -124,6 +127,14 @@ void main()
 	if(u_EnableSkyLight) outputColor = outputColor + irradiance * 0.4f * u_SkyLightIntensity;
 	outputColor = aces(outputColor);
 	outputColor = pow(outputColor, vec3(1.0f/2.2f));
+
+
+	if (u_DrawMask)
+	{
+		vec3 maskColor = texture(u_MaskTexture, fragmentInput.texCoord).rgb;
+		outputColor *= (maskColor.r * u_MaskColor + 0.1f);
+	}
+
 	if(u_RequiresDrawBrush)
 	{
 		const vec3 brushColor = vec3(1.0f, 0.0f, 0.0f);
@@ -131,6 +142,9 @@ void main()
 		float distanceVal = length(fragmentInput.texCoord - u_BrushSettings0.xy);
 		float falloff = smoothstep(u_BrushSettings0.z * (1.0f - u_BrushSettings0.w), u_BrushSettings0.z, distanceVal);
 		outputColor *= mix(brushColor, vec3(1.0), falloff);
+	
 	}
+
+
 	FragColor = vec4(outputColor, 1.0f);
 }

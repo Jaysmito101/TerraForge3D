@@ -6,6 +6,7 @@
 #include "Generators/GeneratorTexture.h"
 #include "Exporters/Serializer.h"
 #include "Misc/CustomInspector.h"
+#include "Renderer/ObjectRenderer.h"
 
 class ApplicationState;
 
@@ -13,17 +14,6 @@ enum BiomeCustomBaseShapeEditMode
 {
 	BiomeCustomBaseShapeEditMode_Draw,
 	BiomeCustomBaseShapeEditMode_Count
-};
-
-struct BiomeCustomBaseShapeDrawSettings
-{
-	float m_BrushSize = 0.2f;
-	float m_BrushStrength = 0.5f;
-	float m_BrushFalloff = 0.5f;
-	float m_BrushPositionX = 0.0f;
-	float m_BrushPositionY = 0.0f;
-	float m_BrushRotation = 0.0f;
-	int m_BrushMode = 0;
 };
 
 class BiomeCustomBaseShape
@@ -58,5 +48,5 @@ private:
 	std::shared_ptr<GeneratorTexture> m_PreviewTexture;
 	BiomeCustomBaseShapeEditMode m_EditMode = BiomeCustomBaseShapeEditMode_Draw;
 	float m_CalculationTime = 0.0f;
-	BiomeCustomBaseShapeDrawSettings m_DrawSettings;
+	DrawBrushSettings m_DrawSettings;
 };

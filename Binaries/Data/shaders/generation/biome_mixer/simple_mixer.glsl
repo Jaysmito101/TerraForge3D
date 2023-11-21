@@ -18,6 +18,8 @@ layout(std430, binding = 1) buffer DataTargetBuffer
 uniform int u_Resolution;
 uniform int u_Mode;
 uniform float u_Strength;
+uniform bool u_UseBiomeMask;
+uniform sampler2D u_BiomeMask;
 
 uint PixelCoordToDataOffset(uint x, uint y)
 {
@@ -40,7 +42,14 @@ void main(void)
 	}
 	else if (u_Mode == 1)
 	{
-		dataTarget[offset] = dataTarget[offset] + u_Strength * dataSource[offset];
+		float factor = 1.0f;
+		if (u_UseBiomeMask)
+		{
+			vec2 uv = offsetv2 / float(u_Resolution);
+			factor = texture(u_BiomeMask, uv).x;
+		}
+
+		dataTarget[offset] = dataTarget[offset] + u_Strength * dataSource[offset] * factor;
 	}
 }
 

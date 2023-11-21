@@ -39,11 +39,17 @@ void SimpleBiomeMixer::Update(GeneratorData* heightmapData, GeneratorData* m_Swa
 		if (settings == m_BiomeSettings.end())  m_BiomeSettings[biomeManager->GetBiomeID()] = SimpleBiomeMixerSettings();
 		auto& biomeSettings = m_BiomeSettings[biomeManager->GetBiomeID()];
 		biomeSettingsMap[biomeManager->GetBiomeID()] = biomeSettings;		
-
-		if (!biomeSettings.enabled || !biomeManager->IsEnabled()) continue;
+		std::cout << biomeManager->GetBiomeName() << " " << biomeSettings.enabled << " " << biomeManager->IsEnabled() << std::endl;
+		if (!(biomeSettings.enabled && biomeManager->IsEnabled())) continue;
 
 		biomeManager->GetBiomeData()->Bind(0);
 		m_Shader->SetUniform1f("u_Strength", biomeSettings.strength);
+		m_Shader->SetUniform1i("u_UseBiomeMask", biomeSettings.useBiomeMask);
+		if (biomeSettings.useBiomeMask)
+		{
+			biomeManager->GetMaskTexture()->Bind(3);
+			m_Shader->SetUniform1i("u_BiomeMask", 3);
+		}
 		m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
 		m_Shader->SetMemoryBarrier();
 	}
@@ -75,6 +81,7 @@ bool SimpleBiomeMixer::ShowSettings()
 
 			BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &biomeSettings.enabled));
 			BIOME_UI_PROPERTY(ImGui::SliderFloat("Strength", &biomeSettings.strength, 0.0f, 1.0f));
+			BIOME_UI_PROPERTY(ImGui::Checkbox("Use Biome Mask", &biomeSettings.useBiomeMask));
 		}
 
 		ImGui::PopID();
