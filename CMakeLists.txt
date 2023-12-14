@@ -73,6 +73,9 @@ if(WIN32)
     )
 endif()
 
+if(APPLE)
+    target_link_libraries(terraforge3d "-framework Security")
+endif()
 
 target_link_libraries(terraforge3d OpenSSL::SSL)
 target_link_libraries(terraforge3d OpenSSL::Crypto)
