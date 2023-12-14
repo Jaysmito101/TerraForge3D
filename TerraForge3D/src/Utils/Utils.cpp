@@ -13,6 +13,7 @@
 #elif __linux__
 #include <inttypes.h>
 #include <unistd.h>
+#include <linux/limits.h>   // PATH_MAX
 #define __int64 int64_t
 #define _close close
 #define _read read
@@ -36,7 +37,6 @@
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
 #include <unistd.h>         // readlink
-#include <linux/limits.h>   // PATH_MAX
 #define MAX_PATH PATH_MAX
 #else
 #include <atlstr.h>
