@@ -5,6 +5,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project(TerraForge3D C CXX)
 
+if(APPLE)
+    set(EXECUTABLE_NAME "tf3d")
+else()
+    set(EXECUTABLE_NAME "terraforge3d")
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REUIRED True)
 
@@ -56,9 +62,9 @@ file(GLOB_RECURSE SOURCES
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_glfw.cpp)
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_opengl3.cpp)
 
-add_executable(terraforge3d ${SOURCES})
+add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
-target_link_libraries(terraforge3d 
+target_link_libraries(${EXECUTABLE_NAME} 
     glfw
     ${GLFW_LIBRARIES}
     ${OPENGL_LIBRARIES}
@@ -67,17 +73,20 @@ target_link_libraries(terraforge3d
 )
 
 if(WIN32)
-    target_compile_definitions(terraforge3d 
+    target_compile_definitions(${EXECUTABLE_NAME} 
         PUBLIC _CRT_SECURE_NO_WARNINGS
         PUBLIC TERR3D_WIN32
     )
 endif()
 
+if(APPLE)
+    target_link_libraries(${EXECUTABLE_NAME} "-framework Security")
+endif()
 
-target_link_libraries(terraforge3d OpenSSL::SSL)
-target_link_libraries(terraforge3d OpenSSL::Crypto)
-target_link_libraries(terraforge3d fmt::fmt)
-target_link_libraries(terraforge3d webp)
+target_link_libraries(${EXECUTABLE_NAME} OpenSSL::SSL)
+target_link_libraries(${EXECUTABLE_NAME} OpenSSL::Crypto)
+target_link_libraries(${EXECUTABLE_NAME} fmt::fmt)
+target_link_libraries(${EXECUTABLE_NAME} webp)
 
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.12.25835)
     set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
