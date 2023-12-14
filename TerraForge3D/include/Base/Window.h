@@ -25,7 +25,7 @@ struct ClearColor
 class Window
 {
 public:
-	Window(std::string title);
+	Window(std::string title="Window");
 	~Window();
 
 	void SetShouldCloseCallback(EventFn callbackFunction);
