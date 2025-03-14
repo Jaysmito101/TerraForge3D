@@ -55,9 +55,9 @@ NodeOutput HillNode::Evaluate(NodeInputParam input, NodeEditorPin *pin)
 
 void HillNode::Load(nlohmann::json data)
 {
-	pos[0] = data["posX"];
-	pos[1] = data["posY"];
-	pos[2] = data["posZ"];
+	pos[0] = data["hillPosX"];
+	pos[1] = data["hillPosY"];
+	pos[2] = data["hillPosZ"];
 	height = data["height"];
 	radius = data["radius"];
 	p = data["p"];
@@ -67,9 +67,9 @@ nlohmann::json HillNode::Save()
 {
 	nlohmann::json data;
 	data["type"] = MeshNodeEditor::MeshNodeType::Hill;
-	data["posX"] = pos[0];
-	data["posY"] = pos[1];
-	data["posZ"] = pos[2];
+	data["hillPosX"] = pos[0];
+	data["hillPosY"] = pos[1];
+	data["hillPosZ"] = pos[2];
 	data["height"] = height;
 	data["radius"] = radius;
 	data["p"] = p;
