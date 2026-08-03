@@ -22,11 +22,19 @@ DEMBaseShapeGenerator::DEMBaseShapeGenerator(ApplicationState* appState)
 	m_TerrainRGBDataCacheFileFormat = m_TerrainRGBDataCacheDir + "{}_{}_{}.webp";
 
 	m_APIKeyInput[0] = '\0';
-	if (PathExist(m_APIKeyConfigPath))
+	bool loadedFromConfig = false;
+	if (m_AppState->configManager != nullptr) {
+		loadedFromConfig = m_AppState->configManager->GetString("apiKeys", "maptilerCloud", m_APIKey);
+	}
+
+	if (!loadedFromConfig && PathExist(m_APIKeyConfigPath))
 	{
 		m_APIKey = ReadShaderSourceFile(m_APIKeyConfigPath, &s_TempBool);
-		strcpy(m_APIKeyInput, m_APIKey.c_str());
+		if (!m_APIKey.empty() && m_AppState->configManager != nullptr) { 
+			m_AppState->configManager->SetString("apiKeys", "maptilerCloud", m_APIKey);
+		}
 	}	
+	std::snprintf(m_APIKeyInput, sizeof(m_APIKeyInput), "%s", m_APIKey.c_str());
 	
 	m_LoadingTexture = std::make_shared<Texture2D>(m_AppState->constants.texturesDir + PATH_SEPARATOR "loading.png", false);
 	m_NullTexture = std::make_shared<Texture2D>(m_AppState->constants.texturesDir + PATH_SEPARATOR "black.jpg", false);
@@ -58,11 +66,18 @@ bool DEMBaseShapeGenerator::ShowSettings()
 	ImGui::InputText("MapTiler Cloud API Key", m_APIKeyInput, 1024);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Create or copy a key from your MapTiler Cloud account: cloud.maptiler.com/account/keys/");
-	if (m_APIKey != m_APIKeyInput && strlen(m_APIKeyInput) > 0 && ImGui::Button("Apply"))
+	ImGui::TextDisabled("Saved in the TerraForge3D user config, not in project files.");
+	if (m_APIKey != m_APIKeyInput && m_APIKeyInput[0] != '\0' && ImGui::Button("Apply"))
 	{
 		m_APIKey = m_APIKeyInput;
-		// save the api key
-		SaveToFile(m_APIKeyConfigPath, m_APIKey);
+		const bool savedInConfig = m_AppState->configManager != nullptr
+			&& m_AppState->configManager->SetString("apiKeys", "maptilerCloud", m_APIKey);
+		if (!savedInConfig)
+		{
+			// Keep a fallback for unusual startup/config-write failures.
+			SaveToFile(m_APIKeyConfigPath, m_APIKey);
+			TF3D_LOG_WARN("Could not save the MapTiler key in the user config store; saved the legacy DEM key file instead.");
+		}
 		m_RequireUpdation = true;
 	}
 	if (m_APIKey.empty())
