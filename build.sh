@@ -2,49 +2,54 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$SCRIPT_DIR"
 BUILD_ROOT="$ROOT_DIR/build"
 
 COMMAND="help"
 CONFIGURATION="Debug"
-GENERATOR_INPUT="Ninja"
+GENERATOR_INPUT="ninja"
+ARCHITECTURE="x64"
 BUILD_DIR=""
 NO_SETUP=0
 RECONFIGURE=0
 CMAKE_ARGS=()
 
 usage() {
-    cat <<'EOF'
+    cat <<EOF
 TerraForge3D build helper for macOS
 
 Usage:
-  ./scripts/terraforge.sh setup
-  ./scripts/terraforge.sh configure --generator ninja --configuration Debug
-  ./scripts/terraforge.sh build --generator ninja --configuration Release
-  ./scripts/terraforge.sh run --generator ninja --configuration Debug
-  ./scripts/terraforge.sh clean --generator ninja
-  ./scripts/terraforge.sh all --generator make --configuration Release
+  ./build.sh setup
+  ./build.sh configure --generator ninja --configuration Debug
+  ./build.sh build --generator ninja --configuration Release
+  ./build.sh run --generator ninja --configuration Debug
+  ./build.sh clean --generator ninja
+  ./build.sh all --generator make --configuration Release
 
 Commands:
-  setup       Initialize and update all git submodules.
+  setup       Initialize and update all Git submodules.
   configure   Generate the selected CMake build tree.
   build       Configure when needed, then build terraforge3d.
   run         Build when needed, then run terraforge3d.
   clean       Remove the selected build tree.
   all         Run setup, configure, and build.
 
-Options:
-  --generator ninja|make|xcode       Default: ninja
-  --configuration Debug|Release|RelWithDebInfo|MinSizeRel
-  --build-dir <path>                Override it inside the root build directory
-  --no-setup                        Skip automatic submodule setup
-  --reconfigure                     Force CMake regeneration
-  --cmake-arg <arg>                 Pass an additional argument to CMake
+Options (defaults are shown in brackets):
+  -g, --generator <name>       visualstudio, ninja, make, or xcode [ninja]
+  -c, --configuration <name>   Debug, Release, RelWithDebInfo, or MinSizeRel [Debug]
+  -a, --architecture <name>    x64 or win32; Visual Studio only [x64]
+      --build-dir <path>       Custom directory inside build/ [auto-selected]
+      --no-setup                Skip automatic submodule setup
+      --reconfigure             Force CMake regeneration
+      --cmake-arg <arg>         Pass an additional argument to CMake
 
-Build trees:
-  build/macos.ninja
-  build/macos.make
-  build/compile_commands.json       clangd database when supported
+Default build trees:
+  build/macos.ninja.$CONFIGURATION/
+  build/macos.make.$CONFIGURATION/
+  build/macos.xcode.$CONFIGURATION/
+
+Other output:
+  build/compile_commands.json  Root clangd database when supported
 EOF
 }
 
@@ -88,10 +93,18 @@ select_generator() {
             GENERATOR_ID="xcode"
             MULTI_CONFIG=1
             ;;
-        visualstudio|"visual studio")
+        visualstudio|visual-studio|"visual studio")
             die "Visual Studio is not available on macOS. Use --generator ninja, make, or xcode."
             ;;
         *) die "Unsupported generator: $GENERATOR_INPUT" ;;
+    esac
+}
+
+normalize_architecture() {
+    case "$(lowercase "$ARCHITECTURE")" in
+        x64) ARCHITECTURE="x64" ;;
+        win32) ARCHITECTURE="Win32" ;;
+        *) die "Unsupported architecture: $ARCHITECTURE" ;;
     esac
 }
 
@@ -123,6 +136,11 @@ parse_arguments() {
             -g|--generator)
                 [[ $# -ge 2 ]] || die "$1 requires a value"
                 GENERATOR_INPUT="$2"
+                shift 2
+                ;;
+            -a|--architecture)
+                [[ $# -ge 2 ]] || die "$1 requires a value"
+                ARCHITECTURE="$2"
                 shift 2
                 ;;
             --build-dir)
@@ -241,9 +259,10 @@ clean_project() {
 parse_arguments "$@"
 normalize_configuration
 select_generator
+normalize_architecture
 
 if [[ -z "$BUILD_DIR" ]]; then
-    BUILD_DIR="$BUILD_ROOT/macos.$GENERATOR_ID"
+    BUILD_DIR="$BUILD_ROOT/macos.$GENERATOR_ID.$CONFIGURATION"
 elif [[ "$BUILD_DIR" != /* ]]; then
     BUILD_DIR="$ROOT_DIR/$BUILD_DIR"
 fi
