@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <utility>
 
 namespace
 {
@@ -35,6 +37,7 @@ ConfigManager::ConfigManager()
 
 void ConfigManager::Load()
 {
+	m_Config = nlohmann::json::object();
 	if (!std::filesystem::exists(m_UserConfigPath)) return;
 
 	try
@@ -42,9 +45,13 @@ void ConfigManager::Load()
 		std::ifstream file(m_UserConfigPath);
 		nlohmann::json config;
 		file >> config;
-		if (config.contains("theme") && config["theme"].is_object())
+		if (!config.is_object())
+			throw std::runtime_error("user config root must be a JSON object");
+
+		m_Config = std::move(config);
+		if (m_Config.contains("theme") && m_Config["theme"].is_object())
 		{
-			const auto& theme = config["theme"];
+			const auto& theme = m_Config["theme"];
 			m_LastSavedThemeName = theme.value("name", "Default");
 			m_LastSavedThemeData = theme.value("style", "");
 		}
@@ -61,6 +68,36 @@ bool ConfigManager::LoadLastUsedTheme(std::string& name, std::string& serialized
 	name = m_LastSavedThemeName;
 	serializedStyle = m_LastSavedThemeData;
 	return true;
+}
+
+bool ConfigManager::GetString(const std::string& section, const std::string& key, std::string& value) const
+{
+	const auto sectionIt = m_Config.find(section);
+	if (sectionIt == m_Config.end() || !sectionIt->is_object()) return false;
+
+	const auto valueIt = sectionIt->find(key);
+	if (valueIt == sectionIt->end() || !valueIt->is_string()) return false;
+
+	value = valueIt->get<std::string>();
+	return true;
+}
+
+bool ConfigManager::SetString(const std::string& section, const std::string& key, const std::string& value)
+{
+	const nlohmann::json previousConfig = m_Config;
+	if (!m_Config.is_object()) m_Config = nlohmann::json::object();
+
+	auto& sectionObject = m_Config[section];
+	if (!sectionObject.is_object()) sectionObject = nlohmann::json::object();
+	const auto existingValue = sectionObject.find(key);
+	if (existingValue != sectionObject.end() && existingValue->is_string() && existingValue->get<std::string>() == value)
+		return true;
+
+	sectionObject[key] = value;
+	if (WriteConfig()) return true;
+
+	m_Config = previousConfig;
+	return false;
 }
 
 bool ConfigManager::SaveLastUsedThemeIfChanged(const std::string& name, const std::string& serializedStyle)
@@ -81,7 +118,7 @@ bool ConfigManager::WriteConfig() const
 {
 	try
 	{
-		nlohmann::json config;
+		nlohmann::json config = m_Config.is_object() ? m_Config : nlohmann::json::object();
 		config["version"] = 1;
 		config["theme"] = { { "name", m_LastSavedThemeName }, { "style", m_LastSavedThemeData } };
 
