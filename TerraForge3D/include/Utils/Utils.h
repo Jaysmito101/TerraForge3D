@@ -69,7 +69,7 @@ bool WriteShaderSourceFile(const std::string& path, const std::string& content);
 std::string GetExecutablePath();
 std::string GetExecutableDir();
 std::string GenerateId(uint32_t length);
-std::string FetchURL(std::string baseURL, std::string path);
+std::string FetchURL(std::string baseURL, std::string path, std::string token = "");
 std::string GetTimeStamp();
 bool ShowLayerUpdationMethod(const char* label, int* method);
 float UpdateLayerWithUpdateMethod(float origv, float newv, int method);

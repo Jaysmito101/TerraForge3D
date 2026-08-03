@@ -24,6 +24,7 @@ public:
 private:
 	void LoadstargazersData(nlohmann::json &data);
 	void LoadcontributorsData(nlohmann::json &data);
+	bool stargazersUnavailable = false;
 
 public:
 	std::vector<GitHubData> stargazers;
