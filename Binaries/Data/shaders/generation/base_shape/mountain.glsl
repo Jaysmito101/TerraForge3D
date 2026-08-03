@@ -6,21 +6,23 @@
 			"Type": "Float",
 			"Default": 0.3,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Scale",
 			"Type": "Float",
 			"Default": 1.33,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.001, 16.0, 0.0, 0.0]
 		},    
 		{
 			"Name": "Levels",
 			"Type": "Int",
 			"Default": 12,
 			"Widget": "Slider",
-			"Constraints": [1.0, 32.0, 0.0, 0.0]
+			"Constraints": [1.0, 24.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Seed",
@@ -41,41 +43,42 @@
 			"Label": "Damping Factor",
 			"Default": 0.335,
 			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
+			"Constraints": [0.0, 0.99, 0.0, 0.0]
 		}
 	]
 }
 // CODE
 #include "common/noise_2d.glsl"
+#include "common/base_shape_helpers.glsl"
 
 
-float noise(vec2 uv)
+float ridgeNoise(vec2 uv)
 {
-	const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
-	float fac = 1.0f;
-	float f  = fac * 0.5000f * tf3d_snoise2( uv ); uv = m*uv;
-	f += fac * 0.2500f * tf3d_snoise2( uv ); uv = m*uv;
-	f += fac * 0.1250f * tf3d_snoise2( uv ); uv = m*uv;
-	f += fac * 0.0625f * tf3d_snoise2( uv ); uv = m*uv;
-	return f;
-}
-
-float rnoise(vec2 uv)
-{
-	float ns = abs(tf3d_snoise2(uv));
-	return ns * -2.0f + 1.0f;
+	float ridge = 1.0f - abs(clamp(tf3d_snoise2(uv), -1.0f, 1.0f));
+	return smoothstep(0.0f, 1.0f, clamp(ridge, 0.0f, 1.0f));
 }
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
 	const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
-	vec2 p = uv * u_Scale + u_Offset;
-	float ns = 0.0f, fr = 1.0f, amp = 1.0f;
-	for(int i = 0 ; i < u_Levels ; i++)
+	float scale = tf3d_shape_positive(u_Scale, 0.001f);
+	vec2 offset = clamp(u_Offset, vec2(-10000.0f), vec2(10000.0f));
+	vec2 seedOffset = vec2(float(u_Seed) * 0.173f, float(u_Seed) * 0.317f);
+	vec2 p = uv * scale + offset + seedOffset;
+	float ns = 0.0f;
+	float amplitude = 1.0f;
+	float amplitudeSum = 0.0f;
+	float damping = clamp(u_DampingFactor, 0.0f, 0.99f);
+	int levels = clamp(u_Levels, 1, 24);
+	for(int i = 0 ; i < levels ; i++)
 	{
-		ns += rnoise(p) * amp;
-		p = m * p;
-		amp = amp * u_DampingFactor;
+		float octaveProgress = float(i) / float(max(levels - 1, 1));
+		float octaveWeight = mix(1.0f, 0.65f, octaveProgress);
+		ns += ridgeNoise(p) * amplitude * octaveWeight;
+		amplitudeSum += amplitude;
+		p = m * p + vec2(17.13f, -9.71f) * float(i + 1);
+		amplitude *= damping;
 	}
-	return ns * u_Strength;
+	return clamp(ns / max(amplitudeSum, TF3D_SHAPE_EPSILON), 0.0f, 1.0f)
+		* clamp(u_Strength, 0.0f, 4.0f);
 }
