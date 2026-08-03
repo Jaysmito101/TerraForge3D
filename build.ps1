@@ -44,6 +44,9 @@ Options (defaults are shown in brackets):
       --all                     With clean, remove every build tree too
       --cmake-arg <arg>         Pass an additional argument to CMake
 
+Windows Ninja:
+  Automatically uses clang-cl, lld-link, llvm-lib, and Scoop OpenSSL when available.
+
 Default build trees:
   build\windows.visualstudio.$Configuration\
   build\windows.ninja.$Configuration\
@@ -184,6 +187,7 @@ function Get-GeneratorInfo {
             Name = "Ninja"
             Id = "ninja"
             MultiConfig = $false
+            Toolchain = Join-Path $RootDir "cmake/WindowsClangCl.cmake"
         }
     }
 
@@ -230,12 +234,46 @@ function Invoke-Configure {
         $Arguments += "-DCMAKE_BUILD_TYPE=$Configuration"
     }
 
+    if ($GeneratorInfo.ContainsKey("Toolchain")) {
+        $Arguments += @("--toolchain", $GeneratorInfo.Toolchain)
+
+        $OpenSSLRoot = Get-OpenSSLRoot
+        if ($OpenSSLRoot) {
+            $Arguments += "-DOPENSSL_ROOT_DIR=$OpenSSLRoot"
+            Write-Host "Using OpenSSL root: $OpenSSLRoot"
+        }
+        else {
+            Write-Warning "Scoop OpenSSL was not found; CMake will use its normal OpenSSL search paths."
+        }
+    }
+
     if ($CMakeArgs.Count -gt 0) {
         $Arguments += $CMakeArgs
     }
 
     Invoke-Checked "cmake" $Arguments
     Sync-CompileCommands
+}
+
+function Get-OpenSSLRoot {
+    $EnvironmentRoot = [Environment]::GetEnvironmentVariable("OPENSSL_ROOT_DIR")
+    if (-not [string]::IsNullOrWhiteSpace($EnvironmentRoot) -and
+        (Test-Path (Join-Path $EnvironmentRoot "include\openssl\opensslv.h"))) {
+        return [IO.Path]::GetFullPath($EnvironmentRoot)
+    }
+
+    $Scoop = Get-Command scoop -ErrorAction SilentlyContinue
+    if ($Scoop) {
+        $ScoopRoot = (& $Scoop.Source prefix openssl 2>$null | Select-Object -First 1)
+        if ($ScoopRoot) {
+            $ScoopRoot = $ScoopRoot.ToString().Trim()
+            if (Test-Path (Join-Path $ScoopRoot "include\openssl\opensslv.h")) {
+                return [IO.Path]::GetFullPath($ScoopRoot)
+            }
+        }
+    }
+
+    return $null
 }
 
 function Sync-CompileCommands {
@@ -254,6 +292,31 @@ function Sync-CompileCommands {
 
 function Ensure-Configured {
     $CachePath = Join-Path $BuildDir "CMakeCache.txt"
+
+    $UserSelectedCompiler = $CMakeArgs | Where-Object {
+        $_ -match "^-DCMAKE_(C|CXX)_COMPILER="
+    }
+
+    if ($GeneratorInfo.Id -eq "ninja" -and (Test-Path $CachePath) -and -not $UserSelectedCompiler) {
+        $CompilerEntries = @(
+            Select-String -Path $CachePath -Pattern "^CMAKE_C_COMPILER:.*=" -ErrorAction SilentlyContinue
+            Select-String -Path $CachePath -Pattern "^CMAKE_CXX_COMPILER:.*=" -ErrorAction SilentlyContinue
+        )
+        $UsesClangCl = $CompilerEntries.Count -eq 2 -and ($CompilerEntries | Where-Object {
+            $_.Line -notmatch "(?i)clang-cl(\.exe)?$"
+        }).Count -eq 0
+
+        if (-not $UsesClangCl) {
+            if ($Reconfigure) {
+                Remove-Item -LiteralPath $BuildDir -Recurse -Force
+                Write-Host "Recreated Ninja build tree to switch to clang-cl: $BuildDir"
+            }
+            else {
+                throw "This Ninja build tree uses a different compiler. Re-run with --reconfigure to recreate it with clang-cl."
+            }
+        }
+    }
+
     if ($Reconfigure -or -not (Test-Path $CachePath)) {
         Invoke-Configure
     }
@@ -394,7 +457,15 @@ if ($Command -in @("configure", "build", "run", "all")) {
     }
 
     if ($GeneratorInfo.Id -eq "ninja" -and -not (Get-Command ninja -ErrorAction SilentlyContinue)) {
-        throw "Ninja was selected but was not found on PATH. Install Ninja or use -Generator VisualStudio."
+        throw "Ninja was selected but was not found on PATH. Install Ninja or use --generator visualstudio."
+    }
+
+    if ($GeneratorInfo.Id -eq "ninja") {
+        foreach ($Tool in @("clang-cl", "lld-link", "llvm-lib")) {
+            if (-not (Get-Command $Tool -ErrorAction SilentlyContinue)) {
+                throw "Ninja requires $Tool for the Windows Clang toolchain. Install LLVM or use --generator visualstudio."
+            }
+        }
     }
 }
 
