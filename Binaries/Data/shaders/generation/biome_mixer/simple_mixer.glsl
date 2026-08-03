@@ -45,8 +45,7 @@ void main(void)
 		float factor = 1.0f;
 		if (u_UseBiomeMask)
 		{
-			vec2 uv = offsetv2 / float(u_Resolution);
-			factor = texture(u_BiomeMask, uv).x;
+			factor = texelFetch(u_BiomeMask, ivec2(offsetv2), 0).r;
 		}
 
 		dataTarget[offset] = dataTarget[offset] + u_Strength * dataSource[offset] * factor;
