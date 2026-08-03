@@ -1,3 +1,11 @@
+vec2 tf3d_terrain_hash22(vec2 p)
+{
+    p = vec2(
+        dot(p, vec2(127.1f, 311.7f)),
+        dot(p, vec2(269.5f, 183.3f)));
+    return fract(sin(p) * 43758.5453123f);
+}
+
 float tf3d_terrain_fbm2(
     vec2 p,
     float scale,
