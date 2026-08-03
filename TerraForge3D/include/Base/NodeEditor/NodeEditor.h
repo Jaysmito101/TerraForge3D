@@ -9,6 +9,7 @@
 #include <iterator>
 #include <functional>
 #include <mutex>
+#include <chrono>
 
 #define MAKE_IMGUI_ID(x) ("##" + std::to_string(x)).c_str()
 #define MAKE_IMGUI_LABEL(x, y) (y + std::string("##") + std::to_string(x)).c_str()

@@ -1,11 +1,10 @@
-#define JSON_NOEXCEPTION
-
 #include "Misc/SupportersTribute.h"
 
 #include "Base/Texture2D.h"
 #include "Platform.h"
 
 #include <Utils.h>
+#include <cstdlib>
 #include <imgui.h>
 #include <vector>
 #include <string>
@@ -18,6 +17,7 @@ void SupportersTribute::LoadstargazersData(nlohmann::json &data)
 
 	for (nlohmann::json item : data)
 	{
+		if (!item.is_object() || !item.contains("login") || !item.contains("node_id") || !item.contains("avatar_url")) continue;
 		GitHubData st;
 		st.name = item["login"];
 
@@ -45,6 +45,7 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
 
 	for (nlohmann::json item : data)
 	{
+		if (!item.is_object() || !item.contains("login") || !item.contains("node_id") || !item.contains("avatar_url")) continue;
 		GitHubData st;
 		st.name = item["login"];
 
@@ -75,25 +76,37 @@ void SupportersTribute::LoadcontributorsData(nlohmann::json &data)
 
 SupportersTribute::SupportersTribute()
 {
-	if (IsNetWorkConnected() && (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache") || rand() % 5 == 0))
+	const char *githubTokenValue = std::getenv("TERR3D_GITHUB_TOKEN");
+	const std::string githubToken = githubTokenValue ? githubTokenValue : "";
+	const bool hasGithubToken = !githubToken.empty();
+	stargazersUnavailable = !hasGithubToken;
+
+	if (hasGithubToken && IsNetWorkConnected() && (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache") || rand() % 10 == 0))
 	{
 		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
 		{
-			std::string repoDataStr = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D");
- 			nlohmann::json repoData = nlohmann::json::parse(repoDataStr);
-			int stargazerCount = repoData["stargazers_count"];
-			int perPage = 30;
-			int lastPage = stargazerCount / perPage;
-			std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&page=" + std::to_string(lastPage));
-			SaveToFile(GetExecutableDir() + PATH_SEPARATOR +"Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", stargazersRawData);
-			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
-			LoadstargazersData(stargazersData);
+			std::string repoDataStr = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D", githubToken);
+			nlohmann::json repoData = nlohmann::json::parse(repoDataStr, nullptr, false);
+			if (repoData.is_object() && repoData.contains("stargazers_count") &&
+				(repoData["stargazers_count"].is_number_integer() || repoData["stargazers_count"].is_number_unsigned()))
+			{
+				int stargazerCount = repoData["stargazers_count"];
+				int perPage = 30;
+				int lastPage = stargazerCount / perPage;
+				std::string stargazersRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/stargazers?per_page=30&page=" + std::to_string(lastPage), githubToken);
+				nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData, nullptr, false);
+				if (stargazersData.is_array())
+				{
+					SaveToFile(GetExecutableDir() + PATH_SEPARATOR +"Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", stargazersRawData);
+					LoadstargazersData(stargazersData);
+				}
+			}
 		}
 		{
 			std::string contributorsRawData = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D/contributors");
 			SaveToFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache", contributorsRawData);
-			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
-			LoadcontributorsData(contributorsData);
+			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData, nullptr, false);
+			if (contributorsData.is_array()) LoadcontributorsData(contributorsData);
 		}
 	}
 
@@ -102,25 +115,30 @@ SupportersTribute::SupportersTribute()
 		bool tmp = false;
 		Log("Trying to load cached data.");
 
-		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache"))
+		if (hasGithubToken && FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache"))
 		{
 			Log("Found Stargazers Cached Data!");
 			std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", &tmp);
-			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData);
-			LoadstargazersData(stargazersData);
+			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData, nullptr, false);
+			if (stargazersData.is_array()) LoadstargazersData(stargazersData);
+		}
+
+		else if (hasGithubToken)
+		{
+			Log("Stargazers Cached Data not found!");
 		}
 
 		else
 		{
-			Log("Stargazers Cached Data not found!");
+			Log("Stargazers are unavailable without TERR3D_GITHUB_TOKEN.");
 		}
 
 		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache"))
 		{
 			Log("Found Contributors Cached Data!");
 			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache", &tmp);
-			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData);
-			LoadcontributorsData(contributorsData);
+			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData, nullptr, false);
+			if (contributorsData.is_array()) LoadcontributorsData(contributorsData);
 		}
 
 		else
@@ -173,6 +191,16 @@ void SupportersTribute::ShowSettings(bool *pOpen)
 	ImGui::Separator();
 	ImGui::Separator();
 	ImGui::Text("Stargazers");
+
+	if (stargazersUnavailable)
+	{
+		ImGui::TextWrapped("Stargazers aren't available on the public GitHub API due to GitHub changes.");
+		if (ImGui::SmallButton("GitHub API changes"))
+		{
+			OpenURL("https://github.blog/changelog/2026-06-30-upcoming-access-restrictions-to-public-api-endpoints-and-ui-views/");
+		}
+		ImGui::TextWrapped("Please set TERR3D_GITHUB_TOKEN to see them.");
+	}
 
 	for (GitHubData st : stargazers)
 	{

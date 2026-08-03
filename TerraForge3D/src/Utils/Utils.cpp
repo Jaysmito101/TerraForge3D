@@ -260,10 +260,12 @@ std::string GenerateId(uint32_t length)
 	return id;
 }
 
-std::string FetchURL(std::string baseURL, std::string path)
+std::string FetchURL(std::string baseURL, std::string path, std::string token)
 {
 	httplib::Client cli(baseURL);
-	auto res = cli.Get(path.c_str());
+	httplib::Headers headers;
+	if (!token.empty()) headers.emplace("Authorization", "Bearer " + token);
+	auto res = cli.Get(path.c_str(), headers);
 	cli.set_read_timeout(10);
 
 	if (res.error() == httplib::Error::Success)
