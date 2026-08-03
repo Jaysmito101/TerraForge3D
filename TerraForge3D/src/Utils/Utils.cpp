@@ -13,6 +13,7 @@
 #elif __linux__
 #include <inttypes.h>
 #include <unistd.h>
+#include <linux/limits.h>   // PATH_MAX
 #define __int64 int64_t
 #define _close close
 #define _read read
@@ -37,13 +38,15 @@
 #ifndef TERR3D_WIN32
 #include <libgen.h>         // dirname
 #include <unistd.h>         // readlink
-#include <linux/limits.h>   // PATH_MAX
 #define MAX_PATH PATH_MAX
 #else
 #include <atlstr.h>
 #include <windows.h>
 #include <Commdlg.h>
 #endif
+#ifdef __APPLE__
+#include <libproc.h>
+#endif // __APPLE__
 
 
 static std::string getExecutablePath()
@@ -51,6 +54,8 @@ static std::string getExecutablePath()
 	char rawPathName[MAX_PATH];
 #ifdef TERR3D_WIN32
 	GetModuleFileNameA(NULL, rawPathName, MAX_PATH);
+#elif defined(__APPLE__)
+	proc_pidpath(getpid(), rawPathName, MAX_PATH);
 #else
 	readlink("/proc/self/exe", rawPathName, PATH_MAX);
 #endif
@@ -357,13 +362,13 @@ bool PowerOfTwoDropDown(const char* label, int32_t* value, int start, int end)
 	if (!value) return false;
 	static char buffer[32];
 	int tmp = (int)(log((double)*value) / log(2.0));
-	sprintf(buffer, "%d", (int)pow(2, tmp));
+	snprintf(buffer, 32, "%d", (int)pow(2, tmp));
 	if (ImGui::BeginCombo(label, buffer))
 	{
 		for (int i = start; i <= end; i++)
 		{
 			bool is_selected = (tmp == i);
-			sprintf(buffer, "%d", (int)pow(2, i));
+			snprintf(buffer, 32, "%d", (int)pow(2, i));
 			if (ImGui::Selectable(buffer, is_selected)) tmp = i;
 			if (is_selected) ImGui::SetItemDefaultFocus();
 		}
