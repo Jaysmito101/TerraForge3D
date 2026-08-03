@@ -52,7 +52,8 @@ bool BiomeCustomBaseShape::ShowShettings()
 		m_Shader->SetUniform1i("u_Mode", 0); // for transfer
 		m_Shader->SetUniform1f("u_MixFactor", 0.0f);
 		const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-		m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+		const auto dispatchSize = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
+		m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
 		m_RequireUpdation = true;
 	}
 

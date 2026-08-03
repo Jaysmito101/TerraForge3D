@@ -22,6 +22,7 @@ float calculateFallOff(in vec2 uv)
 void main()
 {
 	ivec2 offset = ivec2(gl_GlobalInvocationID.xy);
+	if (offset.x >= u_Resolution || offset.y >= u_Resolution) return;
 	vec4 oriVal = imageLoad(u_MaskTexture, offset);
 
 	vec2 uv = offset / float(u_Resolution);

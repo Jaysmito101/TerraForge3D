@@ -37,7 +37,8 @@ bool MaskEditor::ApplyDrawingShaders()
 		m_Shader->SetUniform2f("u_BrushPosition", m_DrawSettings.m_BrushPositionX, m_DrawSettings.m_BrushPositionY);
 		m_Shader->SetUniform4f("u_BrushSettings0", m_DrawSettings.m_BrushStrength, m_DrawSettings.m_BrushSize, m_DrawSettings.m_BrushFalloff, 0.0f);
 		const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-		m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+		const auto dispatchSize = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
+		m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
 		m_RequireUpdation = true;
 	}
 
