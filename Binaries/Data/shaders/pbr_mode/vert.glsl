@@ -30,11 +30,12 @@ int PixelCoordToDataOffset(int x, int y)
     return y * u_Resolution + x;
 }
 
+#include "common/height_sampling.glsl"
+
 void main()
 {
     vec2 texCoord = aTexCoord.xy;
-    ivec2 pointCoord = ivec2(texCoord * 0.975f * u_Resolution);
-    vec3 position = aPosition.xyz + aNormal.xyz * data0[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)];
+    vec3 position = aPosition.xyz + aNormal.xyz * SampleHeightBilinear(texCoord);
     //vec3 position = aPosition.xyz + aNormal.xyz * data0[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;
