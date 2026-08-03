@@ -46,7 +46,7 @@ set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 add_subdirectory(./TerraForge3D/vendor/glfw)
 add_subdirectory(./TerraForge3D/vendor/glad/cmake)
 glad_add_library(glad STATIC API gl:core=4.6)
-add_subdirectory(./TerraForge3D/vendor/imgui-builder)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ImGui.cmake)
 add_subdirectory(./TerraForge3D/vendor/libwebp)
 add_subdirectory(./TerraForge3D/vendor/fmt)
 
