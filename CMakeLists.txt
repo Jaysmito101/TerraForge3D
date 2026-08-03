@@ -88,6 +88,15 @@ target_link_libraries(${EXECUTABLE_NAME} OpenSSL::Crypto)
 target_link_libraries(${EXECUTABLE_NAME} fmt::fmt)
 target_link_libraries(${EXECUTABLE_NAME} webp)
 
+add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Binaries/Data"
+        "$<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/Data"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Third Party License"
+        "$<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/Third Party License"
+)
+
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.12.25835)
     set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
     set(CMAKE_CXX20_EXTENSION_COMPILE_OPTION "-std:c++latest")
