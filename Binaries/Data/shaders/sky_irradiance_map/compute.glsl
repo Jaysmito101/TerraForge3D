@@ -20,7 +20,7 @@ layout(binding = 0, rgba32f) uniform imageCube outputTexture;
 // See: OpenGL core profile specs, section 8.13.
 vec3 getSamplingVector()
 {
-    vec2 st = gl_GlobalInvocationID.xy/vec2(imageSize(outputTexture));
+    vec2 st = (vec2(gl_GlobalInvocationID.xy) + vec2(0.5))/vec2(imageSize(outputTexture));
     vec2 uv = 2.0 * vec2(st.x, 1.0-st.y) - vec2(1.0);
 
     vec3 ret;
@@ -55,6 +55,12 @@ layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 void main(void)
 {
+	ivec2 outputSize = imageSize(outputTexture);
+	if (gl_GlobalInvocationID.x >= uint(outputSize.x) ||
+		gl_GlobalInvocationID.y >= uint(outputSize.y)) {
+		return;
+	}
+
 	vec3 N = getSamplingVector();
 	
 	vec3 S, T;

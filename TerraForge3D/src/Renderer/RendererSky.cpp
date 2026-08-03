@@ -84,6 +84,8 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, skyboxTextureEquirectWidth, skyboxTextureEquirectHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, skyboxTextureEquirectData);
 	stbi_image_free(skyboxTextureEquirectData);
 
@@ -93,6 +95,9 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, 6, GL_RGBA32F, m_SkyboxSize, m_SkyboxSize);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	
 	glBindImageTexture(0, skyboxTextureUnfiltered, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA32F);
@@ -115,13 +120,16 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, 6, GL_RGBA32F, m_IrradianceMapSize, m_IrradianceMapSize);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	 
 	glBindImageTexture(0, m_IrradianceMapTextureID, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA32F);
 	m_IrradianceMap->Bind();  
 	glActiveTexture(GL_TEXTURE1); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
 	glUniform1i(glGetUniformLocation(m_IrradianceMap->GetNativeShader(), "u_InputTexture"), 1);
-	glDispatchCompute(m_IrradianceMapSize / 16 + 1, m_IrradianceMapSize / 16 + 1, 6);
+	glDispatchCompute((m_IrradianceMapSize + 15) / 16, (m_IrradianceMapSize + 15) / 16, 6);
 
 	glFinish();
 	
