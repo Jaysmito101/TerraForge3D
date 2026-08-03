@@ -32,7 +32,11 @@ int PixelCoordToDataOffset(int x, int y)
 void main()
 {
     vec2 texCoord = aTexCoord.xy;
-    ivec2 pointCoord = ivec2(texCoord * 0.975 * u_Resolution);
+    ivec2 pointCoord = clamp(
+        ivec2(round(texCoord * float(u_Resolution - 1))),
+        ivec2(0),
+        ivec2(u_Resolution - 1)
+    );
     vec3 position = aPosition.xyz + aNormal.xyz * data0[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)];
     //vec3 position = aPosition.xyz + aNormal.xyz * data0[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);

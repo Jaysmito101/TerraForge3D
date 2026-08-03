@@ -180,6 +180,7 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	source += "// main\n";
 	source += "void main()\n{\n";
 	source += "\tuvec2 offsetv2 = gl_GlobalInvocationID.xy;\n";
+	source += "\tif (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;\n";
 	source += "\tuint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);\n";
 	source += "\tvec2 uv = offsetv2 / float(u_Resolution);\n";
 	source += "\tvec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);\n";

@@ -91,6 +91,8 @@ void applyGaussianFilter()
 
 void main(void)
 {
+	uvec2 invocation = gl_GlobalInvocationID.xy;
+	if (invocation.x >= uint(u_Resolution) || invocation.y >= uint(u_Resolution)) return;
 	if(u_Mode == 0) transferData();
 	else if (u_Mode == 1) applyBasicBrush();
 	else if (u_Mode == 2) applyGaussianFilter();

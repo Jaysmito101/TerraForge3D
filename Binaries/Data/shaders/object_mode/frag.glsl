@@ -71,11 +71,19 @@ mat3 calculateTBN()
 
 vec3 calculateNormal()
 {
-	ivec2 pointCoord = ivec2(fragmentInput.texCoord * u_Resolution);
-	float T = data0[(pointCoord.y - 1) * u_Resolution + pointCoord.x];
-	float B = data0[(pointCoord.y + 1) * u_Resolution + pointCoord.x];
-	float R = data0[pointCoord.y * u_Resolution + (pointCoord.x + 1)];
-	float L = data0[pointCoord.y * u_Resolution + (pointCoord.x - 1)];
+	ivec2 pointCoord = clamp(
+		ivec2(round(fragmentInput.texCoord * float(u_Resolution - 1))),
+		ivec2(0),
+		ivec2(u_Resolution - 1)
+	);
+	ivec2 topCoord = ivec2(pointCoord.x, max(pointCoord.y - 1, 0));
+	ivec2 bottomCoord = ivec2(pointCoord.x, min(pointCoord.y + 1, u_Resolution - 1));
+	ivec2 leftCoord = ivec2(max(pointCoord.x - 1, 0), pointCoord.y);
+	ivec2 rightCoord = ivec2(min(pointCoord.x + 1, u_Resolution - 1), pointCoord.y);
+	float T = data0[topCoord.y * u_Resolution + topCoord.x];
+	float B = data0[bottomCoord.y * u_Resolution + bottomCoord.x];
+	float R = data0[rightCoord.y * u_Resolution + rightCoord.x];
+	float L = data0[leftCoord.y * u_Resolution + leftCoord.x];
 	return normalize(vec3(2*(R-L), 2*(B-T), -4)) * (u_InvertNormals ? 1.0f : -1.0f);
 }
 
