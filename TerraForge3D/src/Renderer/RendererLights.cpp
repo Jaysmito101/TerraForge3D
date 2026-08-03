@@ -40,7 +40,7 @@ void RendererLights::ShowSettings()
 		SHOW_COMBO_BOX("Type", m_RendererLights[i].type, s_RenderLightTypeNames, IM_ARRAYSIZE(s_RenderLightTypeNames));
 		ImGui::DragFloat3(m_RendererLights[i].type == RendererLightType_Directional ? "Direction" : "Position", glm::value_ptr(m_RendererLights[i].position), 0.01f);
 		ImGui::ColorEdit3("Color", glm::value_ptr(m_RendererLights[i].color));
-		ImGui::DragFloat("Intensity", &m_RendererLights[i].intensity, 0.01f);
+		ImGui::DragFloat("Intensity", &m_RendererLights[i].intensity, 0.01f, 0.01f, 100.0f);
 		if (ImGui::Button("Duplicate")) m_RendererLights.push_back(m_RendererLights[i]);
 		ImGui::SameLine();
 		if (ImGui::Button("Delete"))
