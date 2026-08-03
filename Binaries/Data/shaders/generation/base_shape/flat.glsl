@@ -24,14 +24,16 @@
 			"Conditional": "SubStyle",
 			"ConditionalValue": 3,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [-64.0, 64.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Height",
 			"Type": "Float",
 			"Default": 1.0,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [-4.0, 4.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Radius",
@@ -40,7 +42,8 @@
 			"Conditional": "SubStyle",
 			"ConditionalValue": 1,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.01, 4.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Rotation",
@@ -54,7 +57,8 @@
 			"Type": "Vector2",
 			"Default": [0.0, 0.0],
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [-8.0, 8.0, 0.0, 0.0]
 		}
 	]
 }
@@ -70,6 +74,8 @@
 #define SIN_WAVE_TYPE_XPY	2
 #define SIN_WAVE_TYPE_XMY	3
 
+#include "common/base_shape_helpers.glsl"
+
 
 vec2 rotate(vec2 v, float a) 
 {
@@ -82,37 +88,43 @@ vec2 rotate(vec2 v, float a)
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	if(u_SubStyle == SUB_STYLE_FLAT)
+	int subStyle = clamp(u_SubStyle, SUB_STYLE_FLAT, SUB_STYLE_SINE);
+	float height = clamp(u_Height, -4.0f, 4.0f);
+	if(subStyle == SUB_STYLE_FLAT)
 	{
-		return u_Height;
+		return height;
 	}
-	else if(u_SubStyle == SUB_STYLE_DOME)
+	else if(subStyle == SUB_STYLE_DOME)
 	{
-		return u_Height * exp(-(seed.x * seed.x + seed.y * seed.y + seed.z * seed.z) / u_Radius);
+		float radius = tf3d_shape_positive(u_Radius, 0.01f);
+		float radialDistance = dot(seed, seed);
+		return height * exp(-radialDistance / radius);
 	}
-	else if(u_SubStyle == SUB_STYLE_SLOPE)
+	else if(subStyle == SUB_STYLE_SLOPE)
 	{
-		vec2 pos = rotate(seed.xy, u_Rotation);
-		return pos.x * u_Height;
+		vec2 pos = rotate(seed.xy, clamp(u_Rotation, -36000.0f, 36000.0f));
+		return pos.x * height;
 	}
-	else if(u_SubStyle == SUB_STYLE_SINE)
+	else if(subStyle == SUB_STYLE_SINE)
 	{
-		vec2 pos = rotate(seed.xy, u_Rotation) * u_Frequency + u_Offset;
-		if(u_SinWaveType == SIN_WAVE_TYPE_X)
+		vec2 pos = rotate(seed.xy, clamp(u_Rotation, -36000.0f, 36000.0f))
+			* clamp(u_Frequency, -64.0f, 64.0f) + clamp(u_Offset, vec2(-10000.0f), vec2(10000.0f));
+		int waveType = clamp(u_SinWaveType, SIN_WAVE_TYPE_X, SIN_WAVE_TYPE_XMY);
+		if(waveType == SIN_WAVE_TYPE_X)
 		{
-			return sin(pos.x) * u_Height;
+			return sin(pos.x) * height;
 		}
-		else if(u_SinWaveType == SIN_WAVE_TYPE_Y)
+		else if(waveType == SIN_WAVE_TYPE_Y)
 		{
-			return sin(pos.y) * u_Height;
+			return sin(pos.y) * height;
 		}
-		else if(u_SinWaveType == SIN_WAVE_TYPE_XPY)
+		else if(waveType == SIN_WAVE_TYPE_XPY)
 		{
-			return (sin(pos.x) + sin(pos.y)) * u_Height;
+			return (sin(pos.x) + sin(pos.y)) * height;
 		}
-		else if(u_SinWaveType == SIN_WAVE_TYPE_XMY)
+		else if(waveType == SIN_WAVE_TYPE_XMY)
 		{
-			return (sin(pos.x) * sin(pos.y)) * u_Height;
+			return (sin(pos.x) * sin(pos.y)) * height;
 		}
 	}
 	return 0.0f;
