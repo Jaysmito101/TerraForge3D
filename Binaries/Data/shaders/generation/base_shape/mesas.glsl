@@ -1,0 +1,100 @@
+{
+	"Name": "Mesas",
+	"Params": [
+		{
+			"Name": "Strength",
+			"Type": "Float",
+			"Default": 1.0,
+			"Widget": "Drag",
+			"Sensitivity": 0.01,
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Scale",
+			"Type": "Float",
+			"Default": 1.0,
+			"Widget": "Drag",
+			"Sensitivity": 0.01,
+			"Constraints": [0.001, 16.0, 0.0, 0.0]
+		},
+		{
+			"Name": "PlateauWidth",
+			"Label": "Plateau Width",
+			"Type": "Float",
+			"Default": 0.6,
+			"Widget": "Slider",
+			"Constraints": [0.05, 0.95, 0.0, 0.0]
+		},
+		{
+			"Name": "EdgeSoftness",
+			"Label": "Edge Softness",
+			"Type": "Float",
+			"Default": 0.35,
+			"Widget": "Slider",
+			"Constraints": [0.001, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Erosion",
+			"Type": "Float",
+			"Default": 0.3,
+			"Widget": "Slider",
+			"Constraints": [0.0, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Seed",
+			"Type": "Int",
+			"Default": 42,
+			"Widget": "Seed"
+		},
+		{
+			"Name": "Offset",
+			"Type": "Vector2",
+			"Default": [0.0, 0.0],
+			"Widget": "Drag",
+			"Sensitivity": 0.01,
+			"Constraints": [-8.0, 8.0, 0.0, 0.0]
+		},
+		{
+			"Name": "Rotation",
+			"Type": "Float",
+			"Default": 0.0,
+			"Widget": "Slider",
+			"Constraints": [-180.0, 180.0, 0.0, 0.0]
+		}
+	]
+}
+// CODE
+
+#include "common/noise_2d.glsl"
+#include "common/base_shape_helpers.glsl"
+#include "common/base_shape_terrain_helpers.glsl"
+
+vec2 tf3d_mesas_rotate(vec2 value, float angle)
+{
+	float sine = sin(angle);
+	float cosine = cos(angle);
+	return mat2(cosine, -sine, sine, cosine) * value;
+}
+
+float evaluateBaseShape(vec2 uv, vec3 seed)
+{
+	float scale = tf3d_shape_positive(u_Scale, 0.001f);
+	float rotation = 3.14159265f * clamp(u_Rotation, -360.0f, 360.0f) / 180.0f;
+	vec2 offset = clamp(u_Offset, vec2(-10000.0f), vec2(10000.0f));
+	vec2 seedOffset = vec2(float(u_Seed) * 0.173f, float(u_Seed) * 0.317f);
+	vec2 p = tf3d_mesas_rotate((uv * 2.0f - vec2(1.0f)) * scale + offset + seedOffset, rotation);
+
+	float macro = 0.5f + 0.5f * tf3d_terrain_fbm2(p, 0.62f, 6, 2.0f, 0.5f);
+	float plateauWidth = clamp(u_PlateauWidth, 0.05f, 0.95f);
+	float threshold = mix(0.82f, 0.46f, plateauWidth);
+	float edge = mix(0.008f, 0.20f, clamp(u_EdgeSoftness, 0.001f, 1.0f));
+	float mesaMask = tf3d_shape_smoothstep(threshold - edge, threshold + edge, macro);
+
+	float base = 0.5f + 0.5f * tf3d_terrain_fbm2(p + vec2(7.0f, 23.0f), 0.45f, 4, 2.0f, 0.5f);
+	float topVariation = 0.5f + 0.5f * tf3d_terrain_fbm2(p + vec2(-13.0f, 5.0f), 1.55f, 4, 2.0f, 0.5f);
+	float erosionField = 0.5f + 0.5f * tf3d_terrain_fbm2(p + vec2(31.0f, -17.0f), 2.4f, 4, 2.0f, 0.5f);
+	float erosion = clamp(u_Erosion, 0.0f, 1.0f);
+	float topHeight = mix(0.94f + 0.06f * topVariation, 0.68f + 0.24f * erosionField, erosion);
+	float height = base * 0.16f + mesaMask * topHeight * 0.84f;
+	return clamp(height, 0.0f, 1.0f) * clamp(u_Strength, 0.0f, 4.0f);
+}
