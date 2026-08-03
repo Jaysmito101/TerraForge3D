@@ -137,7 +137,7 @@ void ExportManager::ShowTextureExportSettings()
 	if (ImGui::Button("Auto Calculate Min Max"))
 	{
 		auto heightmapData = m_AppState->generationManager->GetHeightmapData()->GetCPUCopy();
-		auto resolution = m_AppState->mainMap.mapResolution;
+		auto resolution = m_AppState->mainMap.tileResolution;
 		auto [minHeight, maxHeight] = std::minmax_element(heightmapData, heightmapData + resolution * resolution);
 		m_ExportHeightmapMinMaxHeight[0] = *minHeight; m_ExportHeightmapMinMaxHeight[1] = *maxHeight;
 		delete[] heightmapData;
