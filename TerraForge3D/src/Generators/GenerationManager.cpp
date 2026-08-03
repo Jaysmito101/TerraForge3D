@@ -110,9 +110,9 @@ void GenerationManager::ShowSettingsInspector()
 			ImGui::SameLine();
 			if (ImGui::Button("Delete"))
 			{
-				std::cout << m_BiomeManagers.size() << std::endl;
+				TF3D_LOG_DEBUG("Loaded {} biome managers", m_BiomeManagers.size());
 				m_BiomeManagers.erase(m_BiomeManagers.begin() + i);
-				std::cout << m_BiomeManagers.size() << std::endl;
+				TF3D_LOG_DEBUG("Active biome managers: {}", m_BiomeManagers.size());
 				m_RequireUpdation = true;
 				SetUINodeData(-1, None);
 			}

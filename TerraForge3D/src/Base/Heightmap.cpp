@@ -1,4 +1,5 @@
 #include "Heightmap.h"
+#include "Base/Logging/Logger.h"
 #include <string>
 #include <cmath>
 #include <iostream>
@@ -14,7 +15,7 @@ Heightmap::Heightmap(const std::string path)
 	void* data = stbi_load_16(path.c_str(), &width, &height, &channels, 1);
     if (!data)
     {
-        std::cout << "Failed to load heightmap (" << path << "): " << stbi_failure_reason() << std::endl;
+		TF3D_LOG_ERROR("Failed to load heightmap '{}': {}", path, stbi_failure_reason());
         return;
     }
     m_Data = static_cast<uint16_t*>(data);

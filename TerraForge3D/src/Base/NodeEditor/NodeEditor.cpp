@@ -1,4 +1,5 @@
 #include "Base/NodeEditor/NodeEditor.h"
+#include "Base/Logging/Logger.h"
 #include "Base/ImGuiShapes.h"
 #include "Base/UIFontManager.h"
 #include "GLFW/glfw3.h"
@@ -258,7 +259,7 @@ void NodeEditorNode::LoadInternal(nlohmann::json data)
 
 	catch(...)
 	{
-		std::cout << "Failed to load node position!\n";
+		TF3D_LOG_WARN("Failed to load node position for node {}", id);
 	}
 
 	reqNodePosLoad = true;

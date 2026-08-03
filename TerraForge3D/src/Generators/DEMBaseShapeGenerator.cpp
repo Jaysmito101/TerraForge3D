@@ -180,7 +180,7 @@ std::shared_ptr<Texture2D> DEMBaseShapeGenerator::LoadTile(uint32_t x, uint32_t 
 	// check if tile is valid
 	if (!IsTileValid(x, y, z))
 	{
-		Log(fmt::format("Tile {} {} {} is not valid", x, y, z));
+		TF3D_LOG_WARN("Invalid DEM tile coordinates: ({}, {}, {})", x, y, z);
 		return m_NullTexture;
 	}
 

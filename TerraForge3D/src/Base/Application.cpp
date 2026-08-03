@@ -15,7 +15,7 @@ static void InitGlad()
 {
 	if (!gladLoadGL(glfwGetProcAddress))
 	{
-		Log("Failed to Initialize GLAD!");
+		TF3D_LOG_ERROR("Failed to initialize GLAD");
 		exit(-1);
 	}
 }
@@ -163,6 +163,6 @@ void Application::Run(std::string loadFile)
 
 Application::~Application()
 {
-	std::cout << "Shutting down Application" << std::endl;
+	TF3D_LOG_INFO("Application shutdown complete");
 	delete m_Window;
 }

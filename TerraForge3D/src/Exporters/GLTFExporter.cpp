@@ -18,7 +18,7 @@ bool GLTFExporter::ExportGLB(const std::string& path, Mesh* mesh, float* progres
 	if (!progress) progress = &m_Progress; *progress = 0.0f;
 	BinaryFileWriter writer(path);
 	if (!writer.IsOpen()) return false;
-	std::cout << "GLB Export is yet to be implemented!\n";
+	TF3D_LOG_WARN("GLB export is not implemented yet");
 	*progress = 1.0f;
 	return true;
 }

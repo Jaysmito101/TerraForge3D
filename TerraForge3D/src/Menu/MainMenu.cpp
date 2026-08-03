@@ -86,7 +86,7 @@ void MainMenu::ShowOptionsMenu()
 		CloseClipboard();
 		delete[] output;
 #else
-		std::cout << "Version Hash : " << output << std::endl;
+		TF3D_LOG_DEBUG("Build version hash: {}", output);
 #endif
 	}
 

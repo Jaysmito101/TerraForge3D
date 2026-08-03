@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Base/Logging/Logger.h"
+
 #include <memory>
 
 #include "Base/Base.h"
@@ -181,7 +183,7 @@ public:
 		}
 		catch (...)
 		{
-			std::cout << "Error loading Serializer Value" << std::endl;
+			TF3D_LOG_ERROR("Failed to load serializer value");
 		}
 		try
 		{
@@ -197,7 +199,7 @@ public:
 		}
 		catch (...)
 		{
-			std::cout << "Error loading Serializer Children" << std::endl;
+			TF3D_LOG_ERROR("Failed to load serializer children");
 		}
 		try
 		{
@@ -217,7 +219,7 @@ public:
 		}
 		catch (...)
 		{
-			std::cout << "Error loading Serializer Arrays" << std::endl;
+			TF3D_LOG_ERROR("Failed to load serializer arrays");
 		}
 	}
 

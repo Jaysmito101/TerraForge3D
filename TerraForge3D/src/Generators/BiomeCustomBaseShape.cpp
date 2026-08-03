@@ -83,7 +83,7 @@ void BiomeCustomBaseShape::Update(GeneratorData* sourceBuffer, GeneratorData* ta
 		}
 		else
 		{
-			Log("Source buffer found to be null when base shape load was requested!");
+			TF3D_LOG_ERROR("Base-shape load requested with a null source buffer");
 		}
 		m_RequireBaseShapeUpdate = false;
 	}

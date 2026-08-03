@@ -65,7 +65,7 @@ void BiomeBaseShapeGenerator::Load(SerializerNode data)
 	m_Source = data->GetString("Source");
 	auto inspector = data->GetChildNode("Inspector");
 	if (inspector) m_Inspector->Load(inspector);
-	else Log("Failed to load inspector data for generator: " + m_Name);
+	else TF3D_LOG_ERROR("Failed to load inspector data for generator '{}'", m_Name);
 	// m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
 	m_Shader = m_AppState->resourceManager->GetComputeShader("BaseShapeGen_" + m_Name, BuildShaderSource());
 	m_RequireUpdation = true;
@@ -193,7 +193,7 @@ bool BiomeBaseShapeGenerator::LoadConfig(const std::string& config)
 	auto metaData = ParseData(config);
 	if (metaData["HasError"].get<bool>())
 	{
-		Log("Error in loading base shape generator config : " + metaData["ErrorMessage"].get<std::string>());
+		TF3D_LOG_ERROR("Failed to load base-shape generator configuration: {}", metaData["ErrorMessage"].get<std::string>());
 		return false;
 	}
 	if (!LoadInspectorFromConfig(metaData)) return false;

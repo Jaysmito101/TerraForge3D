@@ -30,7 +30,7 @@ ResourceManager::~ResourceManager()
 
 std::string ResourceManager::LoadShaderSource(const std::string shader, bool forceReload, bool* success)
 {
-	Log("Loading shader: " + shader);
+	TF3D_LOG_INFO("Loading shader: '{}'", shader);
 	auto shaderPath = FixPathSeperator(shader);
 	shaderPath = m_AppState->constants.shadersDir + PATH_SEPARATOR + shaderPath + ".glsl";
 	return LoadText(shaderPath, forceReload, success);
@@ -76,7 +76,7 @@ std::shared_ptr<ComputeShader> ResourceManager::GetComputeShader(const std::stri
 		}
 	}
 
-	Log("Compiling compute shader: " + name);
+	TF3D_LOG_DEBUG("Compiling compute shader '{}'", name);
 	auto shader = std::make_shared<ComputeShader>(source);
 	m_ComputeShaders[name] = std::make_pair(shader, hash);
 
@@ -95,7 +95,7 @@ std::shared_ptr<Shader> ResourceManager::GetShader(const std::string name, const
 		}
 	}
 
-	Log("Compiling shader: " + name);
+	TF3D_LOG_DEBUG("Compiling shader '{}'", name);
 	auto shader = std::make_shared<Shader>(vertexSource, fragmentSource);
 	m_Shaders[name] = std::make_pair(shader, hash);
 

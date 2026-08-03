@@ -77,7 +77,7 @@ bool ExrTextureExporter::SaveExr(const std::string& path, int resolution, int ch
 	int ret = SaveEXRImageToFile(&image, &header, path.c_str(), &err);
 	if (ret != TINYEXR_SUCCESS)
 	{
-		Log(fmt::format("Failed to save EXR image: {}", err));
+		TF3D_LOG_ERROR("Failed to save EXR image: {}", err);
 		FreeEXRErrorMessage(err);
 		return false;
 	}

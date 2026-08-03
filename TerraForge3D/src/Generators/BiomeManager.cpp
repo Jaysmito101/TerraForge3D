@@ -21,7 +21,7 @@ bool BiomeManager::LoadUpResources()
 		{
 			const std::string config = ReadShaderSourceFile(directoryEntry.path().string(), &s_TempBool);
 			if (!s_TempBool) continue;
-			if (!AddBaseShapeGenerator(config)) Log("ERROR: Failed to load base shape generator " + directoryEntry.path().string());
+			if (!AddBaseShapeGenerator(config)) TF3D_LOG_ERROR("Failed to load base-shape generator '{}'", directoryEntry.path().string());
 		}
 	}
 	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);

@@ -21,9 +21,9 @@ int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name)
 		char *errorLog = (char *)malloc(maxLength);
 		memset(errorLog, 0, maxLength);
 		glGetShaderInfoLog(shader, maxLength, &maxLength, errorLog);
-		Log(std::string("Error in Compiling ") + name + " Shader : ");
-		Log("Shader Source : \n" + shaderSrc + "\n");
-		Log(errorLog);
+		TF3D_LOG_ERROR("Failed to compile {} shader", name);
+		TF3D_LOG_DEBUG("Shader source:\n{}", shaderSrc);
+		TF3D_LOG_ERROR("Shader compiler output: {}", errorLog);
 		glDeleteShader(shader);
 	}
 

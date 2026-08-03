@@ -537,7 +537,7 @@ void CustomInspector::LoadData(SerializerNode node)
 	m_Values.clear();
 	int32_t valueCount = node->GetInteger("ValueCount");
 	auto subNodes = node->GetNodeArray("Values");
-	if (subNodes.size() != valueCount) std::cout << ("Warning: Data might be corrupted.\n");
+	if (subNodes.size() != valueCount) TF3D_LOG_WARN("Inspector data is incomplete: expected {}, found {}", valueCount, subNodes.size());
 	for (auto subNode : subNodes)
 	{
 		std::string name = subNode->GetString("GName");
@@ -571,7 +571,7 @@ void CustomInspector::Load(SerializerNode node)
 	m_ID = node->GetString("ID", m_ID);
 	int valueCount = node->GetInteger("WidgetsCount");
 	auto subNodes = node->GetNodeArray("Widgets");
-	if (subNodes.size() != valueCount) std::cout << ("Warning: Data might be corrupted.\n");
+	if (subNodes.size() != valueCount) TF3D_LOG_WARN("Inspector data is incomplete: expected {}, found {}", valueCount, subNodes.size());
 	for (auto subNode : subNodes)
 	{
 		std::string name = subNode->GetString("GName");

@@ -1,4 +1,5 @@
 #include <Window.h>
+#include "Base/Logging/Logger.h"
 
 #include <GLFW/glfw3.h>
 
@@ -8,7 +9,7 @@ static bool isGLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char *description)
 {
-	fprintf(stderr, "GLFW Error: %d: %s\n", error, description);
+	TF3D_LOG_ERROR("GLFW error {}: {}", error, description ? description : "unknown error");
 }
 
 static void InitGLFW()
@@ -20,7 +21,7 @@ static void InitGLFW()
 
 	if (!glfwInit())
 	{
-		std::cout << "Error in initializeing GLFW!" << std::endl;
+	TF3D_LOG_ERROR("Failed to initialize GLFW");
 		exit(-1);
 	}
 
@@ -42,7 +43,7 @@ Window::Window(std::string title)
 	if (!m_Window)
 	{
 		glfwTerminate();
-		std::cout << "Error in creating window!" << std::endl;
+		TF3D_LOG_ERROR("Failed to create application window");
 		exit(-1);
 	}
 
@@ -170,7 +171,7 @@ void Window::MakeCurrentContext()
 Window::~Window()
 {
 	Close();
-	std::cout << "Destroying Window!" << std::endl;
+	TF3D_LOG_DEBUG("Destroying application window");
 }
 
 void Window::Close()

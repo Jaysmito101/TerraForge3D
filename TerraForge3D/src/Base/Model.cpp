@@ -1,4 +1,5 @@
 #include <Model.h>
+#include "Base/Logging/Logger.h"
 #include <iostream>
 
 #include <glm/gtc/constants.hpp>
@@ -27,20 +28,20 @@ void Model::SetupMeshOnGPU()
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal)); glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord)); glEnableVertexAttribArray(2);
 	//glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1));glEnableVertexAttribArray(3);
-	std::cout << "Setup Model " << name << " on GPU.\n";
+	TF3D_LOG_DEBUG("Uploading model '{}' to GPU", name);
 }
 
 void Model::UploadToGPU()
 {
 	if (!mesh)
 	{
-		std::cout << "In Model " << name << " mesh not available.\n";
+		TF3D_LOG_WARN("Model '{}' has no mesh", name);
 		return;
 	}
 
 	if (!mesh->IsValid())
 	{
-		std::cout << "In Model " << name << " mesh not valid.\n";
+		TF3D_LOG_WARN("Model '{}' contains an invalid mesh", name);
 		return;
 	}
 

@@ -26,7 +26,7 @@ Shader::Shader(std::string vertexSrc, std::string fragmentSrc, std::string geome
 		glDeleteProgram(m_Shader);
 		glDeleteShader(vertShader);
 		glDeleteShader(fragShader);
-		Log(errorLog);
+		TF3D_LOG_ERROR("Shader link failed: {}", errorLog);
 		return;
 	}
 
@@ -60,7 +60,7 @@ Shader::Shader(std::string vertexSrc, std::string fragmentSrc)
 		glDeleteProgram(m_Shader);
 		glDeleteShader(vertShader);
 		glDeleteShader(fragShader);
-		Log(errorLog);
+		TF3D_LOG_ERROR("Shader link failed: {}", errorLog);
 		return;
 	}
 

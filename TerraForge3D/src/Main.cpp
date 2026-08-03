@@ -86,7 +86,7 @@ public:
 			{
 				if (appState->globals.currentOpenFilePath.size() > 3)
 				{
-					Log("Saved to " + appState->globals.currentOpenFilePath);
+					TF3D_LOG_INFO("Saved project: '{}'", appState->globals.currentOpenFilePath);
 					// appState->serailizer->SaveFile(appState->globals.currentOpenFilePath);
 				}
 				// else appState->serailizer->SaveFile(ShowSaveFileDialog("*.terr3d"));
@@ -97,13 +97,13 @@ public:
 			{
 				if (appState->globals.currentOpenFilePath.size() > 3)
 				{
-					Log("CLosed file " + appState->globals.currentOpenFilePath);
+					TF3D_LOG_INFO("Closed project: '{}'", appState->globals.currentOpenFilePath);
 					appState->globals.currentOpenFilePath = "";
 				}
 
 				else
 				{
-					Log("Shutting Down");
+					TF3D_LOG_INFO("Shutdown requested");
 					exit(0);
 				}
 			}
@@ -182,7 +182,7 @@ public:
 		// LoadDefaultStyle();
 
 
-		GetWindow()->SetShouldCloseCallback([&](int x, int y) -> void { Log("Shutting Down"); appState->mainApp->Close(); });
+		GetWindow()->SetShouldCloseCallback([&](int x, int y) -> void { TF3D_LOG_INFO("Window close requested ({}x{})", x, y); appState->mainApp->Close(); });
 		glfwSetDropCallback(GetWindow()->GetNativeWindow(), [](GLFWwindow*, int count, const char** paths) {
 				for (int i = 0; i < count; i++)
 				{
@@ -230,7 +230,7 @@ public:
 
 		if (loadFile.size() > 0)
 		{
-			Log("Loading File from " + loadFile);
+			TF3D_LOG_INFO("Loading project: '{}'", loadFile);
 			// appState->serailizer->LoadFile(loadFile);
 		}
 		// appState->projectManager->SetId(GenerateId(32));
@@ -238,7 +238,7 @@ public:
 		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Regular.ttf");
 		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
 		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
-		Log("Started Up App!");
+		TF3D_LOG_INFO("Application started");
 		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
 		appState->eventManager->RaiseEvent("OnStartUpComplete");
 

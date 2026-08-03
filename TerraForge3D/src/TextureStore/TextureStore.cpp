@@ -72,13 +72,13 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 
 	if(loadFromFile)
 	{
-		Log("Loading texture database from file");
+	TF3D_LOG_INFO("Loading texture database from file");
 		bool tmp = false;
 		std::string tmpStr = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_database.terr3d", &tmp);
 
 		if(tmp == false)
 		{
-			Log("Failed to load texture database from file");
+	TF3D_LOG_ERROR("Failed to load texture database from file");
 			return nlohmann::json();
 		}
 
@@ -89,19 +89,19 @@ nlohmann::json TextureStore::LoadTextureDatabaseJ()
 
 		catch(...)
 		{
-			Log("Failed to parse texture database from file");
+	TF3D_LOG_ERROR("Failed to parse texture database from file");
 			return nlohmann::json();
 		}
 	}
 
 	else
 	{
-		Log("Fetching texture database from web database.");
+	TF3D_LOG_INFO("Fetching texture database from remote source");
 		std::string tmp = FetchURL("https://api.polyhaven.com", "/assets?t=textures");
 
 		if (tmp.size() < 3)
 		{
-			Log("Failed to fetch texture database from web database.");
+	TF3D_LOG_ERROR("Failed to fetch texture database from remote source");
 			return nlohmann::json();
 		}
 
@@ -118,7 +118,7 @@ void TextureStore::VerifyTextureThumbs()
 	{
 		if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR + it.key() + ".png"))
 		{
-			Log("Downloading thumbnail for texture: " + it.key());
+			TF3D_LOG_DEBUG("Downloading thumbnail for texture '{}'", it.key());
 			DownloadFile("https://cdn.polyhaven.com", "/asset_img/thumbs/" +
 					it.key() + ".png?width=100&height=100", GetExecutableDir()
 					+ PATH_SEPARATOR "Data" PATH_SEPARATOR "cache"
@@ -132,7 +132,7 @@ nlohmann::json TextureStore::LoadDownloadedTextureDatabaseJ()
 {
 	if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "texture_database_downloaded.terr3d"))
 	{
-		Log("No Textures downloaded yet");
+	TF3D_LOG_DEBUG("No textures have been downloaded yet");
 		return nlohmann::json();
 	}
 
@@ -143,7 +143,7 @@ nlohmann::json TextureStore::LoadDownloadedTextureDatabaseJ()
 
 	if(tmp == false)
 	{
-		Log("Failed to load downloaded texture database from file");
+	TF3D_LOG_ERROR("Failed to load downloaded texture database from file");
 		return nlohmann::json();
 	}
 
@@ -156,7 +156,7 @@ nlohmann::json TextureStore::LoadDownloadedTextureDatabaseJ()
 
 	catch(...)
 	{
-		Log("Failed to parse downloaded texture database from file");
+	TF3D_LOG_ERROR("Failed to parse downloaded texture database from file");
 		return nlohmann::json();
 	}
 
@@ -204,7 +204,7 @@ void TextureStore::LoadTextureDatabase()
 
 void TextureStore::LoadTextureThumbs()
 {
-	Log("Loading texture thumbnails");
+	TF3D_LOG_INFO("Loading texture thumbnails");
 	int i=0;
 
 	for(auto &it : textureStoreItems)
@@ -226,11 +226,11 @@ void TextureStore::LoadTextureThumbs()
 
 		if(i % 20 == 0)
 		{
-			std::cout << ("Loaded " + std::to_string(i) + " of " + std::to_string(textureStoreItems.size()) + " texture thumbnails\r");
+	TF3D_LOG_DEBUG("Loaded {} of {} texture thumbnails", i, textureStoreItems.size());
 		}
 	}
 
-	Log("Texture thumbnails loaded");
+	TF3D_LOG_INFO("Texture thumbnails loaded");
 }
 
 void TextureStore::SaveDownloadsDatabase()
@@ -282,7 +282,7 @@ void TextureStore::DownloadTexture(int id, int res)
 
 	catch(...)
 	{
-		Log("Failed to download texture : "  + textureStoreItems[id].name);
+	TF3D_LOG_ERROR("Failed to download texture '{}'", textureStoreItems[id].name);
 		return;
 	}
 

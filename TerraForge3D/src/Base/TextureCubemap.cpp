@@ -1,4 +1,5 @@
 #include "TextureCubemap.h"
+#include "Base/Logging/Logger.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -75,7 +76,7 @@ bool TextureCubemap::LoadFace(std::string path, int face)
 
 	if (data)
 	{
-		std::cout << "Loaded : " << path << "\n";
+		TF3D_LOG_DEBUG("Loaded cubemap '{}'", path);
 
 		if(facesData[face])
 		{
@@ -89,7 +90,7 @@ bool TextureCubemap::LoadFace(std::string path, int face)
 	else
 	{
 		res = false;
-		std::cout << "Failed to load : " << path << std::endl;
+		TF3D_LOG_ERROR("Failed to load cubemap '{}'", path);
 		stbi_image_free(data);
 	}
 

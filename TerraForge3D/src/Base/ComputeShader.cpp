@@ -20,7 +20,7 @@ ComputeShader::ComputeShader(std::string source)
 		glGetProgramInfoLog(m_Shader, maxLength, &maxLength, errorLog);
 		glDeleteProgram(m_Shader);
 		glDeleteShader(shader);
-		Log(errorLog);
+		TF3D_LOG_ERROR("Compute shader link failed: {}", errorLog);
 		return;
 	}
 

@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 
 
-#define TF3D_HANDLE_EXCEPTION_MSG(x, message) { try {x;} catch(std::exception& e){ Log(std::string(message) + " [ " + e.what() + " ]" + message);} }
+#define TF3D_HANDLE_EXCEPTION_MSG(x, message) { try {x;} catch(const std::exception& e){ TF3D_LOG_ERROR("{}: {}", message, e.what()); } }
 #define TF3D_HANDLE_EXCEPTION(x) TF3D_HANDLE_EXCEPTION_MSG(x, "Exception:")
 
 
@@ -25,7 +25,7 @@ void Style::LoadFromFile(std::string filepath)
 		LoadFormString(contents);
 	else
 	{
-		Log("Failed to load style file from " + filepath);
+	TF3D_LOG_ERROR("Failed to load style file '{}'", filepath);
 	}
 }
 
@@ -38,7 +38,7 @@ void Style::LoadFormString(std::string contents)
 	}
 	catch (std::exception& e)
 	{
-		Log(std::string("Failed to parse style JSON : ") + e.what());
+	TF3D_LOG_ERROR("Failed to parse style JSON: {}", e.what());
 	}
 
 	// Load Colors
@@ -111,7 +111,7 @@ void Style::SaveToFile(std::string filepath)
 	std::string contents = SaveToString();
 	if (!WriteShaderSourceFile(filepath, contents))
 	{
-		Log("Failed to save style to " + filepath);
+	TF3D_LOG_ERROR("Failed to save style file '{}'", filepath);
 	}
 }
 

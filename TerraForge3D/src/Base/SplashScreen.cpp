@@ -1,6 +1,7 @@
 #ifdef _WIN32
 
 #include <SplashScreen.h>
+#include "Base/Logging/Logger.h"
 #include <resource.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -96,7 +97,7 @@ void SetSplashMessage(std::string message)
 
 void ShowSplashScreen()
 {
-	std::cout << "Hsadgbshdy\n";
+	TF3D_LOG_DEBUG("Splash screen initialized");
 	commandPtr = 1;
 }
 

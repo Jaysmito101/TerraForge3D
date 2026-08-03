@@ -153,19 +153,19 @@ bool DeleteFileT(std::string path)
 	{
 		if (std::filesystem::remove(path))
 		{
-			std::cout << "File " << path << " deleted.\n";
+			TF3D_LOG_DEBUG("Deleted file '{}'", path);
 		}
 
 		else
 		{
-			std::cout << "File " << path << " could not be deleted.\n";
+			TF3D_LOG_WARN("Could not delete file '{}'", path);
 			return false;
 		}
 	}
 
 	catch(const std::filesystem::filesystem_error &err)
 	{
-		std::cout << "filesystem error: " << err.what() << '\n';
+		TF3D_LOG_ERROR("Filesystem error while deleting '{}': {}", path, err.what());
 		return false;
 	}
 
@@ -277,7 +277,7 @@ std::string FetchURL(std::string baseURL, std::string path, std::string token)
 	}
 	else
 	{
-		Log("Error in fetching " + baseURL+ path + " ERROR  : " + httplib::to_string(res.error()));
+		TF3D_LOG_ERROR("HTTP request failed for '{}{}': {}", baseURL, path, httplib::to_string(res.error()));
 	}
 
 	return "";
@@ -489,7 +489,7 @@ void DownloadFile(std::string baseURL, std::string urlPath, std::string path, in
 		httplib::Client cli(baseURL);
 		int done = 0;
 		outfile.open(path.c_str(), std::ios::binary | std::ios::out);
-		std::cout << "Starting download - " << baseURL << urlPath << std::endl;
+		TF3D_LOG_INFO("Starting download: {}{}", baseURL, urlPath);
 		auto res = cli.Get(urlPath.c_str(),
 		                   [&](const char *data, size_t data_length)
 		{
@@ -498,13 +498,13 @@ void DownloadFile(std::string baseURL, std::string urlPath, std::string path, in
 			if (size > 0)
 			{
 				float percent = (float)done / (float)size;
-				std::cout << "Downloaded " << (int)(percent * 100) << "%      \r";
+				TF3D_LOG_DEBUG("Download progress: {}%", static_cast<int>(percent * 100));
 			}
 
 			outfile.write(data, data_length);
 			return true;
 		});
-		std::cout << "Download Complete - " << path << std::endl;
+		TF3D_LOG_INFO("Download complete: '{}'", path);
 		outfile.close();
 	}
 
@@ -533,19 +533,19 @@ void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue)
 
 	if (iRC != ERROR_SUCCESS && !bDidntExist)
 	{
-		Log("RegGetValue( " + std::string(pszVar) + " ) Failed : " + strerror(iRC));
+		TF3D_LOG_ERROR("RegGetValue failed for '{}': {}", pszVar, strerror(iRC));
 	}
 
 	if (!bDidntExist)
 	{
 		if (dwType != REG_SZ)
 		{
-			Log("RegGetValue( " + std::string(pszVar) + " ) found type unhandled " + std::to_string(dwType));
+			TF3D_LOG_WARN("RegGetValue returned unsupported type {} for '{}'", dwType, pszVar);
 		}
 
 		if (strcmp(szValueCurrent, pszValue) == 0)
 		{
-			Log("RegSet( \"" + std::string(pszVar) + "\" \"" + std::string(pszValue) + "\" ): already correct");
+			TF3D_LOG_DEBUG("Registry value '{}' is already '{}'; no update needed", pszVar, pszValue);
 			return;
 		}
 	}
@@ -555,24 +555,24 @@ void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue)
 
 	if (iRC != ERROR_SUCCESS)
 	{
-		Log("RegSetValue( " + std::string(pszVar) + " ) Failed : " + strerror(iRC));
+		TF3D_LOG_ERROR("RegSetValue failed for '{}': {}", pszVar, strerror(iRC));
 	}
 
 	iRC = RegSetValueEx(hkey, "", 0, REG_SZ, (BYTE *)pszValue, (int)strlen(pszValue) + 1);
 
 	if (iRC != ERROR_SUCCESS)
 	{
-		Log("RegSetValue( " + std::string(pszVar) + " ) Failed: " + strerror(iRC));
+		TF3D_LOG_ERROR("RegSetValue failed for '{}': {}", pszVar, strerror(iRC));
 	}
 
 	if (bDidntExist)
 	{
-		Log("RegSet( " + std::string(pszVar) +" ): set to \"" + std::string(pszValue) + "\"");
+		TF3D_LOG_INFO("Registry value '{}' set to '{}'", pszVar, pszValue);
 	}
 
 	else
 	{
-		Log("RegSet( " + std::string(pszVar) +" ): changed \"" + std::string(szValueCurrent) + "\" to \"" + std::string(pszValue) + "\"");
+		TF3D_LOG_INFO("Registry value '{}' changed from '{}' to '{}'", pszVar, szValueCurrent, pszValue);
 	}
 
 	RegCloseKey(hkey);
@@ -663,7 +663,7 @@ void ToggleSystemConsole()
 #ifdef TERR3D_WIN32
 	ShowWindow(GetConsoleWindow(), state ? SW_SHOW : SW_HIDE);
 #else
-	std::cout << "Toogle Console Not Supported on Linux!" << std::endl;
+	TF3D_LOG_WARN("Console toggling is not supported on Linux");
 #endif
 }
 

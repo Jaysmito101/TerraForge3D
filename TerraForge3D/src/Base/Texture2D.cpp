@@ -1,4 +1,5 @@
 #include "Texture2D.h"
+#include "Base/Logging/Logger.h"
 #include <iostream>
 
 #pragma warning(push, 0)
@@ -59,7 +60,7 @@ Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha)
 	}
 	else
 	{
-		std::cout << "Failed to load texture : " << path << std::endl;
+		TF3D_LOG_ERROR("Failed to load texture '{}'", path);
 	}
 }
 

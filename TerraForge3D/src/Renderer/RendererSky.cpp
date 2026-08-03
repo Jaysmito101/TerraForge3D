@@ -69,13 +69,13 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	if (m_SkyboxTextureID > -1) glDeleteTextures(1, &m_SkyboxTextureID);
 	if (m_IrradianceMapTextureID > -1) glDeleteTextures(1, &m_IrradianceMapTextureID); 
 
-	std::cout << "Loading skybox texture : " << path << std::endl;
+	TF3D_LOG_DEBUG("Loading skybox texture '{}'", path);
 
 	int32_t skyboxTextureEquirectWidth = 0, skyboxTextureEquirectHeight = 0;
 	unsigned char* skyboxTextureEquirectData = stbi_load(path.c_str(), &skyboxTextureEquirectWidth, &skyboxTextureEquirectHeight, nullptr, 3);
 	if (!skyboxTextureEquirectData)   
 	{
-		Log("Failed to load skybox texture : %s" + path);
+	TF3D_LOG_ERROR("Failed to load skybox texture '{}'", path);
 		return false;
 	}
 	uint32_t skyboxTextureEquirect = -1;

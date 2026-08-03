@@ -83,7 +83,7 @@ SupportersTribute::SupportersTribute()
 
 	if (hasGithubToken && IsNetWorkConnected() && (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache") || rand() % 10 == 0))
 	{
-		Log("Internet Connection is Live!\nFetching Latest Supporters data.");
+	TF3D_LOG_INFO("Internet connection is available; fetching supporter data");
 		{
 			std::string repoDataStr = FetchURL("https://api.github.com", "/repos/Jaysmito101/TerraForge3D", githubToken);
 			nlohmann::json repoData = nlohmann::json::parse(repoDataStr, nullptr, false);
@@ -113,11 +113,11 @@ SupportersTribute::SupportersTribute()
 	else
 	{
 		bool tmp = false;
-		Log("Trying to load cached data.");
+	TF3D_LOG_DEBUG("Loading cached supporter data");
 
 		if (hasGithubToken && FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache"))
 		{
-			Log("Found Stargazers Cached Data!");
+	TF3D_LOG_DEBUG("Loaded cached stargazer data");
 			std::string stargazersRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "stargazers.terr3dcache", &tmp);
 			nlohmann::json stargazersData = nlohmann::json::parse(stargazersRawData, nullptr, false);
 			if (stargazersData.is_array()) LoadstargazersData(stargazersData);
@@ -125,17 +125,17 @@ SupportersTribute::SupportersTribute()
 
 		else if (hasGithubToken)
 		{
-			Log("Stargazers Cached Data not found!");
+	TF3D_LOG_DEBUG("No cached stargazer data found");
 		}
 
 		else
 		{
-			Log("Stargazers are unavailable without TERR3D_GITHUB_TOKEN.");
+	TF3D_LOG_WARN("Stargazer data unavailable because TERR3D_GITHUB_TOKEN is not set");
 		}
 
 		if (FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache"))
 		{
-			Log("Found Contributors Cached Data!");
+	TF3D_LOG_DEBUG("Loaded cached contributor data");
 			std::string contributorsRawData = ReadShaderSourceFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "contributors.terr3dcache", &tmp);
 			nlohmann::json contributorsData = nlohmann::json::parse(contributorsRawData, nullptr, false);
 			if (contributorsData.is_array()) LoadcontributorsData(contributorsData);
@@ -143,7 +143,7 @@ SupportersTribute::SupportersTribute()
 
 		else
 		{
-			Log("Contributors Cached Data not found!");
+	TF3D_LOG_DEBUG("No cached contributor data found");
 		}
 	}
 }
