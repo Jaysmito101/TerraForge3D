@@ -49,7 +49,9 @@ struct Hash
 };
 
 
+#ifndef MAX
 #define MAX(x, y) (x > y ? x : y)
+#endif 
 
 
 #ifdef TERR3D_WIN32
