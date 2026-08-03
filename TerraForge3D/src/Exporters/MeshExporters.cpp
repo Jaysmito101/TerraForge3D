@@ -16,13 +16,24 @@
 
 Mesh* ExportManager::ApplyMeshTransform(Mesh* mesh, float* data)
 {
-	int size = m_AppState->mainMap.tileResolution, x = 0, y = 0;
+	const int size = m_AppState->mainMap.tileResolution;
+	auto sampleHeightBilinear = [data, size](float u, float v) {
+		u = std::clamp(u, 0.0f, 1.0f) * (size - 1);
+		v = std::clamp(v, 0.0f, 1.0f) * (size - 1);
+		const int x0 = static_cast<int>(std::floor(u));
+		const int y0 = static_cast<int>(std::floor(v));
+		const int x1 = std::min(x0 + 1, size - 1);
+		const int y1 = std::min(y0 + 1, size - 1);
+		const float tx = u - x0;
+		const float ty = v - y0;
+		const float lower = std::lerp(data[y0 * size + x0], data[y0 * size + x1], tx);
+		const float upper = std::lerp(data[y1 * size + x0], data[y1 * size + x1], tx);
+		return std::lerp(lower, upper, ty);
+	};
 	for (int i = 0; i < mesh->GetVertexCount(); i++)
 	{
 		const auto& vert = mesh->GetVertex(i);
-		x = std::clamp((int)(vert.texCoord.x * size), 0, size - 1);
-		y = std::clamp((int)(vert.texCoord.y * size), 0, size - 1);
-		mesh->SetPosition(vert.position + vert.normal * data[y * size + x], i);
+		mesh->SetPosition(vert.position + vert.normal * sampleHeightBilinear(vert.texCoord.x, vert.texCoord.y), i);
 	}
 	mesh->RecalculateNormals();
 	return mesh;

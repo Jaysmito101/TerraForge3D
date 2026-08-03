@@ -25,7 +25,7 @@ void ExportManager::UpdateHeightmapVisualizer()
 
 float* ExportManager::ApplyHeightmapTextureTransform(float* data, float* minMax)
 {
-	auto resolution = m_AppState->mainMap.mapResolution;
+	auto resolution = m_AppState->mainMap.tileResolution;
 	auto minHeight = minMax, maxHeight = minMax + 1;
 	
 	// transform the heightmap data
@@ -69,7 +69,7 @@ void ExportManager::ExportTextureCurrentTile(std::string path, int format, int b
 		this->SetStatusMessage("Exporting : " + path);
 		m_ExportProgress = 0.01f;
 		
-		if (!ExportHeightmapTexture(path, ApplyHeightmapTextureTransform(heightMapData, m_ExportHeightmapMinMaxHeight), format, bitDepth, m_AppState->mainMap.mapResolution)) this->SetStatusMessage("Failed to export : " + path);
+		if (!ExportHeightmapTexture(path, ApplyHeightmapTextureTransform(heightMapData, m_ExportHeightmapMinMaxHeight), format, bitDepth, m_AppState->mainMap.tileResolution)) this->SetStatusMessage("Failed to export : " + path);
 		else this->SetStatusMessage("");
 		
 		m_ExportProgress = 1.1f;
