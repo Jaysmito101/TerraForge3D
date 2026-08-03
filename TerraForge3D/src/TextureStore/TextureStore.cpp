@@ -213,7 +213,7 @@ void TextureStore::LoadTextureThumbs()
 
 		if(!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR + it.name + ".png"))
 		{
-			Log("Thumbnail for texture: " + it.name + " not found.");
+			// Log("Thumbnail for texture: " + it.name + " not found.");
 			it.texThumbnail = new Texture2D(GetExecutableDir() + PATH_SEPARATOR
 					"Data" PATH_SEPARATOR "textures" PATH_SEPARATOR
 					"white.png", false);

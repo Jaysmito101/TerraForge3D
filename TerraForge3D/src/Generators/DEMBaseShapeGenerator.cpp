@@ -10,7 +10,7 @@ static bool AABBContains01(const glm::vec2& minA, const glm::vec2& maxA)
 	static const glm::vec2 minB = glm::vec2(0.0f);
 	static const glm::vec2 maxB = glm::vec2(1.0f);
 	return (maxA.x >= minB.x) && (minA.x <= maxB.x) && (maxA.y >= minB.y) && (minA.y <= maxB.y);
-}
+} 
 
 DEMBaseShapeGenerator::DEMBaseShapeGenerator(ApplicationState* appState)
 {
