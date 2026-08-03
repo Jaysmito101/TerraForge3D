@@ -3,6 +3,7 @@
 #include "Base/ComputeShader.h"
 #include "Utils/Utils.h"
 #include "Profiler.h"
+#include <GLFW/glfw3.h>
 
 GenerationManager::GenerationManager(ApplicationState* appState)
 {
@@ -11,31 +12,135 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = std::make_shared<GeneratorData>();
+	m_WorkingHeightmapData = std::make_shared<GeneratorData>();
 	m_SwapBuffer = std::make_shared<GeneratorData>();
 	m_BiomeMixer = std::make_shared<BiomeMixer>(m_AppState);
 	m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
 	m_BiomeManagers.back()->SetName("Default Global");
 
-	//m_BlurrShader = new ComputeShader(source);
+	GLFWwindow* renderWindow = glfwGetCurrentContext();
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+	m_GenerationWindow = glfwCreateWindow(1, 1, "TerraForge3D Generation", nullptr, renderWindow);
+	glfwMakeContextCurrent(renderWindow);
+	if (m_GenerationWindow) {
+		m_GenerationWorker = std::thread(&GenerationManager::GenerationWorkerLoop, this);
+	}
+	else {
+		TF3D_LOG_ERROR("Failed to create shared generation OpenGL context; generation will run on the render thread");
+	}
 }
 
 GenerationManager::~GenerationManager()
 {
+	{
+		std::lock_guard lock(m_GenerationMutex);
+		m_StopGenerationWorker = true;
+	}
+	m_GenerationCondition.notify_one();
+	if (m_GenerationWorker.joinable()) m_GenerationWorker.join();
+	if (m_GenerationWindow)
+	{
+		glfwDestroyWindow(m_GenerationWindow);
+		m_GenerationWindow = nullptr;
+	}
 }
 
 void GenerationManager::Update()
 {
 	if (m_UpdationPaused) return;
-
-	//if (m_RequireUpdation)
+	if (!m_GenerationWindow)
 	{
-		UpdateInternal();
+		// TF3D_LOG_DEBUG("GenerationManager::Update() - Running generation on render thread as no shared OpenGL context is available");
+		if (m_RequireUpdation)
+		{
+			m_RequireUpdation = false;
+			ExecuteGeneration(true);
+			m_HeightmapData.swap(m_WorkingHeightmapData);
+		}
+		return;
+	}
+
+	if (m_GenerationCompleted.load(std::memory_order_acquire) &&
+		!m_GenerationRunning.load(std::memory_order_acquire))
+	{
+		std::lock_guard lock(m_GenerationMutex);
+		if (m_GenerationCompleted.load(std::memory_order_acquire) &&
+			!m_GenerationRunning.load(std::memory_order_acquire))
+		{
+			m_HeightmapData.swap(m_WorkingHeightmapData);
+			m_GenerationCompleted.store(false, std::memory_order_release);
+		}
+	}
+
+	if (m_RequireUpdation.load(std::memory_order_acquire) &&
+		!m_GenerationRunning.load(std::memory_order_acquire) &&
+		!m_GenerationRequestPending.load(std::memory_order_acquire))
+	{
+		RequestGeneration(true);
 	}
 }
 
 bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPtr)
 {
-	auto forceUpdate = (params == "ForceUpdate");
+	RequestGeneration(params == "ForceUpdate");
+	return false;
+}
+
+void GenerationManager::RequestGeneration(bool force)
+{
+	if (!m_GenerationWindow)
+	{
+		ExecuteGeneration(force);
+		return;
+	}
+	{
+		std::lock_guard lock(m_GenerationMutex);
+		m_GenerationRequestPending = true;
+		m_GenerationForceRequested = m_GenerationForceRequested || force;
+		m_RequireUpdation = false;
+	}
+	m_GenerationCondition.notify_one();
+}
+
+void GenerationManager::WaitForGenerationWorker()
+{
+	std::unique_lock lock(m_GenerationMutex);
+	m_GenerationCondition.wait(lock, [this] { return !m_GenerationRunning && !m_GenerationRequestPending; });
+}
+
+void GenerationManager::GenerationWorkerLoop()
+{
+	glfwMakeContextCurrent(m_GenerationWindow);
+	while (true)
+	{
+		bool force = false;
+		{
+			std::unique_lock lock(m_GenerationMutex);
+			m_GenerationCondition.wait(lock, [this] { return m_StopGenerationWorker || m_GenerationRequestPending; });
+			if (m_StopGenerationWorker) break;
+			force = m_GenerationForceRequested;
+			m_GenerationRequestPending = false;
+			m_GenerationForceRequested = false;
+			m_GenerationRunning = true;
+		}
+
+		ExecuteGeneration(force);
+
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		glFinish();
+
+		{
+			std::lock_guard lock(m_GenerationMutex);
+			m_GenerationRunning = false;
+			m_GenerationCompleted = true;
+		}
+		m_GenerationCondition.notify_all();
+	}
+	glfwMakeContextCurrent(nullptr);
+}
+
+void GenerationManager::ExecuteGeneration(bool forceUpdate)
+{
 	auto hasAnythingUpdated = false;
 	for (auto biome : m_BiomeManagers)
 	{
@@ -47,10 +152,8 @@ bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPt
 	}
 	if (hasAnythingUpdated || m_BiomeMixer->IsUpdationRequired() || forceUpdate)
 	{
-		m_BiomeMixer->Update(m_HeightmapData.get(), m_SwapBuffer.get());
+		m_BiomeMixer->Update(m_WorkingHeightmapData.get(), m_SwapBuffer.get());
 	}
-	m_RequireUpdation = false;
-	return false;
 }
 
 void GenerationManager::PullSeedTextureFromActiveMesh()
@@ -212,8 +315,14 @@ void GenerationManager::ShowSettingsGlobalOptions()
 
 bool GenerationManager::OnTileResolutionChange(const std::string params, void* paramsPtr)
 {
+	WaitForGenerationWorker();
+	{
+		std::lock_guard lock(m_GenerationMutex);
+		m_GenerationCompleted = false;
+	}
 	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
 	m_HeightmapData->Resize(size);
+	m_WorkingHeightmapData->Resize(size);
 	m_SwapBuffer->Resize(size);
 	m_RequireUpdation = true;
 	for (auto biome : m_BiomeManagers)

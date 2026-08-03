@@ -7,6 +7,7 @@
 
 class ApplicationState;
 class ComputeShader;
+struct GLFWwindow;
 
 enum SelectedUINodeObjectType
 {
@@ -64,11 +65,16 @@ private:
 	void ShowSettingsInspector();
 	void ShowSettingsDetailed();
 	void ShowSettingsGlobalOptions();
+	void RequestGeneration(bool force);
+	void WaitForGenerationWorker();
+	void GenerationWorkerLoop();
+	void ExecuteGeneration(bool force);
 
 private:
 	ApplicationState* m_AppState = nullptr;
 
 	std::shared_ptr<GeneratorData> m_HeightmapData;
+	std::shared_ptr<GeneratorData> m_WorkingHeightmapData;
 	std::shared_ptr<GeneratorData> m_SwapBuffer;
 	std::shared_ptr<GeneratorTexture> m_SeedTexture;
 	std::shared_ptr<BiomeMixer> m_BiomeMixer;
@@ -77,8 +83,18 @@ private:
 
 	bool m_IsWindowVisible = true;
 	bool m_UpdationPaused = false;
-	bool m_RequireUpdation = true;
+	std::atomic_bool m_RequireUpdation = true;
 	bool m_UseSeedFromActiveMesh = false;
+
+	GLFWwindow* m_GenerationWindow = nullptr;
+	std::thread m_GenerationWorker;
+	std::mutex m_GenerationMutex;
+	std::condition_variable m_GenerationCondition;
+	std::atomic_bool m_GenerationRequestPending = false;
+	bool m_GenerationForceRequested = false;
+	std::atomic_bool m_GenerationRunning = false;
+	std::atomic_bool m_GenerationCompleted = false;
+	std::atomic_bool m_StopGenerationWorker = false;
 
 	int32_t m_SeedTextureResolution = 256;
 	SelectedUINode m_SelectedNodeUI;
