@@ -57,7 +57,11 @@ bool DEMBaseShapeGenerator::ShowSettings()
 		ImGui::Text("Time Taken : %f", m_CalculationTime);
 		ImGui::Text("Tiles Using : %d", m_TilesUsingCount);
 	}
-	ImGui::InputText("API Key", m_APIKeyInput, 1024);
+	ImGui::TextDisabled("Elevation provider: MapTiler Cloud (Terrain RGB)");
+	ImGui::TextWrapped("Paste an API key created in your MapTiler Cloud account. This key is used to download DEM elevation tiles.");
+	ImGui::InputText("MapTiler Cloud API Key", m_APIKeyInput, 1024);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Create or copy a key from your MapTiler Cloud account: cloud.maptiler.com/account/keys/");
 	if (m_APIKey != m_APIKeyInput && strlen(m_APIKeyInput) > 0 && ImGui::Button("Apply"))
 	{
 		m_APIKey = m_APIKeyInput;
