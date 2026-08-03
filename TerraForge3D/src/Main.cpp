@@ -193,15 +193,15 @@ public:
 		});
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
 		appState->mainModel = new Model("Main_Model");
-		appState->mainModel->mesh->GeneratePlane(256, 1.0f);
+		appState->mainModel->mesh->GeneratePlane(1024, 1.0f);
 		appState->mainModel->mesh->RecalculateNormals();
 		appState->mainModel->SetupMeshOnGPU();
 		appState->mainModel->UploadToGPU();
 
 
 		appState->mainMap.tileCount = 1;
-		appState->mainMap.mapResolution = 256;
-		appState->mainMap.tileResolution = 256;
+		appState->mainMap.mapResolution = 1024;
+		appState->mainMap.tileResolution = 1024;
 		appState->mainMap.tileSize = 1.0f;
 		appState->mainMap.tileOffsetX = appState->mainMap.tileOffsetY = 0.0f;
 		appState->mainMap.currentTileX = appState->mainMap.currentTileY = 0;
