@@ -4,6 +4,7 @@
 #include "Misc/AppStyles.h"
 
 #include <ctype.h>
+#include <cfloat>
 #include <cstring>
 #include <limits.h>
 #include <math.h>
@@ -20,6 +21,45 @@
 static char themeName[256] = "Custom Theme\0";
 static ImGuiStyle themeDefaults;
 static bool themeDefaultsCaptured = false;
+static float themeDefaultScale = 1.0f;
+
+namespace
+{
+	void ScaleStyleSizesWithoutRounding(ImGuiStyle& style, float factor)
+	{
+		auto scale = [factor](float& value) { value *= factor; };
+		auto scaleVector = [&scale](ImVec2& value)
+		{
+			scale(value.x);
+			scale(value.y);
+		};
+
+		scaleVector(style.WindowPadding);
+		scale(style.WindowRounding);
+		scaleVector(style.WindowMinSize);
+		scale(style.ChildRounding);
+		scale(style.PopupRounding);
+		scaleVector(style.FramePadding);
+		scale(style.FrameRounding);
+		scaleVector(style.ItemSpacing);
+		scaleVector(style.ItemInnerSpacing);
+		scaleVector(style.CellPadding);
+		scaleVector(style.TouchExtraPadding);
+		scale(style.IndentSpacing);
+		scale(style.ColumnsMinSpacing);
+		scale(style.ScrollbarSize);
+		scale(style.ScrollbarRounding);
+		scale(style.GrabMinSize);
+		scale(style.GrabRounding);
+		scale(style.LogSliderDeadzone);
+		scale(style.TabRounding);
+		if (style.TabMinWidthForCloseButton != FLT_MAX) scale(style.TabMinWidthForCloseButton);
+		scaleVector(style.SeparatorTextPadding);
+		scaleVector(style.DisplayWindowPadding);
+		scaleVector(style.DisplaySafeAreaPadding);
+		scale(style.MouseCursorScale);
+	}
+}
 
 std::string GetCurrentThemeName()
 {
@@ -35,6 +75,7 @@ void SetCurrentThemeName(const std::string& name)
 void CaptureCurrentThemeDefaults()
 {
 	themeDefaults = ImGui::GetStyle();
+	themeDefaultScale = ImGui::GetIO().FontGlobalScale;
 	themeDefaultsCaptured = true;
 }
 
@@ -42,6 +83,7 @@ void ResetCurrentThemeToDefaults()
 {
 	if (!themeDefaultsCaptured) CaptureCurrentThemeDefaults();
 	ImGui::GetStyle() = themeDefaults;
+	ImGui::GetIO().FontGlobalScale = themeDefaultScale;
 }
 
 void LoadMayaStyle()
@@ -549,6 +591,19 @@ void ShowStyleEditor(bool *pOpen)
 	}
 	ImGui::SameLine();
 	ImGui::TextDisabled("Changes save automatically");
+
+	float uiScale = ImGui::GetIO().FontGlobalScale;
+	if (ImGui::SliderFloat("UI Scale", &uiScale, 0.75f, 2.50f, "%.2fx"))
+	{
+		const float previousScale = ImGui::GetIO().FontGlobalScale;
+		if (previousScale > 0.0f)
+		{
+			// ImGuiStyle::ScaleAllSizes() floors values to pixels, which can
+			// permanently turn small metrics such as 1px values into zero.
+			ScaleStyleSizesWithoutRounding(style, uiScale / previousScale);
+			ImGui::GetIO().FontGlobalScale = uiScale;
+		}
+	}
 
 	// Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
 	if (ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))

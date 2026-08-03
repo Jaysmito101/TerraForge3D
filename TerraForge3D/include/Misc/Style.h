@@ -25,7 +25,11 @@ public:
 	inline void SetStyle(ImGuiStyle style) { this->style = style; }
 	inline ImGuiStyle GetStyle() { return this->style; }
 
+	inline void SetScale(float scale) { this->scale = scale; }
+	inline float GetScale() const { return this->scale; }
+
 private:
 	ImGuiStyle style;
 	std::string name = "Style";
+	float scale = 1.0f;
 };

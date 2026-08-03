@@ -52,6 +52,7 @@ void Style::LoadFormString(std::string contents)
 	}
 
 	TF3D_HANDLE_EXCEPTION_MSG(name = st["Name"].dump(); , "Error in loading name from style");
+	TF3D_HANDLE_EXCEPTION_MSG(scale = st.value("Scale", 1.0f);, "Error in loading scale from style");
 
 	// Floats
 	TF3D_HANDLE_EXCEPTION_MSG(style.Alpha = st["Alpha"]; , "Error in loading Alpha from style");
@@ -98,12 +99,17 @@ void Style::LoadFormString(std::string contents)
 	TF3D_HANDLE_EXCEPTION_MSG(style.WindowMinSize = ImVec2(st["WindowMinSize"]["X"], st["WindowMinSize"]["Y"]); , "Error in loading WindowMinSize  from style");
 	TF3D_HANDLE_EXCEPTION_MSG(style.WindowTitleAlign = ImVec2(st["WindowTitleAlign"]["X"], st["WindowTitleAlign"]["Y"]); , "Error in loading WindowTitleAlign  from style");
 	TF3D_HANDLE_EXCEPTION_MSG(style.FramePadding = ImVec2(st["FramePadding"]["X"], st["FramePadding"]["Y"]);, "Error in loading FramePadding  from style");
+	if (st.contains("SeparatorTextPadding"))
+	{
+		TF3D_HANDLE_EXCEPTION_MSG(style.SeparatorTextPadding = ImVec2(st["SeparatorTextPadding"]["X"], st["SeparatorTextPadding"]["Y"]);, "Error in loading SeparatorTextPadding from style");
+	}
 
 }
 
 void Style::LoadCurrent()
 {
 	style = ImGui::GetStyle();
+	scale = ImGui::GetIO().FontGlobalScale;
 }
 
 void Style::SaveToFile(std::string filepath)
@@ -135,6 +141,7 @@ std::string Style::SaveToString()
 	}
 
 	st["Name"] = name;
+	st["Scale"] = scale;
 
 	st["Colors"] = colors;
 
@@ -207,6 +214,9 @@ std::string Style::SaveToString()
 	tmp["X"] = style.FramePadding.x;
 	tmp["Y"] = style.FramePadding.y;
 	st["FramePadding"] = tmp;
+	tmp["X"] = style.SeparatorTextPadding.x;
+	tmp["Y"] = style.SeparatorTextPadding.y;
+	st["SeparatorTextPadding"] = tmp;
 
 	return st.dump(1, '\t');
 }
@@ -215,4 +225,5 @@ void Style::Apply()
 {
 	ImGuiStyle& st = ImGui::GetStyle();
 	st = style;
+	ImGui::GetIO().FontGlobalScale = scale;
 }
