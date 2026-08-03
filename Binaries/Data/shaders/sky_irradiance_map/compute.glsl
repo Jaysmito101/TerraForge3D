@@ -1,5 +1,7 @@
 #version 430 core
 
+#include "common/sampling.glsl"
+
 const float PI = 3.141592;
 const float TwoPI = 2 * PI;
 const float Epsilon = 0.00001;
@@ -11,31 +13,6 @@ uniform samplerCube u_InputTexture;
 
 layout(binding = 0, rgba32f) uniform imageCube outputTexture;
 
-float radicalInverse_VdC(uint bits)
-{
-	bits = (bits << 16u) | (bits >> 16u);
-	bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-	bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-	bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-	bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-	return float(bits) * 2.3283064365386963e-10; // / 0x100000000
-}
-
-// Sample i-th point from Hammersley point set of NumSamples points total.
-vec2 sampleHammersley(uint i)
-{
-	return vec2(i * InvNumSamples, radicalInverse_VdC(i));
-}
-
-// Uniformly sample point on a hemisphere.
-// Cosine-weighted sampling would be a better fit for Lambertian BRDF but since this
-// compute shader runs only once as a pre-processing step performance is not *that* important.
-// See: "Physically Based Rendering" 2nd ed., section 13.6.1.
-vec3 sampleHemisphere(float u1, float u2)
-{
-	const float u1p = sqrt(max(0.0, 1.0 - u1*u1));
-	return vec3(cos(TwoPI*u2) * u1p, sin(TwoPI*u2) * u1p, u1);
-}
 
 // Calculate normalized sampling direction vector based on current fragment coordinates (gl_GlobalInvocationID.xyz).
 // This is essentially "inverse-sampling": we reconstruct what the sampling vector would be if we wanted it to "hit"
@@ -88,8 +65,8 @@ void main(void)
 	// so we don't need to normalize in PBR fragment shader (so technically it encodes exitant radiance rather than irradiance).
 	vec3 irradiance = vec3(0);
 	for(uint i=0; i<NumSamples; ++i) {
-		vec2 u  = sampleHammersley(i);
-		vec3 Li = tangentToWorld(sampleHemisphere(u.x, u.y), N, S, T);
+		vec2 u  = tf3d_sampleHammersley(i, NumSamples);
+		vec3 Li = tangentToWorld(tf3d_sampleHemisphere(u.x, u.y), N, S, T);
 		float cosTheta = max(0.0, dot(Li, N));
 
 		// PIs here cancel out because of division by pdf.

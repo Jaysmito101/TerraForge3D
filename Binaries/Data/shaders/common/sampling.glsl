@@ -12,11 +12,16 @@ float tf3d_radicalInverseVdc(uint bits)
 	return float(bits) * 2.3283064365386963e-10;
 }
 
+// Sample i-th point from Hammersley point set of NumSamples points total.
 vec2 tf3d_sampleHammersley(uint i, uint sampleCount)
 {
 	return vec2(float(i) / float(sampleCount), tf3d_radicalInverseVdc(i));
 }
 
+// Uniformly sample point on a hemisphere.
+// Cosine-weighted sampling would be a better fit for Lambertian BRDF but since this
+// compute shader runs only once as a pre-processing step performance is not *that* important.
+// See: "Physically Based Rendering" 2nd ed., section 13.6.1.
 vec3 tf3d_sampleHemisphere(float u1, float u2)
 {
 	float r = sqrt(max(0.0, 1.0 - u1 * u1));

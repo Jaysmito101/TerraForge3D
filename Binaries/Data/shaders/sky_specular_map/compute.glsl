@@ -1,5 +1,7 @@
 #version 430 core
 
+#include "common/sampling.glsl"
+
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 const float PI = 3.141592f;
@@ -18,22 +20,6 @@ layout(location=0) uniform float roughness;
 #define PARAM_LEVEL     0
 #define PARAM_ROUGHNESS roughness
 
-// See: http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
-float radicalInverse_VdC(uint bits)
-{
-	bits = (bits << 16u) | (bits >> 16u);
-	bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-	bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-	bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-	bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-	return float(bits) * 2.3283064365386963e-10; // / 0x100000000
-}
-
-// Sample i-th point from Hammersley point set of NumSamples points total.
-vec2 sampleHammersley(uint i)
-{
-	return vec2(i * InvNumSamples, radicalInverse_VdC(i));
-}
 
 // Importance sample GGX normal distribution function for a fixed roughness value.
 // This returns normalized half-vector between Li & Lo.
@@ -124,7 +110,7 @@ void main(void)
 	// Convolve environment map using GGX NDF importance sampling.
 	// Weight by cosine term since Epic claims it generally improves quality.
 	for(uint i=0; i<NumSamples; ++i) {
-		vec2 u = sampleHammersley(i);
+		vec2 u = tf3d_sampleHammersley(i, NumSamples);
 		vec3 Lh = tangentToWorld(sampleGGX(u.x, u.y, PARAM_ROUGHNESS), N, S, T);
 
 		// Compute incident direction (Li) by reflecting viewing direction (Lo) around half-vector (Lh).
