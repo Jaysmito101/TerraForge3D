@@ -40,3 +40,6 @@
 [submodule "TerraForge3D/vendor/glad"]
 	path = TerraForge3D/vendor/glad
 	url = https://github.com/Dav1dde/glad.git
+[submodule "TerraForge3D/vendor/spdlog"]
+	path = TerraForge3D/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
