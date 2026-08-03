@@ -6,7 +6,8 @@
 			"Type": "Float",
 			"Default": 0.5,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Rotation",
@@ -34,7 +35,7 @@
 			"Type": "Float",
 			"Default": 0.634,
 			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
+			"Constraints": [0.0, 2.0, 0.0, 0.0]
 		},
 		{
 			"Name": "InnerFalloff",
@@ -49,7 +50,7 @@
 			"Type": "Float",
 			"Default": 0.179,
 			"Widget": "Slider",
-			"Constraints": [0.00, 1.0, 0.0, 0.0]
+			"Constraints": [0.0, 2.0, 0.0, 0.0]
 		},
 		{
 			"Name": "OuterFalloff",
@@ -117,6 +118,7 @@
 }
 // CODE
 #include "common/noise_2d.glsl"
+#include "common/base_shape_helpers.glsl"
 
 
 vec2 rotate(vec2 v, float a) 
@@ -141,13 +143,31 @@ float noise(vec2 uv)
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	float rotation = 3.141f * u_Rotation / 180.0f;
+	float rotation = 3.14159265f * clamp(u_Rotation, -36000.0f, 36000.0f) / 180.0f;
 	uv = 2.0f * uv - vec2(1.0f);
 	uv = rotate(uv, rotation);
-	float r = length(uv - u_Position) - tf3d_snoise2(uv) * u_LargeDistortion * 0.2f - noise(uv) * u_SmallDistortion;;
-	float rad = u_Radius;
-	float ns0 = u_Height * smoothstep(rad * (1 + u_OuterFalloff), rad, r) - u_Depth * smoothstep(rad, rad * u_InnerFalloff, r);
-	float ns1 = tf3d_snoise2(uv) * u_LargeNoise * 0.2f + noise(uv) * u_SmallNoise;
-	float ns2 = ns1 * ( u_InsideNoise * smoothstep(rad * 1.1f, rad * 0.9f, r) + u_OutsideNoise * smoothstep(rad * 0.9f, rad * 1.1f, r) ); 
-	return (ns0 + ns2) * u_Strength;
+	vec2 position = clamp(u_Position, vec2(-1.0f), vec2(1.0f));
+	float rad = tf3d_shape_positive(u_Radius, 0.03f);
+	float outerFalloff = clamp(abs(u_OuterFalloff), 0.01f, 1.0f);
+	float innerFalloff = clamp(u_InnerFalloff, 0.0f, 0.999f);
+	vec2 seedOffset = vec2(float(u_Seed) * 0.173f, float(u_Seed) * 0.317f);
+
+	float largeNoise = tf3d_snoise2(uv * 1.5f + seedOffset);
+	float smallNoise = noise(uv * 2.0f + seedOffset);
+	float radiusNoise = largeNoise * clamp(u_LargeDistortion, 0.0f, 1.0f) * 0.2f
+		+ smallNoise * clamp(u_SmallDistortion, 0.0f, 1.0f);
+	float r = length(uv - position) - radiusNoise;
+
+	float outerMask = 1.0f - tf3d_shape_smoothstep(rad, rad * (1.0f + outerFalloff), r);
+	float basinMask = 1.0f - tf3d_shape_smoothstep(rad * innerFalloff, rad, r);
+	float ns0 = clamp(u_Height, 0.0f, 2.0f) * outerMask
+		- clamp(u_Depth, 0.0f, 2.0f) * basinMask;
+
+	float insideMask = 1.0f - tf3d_shape_smoothstep(rad * innerFalloff, rad, r);
+	float outsideMask = tf3d_shape_smoothstep(rad, rad * (1.0f + outerFalloff), r);
+	float ns1 = largeNoise * clamp(u_LargeNoise, 0.0f, 1.0f) * 0.2f
+		+ smallNoise * clamp(u_SmallNoise, 0.0f, 1.0f);
+	float ns2 = ns1 * (clamp(u_InsideNoise, 0.0f, 1.0f) * insideMask
+		+ clamp(u_OutsideNoise, 0.0f, 1.0f) * outsideMask);
+	return (ns0 + ns2) * clamp(u_Strength, 0.0f, 4.0f);
 }
