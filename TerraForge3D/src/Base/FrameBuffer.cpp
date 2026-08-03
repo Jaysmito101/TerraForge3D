@@ -1,6 +1,6 @@
 #include "FrameBuffer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 FrameBuffer::FrameBuffer(int w, int h)
 {

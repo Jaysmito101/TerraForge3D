@@ -1,6 +1,6 @@
 #include "ShaderStorageBuffer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 ShaderStorageBuffer::ShaderStorageBuffer()
 {

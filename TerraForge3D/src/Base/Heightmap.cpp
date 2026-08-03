@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <stb/stb_image.h>
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 Heightmap::Heightmap(const std::string path)
 {

@@ -1,5 +1,5 @@
 #include "resource.h"
-#include <glad/glad.h>
+#include <glad/gl.h>
 #ifdef TERR3D_WIN32
 #define GLFW_EXPOSE_NATIVE_WIN32 // For Windows
 #include <GLFW/glfw3.h>

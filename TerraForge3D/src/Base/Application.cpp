@@ -7,7 +7,7 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
@@ -19,7 +19,7 @@ static void Log(const char *log)
 
 static void InitGlad()
 {
-	if (!gladLoadGL())
+	if (!gladLoadGL(glfwGetProcAddress))
 	{
 		Log("Failed to Initialize GLAD!");
 		exit(-1);

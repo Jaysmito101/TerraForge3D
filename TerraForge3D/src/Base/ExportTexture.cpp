@@ -1,6 +1,6 @@
 #include "ExportTexture.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <stb/stb_image_write.h>
 
 void ExportTexture(int fbo, std::string path, int w, int h)

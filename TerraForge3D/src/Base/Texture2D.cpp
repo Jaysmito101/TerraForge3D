@@ -7,7 +7,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 #include <avir/avir.h>
-#include <glad/glad.h>
+#include <glad/gl.h>
 #pragma warning(pop)
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)

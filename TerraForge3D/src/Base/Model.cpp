@@ -8,7 +8,7 @@
 #include <glm/ext/vector_relational.hpp>
 #include <glm/ext/scalar_relational.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 Model::Model(std::string n)
 {

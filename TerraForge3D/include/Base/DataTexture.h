@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <string>
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #ifdef min 
 #undef min
