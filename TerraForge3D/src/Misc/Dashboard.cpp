@@ -92,11 +92,10 @@ void Dashboard::ShowChooseBaseModelPopup()
 		if (selected_item == 0)
 		{
 			// plane
-			static int resolution = 256;
+			static int resolution = 1024;
 			static float scale = 1.0f;
 			ImGui::DragFloat("Scale##GenBasePlane", &scale, 0.01f, 0.05f, 10000.0f);
-			ImGui::DragInt("Resolution##GenBasePlane", &resolution, 0.1f, 2, 100000);
-			resolution = std::clamp(resolution, 2, 1024 * 128);
+			PowerOfTwoDropDown("Resolution##GenBasePlane", &resolution, 1, 17);
 			if (ImGui::Button("Generate Plane##GenBasePlane"))
 			{
 				m_AppState->mainModel->mesh->GeneratePlane(resolution, scale);
@@ -108,11 +107,10 @@ void Dashboard::ShowChooseBaseModelPopup()
 		else if (selected_item == 1)
 		{
 			// sphere
-			static int resolution = 256;
+			static int resolution = 1024;
 			static float scale = 1.0f;
 			ImGui::DragFloat("Radius##GenBaseSphere", &scale, 0.01f, 0.05f, 10000.0f);
-			ImGui::DragInt("Resolutione##GenBaseSphere", &resolution, 0.1f, 1, 100000);
-			resolution = std::clamp(resolution, 1, 100000);
+			PowerOfTwoDropDown("Resolution##GenBaseSphere", &resolution, 1, 16);
 			if (ImGui::Button("Generate Sphere##GenBaseSphere"))
 			{
 				m_AppState->mainModel->mesh->GenerateSphere(resolution, scale);
