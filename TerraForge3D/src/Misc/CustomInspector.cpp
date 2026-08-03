@@ -91,6 +91,8 @@ SerializerNode CustomInspectorValue::Save() const
 		node->SetFile("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
 		node->SetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "null");
 		break;
+	default:
+		break;
 	}
 	return node;
 }
@@ -142,11 +144,15 @@ void CustomInspectorValue::Load(const SerializerNode& node)
 		m_VectorValue[3] = node->GetFloat("ValueW", m_DefaultVectorValue[3]);
 		break;
 	case CustomInspectorValueType_Texture:
+	{
 		const auto& defaultPath = node->GetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
 		const auto& path = node->GetFile("Value", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
 		// delete m_DefaultTextureValue; delete m_TextureValue;
 		m_DefaultTextureValue = std::make_shared<Texture2D>(defaultPath);
 		m_TextureValue = std::make_shared<Texture2D>(path);
+		break;
+	}
+	default:
 		break;
 	}
 }
@@ -693,6 +699,8 @@ bool CustomInspector::RenderSlider(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
 		throw std::runtime_error(std::string("Invalid data type for Slider"));
+	default:
+		throw std::runtime_error(std::string("Invalid data type for Slider"));
 	}
 	return hasChanged;
 }
@@ -738,6 +746,8 @@ bool CustomInspector::RenderDrag(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
 		throw std::runtime_error(std::string("Invalid data type for Drag"));
+	default:
+		throw std::runtime_error(std::string("Invalid data type for Drag"));
 	}
 	return hasChanged;
 }
@@ -767,6 +777,8 @@ bool CustomInspector::RenderColor(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Vector2:
 	case CustomInspectorValueType_Texture:
 		throw std::runtime_error(std::string("Invalid data type for Color"));
+	default:
+		throw std::runtime_error(std::string("Invalid data type for Color"));
 	}
 	return hasChanged;
 }
@@ -786,6 +798,8 @@ bool CustomInspector::RenderTexture(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Vector3:
 	case CustomInspectorValueType_Vector4:
 	case CustomInspectorValueType_Bool:
+		throw std::runtime_error(std::string("Invalid data type for Drag"));
+	default:
 		throw std::runtime_error(std::string("Invalid data type for Drag"));
 	}
 	ImTextureID textureID = value.m_TextureValue ? (ImTextureID)(int64_t)value.m_TextureValue->GetRendererID() : static_cast<ImTextureID>(0);
@@ -816,6 +830,8 @@ bool CustomInspector::RenderDropdown(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_String:
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
+		throw std::runtime_error(std::string("Invalid data type for Dropdown"));
+	default:
 		throw std::runtime_error(std::string("Invalid data type for Dropdown"));
 	}
 
@@ -866,6 +882,8 @@ bool CustomInspector::RenderCheckbox(const CustomInspectorWidget& widget)
 		break;
 	case CustomInspectorValueType_Texture:
 		throw std::runtime_error(std::string("Invalid data type for Checkbox"));
+	default:
+		throw std::runtime_error(std::string("Invalid data type for Checkbox"));
 	}
 	return hasChanged;
 }
@@ -900,6 +918,8 @@ bool CustomInspector::RenderInput(const CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture:
 		throw std::runtime_error(std::string("Invalid data type for Input"));
+	default:
+		throw std::runtime_error(std::string("Invalid data type for Input"));
 	}
 	return hasChanged;
 }
@@ -929,6 +949,8 @@ bool CustomInspector::RenderSeed(CustomInspectorWidget& widget)
 	case CustomInspectorValueType_Vector4:
 	case CustomInspectorValueType_Bool:
 	case CustomInspectorValueType_Texture: // todo: add seed texture here too
+		throw std::runtime_error(std::string("Invalid data type for Seed"));
+	default:
 		throw std::runtime_error(std::string("Invalid data type for Seed"));
 	}
 	return hasChanged;

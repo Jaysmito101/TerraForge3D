@@ -8,7 +8,7 @@ class Application
 {
 public:
 	Application();
-	~Application();
+	virtual ~Application();
 	virtual void OnUpdate(float) {};
 	virtual void OnOneSecondTick() {};
 	virtual void OnImGuiRender() {};

@@ -24,3 +24,10 @@ target_include_directories(ImGui PUBLIC
 )
 
 target_compile_definitions(ImGui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(ImGui PRIVATE
+        -Wno-unused-but-set-variable
+        -Wno-macro-redefined
+    )
+endif()

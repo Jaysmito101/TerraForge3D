@@ -99,7 +99,7 @@ enum TYPE
 
 // implementation
 
-static inline double ease(int easetype, double t)
+[[maybe_unused]] static inline double ease(int easetype, double t)
 {
 	using namespace std;
 	const double d = 1.f;
@@ -795,7 +795,7 @@ int Curve(const char *label, const ImVec2 &size, const int maxpoints, ImVec2 *po
 
 	ImGui::SameLine();
 	// curve selector
-	const char *items[] = { "Custom",
+	[[maybe_unused]] const char *items[] = { "Custom",
 
 	                        "Linear",          "Quad in",     "Quad out",   "Quad in  out",  "Cubic in",   "Cubic out",
 	                        "Cubic in  out",   "Quart in",    "Quart out",  "Quart in  out", "Quint in",   "Quint out",
@@ -810,7 +810,7 @@ int Curve(const char *label, const ImVec2 &size, const int maxpoints, ImVec2 *po
 
 	                        "SinPi2",          "Swing"
 	                      };
-	static int item = 0;
+	[[maybe_unused]] static int item = 0;
 
 	if (modified)
 	{

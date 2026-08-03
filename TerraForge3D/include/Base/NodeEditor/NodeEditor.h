@@ -113,7 +113,7 @@ public:
 
 
 	NodeEditorPin(NodeEditorPinType type = NodeEditorPinType::Input, int id = GenerateUID());
-	~NodeEditorPin();
+	virtual ~NodeEditorPin();
 };
 
 class NodeEditorNode
@@ -147,7 +147,7 @@ public:
 	void DrawHeader(std::string text);
 
 	NodeEditorNode(int id =  GenerateUID());
-	~NodeEditorNode();
+	virtual ~NodeEditorNode();
 };
 
 

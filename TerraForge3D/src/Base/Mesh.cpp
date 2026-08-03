@@ -19,56 +19,6 @@
 // From: https://github.com/cppcooper/icosahedron-sphere/blob/master/Source/Private/Geometry/icosphere.cpp
 namespace Icosahedron
 {
-
-	const float X = .525731112119133606f;
-	const float Z = .850650808352039932f;
-	const float N = 0.f;
-
-	static const float baseVertices[][3] =
-	{
-		{-X,N,Z}, {X,N,Z}, {-X,N,-Z}, {X,N,-Z},
-		{N,Z,X}, {N,Z,-X}, {N,-Z,X}, {N,-Z,-X},
-		{Z,X,N}, {-Z,X, N}, {Z,-X,N}, {-Z,-X, N}
-	};
-
-	static const int baseTriangles[][3] =
-	{
-		{0,4,1},{0,9,4},{9,5,4},{4,5,8},{4,8,1},
-		{8,10,1},{8,3,10},{5,3,8},{5,2,3},{2,7,3},
-		{7,10,3},{7,6,10},{7,11,6},{11,0,6},{0,1,6},
-		{6,1,10},{9,0,11},{9,11,2},{9,2,5},{7,2,11}
-	};
-
-	static const int baseTriangleCount = 20;
-	static const int baseVertexCount = 12;
-
-	static inline glm::vec4 CalculateUV(const glm::vec4& normal)
-	{
-		glm::vec4 uv = glm::vec4(0.0f);
-		const float& x = normal.x;
-		const float& y = normal.y;
-		const float& z = normal.z;
-		float normalisedX = 0;
-		float normalisedZ = -1;
-		if (((x * x) + (z * z)) > 0)
-		{
-			normalisedX = sqrt((x * x) / ((x * x) + (z * z)));
-			if (x < 0) normalisedX = -normalisedX;
-			normalisedZ = sqrt((z * z) / ((x * x) + (z * z)));
-			if (z < 0) normalisedZ = -normalisedZ;
-		}
-		if (normalisedZ == 0) uv.x = ((normalisedX * PI) / 2);
-		else
-		{
-			uv.x = atan(normalisedX / normalisedZ);
-			if (normalisedX < 0) uv.x = PI - uv.x;
-			if (normalisedZ < 0) uv.x += PI;
-		}
-		if (uv.x < 0) uv.x += 2 * PI;
-		uv.x /= 2 * PI;
-		uv.y = (-y + 1) / 2;
-		return uv;
-	}
 }
 
 
@@ -189,8 +139,8 @@ void Mesh::GenerateSphere(int resolution, float radius)
 		int index1 = index0 + 1;
 		int index2 = (stack + 1) * (resolution + 1) + slice;
 		int index3 = index2 + 1;
-		Face face1 = { index0, index1, index2 };
-		Face face2 = { index2, index1, index3 };
+		Face face1 = {{ index0, index1, index2 }};
+		Face face2 = {{ index2, index1, index3 }};
 		m_Faces.push_back(face1);
 		m_Faces.push_back(face2);
 	}
@@ -218,10 +168,10 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 			m_Vertices.push_back(v);
 			if (x != resolution - 1 && y != resolution - 1)
 			{
-				Face f0 = { i, i + resolution + 1, i + resolution };
+				Face f0 = {{ i, i + resolution + 1, i + resolution }};
 				m_Faces.push_back(f0);
 
-				Face f1 = { i, i + 1, i + resolution + 1 };
+				Face f1 = {{ i, i + 1, i + resolution + 1 }};
 				m_Faces.push_back(f1);
 			}
 		}
@@ -252,9 +202,9 @@ void Mesh::GenerateScreenQuad(float dist)
 	m_Vertices.push_back(v);
 
 	 
-	Face f0 = {0, 1, 2};
+	Face f0 = {{0, 1, 2}};
 	m_Faces.push_back(f0);
-	Face f1 = {0, 2, 3};
+	Face f1 = {{0, 2, 3}};
 	m_Faces.push_back(f1);
 }
 
@@ -342,9 +292,9 @@ void Mesh::GenerateTorus(float outerRadius, float innerRadius, int numSegments, 
 		int index1 = index0 + numSegments + 1;
 		int index2 = index0 + 1;
 		int index3 = index1 + 1;
-		Face f0 = {index0, index1, index2};
+		Face f0 = {{index0, index1, index2}};
 		m_Faces.push_back(f0);
-		Face f1 = {index1, index3, index2};
+		Face f1 = {{index1, index3, index2}};
 		m_Faces.push_back(f1);
 	}
 }
@@ -392,11 +342,8 @@ void Mesh::Subdivide()
 		midAB.texCoord = midBC.texCoord = midCA.texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 		// Add the new vertices to the list
-		int indexA = newVerts.size();
 		newVerts.push_back(vertA);
-		int indexB = newVerts.size();
 		newVerts.push_back(vertB);
-		int indexC = newVerts.size();
 		newVerts.push_back(vertC);
 		int indexAB = newVerts.size();
 		newVerts.push_back(midAB);
@@ -406,10 +353,10 @@ void Mesh::Subdivide()
 		newVerts.push_back(midCA);
 
 		// Create the new faces
-		Face face1 = { face.a, indexAB, indexCA };
-		Face face2 = { indexAB, face.b, indexBC };
-		Face face3 = { indexCA, indexBC, face.c };
-		Face face4 = { indexAB, indexBC, indexCA };
+		Face face1 = {{ face.a, indexAB, indexCA }};
+		Face face2 = {{ indexAB, face.b, indexBC }};
+		Face face3 = {{ indexCA, indexBC, face.c }};
+		Face face4 = {{ indexAB, indexBC, indexCA }};
 
 		// Add the new faces to the list
 		newFaces.push_back(face1);

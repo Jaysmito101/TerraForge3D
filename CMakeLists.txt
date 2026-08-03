@@ -66,6 +66,17 @@ file(GLOB_RECURSE SOURCES
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE
+        -Wno-deprecated-declarations
+        -Wno-macro-redefined
+        -Wno-switch
+        -Wno-switch-enum
+    )
+endif()
+
+target_compile_definitions(${EXECUTABLE_NAME} PRIVATE IMGUI_DEFINE_MATH_OPERATORS)
+
 target_link_libraries(${EXECUTABLE_NAME} 
     glfw
     ${GLFW_LIBRARIES}

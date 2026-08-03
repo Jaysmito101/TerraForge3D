@@ -123,7 +123,7 @@ bool NodeEditorPin::IsLinked()
 }
 
 NodeEditorPin::NodeEditorPin(NodeEditorPinType type, int id)
-	:type(type), id(id), link(nullptr)
+	:id(id), link(nullptr), type(type)
 {
 	_id = id;
 }
@@ -228,7 +228,7 @@ void NodeEditorNode::DrawHeader(std::string text)
 	ImGui::DrawFilledRect(ImVec2(start.x, 60), headerColor, 13);
 	ImGui::SetCursorPos(ImVec2(pos.x + ImGuiNodeEditor::GetStyle().NodePadding.x, pos.y + ImGuiNodeEditor::GetStyle().NodePadding.x));
 	ImGui::PushFont(GetUIFont("OpenSans-Bold"));
-	ImGui::Text(text.c_str());
+	ImGui::Text("%s", text.c_str());
 	ImGui::PopFont();
 	ImGui::NewLine();
 }
@@ -612,7 +612,6 @@ NodeEditor::~NodeEditor()
 void NodeEditor::Reset()
 {
 	// Clear Up Node Editor
-	int size = 0;
 	std::unordered_map<uintptr_t, NodeEditorNode *> nodesc = nodes;
 
 	for (auto &it : nodesc)
