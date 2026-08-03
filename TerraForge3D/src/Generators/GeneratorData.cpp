@@ -48,6 +48,7 @@ bool GeneratorData::CopyTo(const GeneratorData* other)
 	glBindBuffer(GL_COPY_WRITE_BUFFER, other->m_RendererID);
 	glBufferData(GL_COPY_WRITE_BUFFER, m_Size, nullptr, GL_DYNAMIC_DRAW);
 	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, m_Size);
+	return true;
 }
 
 float* GeneratorData::GetCPUCopy()
