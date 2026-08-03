@@ -6,49 +6,63 @@
 			"Type": "Float",
 			"Default": 0.58,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Scale",
 			"Type": "Float",
 			"Default": 1.4,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [0.001, 16.0, 0.0, 0.0]
 		},
 		{
 			"Name": "CrackShapeDistortion",
 			"Type": "Float",
-			"Default": 0.680,
+			"Default": 0.380,
 			"Widget": "Slider",
-			"Constraints": [0.0, 3.0, 0.0, 0.0]
+			"Constraints": [0.0, 0.45, 0.0, 0.0]
 		},
 		{
 			"Name": "Smoothness",
 			"Type": "Float",
-			"Default": 0.03,
+			"Default": 0.12,
 			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
+			"Constraints": [0.005, 1.0, 0.0, 0.0]
+		},
+		{
+			"Name": "CrackWidth",
+			"Label": "Crack Width",
+			"Type": "Float",
+			"Default": 0.12,
+			"Widget": "Slider",
+			"Constraints": [0.005, 0.5, 0.0, 0.0],
+			"Tooltip": "Width of the softened crack floor. Larger values remove sharp cell seams."
 		},
 		{
 			"Name": "RandomHeights",
 			"Type": "Float",
 			"Default": 2.8,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [0.0, 8.0, 0.0, 0.0]
 		},		
 		{
 			"Name": "NoiseStrength",
 			"Type": "Float",
 			"Default": 1.0,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		},		
 		{
 			"Name": "NoiseScale",
 			"Type": "Float",
 			"Default": 1.0,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [0.001, 16.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Seed",
@@ -82,24 +96,14 @@
 			"Type": "Vector2",
 			"Default": [0.1, 0.16],
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.0, 4.0, 0.0, 0.0]
 		}
 	]
 }
 // CODE
 
-// IQ's polynomial-based smooth minimum function.
-float smin( float a, float b, float k )
-{
-    float h = clamp(.5 + .5*(b - a)/k, 0., 1.);
-    return mix(b, a, h) - k*h*(1. - h);
-}
-
-float smax( float a, float b, float k )
-{
-	float h = clamp(.5 + .5*(a - b)/k, 0., 1.);
-	return mix(b, a, h) + k*h*(1. - h);
-}
+#include "common/base_shape_helpers.glsl"
 
 /* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
 vec3 random3(vec3 c) 
@@ -173,16 +177,11 @@ float rand(vec3 co){ return rand(co.xy+rand(co.z)); }
 
 vec4 voronoi(vec3 sd)
 {
-	float res = 0.0f;
-
-	//sd.z = 0.0f;
-
-	float bX = floor(sd.x), bY = floor(sd.y), bZ = floor(sd.z);
-	// float fX = fract(sd.x), fY = fract(sd.y), fZ = fract(sd.z);
-	ivec3 sd0 = ivec3(bX, bY, bZ);
+	ivec3 cell = ivec3(floor(sd));
 	vec3 nearestPoint = vec3(0.0f);
-	float nearestDistance = 999999.0f;
-	vec3 d = vec3(999999.0f);
+	float nearestDistance = 1.0e6f;
+	float secondNearestDistance = 1.0e6f;
+	float jitter = clamp(abs(u_CrackShapeDistortion), 0.0f, 0.45f);
 
 	for (int i = -1 ; i <= 1 ; i++)
 	{
@@ -191,42 +190,60 @@ vec4 voronoi(vec3 sd)
 			//int k = 0;
 			for (int k = -1 ; k <= 1 ; k++)
 			{
-				vec3 sd1 = sd0 + vec3(i, j, k);
-				// vec3 sd2 = sd1 + vec3(rand(sd1.xyz), rand(sd1.yzx), rand(sd1.zxy));
-				// vec3 sd2 = sd1 + vec3(sin(sd1.x) * u_CrackShapeDistortion, sin(sd1.y) * u_CrackShapeDistortion, sin(sd1.z) * u_CrackShapeDistortion);
-				float rnd = rand(sd1);
-				vec3 sd2 = sd1 + vec3(sin(fract(rnd * 4658)) * u_CrackShapeDistortion, sin(fract(rnd * 5487)) * u_CrackShapeDistortion, sin(fract(rnd * 3631)) * u_CrackShapeDistortion);
-				vec3 sd3 = (sd - sd2);
+				vec3 neighbor = vec3(cell + ivec3(i, j, k));
+				vec3 randomPoint = vec3(
+					rand(neighbor + vec3(17.0f, 3.0f, 11.0f)),
+					rand(neighbor + vec3(5.0f, 29.0f, 7.0f)),
+					rand(neighbor + vec3(13.0f, 19.0f, 23.0f)));
+				vec3 point = neighbor + vec3(0.5f) + (randomPoint - vec3(0.5f)) * (2.0f * jitter);
+				vec3 sd3 = sd - point;
 				float dst = dot(sd3, sd3);
 				if(dst < nearestDistance)
 				{
+					secondNearestDistance = nearestDistance;
 					nearestDistance = dst;
-					nearestPoint = sd2;
+					nearestPoint = point;
 				}
-
-				// 1st, 2nd and 3rd nearest squared distances.
-				d.z = max(d.x, max(d.y, min(d.z, dst))); // 3rd.
-				d.y = max(d.x, min(d.y, dst)); // 2nd.
-	            d.x = min(d.x, dst); // Closest.
+				else if (dst < secondNearestDistance)
+				{
+					secondNearestDistance = dst;
+				}
 			}
 		}
 	}
-	d = sqrt(d);
-	nearestDistance = min(2./(1./max(d.y - d.x, .001) + 1./max(d.z - d.x, .001)), 1.);
-	return vec4(nearestPoint, nearestDistance);
+
+	float edgeDistance = sqrt(max(secondNearestDistance, 0.0f)) - sqrt(max(nearestDistance, 0.0f));
+	return vec4(nearestPoint, clamp(edgeDistance, 0.0f, 1.0f));
 }
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	seed += u_Offset + vec3(u_Seed);
-	seed *= u_Scale;
-	float n = 0.0f;
-	vec4 voronoiResult = voronoi(seed);
-	if(u_AbsoluteValue) voronoiResult.w  = abs(voronoiResult.w);
-	if(u_SquareValue) voronoiResult.w  = voronoiResult.w  * voronoiResult.w ;
-	float randomHeightFactor = rand(voronoiResult.xyz) * smin(voronoiResult.w * u_Strength, u_MinMaxHeight.y, u_Smoothness);
-	float heightFactor = randomHeightFactor * u_RandomHeights;
-	n = smin(smax(voronoiResult.w * u_Strength, u_MinMaxHeight.x, u_Smoothness), u_MinMaxHeight.y, u_Smoothness) + heightFactor;
-	n += simplex3d(seed * 2.0f * u_NoiseScale) * 0.06f * u_NoiseStrength;
-	return n;
+	float scale = tf3d_shape_positive(u_Scale, 0.001f);
+	vec3 offset = clamp(u_Offset, vec3(-10000.0f), vec3(10000.0f));
+	vec3 domain = (seed + offset) * scale + vec3(u_Seed);
+	vec4 voronoiResult = voronoi(domain);
+	float edgeValue = clamp(voronoiResult.w, 0.0f, 1.0f);
+	if(u_AbsoluteValue) edgeValue = abs(edgeValue);
+	if(u_SquareValue) edgeValue = edgeValue * edgeValue;
+
+	float strength = clamp(u_Strength, 0.0f, 4.0f);
+	float smoothness = clamp(abs(u_Smoothness), 0.001f, 1.0f);
+	float crackWidth = clamp(abs(u_CrackWidth), 0.005f, 0.5f);
+	float lowHeight = clamp(min(u_MinMaxHeight.x, u_MinMaxHeight.y), 0.0f, 4.0f);
+	float highHeight = clamp(max(u_MinMaxHeight.x, u_MinMaxHeight.y), lowHeight, 4.0f);
+	float crackMask = tf3d_shape_smoothstep(0.0f, crackWidth, edgeValue);
+	float cellHeight = edgeValue * strength;
+	cellHeight = tf3d_shape_smax(cellHeight, lowHeight, smoothness);
+	cellHeight = tf3d_shape_smin(cellHeight, highHeight, smoothness);
+	float baseHeight = mix(lowHeight, cellHeight, crackMask);
+
+	float randomHeight = rand(voronoiResult.xyz + vec3(u_Seed));
+	float heightRange = max(highHeight - lowHeight, 0.0f);
+	float heightVariation = (randomHeight - 0.5f) * heightRange
+		* clamp(u_RandomHeights, 0.0f, 8.0f) * crackMask;
+
+	float noiseScale = tf3d_shape_positive(u_NoiseScale, 0.001f);
+	float detail = simplex3d(domain * 2.0f * noiseScale) * 0.06f * clamp(u_NoiseStrength, 0.0f, 4.0f);
+	detail *= mix(0.35f, 1.0f, crackMask);
+	return baseHeight + heightVariation + detail;
 }
