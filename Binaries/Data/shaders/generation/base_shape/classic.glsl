@@ -6,14 +6,16 @@
 			"Type": "Float",
 			"Default": 1.0,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [-4.0, 4.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Scale",
 			"Type": "Float",
 			"Default": 1.0,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [0.001, 16.0, 0.0, 0.0]
 		},
 		{
 			"Name": "Levels",
@@ -54,20 +56,24 @@
 // CODE
 
 #include "common/noise_3d.glsl"
+#include "common/base_shape_helpers.glsl"
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	seed = (seed + u_Offset) * u_Scale + vec3(u_Seed);
+	float scale = tf3d_shape_positive(u_Scale, 0.001);
+	vec3 offset = clamp(u_Offset, vec3(-10000.0), vec3(10000.0));
+	seed = (seed + offset) * scale + vec3(u_Seed);
 	float n = 0.0f;
-	for(int i = 0 ; i < u_Levels ; i++)
+	int levels = clamp(u_Levels, 0, 6);
+	for(int i = 0 ; i < levels ; i++)
 	{
 		seed = vec3(tf3d_cnoise(seed + vec3(0.0f, 0.0f, 0.0f)),
 			tf3d_cnoise(seed + vec3(1.0f, 2.0f, 0.0f)),
 			tf3d_cnoise(seed + vec3(3.0f, 4.0f, 0.0f))
 					);
 	}
-	n = tf3d_cnoise(seed);
+	n = clamp(tf3d_cnoise(seed), -1.0f, 1.0f);
 	if(u_AbsoluteValue) n = abs(n);
-	if(u_SquareValue) n = n * n;	
-	return n * u_Strength;
+	if(u_SquareValue) n = n * n;
+	return n * clamp(u_Strength, -4.0f, 4.0f);
 }
