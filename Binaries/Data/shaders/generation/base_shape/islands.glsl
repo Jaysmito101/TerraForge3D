@@ -27,7 +27,24 @@
 			"Type": "Float",
 			"Default": 8.0,
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [0.01, 32.0, 0.0, 0.0]
+		},
+		{
+			"Name": "TerrainPersistence",
+			"Label": "Terrain Persistence",
+			"Type": "Float",
+			"Default": 0.5,
+			"Widget": "Slider",
+			"Constraints": [0.0, 0.95, 0.0, 0.0]
+		},
+		{
+			"Name": "TerrainLacunarity",
+			"Label": "Terrain Lacunarity",
+			"Type": "Float",
+			"Default": 2.0,
+			"Widget": "Slider",
+			"Constraints": [1.0, 2.0, 0.0, 0.0]
 		},
 		{
 			"Name": "BeachCoverage",
@@ -36,7 +53,7 @@
 			"Default": 0.98,
 			"Widget": "Slider",
 			"Sensitivity": 0.01,
-			"Constraints": [0.0, 2.0, 0.0, 0.0]
+			"Constraints": [0.05, 2.0, 0.0, 0.0]
 		},
 		{
 			"Name": "BeachSteepness",
@@ -53,7 +70,9 @@
 			"Type": "Float",
 			"Default": 0.05,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [-2.0, 2.0, 0.0, 0.0],
+			"Tooltip": "Signed height of the forest band. Negative values carve below the beach level."
 		},
 		{
 			"Name": "ForestCoverage",
@@ -79,7 +98,8 @@
 			"Type": "Float",
 			"Default": 0.05,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [0.0, 2.0, 0.0, 0.0]
 		},
 		{
 			"Name": "MountainCoverage",
@@ -96,7 +116,9 @@
 			"Type": "Float",
 			"Default": 0.67,
 			"Widget": "Drag",
-			"Sensitivity": 0.001
+			"Sensitivity": 0.001,
+			"Constraints": [-2.0, 2.0, 0.0, 0.0],
+			"Tooltip": "Signed height of the mountain band. Negative values carve below the beach level."
 		},
 		{
 			"Name": "Rotation",
@@ -108,13 +130,16 @@
 		{
 			"Name": "Offset",
 			"Type": "Vector2",
-			"Default": [0.0, 0.0, 0.0],
+			"Default": [0.0, 0.0],
 			"Widget": "Drag",
-			"Sensitivity": 0.01
+			"Sensitivity": 0.01,
+			"Constraints": [-8.0, 8.0, 0.0, 0.0]
 		}
 	]
 }
 // CODE
+
+#include "common/base_shape_helpers.glsl"
 
 
 // Modified hash33 by Dave_Hoskins (original does not play well with simplex)
@@ -152,23 +177,26 @@ float SimplexNoiseRaw(vec3 pos)
 
 float SimplexNoise(
     vec3  pos,
-    float octaves,
+    int   octaves,
     float scale,
-    float persistence)
+    float persistence,
+    float lacunarity)
 {
     float final        = 0.0;
     float amplitude    = 1.0;
     float maxAmplitude = 0.0;
-    
-    for(float i = 0.0; i < octaves; ++i)
+    float frequency    = tf3d_shape_positive(scale, 0.001f);
+    int octaveCount    = clamp(octaves, 1, 16);
+
+    for(int i = 0; i < octaveCount; ++i)
     {
-        final        += SimplexNoiseRaw(pos * scale) * amplitude;
-        scale        *= 2.0;
+        final        += SimplexNoiseRaw(pos * frequency) * amplitude;
         maxAmplitude += amplitude;
-        amplitude    *= persistence;
+        frequency    *= clamp(lacunarity, 1.0f, 4.0f);
+        amplitude    *= clamp(persistence, 0.0f, 0.95f);
     }
-    
-    return (final / maxAmplitude);
+
+    return final / max(maxAmplitude, TF3D_SHAPE_EPSILON);
 }
 
 vec2 rotate(vec2 v, float a) 
@@ -181,31 +209,50 @@ vec2 rotate(vec2 v, float a)
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	float rotation = 3.141f * u_Rotation / 180.0f;
-	uv = uv * 2.0f - vec2(1.0) + u_Offset;
-	uv += u_Offset;
+	float rotation = 3.14159265f * clamp(u_Rotation, -36000.0f, 36000.0f) / 180.0f;
+	uv = uv * 2.0f - vec2(1.0f) + clamp(u_Offset, vec2(-10000.0f), vec2(10000.0f));
 	uv = rotate(uv, rotation);
 
-	float beachMask = 1.0f, forestMask = 1.0f, mountainMask = 1.0f;
-	float beachCoverageFactor = (1.0f - clamp(u_BeachCoverage, 0.0, 1.0));
-	float forestCoverageFactor = beachCoverageFactor + (1.0f - beachCoverageFactor) * (1.0f - u_ForestCoverage);
-	float mountainCoverageFactor = forestCoverageFactor +  (1.0f - forestCoverageFactor) * (1.0f - u_MountainCoverage);
+	float beachCoverage = tf3d_shape_positive(u_BeachCoverage, 0.05f);
+	float beachSteepness = clamp(u_BeachSteepness, 0.0f, 1.0f);
+	float forestSteepness = clamp(u_ForestSteepness, 0.0f, 1.0f);
+	float beachCoverageFactor = 1.0f - clamp(u_BeachCoverage, 0.0f, 1.0f);
+	float forestCoverageFactor = beachCoverageFactor
+		+ (1.0f - beachCoverageFactor) * (1.0f - clamp(u_ForestCoverage, 0.0f, 1.0f));
+	float mountainCoverageFactor = forestCoverageFactor
+		+ (1.0f - forestCoverageFactor) * (1.0f - clamp(u_MountainCoverage, 0.0f, 1.0f));
 
-	// if(u_CoverageMode == 0) // single coverage mode
-	{
-		float rad = length(uv) / u_BeachCoverage;
-		float baseMask = exp(- rad * rad * 2.0f);
-		beachMask = smoothstep(beachCoverageFactor, clamp(beachCoverageFactor + 1.0f - u_BeachSteepness * exp(-rad) * 0.9, beachCoverageFactor, 1.0f), baseMask);
-		// forestMask = smoothstep(forestCoverageFactor, clamp(forestCoverageFactor + 1.0f - u_ForestSteepness * exp(-rad) * 0.9, forestCoverageFactor, 1.0f), baseMask);
-	}
-	
-	float beachNoise = SimplexNoise(vec3(uv * u_TerrainScale * 0.1f, u_Seed), u_TerrainOctaves, 1.0f, 0.5f) * beachMask;
-	float forestNoise = SimplexNoise(vec3(uv * u_TerrainScale * 0.12f, u_Seed), u_TerrainOctaves, 1.0f, 0.5f) * beachMask;
-	float mountainNoise = SimplexNoise(vec3(uv * u_TerrainScale * 0.14f, u_Seed), u_TerrainOctaves, 1.0f, 0.5f);
-	
-	float beachResult = smoothstep(beachCoverageFactor, clamp(beachCoverageFactor + 1.0f - u_BeachSteepness, beachCoverageFactor, 1.0f), beachNoise);
-	float forestResult = smoothstep(forestCoverageFactor, clamp(forestCoverageFactor + 1.0f - u_ForestSteepness, forestCoverageFactor, 1.0f), forestNoise);
-	float mountainResult = smoothstep(mountainCoverageFactor, clamp(mountainCoverageFactor + 1.0f, mountainCoverageFactor, 1.0f), mountainNoise);
-	
-	return beachResult * u_BeachHeight + forestResult * u_ForestHeight + mountainResult * u_MountainHeight;
+	float rad = length(uv) / beachCoverage;
+	float baseMask = exp(-rad * rad * 2.0f);
+	float beachEdge = clamp(beachCoverageFactor + 1.0f - beachSteepness * exp(-rad) * 0.9f, beachCoverageFactor, 1.0f);
+	float forestEdge = clamp(forestCoverageFactor + 1.0f - forestSteepness * exp(-rad) * 0.9f, forestCoverageFactor, 1.0f);
+	float mountainEdge = clamp(mountainCoverageFactor + 1.0f, mountainCoverageFactor, 1.0f);
+	float beachMask = tf3d_shape_smoothstep(beachCoverageFactor, beachEdge, baseMask);
+	float forestMask = tf3d_shape_smoothstep(forestCoverageFactor, forestEdge, baseMask);
+	float mountainMask = tf3d_shape_smoothstep(mountainCoverageFactor, mountainEdge, baseMask);
+
+	float terrainScale = tf3d_shape_positive(u_TerrainScale, 0.01f);
+	int terrainOctaves = clamp(u_TerrainOctaves, 1, 16);
+	float persistence = clamp(u_TerrainPersistence, 0.0f, 0.95f);
+	float lacunarity = clamp(u_TerrainLacunarity, 1.0f, 4.0f);
+	float terrainSeed = float(u_Seed);
+
+	float beachNoise = SimplexNoise(vec3(uv * terrainScale * 0.1f, terrainSeed), terrainOctaves, 1.0f, persistence, lacunarity) * beachMask;
+	float forestNoise = SimplexNoise(vec3(uv * terrainScale * 0.12f, terrainSeed + 17.0f), terrainOctaves, 1.0f, persistence, lacunarity) * forestMask;
+	float mountainNoise = SimplexNoise(vec3(uv * terrainScale * 0.14f, terrainSeed + 31.0f), terrainOctaves, 1.0f, persistence, lacunarity) * mountainMask;
+
+	float beachResult = tf3d_shape_smoothstep(beachCoverageFactor, beachEdge, beachNoise);
+	float forestResult = tf3d_shape_smoothstep(forestCoverageFactor, forestEdge, forestNoise);
+	float mountainResult = tf3d_shape_smoothstep(mountainCoverageFactor, mountainEdge, mountainNoise);
+
+	float beachBand = clamp(beachResult - forestResult, 0.0f, 1.0f);
+	float forestBand = clamp(forestResult - mountainResult, 0.0f, 1.0f);
+	float mountainBand = clamp(mountainResult, 0.0f, 1.0f);
+
+	float beachHeight = clamp(u_BeachHeight, 0.0f, 2.0f);
+	float forestHeight = clamp(u_ForestHeight, -2.0f, 2.0f);
+	float mountainHeight = clamp(u_MountainHeight, -2.0f, 2.0f);
+	return clamp(beachBand * beachHeight
+		+ forestBand * forestHeight
+		+ mountainBand * mountainHeight, -2.0f, 2.0f);
 }
