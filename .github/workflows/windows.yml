@@ -1,6 +1,10 @@
 name: Windows Build
 
-on: [push, pull_request]
+on: 
+  pull_request:
+    branches: [ master, gen3 ]
+  
+  workflow_dispatch:
 
 jobs:
   build:
