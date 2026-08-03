@@ -21,7 +21,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
          submodules: true
       
@@ -42,7 +42,7 @@ jobs:
         run: cmake --build ./build
 
       - name: Upload Debug Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v6
         with:
           name: TerraForge3D Linux Debug Build
           path: build/terraforge3d
@@ -58,7 +58,7 @@ jobs:
         run: cmake --build ./build --config Release
 
       - name: Upload Release Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v6
         with:
           name: TerraForge3D Linux Release Build
           path: build/terraforge3d

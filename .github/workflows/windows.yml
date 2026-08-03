@@ -7,7 +7,7 @@ jobs:
     runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
       with:
         submodules: true
     
@@ -20,7 +20,7 @@ jobs:
       run: cmake --build ./build
       
     - name: Upload Debug Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v6
       with:
         name: TerraForge3D Windows Debug Build
         path: build\Debug
@@ -31,7 +31,7 @@ jobs:
       run: cmake --build ./build --config=Release
       
     - name: Upload Release Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v6
       with:
         name: TerraForge3D Windows Release Build
         path: build\Release
