@@ -8,6 +8,8 @@
 #include "Exporters/Serializer.h"
 #include "Misc/CustomInspector.h"
 
+#include <chrono>
+
 #define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
 typedef std::tuple<uint32_t, uint32_t, uint32_t> TextureCacheKey;
@@ -51,15 +53,24 @@ public:
 
 private:
 	void DownloadTerrainRGBTexture(TextureCacheKey key);
+	int32_t GetEffectiveZoomResolution() const;
+	void GetVisibleTileRange(int32_t zoomResolution, int32_t& minTileX, int32_t& maxTileX, int32_t& minTileY, int32_t& maxTileY) const;
+	int32_t GetVisibleTileCount(int32_t zoomResolution) const;
 
 private:
 	ApplicationState* m_AppState = nullptr;
 	int32_t m_ZoomResolution = 0;
+	int32_t m_EffectiveZoomResolution = 0;
 	float m_ZoomOnMap = 1.0f;
 	float m_MapStrength = 1.0f;
 	float m_CalculationTime = 0.0f;
 	int m_TilesUsingCount = 0;
+	int m_VisibleTileCount = 0;
+	int m_TilesSkippedCount = 0;
 	glm::vec2 m_MapCenter = glm::vec2(0.0f);
+	bool m_AutoZoomResolution = true;
+	int m_RequestsScheduledThisUpdate = 0;
+	std::chrono::steady_clock::time_point m_NextTileRequestTime = std::chrono::steady_clock::time_point::min();
 	
 	
 	bool m_RequireUpdation = true;
@@ -71,6 +82,7 @@ private:
 
 
 	std::unordered_map<TextureCacheKey, std::shared_ptr<Texture2D>> m_TextureCache;
+	std::unordered_map<TextureCacheKey, std::chrono::steady_clock::time_point> m_TileRetryAfter;
 	std::string m_APIKey = "";
 	char m_APIKeyInput[1024];
 	std::string m_APIKeyConfigPath;
@@ -78,4 +90,10 @@ private:
 	std::string m_APIPathURLFormat;
 	std::string m_TerrainRGBDataCacheDir;
 	std::string m_TerrainRGBDataCacheFileFormat;
+
+	static constexpr int32_t kMaxTileZoom = 12;
+	static constexpr int32_t kMaxVisibleTiles = 64;
+	static constexpr int32_t kMaxPendingTileRequests = 8;
+	static constexpr int32_t kMaxRequestsPerRefresh = 4;
+	static constexpr int32_t kTileRequestIntervalMilliseconds = 300;
 };

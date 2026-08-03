@@ -5,12 +5,8 @@
 #include "imgui/imgui_internal.h"
 #include "webp/decode.h"
 
-static bool AABBContains01(const glm::vec2& minA, const glm::vec2& maxA) 
-{
-	static const glm::vec2 minB = glm::vec2(0.0f);
-	static const glm::vec2 maxB = glm::vec2(1.0f);
-	return (maxA.x >= minB.x) && (minA.x <= maxB.x) && (maxA.y >= minB.y) && (minA.y <= maxB.y);
-} 
+#include <cmath>
+#include <cstdio>
 
 DEMBaseShapeGenerator::DEMBaseShapeGenerator(ApplicationState* appState)
 {
@@ -69,9 +65,22 @@ bool DEMBaseShapeGenerator::ShowSettings()
 		SaveToFile(m_APIKeyConfigPath, m_APIKey);
 		m_RequireUpdation = true;
 	}
-	BIOME_UI_PROPERTY(ImGui::SliderInt("Zoom Resolution", &m_ZoomResolution, 0, 14));
+	if (m_APIKey.empty())
+		ImGui::TextDisabled("Add a MapTiler Cloud key before downloading elevation tiles.");
 
-	BIOME_UI_PROPERTY(ImGui::DragFloat("Strength", &m_MapStrength, 0.01f));
+	BIOME_UI_PROPERTY(ImGui::Checkbox("Automatic Tile Zoom", &m_AutoZoomResolution));
+	if (!m_AutoZoomResolution)
+	{
+		BIOME_UI_PROPERTY(ImGui::SliderInt("Manual Tile Zoom", &m_ZoomResolution, 0, kMaxTileZoom));
+	}
+	int previewZoom = GetEffectiveZoomResolution();
+	int previewTileCount = GetVisibleTileCount(previewZoom);
+	ImGui::Text("Effective tile zoom: %d (%s)", previewZoom, m_AutoZoomResolution ? "automatic" : "manual");
+	ImGui::TextDisabled("Visible tiles: %d/%d | pending requests: %d/%d", previewTileCount, kMaxVisibleTiles, static_cast<int>(m_TextureDownloadQueue.size()), kMaxPendingTileRequests);
+	ImGui::TextDisabled("At most %d new requests per refresh, with a short delay between requests.", kMaxRequestsPerRefresh);
+
+	m_MapStrength = std::clamp(m_MapStrength, 0.0f, 20.0f);
+	BIOME_UI_PROPERTY(ImGui::DragFloat("Strength", &m_MapStrength, 0.01f, 0.0f, 20.0f));
 
 	// The Map Widget
 	// ImGui::ImageButton((ImTextureID)GetTile(x, y, m_ZoomResolution).get()->GetRendererID(), ImVec2(400, 400));
@@ -80,25 +89,105 @@ bool DEMBaseShapeGenerator::ShowSettings()
 
 	if (ImGui::IsItemHovered() && (std::abs(ImGui::GetIO().MouseWheel) > 0.05 || ( ImGui::IsMouseDown(ImGuiMouseButton_Middle) && (std::abs(ImGui::GetIO().MouseDelta.x) > 0.001f || std::abs(ImGui::GetIO().MouseDelta.y) > 0.01f))))
 	{
-		m_ZoomOnMap = m_ZoomOnMap + ImGui::GetIO().MouseWheel * 0.1f * std::exp(std::pow(m_ZoomOnMap - 1.0f, 0.2f));
+		const ImVec2 imageMin = ImGui::GetItemRectMin();
+		const ImVec2 imageMax = ImGui::GetItemRectMax();
+		const ImVec2 mousePosition = ImGui::GetIO().MousePos;
+		const glm::vec2 imageSize(
+			std::max(imageMax.x - imageMin.x, 1.0f),
+			std::max(imageMax.y - imageMin.y, 1.0f));
+		const glm::vec2 cursorUV = glm::clamp(
+			glm::vec2(
+				(mousePosition.x - imageMin.x) / imageSize.x,
+				(mousePosition.y - imageMin.y) / imageSize.y),
+			glm::vec2(0.0f), glm::vec2(1.0f));
+
+		if (std::abs(ImGui::GetIO().MouseWheel) > 0.05f)
+		{
+			const float oldZoom = m_ZoomOnMap;
+			const glm::vec2 cursorWorld = cursorUV / oldZoom - m_MapCenter;
+			m_ZoomOnMap *= std::pow(1.18f, ImGui::GetIO().MouseWheel);
+			m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
+			m_MapCenter = cursorUV / m_ZoomOnMap - cursorWorld;
+		}
+
 		m_MapCenter.x += ImGui::GetIO().MouseDelta.x * 0.006f / m_ZoomOnMap;
 		m_MapCenter.y += ImGui::GetIO().MouseDelta.y * 0.006f / m_ZoomOnMap;
+		m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
+		m_MapCenter.x = std::clamp(m_MapCenter.x, -4.0f, 4.0f);
+		m_MapCenter.y = std::clamp(m_MapCenter.y, -4.0f, 4.0f);
 		m_RequireUpdation = true;
 	}
 
-	BIOME_UI_PROPERTY(ImGui::DragFloat("Zoom", &m_ZoomOnMap, 1.0f, 1.0f));
+	BIOME_UI_PROPERTY(ImGui::DragFloat("View Zoom", &m_ZoomOnMap, 0.05f, 1.0f, 4096.0f));
 	BIOME_UI_PROPERTY(ImGui::DragFloat2("Center Position", glm::value_ptr(m_MapCenter), 0.01f));
-	if(m_RequireUpdation) m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 12.0f * 200.0f);
+	m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
+	m_MapCenter.x = std::clamp(m_MapCenter.x, -4.0f, 4.0f);
+	m_MapCenter.y = std::clamp(m_MapCenter.y, -4.0f, 4.0f);
+	m_MapStrength = std::clamp(m_MapStrength, 0.0f, 20.0f);
 
 
 	return m_RequireUpdation;
+}
+
+void DEMBaseShapeGenerator::GetVisibleTileRange(int32_t zoomResolution, int32_t& minTileX, int32_t& maxTileX, int32_t& minTileY, int32_t& maxTileY) const
+{
+	zoomResolution = std::clamp(zoomResolution, 0, kMaxTileZoom);
+	const int32_t tileCount = 1 << zoomResolution;
+	const float tileSize = 1.0f / static_cast<float>(tileCount);
+	const float viewZoom = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
+	const float viewEnd = 1.0f / viewZoom;
+	const float edgeEpsilon = 0.00001f;
+
+	auto calculateRange = [&](float center, int32_t& minTile, int32_t& maxTile)
+	{
+		const int32_t rawMin = static_cast<int32_t>(std::ceil((-center / tileSize) - 1.0f - edgeEpsilon));
+		const int32_t rawMax = static_cast<int32_t>(std::ceil(((viewEnd - center) / tileSize) - edgeEpsilon)) - 1;
+		minTile = std::max(0, rawMin);
+		maxTile = std::min(tileCount - 1, rawMax);
+	};
+
+	calculateRange(m_MapCenter.x, minTileX, maxTileX);
+	calculateRange(m_MapCenter.y, minTileY, maxTileY);
+}
+
+int32_t DEMBaseShapeGenerator::GetVisibleTileCount(int32_t zoomResolution) const
+{
+	int32_t minTileX = 0, maxTileX = -1, minTileY = 0, maxTileY = -1;
+	GetVisibleTileRange(zoomResolution, minTileX, maxTileX, minTileY, maxTileY);
+	if (maxTileX < minTileX || maxTileY < minTileY) return 0;
+	return (maxTileX - minTileX + 1) * (maxTileY - minTileY + 1);
+}
+
+int32_t DEMBaseShapeGenerator::GetEffectiveZoomResolution() const
+{
+	const float viewZoom = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
+	int32_t requestedZoom = m_AutoZoomResolution
+		? static_cast<int32_t>(std::floor(std::log2(viewZoom))) + 3
+		: m_ZoomResolution;
+	requestedZoom = std::clamp(requestedZoom, 0, kMaxTileZoom);
+
+	while (requestedZoom > 0 && GetVisibleTileCount(requestedZoom) > kMaxVisibleTiles)
+		--requestedZoom;
+	return requestedZoom;
 }
 
 void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seedTexture)
 {
 	START_PROFILER();
 	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-	auto tileSize = 1.0f / (1 << m_ZoomResolution);
+	m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
+	m_MapCenter.x = std::clamp(m_MapCenter.x, -4.0f, 4.0f);
+	m_MapCenter.y = std::clamp(m_MapCenter.y, -4.0f, 4.0f);
+	m_EffectiveZoomResolution = GetEffectiveZoomResolution();
+	m_VisibleTileCount = GetVisibleTileCount(m_EffectiveZoomResolution);
+	m_RequestsScheduledThisUpdate = 0;
+
+	int32_t minTileX = 0, maxTileX = -1, minTileY = 0, maxTileY = -1;
+	GetVisibleTileRange(m_EffectiveZoomResolution, minTileX, maxTileX, minTileY, maxTileY);
+	const int32_t requestedZoom = std::clamp(m_ZoomResolution, 0, kMaxTileZoom);
+	m_TilesSkippedCount = std::max(0, GetVisibleTileCount(requestedZoom) - m_VisibleTileCount);
+
+	auto tileSize = 1.0f / (1 << m_EffectiveZoomResolution);
 
 	buffer->Bind(0);
 	m_Shader->Bind();
@@ -107,6 +196,7 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
 	m_Shader->SetUniform1i("u_Mode", 0);
 	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+	m_Shader->SetMemoryBarrier();
 
 	// generate the map data
 	m_Shader->SetUniform1i("u_Mode", 1);
@@ -116,25 +206,26 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 
 	
 	m_TilesUsingCount = 0;
-	for (int yi = 0; yi < static_cast<int>(1 << m_ZoomResolution); yi++)
-//	for (int yi = tileStartY; yi < tileEndY; yi++)
+	for (int yi = minTileY; yi <= maxTileY; ++yi)
 	{
-		for (int xi = 0; xi < static_cast<int>(1 << m_ZoomResolution); xi++)
-//		for (int xi = tileStartY; xi < tileEndX; xi++)
+		for (int xi = minTileX; xi <= maxTileX; ++xi)
 		{
 			glm::vec2 startPos = (m_MapCenter + glm::vec2(tileSize * xi, tileSize * yi)) * m_ZoomOnMap;
 			glm::vec2 endPos = startPos + glm::vec2(tileSize * m_ZoomOnMap);
-			if (!AABBContains01(startPos, endPos)) continue;
-			m_Shader->SetUniform1i("u_DEMTexture", GetTile(xi, yi, m_ZoomResolution)->Bind(0));
+			auto tile = GetTile(static_cast<uint32_t>(xi), static_cast<uint32_t>(yi), static_cast<uint32_t>(m_EffectiveZoomResolution));
+			if (!HasTileLoaded(static_cast<uint32_t>(xi), static_cast<uint32_t>(yi), static_cast<uint32_t>(m_EffectiveZoomResolution)))
+				continue;
+			m_Shader->SetUniform1i("u_DEMTexture", tile->Bind(0));
 			m_Shader->SetUniform4f("u_RegionToUpdate", glm::vec4(startPos, endPos));
 			// TODO: [PLAN] do not dispatch based on map tile but texture tile
 			m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
-			// m_Shader->SetMemoryBarrier(); // maybe if this is not very required we can skip this
 			m_TilesUsingCount++;
 		}
 	}
 
 	// update the visualizer map
+	// Mode 2 reads the SSBO written by all mode 1 dispatches.
+	m_Shader->SetMemoryBarrier();
 	m_Shader->SetUniform1i("u_Mode", 2);
 	m_MapVisualzeTexture->BindForCompute(1);
 	m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
@@ -145,7 +236,9 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 
 void DEMBaseShapeGenerator::Load(SerializerNode data)
 {
-	m_ZoomOnMap = data->GetInteger("ZoomOnMap", 1.0f);
+	m_ZoomOnMap = data->GetFloat("ZoomOnMap", 1.0f);
+	m_ZoomResolution = data->GetInteger("ZoomResolution", 0);
+	m_AutoZoomResolution = data->GetInteger("AutoZoomResolution", 1) != 0;
 	m_MapStrength = data->GetFloat("MapStrength", 1.0f);
 	m_MapCenter.x = data->GetFloat("MapCenter_X", 0.0f);
 	m_MapCenter.y = data->GetFloat("MapCenter_Y", 0.0f);
@@ -155,7 +248,9 @@ void DEMBaseShapeGenerator::Load(SerializerNode data)
 SerializerNode DEMBaseShapeGenerator::Save()
 {
 	auto node = CreateSerializerNode();
-	node->SetInteger("ZoomOnMap", m_ZoomOnMap);
+	node->SetFloat("ZoomOnMap", m_ZoomOnMap);
+	node->SetInteger("ZoomResolution", m_ZoomResolution);
+	node->SetInteger("AutoZoomResolution", m_AutoZoomResolution ? 1 : 0);
 	node->SetFloat("MapStrength", m_MapStrength);
 	node->SetFloat("MapCenter_X", m_MapCenter.x);
 	node->SetFloat("MapCenter_Y", m_MapCenter.y);
@@ -164,14 +259,13 @@ SerializerNode DEMBaseShapeGenerator::Save()
 
 bool DEMBaseShapeGenerator::IsTileValid(uint32_t x, uint32_t y, uint32_t z)
 {
-	// z should be between 0 and 12
-	if (z < 0u || z > 12u)
+	if (z > static_cast<uint32_t>(kMaxTileZoom))
 	{
 		return false;
 	}
 
-	// x and y should be between 0 and 2^z
-	if (x < 0u || x > (1u << z) - 1u || y < 0u || y > (1u << z) - 1u)
+	const uint32_t tileCount = 1u << z;
+	if (x >= tileCount || y >= tileCount)
 	{
 		return false;
 	}
@@ -204,27 +298,55 @@ std::shared_ptr<Texture2D> DEMBaseShapeGenerator::LoadTile(uint32_t x, uint32_t 
 	if (std::find(m_TextureDownloadQueue.begin(), m_TextureDownloadQueue.end(), textureCacheKey) != m_TextureDownloadQueue.end())
 	{
 		return m_LoadingTexture;
-	}	
+	}
+
+	auto now = std::chrono::steady_clock::now();
+	auto retryIt = m_TileRetryAfter.find(textureCacheKey);
+	if (retryIt != m_TileRetryAfter.end() && now < retryIt->second)
+		return m_NullTexture;
 
 	// if not, download it
 	if (!PathExist(path))
 	{
+		if (m_APIKey.empty()) return m_NullTexture;
+		if (static_cast<int32_t>(m_TextureDownloadQueue.size()) >= kMaxPendingTileRequests
+			|| m_RequestsScheduledThisUpdate >= kMaxRequestsPerRefresh
+			|| now < m_NextTileRequestTime)
+			return m_LoadingTexture;
+
+		++m_RequestsScheduledThisUpdate;
+		m_NextTileRequestTime = now + std::chrono::milliseconds(kTileRequestIntervalMilliseconds);
 		DownloadTerrainRGBTexture(textureCacheKey);
 		return m_LoadingTexture;
 	}
 
-	// load the tile
-
-	// CLEAN UP THIS CODE
-	static int w = 1, h = 1, sz = 0;
+	int w = 1, h = 1, sz = 0;
 	uint8_t* data = (uint8_t*)ReadBinaryFile(path, &sz);
+	if (!data || sz <= 0)
+	{
+		delete[] data;
+		std::remove(path.c_str());
+		m_TileRetryAfter[textureCacheKey] = now + std::chrono::seconds(30);
+		return m_NullTexture;
+	}
+
 	auto rgbData = WebPDecodeRGBA(data, sz, &w, &h);
+	if (!rgbData || w <= 0 || h <= 0)
+	{
+		delete[] data;
+		if (rgbData) free(rgbData);
+		std::remove(path.c_str());
+		m_TileRetryAfter[textureCacheKey] = now + std::chrono::seconds(30);
+		TF3D_LOG_WARN("Ignoring invalid DEM tile cache entry: {}", path);
+		return m_NullTexture;
+	}
+
 	auto texPtr = std::make_shared<Texture2D>(w, h);
 	m_TextureCache[textureCacheKey] = texPtr;
 	texPtr->SetData(rgbData, 0, true);
 	delete[] data;
 	free(rgbData);
-	// CLEAN UP THIS CODE
+	m_TileRetryAfter.erase(textureCacheKey);
 
 	return texPtr;
 }
@@ -236,8 +358,25 @@ void DEMBaseShapeGenerator::DownloadTerrainRGBTexture(TextureCacheKey key)
 	{
 		auto [x, y, z] = key;
 		auto path = fmt::vformat(m_TerrainRGBDataCacheFileFormat, fmt::make_format_args(x, y, z));
+		auto temporaryPath = path + ".part";
 		auto urlPath = fmt::vformat(m_APIPathURLFormat, fmt::make_format_args(z, x, y, m_APIKey));
-		DownloadFile(m_APIHostURL, urlPath, path);
+		std::remove(temporaryPath.c_str());
+		DownloadFile(m_APIHostURL, urlPath, temporaryPath);
+		if (PathExist(temporaryPath))
+		{
+			std::remove(path.c_str());
+			std::rename(temporaryPath.c_str(), path.c_str());
+		}
 	};
-	m_AppState->jobSystem->AddFunctionWorker(downloadWorker)->onComplete = [this, key](auto*)->void { m_TextureDownloadQueue.erase(std::find(m_TextureDownloadQueue.begin(), m_TextureDownloadQueue.end(), key)); m_RequireUpdation = true; m_AppState->eventManager->RaiseEvent("ForceUpdate", "ForceUpdate"); };
+	m_AppState->jobSystem->AddFunctionWorker(downloadWorker)->onComplete = [this, key](auto*)->void
+	{
+		auto it = std::find(m_TextureDownloadQueue.begin(), m_TextureDownloadQueue.end(), key);
+		if (it != m_TextureDownloadQueue.end()) m_TextureDownloadQueue.erase(it);
+		auto [x, y, z] = key;
+		auto path = fmt::vformat(m_TerrainRGBDataCacheFileFormat, fmt::make_format_args(x, y, z));
+		if (!PathExist(path))
+			m_TileRetryAfter[key] = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+		m_RequireUpdation = true;
+		m_AppState->eventManager->RaiseEvent("ForceUpdate", "ForceUpdate");
+	};
 }
