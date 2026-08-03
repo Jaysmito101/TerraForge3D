@@ -8,10 +8,12 @@ BUILD_ROOT="$ROOT_DIR/build"
 COMMAND="help"
 CONFIGURATION="Debug"
 GENERATOR_INPUT="ninja"
+GENERATOR_ID="ninja"
 ARCHITECTURE="x64"
 BUILD_DIR=""
 NO_SETUP=0
 RECONFIGURE=0
+CLEAN_ALL=0
 CMAKE_ARGS=()
 
 usage() {
@@ -31,16 +33,17 @@ Commands:
   configure   Generate the selected CMake build tree.
   build       Configure when needed, then build terraforge3d.
   run         Build when needed, then run terraforge3d.
-  clean       Remove the selected build tree.
+  clean       Remove generated build/CMake files; use --all for every build tree.
   all         Run setup, configure, and build.
 
 Options (defaults are shown in brackets):
   -g, --generator <name>       visualstudio, ninja, make, or xcode [ninja]
   -c, --configuration <name>   Debug, Release, RelWithDebInfo, or MinSizeRel [Debug]
   -a, --architecture <name>    x64 or win32; Visual Studio only [x64]
-      --build-dir <path>       Custom directory inside build/ [auto-selected]
+      --build-dir <path>       Custom directory inside build/ [build/macos.$GENERATOR_ID.$CONFIGURATION]
       --no-setup                Skip automatic submodule setup
       --reconfigure             Force CMake regeneration
+      --all                     With clean, remove every build tree too
       --cmake-arg <arg>         Pass an additional argument to CMake
 
 Default build trees:
@@ -156,6 +159,10 @@ parse_arguments() {
                 RECONFIGURE=1
                 shift
                 ;;
+            --all)
+                CLEAN_ALL=1
+                shift
+                ;;
             --cmake-arg)
                 [[ $# -ge 2 ]] || die "$1 requires a value"
                 CMAKE_ARGS+=("$2")
@@ -243,23 +250,92 @@ run_project() {
     "$executable"
 }
 
+root_path_is_tracked() {
+    git -C "$ROOT_DIR" ls-files --error-unmatch -- "$1" >/dev/null 2>&1
+}
+
+remove_generated_root_path() {
+    local relative_path="$1"
+    local target_path="$ROOT_DIR/$relative_path"
+
+    [[ -e "$target_path" || -L "$target_path" ]] || return 0
+
+    case "$target_path" in
+        "$ROOT_DIR"/*) ;;
+        *) die "Refusing to remove a path outside $ROOT_DIR: $target_path" ;;
+    esac
+
+    if root_path_is_tracked "$relative_path"; then
+        echo "Preserved tracked path: $relative_path"
+        return 0
+    fi
+
+    rm -rf -- "$target_path"
+    echo "Removed generated path: $relative_path"
+}
+
+remove_generated_root_files() {
+    local relative_path
+    local pattern
+    local target_path
+
+    for relative_path in \
+        CMakeCache.txt \
+        CMakeFiles \
+        CMakeScripts \
+        cmake_install.cmake \
+        CTestTestfile.cmake \
+        install_manifest.txt \
+        Makefile \
+        Debug \
+        Release \
+        gladsources \
+        x64 \
+        .vs \
+        build/compile_commands.json; do
+        remove_generated_root_path "$relative_path"
+    done
+
+    for pattern in '*.sln' '*.vcxproj' '*.vcxproj.filters' '*.vcxproj.user' '*.aps' '*.make'; do
+        for target_path in "$ROOT_DIR"/$pattern; do
+            [[ -f "$target_path" ]] || continue
+            relative_path="${target_path#"$ROOT_DIR/"}"
+            remove_generated_root_path "$relative_path"
+        done
+    done
+
+    for target_path in "$ROOT_DIR"/*.dir; do
+        [[ -d "$target_path" ]] || continue
+        relative_path="${target_path#"$ROOT_DIR/"}"
+        remove_generated_root_path "$relative_path"
+    done
+}
+
 clean_project() {
     local build_root="${BUILD_ROOT%/}"
     local allowed_prefix="$build_root/"
 
-    [[ "$BUILD_DIR" == "$allowed_prefix"* && "$BUILD_DIR" != "$build_root" ]] || \
-        die "Refusing to clean a directory outside $build_root"
+    if [[ "$CLEAN_ALL" -eq 1 ]]; then
+        remove_generated_root_path "build"
+    else
+        [[ "$BUILD_DIR" == "$allowed_prefix"* && "$BUILD_DIR" != "$build_root" ]] || \
+            die "Refusing to clean a directory outside $build_root"
 
-    if [[ -e "$BUILD_DIR" ]]; then
-        rm -rf -- "$BUILD_DIR"
-        echo "Removed $BUILD_DIR"
+        if [[ -e "$BUILD_DIR" ]]; then
+            rm -rf -- "$BUILD_DIR"
+            echo "Removed $BUILD_DIR"
+        fi
     fi
+
+    remove_generated_root_files
 }
 
 parse_arguments "$@"
 normalize_configuration
 select_generator
 normalize_architecture
+
+[[ "$CLEAN_ALL" -eq 0 || "$COMMAND" == "clean" ]] || die "--all is only valid with the clean command."
 
 if [[ -z "$BUILD_DIR" ]]; then
     BUILD_DIR="$BUILD_ROOT/macos.$GENERATOR_ID.$CONFIGURATION"

@@ -7,6 +7,7 @@ $Architecture = "x64"
 $BuildDir = ""
 $NoSetup = $false
 $Reconfigure = $false
+$CleanAll = $false
 $CMakeArgs = @()
 $ScriptArgs = @($args)
 
@@ -19,18 +20,18 @@ TerraForge3D build helper
 
 Usage:
   .\build.ps1 setup
-  .\build.ps1 configure -Generator VisualStudio -Configuration Debug
-  .\build.ps1 build -Generator Ninja -Configuration Release
-  .\build.ps1 run -Generator VisualStudio -Configuration Debug
-  .\build.ps1 clean -Generator Ninja
-  .\build.ps1 all -Generator VisualStudio -Configuration Release
+  .\build.ps1 configure --generator visualstudio --configuration Debug
+  .\build.ps1 build --generator ninja --configuration Release
+  .\build.ps1 run --generator visualstudio --configuration Debug
+  .\build.ps1 clean --generator ninja
+  .\build.ps1 all --generator visualstudio --configuration Release
 
 Commands:
   setup       Initialize and update all Git submodules.
   configure   Generate the selected CMake build tree.
   build       Configure when needed, then build terraforge3d.
   run         Build when needed, then run terraforge3d.
-  clean       Remove the selected build tree.
+  clean       Remove generated build/CMake files; use --all for every build tree.
   all         Run setup, configure, and build.
 
 Options (defaults are shown in brackets):
@@ -40,6 +41,7 @@ Options (defaults are shown in brackets):
       --build-dir <path>       Custom directory inside build\ [build\windows.$($GeneratorInfo.Id).$Configuration]
       --no-setup                Skip automatic submodule setup
       --reconfigure             Force CMake regeneration
+      --all                     With clean, remove every build tree too
       --cmake-arg <arg>         Pass an additional argument to CMake
 
 Default build trees:
@@ -61,8 +63,10 @@ function Read-OptionValue {
         throw "$Option requires a value"
     }
 
-    $Index.Value++
-    return [string]$ScriptArgs[$Index.Value]
+    $Index.Value = $Index.Value + 1
+    $Value = [string]$ScriptArgs[$Index.Value]
+    $Index.Value = $Index.Value + 1
+    return $Value
 }
 
 function Parse-Arguments {
@@ -82,45 +86,39 @@ function Parse-Arguments {
     while ($Index -lt $ScriptArgs.Count) {
         $Option = [string]$ScriptArgs[$Index]
 
-        switch ($Option) {
-            { $_ -in @("-h", "--help") } {
-                $Command = "help"
-                $Index++
-                continue
-            }
-            { $_ -in @("-g", "--generator") } {
-                $GeneratorInput = Read-OptionValue $Option ([ref]$Index)
-                continue
-            }
-            { $_ -in @("-c", "--configuration") } {
-                $Configuration = Read-OptionValue $Option ([ref]$Index)
-                continue
-            }
-            { $_ -in @("-a", "--architecture") } {
-                $Architecture = Read-OptionValue $Option ([ref]$Index)
-                continue
-            }
-            "--build-dir" {
-                $BuildDir = Read-OptionValue $Option ([ref]$Index)
-                continue
-            }
-            "--no-setup" {
-                $NoSetup = $true
-                $Index++
-                continue
-            }
-            "--reconfigure" {
-                $Reconfigure = $true
-                $Index++
-                continue
-            }
-            { $_ -in @("--cmake-arg") } {
-                $CMakeArgs += Read-OptionValue $Option ([ref]$Index)
-                continue
-            }
-            default {
-                throw "Unknown argument: $Option"
-            }
+        if ($Option -in @("-h", "--help")) {
+            $Command = "help"
+            $Index++
+        }
+        elseif ($Option -in @("-g", "--generator")) {
+            $GeneratorInput = Read-OptionValue $Option ([ref]$Index)
+        }
+        elseif ($Option -in @("-c", "--configuration")) {
+            $Configuration = Read-OptionValue $Option ([ref]$Index)
+        }
+        elseif ($Option -in @("-a", "--architecture")) {
+            $Architecture = Read-OptionValue $Option ([ref]$Index)
+        }
+        elseif ($Option -eq "--build-dir") {
+            $BuildDir = Read-OptionValue $Option ([ref]$Index)
+        }
+        elseif ($Option -eq "--no-setup") {
+            $NoSetup = $true
+            $Index++
+        }
+        elseif ($Option -eq "--reconfigure") {
+            $Reconfigure = $true
+            $Index++
+        }
+        elseif ($Option -eq "--all") {
+            $CleanAll = $true
+            $Index++
+        }
+        elseif ($Option -eq "--cmake-arg") {
+            $CMakeArgs += Read-OptionValue $Option ([ref]$Index)
+        }
+        else {
+            throw "Unknown argument: $Option"
         }
     }
 
@@ -131,6 +129,7 @@ function Parse-Arguments {
     Set-Variable -Name BuildDir -Value $BuildDir -Scope 1
     Set-Variable -Name NoSetup -Value $NoSetup -Scope 1
     Set-Variable -Name Reconfigure -Value $Reconfigure -Scope 1
+    Set-Variable -Name CleanAll -Value $CleanAll -Scope 1
     Set-Variable -Name CMakeArgs -Value $CMakeArgs -Scope 1
 }
 
@@ -192,6 +191,10 @@ function Get-GeneratorInfo {
 }
 
 $GeneratorInfo = Get-GeneratorInfo
+
+if ($CleanAll -and $Command -ne "clean") {
+    throw "--all is only valid with the clean command."
+}
 
 if ([string]::IsNullOrWhiteSpace($BuildDir)) {
     $BuildDir = Join-Path $DefaultBuildRoot ("windows." + $GeneratorInfo.Id + "." + $Configuration)
@@ -297,18 +300,82 @@ function Invoke-Run {
     }
 }
 
+function Test-RootPathTracked {
+    param([Parameter(Mandatory = $true)][string]$RelativePath)
+
+    & git -C $RootDir ls-files --error-unmatch -- $RelativePath *> $null
+    return $LASTEXITCODE -eq 0
+}
+
+function Remove-GeneratedRootPath {
+    param([Parameter(Mandatory = $true)][string]$RelativePath)
+
+    $Path = Join-Path $RootDir $RelativePath
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return
+    }
+
+    if (Test-RootPathTracked $RelativePath) {
+        Write-Host "Preserved tracked path: $RelativePath"
+        return
+    }
+
+    Remove-Item -LiteralPath $Path -Recurse -Force
+    Write-Host "Removed generated path: $RelativePath"
+}
+
+function Remove-GeneratedRootFiles {
+    $GeneratedPaths = @(
+        "CMakeCache.txt",
+        "CMakeFiles",
+        "CMakeScripts",
+        "cmake_install.cmake",
+        "CTestTestfile.cmake",
+        "install_manifest.txt",
+        "Makefile",
+        "Debug",
+        "Release",
+        "gladsources",
+        "x64",
+        ".vs",
+        "build\compile_commands.json"
+    )
+
+    foreach ($RelativePath in $GeneratedPaths) {
+        Remove-GeneratedRootPath $RelativePath
+    }
+
+    $GeneratedFilePatterns = @("*.sln", "*.vcxproj", "*.vcxproj.filters", "*.vcxproj.user", "*.aps", "*.make")
+    foreach ($Pattern in $GeneratedFilePatterns) {
+        Get-ChildItem -LiteralPath $RootDir -File -Force -Filter $Pattern | ForEach-Object {
+            Remove-GeneratedRootPath $_.Name
+        }
+    }
+
+    Get-ChildItem -LiteralPath $RootDir -Directory -Force |
+        Where-Object { $_.Name -like "*.dir" } |
+        ForEach-Object { Remove-GeneratedRootPath $_.Name }
+}
+
 function Invoke-Clean {
     $BuildRoot = [IO.Path]::GetFullPath($DefaultBuildRoot).TrimEnd([IO.Path]::DirectorySeparatorChar)
     $AllowedPrefix = $BuildRoot + [IO.Path]::DirectorySeparatorChar
 
-    if (-not $BuildDir.StartsWith($AllowedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-        throw "Refusing to clean a directory outside $BuildRoot"
+    if ($CleanAll) {
+        Remove-GeneratedRootPath "build"
+    }
+    else {
+        if (-not $BuildDir.StartsWith($AllowedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to clean a directory outside $BuildRoot"
+        }
+
+        if (Test-Path $BuildDir) {
+            Remove-Item -LiteralPath $BuildDir -Recurse -Force
+            Write-Host "Removed $BuildDir"
+        }
     }
 
-    if (Test-Path $BuildDir) {
-        Remove-Item -LiteralPath $BuildDir -Recurse -Force
-        Write-Host "Removed $BuildDir"
-    }
+    Remove-GeneratedRootFiles
 }
 
 if ($Command -eq "help") {
