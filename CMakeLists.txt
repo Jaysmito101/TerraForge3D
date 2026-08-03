@@ -36,7 +36,7 @@ include_directories(
     ./TerraForge3D/vendor/httplib
     ./TerraForge3D/vendor/imgui
     ./TerraForge3D/vendor/imgui-node-editor
-    ./TerraForge3D/vendor/json/single_include/nlohmann
+    ./TerraForge3D/vendor/json/single_include
     ./TerraForge3D/vendor/stb
     ./TerraForge3D/vendor/libpng
     ${OPENSSL_INCLUDE_DIR}

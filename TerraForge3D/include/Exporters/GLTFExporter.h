@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 class Mesh;
 class BinaryFileWriter;

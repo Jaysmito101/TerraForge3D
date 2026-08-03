@@ -2,7 +2,7 @@
 #include "Utils/Utils.h"
 
 #include "imgui/imgui.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 
 #define TF3D_HANDLE_EXCEPTION_MSG(x, message) { try {x;} catch(std::exception& e){ Log(std::string(message) + " [ " + e.what() + " ]" + message);} }
@@ -216,4 +216,3 @@ void Style::Apply()
 	ImGuiStyle& st = ImGui::GetStyle();
 	st = style;
 }
-

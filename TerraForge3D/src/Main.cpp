@@ -18,7 +18,7 @@
 #include "Utils/Utils.h"
 #undef cNear
 #undef cFar
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include <sys/stat.h>
 
 #include "Misc/CustomInspector.h"

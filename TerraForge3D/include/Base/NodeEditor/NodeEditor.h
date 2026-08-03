@@ -1,5 +1,5 @@
 #pragma once
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "imgui-node-editor/imgui_node_editor.h"
 
 #include <vector>

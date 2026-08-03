@@ -1,6 +1,6 @@
 #pragma once
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include "Base/Base.h"
 #include "Utils/Utils.h"
 #include "Generators/GeneratorData.h"

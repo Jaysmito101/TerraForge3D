@@ -22,7 +22,7 @@
 #include "Generators/GenerationManager.h"
 
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 #ifndef MAX_VIEWPORT_COUNT
 #define MAX_VIEWPORT_COUNT 8
