@@ -62,8 +62,8 @@ public:
 		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs");
 		SetLogsDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs");
 		SetWindowConfigPath(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "windowconfigs.terr3d");
-		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave\"");
-		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "temp\"");
+		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave");
+		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "temp");
 	}
 
 	virtual void OnUpdate(float deltatime) override
