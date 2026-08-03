@@ -6,7 +6,8 @@
 #include "Generators/BiomeCustomBaseShape.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/MaskEditor.h"
+#include "Generators/CalculatedMaskGenerator.h"
+#include "Generators/MaskTool.h"
 #include "Base/Base.h"
 
 class ApplicationState;
@@ -35,6 +36,7 @@ public:
 	bool ShowCustomBaseShapeSettings();
 	bool ShowGeneralSettings();
 	bool ShowBaseNoiseSettings();
+	bool ShowMaskToolSettings();
 
 	inline const bool IsEnabled() const { return m_IsEnabled; }
 	inline const char* GetBiomeName() const { return m_BiomeName; }
@@ -47,7 +49,8 @@ public:
 	inline const std::vector<int>& GetFilters() const { return m_Filters; }
 	inline const std::string& GetBiomeID() const { return m_BiomeID; }
 	inline void SetName(const std::string& name) { strcpy(m_BiomeName, name.c_str()); }
-	inline GeneratorTexture* GetMaskTexture() const { return m_MaskEditor->GetTexture(); }
+	inline GeneratorTexture* GetMaskTexture() const { return m_MaskTool->GetTexture(); }
+	inline GeneratorTexture* GetMaskPreviewTexture() const { return m_MaskTool->GetPreviewTexture(); }
 
 	bool AddBaseShapeGenerator(const std::string& config);
 	bool LoadUpResources();
@@ -66,8 +69,9 @@ private:
 	BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
 	std::vector<int> m_Filters;
 	std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
+	std::shared_ptr<CalculatedMaskGenerator> m_CalculatedMaskGenerator;
 
-	std::shared_ptr<MaskEditor> m_MaskEditor;
+	std::shared_ptr<MaskTool> m_MaskTool;
 
 	std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
 	std::shared_ptr<BiomeBaseNoiseGenerator> m_BaseNoiseGenerator;

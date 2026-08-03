@@ -1,10 +1,17 @@
 #pragma once
 #include "Base/Base.h"
 
+enum class GeneratorTextureStorage
+{
+	RGBA32F,
+	R8,
+	R16,
+};
+
 class GeneratorTexture
 {
 public:
-	GeneratorTexture(int32_t width, int32_t height);
+	GeneratorTexture(int32_t width, int32_t height, GeneratorTextureStorage storage = GeneratorTextureStorage::RGBA32F);
 	~GeneratorTexture();
 
 	void Resize(int32_t width, int32_t height);
@@ -22,6 +29,7 @@ public:
 	inline const int32_t GetHeight() const { return m_Height; }
 	inline const uint32_t GetRendererID() const { return m_RendererID; }
 	inline const ImTextureID GetTextureID() const { return (ImTextureID)(intptr_t)m_RendererID; }
+	inline const bool IsSingleChannel() const { return m_Storage == GeneratorTextureStorage::R8 || m_Storage == GeneratorTextureStorage::R16; }
 
 
 private:
@@ -30,5 +38,7 @@ private:
 	uint32_t m_RendererID = 0;
 	GLenum m_InternalFormat = 0;
 	GLenum m_Format = 0;
+	GLenum m_PixelType = 0;
+	GeneratorTextureStorage m_Storage = GeneratorTextureStorage::RGBA32F;
 	float* m_Data = nullptr;
 };

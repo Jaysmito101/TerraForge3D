@@ -26,8 +26,9 @@ bool BiomeManager::LoadUpResources()
 	}
 	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
 	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
+	m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
 	m_CustomBaseShape = std::make_shared<BiomeCustomBaseShape>(m_AppState);
-	m_MaskEditor = std::make_shared<MaskEditor>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
+	m_MaskTool = std::make_shared<MaskTool>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
 	return true;
 }
 
@@ -62,7 +63,8 @@ void BiomeManager::Resize()
 	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
 	m_Data->Resize(size);
 	m_CustomBaseShape->Resize();
-	m_MaskEditor->Resize(m_AppState->mainMap.tileResolution);
+	m_CalculatedMaskGenerator->Resize(m_AppState->mainMap.tileResolution);
+	m_MaskTool->Resize(m_AppState->mainMap.tileResolution);
 	m_RequireUpdation = true;
 }
 
@@ -93,6 +95,7 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	// optimized when filters are implemented
 
 	m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture);
+	m_CalculatedMaskGenerator->Invalidate();
 
 
 	END_PROFILER(m_CalculationTime);
@@ -153,16 +156,28 @@ bool BiomeManager::ShowGeneralSettings()
 	BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
 	if (ImGui::ColorEdit3("Biome Color", reinterpret_cast<float*>(&m_Color)))
 	{
-		m_MaskEditor->SetVizColor(m_Color.x, m_Color.y, m_Color.z);
+		m_MaskTool->SetVizColor(m_Color.x, m_Color.y, m_Color.z);
 	}
-
-	BIOME_UI_PROPERTY(m_MaskEditor->ShowSettings());
 
 
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
 		ImGui::Text("Time Taken: %f", m_CalculationTime);
 	}
+	ImGui::PopID();
+	return m_RequireUpdation;
+}
+
+bool BiomeManager::ShowMaskToolSettings()
+{
+	ImGui::PushID(m_BiomeID.data());
+	if (m_MaskTool->IsShowingGeneratedMask() && ImGui::CollapsingHeader("Generated mask source", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		BIOME_UI_PROPERTY(m_CalculatedMaskGenerator->ShowSettings());
+	}
+	m_CalculatedMaskGenerator->Update(m_Data.get());
+	m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated terrain mask");
+	BIOME_UI_PROPERTY(m_MaskTool->ShowSettings());
 	ImGui::PopID();
 	return m_RequireUpdation;
 }

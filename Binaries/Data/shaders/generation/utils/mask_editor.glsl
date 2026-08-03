@@ -1,39 +1,76 @@
 #version 430 core
 
-// work group size
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-// texture for mask
-layout(binding = 0, rgba32f) uniform image2D u_MaskTexture;
+layout(binding = 0, r16) uniform image2D u_MaskTexture;
+layout(binding = 0) uniform sampler2D u_BaseMask;
 
+layout(std430, binding = 1) readonly buffer StrokeSettingsBuffer
+{
+	vec4 u_StrokeSettings[]; // strength, size, falloff, mode
+};
+
+layout(std430, binding = 2) readonly buffer StrokeRangesBuffer
+{
+	ivec4 u_StrokeRanges[]; // point start, point count, unused, unused
+};
+
+layout(std430, binding = 3) readonly buffer StrokePointsBuffer
+{
+	vec4 u_StrokePoints[]; // normalized terrain position in xy
+};
 
 uniform int u_Resolution;
-uniform vec2 u_BrushPosition;
-uniform vec4 u_BrushSettings0;
-uniform int u_Mode;
+uniform int u_StrokeCount;
 
-
-float calculateFallOff(in vec2 uv)
+float distanceToStroke(in vec2 uv, in int pointStart, in int pointCount)
 {
-	float distanceVal = length(uv - u_BrushPosition);
-	return smoothstep(u_BrushSettings0.y * (1.0f - u_BrushSettings0.z), u_BrushSettings0.y, distanceVal);
+	if (pointCount <= 0) return 1000000.0f;
+	if (pointCount == 1) return length(uv - u_StrokePoints[pointStart].xy);
+
+	float closestDistance = 1000000.0f;
+	for (int pointIndex = 0; pointIndex < pointCount - 1; ++pointIndex)
+	{
+		vec2 start = u_StrokePoints[pointStart + pointIndex].xy;
+		vec2 end = u_StrokePoints[pointStart + pointIndex + 1].xy;
+		vec2 segment = end - start;
+		float segmentLengthSquared = dot(segment, segment);
+		float projection = segmentLengthSquared < 0.0000001f
+			? 0.0f
+			: clamp(dot(uv - start, segment) / segmentLengthSquared, 0.0f, 1.0f);
+		closestDistance = min(closestDistance, length(uv - (start + projection * segment)));
+	}
+	return closestDistance;
+}
+
+float strokeInfluence(in vec2 uv, in vec4 settings, in int pointStart, in int pointCount)
+{
+	float distanceValue = distanceToStroke(uv, pointStart, pointCount);
+	float outerEdge = max(settings.y, 0.000001f);
+	float innerEdge = outerEdge * (1.0f - clamp(settings.z, 0.0f, 1.0f));
+	float falloff = smoothstep(innerEdge, max(innerEdge + 0.000001f, outerEdge), distanceValue);
+	return clamp(settings.x * (1.0f - falloff), 0.0f, 1.0f);
 }
 
 void main()
 {
-	ivec2 offset = ivec2(gl_GlobalInvocationID.xy);
-	if (offset.x >= u_Resolution || offset.y >= u_Resolution) return;
-	vec4 oriVal = imageLoad(u_MaskTexture, offset);
+	ivec2 coordinate = ivec2(gl_GlobalInvocationID.xy);
+	if (coordinate.x >= u_Resolution || coordinate.y >= u_Resolution) return;
 
-	vec2 uv = offset / float(u_Resolution);
+	float value = texelFetch(u_BaseMask, coordinate, 0).r;
+	vec2 uv = (vec2(coordinate) + vec2(0.5f)) / float(u_Resolution);
 
-	// u_BrushSettings0 = strength, size, falloff, reserved
-	float val = mix(u_BrushSettings0.x, 0.0f, calculateFallOff(uv));
+	// NOTE/TODO: This is a pretty bad ideas as this scales very badly, ideally we want
+	// either a more clever way to select strokes per pixel (like some partationng)
+	// or we rasterize strokes incrementally
+	for (int strokeIndex = 0; strokeIndex < u_StrokeCount; ++strokeIndex)
+	{
+		vec4 settings = u_StrokeSettings[strokeIndex];
+		ivec4 range = u_StrokeRanges[strokeIndex];
+		float influence = strokeInfluence(uv, settings, range.x, range.y);
+		float target = settings.w > 0.5f ? 0.0f : 1.0f;
+		value = mix(value, target, influence);
+	}
 
-	if (u_Mode == 1)
-		val = clamp(oriVal.x - val, 0.0f, 1.0f);
-	else
-		val = clamp(oriVal.x + val, 0.0f, 1.0f);
-
-	imageStore(u_MaskTexture, offset, vec4(val, val, val, 1.0f));
+	imageStore(u_MaskTexture, coordinate, vec4(value, value, value, 1.0f));
 }

@@ -139,8 +139,8 @@ void main()
 
 	if (u_DrawMask)
 	{
-		vec3 maskColor = texture(u_MaskTexture, fragmentInput.texCoord).rgb;
-		outputColor *= (maskColor.r * u_MaskColor + 0.1f);
+		float maskValue = texture(u_MaskTexture, fragmentInput.texCoord).r;
+		outputColor = mix(outputColor, u_MaskColor, clamp(maskValue * 0.65f, 0.0f, 1.0f));
 	}
 
 	if(u_RequiresDrawBrush)
@@ -149,7 +149,7 @@ void main()
 		// u_BrushSettings0.z = radius, u_BrushSettings0.w = hardness
 		float distanceVal = length(fragmentInput.texCoord - u_BrushSettings0.xy);
 		float falloff = smoothstep(u_BrushSettings0.z * (1.0f - u_BrushSettings0.w), u_BrushSettings0.z, distanceVal);
-		outputColor *= mix(brushColor, vec3(1.0), falloff);
+		outputColor = mix(outputColor, brushColor, (1.0f - falloff) * 0.75f);
 	
 	}
 

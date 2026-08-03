@@ -19,6 +19,7 @@ enum SelectedUINodeObjectType
 	SelectedUINodeObjectType_BaseNoise,
 	SelectedUINodeObjectType_BaseShape,
 	SelectedUINodeObjectType_CustomBaseShape,
+	SelectedUINodeObjectType_MaskTool,
 	SelectedUINodeObjectType_Material
 };
 
@@ -61,12 +62,12 @@ public:
 	inline const std::vector<std::shared_ptr<BiomeManager>>& GetBiomeManagers() const { return m_BiomeManagers; }
 
 private:
+	void WaitForGenerationWorker();
 	void PullSeedTextureFromActiveMesh();
 	void ShowSettingsInspector();
 	void ShowSettingsDetailed();
 	void ShowSettingsGlobalOptions();
 	void RequestGeneration(bool force);
-	void WaitForGenerationWorker();
 	void GenerationWorkerLoop();
 	void ExecuteGeneration(bool force);
 

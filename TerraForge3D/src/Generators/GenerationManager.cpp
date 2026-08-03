@@ -225,6 +225,10 @@ void GenerationManager::ShowSettingsInspector()
 				{
 					SetUINodeData(i, General);
 				}
+				if (ImGui::Selectable("Mask", m_SelectedNodeUI.m_ID == MakeUINodeID(i, MaskTool)))
+				{
+					SetUINodeData(i, MaskTool);
+				}
 				if (ImGui::Selectable("Base Shape", m_SelectedNodeUI.m_ID == MakeUINodeID(i, BaseShape)))
 				{
 					SetUINodeData(i, BaseShape);
@@ -269,6 +273,7 @@ void GenerationManager::ShowSettingsDetailed()
 	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseShapeSettings() || m_RequireUpdation;
 	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowCustomBaseShapeSettings() || m_RequireUpdation;
 	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseNoiseSettings() || m_RequireUpdation;
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_MaskTool) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowMaskToolSettings() || m_RequireUpdation;
 
 	ImGui::End();
 }

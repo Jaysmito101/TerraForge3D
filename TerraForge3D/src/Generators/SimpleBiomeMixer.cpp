@@ -18,15 +18,17 @@ void SimpleBiomeMixer::Update(GeneratorData* heightmapData, GeneratorData* m_Swa
 {
 	const auto& biomeManagers = m_AppState->generationManager->GetBiomeManagers();
 	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
+	const auto dispatchSize = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
 
 
 	m_Shader->Bind();
 	m_SwapBuffer->Bind(1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	// clear the buffer
 	m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
 	m_Shader->SetUniform1i("u_Mode", 0);
-	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+	m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
 	m_Shader->SetMemoryBarrier();
 
 	std::unordered_map<std::string, SimpleBiomeMixerSettings> biomeSettingsMap;
@@ -50,7 +52,7 @@ void SimpleBiomeMixer::Update(GeneratorData* heightmapData, GeneratorData* m_Swa
 			biomeManager->GetMaskTexture()->Bind(3);
 			m_Shader->SetUniform1i("u_BiomeMask", 3);
 		}
-		m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+		m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
 		m_Shader->SetMemoryBarrier();
 	}
 

@@ -172,6 +172,8 @@ bool BiomeCustomBaseShape::ShowDrawEditor()
 		auto posOnTerrain = activeViewport->GetPositionOnTerrain();
 		m_DrawSettings.m_BrushPositionX = posOnTerrain.x;
 		m_DrawSettings.m_BrushPositionY = posOnTerrain.y;
+		m_DrawSettings.m_ShowMask = false;
+		m_DrawSettings.m_ShowBrushCursor = true;
 		m_AppState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(&m_DrawSettings);
 
 		if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
