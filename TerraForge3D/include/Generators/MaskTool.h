@@ -48,6 +48,7 @@ private:
 	void SetPreviewMode(MaskPreviewMode mode);
 	void UpdateViewportOverlay(bool showBrush);
 	bool ShowPaintedSettings();
+	bool UndoLastStroke();
 	void RasterizeStrokes();
 	void FinishActiveStroke();
 	void StartActiveStroke(const glm::vec2& position);

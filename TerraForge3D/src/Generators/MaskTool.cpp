@@ -142,6 +142,22 @@ void MaskTool::FinishActiveStroke()
 	RasterizeStrokes();
 }
 
+bool MaskTool::UndoLastStroke()
+{
+	if (m_HasActiveStroke)
+	{
+		m_ActiveStroke = MaskStroke{};
+		m_HasActiveStroke = false;
+		RasterizeStrokes();
+		return true;
+	}
+	if (m_Strokes.empty()) return false;
+
+	m_Strokes.pop_back();
+	RasterizeStrokes();
+	return true;
+}
+
 void MaskTool::StartActiveStroke(const glm::vec2& position)
 {
 	m_ActiveStroke = MaskStroke{};
@@ -216,6 +232,16 @@ bool MaskTool::ShowPaintedSettings()
 		s_CurrentlyEditingMaskTool = this;
 		changed = true;
 	}
+	const bool canUndo = m_HasActiveStroke || !m_Strokes.empty();
+	ImGui::BeginDisabled(!canUndo);
+	if (ImGui::Button("Undo stroke")) changed |= UndoLastStroke();
+	ImGui::EndDisabled();
+	ImGui::SameLine();
+	ImGui::TextDisabled("Ctrl+Z");
+	if (m_IsEditing && ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z)) {
+		changed |= UndoLastStroke();
+	}
+
 	if (m_IsEditing)
 	{
 		if (ImGui::Button("Stop editing"))
