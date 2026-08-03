@@ -175,7 +175,11 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	source += "uint PixelCoordToDataOffset(uint x, uint y)\n";
 	source += "{\n\treturn y * u_Resolution + x;\n}\n\n";
 	source += "// body\n";
-	source += m_Source;
+	bool includeSuccess = false;
+	const auto expandedSource = m_AppState->resourceManager->PreprocessShaderSource(
+		m_Source, "generation/base_shape/" + m_Name + ".glsl", &includeSuccess);
+	if (includeSuccess) source += expandedSource;
+	else source += m_Source;
 	source += "\n\n";
 	source += "// main\n";
 	source += "void main()\n{\n";
