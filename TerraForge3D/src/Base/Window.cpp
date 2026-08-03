@@ -34,7 +34,7 @@ static void InitGLFW()
 }
 
 
-Window::Window(std::string title = "Window")
+Window::Window(std::string title)
 {
 	InitGLFW();
 	m_Window = glfwCreateWindow(640, 480, title.c_str(), NULL, NULL);
