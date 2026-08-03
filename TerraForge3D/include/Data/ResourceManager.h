@@ -10,6 +10,7 @@ public:
 	virtual ~ResourceManager();
 
 	std::string LoadShaderSource(const std::string shader, bool forceReload = false, bool* success = nullptr);
+	std::string PreprocessShaderSource(const std::string& source, const std::string& sourcePath, bool* success = nullptr);
 	std::string LoadText(const std::string path, bool forceReload = false, bool* success = nullptr);
 
 	std::shared_ptr<ComputeShader> GetComputeShader(const std::string name, const std::string source);
