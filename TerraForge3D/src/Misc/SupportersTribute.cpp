@@ -185,7 +185,7 @@ void SupportersTribute::ShowSettings(bool *pOpen)
 
 		ImGui::Image((ImTextureID)(uint64_t)avTexId, ImVec2(30, 30));
 		ImGui::SameLine();
-		ImGui::Text(st.name.c_str());
+		ImGui::Text("%s", st.name.c_str());
 	}
 
 	ImGui::Separator();
@@ -213,7 +213,7 @@ void SupportersTribute::ShowSettings(bool *pOpen)
 
 		ImGui::Image((ImTextureID)(uint64_t)avTexId, ImVec2(30, 30));
 		ImGui::SameLine();
-		ImGui::Text(st.name.c_str());
+		ImGui::Text("%s", st.name.c_str());
 	}
 
 	ImGui::Separator();

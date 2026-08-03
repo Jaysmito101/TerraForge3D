@@ -36,5 +36,4 @@ private:
 	uint32_t m_IrradianceMapTextureID = -1;
 	int32_t m_SkyboxSize = 512;
 	int32_t m_IrradianceMapSize = 32;
-	int32_t temp = 0;
 };

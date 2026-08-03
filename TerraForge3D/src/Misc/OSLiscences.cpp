@@ -22,7 +22,7 @@ OSLiscences::OSLiscences(ApplicationState *as)
 	appState = as;
 	std::string path = appState->constants.liscensesDir;
 
-	for (const auto entry : fs::directory_iterator(path))
+	for (const auto& entry : fs::directory_iterator(path))
 	{
 		std::string path = entry.path().string();
 		std::string name = entry.path().filename().string();
@@ -36,11 +36,11 @@ void OSLiscences::ShowLisc(std::string &name, std::string &content, int id)
 {
 	bool state = ImGui::CollapsingHeader(("##LiscItem" + std::to_string(id)).c_str());
 	ImGui::SameLine();
-	ImGui::Text(name.c_str());
+	ImGui::Text("%s", name.c_str());
 
 	if (state)
 	{
-		ImGui::Text(content.c_str());
+		ImGui::Text("%s", content.c_str());
 	}
 }
 

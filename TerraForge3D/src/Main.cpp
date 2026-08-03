@@ -234,13 +234,10 @@ public:
 			// appState->serailizer->LoadFile(loadFile);
 		}
 		// appState->projectManager->SetId(GenerateId(32));
-		float t = 1.0f;
 		// Load Fonts
 		LoadUIFont("Open-Sans-Regular", 18, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Regular.ttf");
 		LoadUIFont("OpenSans-Bold", 25, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
 		LoadUIFont("OpenSans-Semi-Bold", 22, appState->constants.fontsDir + PATH_SEPARATOR "OpenSans-Bold.ttf");
-		bool tpp = false;
-
 		Log("Started Up App!");
 		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
 		appState->eventManager->RaiseEvent("OnStartUpComplete");
@@ -248,7 +245,7 @@ public:
 
 	}
 
-	void OnEnd()
+	void OnEnd() override
 	{
 		appState->eventManager->RaiseEvent("OnEnd");
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) delete appState->viewportManagers[i];
@@ -266,7 +263,6 @@ public:
 		delete appState->mainMenu;
 		delete appState->osLiscences;
 		delete appState->exportManager;
-		delete appState->projectManager;
 		delete appState->resourceManager;
 		// delete appState->serailizer;
 		delete appState;

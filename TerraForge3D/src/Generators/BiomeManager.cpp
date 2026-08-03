@@ -36,7 +36,6 @@ BiomeManager::BiomeManager(ApplicationState* appState)
 	m_AppState = appState;
 	m_BiomeID = GenerateId(8);
 	m_Color = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
-	bool success = false;
 	m_Data = std::make_shared<GeneratorData>();
 	static int s_BiomeID = 1;
 	snprintf(m_BiomeName, 64, "Biome %d", s_BiomeID++);

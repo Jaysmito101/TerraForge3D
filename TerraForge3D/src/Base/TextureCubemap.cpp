@@ -10,12 +10,6 @@
 
 #include <iostream>
 
-static void Log(const char *str)
-{
-	std::cout << str << std::endl;
-}
-
-
 TextureCubemap::TextureCubemap()
 {
 	faces.push_back("");

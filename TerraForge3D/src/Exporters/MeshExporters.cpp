@@ -35,7 +35,6 @@ bool ExportManager::ExportMesh(std::string path, Mesh* mesh, int format)
 	auto filename = std::string("");
 	for (auto ch : filename0) if (std::isalnum(ch) || ch == ' ' || ch == '_') filename += ch;
 	path = fsPath.parent_path().string() + "/" + filename;
-	bool add_extension = fsPath.has_extension();
 	switch (format)
 	{
 		case 0: path += ".obj"; return m_ObjExporter.Export(path, mesh, &m_ExportProgress);

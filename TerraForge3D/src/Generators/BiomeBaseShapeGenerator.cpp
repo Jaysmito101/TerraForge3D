@@ -19,7 +19,6 @@ BiomeBaseShapeGenerator::~BiomeBaseShapeGenerator()
 
 bool BiomeBaseShapeGenerator::ShowSettings()
 {
-	static bool ttp = false;
 	ImGui::PushID(m_ID.c_str());
 	BIOME_UI_PROPERTY(m_Inspector->Render());
 	ImGui::PopID();

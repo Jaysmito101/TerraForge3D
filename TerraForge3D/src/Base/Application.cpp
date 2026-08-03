@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Base/Application.h"
 
 #include <imgui/imgui.h>
@@ -15,7 +13,7 @@
 static void Log(const char *log)
 {
 	std::cout << log << std::endl;
-};
+}
 
 static void InitGlad()
 {
@@ -104,7 +102,6 @@ void Application::Render()
 
 void Application::ImGuiRenderBegin()
 {
-	ImGuiIO &io = ImGui::GetIO();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();

@@ -57,6 +57,8 @@ bool BiomeMixer::ShowSettings()
 	case BiomeMixerMethod_AlphaBlend:
 		ImGui::Text("TODO");
 		break;
+	default:
+		break;
 	}
 
 

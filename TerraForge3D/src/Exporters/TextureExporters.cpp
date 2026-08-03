@@ -46,7 +46,6 @@ bool ExportManager::ExportHeightmapTexture(std::string path, float* data, int fo
 	auto filename = std::string("");
 	for (auto ch : filename0) if (std::isalnum(ch) || ch == ' ' || ch == '_') filename += ch;
 	path = fsPath.parent_path().string() + "/" + filename;
-	bool add_extension = fsPath.has_extension();
 	switch (format)
 	{
 	case 0: path += ".png"; return m_PngTextureExporter.ExportHeightmap(path, data, bitDepth, resolution, &m_ExportProgress);

@@ -68,7 +68,7 @@ bool BiomeCustomBaseShape::ShowShettings()
 		ImGui::EndTabBar();
 	}
 
-	return m_RequireUpdation && m_Enabled || enabledSwitch;
+	return (m_RequireUpdation && m_Enabled) || enabledSwitch;
 }
 
 void BiomeCustomBaseShape::Update(GeneratorData* sourceBuffer, GeneratorData* targetBuffer, GeneratorData* swapBuffer)

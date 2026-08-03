@@ -1,4 +1,3 @@
-#pragma once
 #include "Base/EntryPoint.h"
 #include "Base/SplashScreen.h"
 #include "Base/Logging/Logger.h"

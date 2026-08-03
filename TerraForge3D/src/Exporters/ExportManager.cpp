@@ -24,7 +24,7 @@ void ExportManager::ShowSettings()
 
 	if (m_ExportProgress > 0.0f || m_HideExportControls)
 	{
-		if (m_StatusMessage.size() > 0) ImGui::Text(m_StatusMessage.data());
+		if (m_StatusMessage.size() > 0) ImGui::Text("%s", m_StatusMessage.data());
 		ImGui::ProgressBar(m_ExportProgress);
 	}
 	else

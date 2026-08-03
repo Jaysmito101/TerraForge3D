@@ -200,7 +200,6 @@ void Mesh::GenerateSphere(int resolution, float radius)
 void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 {
 	Clear();
-	int triIndex = 0;
 	for (int y = 0; y < resolution; y++)
 	{
 		for (int x = 0; x < resolution; x++)

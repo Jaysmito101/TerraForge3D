@@ -343,7 +343,7 @@ void TextureStore::ShowAllTexturesSettings()
 			ImGui::PushID(item.name.data());
 			ImGui::BeginChild("##texture_thumb", ImVec2(width, 300), true);
 			ImGui::Image((ImTextureID)(uint64_t)item.texThumbnail->GetRendererID(), ImVec2(width, 150));
-			ImGui::Text(item.name.data());
+			ImGui::Text("%s", item.name.data());
 
 			if(!item.downloaded)
 			{
@@ -425,7 +425,7 @@ void TextureStore::ShowDownloadedTexturesSettings()
 		ImGui::PushID(i);
 		ImGui::BeginChild("##texture_thumb", ImVec2(width, 300), true);
 		ImGui::Image((ImTextureID)(uint64_t)item.texThumbnail->GetRendererID(), ImVec2(width, 120));
-		ImGui::Text(item.name.c_str());
+		ImGui::Text("%s", item.name.c_str());
 
 		if(ImGui::Button("Delete##DTS"))
 		{

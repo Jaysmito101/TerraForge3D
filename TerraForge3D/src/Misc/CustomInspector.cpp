@@ -641,7 +641,7 @@ bool CustomInspector::Render()
 		else if (widget.m_Type == CustomInspectorWidgetType_Seperator) ImGui::Separator();
 		else if (widget.m_Type == CustomInspectorWidgetType_NewLine) ImGui::NewLine();
 		if (widget.m_FontName.size() > 0) ImGui::PopFont();
-		if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip(widget.m_Tooltip.c_str());
+		if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip("%s", widget.m_Tooltip.c_str());
 		if (widget.m_Type != CustomInspectorWidgetType_Seed)
 		{
 			if (ImGui::BeginPopupContextItem(widget.m_ID.c_str()))

@@ -384,7 +384,6 @@ std::string GetStyleData()
 	for (int i = 0; i < ImGuiCol_COUNT; i++)
 	{
 		const ImVec4 &col = style.Colors[i];
-		const char *name = ImGui::GetStyleColorName(i);
 		color = nlohmann::json();
 		color["x"] = col.x;
 		color["y"] = col.y;
@@ -604,8 +603,6 @@ void ShowStyleEditor(bool *pOpen)
 
 		if (ImGui::BeginTabItem("Colors"))
 		{
-			static int output_dest = 0;
-			static bool output_only_modified = true;
 			static ImGuiTextFilter filter;
 			filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
 			static ImGuiColorEditFlags alpha_flags = 0;

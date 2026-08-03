@@ -7,7 +7,7 @@ static void ShowJob(JobSystem::Job* job)
 	ImGui::PushID((job->name + std::to_string(job->id)).data());
 	if (ImGui::CollapsingHeader(job->name.data()))
 	{
-		ImGui::Text(job->description.data());
+				ImGui::Text("%s", job->description.data());
 	}
 	ImGui::PopID();
 }

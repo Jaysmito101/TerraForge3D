@@ -14,7 +14,7 @@ namespace JobSystem
 	{
 	public:
 		JobManager(ApplicationState* appState);
-		~JobManager();
+		virtual ~JobManager();
 
 		virtual void ShowSettings();
 
