@@ -3,6 +3,7 @@
 #include "Base/UIFontManager.h"
 #include "GLFW/glfw3.h"
 #include "Application.h"
+#include <chrono>
 
 static int uidSeed = 1;
 
