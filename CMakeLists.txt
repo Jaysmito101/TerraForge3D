@@ -28,7 +28,6 @@ include_directories(
     ./TerraForge3D/vendor/tinyexr
     ./TerraForge3D/vendor/avir
     ./TerraForge3D/vendor/delaunator/include
-    ./TerraForge3D/vendor/glad/include
     ./TerraForge3D/vendor/glfw/include
     ./TerraForge3D/vendor/fmt/include
     ./TerraForge3D/vendor/glm
@@ -45,7 +44,8 @@ set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 
 add_subdirectory(./TerraForge3D/vendor/glfw)
-add_subdirectory(./TerraForge3D/vendor/glad)
+add_subdirectory(./TerraForge3D/vendor/glad/cmake)
+glad_add_library(glad STATIC API gl:core=4.6)
 add_subdirectory(./TerraForge3D/vendor/imgui-builder)
 add_subdirectory(./TerraForge3D/vendor/libwebp)
 add_subdirectory(./TerraForge3D/vendor/fmt)
@@ -68,7 +68,7 @@ target_link_libraries(${EXECUTABLE_NAME}
     glfw
     ${GLFW_LIBRARIES}
     ${OPENGL_LIBRARIES}
-    Glad
+    glad
     ImGui
 )
 
