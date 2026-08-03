@@ -53,6 +53,7 @@ float gaussianSample(ivec2 offset)
 	};
 
 	float sum = 0.0;
+	float weightSum = 0.0;
 	
 	for (int i = -2; i <= 2; i++)
 	{
@@ -60,68 +61,70 @@ float gaussianSample(ivec2 offset)
 		{
 			ivec2 offsetiv2 = offset + ivec2(i, j);
 			if (offsetiv2.x < 0 || offsetiv2.x >= u_Resolution || offsetiv2.y < 0 || offsetiv2.y >= u_Resolution) continue;
-			sum += dataSource[PixelCoordToDataOffset(uint(offsetiv2.x), uint(offsetiv2.y))] * filterMask[i + 2][j + 2];
+			float weight = filterMask[i + 2][j + 2];
+			sum += dataSource[PixelCoordToDataOffset(uint(offsetiv2.x), uint(offsetiv2.y))] * weight;
+			weightSum += weight;
 		}
 	}
 
-	return sum;
+	return sum / max(weightSum, 0.000001f);
+}
+
+float slopeHeightAt(ivec2 coord)
+{
+	coord = clamp(coord, ivec2(0), ivec2(u_Resolution - 1));
+	if (m_UseGaussianPreFilter) return gaussianSample(coord);
+	return dataSource[PixelCoordToDataOffset(uint(coord.x), uint(coord.y))];
 }
 
 float calculateSlopeFactorAtCoord(ivec2 offsetb, ivec2 offsetc, float radius)
 {
-	if (u_Resolution < 3) return 0.0f;
+	if (u_Resolution < 2) return 0.0f;
 
-	ivec2 offsetv2 = offsetb + offsetc;
-	offsetv2 = clamp(offsetv2, ivec2(1), ivec2(u_Resolution - 2));
-	
+	ivec2 center = clamp(offsetb + offsetc, ivec2(0), ivec2(u_Resolution - 1));
+	int stepPixels = max(int(round(abs(radius))), 1);
+	float step = float(stepPixels);
 
-	float T = 0.0f, B = 0.0f, L = 0.0f, R = 0.0f;
+	float dX =
+		(3.0f * slopeHeightAt(center + ivec2( stepPixels, -stepPixels)) +
+		 10.0f * slopeHeightAt(center + ivec2( stepPixels,  0)) +
+		 3.0f * slopeHeightAt(center + ivec2( stepPixels,  stepPixels)) -
+		 3.0f * slopeHeightAt(center + ivec2(-stepPixels, -stepPixels)) -
+		10.0f * slopeHeightAt(center + ivec2(-stepPixels,  0)) -
+		 3.0f * slopeHeightAt(center + ivec2(-stepPixels,  stepPixels))) / (32.0f * step);
+	float dY =
+		(3.0f * slopeHeightAt(center + ivec2(-stepPixels,  stepPixels)) +
+		10.0f * slopeHeightAt(center + ivec2( 0,  stepPixels)) +
+		 3.0f * slopeHeightAt(center + ivec2( stepPixels,  stepPixels)) -
+		 3.0f * slopeHeightAt(center + ivec2(-stepPixels, -stepPixels)) -
+		10.0f * slopeHeightAt(center + ivec2( 0, -stepPixels)) -
+		 3.0f * slopeHeightAt(center + ivec2( stepPixels, -stepPixels))) / (32.0f * step);
 
-	if (m_UseGaussianPreFilter)
-	{
-		T = gaussianSample(offsetv2 + ivec2(0, -1));
-		B = gaussianSample(offsetv2 + ivec2(0, 1));
-		L = gaussianSample(offsetv2 + ivec2(-1, 0));
-		R = gaussianSample(offsetv2 + ivec2(1, 0));
-	}
-	else
-	{
-		T = dataSource[PixelCoordToDataOffset(uint(offsetv2.x), uint(offsetv2.y - 1))];
-		B = dataSource[PixelCoordToDataOffset(uint(offsetv2.x), uint(offsetv2.y + 1))];
-		L = dataSource[PixelCoordToDataOffset(uint(offsetv2.x - 1), uint(offsetv2.y))];
-		R = dataSource[PixelCoordToDataOffset(uint(offsetv2.x + 1), uint(offsetv2.y))];
-	}
-
-	float slopeFactor = 0.0f;
-
-	// calculate the slope factor
-	
-	float dX = (R - L);
-	float dY = (B - T);
-	slopeFactor = sqrt(dX * dX + dY * dY);
-
-	return slopeFactor * float(u_Resolution) / max(radius, 1.0f);
+	return length(vec2(dX, dY)) * float(u_Resolution);
 }
 
 float calculateSlopeFactor()
 {
 	ivec2 offsetv2 = ivec2(gl_GlobalInvocationID.xy);
 	int smoothingRadius = clamp(u_SlopeSmoothingRadius, 0, 20);
-	float samplingRadius = max(abs(u_SlopeSamplingRadius), 1.0f);
+	int samplingRadius = max(int(round(abs(u_SlopeSamplingRadius))), 1);
 
 	float factor = 0.0f;
+	float weightSum = 0.0f;
+	float sigma = max(float(smoothingRadius) * 0.5f, 1.0f);
 
 	for (int i = -smoothingRadius; i <= smoothingRadius; i++)
 	{
 		for (int j = -smoothingRadius; j <= smoothingRadius; j++)
 		{
-			ivec2 sampleOffset = ivec2(round(vec2(i, j) * samplingRadius));
-			factor += calculateSlopeFactorAtCoord(offsetv2, sampleOffset, samplingRadius);
+			ivec2 sampleOffset = ivec2(i, j) * samplingRadius;
+			float weight = exp(-0.5f * (float(i * i + j * j) / (sigma * sigma)));
+			factor += calculateSlopeFactorAtCoord(offsetv2, sampleOffset, float(samplingRadius)) * weight;
+			weightSum += weight;
 		}
 	}
 
-	float sampleCount = float((smoothingRadius * 2 + 1) * (smoothingRadius * 2 + 1));
-	factor /= max(sampleCount, 1.0f);
+	factor /= max(weightSum, 0.000001f);
 
 	vec2 transformRange = vec2(min(u_TransformRange.x, u_TransformRange.y), max(u_TransformRange.x, u_TransformRange.y));
 	factor = tf3d_shape_smoothstep(transformRange.x, transformRange.y, factor);
