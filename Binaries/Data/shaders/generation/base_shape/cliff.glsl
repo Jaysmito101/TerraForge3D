@@ -6,7 +6,8 @@
       "Type": "Float",
       "Default": 0.5,
       "Widget": "Drag",
-      "Sensitivity": 0.01
+      "Sensitivity": 0.01,
+      "Constraints": [-4.0, 4.0, 0.0, 0.0]
     },
     {
       "Name": "Rotation",
@@ -20,14 +21,15 @@
       "Type": "Float",
       "Default": 0.550,
       "Widget": "Slider",
-      "Constraints": [0.00, 1.0, 0.0, 0.0]
+      "Constraints": [0.001, 1.0, 0.0, 0.0]
     },
     {
       "Name": "Position",
       "Type": "Float",
       "Default": 0.65,
       "Widget": "Drag",
-      "Sensitivity": 0.01
+      "Sensitivity": 0.01,
+      "Constraints": [-2.0, 2.0, 0.0, 0.0]
     },
     {
       "Name": "Distortion",
@@ -42,7 +44,8 @@
       "Default": 1.16,
       "Label": "Distortion Scale",
       "Widget": "Drag",
-      "Sensitivity": 0.01      
+      "Sensitivity": 0.01,
+      "Constraints": [0.001, 8.0, 0.0, 0.0]
     },
     {
       "Name": "Noise",
@@ -58,12 +61,13 @@
       "Label": "Noise Scale",
       "Widget": "Drag",
       "Sensitivity": 0.001,
-      "Constraints": [-2.0, 2.0, 0.0, 0.0]
+      "Constraints": [0.001, 8.0, 0.0, 0.0]
     }
   ]
 }
 // CODE
 #include "common/noise_2d.glsl"
+#include "common/base_shape_helpers.glsl"
 
 vec2 rotate(vec2 v, float a) 
 {
@@ -85,13 +89,18 @@ float noise(vec2 uv)
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
 {
-	float rotation = 3.141f * u_Rotation / 180.0f;
+	float rotation = 3.14159265f * clamp(u_Rotation, -36000.0f, 36000.0f) / 180.0f;
 	uv = 2.0f * uv - vec2(1.0f);
 	uv = rotate(uv, rotation);
-	float x = (1.0f - uv.x - u_Position - u_Distortion * noise(uv * u_DistortionScale)) / u_Thickness;
-	float ns = pow(0.5f * x * x * x - 1.5f * x, 2.0f);
-	if(x < 0.0f) ns = 0.0f;
-	else if(x > 1.0f) ns = 1.0f;
-	ns += noise(uv * u_NoiseScale + vec2(1.0f, 2.0f)) * u_Noise;
-	return ns * u_Strength;
+
+	float thickness = tf3d_shape_positive(u_Thickness, 0.001f);
+	float distortionScale = tf3d_shape_positive(u_DistortionScale, 0.001f);
+	float noiseScale = tf3d_shape_positive(u_NoiseScale, 0.001f);
+	float position = clamp(u_Position, -4.0f, 4.0f);
+	float distortion = clamp(u_Distortion, 0.0f, 1.0f) * noise(uv * distortionScale);
+	float x = (1.0f - uv.x - position - distortion) / thickness;
+	float clampedX = clamp(x, 0.0f, 1.0f);
+	float ns = pow(0.5f * clampedX * clampedX * clampedX - 1.5f * clampedX, 2.0f);
+	ns += noise(uv * noiseScale + vec2(1.0f, 2.0f)) * clamp(u_Noise, 0.0f, 1.0f);
+	return ns * clamp(u_Strength, -4.0f, 4.0f);
 }
