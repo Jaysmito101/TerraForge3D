@@ -75,6 +75,7 @@ void applyGaussianFilter()
 	);
 
 	float sum = 0.0f;
+	float weightSum = 0.0f;
 
 	for(int i = -2; i <= 2; i++)
 	{
@@ -83,10 +84,12 @@ void applyGaussianFilter()
 			ivec2 offsetiv2 = ivec2(offsetv2) + ivec2(i, j);
 			if(offsetiv2.x < 0 || offsetiv2.x >= u_Resolution || offsetiv2.y < 0 || offsetiv2.y >= u_Resolution) continue;
 			uint offset = PixelCoordToDataOffset(offsetiv2.x, offsetiv2.y);
-			sum += dataSource[offset] * filterMask[i + 2][j + 2];
+			float weight = filterMask[i + 2][j + 2];
+			sum += dataSource[offset] * weight;
+			weightSum += weight;
 		}
 	}
-	dataTarget[offset] = mix(sum / 273.0f, dataTarget[offset], calculateFallOff(uv));
+	dataTarget[offset] = mix(sum / max(weightSum, 0.000001f), dataTarget[offset], calculateFallOff(uv));
 }
 
 void main(void)
