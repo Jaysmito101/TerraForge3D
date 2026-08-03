@@ -7,6 +7,7 @@ $Architecture = "x64"
 $BuildDir = ""
 $NoSetup = $false
 $Reconfigure = $false
+$Rebuild = $false
 $CleanAll = $false
 $CMakeArgs = @()
 $ScriptArgs = @($args)
@@ -41,6 +42,7 @@ Options (defaults are shown in brackets):
       --build-dir <path>       Custom directory inside build\ [build\windows.$($GeneratorInfo.Id).$Configuration]
       --no-setup                Skip automatic submodule setup
       --reconfigure             Force CMake regeneration
+      --rebuild                 Clean and rebuild before running/building
       --all                     With clean, remove every build tree too
       --cmake-arg <arg>         Pass an additional argument to CMake
 
@@ -113,6 +115,10 @@ function Parse-Arguments {
             $Reconfigure = $true
             $Index++
         }
+        elseif ($Option -eq "--rebuild") {
+            $Rebuild = $true
+            $Index++
+        }
         elseif ($Option -eq "--all") {
             $CleanAll = $true
             $Index++
@@ -132,6 +138,7 @@ function Parse-Arguments {
     Set-Variable -Name BuildDir -Value $BuildDir -Scope 1
     Set-Variable -Name NoSetup -Value $NoSetup -Scope 1
     Set-Variable -Name Reconfigure -Value $Reconfigure -Scope 1
+    Set-Variable -Name Rebuild -Value $Rebuild -Scope 1
     Set-Variable -Name CleanAll -Value $CleanAll -Scope 1
     Set-Variable -Name CMakeArgs -Value $CMakeArgs -Scope 1
 }
@@ -331,6 +338,10 @@ function Invoke-Build {
         "--parallel"
     )
 
+    if ($Rebuild) {
+        $Arguments += "--clean-first"
+    }
+
     if ($GeneratorInfo.MultiConfig) {
         $Arguments += @("--config", $Configuration)
     }
@@ -349,7 +360,7 @@ function Get-ExecutablePath {
 
 function Invoke-Run {
     $Executable = Get-ExecutablePath
-    if (-not (Test-Path $Executable)) {
+    if ($Rebuild -or -not (Test-Path $Executable)) {
         Invoke-Build
     }
 

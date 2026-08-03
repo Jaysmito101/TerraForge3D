@@ -13,6 +13,7 @@ ARCHITECTURE="x64"
 BUILD_DIR=""
 NO_SETUP=0
 RECONFIGURE=0
+REBUILD=0
 CLEAN_ALL=0
 CMAKE_ARGS=()
 
@@ -43,6 +44,7 @@ Options (defaults are shown in brackets):
       --build-dir <path>       Custom directory inside build/ [build/macos.$GENERATOR_ID.$CONFIGURATION]
       --no-setup                Skip automatic submodule setup
       --reconfigure             Force CMake regeneration
+      --rebuild                 Clean and rebuild before running/building
       --all                     With clean, remove every build tree too
       --cmake-arg <arg>         Pass an additional argument to CMake
 
@@ -159,6 +161,10 @@ parse_arguments() {
                 RECONFIGURE=1
                 shift
                 ;;
+            --rebuild)
+                REBUILD=1
+                shift
+                ;;
             --all)
                 CLEAN_ALL=1
                 shift
@@ -223,6 +229,9 @@ build_project() {
     ensure_configured
 
     local args=(--build "$BUILD_DIR" --target terraforge3d --parallel)
+    if [[ "$REBUILD" -eq 1 ]]; then
+        args+=(--clean-first)
+    fi
     if [[ "$MULTI_CONFIG" -eq 1 ]]; then
         args+=(--config "$CONFIGURATION")
     fi
@@ -242,7 +251,7 @@ executable_path() {
 run_project() {
     local executable
     executable="$(executable_path)"
-    if [[ ! -x "$executable" ]]; then
+    if [[ "$REBUILD" -eq 1 || ! -x "$executable" ]]; then
         build_project
     fi
 
