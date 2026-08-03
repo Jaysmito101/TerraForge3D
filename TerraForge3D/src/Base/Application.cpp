@@ -1,4 +1,5 @@
 #include "Base/Application.h"
+#include "Base/Logging/Logger.h"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -9,11 +10,6 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
-
-static void Log(const char *log)
-{
-	std::cout << log << std::endl;
-}
 
 static void InitGlad()
 {

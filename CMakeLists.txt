@@ -32,6 +32,7 @@ include_directories(
     ./TerraForge3D/vendor/delaunator/include
     ./TerraForge3D/vendor/glfw/include
     ./TerraForge3D/vendor/fmt/include
+    ./TerraForge3D/vendor/spdlog/include
     ./TerraForge3D/vendor/glm
     ./TerraForge3D/vendor/httplib
     ./TerraForge3D/vendor/imgui
@@ -76,6 +77,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 target_compile_definitions(${EXECUTABLE_NAME} PRIVATE IMGUI_DEFINE_MATH_OPERATORS)
+target_compile_definitions(${EXECUTABLE_NAME} PRIVATE SPDLOG_FMT_EXTERNAL)
 
 target_link_libraries(${EXECUTABLE_NAME} 
     glfw

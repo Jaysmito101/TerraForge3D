@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Base/Logging/Logger.h"
+
 
 
 #include "Base/Base.h"
@@ -83,8 +85,6 @@ char *ReadBinaryFile(std::string path, int32_t sizeToLoad = INT32_MAX);
 Hash MD5File(std::string path);
 void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
 void SaveToFile(std::string filename, std::string content = "");
-void Log(const char *log);
-void Log(std::string log);
 
 #ifdef TERR3D_WIN32
 #include <windows.h>

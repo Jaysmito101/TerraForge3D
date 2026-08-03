@@ -519,17 +519,6 @@ void SaveToFile(std::string filename, std::string content)
 	outfile.close();
 }
 
-void Log(const char *log)
-{
-	std::cout << log << std::endl;
-};
-
-
-void Log(std::string log)
-{
-	std::cout << log << std::endl;
-};
-
 #ifdef TERR3D_WIN32
 
 // From https://stackoverflow.com/a/20256714/14911094
