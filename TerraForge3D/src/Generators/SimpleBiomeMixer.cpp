@@ -39,7 +39,7 @@ void SimpleBiomeMixer::Update(GeneratorData* heightmapData, GeneratorData* m_Swa
 		if (settings == m_BiomeSettings.end())  m_BiomeSettings[biomeManager->GetBiomeID()] = SimpleBiomeMixerSettings();
 		auto& biomeSettings = m_BiomeSettings[biomeManager->GetBiomeID()];
 		biomeSettingsMap[biomeManager->GetBiomeID()] = biomeSettings;		
-		TF3D_LOG_DEBUG("Biome '{}' settings: enabled={}, active={}", biomeManager->GetBiomeName(), biomeSettings.enabled, biomeManager->IsEnabled());
+		// TF3D_LOG_DEBUG("Biome '{}' settings: enabled={}, active={}", biomeManager->GetBiomeName(), biomeSettings.enabled, biomeManager->IsEnabled());
 		if (!(biomeSettings.enabled && biomeManager->IsEnabled())) continue;
 
 		biomeManager->GetBiomeData()->Bind(0);
