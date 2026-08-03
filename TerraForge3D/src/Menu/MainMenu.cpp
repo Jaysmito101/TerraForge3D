@@ -96,6 +96,43 @@ void MainMenu::ShowOptionsMenu()
 		{
 			appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
 			appState->styleManager->Apply();
+			SetCurrentThemeName("Default");
+			CaptureCurrentThemeDefaults();
+		}
+
+		if (ImGui::BeginMenu("Select"))
+		{
+			std::error_code error;
+			const std::filesystem::path stylesDirectory(appState->constants.stylesDir);
+			bool hasThemes = false;
+			if (std::filesystem::exists(stylesDirectory, error))
+			{
+				std::vector<std::filesystem::path> themeFiles;
+				for (const auto& entry : std::filesystem::directory_iterator(stylesDirectory, error))
+				{
+					if (!entry.is_regular_file(error) || entry.path().extension() != ".json") continue;
+					if (entry.path().stem() == "Default") continue;
+					themeFiles.push_back(entry.path());
+				}
+				std::sort(themeFiles.begin(), themeFiles.end());
+
+				for (const auto& themeFile : themeFiles)
+				{
+					const std::string themeFileName = themeFile.stem().string();
+					const bool isSelected = themeFileName == GetCurrentThemeName();
+					if (ImGui::MenuItem(themeFileName.c_str(), nullptr, isSelected))
+					{
+						appState->styleManager->LoadFromFile(themeFile.string());
+						appState->styleManager->Apply();
+						SetCurrentThemeName(themeFileName);
+						CaptureCurrentThemeDefaults();
+					}
+				}
+				hasThemes = !themeFiles.empty();
+			}
+
+			if (!hasThemes) ImGui::TextDisabled("No custom themes found");
+			ImGui::EndMenu();
 		}
 
 		if (ImGui::MenuItem("Load Theme From File"))
@@ -105,6 +142,8 @@ void MainMenu::ShowOptionsMenu()
 			{
 				appState->styleManager->LoadFromFile(path);
 				appState->styleManager->Apply();
+				SetCurrentThemeName(std::filesystem::path(path).stem().string());
+				CaptureCurrentThemeDefaults();
 			}
 		}
 		ImGui::EndMenu();

@@ -154,6 +154,15 @@ public:
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
 		if (appState->windows.supportersTribute) appState->supportersTribute->ShowSettings(&appState->windows.supportersTribute);
 
+		if (appState->configManager)
+		{
+			Style currentTheme;
+			currentTheme.LoadCurrent();
+			currentTheme.SetName(GetCurrentThemeName());
+			appState->configManager->SaveLastUsedThemeIfChanged(
+				GetCurrentThemeName(), currentTheme.SaveToString());
+		}
+
 		OnImGuiRenderEnd();
 	}
 
@@ -176,6 +185,7 @@ public:
 		appState->constants.logsDir = appState->constants.dataDir + PATH_SEPARATOR "logs";
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
 		appState->constants.stylesDir = appState->constants.dataDir + PATH_SEPARATOR "styles";
+		appState->configManager = new ConfigManager();
 
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		
@@ -226,6 +236,20 @@ public:
 		
 		appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
 		appState->styleManager->Apply();
+		SetCurrentThemeName("Default");
+		CaptureCurrentThemeDefaults();
+
+		std::string lastThemeName;
+		std::string lastThemeData;
+		if (appState->configManager->LoadLastUsedTheme(lastThemeName, lastThemeData))
+		{
+			Style lastTheme;
+			lastTheme.LoadFormString(lastThemeData);
+			lastTheme.Apply();
+			SetCurrentThemeName(lastThemeName);
+			CaptureCurrentThemeDefaults();
+			TF3D_LOG_INFO("Loaded last used theme: '{}'", lastThemeName);
+		}
 
 
 		if (loadFile.size() > 0)
@@ -264,6 +288,7 @@ public:
 		delete appState->osLiscences;
 		delete appState->exportManager;
 		delete appState->resourceManager;
+		delete appState->configManager;
 		// delete appState->serailizer;
 		delete appState;
 	}

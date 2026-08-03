@@ -12,6 +12,7 @@
 #include "Misc/Dashboard.h"
 #include "Misc/Style.h"
 #include "Data/ResourceManager.h"
+#include "Data/ConfigManager.h"
 #include "Platform.h"
 #include "Job/Job.h"
 #include "Job/JobSystem.h"
@@ -109,6 +110,7 @@ public:
 	JobSystem::JobManager* jobManager = nullptr;
 	EventManager* eventManager = nullptr;
 	ResourceManager* resourceManager = nullptr;
+	ConfigManager* configManager = nullptr;
 
 	struct
 	{

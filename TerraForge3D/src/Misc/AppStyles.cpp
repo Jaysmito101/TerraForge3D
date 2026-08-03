@@ -4,6 +4,7 @@
 #include "Misc/AppStyles.h"
 
 #include <ctype.h>
+#include <cstring>
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
@@ -17,6 +18,31 @@
 
 
 static char themeName[256] = "Custom Theme\0";
+static ImGuiStyle themeDefaults;
+static bool themeDefaultsCaptured = false;
+
+std::string GetCurrentThemeName()
+{
+	return themeName;
+}
+
+void SetCurrentThemeName(const std::string& name)
+{
+	strncpy(themeName, name.c_str(), sizeof(themeName) - 1);
+	themeName[sizeof(themeName) - 1] = '\0';
+}
+
+void CaptureCurrentThemeDefaults()
+{
+	themeDefaults = ImGui::GetStyle();
+	themeDefaultsCaptured = true;
+}
+
+void ResetCurrentThemeToDefaults()
+{
+	if (!themeDefaultsCaptured) CaptureCurrentThemeDefaults();
+	ImGui::GetStyle() = themeDefaults;
+}
 
 void LoadMayaStyle()
 {
@@ -516,6 +542,13 @@ void ShowStyleEditor(bool *pOpen)
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
 	ImGui::InputText("Theme Name", themeName, 256);
+	if (ImGui::Button("Reset to Theme Defaults"))
+	{
+		ResetCurrentThemeToDefaults();
+		ref_saved_style = ImGui::GetStyle();
+	}
+	ImGui::SameLine();
+	ImGui::TextDisabled("Changes save automatically");
 
 	// Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
 	if (ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))
