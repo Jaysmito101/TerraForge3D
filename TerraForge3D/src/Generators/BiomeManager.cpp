@@ -147,6 +147,7 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture);
 	m_FilterStack->Update(m_Data.get());
 	m_CalculatedMaskGenerator->Invalidate();
+	m_CalculatedMaskGenerator->Update(m_Data.get());
 
 
 	END_PROFILER(m_CalculationTime);
@@ -226,7 +227,6 @@ bool BiomeManager::ShowMaskToolSettings()
 	{
 		BIOME_UI_PROPERTY(m_CalculatedMaskGenerator->ShowSettings());
 	}
-	m_CalculatedMaskGenerator->Update(m_Data.get());
 	m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated terrain mask");
 	BIOME_UI_PROPERTY(m_MaskTool->ShowSettings());
 	ImGui::PopID();
