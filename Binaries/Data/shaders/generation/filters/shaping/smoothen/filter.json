@@ -41,13 +41,13 @@
     },
     "Params": [
         {
-            "Name": "Exponent",
+            "Name": "Smoothing",
             "Type": "Float",
             "Default": 2,
             "Widget": "Slider",
             "Constraints": [
                 1.0,
-                8
+                4.0
             ],
             "Label": "Exponent",
             "Description": "Power applied to each input value before smoothstep.",
