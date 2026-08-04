@@ -11,6 +11,7 @@ public:
 	~FrameBuffer();
 
 	void Begin();
+	void Resolve();
 	uint32_t End();
 
 	uint32_t GetColorTexture();
@@ -27,6 +28,6 @@ public:
 	}
 
 private:
-	uint32_t colorTexture, depthTexture, fbo;
+	uint32_t colorTexture, multisampleColorTexture, depthTexture, fbo, resolveFbo;
 	int width, height;
 };
