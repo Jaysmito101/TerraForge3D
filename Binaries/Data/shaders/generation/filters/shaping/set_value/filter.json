@@ -1,0 +1,52 @@
+{
+    "ID": "set_value",
+    "Name": "Set Value",
+    "Category": "Shaping",
+    "Implementation": "PhaseChain",
+    "Description": "Creates a constant operation field. The standard merge stage then applies it using the selected strength, mask, and merge mode.",
+    "Phases": {
+        "Value": "set_value",
+        "Merge": "../../common/merge"
+    },
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "Value",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Value",
+                "Input": "Current",
+                "Output": "Value",
+                "Uniforms": {
+                    "u_Value": {
+                        "Parameter": "Value"
+                    }
+                }
+            }
+        ],
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "Value",
+            "Output": "Next"
+        }
+    },
+    "Params": [
+        {
+            "Name": "Value",
+            "Type": "Float",
+            "Default": 0.0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [-100.0, 100.0],
+            "Label": "Value",
+            "Description": "The constant terrain value supplied to the merge operation.",
+            "Tooltip": "Override replaces terrain with this value; Add, Subtract, and Multiply combine it with the current terrain."
+        }
+    ]
+}

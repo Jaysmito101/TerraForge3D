@@ -1,0 +1,51 @@
+{
+    "ID": "flatten",
+    "Name": "Flatten",
+    "Category": "Shaping",
+    "Implementation": "PhaseChain",
+    "Description": "Flattens terrain toward the interpolated height of its surrounding neighborhood.",
+    "Phases": {
+        "Flatten": "flatten",
+        "Merge": "../../common/merge"
+    },
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "Flattened",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Flatten",
+                "Input": "Current",
+                "Output": "Flattened",
+                "Uniforms": {
+                    "u_Radius": {
+                        "Parameter": "Radius"
+                    }
+                }
+            }
+        ],
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "Flattened",
+            "Output": "Next"
+        }
+    },
+    "Params": [
+        {
+            "Name": "Radius",
+            "Type": "Int",
+            "Default": 1,
+            "Widget": "Slider",
+            "Constraints": [1, 16],
+            "Label": "Interpolation radius",
+            "Description": "Controls how far around each point the surrounding height is sampled.",
+            "Tooltip": "A larger radius produces broader, smoother flattening. Use Strength to control how strongly it is applied."
+        }
+    ]
+}
