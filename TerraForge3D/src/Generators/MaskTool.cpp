@@ -43,6 +43,7 @@ void MaskTool::Resize(int size)
 
 void MaskTool::SetPreviewMode(MaskPreviewMode mode)
 {
+	if (mode == MaskPreviewMode::Generated && m_ExternalGeneratedTexture == nullptr) return;
 	if (m_PreviewMode == mode) return;
 	FinishActiveStroke();
 	m_PreviewMode = mode;
@@ -51,8 +52,14 @@ void MaskTool::SetPreviewMode(MaskPreviewMode mode)
 
 void MaskTool::SetGeneratedMaskTexture(GeneratorTexture* texture, const char* label)
 {
+	const bool sourceChanged = m_ExternalGeneratedTexture != texture;
 	m_ExternalGeneratedTexture = texture;
 	if (label != nullptr) m_GeneratedMaskLabel = label;
+	if (m_ExternalGeneratedTexture == nullptr && m_PreviewMode == MaskPreviewMode::Generated)
+	{
+		m_PreviewMode = MaskPreviewMode::Painted;
+	}
+	if (sourceChanged) m_RequireUpdation = true;
 }
 
 void MaskTool::ClearGeneratedMaskTexture()
@@ -60,6 +67,29 @@ void MaskTool::ClearGeneratedMaskTexture()
 	m_ExternalGeneratedTexture = nullptr;
 	m_GeneratedMaskLabel = "Generated mask";
 	if (m_PreviewMode == MaskPreviewMode::Generated) m_PreviewMode = MaskPreviewMode::Painted;
+	m_RequireUpdation = true;
+}
+
+SerializerNode MaskTool::Save() const
+{
+	auto node = CreateSerializerNode();
+	node->SetInteger("MaskSource", static_cast<int>(m_PreviewMode));
+	return node;
+}
+
+void MaskTool::Load(SerializerNode data)
+{
+	if (data == nullptr) return;
+	const int savedSource = data->GetInteger("MaskSource",
+		data->GetInteger("PreviewMode", static_cast<int>(MaskPreviewMode::Painted)));
+	const auto source = static_cast<MaskPreviewMode>(glm::clamp(savedSource, 0, 1));
+	FinishActiveStroke();
+	m_PreviewMode = source == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
+		? MaskPreviewMode::Generated
+		: MaskPreviewMode::Painted;
+	m_IsEditing = false;
+	if (s_CurrentlyEditingMaskTool == this) s_CurrentlyEditingMaskTool = nullptr;
+	m_RequireUpdation = true;
 }
 
 bool MaskTool::CopyGeneratedMaskToPainted()
@@ -299,7 +329,7 @@ bool MaskTool::ShowSettings(bool showViewportMask)
 	ImGui::TextDisabled("Paint a reusable mask or inspect a live calculated mask.");
 
 	int previewMode = static_cast<int>(m_PreviewMode);
-	if (ImGui::RadioButton("Painted", previewMode == static_cast<int>(MaskPreviewMode::Painted)))
+	if (ImGui::RadioButton("Manual", previewMode == static_cast<int>(MaskPreviewMode::Painted)))
 	{
 		SetPreviewMode(MaskPreviewMode::Painted);
 		previewMode = static_cast<int>(m_PreviewMode);
@@ -312,6 +342,8 @@ bool MaskTool::ShowSettings(bool showViewportMask)
 		previewMode = static_cast<int>(m_PreviewMode);
 	}
 	ImGui::EndDisabled();
+	ImGui::TextDisabled("Active source: %s (used by generation)",
+		m_PreviewMode == MaskPreviewMode::Generated ? "Generated" : "Manual");
 
 	GeneratorTexture* previewTexture = GetPreviewTexture();
 	if (previewTexture != nullptr)

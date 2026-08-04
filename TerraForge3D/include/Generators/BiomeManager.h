@@ -52,7 +52,7 @@ public:
 	inline const std::vector<std::shared_ptr<BiomeFilterDefinition>>& GetFilterDefinitions() const { return m_FilterStack->GetDefinitions(); }
 	inline const std::string& GetBiomeID() const { return m_BiomeID; }
 	inline void SetName(const std::string& name) { strcpy(m_BiomeName, name.c_str()); }
-	inline GeneratorTexture* GetMaskTexture() const { return m_MaskTool->GetTexture(); }
+	inline GeneratorTexture* GetMaskTexture() const { return m_MaskTool->GetPreviewTexture(); }
 	inline GeneratorTexture* GetMaskPreviewTexture() const { return m_MaskTool->GetPreviewTexture(); }
 
 	bool AddBaseShapeGenerator(const std::string& config);

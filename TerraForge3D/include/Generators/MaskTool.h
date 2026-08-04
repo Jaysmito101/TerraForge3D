@@ -3,6 +3,7 @@
 #include "Base/Base.h"
 #include "Generators/GeneratorTexture.h"
 #include "Renderer/BrushSettings.h"
+#include "Exporters/Serializer.h"
 
 #include <vector>
 
@@ -25,6 +26,8 @@ public:
 
 	bool ShowSettings(bool showViewportMask = true);
 	bool ApplyDrawingShaders();
+	SerializerNode Save() const;
+	void Load(SerializerNode data);
 
 	void SetGeneratedMaskTexture(GeneratorTexture* texture, const char* label = "Filter mask");
 	void ClearGeneratedMaskTexture();
@@ -32,7 +35,12 @@ public:
 
 	inline void SetVizColor(float r, float g, float b) { m_VizColor = glm::vec3(r, g, b); }
 	inline void SetInvertPreview(bool invert) { m_InvertPreview = invert; }
-	inline GeneratorTexture* GetTexture() const { return m_PaintedTexture.get(); }
+	inline GeneratorTexture* GetTexture() const
+	{
+		return m_PreviewMode == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
+			? m_ExternalGeneratedTexture
+			: m_PaintedTexture.get();
+	}
 	inline GeneratorTexture* GetPreviewTexture() const;
 	inline bool IsShowingGeneratedMask() const { return m_PreviewMode == MaskPreviewMode::Generated; }
 
@@ -86,9 +94,5 @@ private:
 
 inline GeneratorTexture* MaskTool::GetPreviewTexture() const
 {
-	if (m_PreviewMode == MaskPreviewMode::Generated)
-	{
-		return m_ExternalGeneratedTexture;
-	}
-	return m_PaintedTexture.get();
+	return GetTexture();
 }

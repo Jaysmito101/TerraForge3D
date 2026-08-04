@@ -91,6 +91,7 @@ void BiomeFilter::Load(SerializerNode data)
 		if (parameters != nullptr) m_Inspector->LoadData(parameters);
 	}
 	if (m_CalculatedMaskGenerator != nullptr) m_CalculatedMaskGenerator->Load(data->GetChildNode("CalculatedMask"));
+	if (m_MaskTool != nullptr) m_MaskTool->Load(data->GetChildNode("MaskTool"));
 }
 
 SerializerNode BiomeFilter::Save() const
@@ -105,5 +106,6 @@ SerializerNode BiomeFilter::Save() const
 	node->SetInteger("MergeMode", static_cast<int>(m_MergeMode));
 	if (m_Inspector != nullptr) node->SetChildNode("Parameters", m_Inspector->SaveData());
 	if (m_CalculatedMaskGenerator != nullptr) node->SetChildNode("CalculatedMask", m_CalculatedMaskGenerator->Save());
+	if (m_MaskTool != nullptr) node->SetChildNode("MaskTool", m_MaskTool->Save());
 	return node;
 }
