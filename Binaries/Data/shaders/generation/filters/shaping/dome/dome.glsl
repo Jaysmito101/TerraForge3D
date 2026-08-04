@@ -14,11 +14,11 @@ void main()
 
 	vec2 uv = (vec2(coordinate) + vec2(0.5f)) / float(u_Resolution);
 	vec2 centered = abs(uv * 2.0f - 1.0f);
-	float squareRadius = clamp(max(centered.x, centered.y), 0.0f, 1.0f);
 	float curvature = max(u_Curvature, 0.0001f);
 
+	float normalizedRadiusSquared = clamp(dot(centered, centered) * 0.5f, 0.0f, 1.0f);
 	float edgeValue = exp(-curvature);
-	float gaussian = exp(-curvature * squareRadius * squareRadius);
+	float gaussian = exp(-curvature * normalizedRadiusSquared);
 	float dome = (gaussian - edgeValue) / max(1.0f - edgeValue, 0.0001f);
 
 	outputData[indexOf(coordinate)] = clamp(dome * u_CoreStrength, 0.0f, 1.0f);

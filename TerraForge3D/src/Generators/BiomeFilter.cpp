@@ -5,10 +5,22 @@
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
+
+	BiomeFilterMergeMode MergeModeFromString(const std::string& value)
+	{
+		if (value == "Override") return BiomeFilterMergeMode::Override;
+		if (value == "Add") return BiomeFilterMergeMode::Add;
+		if (value == "Subtract") return BiomeFilterMergeMode::Subtract;
+		if (value == "Multiply") return BiomeFilterMergeMode::Multiply;
+		return BiomeFilterMergeMode::Blend;
+	}
+
+
 BiomeFilter::BiomeFilter(ApplicationState* appState, std::shared_ptr<BiomeFilterDefinition> definition)
 	: m_AppState(appState), m_Definition(std::move(definition)), m_Inspector(std::make_shared<CustomInspector>()), m_ID(GenerateId(8))
 {
 	if (m_Definition == nullptr) return;
+	m_MergeMode = MergeModeFromString(m_Definition->GetMetadata().value("DefaultMergeMode", "Blend"));
 	m_Definition->BuildInspector(*m_Inspector);
 	m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
 	m_MaskTool = std::make_shared<MaskTool>(m_AppState, glm::vec3(1.0f, 0.0f, 0.0f));

@@ -3,7 +3,8 @@
     "Name": "Dome",
     "Category": "Shaping",
     "Implementation": "PhaseChain",
-    "Description": "Applies a square-fitted Gaussian dome that preserves the center and attenuates terrain toward the map edges.",
+    "DefaultMergeMode": "Multiply",
+    "Description": "Applies a smooth Gaussian bell centered on the square region, preserving the center and attenuating terrain toward the edges.",
     "Phases": {
         "Dome": "dome",
         "Merge": "../../common/merge"
@@ -45,7 +46,7 @@
             "Type": "Float",
             "Default": 1.0,
             "Widget": "Slider",
-            "Constraints": [0.0, 1.0],
+            "Constraints": [0.0, 2.0],
             "Label": "Core strength",
             "Description": "Sets the maximum dome value at the center of the square region.",
             "Tooltip": "With Multiply merge, 1.0 preserves the center and lower values attenuate it as well as the edges."
@@ -53,10 +54,10 @@
         {
             "Name": "Curvature",
             "Type": "Float",
-            "Default": 2.0,
+            "Default": 4.3,
             "Widget": "Slider",
             "Constraints": [0.1, 16.0],
-            "Label": "Curvature / exponent",
+            "Label": "Curvature",
             "Description": "Controls how quickly the Gaussian dome falls from the center toward the square boundary.",
             "Tooltip": "Higher values keep the core tighter and produce stronger edge attenuation."
         }
