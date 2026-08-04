@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
 
@@ -260,8 +261,24 @@ public:
 	inline void SetFontName(const std::string& fontName) { m_FontName = fontName; }
 	inline void SetDropdownOptions(const std::vector<std::string>& options) { m_DropdownOptions = options; }
 	inline void SetSpeed(float speed) { m_FSpeed = speed; m_ISpeed = static_cast<int32_t>(speed); }
-	inline void SetRenderOnCondition(const std::string condtionName, int32_t conditionValue) { m_UseRenderOnCondition = true; m_RenderOnConditionName = condtionName; m_RenderOnConditionValue = conditionValue; }
-	inline void ClearCondition() { m_UseRenderOnCondition = false; m_RenderOnConditionName = ""; m_RenderOnConditionValue = 0; }
+	inline void SetRenderOnCondition(const std::string& conditionName, int32_t conditionValue)
+	{
+		SetRenderOnConditions(conditionName, { conditionValue });
+	}
+	inline void SetRenderOnConditions(const std::string& conditionName, const std::vector<int32_t>& conditionValues)
+	{
+		m_UseRenderOnCondition = true;
+		m_RenderOnConditionName = conditionName;
+		m_RenderOnConditionValues = conditionValues;
+		m_RenderOnConditionValue = conditionValues.empty() ? 0 : conditionValues.front();
+	}
+	inline void ClearCondition()
+	{
+		m_UseRenderOnCondition = false;
+		m_RenderOnConditionName = "";
+		m_RenderOnConditionValue = 0;
+		m_RenderOnConditionValues.clear();
+	}
 
 	SerializerNode Save() const;
 	void Load(SerializerNode node);
@@ -285,6 +302,7 @@ private:
 	bool m_UseRenderOnCondition = false;
 	std::string m_RenderOnConditionName = "";
 	int32_t m_RenderOnConditionValue = 0;
+	std::vector<int32_t> m_RenderOnConditionValues;
 };
 
 class CustomInspector

@@ -4,6 +4,8 @@
 #include "Utils/PathEditor.h"
 #include "Utils/Utils.h"
 
+#include <algorithm>
+
 #ifdef min
 #undef min
 #endif
@@ -277,6 +279,8 @@ SerializerNode CustomInspectorWidget::Save() const
 		node->SetInteger("RenderOnConditionValue", m_RenderOnConditionValue);
 		node->SetString("RenderOnConditionName", m_RenderOnConditionName);
 		node->SetInteger("UseRenderOnCondition", m_UseRenderOnCondition ? 1 : 0);
+		if (!m_RenderOnConditionValues.empty())
+			node->SetIntegerArray("RenderOnConditionValues", m_RenderOnConditionValues);
 	}
 	if (m_FontName.size() > 0) node->SetString("FontName", m_FontName);
 	if (m_Tooltip.size() > 0) node->SetString("Tooltip", m_Tooltip);
@@ -301,6 +305,8 @@ void CustomInspectorWidget::Load(SerializerNode node)
 	{
 		m_RenderOnConditionValue = node->GetInteger("RenderOnConditionValue", m_RenderOnConditionValue);
 		m_RenderOnConditionName = node->GetString("RenderOnConditionName", m_RenderOnConditionName);
+		m_RenderOnConditionValues = node->GetIntegerArray("RenderOnConditionValues", {});
+		if (m_RenderOnConditionValues.empty()) m_RenderOnConditionValues.push_back(m_RenderOnConditionValue);
 	}
 	m_Tooltip = node->GetString("Tooltip", m_Tooltip);
 	m_FontName = node->GetString("FontName", m_FontName);
@@ -713,7 +719,13 @@ bool CustomInspector::LoadConfig(const nlohmann::json& config)
 			if (parameter.contains("Tooltip")) widget.SetTooltip(parameter["Tooltip"].get<std::string>());
 			else if (parameter.contains("Description")) widget.SetTooltip(parameter["Description"].get<std::string>());
 			if (parameter.contains("Conditional"))
-				widget.SetRenderOnCondition(parameter["Conditional"].get<std::string>(), parameter.value("ConditionalValue", 1));
+			{
+				const std::string conditionName = parameter["Conditional"].get<std::string>();
+				if (parameter.contains("ConditionalValues") && parameter["ConditionalValues"].is_array())
+					widget.SetRenderOnConditions(conditionName, parameter["ConditionalValues"].get<std::vector<int32_t>>());
+				else
+					widget.SetRenderOnCondition(conditionName, parameter.value("ConditionalValue", 1));
+			}
 		}
 		if (config.contains("Buttons") && config["Buttons"].is_array())
 		{
@@ -794,7 +806,12 @@ bool CustomInspector::Render()
 		{
 			if (!HasVariable(widget.m_RenderOnConditionName)) continue;
 			const auto& condition = m_Values.at(widget.m_RenderOnConditionName);
-			if (condition.GetInt() != widget.m_RenderOnConditionValue) continue;
+			const auto& allowedValues = widget.m_RenderOnConditionValues;
+			if (!allowedValues.empty())
+			{
+				if (std::find(allowedValues.begin(), allowedValues.end(), condition.GetInt()) == allowedValues.end()) continue;
+			}
+			else if (condition.GetInt() != widget.m_RenderOnConditionValue) continue;
 		}
 		ImGui::PushID(widget.m_ID.c_str());
 		if (widget.m_FontName.size() > 0) ImGui::PushFont(GetUIFont(widget.m_FontName));
