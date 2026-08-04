@@ -16,20 +16,13 @@ RendererManager::RendererManager(ApplicationState* appState)
 
 RendererManager::~RendererManager()
 {
-	/*delete m_ObjectRenderer;
-	delete m_HeightmapRenderer;
-	delete m_ShadedRenderer;
-	delete m_TextureSlotRenderer;
-	delete m_WireframeRenderer;
-
-	delete m_RendererLights;
-	delete m_RendererSky;*/
 }
 
 void RendererManager::Render(RendererViewport* viewport)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
 	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
+	glEnable(GL_MULTISAMPLE);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_RendererSky->Render(viewport);
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
@@ -42,6 +35,7 @@ void RendererManager::Render(RendererViewport* viewport)
 	case RendererViewportMode_TextureSlot: m_TextureSlotRenderer->Render(viewport); break;
 	default: break;
 	}
+	viewport->m_FrameBuffer->Resolve();
 }
 
 void RendererManager::ShowSettings()
