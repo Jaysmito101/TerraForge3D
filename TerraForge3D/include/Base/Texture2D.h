@@ -6,7 +6,7 @@ class Texture2D
 {
 public:
 	Texture2D(uint32_t width, uint32_t height);
-	Texture2D(const std::string path, bool preserveData = true, bool readAlpha = false);
+	Texture2D(const std::string path, bool preserveData = true, bool readAlpha = false, bool loadAs16Bit = false);
 	virtual ~Texture2D();
 
 	virtual uint32_t GetWidth() const
