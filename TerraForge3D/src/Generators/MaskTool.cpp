@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Renderer/ObjectRenderer.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 #include <cmath>

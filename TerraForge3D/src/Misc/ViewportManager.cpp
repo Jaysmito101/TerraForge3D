@@ -1,6 +1,7 @@
 #include "Misc/ViewportManager.h"
 #include "Data/ApplicationState.h"
 #include "Base/Base.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 ViewportManager::ViewportManager(ApplicationState* appState)

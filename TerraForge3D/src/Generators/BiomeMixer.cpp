@@ -1,5 +1,6 @@
 #include "Generators/BiomeMixer.h"
 #include "Data/ApplicationState.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 BiomeMixer::BiomeMixer(ApplicationState* appState)

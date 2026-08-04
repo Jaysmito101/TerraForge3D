@@ -2,6 +2,7 @@
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 BiomeFilter::BiomeFilter(ApplicationState* appState, std::shared_ptr<BiomeFilterDefinition> definition)

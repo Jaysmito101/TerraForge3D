@@ -1,5 +1,6 @@
 #include "Renderer/RendererSky.h"
 #include "Base/Base.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
 

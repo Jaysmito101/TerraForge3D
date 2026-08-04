@@ -1,4 +1,5 @@
 #include "Renderer/RendererLights.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 RendererLights::RendererLights(ApplicationState* appState)

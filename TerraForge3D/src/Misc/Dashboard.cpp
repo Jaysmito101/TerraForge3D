@@ -1,5 +1,6 @@
 #include "Misc/Dashboard.h"
 #include "Data/ApplicationState.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 Dashboard::Dashboard(ApplicationState* appState)

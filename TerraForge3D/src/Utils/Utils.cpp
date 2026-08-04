@@ -358,48 +358,6 @@ bool IsNetWorkConnected()
 #endif
 }
 
-bool PowerOfTwoDropDown(const char* label, int32_t* value, int start, int end)
-{
-	if (!value) return false;
-	static char buffer[32];
-	int tmp = (int)(log((double)*value) / log(2.0));
-	snprintf(buffer, 32, "%d", (int)pow(2, tmp));
-	if (ImGui::BeginCombo(label, buffer))
-	{
-		for (int i = start; i <= end; i++)
-		{
-			bool is_selected = (tmp == i);
-			snprintf(buffer, 32, "%d", (int)pow(2, i));
-			if (ImGui::Selectable(buffer, is_selected)) tmp = i;
-			if (is_selected) ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-	tmp = (int)pow(2, tmp);
-	bool reslt = (*value != tmp);
-	*value = tmp;
-	return reslt;
-}
-
-bool ShowComboBox(const char* label, int* selected, const char** values, int count)
-{
-	if (!selected) return false;
-	int tmp = *selected;
-	if (ImGui::BeginCombo(label, values[*selected]))
-	{
-		for (int i = 0; i < count; i++)
-		{
-			bool is_selected = (tmp == i);
-			if (ImGui::Selectable(values[i], is_selected)) tmp = i;
-			if (is_selected) ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-	bool reslt = (*selected != tmp);
-	*selected = tmp;
-	return reslt;
-}
-
 std::string FormatMemoryToString(uint64_t size)
 {
 	std::string result = "";
@@ -434,26 +392,6 @@ bool FuzzyFilterMatch(const std::string& query, const std::string& candidate)
 		candidateIndex++;
 	}
 	return true;
-}
-
-bool ShowLayerUpdationMethod(const char* label, int* method)
-{
-	if (!method) return false;
-	static const char* items[] = {"Set", "Add", "Subtract", "Multiply"};
-	int selct = *method;
-	if (ImGui::BeginCombo(label, items[selct]))
-	{
-		for (int i = 0; i < IM_ARRAYSIZE(items); i++)
-		{
-			bool is_selected = (selct == i);
-			if (ImGui::Selectable(items[i], is_selected)) selct= i;
-			if (is_selected) ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-	bool reslt = (*method != selct);
-	*method = selct;
-	return reslt;
 }
 
 float UpdateLayerWithUpdateMethod(float origv, float newv, int method)
@@ -709,59 +647,6 @@ std::string ColorConvertToHexString(float r, float g, float b, float a)
 	stream << std::setfill('0') << std::setw(2) << std::hex << ia;
 
 	return stream.str();
-}
-
-bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& historyStack)
-{
-	static char s_Buffer[256];
-	bool changed = false;
-	changed = ImGui::InputInt(label.c_str(), seed) || changed;
-	ImGui::SameLine();
-	if (ImGui::Button("R"))
-	{
-		*seed = rand() % 500;
-		changed = true;
-	}
-	ImGui::SameLine();
-	auto iteratorIndex = std::find(historyStack.begin(), historyStack.end(), *seed);
-	if (iteratorIndex == historyStack.end())
-	{
-		if (ImGui::Button("S")) historyStack.push_back(*seed);
-	}
-	else
-	{
-		if (ImGui::Button("D")) historyStack.erase(iteratorIndex);
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("H"))
-	{
-		if (historyStack.size() > 0)
-		{
-			*seed = historyStack.back();
-			historyStack.pop_back();
-			changed = true;
-		}
-	}
-	if (ImGui::BeginPopupContextItem())
-	{
-		if (ImGui::Button("Clear History"))
-		{
-			historyStack.clear();
-		}
-		ImGui::PushID(label.c_str());
-		for (auto i : historyStack)
-		{
-			snprintf(s_Buffer, 256, "%d", i);
-			if (ImGui::Selectable(s_Buffer, *seed == i))
-			{
-				*seed = i;
-				changed = true;
-			}
-		}
-		ImGui::PopID();
-		ImGui::EndPopup();
-	}
-	return changed;
 }
 
 void OpenURL(std::string url)

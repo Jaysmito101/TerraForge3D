@@ -1,5 +1,6 @@
 #include "Misc/CustomInspector.h"
 #include "Base/Base.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/PathEditor.h"
 #include "Utils/Utils.h"
 

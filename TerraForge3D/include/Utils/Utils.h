@@ -63,7 +63,6 @@ std::wstring s2ws(const std::string &s);
 std::string ColorConvertToHexString(float r, float g, float b, float a = 1.0f);
 std::string LowercaseFilterText(const std::string& value);
 bool FuzzyFilterMatch(const std::string& query, const std::string& candidate);
-bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& historyStack);
 void OpenURL(std::string url);
 std::string ShowSaveFileDialog(std::string ext = ".terr3d");
 std::string openfilename();
@@ -75,13 +74,11 @@ std::string GetExecutableDir();
 std::string GenerateId(uint32_t length);
 std::string FetchURL(std::string baseURL, std::string path, std::string token = "");
 std::string GetTimeStamp();
-bool ShowLayerUpdationMethod(const char* label, int* method);
 float UpdateLayerWithUpdateMethod(float origv, float newv, int method);
 char *UChar2Char(unsigned char *data, int length);
 bool FileExists(std::string path, bool writeAccess = false);
 bool PathExist(const std::string &s);
 bool IsNetWorkConnected();
-bool PowerOfTwoDropDown(const char* label, int32_t* value, int start, int end);
 char *ReadBinaryFile(std::string path, int *size, int32_t sizeToLoad = INT32_MAX);
 char *ReadBinaryFile(std::string path, int32_t sizeToLoad = INT32_MAX);
 Hash MD5File(std::string path);
@@ -115,16 +112,7 @@ void OnBeforeImGuiRender();
 
 void OnImGuiRenderEnd();
 
-bool ShowComboBox(const char* label, int* selected, const char** values, int count);
-
 std::string FormatMemoryToString(uint64_t size);
-
-#define SHOW_COMBO_BOX(label, selected, values, count) \
-{ \
-	int p_VPModeCopy##__LINE__ = static_cast<int>(selected); \
-	ShowComboBox(label, &p_VPModeCopy##__LINE__, values, count); \
-	selected = static_cast<decltype(selected)>(p_VPModeCopy##__LINE__); \
-}
 
 // KEY DEFINES
 /* The unknown key */

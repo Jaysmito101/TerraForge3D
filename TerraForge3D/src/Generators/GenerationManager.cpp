@@ -1,6 +1,7 @@
 #include "Generators/GenerationManager.h"
 #include "Data/ApplicationState.h"
 #include "Base/ComputeShader.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 #include "Profiler.h"
 #include <GLFW/glfw3.h>
