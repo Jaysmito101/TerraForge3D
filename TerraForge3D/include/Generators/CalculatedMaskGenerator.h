@@ -39,6 +39,7 @@ struct CalculatedMaskSettings
 	float angleWidth = 45.0f;
 	float scale = 4.0f;
 	float seed = 42.0f;
+	float sampleRadius = 3.0f;
 	float seaLevel = 0.0f;
 	glm::vec2 center = glm::vec2(0.5f);
 	glm::vec2 pathEnd = glm::vec2(0.75f, 0.5f);

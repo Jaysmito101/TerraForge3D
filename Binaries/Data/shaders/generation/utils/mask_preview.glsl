@@ -17,7 +17,7 @@ uniform vec4 u_Range;
 uniform vec4 u_Settings0;
 // xy = point/center, zw = path endpoint
 uniform vec4 u_Settings1;
-// x = sea level, y = select valleys, z = use path
+// x = sea level, y = select valleys, z = use path, w = terrain sample radius
 uniform vec4 u_Settings2;
 
 int PixelCoordToDataOffset(ivec2 coordinate)
@@ -34,19 +34,51 @@ float TerrainValue(ivec2 coordinate)
 float RangeMask(float value)
 {
 	float softness = max(u_Range.z, 0.000001);
-	float lower = smoothstep(u_Range.x - softness, u_Range.x + softness, value);
-	float upper = 1.0 - smoothstep(u_Range.y - softness, u_Range.y + softness, value);
+	float minimum = min(u_Range.x, u_Range.y);
+	float maximum = max(u_Range.x, u_Range.y);
+	float lower = smoothstep(minimum - softness, minimum + softness, value);
+	float upper = 1.0 - smoothstep(maximum - softness, maximum + softness, value);
 	return clamp(lower * upper, 0.0, 1.0);
+}
+
+float FilteredTerrainValue(ivec2 coordinate)
+{
+	float sum = 0.0;
+	float weightSum = 0.0;
+	for (int y = -1; y <= 1; ++y)
+	{
+		for (int x = -1; x <= 1; ++x)
+		{
+			float weight = float((x == 0 ? 2 : 1) * (y == 0 ? 2 : 1));
+			sum += TerrainValue(coordinate + ivec2(x, y)) * weight;
+			weightSum += weight;
+		}
+	}
+	return sum / weightSum;
 }
 
 vec2 TerrainGradient(ivec2 coordinate)
 {
-	float top = TerrainValue(coordinate + ivec2(0, -1));
-	float bottom = TerrainValue(coordinate + ivec2(0, 1));
-	float left = TerrainValue(coordinate + ivec2(-1, 0));
-	float right = TerrainValue(coordinate + ivec2(1, 0));
+	int sampleRadius = clamp(int(round(u_Settings2.w)), 1, 8);
 	float texelSize = max(u_Range.w / float(u_Resolution), 0.000001);
-	return vec2(right - left, bottom - top) / (2.0 * texelSize);
+	float step = float(sampleRadius);
+	float dX =
+		(3.0 * FilteredTerrainValue(coordinate + ivec2( sampleRadius, -sampleRadius)) +
+		 10.0 * FilteredTerrainValue(coordinate + ivec2( sampleRadius,  0)) +
+		  3.0 * FilteredTerrainValue(coordinate + ivec2( sampleRadius,  sampleRadius)) -
+		  3.0 * FilteredTerrainValue(coordinate + ivec2(-sampleRadius, -sampleRadius)) -
+		 10.0 * FilteredTerrainValue(coordinate + ivec2(-sampleRadius,  0)) -
+		  3.0 * FilteredTerrainValue(coordinate + ivec2(-sampleRadius,  sampleRadius))) /
+		(32.0 * step * texelSize);
+	float dY =
+		(3.0 * FilteredTerrainValue(coordinate + ivec2(-sampleRadius,  sampleRadius)) +
+		 10.0 * FilteredTerrainValue(coordinate + ivec2( 0,  sampleRadius)) +
+		  3.0 * FilteredTerrainValue(coordinate + ivec2( sampleRadius,  sampleRadius)) -
+		  3.0 * FilteredTerrainValue(coordinate + ivec2(-sampleRadius, -sampleRadius)) -
+		 10.0 * FilteredTerrainValue(coordinate + ivec2( 0, -sampleRadius)) -
+		  3.0 * FilteredTerrainValue(coordinate + ivec2( sampleRadius, -sampleRadius))) /
+		(32.0 * step * texelSize);
+	return vec2(dX, dY);
 }
 
 float SlopeDegrees(ivec2 coordinate)
@@ -56,27 +88,28 @@ float SlopeDegrees(ivec2 coordinate)
 
 float CurvatureValue(ivec2 coordinate)
 {
-	float center = TerrainValue(coordinate);
-	float neighbors = TerrainValue(coordinate + ivec2(-1, 0))
-		+ TerrainValue(coordinate + ivec2(1, 0))
-		+ TerrainValue(coordinate + ivec2(0, -1))
-		+ TerrainValue(coordinate + ivec2(0, 1));
+	float center = FilteredTerrainValue(coordinate);
+	float neighbors = FilteredTerrainValue(coordinate + ivec2(-1, 0))
+		+ FilteredTerrainValue(coordinate + ivec2(1, 0))
+		+ FilteredTerrainValue(coordinate + ivec2(0, -1))
+		+ FilteredTerrainValue(coordinate + ivec2(0, 1));
 	return 4.0 * center - neighbors;
 }
 
 float RoughnessValue(ivec2 coordinate)
 {
-	float center = TerrainValue(coordinate);
+	float center = FilteredTerrainValue(coordinate);
 	float total = 0.0;
 	for (int y = -1; y <= 1; ++y)
 	{
 		for (int x = -1; x <= 1; ++x)
 		{
 			if (x == 0 && y == 0) continue;
-			total += abs(TerrainValue(coordinate + ivec2(x, y)) - center);
+			total += abs(FilteredTerrainValue(coordinate + ivec2(x, y)) - center);
 		}
 	}
-	return total / 8.0;
+	float average = total / 8.0;
+	return 1.0 - exp(-average * 16.0);
 }
 
 float AngleDistance(float a, float b)
@@ -138,10 +171,10 @@ float PointSegmentDistance(vec2 point, vec2 start, vec2 end)
 
 float LocalWetness(ivec2 coordinate)
 {
-	float height = TerrainValue(coordinate);
+	float height = FilteredTerrainValue(coordinate);
 	float average = 0.25 * (
-		TerrainValue(coordinate + ivec2(-1, 0)) + TerrainValue(coordinate + ivec2(1, 0)) +
-		TerrainValue(coordinate + ivec2(0, -1)) + TerrainValue(coordinate + ivec2(0, 1)));
+		FilteredTerrainValue(coordinate + ivec2(-1, 0)) + FilteredTerrainValue(coordinate + ivec2(1, 0)) +
+		FilteredTerrainValue(coordinate + ivec2(0, -1)) + FilteredTerrainValue(coordinate + ivec2(0, 1)));
 	float lowland = 1.0 - clamp(height * 0.5 + 0.5, 0.0, 1.0);
 	float concavity = clamp((average - height) * 8.0 + 0.5, 0.0, 1.0);
 	float gentle = 1.0 - clamp(SlopeDegrees(coordinate) / 90.0, 0.0, 1.0);
@@ -150,12 +183,12 @@ float LocalWetness(ivec2 coordinate)
 
 float AmbientCavity(ivec2 coordinate)
 {
-	float height = TerrainValue(coordinate);
+	float height = FilteredTerrainValue(coordinate);
 	float average = 0.125 * (
-		TerrainValue(coordinate + ivec2(-1, -1)) + TerrainValue(coordinate + ivec2(0, -1)) +
-		TerrainValue(coordinate + ivec2(1, -1)) + TerrainValue(coordinate + ivec2(-1, 0)) +
-		TerrainValue(coordinate + ivec2(1, 0)) + TerrainValue(coordinate + ivec2(-1, 1)) +
-		TerrainValue(coordinate + ivec2(0, 1)) + TerrainValue(coordinate + ivec2(1, 1)));
+		FilteredTerrainValue(coordinate + ivec2(-1, -1)) + FilteredTerrainValue(coordinate + ivec2(0, -1)) +
+		FilteredTerrainValue(coordinate + ivec2(1, -1)) + FilteredTerrainValue(coordinate + ivec2(-1, 0)) +
+		FilteredTerrainValue(coordinate + ivec2(1, 0)) + FilteredTerrainValue(coordinate + ivec2(-1, 1)) +
+		FilteredTerrainValue(coordinate + ivec2(0, 1)) + FilteredTerrainValue(coordinate + ivec2(1, 1)));
 	return clamp((average - height) * 8.0 + 0.5, 0.0, 1.0);
 }
 
@@ -172,16 +205,17 @@ float TerrainMask(ivec2 coordinate, vec2 uv)
 	vec2 gradient = TerrainGradient(coordinate);
 	float aspect = mod(degrees(atan(gradient.y, gradient.x)) + 360.0, 360.0);
 	float curvature = CurvatureValue(coordinate);
+	float normalizedCurvature = clamp(0.5 + curvature * 8.0, 0.0, 1.0);
 
 	switch (u_Mode)
 	{
 	case 0: return RangeMask(height);
 	case 1: return RangeMask(slope); 
 	case 2: return DirectionMask(aspect);
-	case 3: return RangeMask(curvature); 
+	case 3: return RangeMask(normalizedCurvature);
 	case 4: return RangeMask(RoughnessValue(coordinate)); 
 	case 5: return RangeMask(1.0 - clamp(slope / 90.0, 0.0, 1.0)); 
-	case 6: return RangeMask(u_Settings2.y > 0.5 ? -curvature : curvature);
+	case 6: return RangeMask(clamp(0.5 + (u_Settings2.y > 0.5 ? -curvature : curvature) * 8.0, 0.0, 1.0));
 	case 7: return RangeMask(height - u_Settings2.x); 
 	case 8: return RangeMask(abs(height - u_Settings2.x));
 	case 9: return RangeMask(LocalWetness(coordinate)); 
@@ -202,7 +236,13 @@ float TerrainMask(ivec2 coordinate, vec2 uv)
 	}
 	case 14: return RangeMask(height); 
 	case 15: return RangeMask(FractalNoise(uv * max(u_Settings0.z, 0.01) + vec2(u_Settings0.w)));
-	case 16: return RangeMask(distance(uv, u_Settings1.xy)); 
+	case 16:
+	{
+		float radialDistance = distance(uv, u_Settings1.xy);
+		float innerRadius = min(u_Range.x, u_Range.y);
+		float outerRadius = max(u_Range.x, u_Range.y);
+		return 1.0 - smoothstep(innerRadius - u_Range.z, outerRadius + u_Range.z, radialDistance);
+	}
 	default: return 0.0;
 	}
 }
