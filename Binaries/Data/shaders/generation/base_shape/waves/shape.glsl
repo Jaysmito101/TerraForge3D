@@ -1,77 +1,3 @@
-{
-	"Name": "Waves",
-	"Params": [
-		{
-			"Name": "Strength",
-			"Type": "Float",
-			"Default": 0.7,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.0, 4.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Scale",
-			"Type": "Float",
-			"Default": 1.0,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.001, 16.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Wavelength",
-			"Type": "Float",
-			"Default": 3.5,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.2, 16.0, 0.0, 0.0]
-		},
-		{
-			"Name": "WaveAmount",
-			"Label": "Wave Amount",
-			"Type": "Float",
-			"Default": 0.7,
-			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Distortion",
-			"Type": "Float",
-			"Default": 0.3,
-			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Octaves",
-			"Type": "Int",
-			"Default": 4,
-			"Widget": "Slider",
-			"Constraints": [1.0, 12.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Seed",
-			"Type": "Int",
-			"Default": 42,
-			"Widget": "Seed"
-		},
-		{
-			"Name": "Offset",
-			"Type": "Vector2",
-			"Default": [0.0, 0.0],
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [-8.0, 8.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Rotation",
-			"Type": "Float",
-			"Default": 0.0,
-			"Widget": "Slider",
-			"Constraints": [-180.0, 180.0, 0.0, 0.0]
-		}
-	]
-}
-// CODE
-
 #include "common/noise_2d.glsl"
 #include "common/base_shape_helpers.glsl"
 #include "common/base_shape_terrain_helpers.glsl"
@@ -108,3 +34,4 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	float height = mix(base, wave, amount);
 	return clamp(height, 0.0f, 1.0f) * clamp(u_Strength, 0.0f, 4.0f);
 }
+

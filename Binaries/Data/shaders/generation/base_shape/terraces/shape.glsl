@@ -1,70 +1,3 @@
-{
-	"Name": "Terraces",
-	"Params": [
-		{
-			"Name": "Strength",
-			"Type": "Float",
-			"Default": 1.0,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.0, 4.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Scale",
-			"Type": "Float",
-			"Default": 1.0,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.001, 16.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Levels",
-			"Type": "Int",
-			"Default": 8,
-			"Widget": "Slider",
-			"Constraints": [2.0, 32.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Smoothness",
-			"Type": "Float",
-			"Default": 0.35,
-			"Widget": "Slider",
-			"Constraints": [0.001, 1.0, 0.0, 0.0],
-			"Tooltip": "Softens terrace transitions. A value of 1 approaches a continuous slope."
-		},
-		{
-			"Name": "NoiseStrength",
-			"Label": "Noise Strength",
-			"Type": "Float",
-			"Default": 0.15,
-			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Seed",
-			"Type": "Int",
-			"Default": 42,
-			"Widget": "Seed"
-		},
-		{
-			"Name": "Offset",
-			"Type": "Vector2",
-			"Default": [0.0, 0.0],
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [-8.0, 8.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Rotation",
-			"Type": "Float",
-			"Default": 0.0,
-			"Widget": "Slider",
-			"Constraints": [-180.0, 180.0, 0.0, 0.0]
-		}
-	]
-}
-// CODE
-
 #include "common/noise_2d.glsl"
 #include "common/base_shape_helpers.glsl"
 #include "common/base_shape_terrain_helpers.glsl"
@@ -103,3 +36,4 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	terrace += detail * noiseStrength * 0.08f * (0.35f + 0.65f * smoothness);
 	return clamp(terrace, 0.0f, 1.0f) * clamp(u_Strength, 0.0f, 4.0f);
 }
+

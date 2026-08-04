@@ -1,0 +1,126 @@
+{
+  "Name": "Cliff",
+  "Params": [
+    {
+      "Name": "Strength",
+      "Type": "Float",
+      "Default": 0.5,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        -4,
+        4,
+        0,
+        0
+      ],
+      "Description": "Scales the overall height amplitude of the generated shape.",
+      "Tooltip": "Adjust the overall strength of this base shape."
+    },
+    {
+      "Name": "Rotation",
+      "Type": "Float",
+      "Default": 0,
+      "Widget": "Slider",
+      "Constraints": [
+        -180,
+        180,
+        0,
+        0
+      ],
+      "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+      "Tooltip": "Use rotation to change the direction of directional features."
+    },
+    {
+      "Name": "Thickness",
+      "Type": "Float",
+      "Default": 0.55,
+      "Widget": "Slider",
+      "Constraints": [
+        0.001,
+        1,
+        0,
+        0
+      ],
+      "Description": "Controls the thickness of the generated band or wall.",
+      "Tooltip": "Increase thickness to widen the feature."
+    },
+    {
+      "Name": "Position",
+      "Type": "Float",
+      "Default": 0.65,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        -2,
+        2,
+        0,
+        0
+      ],
+      "Description": "Controls the normalized location of the primary feature.",
+      "Tooltip": "Move the feature within the terrain using its normalized coordinates."
+    },
+    {
+      "Name": "Distortion",
+      "Type": "Float",
+      "Default": 0.23,
+      "Widget": "Slider",
+      "Constraints": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "Description": "Controls the amount of procedural warping applied to the shape.",
+      "Tooltip": "Increase distortion for a less regular silhouette."
+    },
+    {
+      "Name": "DistortionScale",
+      "Type": "Float",
+      "Default": 1.16,
+      "Label": "Distortion Scale",
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.001,
+        8,
+        0,
+        0
+      ],
+      "Description": "Controls the size of the distortion pattern.",
+      "Tooltip": "Higher values generally create finer distortion."
+    },
+    {
+      "Name": "Noise",
+      "Type": "Float",
+      "Default": 0.13,
+      "Widget": "Slider",
+      "Constraints": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "Description": "Controls the amount of noise mixed into the shape.",
+      "Tooltip": "Increase noise to add more irregular variation."
+    },
+    {
+      "Name": "NoiseScale",
+      "Type": "Float",
+      "Default": 0.7,
+      "Label": "Noise Scale",
+      "Widget": "Drag",
+      "Sensitivity": 0.001,
+      "Constraints": [
+        0.001,
+        8,
+        0,
+        0
+      ],
+      "Description": "Controls the size of the noise features.",
+      "Tooltip": "Higher values generally make noise features smaller."
+    }
+  ],
+  "ID": "cliff",
+  "Description": "Generates a cliff-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
+}

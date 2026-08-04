@@ -1,53 +1,3 @@
-{
-	"Name": "Mountain",
-	"Params": [
-		{
-			"Name": "Strength",
-			"Type": "Float",
-			"Default": 0.3,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.0, 4.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Scale",
-			"Type": "Float",
-			"Default": 1.33,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.001, 16.0, 0.0, 0.0]
-		},    
-		{
-			"Name": "Levels",
-			"Type": "Int",
-			"Default": 12,
-			"Widget": "Slider",
-			"Constraints": [1.0, 24.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Seed",
-			"Type": "Int",
-			"Default": 12,
-			"Widget": "Seed"
-		},
-		{
-			"Name": "Offset",
-			"Type": "Vector2",
-			"Default": [0.0, 0.0],
-			"Widget": "Drag",
-			"Sensitivity": 0.01
-		},
-		{
-			"Name": "DampingFactor",
-			"Type": "Float",
-			"Label": "Damping Factor",
-			"Default": 0.335,
-			"Widget": "Slider",
-			"Constraints": [0.0, 0.99, 0.0, 0.0]
-		}
-	]
-}
-// CODE
 #include "common/noise_2d.glsl"
 #include "common/base_shape_helpers.glsl"
 
@@ -82,3 +32,4 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	return clamp(ns / max(amplitudeSum, TF3D_SHAPE_EPSILON), 0.0f, 1.0f)
 		* clamp(u_Strength, 0.0f, 4.0f);
 }
+

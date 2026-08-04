@@ -1,0 +1,135 @@
+{
+  "Name": "Canyons",
+  "Params": [
+    {
+      "Name": "Strength",
+      "Type": "Float",
+      "Default": 1,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0,
+        4,
+        0,
+        0
+      ],
+      "Description": "Scales the overall height amplitude of the generated shape.",
+      "Tooltip": "Adjust the overall strength of this base shape."
+    },
+    {
+      "Name": "Scale",
+      "Type": "Float",
+      "Default": 1,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.001,
+        16,
+        0,
+        0
+      ],
+      "Description": "Controls the scale of the coordinate space used by the shape.",
+      "Tooltip": "Higher values generally create smaller, more frequent features."
+    },
+    {
+      "Name": "Width",
+      "Label": "Canyon Width",
+      "Type": "Float",
+      "Default": 0.22,
+      "Widget": "Slider",
+      "Constraints": [
+        0.01,
+        0.9,
+        0,
+        0
+      ],
+      "Description": "Controls the width of the main canyon bands.",
+      "Tooltip": "Increase width for broader canyon regions."
+    },
+    {
+      "Name": "Depth",
+      "Type": "Float",
+      "Default": 0.7,
+      "Widget": "Slider",
+      "Constraints": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "Description": "Controls how deeply the generated feature cuts into the terrain.",
+      "Tooltip": "Increase depth for a stronger depression or relief."
+    },
+    {
+      "Name": "Waviness",
+      "Type": "Float",
+      "Default": 0.45,
+      "Widget": "Slider",
+      "Constraints": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "Description": "Controls how much the main feature meanders or bends.",
+      "Tooltip": "Increase waviness for more winding feature paths."
+    },
+    {
+      "Name": "Octaves",
+      "Type": "Int",
+      "Default": 5,
+      "Widget": "Slider",
+      "Constraints": [
+        1,
+        16,
+        0,
+        0
+      ],
+      "Description": "Controls how many noise octaves contribute to the shape.",
+      "Tooltip": "More octaves add finer detail and increase generation cost."
+    },
+    {
+      "Name": "Seed",
+      "Type": "Int",
+      "Default": 42,
+      "Widget": "Seed",
+      "Description": "Selects the deterministic random pattern used by the generator.",
+      "Tooltip": "Change the seed to create a different reproducible layout."
+    },
+    {
+      "Name": "Offset",
+      "Type": "Vector2",
+      "Default": [
+        0,
+        0
+      ],
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        -8,
+        8,
+        0,
+        0
+      ],
+      "Description": "Translates the sampling coordinates without changing the shape's scale.",
+      "Tooltip": "Use the offset to move through the procedural field."
+    },
+    {
+      "Name": "Rotation",
+      "Type": "Float",
+      "Default": 0,
+      "Widget": "Slider",
+      "Constraints": [
+        -180,
+        180,
+        0,
+        0
+      ],
+      "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+      "Tooltip": "Use rotation to change the direction of directional features."
+    }
+  ],
+  "ID": "canyons",
+  "Description": "Generates a canyons-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
+}
