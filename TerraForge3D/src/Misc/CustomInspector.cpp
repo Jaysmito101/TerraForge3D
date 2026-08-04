@@ -1,5 +1,6 @@
 #include "Misc/CustomInspector.h"
 #include "Base/Base.h"
+#include "Utils/PathEditor.h"
 #include "Utils/Utils.h"
 
 #ifdef min
@@ -46,6 +47,7 @@ std::string CustomInspectorValue::CustomInspectorValueTypeToString(CustomInspect
 	case CustomInspectorValueType_Vector3:	return "Vector3";
 	case CustomInspectorValueType_Vector4:	return "Vector4";
 	case CustomInspectorValueType_Texture:	return "Texture";
+	case CustomInspectorValueType_Path:		return "Path";
 	default: return "Unknown";
 	}
 }
@@ -60,6 +62,7 @@ CustomInspectorValueType CustomInspectorValue::CustomInspectorValueTypeFromStrin
 	if (type == "Vector3")	return CustomInspectorValueType_Vector3;
 	if (type == "Vector4")	return CustomInspectorValueType_Vector4;
 	if (type == "Texture")	return CustomInspectorValueType_Texture;
+	if (type == "Path")		return CustomInspectorValueType_Path;
 	return CustomInspectorValueType_Unknown;
 }
 
@@ -114,6 +117,17 @@ SerializerNode CustomInspectorValue::Save() const
 	case CustomInspectorValueType_Texture:
 		node->SetFile("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
 		node->SetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "null");
+		break;
+	case CustomInspectorValueType_Path:
+		node->SetInteger("PathPointCount", m_PathPointCount);
+		node->SetInteger("DefaultPathPointCount", m_DefaultPathPointCount);
+		for (size_t index = 0; index < CustomInspectorMaxPathPoints; ++index)
+		{
+			node->SetFloat("PathValueX" + std::to_string(index), m_PathPoints[index].x);
+			node->SetFloat("PathValueY" + std::to_string(index), m_PathPoints[index].y);
+			node->SetFloat("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
+			node->SetFloat("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+		}
 		break;
 	default:
 		break;
@@ -176,6 +190,17 @@ void CustomInspectorValue::Load(const SerializerNode& node)
 		m_TextureValue = std::make_shared<Texture2D>(path);
 		break;
 	}
+	case CustomInspectorValueType_Path:
+		m_DefaultPathPointCount = glm::clamp(node->GetInteger("DefaultPathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
+		m_PathPointCount = glm::clamp(node->GetInteger("PathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
+		for (size_t index = 0; index < CustomInspectorMaxPathPoints; ++index)
+		{
+			m_DefaultPathPoints[index].x = node->GetFloat("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
+			m_DefaultPathPoints[index].y = node->GetFloat("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+			m_PathPoints[index].x = node->GetFloat("PathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
+			m_PathPoints[index].y = node->GetFloat("PathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+		}
+		break;
 	default:
 		break;
 	}
@@ -199,6 +224,7 @@ std::string CustomInspectorWidget::CustomInspectorWidgetTypeToString(CustomInspe
 	case CustomInspectorWidgetType_Drag:		return "Drag";
 	case CustomInspectorWidgetType_Color:		return "Color";
 	case CustomInspectorWidgetType_Texture:		return "Texture";
+	case CustomInspectorWidgetType_Path:		return "Path";
 	case CustomInspectorWidgetType_Button:		return "Button";
 	case CustomInspectorWidgetType_Checkbox:	return "Checkbox";
 	case CustomInspectorWidgetType_Input:		return "Input";
@@ -218,6 +244,7 @@ CustomInspectorWidgetType CustomInspectorWidget::CustomInspectorWidgetTypeFromSt
 	if (type == "Drag")			return CustomInspectorWidgetType_Drag;
 	if (type == "Color")		return CustomInspectorWidgetType_Color;
 	if (type == "Texture")		return CustomInspectorWidgetType_Texture;
+	if (type == "Path")			return CustomInspectorWidgetType_Path;
 	if (type == "Button")		return CustomInspectorWidgetType_Button;
 	if (type == "Checkbox")		return CustomInspectorWidgetType_Checkbox;
 	if (type == "Input")		return CustomInspectorWidgetType_Input;
@@ -377,6 +404,16 @@ CustomInspectorValue& CustomInspector::AddTextureVariable(const std::string& nam
 	return AddVariable(name, value);
 }
 
+CustomInspectorValue& CustomInspector::AddPathVariable(const std::string& name,
+	const std::array<glm::vec2, CustomInspectorMaxPathPoints>& defaultPoints, int defaultPointCount)
+{
+	CustomInspectorValue value(CustomInspectorValueType_Path);
+	value.m_DefaultPathPoints = value.m_PathPoints = defaultPoints;
+	value.m_DefaultPathPointCount = value.m_PathPointCount = glm::clamp(defaultPointCount, 1, static_cast<int>(CustomInspectorMaxPathPoints));
+	value.m_Name = name;
+	return AddVariable(name, value);
+}
+
 CustomInspectorValue& CustomInspector::AddVairableFromConfig(const nlohmann::json& config)
 {
 	std::string name = config.contains("Name") ? config["Name"].get<std::string>() : "Unnamed";
@@ -393,7 +430,25 @@ CustomInspectorValue& CustomInspector::AddVairableFromConfig(const nlohmann::jso
 	case CustomInspectorValueType_Vector2:	{ auto& var = AddVector2Variable(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f)); var.m_Name = name; return var; }
 	case CustomInspectorValueType_Vector3:	{ auto& var = AddVector3Variable(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f)); var.m_Name = name; return var; }
 	case CustomInspectorValueType_Vector4:	{ auto& var = AddVector4Variable(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f)); var.m_Name = name; return var; }
- 	case CustomInspectorValueType_Texture:  { auto& var = AddTextureVariable(name, hasDefaultValue ? std::make_shared<Texture2D>(config["Default"].get<std::string>()) : nullptr); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Texture:  { auto& var = AddTextureVariable(name, hasDefaultValue ? std::make_shared<Texture2D>(config["Default"].get<std::string>()) : nullptr); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Path:
+	{
+		std::array<glm::vec2, CustomInspectorMaxPathPoints> points{};
+		int pointCount = config.value("PointCount", 2);
+		if (hasDefaultValue && config["Default"].is_array())
+		{
+			pointCount = config.value("PointCount", static_cast<int>(config["Default"].size()));
+			for (size_t index = 0; index < config["Default"].size() && index < CustomInspectorMaxPathPoints; ++index)
+			{
+				const auto& point = config["Default"][index];
+				if (!point.is_array() || point.size() < 2) continue;
+				points[index] = glm::vec2(point[0].get<float>(), point[1].get<float>());
+			}
+		}
+		auto& var = AddPathVariable(name, points, pointCount);
+		var.m_Name = name;
+		return var;
+	}
 	default:
 		throw std::runtime_error("Unknown value type");
 	}
@@ -464,7 +519,7 @@ CustomInspectorWidget& CustomInspector::AddButtonWidget(const std::string& label
 {
 	CustomInspectorWidget widget(CustomInspectorWidgetType_Button);
 	widget.SetLabel(label);
-	// widget.SetActionName(actionName); TODO
+	widget.SetActionName(actionName);
 	return AddWidget(label, widget);
 }
 
@@ -501,6 +556,14 @@ CustomInspectorWidget& CustomInspector::AddDropdownWidget(const std::string& lab
 	return AddWidget(label, widget);
 }
 
+CustomInspectorWidget& CustomInspector::AddPathWidget(const std::string& label, const std::string& variableName)
+{
+	CustomInspectorWidget widget(CustomInspectorWidgetType_Path);
+	widget.SetLabel(label);
+	widget.SetVariableName(variableName);
+	return AddWidget(label, widget);
+}
+
 CustomInspectorWidget& CustomInspector::AddSeperatorWidget()
 {
 	return AddWidget("Seperator", CustomInspectorWidget(CustomInspectorWidgetType_Seperator));
@@ -528,6 +591,7 @@ CustomInspectorWidget& CustomInspector::AddWidgetFromString(const std::string& l
 	case CustomInspectorWidgetType_Drag:		return AddDragWidget(label, variableName);
 	case CustomInspectorWidgetType_Color:		return AddColorWidget(label, variableName);
 	case CustomInspectorWidgetType_Texture:		return AddTextureWidget(label, variableName);
+	case CustomInspectorWidgetType_Path:		return AddPathWidget(label, variableName);
 	case CustomInspectorWidgetType_Button:		return AddButtonWidget(label, variableName);
 	case CustomInspectorWidgetType_Checkbox:	return AddCheckboxWidget(label, variableName);
 	case CustomInspectorWidgetType_Input:		return AddInputWidget(label, variableName);
@@ -575,6 +639,7 @@ SerializerNode CustomInspector::Save() const
 {
 	SerializerNode node = CreateSerializerNode();
 	node->SetString("ID", m_ID);
+	if (!m_Description.empty()) node->SetString("Description", m_Description);
 	node->SetChildNode("Data", SaveData());
 	node->SetStringArray("WidgetsOrder", m_WidgetsOrder);
 	node->SetInteger("WidgetsCount", static_cast<int32_t>(m_Widgets.size()));
@@ -592,8 +657,11 @@ void CustomInspector::Load(SerializerNode node)
 {
 	LoadData(node->GetChildNode("Data"));
 	m_Widgets.clear();
+	m_WidgetsOrder.clear();
 	m_ID = node->GetString("ID", m_ID);
+	m_Description = node->GetString("Description", m_Description);
 	int valueCount = node->GetInteger("WidgetsCount");
+	m_WidgetsOrder = node->GetStringArray("WidgetsOrder");
 	auto subNodes = node->GetNodeArray("Widgets");
 	if (subNodes.size() != valueCount) TF3D_LOG_WARN("Inspector data is incomplete: expected {}, found {}", valueCount, subNodes.size());
 	for (auto subNode : subNodes)
@@ -603,11 +671,16 @@ void CustomInspector::Load(SerializerNode node)
 		widget.Load(subNode);
 		m_Widgets[name] = widget;
 	}
+	if (m_WidgetsOrder.empty())
+	{
+		for (const auto& subNode : subNodes) m_WidgetsOrder.push_back(subNode->GetString("GName"));
+	}
 }
 
 bool CustomInspector::LoadConfig(const nlohmann::json& config)
 {
 	Clear();
+	m_Description = config.value("Description", "");
 	if (!config.contains("Params") || !config["Params"].is_array())
 	{
 		AddTextWidget("No parameters available");
@@ -640,6 +713,18 @@ bool CustomInspector::LoadConfig(const nlohmann::json& config)
 			else if (parameter.contains("Description")) widget.SetTooltip(parameter["Description"].get<std::string>());
 			if (parameter.contains("Conditional"))
 				widget.SetRenderOnCondition(parameter["Conditional"].get<std::string>(), parameter.value("ConditionalValue", 1));
+		}
+		if (config.contains("Buttons") && config["Buttons"].is_array())
+		{
+			for (const auto& button : config["Buttons"])
+			{
+				if (!button.is_object()) continue;
+				const std::string action = button.value("Action", button.value("Name", "Action"));
+				const std::string label = button.value("Label", action);
+				auto& widget = AddButtonWidget(label, action);
+				if (button.contains("Tooltip")) widget.SetTooltip(button["Tooltip"].get<std::string>());
+				else if (button.contains("Description")) widget.SetTooltip(button["Description"].get<std::string>());
+			}
 		}
 	}
 	catch (const std::exception& exception)
@@ -693,48 +778,68 @@ CustomInspectorWidget& CustomInspector::SetWidgetSpeed(const std::string& label,
 bool CustomInspector::Render()
 {
 	bool hasChanged = false;
+	m_LastChangedVariable.clear();
+	m_LastAction.clear();
 	ImGui::PushID(m_ID.c_str());
+	if (!m_Description.empty())
+	{
+		ImGui::TextWrapped("%s", m_Description.c_str());
+		ImGui::Separator();
+	}
 	for (const auto& widgetLabel : m_WidgetsOrder)
 	{
 		const auto& widget = m_Widgets[widgetLabel];
 		if (widget.m_UseRenderOnCondition)
 		{
-			const auto& condition = m_Values[widget.m_RenderOnConditionName];
+			if (!HasVariable(widget.m_RenderOnConditionName)) continue;
+			const auto& condition = m_Values.at(widget.m_RenderOnConditionName);
 			if (condition.GetInt() != widget.m_RenderOnConditionValue) continue;
 		}
 		ImGui::PushID(widget.m_ID.c_str());
 		if (widget.m_FontName.size() > 0) ImGui::PushFont(GetUIFont(widget.m_FontName));
-		if (widget.m_Type == CustomInspectorWidgetType_Slider) hasChanged = RenderSlider(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Drag) hasChanged = RenderDrag(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Color) hasChanged = RenderColor(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Texture) hasChanged = RenderTexture(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Button) hasChanged = RenderButton(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Checkbox) hasChanged = RenderCheckbox(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Input) hasChanged = RenderInput(widget) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Seed) hasChanged = RenderSeed(m_Widgets[widgetLabel]) || hasChanged;
-		else if (widget.m_Type == CustomInspectorWidgetType_Dropdown) hasChanged = RenderDropdown(widget) || hasChanged;
+		bool widgetChanged = false;
+		if (widget.m_Type == CustomInspectorWidgetType_Slider) widgetChanged = RenderSlider(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Drag) widgetChanged = RenderDrag(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Color) widgetChanged = RenderColor(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Texture) widgetChanged = RenderTexture(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Path) widgetChanged = RenderPath(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Button) widgetChanged = RenderButton(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Checkbox) widgetChanged = RenderCheckbox(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Input) widgetChanged = RenderInput(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Seed) widgetChanged = RenderSeed(m_Widgets[widgetLabel]);
+		else if (widget.m_Type == CustomInspectorWidgetType_Dropdown) widgetChanged = RenderDropdown(widget);
 		else if (widget.m_Type == CustomInspectorWidgetType_Seperator) ImGui::Separator();
 		else if (widget.m_Type == CustomInspectorWidgetType_NewLine) ImGui::NewLine();
+		else if (widget.m_Type == CustomInspectorWidgetType_Text) ImGui::TextWrapped("%s", widget.m_Label.c_str());
+		if (widgetChanged)
+		{
+			hasChanged = true;
+			if (widget.m_Type == CustomInspectorWidgetType_Button) m_LastAction = widget.m_VariableName;
+			else if (!widget.m_VariableName.empty()) m_LastChangedVariable = widget.m_VariableName;
+		}
 		if (widget.m_FontName.size() > 0) ImGui::PopFont();
 		RenderInspectorTooltip(widget.m_Label, widget.m_Tooltip);
-		if (widget.m_Type != CustomInspectorWidgetType_Seed)
+		if (widget.m_Type != CustomInspectorWidgetType_Seed &&
+			widget.m_Type != CustomInspectorWidgetType_Button &&
+			!widget.m_VariableName.empty())
 		{
 			if (ImGui::BeginPopupContextItem(widget.m_ID.c_str()))
 			{
 				static char s_ResetButtonName[1024];
 				sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
 				// BUG: This doesn't work for some reason!
-				if (ImGui::Button(s_ResetButtonName)) 
+				if (ImGui::Button(s_ResetButtonName))
 				{
-					m_Values[widget.m_VariableName].ResetValue(); 
+					m_Values[widget.m_VariableName].ResetValue();
 					hasChanged = true;
+					m_LastChangedVariable = widget.m_VariableName;
 				}
 				ImGui::EndPopup();
 			}
 		}
 		ImGui::PopID();
 	}
-	if (ImGui::Button("Reset to Defaults"))
+	if (m_ShowResetButton && ImGui::Button("Reset to Defaults"))
 	{
 		for (auto& it : m_Values) it.second.ResetValue();
 		hasChanged = true;
@@ -904,6 +1009,8 @@ bool CustomInspector::RenderDropdown(const CustomInspectorWidget& widget)
 		throw std::runtime_error(std::string("Invalid data type for Dropdown"));
 	}
 
+	if (widget.m_DropdownOptions.empty()) return false;
+	value.m_IntValue = glm::clamp(value.m_IntValue, 0, static_cast<int32_t>(widget.m_DropdownOptions.size()) - 1);
 	if (ImGui::BeginCombo(widget.m_Label.c_str(), widget.m_DropdownOptions[value.m_IntValue].c_str()))
 	{
 		for (int i = 0; i < static_cast<int32_t>(widget.m_DropdownOptions.size()); i++)
@@ -921,6 +1028,15 @@ bool CustomInspector::RenderDropdown(const CustomInspectorWidget& widget)
 bool CustomInspector::RenderButton(const CustomInspectorWidget& widget)
 {
 	return ImGui::Button(widget.m_Label.c_str());
+}
+
+bool CustomInspector::RenderPath(const CustomInspectorWidget& widget)
+{
+	auto& value = m_Values[widget.m_VariableName];
+	if (value.GetType() != CustomInspectorValueType_Path)
+		throw std::runtime_error("Invalid data type for Path");
+	return TerraForge3D::UI::DrawPathEditor<CustomInspectorMaxPathPoints>(
+		widget.m_Label.c_str(), value.m_PathPoints, value.m_PathPointCount);
 }
 
 bool CustomInspector::RenderCheckbox(const CustomInspectorWidget& widget)

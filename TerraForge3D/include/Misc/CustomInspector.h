@@ -15,8 +15,11 @@ enum CustomInspectorValueType
 	CustomInspectorValueType_Vector3,
 	CustomInspectorValueType_Vector4,
 	CustomInspectorValueType_Texture,
+	CustomInspectorValueType_Path,
 	CustomInspectorValueType_Count
 };
+
+inline constexpr size_t CustomInspectorMaxPathPoints = 16;
 
 class CustomInspectorValue
 {
@@ -172,6 +175,15 @@ public:
 		return nullptr;
 	}
 
+	inline const std::array<glm::vec2, CustomInspectorMaxPathPoints>& GetPathPoints() const { return m_PathPoints; }
+	inline int GetPathPointCount() const { return m_PathPointCount; }
+	inline void SetVector2(glm::vec2 value)
+	{
+		if (m_Type != CustomInspectorValueType_Vector2) return;
+		m_VectorValue[0] = value.x;
+		m_VectorValue[1] = value.y;
+	}
+
 	inline void ResetValue()
 	{
 		m_IntValue = m_DefaultIntValue;
@@ -183,6 +195,8 @@ public:
 		m_VectorValue[1] = m_DefaultVectorValue[1];
 		m_VectorValue[2] = m_DefaultVectorValue[2];
 		m_VectorValue[3] = m_DefaultVectorValue[3];
+		m_PathPoints = m_DefaultPathPoints;
+		m_PathPointCount = m_DefaultPathPointCount;
 	}
 
 	SerializerNode Save() const;
@@ -201,6 +215,9 @@ private:
 	std::string m_StringValue = "", m_DefaultStringValue = "";
 	std::shared_ptr<Texture2D> m_TextureValue = nullptr, m_DefaultTextureValue = nullptr;
 	float m_VectorValue[4] = { 0.0f, 0.0f, 0.0f, 0.0f }, m_DefaultVectorValue[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	std::array<glm::vec2, CustomInspectorMaxPathPoints> m_PathPoints{};
+	std::array<glm::vec2, CustomInspectorMaxPathPoints> m_DefaultPathPoints{};
+	int32_t m_PathPointCount = 2, m_DefaultPathPointCount = 2;
 };
 
 enum CustomInspectorWidgetType
@@ -210,6 +227,7 @@ enum CustomInspectorWidgetType
 	CustomInspectorWidgetType_Drag,
 	CustomInspectorWidgetType_Color,
 	CustomInspectorWidgetType_Texture,
+	CustomInspectorWidgetType_Path,
 	CustomInspectorWidgetType_Button,
 	CustomInspectorWidgetType_Checkbox,
 	CustomInspectorWidgetType_Input,
@@ -232,6 +250,7 @@ public:
 	inline std::string GetVariableName() const { return m_VariableName; }
 	inline void SetLabel(const std::string& label) { m_Label = label; }
 	inline void SetVariableName(const std::string& variableName) { m_VariableName = variableName; }
+	inline void SetActionName(const std::string& actionName) { m_VariableName = actionName; }
 	inline void SetTooltip(const std::string& tooltip) { m_Tooltip = tooltip; }
 	inline void SetConstraints(float a = 0.0f, float b = 0.0f, float c = 0.0f, float d = 0.0f) { m_Constratins[0] = a; m_Constratins[1] = b; m_Constratins[2] = c; m_Constratins[3] = d; }
 	inline void SetFontName(const std::string& fontName) { m_FontName = fontName; }
@@ -282,6 +301,8 @@ public:
 	CustomInspectorValue& AddVector3Variable(const std::string& name, glm::vec3 defaultValue = glm::vec3(0.0f));
 	CustomInspectorValue& AddVector4Variable(const std::string& name, glm::vec4 defaultValue = glm::vec4(0.0f));
 	CustomInspectorValue& AddTextureVariable(const std::string& name, std::shared_ptr<Texture2D> defaultValue = nullptr);
+	CustomInspectorValue& AddPathVariable(const std::string& name,
+		const std::array<glm::vec2, CustomInspectorMaxPathPoints>& defaultPoints = {}, int defaultPointCount = 2);
 	CustomInspectorValue& AddVairableFromConfig(const nlohmann::json& config);
 
 	bool HasWidget(const std::string& name);
@@ -292,7 +313,8 @@ public:
 	CustomInspectorWidget& AddDragWidget(const std::string& label, const std::string& variableName, float min = 0.0f, float max = 0.0f, float speed = 1.0f);
 	CustomInspectorWidget& AddColorWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddTextureWidget(const std::string& label, const std::string& variableName, float width = 100.0f, float height = 100.0f);
-	CustomInspectorWidget& AddButtonWidget(const std::string& label, const std::string& actionName); // for future
+	CustomInspectorWidget& AddPathWidget(const std::string& label, const std::string& variableName);
+	CustomInspectorWidget& AddButtonWidget(const std::string& label, const std::string& actionName);
 	CustomInspectorWidget& AddCheckboxWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddInputWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddSeedWidget(const std::string& label, const std::string& variableName);
@@ -316,8 +338,20 @@ public:
 	bool LoadConfig(const nlohmann::json& config);
 
 	bool Render();
+	inline const std::string& GetDescription() const { return m_Description; }
+	inline const std::string& GetLastChangedVariable() const { return m_LastChangedVariable; }
+	inline const std::string& GetLastAction() const { return m_LastAction; }
+	inline void SetShowResetButton(bool show) { m_ShowResetButton = show; }
 
-	inline void Clear() { m_Values.clear(); m_Widgets.clear(); m_WidgetsOrder.clear(); }
+	inline void Clear()
+	{
+		m_Values.clear();
+		m_Widgets.clear();
+		m_WidgetsOrder.clear();
+		m_Description.clear();
+		m_LastChangedVariable.clear();
+		m_LastAction.clear();
+	}
 	inline const std::unordered_map<std::string, CustomInspectorValue>& GetValues() const { return m_Values; }
 	inline const std::unordered_map<std::string, CustomInspectorWidget>& GetWidgets() const { return m_Widgets; }
 	inline const std::vector<std::string>& GetWidgetsOrder() const { return m_WidgetsOrder; }
@@ -333,6 +367,7 @@ private:
 	bool RenderInput(const CustomInspectorWidget& widget);
 	bool RenderSeed(CustomInspectorWidget& widget);
 	bool RenderDropdown(const CustomInspectorWidget& widget);
+	bool RenderPath(const CustomInspectorWidget& widget);
 
 
 private:
@@ -340,4 +375,8 @@ private:
 	std::unordered_map<std::string, CustomInspectorWidget> m_Widgets;
 	std::vector<std::string> m_WidgetsOrder;
 	std::string m_ID = "";
+	std::string m_Description;
+	std::string m_LastChangedVariable;
+	std::string m_LastAction;
+	bool m_ShowResetButton = true;
 };
