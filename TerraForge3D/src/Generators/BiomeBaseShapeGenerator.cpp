@@ -19,7 +19,7 @@ BiomeBaseShapeGenerator::~BiomeBaseShapeGenerator()
 bool BiomeBaseShapeGenerator::ShowSettings()
 {
 	ImGui::PushID(m_ID.c_str());
-	if (!m_Description.empty())
+	if (!m_Description.empty() && m_Inspector->GetDescription().empty())
 	{
 		ImGui::TextWrapped("%s", m_Description.c_str());
 		ImGui::Separator();
