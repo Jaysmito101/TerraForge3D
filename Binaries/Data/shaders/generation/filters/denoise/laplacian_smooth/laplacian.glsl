@@ -18,5 +18,5 @@ void main()
 		+ sampleInput(coordinate + ivec2(0, -1))
 		+ sampleInput(coordinate + ivec2(0, 1)));
 	float weight = clamp(u_Weight, 0.0f, 0.25f);
-	outputData[indexOf(coordinate)] = center + (neighbors - center) * weight;
+	writeOutput(coordinate, center + (neighbors - center) * weight);
 }

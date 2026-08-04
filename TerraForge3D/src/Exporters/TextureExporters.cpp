@@ -21,6 +21,7 @@ void ExportManager::UpdateHeightmapVisualizer()
 	m_VisualzeShader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
 	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	m_VisualzeShader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+	m_VisualzeShader->SetMemoryBarrier();
 }
 
 float* ExportManager::ApplyHeightmapTextureTransform(float* data, float* minMax)

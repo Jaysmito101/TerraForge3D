@@ -4,10 +4,7 @@
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 // output data buffer
-layout (std430, binding = 0) buffer DataBuffer
-{
-	float data[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) uniform image2D DataTexture;
 
 // output texture
 layout(rgba32f, binding = 1) uniform image2D VisualizerTexture;
@@ -75,7 +72,7 @@ void main()
 		uvec2 offsetv2 = gl_GlobalInvocationID.xy;
 		if (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;
 		uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
-		data[offset] = 0.0f;
+		imageStore(DataTexture, ivec2(offsetv2), vec4(0.0f));
 	}
 	else if (u_Mode == 1) // the generation
 	{
@@ -85,7 +82,7 @@ void main()
 		vec2 uv = offsetv2 / float(u_Resolution);
 		uv = vec2(uv.x, 1.0f - uv.y);
 		vec2 rData = evaluateDEM(uv);
-		if(rData.y > 0.5f) data[offset] = rData.x;
+		if(rData.y > 0.5f) imageStore(DataTexture, ivec2(offsetv2), vec4(rData.x, 0.0, 0.0, 0.0));
 	}
 	else if (u_Mode == 2)
 	{
@@ -96,10 +93,10 @@ void main()
 		uv = vec2(uv.x, 1.0f - uv.y);
 		ivec2 offsetv2 = clamp(ivec2(uv * float(u_Resolution)), ivec2(1), ivec2(u_Resolution - 2));
 		// Get neighboring height values
-		float heightLeft = data[PixelCoordToDataOffset(uint(offsetv2.x - 1), uint(offsetv2.y))];
-		float heightRight = data[PixelCoordToDataOffset(uint(offsetv2.x + 1), uint(offsetv2.y))];
-		float heightTop = data[PixelCoordToDataOffset(uint(offsetv2.x), uint(offsetv2.y + 1))];
-		float heightBottom = data[PixelCoordToDataOffset(uint(offsetv2.x), uint(offsetv2.y - 1))];
+		float heightLeft = imageLoad(DataTexture, ivec2(offsetv2.x - 1, offsetv2.y)).r;
+		float heightRight = imageLoad(DataTexture, ivec2(offsetv2.x + 1, offsetv2.y)).r;
+		float heightTop = imageLoad(DataTexture, ivec2(offsetv2.x, offsetv2.y + 1)).r;
+		float heightBottom = imageLoad(DataTexture, ivec2(offsetv2.x, offsetv2.y - 1)).r;
 
 		// Calculate slope using central differences
 		vec2 slope = (vec2(heightLeft - heightRight, heightBottom - heightTop)) * 50.0f;

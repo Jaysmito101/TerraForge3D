@@ -9,10 +9,7 @@ uniform float a;
 uniform float b;
 uniform float c;
 
-layout(std430, binding = 0) buffer DataBuffer0
-{
-    float data0[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) uniform image2D DataTexture;
 
 uint PixelCoordToDataOffset(uint x, uint y)
 {
@@ -49,9 +46,8 @@ float noise(in vec2 p)
 void main(void)
 {
 	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
-	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
 	vec2 uv = offsetv2 / vec2(r, r);
-	float color = data0[offset];
+	float color = imageLoad(DataTexture, ivec2(offsetv2)).r;
 	color = 0.0f;
 	color += noise(uv * 1.0f) * a / 1.0f;
 	color += noise(uv * 2.0f) * b / 2.0f;
@@ -60,5 +56,5 @@ void main(void)
 	{
 		color += noise(uv * pow(2.0f, i)) / pow(2.0f, i);
 	}
-	data0[offset] = color;
+	imageStore(DataTexture, ivec2(offsetv2), vec4(color, 0.0, 0.0, 0.0));
 }

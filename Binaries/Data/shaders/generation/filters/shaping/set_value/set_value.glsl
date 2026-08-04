@@ -11,5 +11,5 @@ void main()
 	ivec2 coordinate = ivec2(gl_GlobalInvocationID.xy);
 	if (coordinate.x >= u_Resolution || coordinate.y >= u_Resolution) return;
 
-	outputData[indexOf(coordinate)] = u_Value;
+	writeOutput(coordinate, u_Value);
 }

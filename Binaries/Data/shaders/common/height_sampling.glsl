@@ -5,10 +5,10 @@ float SampleHeightBilinear(vec2 texCoord)
 	ivec2 upper = min(lower + ivec2(1), ivec2(u_Resolution - 1));
 	vec2 blend = fract(samplePosition);
 
-	float lowerLeft = data0[PixelCoordToDataOffset(lower.x, lower.y)];
-	float lowerRight = data0[PixelCoordToDataOffset(upper.x, lower.y)];
-	float upperLeft = data0[PixelCoordToDataOffset(lower.x, upper.y)];
-	float upperRight = data0[PixelCoordToDataOffset(upper.x, upper.y)];
+	float lowerLeft = imageLoad(u_Heightmap, lower).r;
+	float lowerRight = imageLoad(u_Heightmap, ivec2(upper.x, lower.y)).r;
+	float upperLeft = imageLoad(u_Heightmap, ivec2(lower.x, upper.y)).r;
+	float upperRight = imageLoad(u_Heightmap, upper).r;
 	return mix(mix(lowerLeft, lowerRight, blend.x), mix(upperLeft, upperRight, blend.x), blend.y);
 }
 

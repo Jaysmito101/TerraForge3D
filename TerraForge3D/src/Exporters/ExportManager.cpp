@@ -9,8 +9,7 @@ ExportManager::ExportManager(ApplicationState* as)
 {
 	m_AppState = as;
 	m_VisualzeTexture = std::make_shared<GeneratorTexture>(256, 256);
-	const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "exporters" PATH_SEPARATOR "texture_export_visualizer.glsl", &s_TempBool);
-	m_VisualzeShader = std::make_shared<ComputeShader>(shaderSource);
+	m_VisualzeShader = m_AppState->resourceManager->LoadComputeShader("exporters/texture_export_visualizer", true);
 }
 
 ExportManager::~ExportManager()

@@ -11,10 +11,7 @@ out VertexData
   vec2 texCoord;
 } vertexOutput;
 
-layout(std430, binding = 0) buffer DataBuffer0
-{
-    float data0[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D u_Heightmap;
 
 uniform int u_Resolution;
 uniform float u_TileSize;

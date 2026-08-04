@@ -17,5 +17,5 @@ void main()
 		value = abs(value);
 	}
 	float exponent = max(u_Exponent, 0.0001f);
-	outputData[indexOf(coordinate)] = pow(max(value, 0.0f), exponent);
+	writeOutput(coordinate, pow(max(value, 0.0f), exponent));
 }

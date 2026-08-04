@@ -1,6 +1,7 @@
 #include "Data/ResourceManager.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
+#include "Generators/GeneratorData.h"
 
 #include <filesystem>
 #include <algorithm>
@@ -10,6 +11,15 @@
 
 namespace
 {
+	std::string InjectFieldFormatDefine(std::string source)
+	{
+		const auto versionEnd = source.find('\n');
+		const std::string define = std::string("#define TF3D_FIELD_FORMAT ") + GeneratorData::GetDefaultStorageImageFormat() + "\n";
+		if (versionEnd == std::string::npos) return define + source;
+		source.insert(versionEnd + 1, define);
+		return source;
+	}
+
 	std::string NormalizeShaderPath(std::string path)
 	{
 		for (char& c : path)
@@ -172,7 +182,8 @@ std::string ResourceManager::LoadText(const std::string path, bool forceReload, 
 
 std::shared_ptr<ComputeShader> ResourceManager::GetComputeShader(const std::string name, const std::string source)
 {
-	auto hash = std::hash<std::string>{}(source);
+	const auto formattedSource = InjectFieldFormatDefine(source);
+	auto hash = std::hash<std::string>{}(formattedSource);
 	if (m_ComputeShaders.find(name) != m_ComputeShaders.end())
 	{
 		if (hash == m_ComputeShaders[name].second)
@@ -182,7 +193,7 @@ std::shared_ptr<ComputeShader> ResourceManager::GetComputeShader(const std::stri
 	}
 
 	TF3D_LOG_DEBUG("Compiling compute shader '{}'", name);
-	auto shader = std::make_shared<ComputeShader>(source);
+	auto shader = std::make_shared<ComputeShader>(formattedSource);
 	m_ComputeShaders[name] = std::make_pair(shader, hash);
 
 	return shader;
@@ -190,7 +201,9 @@ std::shared_ptr<ComputeShader> ResourceManager::GetComputeShader(const std::stri
 
 std::shared_ptr<Shader> ResourceManager::GetShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
 {
-	auto hash = std::hash<std::string>{}(vertexSource + fragmentSource);
+	const auto formattedVertexSource = InjectFieldFormatDefine(vertexSource);
+	const auto formattedFragmentSource = InjectFieldFormatDefine(fragmentSource);
+	auto hash = std::hash<std::string>{}(formattedVertexSource + formattedFragmentSource);
 
 	if (m_Shaders.find(name) != m_Shaders.end())
 	{
@@ -201,7 +214,7 @@ std::shared_ptr<Shader> ResourceManager::GetShader(const std::string name, const
 	}
 
 	TF3D_LOG_DEBUG("Compiling shader '{}'", name);
-	auto shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+	auto shader = std::make_shared<Shader>(formattedVertexSource, formattedFragmentSource);
 	m_Shaders[name] = std::make_pair(shader, hash);
 
 	return shader;

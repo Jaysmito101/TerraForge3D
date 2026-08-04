@@ -10,35 +10,12 @@ in VertexData
   vec2 texCoord;
 } fragmentInput;
 
-layout(std430, binding = 0) buffer DataBuffer0
-{
-    vec4 data0[];
-};
-
-layout(std430, binding = 1) buffer DataBuffer1
-{
-    vec4 data1[];
-};
-
-layout(std430, binding = 2) buffer DataBuffer2
-{
-    vec4 data2[];
-};
-
-layout(std430, binding = 3) buffer DataBuffer3
-{
-    vec4 data3[];
-};
-
-layout(std430, binding = 4) buffer DataBuffer4
-{
-    vec4 data4[];
-};
-
-layout(std430, binding = 5) buffer DataBuffer5
-{
-    vec4 data5[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D data0;
+layout(TF3D_FIELD_FORMAT, binding = 1) readonly uniform image2D data1;
+layout(TF3D_FIELD_FORMAT, binding = 2) readonly uniform image2D data2;
+layout(TF3D_FIELD_FORMAT, binding = 3) readonly uniform image2D data3;
+layout(TF3D_FIELD_FORMAT, binding = 4) readonly uniform image2D data4;
+layout(TF3D_FIELD_FORMAT, binding = 5) readonly uniform image2D data5;
 
 
 
@@ -62,12 +39,13 @@ float mapInRange(float value, float minV, float maxV, float newMin, float newMax
 
 vec4 SampleTexture(int index, int textureSlot)
 {
-	if(textureSlot == 0) return data0[index];
-	else if(textureSlot == 1) return data1[index];
-	else if(textureSlot == 2) return data2[index];
-	else if(textureSlot == 3) return data3[index];
-	else if(textureSlot == 4) return data4[index];
-	else if(textureSlot == 5) return data5[index];
+	ivec2 coordinate = ivec2(index % u_Resolution, index / u_Resolution);
+	if(textureSlot == 0) return vec4(imageLoad(data0, coordinate).r);
+	else if(textureSlot == 1) return vec4(imageLoad(data1, coordinate).r);
+	else if(textureSlot == 2) return vec4(imageLoad(data2, coordinate).r);
+	else if(textureSlot == 3) return vec4(imageLoad(data3, coordinate).r);
+	else if(textureSlot == 4) return vec4(imageLoad(data4, coordinate).r);
+	else if(textureSlot == 5) return vec4(imageLoad(data5, coordinate).r);
 	else return vec4(0.0f);
 }
 

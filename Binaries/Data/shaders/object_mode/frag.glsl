@@ -9,10 +9,7 @@ in VertexData
   vec2 texCoord;
 } fragmentInput;
 
-layout(std430, binding = 0) readonly buffer DataBuffer0
-{
-	float data0[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D u_Heightmap;
 
 layout(std430, binding = 1) buffer SharedDataBuffer1
 {

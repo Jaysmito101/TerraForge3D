@@ -42,5 +42,5 @@ void main()
 	float slope = length(vec2(dx, dy));
 	float slopeEnd = u_SlopeLimit + max(u_SlopeSoftness, 0.000001f);
 	float flatInfluence = 1.0f - smoothstep(max(u_SlopeLimit, 0.0f), slopeEnd, slope);
-	outputData[indexOf(coordinate)] = mix(center, filtered, clamp(flatInfluence, 0.0f, 1.0f));
+	writeOutput(coordinate, mix(center, filtered, clamp(flatInfluence, 0.0f, 1.0f)));
 }

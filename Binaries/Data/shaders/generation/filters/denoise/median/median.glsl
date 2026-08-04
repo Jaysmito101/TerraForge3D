@@ -36,5 +36,5 @@ void main()
 		samples[j + 1] = value;
 	}
 
-	outputData[indexOf(coordinate)] = samples[count / 2];
+	writeOutput(coordinate, samples[count / 2]);
 }

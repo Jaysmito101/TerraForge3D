@@ -2,10 +2,7 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(std430, binding = 0) readonly buffer TerrainData
-{
-	float data0[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D TerrainData;
 
 layout(binding = 1, r16) uniform image2D u_MaskTexture;
 
@@ -59,7 +56,7 @@ int PixelCoordToDataOffset(ivec2 coordinate)
 float TerrainValue(ivec2 coordinate)
 {
 	coordinate = clamp(coordinate, ivec2(0), ivec2(u_Resolution - 1));
-	return data0[PixelCoordToDataOffset(coordinate)];
+	return imageLoad(TerrainData, coordinate).r;
 }
 
 float RangeMask(float value)

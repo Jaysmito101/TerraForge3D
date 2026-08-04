@@ -19,5 +19,5 @@ void main()
 		+ sampleInput(coordinate + ivec2(0, -radius))
 		+ sampleInput(coordinate + ivec2(0, radius));
 
-	outputData[indexOf(coordinate)] = surroundingHeight * 0.25f;
+	writeOutput(coordinate, surroundingHeight * 0.25f);
 }

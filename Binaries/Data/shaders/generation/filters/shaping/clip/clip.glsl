@@ -26,5 +26,5 @@ void main()
 	if (coordinate.x >= u_Resolution || coordinate.y >= u_Resolution) return;
 
 	float value = sampleInput(coordinate);
-	outputData[indexOf(coordinate)] = clipValue(value, u_Threshold, u_Side, max(u_Softness, 0.0f));
+	writeOutput(coordinate, clipValue(value, u_Threshold, u_Side, max(u_Softness, 0.0f)));
 }

@@ -28,5 +28,5 @@ void main()
 		value += sampleInput(sampleCoordinate) * weight;
 		weightSum += weight;
 	}
-	outputData[indexOf(coordinate)] = value / max(weightSum, 0.000001f);
+	writeOutput(coordinate, value / max(weightSum, 0.000001f));
 }

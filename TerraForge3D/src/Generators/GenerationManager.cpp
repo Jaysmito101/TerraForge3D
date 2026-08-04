@@ -1,5 +1,6 @@
 #include "Generators/GenerationManager.h"
 #include "Data/ApplicationState.h"
+#include "Data/ConfigManager.h"
 #include "Base/ComputeShader.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
@@ -11,6 +12,12 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 {
 	// if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
 	m_AppState = appState;
+	std::string configuredStorage;
+	if (m_AppState->configManager != nullptr && m_AppState->configManager->GetString("generation", "field_storage", configuredStorage))
+	{
+		GeneratorData::SetDefaultStorage(configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
+	}
+	m_FieldStorageUiMode = GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0;
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = std::make_shared<GeneratorData>();
@@ -386,6 +393,20 @@ void GenerationManager::ShowSettingsDetailed()
 
 void GenerationManager::ShowSettingsGlobalOptions()
 {
+	int storageMode = m_FieldStorageUiMode;
+	const char* storageLabels[] = { "R32F (32-bit float)", "R16F (16-bit float)" };
+	if (ImGui::Combo("Field Storage", &storageMode, storageLabels, IM_ARRAYSIZE(storageLabels)))
+	{
+		m_FieldStorageUiMode = storageMode;
+		m_FieldStorageRestartPending = true;
+		if (m_AppState->configManager != nullptr)
+			m_AppState->configManager->SetString("generation", "field_storage", storageMode == 1 ? "R16F" : "R32F");
+	}
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Controls the precision of generated field textures.");
+	if (m_FieldStorageRestartPending) {
+		ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.2f, 1.0f), "Restart required to apply storage change.");
+	}
+
 	ImGui::Checkbox("Use Seed Texture", &m_UseSeedFromActiveMesh);
 	ImGui::Checkbox("Auto Updation Paused", &m_UpdationPaused);
 

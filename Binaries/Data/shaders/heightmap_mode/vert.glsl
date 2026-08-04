@@ -11,11 +11,6 @@ out VertexData
   vec2 texCoord;
 } vertexOutput;
 
-layout(std430, binding = 0) buffer DataBuffer0
-{
-    float data0[];
-};
-
 uniform int u_Resolution;
 uniform int u_SubTileSize;
 uniform float u_TileSize;

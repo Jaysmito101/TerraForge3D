@@ -21,5 +21,5 @@ void main()
 	float gaussian = exp(-curvature * normalizedRadiusSquared);
 	float dome = (gaussian - edgeValue) / max(1.0f - edgeValue, 0.0001f);
 
-	outputData[indexOf(coordinate)] = clamp(dome * u_CoreStrength, 0.0f, 1.0f);
+	writeOutput(coordinate, clamp(dome * u_CoreStrength, 0.0f, 1.0f));
 }

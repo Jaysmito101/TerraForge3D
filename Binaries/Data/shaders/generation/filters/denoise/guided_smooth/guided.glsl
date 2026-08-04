@@ -35,5 +35,5 @@ void main()
 	float coefficient = variance / (variance + epsilon);
 	float offset = mean - coefficient * mean;
 	float center = sampleInput(coordinate);
-	outputData[indexOf(coordinate)] = coefficient * center + offset;
+	writeOutput(coordinate, coefficient * center + offset);
 }

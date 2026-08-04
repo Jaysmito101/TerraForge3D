@@ -4,15 +4,8 @@
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 // output data buffer
-layout (std430, binding = 0) buffer DataSourceBuffer
-{
-	float dataSource[];
-};
-
-layout (std430, binding = 1) buffer DataTargetBuffer
-{
-	float dataTarget[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D DataSourceTexture;
+layout(TF3D_FIELD_FORMAT, binding = 1) writeonly uniform image2D DataTargetTexture;
 
 // uniforms
 uniform int u_Resolution;
@@ -69,7 +62,7 @@ float gaussianSample(ivec2 offset)
 			ivec2 offsetiv2 = offset + ivec2(i, j);
 			if (offsetiv2.x < 0 || offsetiv2.x >= u_Resolution || offsetiv2.y < 0 || offsetiv2.y >= u_Resolution) continue;
 			float weight = filterMask[i + 2][j + 2];
-			sum += dataSource[PixelCoordToDataOffset(uint(offsetiv2.x), uint(offsetiv2.y))] * weight;
+			sum += imageLoad(DataSourceTexture, offsetiv2).r * weight;
 			weightSum += weight;
 		}
 	}
@@ -81,7 +74,7 @@ float slopeHeightAt(ivec2 coord)
 {
 	coord = clamp(coord, ivec2(0), ivec2(u_Resolution - 1));
 	if (u_UseGaussianPreFilter) return gaussianSample(coord);
-	return dataSource[PixelCoordToDataOffset(uint(coord.x), uint(coord.y))];
+	return imageLoad(DataSourceTexture, coord).r;
 }
 
 float calculateSlopeFactorAtCoord(ivec2 offsetb, ivec2 offsetc, float radius)
@@ -193,15 +186,17 @@ void main(void)
 	else if ( u_TransformFactor == 2)
 	{
 		vec2 transformRange = vec2(min(u_TransformRange.x, u_TransformRange.y), max(u_TransformRange.x, u_TransformRange.y));
-		n = n * tf3d_shape_smoothstep(transformRange.x, transformRange.y, dataSource[offset]);
+		 n = n * tf3d_shape_smoothstep(transformRange.x, transformRange.y, imageLoad(DataSourceTexture, ivec2(offsetv2)).r);
 	}
 
 	n = n * clamp(u_Strength, -4.0f, 4.0f) * clamp(u_Influence, 0.0f, 1.0f);
 
-	if ( u_MixMethod == 0 ) dataTarget[offset] = dataSource[offset] + n;
-	else if ( u_MixMethod == 1 ) dataTarget[offset] = dataSource[offset] * n;
-	else if ( u_MixMethod == 2 ) dataTarget[offset] = dataSource[offset] * n + dataSource[offset];
-	else if ( u_MixMethod == 3 ) dataTarget[offset] = n;
-	else dataTarget[offset] = dataSource[offset];
+	float sourceValue = imageLoad(DataSourceTexture, ivec2(offsetv2)).r;
+	float result = sourceValue;
+	if ( u_MixMethod == 0 ) result = sourceValue + n;
+	else if ( u_MixMethod == 1 ) result = sourceValue * n;
+	else if ( u_MixMethod == 2 ) result = sourceValue * n + sourceValue;
+	else if ( u_MixMethod == 3 ) result = n;
+	imageStore(DataTargetTexture, ivec2(offsetv2), vec4(result, 0.0, 0.0, 0.0));
 
 }

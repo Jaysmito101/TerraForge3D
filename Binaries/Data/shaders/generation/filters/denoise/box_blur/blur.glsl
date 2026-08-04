@@ -23,5 +23,5 @@ void main()
 		sampleCount++;
 	}
 
-	outputData[indexOf(coordinate)] = value / max(float(sampleCount), 1.0f);
+	writeOutput(coordinate, value / max(float(sampleCount), 1.0f));
 }

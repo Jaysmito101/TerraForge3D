@@ -135,9 +135,8 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	source += "\n";
 	source += "// work group size\n";
 	source += "layout (local_size_x = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_y = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_z = 1) in;\n\n";
-	source += "// output data buffer\n";
-	source += "layout(std430, binding = 0) buffer DataBuffer\n";
-	source += "{\n\tfloat data[];\n};\n\n";
+	source += "// output field texture\n";
+	source += "layout(TF3D_FIELD_FORMAT, binding = 0) writeonly uniform image2D DataTexture;\n\n";
 	source += "// uniform variables\n";
 	source += "// default uniforms\n";
 	source += "uniform int u_Resolution;\n";
@@ -178,11 +177,11 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	source += "void main()\n{\n";
 	source += "\tuvec2 offsetv2 = gl_GlobalInvocationID.xy;\n";
 	source += "\tif (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;\n";
-	source += "\tuint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);\n";
+	source += "\tivec2 pixelCoord = ivec2(offsetv2);\n";
 	source += "\tvec2 uv = offsetv2 / float(u_Resolution);\n";
 	source += "\tvec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);\n";
 	source += "\tif (u_UseSeedTexture)\n\t{\n\t\tseed = texture(u_SeedTexture, uv).rgb; \n\t}\n";
-	source += "\tdata[offset] = evaluateBaseShape(uv, seed);\n}\n";
+	source += "\timageStore(DataTexture, pixelCoord, vec4(evaluateBaseShape(uv, seed), 0.0, 0.0, 0.0));\n}\n";
 	return source;
 }
 

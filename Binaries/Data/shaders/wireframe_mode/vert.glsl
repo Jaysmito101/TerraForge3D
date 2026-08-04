@@ -11,10 +11,7 @@ out VertexData
   vec2 texCoord;
 } vertexOutput;
 
-layout(std430, binding = 0) buffer DataBuffer0
-{
-    float data0[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D u_Heightmap;
 
 uniform int u_Resolution;
 uniform int u_SubTileSize;
@@ -34,7 +31,7 @@ void main()
 {
     vec2 texCoord = aTexCoord.xy;
     ivec2 pointCoord = ivec2(texCoord * 0.975f * u_Resolution);
-    vec3 position = aPosition.xyz + aNormal.xyz * data0[PixelCoordToDataOffset(pointCoord.x, pointCoord.y)];
+	vec3 position = aPosition.xyz + aNormal.xyz * imageLoad(u_Heightmap, pointCoord).r;
     //vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;

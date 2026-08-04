@@ -101,5 +101,7 @@ private:
 	std::atomic_bool m_StopGenerationWorker = false;
 
 	int32_t m_SeedTextureResolution = 256;
+	int m_FieldStorageUiMode = 0;
+	bool m_FieldStorageRestartPending = false;
 	SelectedUINode m_SelectedNodeUI;
 };

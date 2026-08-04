@@ -4,15 +4,8 @@
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 // output data buffer
-layout(std430, binding = 0) buffer DataSourceBuffer
-{
-	float dataSource[];
-};
-
-layout(std430, binding = 1) buffer DataTargetBuffer
-{
-	float dataTarget[];
-};
+layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D DataSourceTexture;
+layout(TF3D_FIELD_FORMAT, binding = 1) uniform image2D DataTargetTexture;
 
 // uniforms
 uniform int u_Resolution;
@@ -33,12 +26,12 @@ void main(void)
 	if (offsetv2.x >= u_Resolution || offsetv2.y >= u_Resolution) return;
 
 
-	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
+	ivec2 pixelCoord = ivec2(offsetv2);
 
 
 	if (u_Mode == 0) 
 	{
-		dataTarget[offset] = 0.0f;
+		imageStore(DataTargetTexture, pixelCoord, vec4(0.0f));
 	}
 	else if (u_Mode == 1)
 	{
@@ -48,7 +41,9 @@ void main(void)
 			factor = texelFetch(u_BiomeMask, ivec2(offsetv2), 0).r;
 		}
 
-		dataTarget[offset] = dataTarget[offset] + u_Strength * dataSource[offset] * factor;
+		float current = imageLoad(DataTargetTexture, pixelCoord).r;
+		float source = imageLoad(DataSourceTexture, pixelCoord).r;
+		imageStore(DataTargetTexture, pixelCoord, vec4(current + u_Strength * source * factor, 0.0, 0.0, 0.0));
 	}
 }
 

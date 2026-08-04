@@ -22,7 +22,7 @@ void main()
 
 	if (!u_HasHeightmap)
 	{
-		outputData[indexOf(coordinate)] = 1.0e20f;
+		writeOutput(coordinate, 1.0e20f);
 		return;
 	}
 
@@ -39,7 +39,7 @@ void main()
 	float coverage = feather > 0.0001f ? smoothstep(0.0f, feather, edgeDistance) : step(0.0f, edgeDistance);
 	if (coverage <= 0.0001f)
 	{
-		outputData[indexOf(coordinate)] = 1.0e20f;
+		writeOutput(coordinate, 1.0e20f);
 		return;
 	}
 
@@ -47,5 +47,5 @@ void main()
 	if (u_Invert) height = 1.0f - height;
 
 	float importedHeight = height * u_HeightScale + u_HeightOffset;
-	outputData[indexOf(coordinate)] = mix(sampleInput(coordinate), importedHeight, coverage);
+	writeOutput(coordinate, mix(sampleInput(coordinate), importedHeight, coverage));
 }
