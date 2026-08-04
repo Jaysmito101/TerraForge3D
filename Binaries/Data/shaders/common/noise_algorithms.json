@@ -1,0 +1,15 @@
+{
+  "Default": "Simplex",
+  "Algorithms": [
+    { "Id": 0, "Token": "BILLOW", "Label": "Billow", "Description": "Soft cloud-like lobes made from the absolute value of noise." },
+    { "Id": 1, "Token": "SIMPLEX", "Label": "Simplex", "Description": "Smooth, low-artifact gradient noise with organic variation." },
+    { "Id": 2, "Token": "PERLIN", "Label": "Perlin", "Description": "Classic lattice gradient noise for familiar terrain-like variation." },
+    { "Id": 3, "Token": "GABOR", "Label": "Gabor", "Description": "Directional oscillations with controllable local frequency." },
+    { "Id": 4, "Token": "VALUE", "Label": "Value", "Description": "Smooth interpolation between deterministic random cell values." },
+    { "Id": 5, "Token": "PHASOR", "Label": "Phasor", "Description": "Smooth periodic bands driven by a changing phase field." },
+    { "Id": 6, "Token": "RIDGED", "Label": "Ridged", "Description": "Sharp mountain-like crests made by folding the noise signal." },
+    { "Id": 7, "Token": "VORONOI", "Label": "Voronoi", "Description": "Cell and cell-edge patterns from a jittered feature-point lattice." },
+    { "Id": 8, "Token": "WHITE", "Label": "White", "Description": "Crisp unfiltered grain with intentionally strong local contrast." },
+    { "Id": 9, "Token": "WORLEY", "Label": "Worley", "Description": "Distance to the nearest feature point in a jittered lattice." }
+  ]
+}
