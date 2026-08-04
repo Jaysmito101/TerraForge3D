@@ -107,7 +107,8 @@ float calculateSlopeFactorAtCoord(ivec2 offsetb, ivec2 offsetc, float radius)
 		10.0f * slopeHeightAt(center + ivec2( 0, -stepPixels)) -
 		 3.0f * slopeHeightAt(center + ivec2( stepPixels, -stepPixels))) / (32.0f * step);
 
-	return length(vec2(dX, dY)) * float(u_Resolution);
+	float slopeGradient = length(vec2(dX, dY)) * float(u_Resolution);
+	return clamp(atan(slopeGradient) / 1.57079632679f, 0.0f, 1.0f);
 }
 
 float calculateSlopeFactor()
@@ -176,7 +177,7 @@ void main(void)
 	{
 		float octaveStrength = clamp(u_NoiseOctaveStrengths[i], 0.0f, 1.0f);
 		float pixelsPerFeature = float(u_Resolution) / max(2.0f * octaveFrequency, 0.0001f);
-		float antiAliasWeight = smoothstep(4.0f, 8.0f, pixelsPerFeature);
+		float antiAliasWeight = smoothstep(8.0f, 16.0f, pixelsPerFeature);
 		float effectiveStrength = octaveStrength * antiAliasWeight;
 		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + float(i) * 11.73f)
 			* amplitude * effectiveStrength;
