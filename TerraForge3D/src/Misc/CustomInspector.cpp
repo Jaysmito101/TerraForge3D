@@ -581,6 +581,51 @@ void CustomInspector::Load(SerializerNode node)
 	}
 }
 
+bool CustomInspector::LoadConfig(const nlohmann::json& config)
+{
+	Clear();
+	if (!config.contains("Params") || !config["Params"].is_array())
+	{
+		AddTextWidget("No parameters available");
+		return true;
+	}
+
+	try
+	{
+		for (const auto& parameter : config["Params"])
+		{
+			const auto& value = AddVairableFromConfig(parameter);
+			const std::string widgetType = parameter.value("Widget", "Input");
+			const std::string widgetLabel = parameter.value("Label", value.GetName());
+			auto& widget = AddWidgetFromString(widgetLabel, widgetType, value.GetName());
+			if (parameter.contains("Sensitivity")) widget.SetSpeed(parameter["Sensitivity"].get<float>());
+			if (parameter.contains("Options")) widget.SetDropdownOptions(parameter["Options"].get<std::vector<std::string>>());
+			if (parameter.contains("Constraints"))
+			{
+				const auto& constraints = parameter["Constraints"];
+				if (constraints.is_array() && constraints.size() >= 2)
+				{
+					const float c0 = constraints[0].get<float>();
+					const float c1 = constraints[1].get<float>();
+					const float c2 = constraints.size() > 2 ? constraints[2].get<float>() : 0.0f;
+					const float c3 = constraints.size() > 3 ? constraints[3].get<float>() : 0.0f;
+					widget.SetConstraints(c0, c1, c2, c3);
+				}
+			}
+			if (parameter.contains("Tooltip")) widget.SetTooltip(parameter["Tooltip"].get<std::string>());
+			else if (parameter.contains("Description")) widget.SetTooltip(parameter["Description"].get<std::string>());
+			if (parameter.contains("Conditional"))
+				widget.SetRenderOnCondition(parameter["Conditional"].get<std::string>(), parameter.value("ConditionalValue", 1));
+		}
+	}
+	catch (const std::exception& exception)
+	{
+		TF3D_LOG_ERROR("Failed to load inspector metadata: {}", exception.what());
+		return false;
+	}
+	return true;
+}
+
 CustomInspectorWidget& CustomInspector::SetWidgetDropdownOptions(const std::string& label, const std::vector<std::string>& options)
 {
 	auto& widget = m_Widgets[label];

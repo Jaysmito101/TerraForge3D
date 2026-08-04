@@ -313,6 +313,7 @@ public:
 	void LoadData(SerializerNode node);
 	SerializerNode Save() const;
 	void Load(SerializerNode node);
+	bool LoadConfig(const nlohmann::json& config);
 
 	bool Render();
 
