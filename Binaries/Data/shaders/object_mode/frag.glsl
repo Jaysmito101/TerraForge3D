@@ -10,11 +10,10 @@ in VertexData
   vec2 texCoord;
 } fragmentInput;
 
-layout(std430, binding = 0) buffer DataBuffer0
+layout(std430, binding = 0) readonly buffer DataBuffer0
 {
 	float data0[];
 };
-
 
 layout(std430, binding = 1) buffer SharedDataBuffer1
 {
@@ -57,35 +56,17 @@ int PixelCoordToDataOffset(int x, int y)
 	return y * u_Resolution + x;
 }
 
-// From : https://stackoverflow.com/a/5261402/14911094
-mat3 calculateTBN()
-{
-	vec3 p_dx = dFdx(fragmentInput.position);
-	vec3 p_dy = dFdy(fragmentInput.position);
-	vec2 tc_dx = dFdx(fragmentInput.texCoord);
-	vec2 tc_dy = dFdy(fragmentInput.texCoord);
-	vec3 t = normalize(p_dx * tc_dy.y - p_dy * tc_dx.y);
-	vec3 b = normalize(-p_dx * tc_dy.x + p_dy * tc_dx.x);
-	vec3 n = cross(t, b);
-	return mat3(t, b, n);
-}
+#include "common/height_sampling.glsl"
 
 vec3 calculateNormal()
 {
-	ivec2 pointCoord = clamp(
-		ivec2(round(fragmentInput.texCoord * float(u_Resolution - 1))),
-		ivec2(0),
-		ivec2(u_Resolution - 1)
-	);
-	ivec2 topCoord = ivec2(pointCoord.x, max(pointCoord.y - 1, 0));
-	ivec2 bottomCoord = ivec2(pointCoord.x, min(pointCoord.y + 1, u_Resolution - 1));
-	ivec2 leftCoord = ivec2(max(pointCoord.x - 1, 0), pointCoord.y);
-	ivec2 rightCoord = ivec2(min(pointCoord.x + 1, u_Resolution - 1), pointCoord.y);
-	float T = data0[topCoord.y * u_Resolution + topCoord.x];
-	float B = data0[bottomCoord.y * u_Resolution + bottomCoord.x];
-	float R = data0[rightCoord.y * u_Resolution + rightCoord.x];
-	float L = data0[leftCoord.y * u_Resolution + leftCoord.x];
-	return normalize(vec3(2*(R-L), 2*(B-T), -4)) * (u_InvertNormals ? 1.0f : -1.0f);
+	vec3 up = normalize(fragmentInput.normal);
+	float height = SampleHeightBilinear(fragmentInput.texCoord);
+	vec3 basePosition = fragmentInput.position - up * dot(fragmentInput.position, up);
+	vec3 dx = dFdx(basePosition) + up * dFdx(height);
+	vec3 dy = dFdy(basePosition) + up * dFdy(height);
+	vec3 normal = normalize(cross(dx, dy));
+	return u_InvertNormals ? -normal : normal;
 }
 
 // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
@@ -112,8 +93,7 @@ void main()
 		}
 	}
 
-	mat3 TBN = calculateTBN();
-	vec3 normal  = calculateNormal(); normal = normalize(TBN * normal);
+	vec3 normal = calculateNormal();
 	vec3 outputColor = vec3(0.0f);	
 	float diff = 0.0f, spec = 0.0f, atten = 0.0f;
 	for(int i = 0 ; i < u_LightCount ; i ++)
