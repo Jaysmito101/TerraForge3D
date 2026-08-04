@@ -78,6 +78,18 @@ namespace
 		case CustomInspectorValueType_Texture:
 			if (value.GetTexture() != nullptr) shader->SetUniform1i(uniformName, value.GetTexture()->Bind(textureSlot++));
 			break;
+		case CustomInspectorValueType_Curve:
+		{
+			const std::string pointCountUniform = binding != nullptr && binding->is_object()
+				? binding->value("PointCountUniform", uniformName + "PointCount")
+				: uniformName + "PointCount";
+			shader->SetUniform1i(pointCountUniform, glm::clamp(value.GetCurvePointCount(), 2, static_cast<int>(CustomInspectorMaxCurvePoints)));
+			for (size_t pointIndex = 0; pointIndex < CustomInspectorMaxCurvePoints; ++pointIndex)
+			{
+				shader->SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", value.GetCurvePoints()[pointIndex]);
+			}
+			break;
+		}
 		case CustomInspectorValueType_String:
 		case CustomInspectorValueType_Unknown:
 		default:
