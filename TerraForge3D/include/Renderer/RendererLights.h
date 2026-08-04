@@ -4,20 +4,12 @@
 
 class ApplicationState;
 
-enum RendererLightType
-{
-	RendererLightType_Directional = 0,
-	RendererLightType_Point,
-	RendererLightType_Count
-};
-
-struct RendererLightData
+struct RendererSunData
 {
 	char name[1024];
-	glm::vec3 position = glm::vec3(0.0f); // or direction
+	glm::vec3 direction = glm::vec3(-1.0f, -1.0f, -1.0f);
 	glm::vec3 color = glm::vec3(1.0f);
-	float intensity = 1.0f;
-	RendererLightType type = RendererLightType_Directional;
+	float intensity = 0.5f;
 };
 
 class RendererLights
@@ -29,7 +21,7 @@ public:
 	void ShowSettings();
 
 public:
-	std::vector<RendererLightData> m_RendererLights;
+	RendererSunData m_Sun;
 	bool m_UseSkyLight = true;
 	float m_SkyLightIntensity = 0.6f;
 

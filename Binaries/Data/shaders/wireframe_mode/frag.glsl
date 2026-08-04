@@ -15,20 +15,6 @@ layout(std430, binding = 0) buffer DataBuffer0
     float data0[];
 };
 
-#define MAX_LIGHTS 16
-#define LIGHT_TYPE_DIRECTIONAL 0
-#define LIGHT_TYPE_POINT	   1
-
-struct RendererLightData
-{
-	vec3 position;
-	vec3 color;
-	float intensity;
-	int type;
-};
-
-uniform RendererLightData u_Lights[MAX_LIGHTS];
-uniform int u_LightCount;
 uniform int u_Resolution;
 uniform int u_SubTileSize;
 uniform float u_TileSize;

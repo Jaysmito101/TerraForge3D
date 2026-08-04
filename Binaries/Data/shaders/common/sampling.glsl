@@ -18,10 +18,17 @@ vec2 tf3d_sampleHammersley(uint i, uint sampleCount)
 	return vec2(float(i) / float(sampleCount), tf3d_radicalInverseVdc(i));
 }
 
-// Uniformly sample point on a hemisphere.
-// Cosine-weighted sampling would be a better fit for Lambertian BRDF but since this
-// compute shader runs only once as a pre-processing step performance is not *that* important.
+// Cosine-weighted hemisphere sample for Lambertian irradiance integration.
+// Its PDF is cos(theta) / PI, so the irradiance estimator is PI * Li.
 // See: "Physically Based Rendering" 2nd ed., section 13.6.1.
+vec3 tf3d_sampleCosineHemisphere(float u1, float u2)
+{
+	float radius = sqrt(u1);
+	float phi = TF3D_TWO_PI * u2;
+	return vec3(cos(phi) * radius, sin(phi) * radius, sqrt(max(0.0, 1.0 - u1)));
+}
+
+// Retained for callers that need a uniform hemisphere distribution.
 vec3 tf3d_sampleHemisphere(float u1, float u2)
 {
 	float r = sqrt(max(0.0, 1.0 - u1 * u1));

@@ -1,7 +1,6 @@
 #include "Renderer/ObjectRenderer.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
-#include <algorithm>
 
 ObjectRenderer::ObjectRenderer(ApplicationState* appState)
 {
@@ -51,21 +50,19 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	}
 
 
-	auto& rendererLights = m_AppState->rendererManager->GetRendererLights()->m_RendererLights; auto renderLightsCount = std::min((int)rendererLights.size(), OBJECT_RENDERER_MAX_LIGHTS);
+	const auto& sun = m_AppState->rendererManager->GetRendererLights()->m_Sun;
+	glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SunDirection"), sun.direction.x, sun.direction.y, sun.direction.z);
+	glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SunColor"), sun.color.x, sun.color.y, sun.color.z);
+	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SunIntensity"), sun.intensity);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_EnableSkyLight"), (m_AppState->rendererManager->GetRendererLights()->m_UseSkyLight && m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady()) ? GL_TRUE : GL_FALSE);
-	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SkyLightIntensity"), (m_AppState->rendererManager->GetRendererLights()->m_SkyLightIntensity));
+	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SkyLightIntensity"), m_AppState->rendererManager->GetRendererLights()->m_SkyLightIntensity);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap());
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap() : 0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IrradianceMap"), 1);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_LightCount"), (int)renderLightsCount); 
-	for (int i = 0; i < rendererLights.size(); i++) 
-	{  
-		glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_Lights[" + std::to_string(i) + "].position").c_str()), rendererLights[i].position.x, rendererLights[i].position.y, rendererLights[i].position.z);
-		glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_Lights[" + std::to_string(i) + "].color").c_str()), rendererLights[i].color.x, rendererLights[i].color.y, rendererLights[i].color.z);
-		glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_Lights[" + std::to_string(i) + "].intensity").c_str()), rendererLights[i].intensity);
-		glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_Lights[" + std::to_string(i) + "].type").c_str()), rendererLights[i].type);
-	}
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetSkyboxMap() : 0);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SkyboxMap"), 2);
 	
 	m_AppState->mainModel->Render();
 

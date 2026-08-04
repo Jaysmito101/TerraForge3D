@@ -3,8 +3,6 @@
 #include "Renderer/RendererBase.h"
 #include "Renderer/BrushSettings.h"
 
-#define OBJECT_RENDERER_MAX_LIGHTS 16
-
 struct BiomeCustomBaseShapeDrawSettings;
 
 
