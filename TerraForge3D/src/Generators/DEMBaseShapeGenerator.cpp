@@ -56,6 +56,13 @@ DEMBaseShapeGenerator::~DEMBaseShapeGenerator()
 
 bool DEMBaseShapeGenerator::ShowSettings()
 {
+	if (m_ViewInteractionPending &&
+		std::chrono::steady_clock::now() - m_LastViewInteractionTime >= std::chrono::milliseconds(kTileRequestDebounceMilliseconds))
+	{
+		m_ViewInteractionPending = false;
+		m_RequireUpdation = true;
+	}
+
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
 		ImGui::Text("Time Taken : %f", m_CalculationTime);
@@ -83,16 +90,26 @@ bool DEMBaseShapeGenerator::ShowSettings()
 	if (m_APIKey.empty())
 		ImGui::TextDisabled("Add a MapTiler Cloud key before downloading elevation tiles.");
 
-	BIOME_UI_PROPERTY(ImGui::Checkbox("Automatic Tile Zoom", &m_AutoZoomResolution));
+	if (ImGui::Checkbox("Automatic Tile Zoom", &m_AutoZoomResolution))
+	{
+		m_RequireUpdation = true;
+		MarkViewInteraction();
+	}
 	if (!m_AutoZoomResolution)
 	{
-		BIOME_UI_PROPERTY(ImGui::SliderInt("Manual Tile Zoom", &m_ZoomResolution, 0, kMaxTileZoom));
+		if (ImGui::SliderInt("Manual Tile Zoom", &m_ZoomResolution, 0, kMaxTileZoom))
+		{
+			m_RequireUpdation = true;
+			MarkViewInteraction();
+		}
 	}
 	int previewZoom = GetEffectiveZoomResolution();
 	int previewTileCount = GetVisibleTileCount(previewZoom);
 	ImGui::Text("Effective tile zoom: %d (%s)", previewZoom, m_AutoZoomResolution ? "automatic" : "manual");
 	ImGui::TextDisabled("Visible tiles: %d/%d | pending requests: %d/%d", previewTileCount, kMaxVisibleTiles, static_cast<int>(m_TextureDownloadQueue.size()), kMaxPendingTileRequests);
-	ImGui::TextDisabled("At most %d new requests per refresh, with a short delay between requests.", kMaxRequestsPerRefresh);
+	ImGui::TextDisabled("Rendered tiles: %d high-res | %d fallback-covered", m_TilesUsingCount, m_TilesFallbackCount);
+	ImGui::TextDisabled("At most %d new requests per refresh; downloads wait %d ms after view movement.",
+		kMaxRequestsPerRefresh, kTileRequestDebounceMilliseconds);
 
 	m_MapStrength = std::clamp(m_MapStrength, 0.0f, 20.0f);
 	BIOME_UI_PROPERTY(ImGui::DragFloat("Strength", &m_MapStrength, 0.01f, 0.0f, 20.0f));
@@ -130,11 +147,11 @@ bool DEMBaseShapeGenerator::ShowSettings()
 		m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
 		m_MapCenter.x = std::clamp(m_MapCenter.x, -4.0f, 4.0f);
 		m_MapCenter.y = std::clamp(m_MapCenter.y, -4.0f, 4.0f);
-		m_RequireUpdation = true;
+		MarkViewInteraction();
 	}
 
-	BIOME_UI_PROPERTY(ImGui::DragFloat("View Zoom", &m_ZoomOnMap, 0.05f, 1.0f, 4096.0f));
-	BIOME_UI_PROPERTY(ImGui::DragFloat2("Center Position", glm::value_ptr(m_MapCenter), 0.01f));
+	if (ImGui::DragFloat("View Zoom", &m_ZoomOnMap, 0.05f, 1.0f, 4096.0f)) MarkViewInteraction();
+	if (ImGui::DragFloat2("Center Position", glm::value_ptr(m_MapCenter), 0.01f)) MarkViewInteraction();
 	m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
 	m_MapCenter.x = std::clamp(m_MapCenter.x, -4.0f, 4.0f);
 	m_MapCenter.y = std::clamp(m_MapCenter.y, -4.0f, 4.0f);
@@ -142,6 +159,51 @@ bool DEMBaseShapeGenerator::ShowSettings()
 
 
 	return m_RequireUpdation;
+}
+
+void DEMBaseShapeGenerator::MarkViewInteraction()
+{
+	m_ViewInteractionPending = true;
+	m_LastViewInteractionTime = std::chrono::steady_clock::now();
+	m_RequireUpdation = true;
+}
+
+std::shared_ptr<Texture2D> DEMBaseShapeGenerator::FindBestAvailableTile(
+	uint32_t x, uint32_t y, uint32_t z, TextureCacheKey& resolvedKey)
+{
+	if (z == 0) return nullptr;
+	bool requestedNearestFallback = false;
+	for (int32_t fallbackZoom = static_cast<int32_t>(z) - 1; fallbackZoom >= 0; --fallbackZoom)
+	{
+		const uint32_t shift = z - static_cast<uint32_t>(fallbackZoom);
+		const TextureCacheKey candidateKey(x >> shift, y >> shift, static_cast<uint32_t>(fallbackZoom));
+		auto cached = m_TextureCache.find(candidateKey);
+		if (cached != m_TextureCache.end())
+		{
+			resolvedKey = candidateKey;
+			return cached->second;
+		}
+
+		const auto path = fmt::vformat(m_TerrainRGBDataCacheFileFormat,
+			fmt::make_format_args(std::get<0>(candidateKey), std::get<1>(candidateKey), std::get<2>(candidateKey)));
+		if (!PathExist(path))
+		{
+			if (!requestedNearestFallback)
+			{
+				LoadTile(std::get<0>(candidateKey), std::get<1>(candidateKey), std::get<2>(candidateKey));
+				requestedNearestFallback = true;
+			}
+			continue;
+		}
+
+		auto tile = LoadTile(std::get<0>(candidateKey), std::get<1>(candidateKey), std::get<2>(candidateKey));
+		if (HasTileLoaded(std::get<0>(candidateKey), std::get<1>(candidateKey), std::get<2>(candidateKey)))
+		{
+			resolvedKey = candidateKey;
+			return tile;
+		}
+	}
+	return nullptr;
 }
 
 void DEMBaseShapeGenerator::GetVisibleTileRange(int32_t zoomResolution, int32_t& minTileX, int32_t& maxTileX, int32_t& minTileY, int32_t& maxTileY) const
@@ -190,6 +252,13 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 {
 	START_PROFILER();
 	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
+	const auto now = std::chrono::steady_clock::now();
+	if (m_ViewInteractionPending
+		&& now - m_LastViewInteractionTime >= std::chrono::milliseconds(kTileRequestDebounceMilliseconds))
+	{
+		m_ViewInteractionPending = false;
+	}
+	m_AllowTileRequestsThisUpdate = !m_ViewInteractionPending;
 	m_ZoomOnMap = std::clamp(m_ZoomOnMap, 1.0f, 4096.0f);
 	m_MapCenter.x = std::clamp(m_MapCenter.x, -4.0f, 4.0f);
 	m_MapCenter.y = std::clamp(m_MapCenter.y, -4.0f, 4.0f);
@@ -201,8 +270,6 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	GetVisibleTileRange(m_EffectiveZoomResolution, minTileX, maxTileX, minTileY, maxTileY);
 	const int32_t requestedZoom = std::clamp(m_ZoomResolution, 0, kMaxTileZoom);
 	m_TilesSkippedCount = std::max(0, GetVisibleTileCount(requestedZoom) - m_VisibleTileCount);
-
-	auto tileSize = 1.0f / (1 << m_EffectiveZoomResolution);
 
 	buffer->Bind(0);
 	m_Shader->Bind();
@@ -217,25 +284,68 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	m_Shader->SetUniform1i("u_Mode", 1);
 	m_Shader->SetUniform1f("u_ZoomOnMap", m_ZoomOnMap);
 	m_Shader->SetUniform1f("u_MapStrength", m_MapStrength);
-	m_Shader->SetUniform1f("u_RegionTileSize", tileSize * m_ZoomOnMap);
 
-	
 	m_TilesUsingCount = 0;
+	m_TilesFallbackCount = 0;
+	struct PreviewTile
+	{
+		TextureCacheKey key;
+		std::shared_ptr<Texture2D> texture;
+	};
+	std::vector<PreviewTile> fallbackTiles;
+	std::vector<PreviewTile> highResolutionTiles;
+	const auto effectiveZoom = static_cast<uint32_t>(m_EffectiveZoomResolution);
 	for (int yi = minTileY; yi <= maxTileY; ++yi)
 	{
 		for (int xi = minTileX; xi <= maxTileX; ++xi)
 		{
-			glm::vec2 startPos = (m_MapCenter + glm::vec2(tileSize * xi, tileSize * yi)) * m_ZoomOnMap;
-			glm::vec2 endPos = startPos + glm::vec2(tileSize * m_ZoomOnMap);
-			auto tile = GetTile(static_cast<uint32_t>(xi), static_cast<uint32_t>(yi), static_cast<uint32_t>(m_EffectiveZoomResolution));
-			if (!HasTileLoaded(static_cast<uint32_t>(xi), static_cast<uint32_t>(yi), static_cast<uint32_t>(m_EffectiveZoomResolution)))
+			const auto tileX = static_cast<uint32_t>(xi);
+			const auto tileY = static_cast<uint32_t>(yi);
+			auto exactTile = m_TextureCache.find(TextureCacheKey(tileX, tileY, effectiveZoom));
+			if (exactTile != m_TextureCache.end())
+			{
+				highResolutionTiles.push_back({ TextureCacheKey(tileX, tileY, effectiveZoom), exactTile->second });
 				continue;
-			m_Shader->SetUniform1i("u_DEMTexture", tile->Bind(0));
-			m_Shader->SetUniform4f("u_RegionToUpdate", glm::vec4(startPos, endPos));
-			// TODO: [PLAN] do not dispatch based on map tile but texture tile
-			m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
-			m_TilesUsingCount++;
+			}
+
+			TextureCacheKey fallbackKey;
+			auto fallback = FindBestAvailableTile(tileX, tileY, effectiveZoom, fallbackKey);
+			if (fallback != nullptr)
+			{
+				const auto duplicate = std::find_if(fallbackTiles.begin(), fallbackTiles.end(),
+					[&fallbackKey](const PreviewTile& candidate) { return candidate.key == fallbackKey; });
+				if (duplicate == fallbackTiles.end())
+					fallbackTiles.push_back({ fallbackKey, fallback });
+				++m_TilesFallbackCount;
+			}
+
+			auto tile = GetTile(tileX, tileY, effectiveZoom);
+			if (HasTileLoaded(tileX, tileY, effectiveZoom))
+				highResolutionTiles.push_back({ TextureCacheKey(tileX, tileY, effectiveZoom), tile });
 		}
+	}
+
+	auto renderPreviewTile = [&](const PreviewTile& previewTile)
+	{
+		const auto tileZoom = std::get<2>(previewTile.key);
+		const float tileSize = 1.0f / static_cast<float>(1u << tileZoom);
+		const glm::vec2 startPos = (m_MapCenter + glm::vec2(
+			tileSize * static_cast<float>(std::get<0>(previewTile.key)),
+			tileSize * static_cast<float>(std::get<1>(previewTile.key)))) * m_ZoomOnMap;
+		const glm::vec2 endPos = startPos + glm::vec2(tileSize * m_ZoomOnMap);
+		m_Shader->SetUniform1f("u_RegionTileSize", tileSize * m_ZoomOnMap);
+		m_Shader->SetUniform1i("u_DEMTexture", previewTile.texture->Bind(0));
+		m_Shader->SetUniform4f("u_RegionToUpdate", glm::vec4(startPos, endPos));
+		m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+	};
+
+	for (const auto& tile : fallbackTiles) {
+		renderPreviewTile(tile);
+	}
+	for (const auto& tile : highResolutionTiles)
+	{
+		renderPreviewTile(tile);
+		++m_TilesUsingCount;
 	}
 
 	// update the visualizer map
@@ -324,6 +434,7 @@ std::shared_ptr<Texture2D> DEMBaseShapeGenerator::LoadTile(uint32_t x, uint32_t 
 	if (!PathExist(path))
 	{
 		if (m_APIKey.empty()) return m_NullTexture;
+		if (!m_AllowTileRequestsThisUpdate) return m_LoadingTexture;
 		if (static_cast<int32_t>(m_TextureDownloadQueue.size()) >= kMaxPendingTileRequests
 			|| m_RequestsScheduledThisUpdate >= kMaxRequestsPerRefresh
 			|| now < m_NextTileRequestTime)

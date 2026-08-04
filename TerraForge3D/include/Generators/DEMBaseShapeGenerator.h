@@ -53,6 +53,8 @@ public:
 
 private:
 	void DownloadTerrainRGBTexture(TextureCacheKey key);
+	void MarkViewInteraction();
+	std::shared_ptr<Texture2D> FindBestAvailableTile(uint32_t x, uint32_t y, uint32_t z, TextureCacheKey& resolvedKey);
 	int32_t GetEffectiveZoomResolution() const;
 	void GetVisibleTileRange(int32_t zoomResolution, int32_t& minTileX, int32_t& maxTileX, int32_t& minTileY, int32_t& maxTileY) const;
 	int32_t GetVisibleTileCount(int32_t zoomResolution) const;
@@ -65,12 +67,16 @@ private:
 	float m_MapStrength = 1.0f;
 	float m_CalculationTime = 0.0f;
 	int m_TilesUsingCount = 0;
+	int m_TilesFallbackCount = 0;
 	int m_VisibleTileCount = 0;
 	int m_TilesSkippedCount = 0;
 	glm::vec2 m_MapCenter = glm::vec2(0.0f);
 	bool m_AutoZoomResolution = true;
 	int m_RequestsScheduledThisUpdate = 0;
 	std::chrono::steady_clock::time_point m_NextTileRequestTime = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point m_LastViewInteractionTime = std::chrono::steady_clock::time_point::min();
+	bool m_ViewInteractionPending = false;
+	bool m_AllowTileRequestsThisUpdate = true;
 	
 	
 	bool m_RequireUpdation = true;
@@ -96,4 +102,5 @@ private:
 	static constexpr int32_t kMaxPendingTileRequests = 8;
 	static constexpr int32_t kMaxRequestsPerRefresh = 4;
 	static constexpr int32_t kTileRequestIntervalMilliseconds = 300;
+	static constexpr int32_t kTileRequestDebounceMilliseconds = 300;
 };
