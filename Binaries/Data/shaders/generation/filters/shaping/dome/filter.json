@@ -1,0 +1,64 @@
+{
+    "ID": "dome",
+    "Name": "Dome",
+    "Category": "Shaping",
+    "Implementation": "PhaseChain",
+    "Description": "Applies a square-fitted Gaussian dome that preserves the center and attenuates terrain toward the map edges.",
+    "Phases": {
+        "Dome": "dome",
+        "Merge": "../../common/merge"
+    },
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "Dome",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Dome",
+                "Input": "Current",
+                "Output": "Dome",
+                "Uniforms": {
+                    "u_CoreStrength": {
+                        "Parameter": "CoreStrength"
+                    },
+                    "u_Curvature": {
+                        "Parameter": "Curvature"
+                    }
+                }
+            }
+        ],
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "Dome",
+            "Output": "Next"
+        }
+    },
+    "Params": [
+        {
+            "Name": "CoreStrength",
+            "Type": "Float",
+            "Default": 1.0,
+            "Widget": "Slider",
+            "Constraints": [0.0, 1.0],
+            "Label": "Core strength",
+            "Description": "Sets the maximum dome value at the center of the square region.",
+            "Tooltip": "With Multiply merge, 1.0 preserves the center and lower values attenuate it as well as the edges."
+        },
+        {
+            "Name": "Curvature",
+            "Type": "Float",
+            "Default": 2.0,
+            "Widget": "Slider",
+            "Constraints": [0.1, 16.0],
+            "Label": "Curvature / exponent",
+            "Description": "Controls how quickly the Gaussian dome falls from the center toward the square boundary.",
+            "Tooltip": "Higher values keep the core tighter and produce stronger edge attenuation."
+        }
+    ]
+}
