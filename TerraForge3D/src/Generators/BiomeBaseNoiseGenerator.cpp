@@ -18,46 +18,62 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 	m_NoiseOctaveStrengths[0] = m_NoiseOctaveStrengths[1] = 0.0f;
 	{
 		m_Inspector->AddIntegerVariable("Seed", 152);
-		m_Inspector->AddSeedWidget("Seed", "Seed");
+		auto& seedWidget = m_Inspector->AddSeedWidget("Seed", "Seed");
+		seedWidget.SetTooltip("Random seed used to generate the base noise pattern.");
 
 		m_Inspector->AddFloatVariable("Influence", 0.5f);
-		m_Inspector->AddSliderWidget("Influence", "Influence", 0.0f, 1.0f);
+		auto& influenceWidget = m_Inspector->AddSliderWidget("Influence", "Influence", 0.0f, 1.0f);
+		influenceWidget.SetTooltip("Controls how strongly this generator contributes to the final biome output.");
 
 		m_Inspector->AddFloatVariable("Strength", 1.0f);
-		m_Inspector->AddDragWidget("Strength", "Strength", 0.0f, 0.0f, 0.01f);
+		auto& strengthWidget = m_Inspector->AddDragWidget("Strength", "Strength", 0.0f, 0.0f, 0.01f);
+		strengthWidget.SetTooltip("Scales the amplitude of the generated noise.");
 
 		m_Inspector->AddFloatVariable("Frequency", 0.45f);
-		m_Inspector->AddDragWidget("Frequency", "Frequency", 0.0f, 0.0f, 0.01f);
+		auto& frequencyWidget = m_Inspector->AddDragWidget("Frequency", "Frequency", 0.0f, 0.0f, 0.01f);
+		frequencyWidget.SetTooltip("Controls how dense the noise detail is across the map.");
 
 		m_Inspector->AddFloatVariable("Lacunarity", 1.8f);
-		m_Inspector->AddDragWidget("Lacunarity", "Lacunarity", 0.0f, 0.0f, 0.01f);
+		auto& lacunarityWidget = m_Inspector->AddDragWidget("Lacunarity", "Lacunarity", 0.0f, 0.0f, 0.01f);
+		lacunarityWidget.SetTooltip("Multiplier applied to the frequency for each octave.");
 
 		m_Inspector->AddFloatVariable("Persistence", 0.55f);
-		m_Inspector->AddDragWidget("Persistence", "Persistence", 0.0f, 0.0f, 0.01f);
+		auto& persistenceWidget = m_Inspector->AddDragWidget("Persistence", "Persistence", 0.0f, 0.0f, 0.01f);
+		persistenceWidget.SetTooltip("Multiplier applied to the strength of each successive octave.");
 
 		m_Inspector->AddBoolVariable("AutoUseSeedTexture", true);
-		m_Inspector->AddCheckboxWidget("Auto Use Seed Texture", "AutoUseSeedTexture").SetTooltip("Setting this to true will cause seed texture to be ignored");
+		auto& seedTextureWidget = m_Inspector->AddCheckboxWidget("Auto Use Seed Texture", "AutoUseSeedTexture");
+		seedTextureWidget.SetTooltip("When enabled, the generated seed texture is ignored.");
 
 		m_Inspector->AddVector3Variable("Offset");
-		m_Inspector->AddDragWidget("Offset", "Offset", 0.0f, 0.0f, 0.01f);
+		auto& offsetWidget = m_Inspector->AddDragWidget("Offset", "Offset", 0.0f, 0.0f, 0.01f);
+		offsetWidget.SetTooltip("Offsets the noise sampling position in 3D space.");
 
 		m_Inspector->AddIntegerVariable("MixMethod");
-		m_Inspector->AddDropdownWidget("Mix Method", "MixMethod", { "Add", "Multiply", "Add & Multiply", "Set", "None"});
+		auto& mixMethodWidget = m_Inspector->AddDropdownWidget("Mix Method", "MixMethod", { "Add", "Multiply", "Add & Multiply", "Set", "None"});
+		mixMethodWidget.SetTooltip("Selects how this output is blended with the source buffer.");
 
 		m_Inspector->AddIntegerVariable("TransformFactor", 1);
-		m_Inspector->AddDropdownWidget("Transform Factor", "TransformFactor", { "None", "Slope", "Height" });
+		auto& transformFactorWidget = m_Inspector->AddDropdownWidget("Transform Factor", "TransformFactor", { "None", "Slope", "Height" });
+		transformFactorWidget.SetTooltip("Chooses which terrain factor is used to remap the noise.");
 
 		m_Inspector->AddIntegerVariable("SlopeSmoothingRadius", 3);
-		m_Inspector->AddSliderWidget("Slope Smoothing Radius", "SlopeSmoothingRadius", 0, 20).SetRenderOnCondition("TransformFactor", 1);
+		auto& slopeSmoothingWidget = m_Inspector->AddSliderWidget("Slope Smoothing Radius", "SlopeSmoothingRadius", 0, 20);
+		slopeSmoothingWidget.SetTooltip("Sets the radius used to smooth slope sampling.");
+		slopeSmoothingWidget.SetRenderOnCondition("TransformFactor", 1);
 
 		m_Inspector->AddFloatVariable("SlopeSamplingRadius", 3);
-		m_Inspector->AddSliderWidget("Slope Sampling Radius", "SlopeSamplingRadius", 1.0, 10.0).SetRenderOnCondition("TransformFactor", 1);
+		auto& slopeSamplingWidget = m_Inspector->AddSliderWidget("Slope Sampling Radius", "SlopeSamplingRadius", 1.0, 10.0);
+		slopeSamplingWidget.SetTooltip("Controls how far the generator samples around each point when measuring slope.");
+		slopeSamplingWidget.SetRenderOnCondition("TransformFactor", 1);
 
 		m_Inspector->AddVector2Variable("TransformRange", { 0.0f, 1.0f });
-		m_Inspector->AddDragWidget("Transform Range", "TransformRange", 0.0f, 0.0f, 0.001f);
+		auto& transformRangeWidget = m_Inspector->AddDragWidget("Transform Range", "TransformRange", 0.0f, 0.0f, 0.001f);
+		transformRangeWidget.SetTooltip("Remaps the chosen transform factor into this normalized range.");
 
 		m_Inspector->AddBoolVariable("UseGaussianPreFilter", false);
-		m_Inspector->AddCheckboxWidget("Use Gaussian Pre Filter", "UseGaussianPreFilter");
+		auto& gaussianFilterWidget = m_Inspector->AddCheckboxWidget("Use Gaussian Pre Filter", "UseGaussianPreFilter");
+		gaussianFilterWidget.SetTooltip("Applies a gaussian pre-filter before the noise is evaluated.");
 	}
 }
 
