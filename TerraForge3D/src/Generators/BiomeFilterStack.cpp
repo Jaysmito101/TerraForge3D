@@ -65,7 +65,7 @@ bool BiomeFilterStack::ShowSettings(int filterIndex)
 namespace
 {
 	void SetUniformFromParameter(const std::shared_ptr<ComputeShader>& shader, const std::string& uniformName,
-		const CustomInspectorValue& value, int& textureSlot)
+		const CustomInspectorValue& value, int& textureSlot, const nlohmann::json* binding = nullptr)
 	{
 		switch (value.GetType())
 		{
@@ -76,8 +76,17 @@ namespace
 		case CustomInspectorValueType_Vector3: shader->SetUniform3f(uniformName, value.GetVector3()); break;
 		case CustomInspectorValueType_Vector4: shader->SetUniform4f(uniformName, value.GetVector4()); break;
 		case CustomInspectorValueType_Texture:
-			if (value.GetTexture() != nullptr) shader->SetUniform1i(uniformName, value.GetTexture()->Bind(textureSlot++));
+		{
+			const auto texture = value.GetTexture();
+			const bool hasTexture = texture != nullptr && texture->IsLoaded();
+			if (hasTexture) shader->SetUniform1i(uniformName, texture->Bind(textureSlot++));
+			if (binding != nullptr && binding->is_object())
+			{
+				const std::string presenceUniform = binding->value("PresenceUniform", "");
+				if (!presenceUniform.empty()) shader->SetUniform1i(presenceUniform, hasTexture ? 1 : 0);
+			}
 			break;
+		}
 		case CustomInspectorValueType_Curve:
 		{
 			const std::string pointCountUniform = binding != nullptr && binding->is_object()
@@ -152,7 +161,7 @@ void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter>& filte
 			const std::string parameterName = binding["Parameter"].get<std::string>();
 			const auto parameter = filter->GetParameters().find(parameterName);
 			if (parameter != filter->GetParameters().end())
-				SetUniformFromParameter(shader, uniformName, parameter->second, textureSlot);
+				SetUniformFromParameter(shader, uniformName, parameter->second, textureSlot, &binding);
 			continue;
 		}
 		SetUniformFromJson(shader, uniformName, binding, textureSlot);
