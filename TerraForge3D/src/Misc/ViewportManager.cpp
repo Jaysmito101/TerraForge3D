@@ -22,7 +22,13 @@ ViewportManager::~ViewportManager()
 void ViewportManager::Update()
 {
 	if (m_AutoCalculateAspectRatio) m_RendererViewport->m_Camera.aspect = (m_Width / (m_Height + 0.000000001f));
-	if (m_IsVisible) this->m_AppState->rendererManager->Render(this->m_RendererViewport);
+	if (m_IsVisible)
+	{
+		const uint32_t renderWidth = static_cast<uint32_t>(std::max(m_Width, 1.0f));
+		const uint32_t renderHeight = static_cast<uint32_t>(std::max(m_Height, 1.0f));
+		m_RendererViewport->ResizeTo(renderWidth, renderHeight);
+		this->m_AppState->rendererManager->Render(this->m_RendererViewport);
+	}
 	m_IsActive &= m_IsVisible;
 }
 
