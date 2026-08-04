@@ -23,6 +23,16 @@ uniform float u_CurvatureScale;
 uniform float u_CavityScale;
 uniform vec2 u_PathPoints[16];
 uniform int u_PathPointCount;
+uniform int u_NoiseAlgorithm;
+uniform float u_NoiseScale;
+uniform float u_NoiseSeed;
+uniform int u_NoiseOctaves;
+uniform float u_NoiseLacunarity;
+uniform float u_NoisePersistence;
+uniform float u_NoiseWarp;
+uniform float u_NoiseJitter;
+
+#include "common/noise_2d.glsl"
 
 
 int PixelCoordToDataOffset(ivec2 coordinate)
@@ -155,40 +165,6 @@ float DirectionMask(float angle)
 	return 1.0 - smoothstep(width, width + softness, distance);
 }
 
-float Hash12(vec2 position)
-{
-	vec3 value = fract(vec3(position.xyx) * 0.1031);
-	value += dot(value, value.yzx + 33.33);
-	return fract((value.x + value.y) * value.z);
-}
-
-float Noise2(vec2 position)
-{
-	vec2 cell = floor(position);
-	vec2 local = fract(position);
-	local = local * local * (3.0 - 2.0 * local);
-	float a = Hash12(cell);
-	float b = Hash12(cell + vec2(1.0, 0.0));
-	float c = Hash12(cell + vec2(0.0, 1.0));
-	float d = Hash12(cell + vec2(1.0, 1.0));
-	return mix(mix(a, b, local.x), mix(c, d, local.x), local.y);
-}
-
-float FractalNoise(vec2 position)
-{
-	float value = 0.0;
-	float amplitude = 0.5;
-	float amplitudeSum = 0.0;
-	for (int octave = 0; octave < 5; ++octave)
-	{
-		value += Noise2(position) * amplitude;
-		amplitudeSum += amplitude;
-		position = position * 2.03 + vec2(17.13, 9.71);
-		amplitude *= 0.5;
-	}
-	return value / max(amplitudeSum, 0.000001);
-}
-
 float PointSegmentDistance(vec2 point, vec2 start, vec2 end)
 {
 	vec2 direction = end - start;
@@ -277,7 +253,13 @@ float TerrainMask(ivec2 coordinate, vec2 uv)
 		return RangeMask(distanceValue);
 	}
 	case TF3D_MASK_HEIGHT_CONTOUR: return RangeMask(height);
-	case TF3D_MASK_PROCEDURAL_NOISE: return RangeMask(FractalNoise(uv * max(u_Settings0.z, 0.01) + vec2(u_Settings0.w)));
+	case TF3D_MASK_PROCEDURAL_NOISE:
+	{
+		float noise = tf3d_noise2_fbm(
+			uv, u_NoiseAlgorithm, u_NoiseScale, u_NoiseSeed, u_NoiseOctaves,
+			u_NoiseLacunarity, u_NoisePersistence, u_NoiseWarp, u_NoiseJitter);
+		return RangeMask(0.5 + 0.5 * noise);
+	}
 	case TF3D_MASK_RADIAL_GRADIENT:
 	{
 		float radialDistance = distance(uv, u_Settings1.xy);

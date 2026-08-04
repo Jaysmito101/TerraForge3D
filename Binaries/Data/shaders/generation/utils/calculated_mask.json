@@ -205,10 +205,16 @@
       "Mode": 15,
       "ShaderSymbol": "TF3D_MASK_PROCEDURAL_NOISE",
       "Name": "Procedural noise",
-      "Description": "Creates a deterministic breakup mask from procedural value noise.",
+      "Description": "Creates a deterministic breakup mask from the shared procedural noise library.",
       "Params": [
-        { "Name": "Scale", "Type": "Float", "Default": 4.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.01, 64.0], "Label": "Noise scale", "Description": "Sampling scale of the procedural breakup.", "Tooltip": "Higher values create smaller, more frequent patches." },
+        { "Name": "Scale", "Type": "Float", "Default": 4.0, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.01, 64.0], "Label": "Noise scale", "Description": "Sampling scale of the procedural breakup.", "Tooltip": "Higher values create smaller, more frequent patches." },
         { "Name": "Seed", "Type": "Int", "Default": 42, "Widget": "Seed", "Label": "Noise seed", "Description": "Deterministically changes the procedural noise pattern.", "Tooltip": "Use a new seed for a different breakup layout without changing its scale." },
+        { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise algorithm", "Description": "Selects the shared noise model used to build the mask." },
+        { "Name": "NoiseOctaves", "Type": "Int", "Default": 5, "Widget": "Slider", "Constraints": [1, 16], "Label": "Noise octaves", "Description": "Controls how many frequency layers are combined.", "Tooltip": "More octaves add detail at a higher shader cost." },
+        { "Name": "NoiseLacunarity", "Type": "Float", "Default": 2.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [1.0, 4.0], "Label": "Noise lacunarity", "Description": "Controls the frequency multiplier between layers.", "Tooltip": "Higher values separate the detail scales more strongly." },
+        { "Name": "NoisePersistence", "Type": "Float", "Default": 0.5, "Widget": "Slider", "Constraints": [0.0, 0.99], "Label": "Noise persistence", "Description": "Controls how much amplitude each layer retains.", "Tooltip": "Higher values keep more fine detail visible." },
+        { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise warp", "Description": "Bends the sampling domain before evaluating noise.", "Tooltip": "Use this to make otherwise regular patterns more organic." },
+        { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise jitter", "Description": "Offsets feature points for the mask's cellular patterns.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local feature placement.", "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
         { "Name": "Range", "Type": "Vector2", "Default": [0.35, 0.65], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Noise range", "Description": "Noise response interval to include.", "Tooltip": "The range controls which noise values become active." },
         { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the selected noise response interval.", "Tooltip": "Use a larger value for less binary breakup." }
       ]
