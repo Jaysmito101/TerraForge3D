@@ -7,7 +7,7 @@
 
 #include <nlohmann/json.hpp>
 
-struct TF3DNoiseAlgorithmEntry
+struct NoiseAlgorithmEntry
 {
 	int value = -1;
 	std::string token;
@@ -15,7 +15,7 @@ struct TF3DNoiseAlgorithmEntry
 	std::string description;
 };
 
-class TF3DNoiseAlgorithmCatalog
+class NoiseAlgorithmCatalog
 {
 public:
 	bool LoadFromFile(const std::string& path, std::string* error = nullptr)
@@ -91,7 +91,7 @@ public:
 	int MaxValue() const { return m_Entries.empty() ? -1 : m_Entries.back().value; }
 	int DefaultValue() const { return m_DefaultValue; }
 
-	const std::vector<TF3DNoiseAlgorithmEntry>& Entries() const { return m_Entries; }
+	const std::vector<NoiseAlgorithmEntry>& Entries() const { return m_Entries; }
 	const std::vector<std::string>& Labels() const { return m_Labels; }
 
 	bool TryGetValue(const std::string& name, int& value) const
@@ -163,7 +163,7 @@ private:
 		return true;
 	}
 
-	std::vector<TF3DNoiseAlgorithmEntry> m_Entries;
+	std::vector<NoiseAlgorithmEntry> m_Entries;
 	std::vector<std::string> m_Labels;
 	int m_DefaultValue = 0;
 	bool m_Valid = false;

@@ -4,7 +4,7 @@
 
 #include "Generators/NoiseAlgorithmCatalog.h"
 
-inline bool ApplyTF3DNoiseAlgorithmMetadata(nlohmann::json& config, const TF3DNoiseAlgorithmCatalog& catalog)
+inline bool ApplyNoiseAlgorithmMetadata(nlohmann::json& config, const NoiseAlgorithmCatalog& catalog)
 {
 	if (!catalog.IsValid()) return false;
 	if (!config.contains("Params") || !config["Params"].is_array()) return true;

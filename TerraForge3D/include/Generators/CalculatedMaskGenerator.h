@@ -4,6 +4,7 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Misc/CustomInspector.h"
+#include "Generators/NoiseAlgorithmCatalog.h"
 
 class ApplicationState;
 class ComputeShader;
@@ -43,6 +44,12 @@ struct CalculatedMaskSettings
 	float angleWidth = 45.0f;
 	float scale = 4.0f;
 	float seed = 42.0f;
+	int noiseAlgorithm = 0;
+	int noiseOctaves = 5;
+	float noiseLacunarity = 2.0f;
+	float noisePersistence = 0.5f;
+	float noiseWarp = 0.0f;
+	float noiseJitter = 0.75f;
 	float sampleRadius = 3.0f;
 	float curvatureScale = 32.0f;
 	float cavityScale = 48.0f;
@@ -82,6 +89,7 @@ private:
 	std::shared_ptr<ComputeShader> m_Shader;
 	std::shared_ptr<GeneratorTexture> m_Texture;
 	std::shared_ptr<CustomInspector> m_Inspector;
+	NoiseAlgorithmCatalog m_NoiseAlgorithms;
 	nlohmann::json m_Metadata;
 	CalculatedMaskSettings m_Settings;
 	int m_Size = 256;

@@ -1,4 +1,5 @@
 #include "Generators/BiomeBaseShapeGenerator.h"
+#include "Generators/NoiseAlgorithmConfig.h"
 #include "Data/ApplicationState.h"
 
 BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState* appState)
@@ -10,6 +11,10 @@ BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState* appState)
 	m_ShaderPath = "";
 	m_Name = "";
 	m_Inspector = std::make_shared<CustomInspector>();
+	std::string catalogError;
+	if (!m_NoiseAlgorithms.LoadFromFile(NoiseAlgorithmCatalog::IndexPath(m_AppState->constants.shadersDir), &catalogError)) {
+		TF3D_LOG_ERROR("{}", catalogError);
+	}
 }
 
 BiomeBaseShapeGenerator::~BiomeBaseShapeGenerator()
@@ -112,13 +117,22 @@ nlohmann::json BiomeBaseShapeGenerator::ParseData(const std::string& config)
 bool BiomeBaseShapeGenerator::LoadInspectorFromConfig(const nlohmann::json& config)
 {
 	m_Name = config.value("Name", "Unnamed");
-	return m_Inspector->LoadConfig(config);
+	auto inspectorConfig = config;
+	if (!ApplyNoiseAlgorithmMetadata(inspectorConfig, m_NoiseAlgorithms))
+	{
+		TF3D_LOG_ERROR("Failed to apply noise algorithm metadata for base shape '{}'.", m_Name);
+		return false;
+	}
+	if (!m_Inspector->LoadConfig(inspectorConfig)) return false;
+	return true;
 }
 
 std::string BiomeBaseShapeGenerator::BuildShaderSource()
 {
 	std::string source = "";
 	source += "#version 430 core\n\n";
+	source += m_NoiseAlgorithms.ShaderDefines();
+	source += "\n";
 	source += "// work group size\n";
 	source += "layout (local_size_x = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_y = " + std::to_string(m_AppState->constants.gpuWorkgroupSize) + ", local_size_z = 1) in;\n\n";
 	source += "// output data buffer\n";

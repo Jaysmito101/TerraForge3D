@@ -8,6 +8,7 @@
 #include "Generators/GeneratorTexture.h"
 #include "Exporters/Serializer.h"
 #include "Misc/CustomInspector.h"
+#include "Generators/NoiseAlgorithmCatalog.h"
 
 #define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
@@ -36,5 +37,6 @@ private:
 	bool m_RequireUpdation = true;
 	std::shared_ptr<ComputeShader> m_Shader;
 	std::shared_ptr<CustomInspector> m_Inspector;
+	NoiseAlgorithmCatalog m_NoiseAlgorithms;
 	std::array<float, BIOME_BASE_NOISE_OCTAVE_COUNT> m_NoiseOctaveStrengths{};
 };

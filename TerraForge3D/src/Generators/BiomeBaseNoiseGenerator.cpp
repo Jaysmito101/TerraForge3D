@@ -4,13 +4,28 @@
 #include "Utils/Utils.h"
 #include "Profiler.h"
 
+	void EnsureNoiseValues(CustomInspector& inspector, int defaultNoiseAlgorithm)
+	{
+		if (!inspector.HasVariable("NoiseAlgorithm")) inspector.AddIntegerVariable("NoiseAlgorithm", defaultNoiseAlgorithm);
+		if (!inspector.HasVariable("NoiseOctaves")) inspector.AddIntegerVariable("NoiseOctaves", 10);
+		if (!inspector.HasVariable("NoiseWarp")) inspector.AddFloatVariable("NoiseWarp", 0.0f);
+		if (!inspector.HasVariable("NoiseJitter")) inspector.AddFloatVariable("NoiseJitter", 0.75f);
+	}
+
 BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 {
 	m_AppState = appState;
+	std::string catalogError;
+	if (!m_NoiseAlgorithms.LoadFromFile(NoiseAlgorithmCatalog::IndexPath(m_AppState->constants.shadersDir), &catalogError))
+		TF3D_LOG_ERROR("{}", catalogError);
 
-	// const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_noise" PATH_SEPARATOR "noise_gen.glsl", &s_TempBool);
-	// m_Shader = std::make_shared<ComputeShader>(shaderSource);
-	m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/base_noise/noise_gen");
+	bool shaderLoaded = false;
+	const auto shaderSource = m_AppState->resourceManager->LoadShaderSource("generation/base_noise/noise_gen", false, &shaderLoaded);
+	if (shaderLoaded && m_NoiseAlgorithms.IsValid())
+	{
+		m_Shader = m_AppState->resourceManager->GetComputeShader(
+			"generation/base_noise/noise_gen", m_NoiseAlgorithms.InjectShaderDefines(shaderSource));
+	}
 
 	m_Inspector = std::make_shared<CustomInspector>();
 
@@ -18,8 +33,12 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 	m_NoiseOctaveStrengths[0] = m_NoiseOctaveStrengths[1] = 0.0f;
 	{
 		m_Inspector->AddIntegerVariable("Seed", 152);
-		auto& seedWidget = m_Inspector->AddSeedWidget("Seed", "Seed");
+		auto& seedWidget = m_Inspector->AddSeedWidget("Noise Seed", "Seed");
 		seedWidget.SetTooltip("Random seed used to generate the base noise pattern.");
+
+		m_Inspector->AddIntegerVariable("NoiseAlgorithm", m_NoiseAlgorithms.DefaultValue());
+		auto& algorithmWidget = m_Inspector->AddDropdownWidget("Noise Algorithm", "NoiseAlgorithm", m_NoiseAlgorithms.Labels());
+		algorithmWidget.SetTooltip(m_NoiseAlgorithms.Tooltip());
 
 		m_Inspector->AddFloatVariable("Influence", 0.5f);
 		auto& influenceWidget = m_Inspector->AddSliderWidget("Influence", "Influence", 0.0f, 1.0f);
@@ -30,16 +49,33 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 		strengthWidget.SetTooltip("Scales the amplitude of the generated noise.");
 
 		m_Inspector->AddFloatVariable("Frequency", 0.45f);
-		auto& frequencyWidget = m_Inspector->AddDragWidget("Frequency", "Frequency", 0.0f, 0.0f, 0.01f);
-		frequencyWidget.SetTooltip("Controls how dense the noise detail is across the map.");
+		auto& frequencyWidget = m_Inspector->AddDragWidget("Noise Scale", "Frequency", 0.0f, 0.0f, 0.001f);
+		frequencyWidget.SetTooltip("Controls the size of the shared noise features. Higher values create smaller features.");
 
 		m_Inspector->AddFloatVariable("Lacunarity", 1.8f);
-		auto& lacunarityWidget = m_Inspector->AddDragWidget("Lacunarity", "Lacunarity", 0.0f, 0.0f, 0.01f);
-		lacunarityWidget.SetTooltip("Multiplier applied to the frequency for each octave.");
+		auto& lacunarityWidget = m_Inspector->AddDragWidget("Noise Lacunarity", "Lacunarity", 1.0f, 4.0f, 0.01f);
+		lacunarityWidget.SetTooltip("Frequency multiplier between successive noise layers.");
 
 		m_Inspector->AddFloatVariable("Persistence", 0.55f);
-		auto& persistenceWidget = m_Inspector->AddDragWidget("Persistence", "Persistence", 0.0f, 0.0f, 0.01f);
-		persistenceWidget.SetTooltip("Multiplier applied to the strength of each successive octave.");
+		auto& persistenceWidget = m_Inspector->AddSliderWidget("Noise Persistence", "Persistence", 0.0f, 0.99f);
+		persistenceWidget.SetTooltip("Amplitude retained by each successive noise layer.");
+
+		m_Inspector->AddIntegerVariable("NoiseOctaves", 10);
+		auto& octaveWidget = m_Inspector->AddSliderWidget("Noise Octaves", "NoiseOctaves", 1, BIOME_BASE_NOISE_OCTAVE_COUNT);
+		octaveWidget.SetTooltip("Number of noise layers enabled from the octave strength profile.");
+
+		m_Inspector->AddFloatVariable("NoiseWarp", 0.0f);
+		auto& warpWidget = m_Inspector->AddDragWidget("Noise Warp", "NoiseWarp", 0.0f, 4.0f, 0.01f);
+		warpWidget.SetTooltip("Bends the sampling domain before evaluating the noise, adding organic distortion.");
+
+		m_Inspector->AddFloatVariable("NoiseJitter", 0.75f);
+		auto& jitterWidget = m_Inspector->AddSliderWidget("Noise Jitter", "NoiseJitter", 0.0f, 1.0f);
+		jitterWidget.SetTooltip("Moves feature points inside Voronoi, Worley, and Gabor cells.");
+		jitterWidget.SetRenderOnConditions("NoiseAlgorithm", {
+			m_NoiseAlgorithms.Value("Gabor"),
+			m_NoiseAlgorithms.Value("Voronoi"),
+			m_NoiseAlgorithms.Value("Worley")
+		});
 
 		m_Inspector->AddBoolVariable("AutoUseSeedTexture", true);
 		auto& seedTextureWidget = m_Inspector->AddCheckboxWidget("Auto Use Seed Texture", "AutoUseSeedTexture");
@@ -121,6 +157,12 @@ void BiomeBaseNoiseGenerator::Update(GeneratorData* sourceBuffer, GeneratorData*
 	m_Shader->SetUniform1f("u_Strength", values.at("Strength").GetFloat());
 	m_Shader->SetUniform1f("u_Influence", values.at("Influence").GetFloat());
 	m_Shader->SetUniform1f("u_Frequency", values.at("Frequency").GetFloat());
+	m_Shader->SetUniform1i("u_NoiseAlgorithm", values.at("NoiseAlgorithm").GetInt());
+	m_Shader->SetUniform1f("u_NoiseScale", values.at("Frequency").GetFloat());
+	m_Shader->SetUniform1f("u_NoiseSeed", static_cast<float>(values.at("Seed").GetInt()));
+	m_Shader->SetUniform1i("u_NoiseOctaves", values.at("NoiseOctaves").GetInt());
+	m_Shader->SetUniform1f("u_NoiseWarp", values.at("NoiseWarp").GetFloat());
+	m_Shader->SetUniform1f("u_NoiseJitter", values.at("NoiseJitter").GetFloat());
 	m_Shader->SetUniform1f("u_Lacunarity", values.at("Lacunarity").GetFloat());
 	m_Shader->SetUniform1f("u_Persistence", values.at("Persistence").GetFloat());
 	m_Shader->SetUniform3f("u_Offset", values.at("Offset").GetVector3());
@@ -161,6 +203,7 @@ void BiomeBaseNoiseGenerator::Load(SerializerNode data)
 		// Remove values written by the previous generic CustomInspector octave UI.
 		if (m_Inspector->HasVariable(variableName)) m_Inspector->RemoveVariable(variableName);
 	}
+	EnsureNoiseValues(*m_Inspector, m_NoiseAlgorithms.DefaultValue());
 }
 
 SerializerNode BiomeBaseNoiseGenerator::Save()

@@ -7,6 +7,7 @@
 #include "Generators/GeneratorTexture.h"
 #include "Exporters/Serializer.h"
 #include "Misc/CustomInspector.h"
+#include "Generators/NoiseAlgorithmCatalog.h"
 
 #define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
@@ -46,5 +47,6 @@ protected:
 	std::string m_Description = "";
 	std::string m_Source = "";
 	std::string m_ShaderPath = "";
+	NoiseAlgorithmCatalog m_NoiseAlgorithms;
 	bool m_RequireUpdation = true;
 };

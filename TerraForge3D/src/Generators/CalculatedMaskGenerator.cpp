@@ -1,4 +1,5 @@
 #include "Generators/CalculatedMaskGenerator.h"
+#include "Generators/NoiseAlgorithmConfig.h"
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
@@ -36,22 +37,28 @@ namespace
 CalculatedMaskGenerator::CalculatedMaskGenerator(ApplicationState* state)
 	: m_AppState(state)
 {
+	std::string catalogError;
+	if (!m_NoiseAlgorithms.LoadFromFile(NoiseAlgorithmCatalog::IndexPath(m_AppState->constants.shadersDir), &catalogError)) {
+		TF3D_LOG_ERROR("{}", catalogError);
+	}
+	else {
+		m_Settings.noiseAlgorithm = m_NoiseAlgorithms.DefaultValue();
+	}
 	m_Texture = std::make_shared<GeneratorTexture>(m_Size, m_Size, GeneratorTextureStorage::R16);
 	m_Inspector = std::make_shared<CustomInspector>();
 	m_Inspector->SetShowResetButton(false);
 	m_MetadataLoaded = LoadMetadata();
-	if (m_MetadataLoaded)
+	bool shaderSourceLoaded = false;
+	const auto shaderSource = m_AppState->resourceManager->LoadShaderSource(
+		"generation/utils/mask_preview", false, &shaderSourceLoaded);
+	if (shaderSourceLoaded && m_NoiseAlgorithms.IsValid())
 	{
-		bool shaderSourceLoaded = false;
-		const auto shaderSource = m_AppState->resourceManager->LoadShaderSource(
-			"generation/utils/mask_preview", false, &shaderSourceLoaded);
-		if (shaderSourceLoaded)
-		{
-			m_Shader = m_AppState->resourceManager->GetComputeShader(
-				"CalculatedMaskPreview", InjectMaskModeDefines(shaderSource, m_Metadata));
-		}
+		const auto shaderSourceWithNoiseDefines = m_NoiseAlgorithms.InjectShaderDefines(shaderSource);
+		const auto finalShaderSource = m_MetadataLoaded
+			? InjectMaskModeDefines(shaderSourceWithNoiseDefines, m_Metadata)
+			: shaderSourceWithNoiseDefines;
+		m_Shader = m_AppState->resourceManager->GetComputeShader("CalculatedMaskPreview", finalShaderSource);
 	}
-	if (m_Shader == nullptr) m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/utils/mask_preview");
 	if (!m_MetadataLoaded)
 	{
 		TF3D_LOG_ERROR("Calculated mask metadata could not be loaded; calculated mask settings are unavailable.");
@@ -102,6 +109,7 @@ bool CalculatedMaskGenerator::LoadInspectorForType(int typeIndex)
 		for (const auto& parameter : types[typeIndex]["Params"]) config["Params"].push_back(parameter);
 	}
 	if (m_Metadata.contains("Buttons")) config["Buttons"] = m_Metadata["Buttons"];
+	if (!ApplyNoiseAlgorithmMetadata(config, m_NoiseAlgorithms)) return false;
 
 	if (!m_Inspector->LoadConfig(config)) return false;
 	m_Inspector->SetShowResetButton(false);
@@ -194,6 +202,12 @@ void CalculatedMaskGenerator::SyncSettingsFromInspector()
 	if (m_Inspector->HasVariable("DirectionWidth")) m_Settings.angleWidth = m_Inspector->GetVariable("DirectionWidth").GetFloat();
 	if (m_Inspector->HasVariable("Scale")) m_Settings.scale = m_Inspector->GetVariable("Scale").GetFloat();
 	if (m_Inspector->HasVariable("Seed")) m_Settings.seed = m_Inspector->GetVariable("Seed").GetFloat();
+	if (m_Inspector->HasVariable("NoiseAlgorithm")) m_Settings.noiseAlgorithm = m_Inspector->GetVariable("NoiseAlgorithm").GetInt();
+	if (m_Inspector->HasVariable("NoiseOctaves")) m_Settings.noiseOctaves = m_Inspector->GetVariable("NoiseOctaves").GetInt();
+	if (m_Inspector->HasVariable("NoiseLacunarity")) m_Settings.noiseLacunarity = m_Inspector->GetVariable("NoiseLacunarity").GetFloat();
+	if (m_Inspector->HasVariable("NoisePersistence")) m_Settings.noisePersistence = m_Inspector->GetVariable("NoisePersistence").GetFloat();
+	if (m_Inspector->HasVariable("NoiseWarp")) m_Settings.noiseWarp = m_Inspector->GetVariable("NoiseWarp").GetFloat();
+	if (m_Inspector->HasVariable("NoiseJitter")) m_Settings.noiseJitter = m_Inspector->GetVariable("NoiseJitter").GetFloat();
 	if (m_Inspector->HasVariable("SampleRadius")) m_Settings.sampleRadius = m_Inspector->GetVariable("SampleRadius").GetFloat();
 	if (m_Inspector->HasVariable("CurvatureSensitivity")) m_Settings.curvatureScale = m_Inspector->GetVariable("CurvatureSensitivity").GetFloat();
 	if (m_Inspector->HasVariable("CavitySensitivity")) m_Settings.cavityScale = m_Inspector->GetVariable("CavitySensitivity").GetFloat();
@@ -270,6 +284,12 @@ void CalculatedMaskGenerator::Load(SerializerNode data)
 	if (!LoadInspectorForType(typeIndex)) return;
 	const auto inspectorData = data->GetChildNode("Inspector");
 	if (inspectorData != nullptr) m_Inspector->LoadData(inspectorData);
+	if (!m_Inspector->HasVariable("NoiseAlgorithm")) m_Inspector->AddIntegerVariable("NoiseAlgorithm", m_NoiseAlgorithms.DefaultValue());
+	if (!m_Inspector->HasVariable("NoiseOctaves")) m_Inspector->AddIntegerVariable("NoiseOctaves", 5);
+	if (!m_Inspector->HasVariable("NoiseLacunarity")) m_Inspector->AddFloatVariable("NoiseLacunarity", 2.0f);
+	if (!m_Inspector->HasVariable("NoisePersistence")) m_Inspector->AddFloatVariable("NoisePersistence", 0.5f);
+	if (!m_Inspector->HasVariable("NoiseWarp")) m_Inspector->AddFloatVariable("NoiseWarp", 0.0f);
+	if (!m_Inspector->HasVariable("NoiseJitter")) m_Inspector->AddFloatVariable("NoiseJitter", 0.75f);
 	if (m_Inspector->HasVariable("MaskType")) m_Inspector->GetVariable("MaskType").SetInt(typeIndex);
 	SyncSettingsFromInspector();
 	Invalidate();
@@ -291,6 +311,14 @@ bool CalculatedMaskGenerator::Update(GeneratorData* sourceData)
 		m_Settings.softness,
 		m_AppState->mainMap.tileSize);
 	m_Shader->SetUniform4f("u_Settings0", m_Settings.angle, m_Settings.angleWidth, m_Settings.scale, m_Settings.seed);
+	m_Shader->SetUniform1i("u_NoiseAlgorithm", glm::clamp(m_Settings.noiseAlgorithm, 0, m_NoiseAlgorithms.MaxValue()));
+	m_Shader->SetUniform1f("u_NoiseScale", m_Settings.scale);
+	m_Shader->SetUniform1f("u_NoiseSeed", m_Settings.seed);
+	m_Shader->SetUniform1i("u_NoiseOctaves", glm::clamp(m_Settings.noiseOctaves, 1, 16));
+	m_Shader->SetUniform1f("u_NoiseLacunarity", m_Settings.noiseLacunarity);
+	m_Shader->SetUniform1f("u_NoisePersistence", m_Settings.noisePersistence);
+	m_Shader->SetUniform1f("u_NoiseWarp", m_Settings.noiseWarp);
+	m_Shader->SetUniform1f("u_NoiseJitter", m_Settings.noiseJitter);
 	m_Shader->SetUniform4f("u_Settings1", m_Settings.center.x, m_Settings.center.y, m_Settings.pathEnd.x, m_Settings.pathEnd.y);
 	m_Shader->SetUniform4f("u_Settings2", m_Settings.seaLevel, m_Settings.selectValleys ? 1.0f : 0.0f, m_Settings.usePath ? 1.0f : 0.0f, m_Settings.sampleRadius);
 	m_Shader->SetUniform1f("u_CurvatureScale", m_Settings.curvatureScale);
