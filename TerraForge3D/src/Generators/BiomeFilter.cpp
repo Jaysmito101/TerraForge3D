@@ -17,7 +17,10 @@ BiomeFilter::BiomeFilter(ApplicationState* appState, std::shared_ptr<BiomeFilter
 bool BiomeFilter::ShowSettings()
 {
 	bool changed = false;
-	if (!m_Definition->GetDescription().empty()) ImGui::TextWrapped("%s", m_Definition->GetDescription().c_str());
+	if (m_Inspector == nullptr || m_Inspector->GetDescription().empty())
+	{
+		if (!m_Definition->GetDescription().empty()) ImGui::TextWrapped("%s", m_Definition->GetDescription().c_str());
+	}
 	changed |= ImGui::Checkbox("Enabled", &m_Enabled);
 	if (m_Inspector != nullptr && m_Definition->GetMetadata().contains("Params"))
 		changed |= m_Inspector->Render();
@@ -86,6 +89,7 @@ void BiomeFilter::Load(SerializerNode data)
 		auto parameters = data->GetChildNode("Parameters");
 		if (parameters != nullptr) m_Inspector->LoadData(parameters);
 	}
+	if (m_CalculatedMaskGenerator != nullptr) m_CalculatedMaskGenerator->Load(data->GetChildNode("CalculatedMask"));
 }
 
 SerializerNode BiomeFilter::Save() const
@@ -99,5 +103,6 @@ SerializerNode BiomeFilter::Save() const
 	node->SetFloat("Strength", m_Strength);
 	node->SetInteger("MergeMode", static_cast<int>(m_MergeMode));
 	if (m_Inspector != nullptr) node->SetChildNode("Parameters", m_Inspector->SaveData());
+	if (m_CalculatedMaskGenerator != nullptr) node->SetChildNode("CalculatedMask", m_CalculatedMaskGenerator->Save());
 	return node;
 }
