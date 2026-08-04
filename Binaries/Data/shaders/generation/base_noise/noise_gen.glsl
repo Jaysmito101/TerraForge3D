@@ -38,7 +38,7 @@ uniform int u_NoiseOctaveStrengthsCount;
 uniform int u_SlopeSmoothingRadius;
 uniform vec2 u_TransformRange;
 uniform float u_SlopeSamplingRadius;
-uniform bool m_UseGaussianPreFilter;
+uniform bool u_UseGaussianPreFilter;
 
 #include "common/noise_2d.glsl"
 #include "common/noise_3d.glsl"
@@ -80,7 +80,7 @@ float gaussianSample(ivec2 offset)
 float slopeHeightAt(ivec2 coord)
 {
 	coord = clamp(coord, ivec2(0), ivec2(u_Resolution - 1));
-	if (m_UseGaussianPreFilter) return gaussianSample(coord);
+	if (u_UseGaussianPreFilter) return gaussianSample(coord);
 	return dataSource[PixelCoordToDataOffset(uint(coord.x), uint(coord.y))];
 }
 
@@ -170,14 +170,20 @@ void main(void)
 	float amplitude = 1.0f;
 	float amplitudeSum = 0.0f;
 	int octaveCount = clamp(min(u_NoiseOctaves, u_NoiseOctaveStrengthsCount), 0, 16);
+	const mat2 octaveRotation = mat2(0.8f, -0.6f, 0.6f, 0.8f);
+	float octaveFrequency = frequencyInput;
 	for (int i = 0; i < octaveCount; ++i)
 	{
 		float octaveStrength = clamp(u_NoiseOctaveStrengths[i], 0.0f, 1.0f);
+		float pixelsPerFeature = float(u_Resolution) / max(2.0f * octaveFrequency, 0.0001f);
+		float antiAliasWeight = smoothstep(4.0f, 8.0f, pixelsPerFeature);
+		float effectiveStrength = octaveStrength * antiAliasWeight;
 		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + float(i) * 11.73f)
-			* amplitude * octaveStrength;
-		amplitudeSum += amplitude * octaveStrength;
-		noiseDomain = noiseDomain * lacunarity + vec2(17.13f, 9.71f);
+			* amplitude * effectiveStrength;
+		amplitudeSum += amplitude * effectiveStrength;
+		noiseDomain = octaveRotation * noiseDomain * lacunarity + vec2(17.13f, 9.71f);
 		amplitude *= persistence;
+		octaveFrequency *= lacunarity;
 	}
 	n /= max(amplitudeSum, 0.0001f);
 
