@@ -21,6 +21,22 @@ uniform vec4 u_Settings1;
 uniform vec4 u_Settings2;
 uniform float u_CurvatureScale;
 uniform float u_CavityScale;
+uniform float u_SpiralArms;
+uniform float u_SpiralTurns;
+uniform float u_SpiralThickness;
+uniform float u_SpiralSoftness;
+uniform float u_SpiralRotation;
+uniform int u_SpiralInvert;
+uniform float u_GridCells;
+uniform float u_GridThickness;
+uniform float u_GridSoftness;
+uniform float u_GridRotation;
+uniform int u_GridInvert;
+uniform float u_DotCells;
+uniform float u_DotRadius;
+uniform float u_DotSoftness;
+uniform float u_DotRotation;
+uniform int u_DotInvert;
 uniform vec2 u_PathPoints[16];
 uniform int u_PathPointCount;
 uniform int u_NoiseAlgorithm;
@@ -210,6 +226,53 @@ float AmbientCavity(ivec2 coordinate)
 	return 1.0 - exp(-depression * max(u_CavityScale, 0.001));
 }
 
+float SpiralMask(vec2 uv)
+{
+	const float twoPi = 6.28318530718;
+	vec2 offset = uv - u_Settings1.xy;
+	float radius = length(offset);
+	float angle = atan(offset.y, offset.x);
+	float arms = max(u_SpiralArms, 1.0);
+	float turns = max(u_SpiralTurns, 0.0);
+	float phase = angle / twoPi * arms + radius * turns - u_SpiralRotation / 360.0;
+	float distanceToArm = abs(fract(phase + 0.5) - 0.5) * 2.0;
+	float halfWidth = clamp(u_SpiralThickness, 0.001, 0.5);
+	float antiAlias = max((arms + turns) / max(float(u_Resolution), 1.0), 0.0001);
+	float softness = max(u_SpiralSoftness, antiAlias);
+	float mask = 1.0 - smoothstep(halfWidth, halfWidth + softness, distanceToArm);
+	return u_SpiralInvert != 0 ? 1.0 - mask : mask;
+}
+
+float GridMask(vec2 uv)
+{
+	const float twoPi = 6.28318530718;
+	float rotation = u_GridRotation / 360.0 * twoPi;
+	mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation), sin(rotation), cos(rotation));
+	vec2 gridPosition = rotationMatrix * (uv - u_Settings1.xy) * max(u_GridCells, 1.0);
+	vec2 distanceToLine = abs(fract(gridPosition + 0.5) - 0.5);
+	float lineDistance = min(distanceToLine.x, distanceToLine.y);
+	float halfWidth = clamp(u_GridThickness, 0.001, 0.5);
+	float antiAlias = max(max(u_GridCells, 1.0) / max(float(u_Resolution), 1.0), 0.0001);
+	float softness = max(u_GridSoftness, antiAlias);
+	float mask = 1.0 - smoothstep(halfWidth, halfWidth + softness, lineDistance);
+	return u_GridInvert != 0 ? 1.0 - mask : mask;
+}
+
+float DotMask(vec2 uv)
+{
+	const float twoPi = 6.28318530718;
+	float rotation = u_DotRotation / 360.0 * twoPi;
+	mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation), sin(rotation), cos(rotation));
+	vec2 dotPosition = rotationMatrix * (uv - u_Settings1.xy) * max(u_DotCells, 1.0);
+	vec2 cellOffset = fract(dotPosition + 0.5) - 0.5;
+	float distanceToDot = length(cellOffset);
+	float radius = clamp(u_DotRadius, 0.001, 0.5);
+	float antiAlias = max(max(u_DotCells, 1.0) / max(float(u_Resolution), 1.0), 0.0001);
+	float softness = max(u_DotSoftness, antiAlias);
+	float mask = 1.0 - smoothstep(radius, radius + softness, distanceToDot);
+	return u_DotInvert != 0 ? 1.0 - mask : mask;
+}
+
 vec2 SafeNormalize(vec2 value)
 {
 	float lengthValue = length(value);
@@ -270,6 +333,9 @@ float TerrainMask(ivec2 coordinate, vec2 uv)
 		if (outerRadius - innerRadius <= 0.000001) return radialDistance <= outerRadius ? 1.0 : 0.0;
 		return 1.0 - smoothstep(innerRadius - radialSoftness, outerRadius + radialSoftness, radialDistance);
 	}
+	case TF3D_MASK_SPIRAL: return SpiralMask(uv);
+	case TF3D_MASK_GRID: return GridMask(uv);
+	case TF3D_MASK_DOTS: return DotMask(uv);
 	default: return 0.0;
 	}
 }

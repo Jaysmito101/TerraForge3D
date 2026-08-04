@@ -28,6 +28,9 @@ enum class CalculatedMaskType
 	HeightContour,
 	ProceduralNoise,
 	RadialGradient,
+	Spiral,
+	Grid,
+	Dots,
 	Count,
 };
 
@@ -54,6 +57,22 @@ struct CalculatedMaskSettings
 	float curvatureScale = 32.0f;
 	float cavityScale = 48.0f;
 	float seaLevel = 0.0f;
+	float spiralArms = 1.0f;
+	float spiralTurns = 8.0f;
+	float spiralThickness = 0.08f;
+	float spiralSoftness = 0.03f;
+	float spiralRotation = 0.0f;
+	bool spiralInvert = false;
+	float gridCells = 12.0f;
+	float gridThickness = 0.08f;
+	float gridSoftness = 0.03f;
+	float gridRotation = 0.0f;
+	bool gridInvert = false;
+	float dotCells = 12.0f;
+	float dotRadius = 0.24f;
+	float dotSoftness = 0.03f;
+	float dotRotation = 0.0f;
+	bool dotInvert = false;
 	glm::vec2 center = glm::vec2(0.5f);
 	glm::vec2 pathEnd = glm::vec2(0.75f, 0.5f);
 	std::array<glm::vec2, MaxPathPoints> pathPoints{};

@@ -212,6 +212,22 @@ void CalculatedMaskGenerator::SyncSettingsFromInspector()
 	if (m_Inspector->HasVariable("CurvatureSensitivity")) m_Settings.curvatureScale = m_Inspector->GetVariable("CurvatureSensitivity").GetFloat();
 	if (m_Inspector->HasVariable("CavitySensitivity")) m_Settings.cavityScale = m_Inspector->GetVariable("CavitySensitivity").GetFloat();
 	if (m_Inspector->HasVariable("SeaLevel")) m_Settings.seaLevel = m_Inspector->GetVariable("SeaLevel").GetFloat();
+	if (m_Inspector->HasVariable("SpiralArms")) m_Settings.spiralArms = m_Inspector->GetVariable("SpiralArms").GetFloat();
+	if (m_Inspector->HasVariable("SpiralTurns")) m_Settings.spiralTurns = m_Inspector->GetVariable("SpiralTurns").GetFloat();
+	if (m_Inspector->HasVariable("SpiralThickness")) m_Settings.spiralThickness = m_Inspector->GetVariable("SpiralThickness").GetFloat();
+	if (m_Inspector->HasVariable("SpiralSoftness")) m_Settings.spiralSoftness = m_Inspector->GetVariable("SpiralSoftness").GetFloat();
+	if (m_Inspector->HasVariable("SpiralRotation")) m_Settings.spiralRotation = m_Inspector->GetVariable("SpiralRotation").GetFloat();
+	if (m_Inspector->HasVariable("SpiralInvert")) m_Settings.spiralInvert = m_Inspector->GetVariable("SpiralInvert").GetBool();
+	if (m_Inspector->HasVariable("GridCells")) m_Settings.gridCells = m_Inspector->GetVariable("GridCells").GetFloat();
+	if (m_Inspector->HasVariable("GridThickness")) m_Settings.gridThickness = m_Inspector->GetVariable("GridThickness").GetFloat();
+	if (m_Inspector->HasVariable("GridSoftness")) m_Settings.gridSoftness = m_Inspector->GetVariable("GridSoftness").GetFloat();
+	if (m_Inspector->HasVariable("GridRotation")) m_Settings.gridRotation = m_Inspector->GetVariable("GridRotation").GetFloat();
+	if (m_Inspector->HasVariable("GridInvert")) m_Settings.gridInvert = m_Inspector->GetVariable("GridInvert").GetBool();
+	if (m_Inspector->HasVariable("DotCells")) m_Settings.dotCells = m_Inspector->GetVariable("DotCells").GetFloat();
+	if (m_Inspector->HasVariable("DotRadius")) m_Settings.dotRadius = m_Inspector->GetVariable("DotRadius").GetFloat();
+	if (m_Inspector->HasVariable("DotSoftness")) m_Settings.dotSoftness = m_Inspector->GetVariable("DotSoftness").GetFloat();
+	if (m_Inspector->HasVariable("DotRotation")) m_Settings.dotRotation = m_Inspector->GetVariable("DotRotation").GetFloat();
+	if (m_Inspector->HasVariable("DotInvert")) m_Settings.dotInvert = m_Inspector->GetVariable("DotInvert").GetBool();
 	if (m_Inspector->HasVariable("Center")) m_Settings.center = m_Inspector->GetVariable("Center").GetVector2();
 	if (m_Inspector->HasVariable("UsePath")) m_Settings.usePath = m_Inspector->GetVariable("UsePath").GetBool();
 	if (m_Inspector->HasVariable("Feature")) m_Settings.selectValleys = m_Inspector->GetVariable("Feature").GetInt() == 1;
@@ -323,6 +339,22 @@ bool CalculatedMaskGenerator::Update(GeneratorData* sourceData)
 	m_Shader->SetUniform4f("u_Settings2", m_Settings.seaLevel, m_Settings.selectValleys ? 1.0f : 0.0f, m_Settings.usePath ? 1.0f : 0.0f, m_Settings.sampleRadius);
 	m_Shader->SetUniform1f("u_CurvatureScale", m_Settings.curvatureScale);
 	m_Shader->SetUniform1f("u_CavityScale", m_Settings.cavityScale);
+	m_Shader->SetUniform1f("u_SpiralArms", m_Settings.spiralArms);
+	m_Shader->SetUniform1f("u_SpiralTurns", m_Settings.spiralTurns);
+	m_Shader->SetUniform1f("u_SpiralThickness", m_Settings.spiralThickness);
+	m_Shader->SetUniform1f("u_SpiralSoftness", m_Settings.spiralSoftness);
+	m_Shader->SetUniform1f("u_SpiralRotation", m_Settings.spiralRotation);
+	m_Shader->SetUniform1i("u_SpiralInvert", m_Settings.spiralInvert ? 1 : 0);
+	m_Shader->SetUniform1f("u_GridCells", m_Settings.gridCells);
+	m_Shader->SetUniform1f("u_GridThickness", m_Settings.gridThickness);
+	m_Shader->SetUniform1f("u_GridSoftness", m_Settings.gridSoftness);
+	m_Shader->SetUniform1f("u_GridRotation", m_Settings.gridRotation);
+	m_Shader->SetUniform1i("u_GridInvert", m_Settings.gridInvert ? 1 : 0);
+	m_Shader->SetUniform1f("u_DotCells", m_Settings.dotCells);
+	m_Shader->SetUniform1f("u_DotRadius", m_Settings.dotRadius);
+	m_Shader->SetUniform1f("u_DotSoftness", m_Settings.dotSoftness);
+	m_Shader->SetUniform1f("u_DotRotation", m_Settings.dotRotation);
+	m_Shader->SetUniform1i("u_DotInvert", m_Settings.dotInvert ? 1 : 0);
 	m_Shader->SetUniform1i("u_PathPointCount", glm::clamp(m_Settings.pathPointCount, 2, CalculatedMaskSettings::MaxPathPoints));
 	for (int pointIndex = 0; pointIndex < CalculatedMaskSettings::MaxPathPoints; ++pointIndex)
 	{

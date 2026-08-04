@@ -230,6 +230,52 @@
         { "Name": "Range", "Type": "Vector2", "Default": [0.0, 0.2], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Distance range", "Description": "Inner and outer normalized radius of the radial gradient.", "Tooltip": "The mask is strongest inside the inner radius and fades out past the outer radius." },
         { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the radial band as a fraction of its width.", "Tooltip": "This keeps the gradient proportional when the radius changes." }
       ]
+    },
+    {
+      "ID": "spiral",
+      "Mode": 17,
+      "ShaderSymbol": "TF3D_MASK_SPIRAL",
+      "Name": "Spiral",
+      "Description": "Creates a smooth spiral band mask around a normalized map center for concentric or winding distributions.",
+      "Params": [
+        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Sets the origin around which the spiral winds.", "Tooltip": "Move the center to place the spiral over a particular terrain region." },
+        { "Name": "SpiralArms", "Type": "Float", "Default": 1.0, "Widget": "Slider", "Constraints": [1.0, 8.0], "Label": "Arms", "Description": "Controls how many parallel arms run through the spiral.", "Tooltip": "One arm makes a single continuous coil; higher values create evenly spaced parallel coils." },
+        { "Name": "SpiralTurns", "Type": "Float", "Default": 8.0, "Widget": "Slider", "Constraints": [0.0, 32.0], "Label": "Turns", "Description": "Controls how many times the arm winds from the center toward the edge.", "Tooltip": "Higher values pack the spiral bands more tightly across the map." },
+        { "Name": "SpiralThickness", "Type": "Float", "Default": 0.08, "Widget": "Slider", "Constraints": [0.005, 0.5], "Label": "Band thickness", "Description": "Controls the width of the solid part of each spiral band.", "Tooltip": "Increase it for broad distribution zones; lower it for narrow lines." },
+        { "Name": "SpiralSoftness", "Type": "Float", "Default": 0.03, "Widget": "Slider", "Constraints": [0.0, 0.25], "Label": "Band softness", "Description": "Controls how gently each spiral band fades into its surroundings.", "Tooltip": "A small amount removes harsh pixel edges while preserving a readable band." },
+        { "Name": "SpiralRotation", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Rotation", "Description": "Rotates the spiral around its center in degrees.", "Tooltip": "Use this to align the spiral arms with a preferred world or map direction." },
+        { "Name": "SpiralInvert", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Invert", "Description": "Swaps the spiral bands and the space between them.", "Tooltip": "Use the inverted result when the surrounding area should be selected instead of the spiral lines." }
+      ]
+    },
+    {
+      "ID": "grid",
+      "Mode": 18,
+      "ShaderSymbol": "TF3D_MASK_GRID",
+      "Name": "Grid",
+      "Description": "Creates a regular square grid mask around a normalized map center for tiled or lattice-like distributions.",
+      "Params": [
+        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Sets the point where the grid lines cross and from which the grid is aligned.", "Tooltip": "Move the center to align the grid with a feature or region on the terrain." },
+        { "Name": "GridCells", "Type": "Float", "Default": 12.0, "Widget": "Slider", "Constraints": [1.0, 64.0], "Label": "Cells across map", "Description": "Controls the number of grid cells across the normalized map.", "Tooltip": "Higher values create smaller, more frequent tiles." },
+        { "Name": "GridThickness", "Type": "Float", "Default": 0.08, "Widget": "Slider", "Constraints": [0.005, 0.5], "Label": "Line thickness", "Description": "Controls the width of the solid part of each grid line.", "Tooltip": "Increase it for broad bands; lower it for fine lattice lines." },
+        { "Name": "GridSoftness", "Type": "Float", "Default": 0.03, "Widget": "Slider", "Constraints": [0.0, 0.25], "Label": "Line softness", "Description": "Controls how gently each grid line fades into the surrounding cells.", "Tooltip": "A small amount keeps the grid readable while avoiding harsh pixel edges." },
+        { "Name": "GridRotation", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Rotation", "Description": "Rotates the entire grid around its center in degrees.", "Tooltip": "Use this to create a diagonal or world-aligned lattice." },
+        { "Name": "GridInvert", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Invert", "Description": "Swaps the grid lines and the space between them.", "Tooltip": "Use the inverted result when the cells should be selected instead of the grid lines." }
+      ]
+    },
+    {
+      "ID": "dots",
+      "Mode": 19,
+      "ShaderSymbol": "TF3D_MASK_DOTS",
+      "Name": "Dots",
+      "Description": "Creates a regular field of soft circular dots around a normalized map center for polka-dot or tiled distributions.",
+      "Params": [
+        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Sets the origin used to align the dot lattice.", "Tooltip": "Move the center to align the dot pattern with a terrain feature or region." },
+        { "Name": "DotCells", "Type": "Float", "Default": 12.0, "Widget": "Slider", "Constraints": [1.0, 64.0], "Label": "Dots across map", "Description": "Controls the number of dot cells across the normalized map.", "Tooltip": "Higher values create smaller, more frequent dots." },
+        { "Name": "DotRadius", "Type": "Float", "Default": 0.24, "Widget": "Slider", "Constraints": [0.005, 0.5], "Label": "Dot radius", "Description": "Controls the radius of each solid circular dot relative to its cell.", "Tooltip": "Increase it for larger dots; values near half a cell almost fill each tile." },
+        { "Name": "DotSoftness", "Type": "Float", "Default": 0.03, "Widget": "Slider", "Constraints": [0.0, 0.25], "Label": "Dot softness", "Description": "Controls how gently each dot fades into the surrounding space.", "Tooltip": "A small amount keeps the dots smooth without making them look blurry." },
+        { "Name": "DotRotation", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Rotation", "Description": "Rotates the dot lattice around its center in degrees.", "Tooltip": "Circular dots stay round while their lattice alignment rotates." },
+        { "Name": "DotInvert", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Invert", "Description": "Swaps the dots and the space between them.", "Tooltip": "Use the inverted result when the background cells should be selected instead of the dots." }
+      ]
     }
   ]
 }
