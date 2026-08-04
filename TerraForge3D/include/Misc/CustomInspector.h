@@ -17,10 +17,12 @@ enum CustomInspectorValueType
 	CustomInspectorValueType_Vector4,
 	CustomInspectorValueType_Texture,
 	CustomInspectorValueType_Path,
+	CustomInspectorValueType_Curve,
 	CustomInspectorValueType_Count
 };
 
 inline constexpr size_t CustomInspectorMaxPathPoints = 16;
+inline constexpr size_t CustomInspectorMaxCurvePoints = 16;
 
 class CustomInspectorValue
 {
@@ -178,6 +180,8 @@ public:
 
 	inline const std::array<glm::vec2, CustomInspectorMaxPathPoints>& GetPathPoints() const { return m_PathPoints; }
 	inline int GetPathPointCount() const { return m_PathPointCount; }
+	inline const std::array<glm::vec2, CustomInspectorMaxCurvePoints>& GetCurvePoints() const { return m_CurvePoints; }
+	inline int GetCurvePointCount() const { return m_CurvePointCount; }
 	inline void SetInt(int value)
 	{
 		if (m_Type == CustomInspectorValueType_Int) m_IntValue = value;
@@ -202,6 +206,8 @@ public:
 		m_VectorValue[3] = m_DefaultVectorValue[3];
 		m_PathPoints = m_DefaultPathPoints;
 		m_PathPointCount = m_DefaultPathPointCount;
+		m_CurvePoints = m_DefaultCurvePoints;
+		m_CurvePointCount = m_DefaultCurvePointCount;
 	}
 
 	SerializerNode Save() const;
@@ -223,6 +229,9 @@ private:
 	std::array<glm::vec2, CustomInspectorMaxPathPoints> m_PathPoints{};
 	std::array<glm::vec2, CustomInspectorMaxPathPoints> m_DefaultPathPoints{};
 	int32_t m_PathPointCount = 2, m_DefaultPathPointCount = 2;
+	std::array<glm::vec2, CustomInspectorMaxCurvePoints> m_CurvePoints{};
+	std::array<glm::vec2, CustomInspectorMaxCurvePoints> m_DefaultCurvePoints{};
+	int32_t m_CurvePointCount = 2, m_DefaultCurvePointCount = 2;
 };
 
 enum CustomInspectorWidgetType
@@ -233,6 +242,7 @@ enum CustomInspectorWidgetType
 	CustomInspectorWidgetType_Color,
 	CustomInspectorWidgetType_Texture,
 	CustomInspectorWidgetType_Path,
+	CustomInspectorWidgetType_Curve,
 	CustomInspectorWidgetType_Button,
 	CustomInspectorWidgetType_Checkbox,
 	CustomInspectorWidgetType_Input,
@@ -325,6 +335,8 @@ public:
 	CustomInspectorValue& AddTextureVariable(const std::string& name, std::shared_ptr<Texture2D> defaultValue = nullptr);
 	CustomInspectorValue& AddPathVariable(const std::string& name,
 		const std::array<glm::vec2, CustomInspectorMaxPathPoints>& defaultPoints = {}, int defaultPointCount = 2);
+	CustomInspectorValue& AddCurveVariable(const std::string& name,
+		const std::array<glm::vec2, CustomInspectorMaxCurvePoints>& defaultPoints = {}, int defaultPointCount = 2);
 	CustomInspectorValue& AddVairableFromConfig(const nlohmann::json& config);
 
 	bool HasWidget(const std::string& name);
@@ -336,6 +348,7 @@ public:
 	CustomInspectorWidget& AddColorWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddTextureWidget(const std::string& label, const std::string& variableName, float width = 100.0f, float height = 100.0f);
 	CustomInspectorWidget& AddPathWidget(const std::string& label, const std::string& variableName);
+	CustomInspectorWidget& AddCurveWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddButtonWidget(const std::string& label, const std::string& actionName);
 	CustomInspectorWidget& AddCheckboxWidget(const std::string& label, const std::string& variableName);
 	CustomInspectorWidget& AddInputWidget(const std::string& label, const std::string& variableName);
@@ -390,6 +403,7 @@ private:
 	bool RenderSeed(CustomInspectorWidget& widget);
 	bool RenderDropdown(const CustomInspectorWidget& widget);
 	bool RenderPath(const CustomInspectorWidget& widget);
+	bool RenderCurve(const CustomInspectorWidget& widget);
 
 
 private:

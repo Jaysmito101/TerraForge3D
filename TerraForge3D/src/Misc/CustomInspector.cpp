@@ -51,6 +51,7 @@ std::string CustomInspectorValue::CustomInspectorValueTypeToString(CustomInspect
 	case CustomInspectorValueType_Vector4:	return "Vector4";
 	case CustomInspectorValueType_Texture:	return "Texture";
 	case CustomInspectorValueType_Path:		return "Path";
+	case CustomInspectorValueType_Curve:		return "Curve";
 	default: return "Unknown";
 	}
 }
@@ -66,6 +67,7 @@ CustomInspectorValueType CustomInspectorValue::CustomInspectorValueTypeFromStrin
 	if (type == "Vector4")	return CustomInspectorValueType_Vector4;
 	if (type == "Texture")	return CustomInspectorValueType_Texture;
 	if (type == "Path")		return CustomInspectorValueType_Path;
+	if (type == "Curve")		return CustomInspectorValueType_Curve;
 	return CustomInspectorValueType_Unknown;
 }
 
@@ -130,6 +132,17 @@ SerializerNode CustomInspectorValue::Save() const
 			node->SetFloat("PathValueY" + std::to_string(index), m_PathPoints[index].y);
 			node->SetFloat("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
 			node->SetFloat("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+		}
+		break;
+	case CustomInspectorValueType_Curve:
+		node->SetInteger("CurvePointCount", m_CurvePointCount);
+		node->SetInteger("DefaultCurvePointCount", m_DefaultCurvePointCount);
+		for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
+		{
+			node->SetFloat("CurveValueX" + std::to_string(index), m_CurvePoints[index].x);
+			node->SetFloat("CurveValueY" + std::to_string(index), m_CurvePoints[index].y);
+			node->SetFloat("DefaultCurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
+			node->SetFloat("DefaultCurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
 		}
 		break;
 	default:
@@ -204,6 +217,17 @@ void CustomInspectorValue::Load(const SerializerNode& node)
 			m_PathPoints[index].y = node->GetFloat("PathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
 		}
 		break;
+	case CustomInspectorValueType_Curve:
+		m_DefaultCurvePointCount = glm::clamp(node->GetInteger("DefaultCurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
+		m_CurvePointCount = glm::clamp(node->GetInteger("CurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
+		for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
+		{
+			m_DefaultCurvePoints[index].x = node->GetFloat("DefaultCurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
+			m_DefaultCurvePoints[index].y = node->GetFloat("DefaultCurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
+			m_CurvePoints[index].x = node->GetFloat("CurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
+			m_CurvePoints[index].y = node->GetFloat("CurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
+		}
+		break;
 	default:
 		break;
 	}
@@ -228,6 +252,7 @@ std::string CustomInspectorWidget::CustomInspectorWidgetTypeToString(CustomInspe
 	case CustomInspectorWidgetType_Color:		return "Color";
 	case CustomInspectorWidgetType_Texture:		return "Texture";
 	case CustomInspectorWidgetType_Path:		return "Path";
+	case CustomInspectorWidgetType_Curve:		return "Curve";
 	case CustomInspectorWidgetType_Button:		return "Button";
 	case CustomInspectorWidgetType_Checkbox:	return "Checkbox";
 	case CustomInspectorWidgetType_Input:		return "Input";
@@ -248,6 +273,7 @@ CustomInspectorWidgetType CustomInspectorWidget::CustomInspectorWidgetTypeFromSt
 	if (type == "Color")		return CustomInspectorWidgetType_Color;
 	if (type == "Texture")		return CustomInspectorWidgetType_Texture;
 	if (type == "Path")			return CustomInspectorWidgetType_Path;
+	if (type == "Curve")			return CustomInspectorWidgetType_Curve;
 	if (type == "Button")		return CustomInspectorWidgetType_Button;
 	if (type == "Checkbox")		return CustomInspectorWidgetType_Checkbox;
 	if (type == "Input")		return CustomInspectorWidgetType_Input;
@@ -421,6 +447,29 @@ CustomInspectorValue& CustomInspector::AddPathVariable(const std::string& name,
 	return AddVariable(name, value);
 }
 
+CustomInspectorValue& CustomInspector::AddCurveVariable(const std::string& name,
+	const std::array<glm::vec2, CustomInspectorMaxCurvePoints>& defaultPoints, int defaultPointCount)
+{
+	CustomInspectorValue value(CustomInspectorValueType_Curve);
+	value.m_CurvePoints.fill(glm::vec2(-1.0f));
+	value.m_DefaultCurvePoints.fill(glm::vec2(-1.0f));
+	const int pointCount = glm::clamp(defaultPointCount, 2, static_cast<int>(CustomInspectorMaxCurvePoints));
+	for (int index = 0; index < pointCount; ++index)
+	{
+		value.m_CurvePoints[index] = defaultPoints[index];
+		value.m_DefaultCurvePoints[index] = defaultPoints[index];
+	}
+	if (value.m_CurvePoints[0].x < 0.0f)
+	{
+		value.m_CurvePoints[0] = value.m_DefaultCurvePoints[0] = glm::vec2(0.0f, 0.0f);
+	}
+	if (value.m_CurvePoints[1].x < 0.0f || value.m_CurvePoints[1].x <= value.m_CurvePoints[0].x)
+		value.m_CurvePoints[1] = value.m_DefaultCurvePoints[1] = glm::vec2(1.0f, 1.0f);
+	value.m_DefaultCurvePointCount = value.m_CurvePointCount = pointCount;
+	value.m_Name = name;
+	return AddVariable(name, value);
+}
+
 CustomInspectorValue& CustomInspector::AddVairableFromConfig(const nlohmann::json& config)
 {
 	std::string name = config.contains("Name") ? config["Name"].get<std::string>() : "Unnamed";
@@ -453,6 +502,30 @@ CustomInspectorValue& CustomInspector::AddVairableFromConfig(const nlohmann::jso
 			}
 		}
 		auto& var = AddPathVariable(name, points, pointCount);
+		var.m_Name = name;
+		return var;
+	}
+	case CustomInspectorValueType_Curve:
+	{
+		std::array<glm::vec2, CustomInspectorMaxCurvePoints> points;
+		points.fill(glm::vec2(-1.0f));
+		int pointCount = config.value("PointCount", 2);
+		if (hasDefaultValue && config["Default"].is_array())
+		{
+			pointCount = config.value("PointCount", static_cast<int>(config["Default"].size()));
+			for (size_t index = 0; index < config["Default"].size() && index < CustomInspectorMaxCurvePoints; ++index)
+			{
+				const auto& point = config["Default"][index];
+				if (!point.is_array() || point.size() < 2) continue;
+				points[index] = glm::vec2(point[0].get<float>(), point[1].get<float>());
+			}
+		}
+		else
+		{
+			points[0] = glm::vec2(0.0f, 0.0f);
+			points[1] = glm::vec2(1.0f, 1.0f);
+		}
+		auto& var = AddCurveVariable(name, points, pointCount);
 		var.m_Name = name;
 		return var;
 	}
@@ -571,6 +644,14 @@ CustomInspectorWidget& CustomInspector::AddPathWidget(const std::string& label, 
 	return AddWidget(label, widget);
 }
 
+CustomInspectorWidget& CustomInspector::AddCurveWidget(const std::string& label, const std::string& variableName)
+{
+	CustomInspectorWidget widget(CustomInspectorWidgetType_Curve);
+	widget.SetLabel(label);
+	widget.SetVariableName(variableName);
+	return AddWidget(label, widget);
+}
+
 CustomInspectorWidget& CustomInspector::AddSeperatorWidget()
 {
 	return AddWidget("Seperator", CustomInspectorWidget(CustomInspectorWidgetType_Seperator));
@@ -599,6 +680,7 @@ CustomInspectorWidget& CustomInspector::AddWidgetFromString(const std::string& l
 	case CustomInspectorWidgetType_Color:		return AddColorWidget(label, variableName);
 	case CustomInspectorWidgetType_Texture:		return AddTextureWidget(label, variableName);
 	case CustomInspectorWidgetType_Path:		return AddPathWidget(label, variableName);
+	case CustomInspectorWidgetType_Curve:		return AddCurveWidget(label, variableName);
 	case CustomInspectorWidgetType_Button:		return AddButtonWidget(label, variableName);
 	case CustomInspectorWidgetType_Checkbox:	return AddCheckboxWidget(label, variableName);
 	case CustomInspectorWidgetType_Input:		return AddInputWidget(label, variableName);
@@ -821,6 +903,7 @@ bool CustomInspector::Render()
 		else if (widget.m_Type == CustomInspectorWidgetType_Color) widgetChanged = RenderColor(widget);
 		else if (widget.m_Type == CustomInspectorWidgetType_Texture) widgetChanged = RenderTexture(widget);
 		else if (widget.m_Type == CustomInspectorWidgetType_Path) widgetChanged = RenderPath(widget);
+		else if (widget.m_Type == CustomInspectorWidgetType_Curve) widgetChanged = RenderCurve(widget);
 		else if (widget.m_Type == CustomInspectorWidgetType_Button) widgetChanged = RenderButton(widget);
 		else if (widget.m_Type == CustomInspectorWidgetType_Checkbox) widgetChanged = RenderCheckbox(widget);
 		else if (widget.m_Type == CustomInspectorWidgetType_Input) widgetChanged = RenderInput(widget);
@@ -1055,6 +1138,30 @@ bool CustomInspector::RenderPath(const CustomInspectorWidget& widget)
 		throw std::runtime_error("Invalid data type for Path");
 	return TerraForge3D::UI::DrawPathEditor<CustomInspectorMaxPathPoints>(
 		widget.m_Label.c_str(), value.m_PathPoints, value.m_PathPointCount);
+}
+
+bool CustomInspector::RenderCurve(const CustomInspectorWidget& widget)
+{
+	auto& value = m_Values[widget.m_VariableName];
+	if (value.GetType() != CustomInspectorValueType_Curve)
+		throw std::runtime_error("Invalid data type for Curve");
+
+	std::array<ImVec2, CustomInspectorMaxCurvePoints> points{};
+	for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
+		points[index] = ImVec2(value.m_CurvePoints[index].x, value.m_CurvePoints[index].y);
+
+	const float width = std::max(ImGui::GetContentRegionAvail().x, 220.0f);
+	const std::string curveLabel = widget.m_Label + "##" + widget.m_VariableName;
+	const bool changed = ImGui::Curve(curveLabel.c_str(), ImVec2(width, 180.0f),
+		static_cast<int>(CustomInspectorMaxCurvePoints), points.data()) != 0;
+	int pointCount = 0;
+	while (pointCount < static_cast<int>(CustomInspectorMaxCurvePoints) && points[pointCount].x >= 0.0f)
+		++pointCount;
+	pointCount = std::clamp(pointCount, 2, static_cast<int>(CustomInspectorMaxCurvePoints));
+	for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
+		value.m_CurvePoints[index] = glm::vec2(points[index].x, points[index].y);
+	value.m_CurvePointCount = pointCount;
+	return changed;
 }
 
 bool CustomInspector::RenderCheckbox(const CustomInspectorWidget& widget)
