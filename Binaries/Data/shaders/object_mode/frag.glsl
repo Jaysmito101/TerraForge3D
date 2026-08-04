@@ -62,9 +62,10 @@ vec3 calculateNormal()
 {
 	vec3 up = normalize(fragmentInput.normal);
 	float height = SampleHeightBilinear(fragmentInput.texCoord);
-	vec3 basePosition = fragmentInput.position - up * dot(fragmentInput.position, up);
-	vec3 dx = dFdx(basePosition) + up * dFdx(height);
-	vec3 dy = dFdy(basePosition) + up * dFdy(height);
+	vec3 basePosition = fragmentInput.position - up * height;
+	vec2 heightGradient = SampleHeightGradient(fragmentInput.texCoord);
+	vec3 dx = dFdx(basePosition) + up * dot(heightGradient, dFdx(fragmentInput.texCoord));
+	vec3 dy = dFdy(basePosition) + up * dot(heightGradient, dFdy(fragmentInput.texCoord));
 	vec3 normal = normalize(cross(dx, dy));
 	return u_InvertNormals ? -normal : normal;
 }
