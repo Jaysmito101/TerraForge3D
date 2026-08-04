@@ -5,6 +5,7 @@
 #include "Utils/Utils.h"
 #include <fstream>
 #include <iostream>
+#include <cctype>
 #include <sys/stat.h>
 #include  <cstdio>
 #include  <cstdlib>
@@ -408,6 +409,31 @@ std::string FormatMemoryToString(uint64_t size)
 	else if (size <= 1000000000000) return std::to_string(size / (1000000000.0)) + " GB";
 	else if (size <= 1000000000000000) return std::to_string(size / (1000000000000.0)) + " TB";
 	return std::to_string(size) + " B";
+}
+
+std::string LowercaseFilterText(const std::string& value)
+{
+	std::string result;
+	result.reserve(value.size());
+	for (const char character : value)
+		result.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(character))));
+	return result;
+}
+
+bool FuzzyFilterMatch(const std::string& query, const std::string& candidate)
+{
+	const std::string normalizedQuery = LowercaseFilterText(query);
+	if (normalizedQuery.empty()) return true;
+
+	const std::string normalizedCandidate = LowercaseFilterText(candidate);
+	size_t candidateIndex = 0;
+	for (const char queryCharacter : normalizedQuery)
+	{
+		candidateIndex = normalizedCandidate.find(queryCharacter, candidateIndex);
+		if (candidateIndex == std::string::npos) return false;
+		candidateIndex++;
+	}
+	return true;
 }
 
 bool ShowLayerUpdationMethod(const char* label, int* method)

@@ -61,6 +61,8 @@ std::wstring s2ws(const std::string &s);
 #endif
 
 std::string ColorConvertToHexString(float r, float g, float b, float a = 1.0f);
+std::string LowercaseFilterText(const std::string& value);
+bool FuzzyFilterMatch(const std::string& query, const std::string& candidate);
 bool ShowSeedSettings(const std::string& label, int* seed, std::vector<int>& historyStack);
 void OpenURL(std::string url);
 std::string ShowSaveFileDialog(std::string ext = ".terr3d");
