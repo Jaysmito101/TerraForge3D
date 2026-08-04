@@ -31,6 +31,8 @@ enum class CalculatedMaskType
 
 struct CalculatedMaskSettings
 {
+	static constexpr int MaxPathPoints = 16;
+
 	CalculatedMaskType type = CalculatedMaskType::HeightRange;
 	float minimum = 0.25f;
 	float maximum = 0.75f;
@@ -40,9 +42,13 @@ struct CalculatedMaskSettings
 	float scale = 4.0f;
 	float seed = 42.0f;
 	float sampleRadius = 3.0f;
+	float curvatureScale = 32.0f;
+	float cavityScale = 48.0f;
 	float seaLevel = 0.0f;
 	glm::vec2 center = glm::vec2(0.5f);
 	glm::vec2 pathEnd = glm::vec2(0.75f, 0.5f);
+	std::array<glm::vec2, MaxPathPoints> pathPoints{};
+	int pathPointCount = 2;
 	bool usePath = false;
 	bool selectValleys = false;
 };
