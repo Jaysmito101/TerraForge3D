@@ -9,6 +9,7 @@
 #include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/MaskTool.h"
 #include "Generators/BiomeFilterStack.h"
+#include "Generators/GeneratorDataStatistics.h"
 #include "Base/Base.h"
 
 class ApplicationState;
@@ -82,4 +83,8 @@ private:
 	std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
 	std::shared_ptr<BiomeBaseNoiseGenerator> m_BaseNoiseGenerator;
 	std::shared_ptr< BiomeCustomBaseShape> m_CustomBaseShape;
+	std::shared_ptr<GeneratorDataStatistics> m_Statistics;
+	GeneratorDataStatisticsResult m_StatisticsResult;
+	bool m_StatisticsDirty = true;
+	int m_StatisticsSampleStride = 4;
 };

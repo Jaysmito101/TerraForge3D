@@ -78,6 +78,7 @@ bool BiomeManager::LoadUpResources()
 	m_CustomBaseShape = std::make_shared<BiomeCustomBaseShape>(m_AppState);
 	m_MaskTool = std::make_shared<MaskTool>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
 	m_FilterStack = std::make_shared<BiomeFilterStack>(m_AppState);
+	m_Statistics = std::make_shared<GeneratorDataStatistics>(m_AppState);
 	return true;
 }
 
@@ -116,6 +117,7 @@ void BiomeManager::Resize()
 	m_MaskTool->Resize(m_AppState->mainMap.tileResolution);
 	m_FilterStack->Resize(size, m_AppState->mainMap.tileResolution);
 	m_RequireUpdation = true;
+	m_StatisticsDirty = true;
 }
 
 void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTexture)
@@ -152,6 +154,7 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 
 	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
+	m_StatisticsDirty = true;
 }
 
 bool BiomeManager::ShowCustomBaseShapeSettings()
@@ -215,6 +218,27 @@ bool BiomeManager::ShowGeneralSettings()
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
 		ImGui::Text("Time Taken: %f", m_CalculationTime);
+		if (m_StatisticsDirty && m_Statistics != nullptr && m_Data != nullptr)
+		{
+			m_Statistics->Compute(m_Data.get(), m_AppState->mainMap.tileResolution, m_StatisticsSampleStride);
+			glFinish();
+			m_StatisticsResult = m_Statistics->Read();
+			m_StatisticsDirty = false;
+		}
+
+		if (!m_StatisticsResult.valid)
+		{
+			ImGui::TextDisabled("No completed statistics yet.");
+		}
+		else
+		{
+			ImGui::Text("Minimum: %.6f", m_StatisticsResult.minimum);
+			ImGui::Text("Maximum: %.6f", m_StatisticsResult.maximum);
+			ImGui::TextDisabled("Histogram sampled every %d pixels", m_StatisticsSampleStride);
+			ImGui::PlotLines("##BiomeFieldHistogram", m_StatisticsResult.histogram.data(),
+				static_cast<int>(m_StatisticsResult.histogram.size()), 0, "Height distribution", 0.0f, 1.0f,
+				ImVec2(-1.0f, 120.0f));
+		}
 	}
 	ImGui::PopID();
 	return m_RequireUpdation;
