@@ -1,11 +1,5 @@
 const float TF3D_NOISE_PI2 = 6.28318530718;
 
-vec2 tf3d_hash2(vec2 p)
-{
-	p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
-	return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
-}
-
 float tf3d_hash12(vec2 p, float seed)
 {
 	vec3 value = fract(vec3(p.xyx + seed) * 0.1031);
@@ -20,17 +14,22 @@ vec2 tf3d_hash22(vec2 p, float seed)
 		tf3d_hash12(p + vec2(5.0, 29.0), seed + 19.19));
 }
 
-float tf3d_noise_seed_offset(float seed)
+const vec2 TF3D_NOISE_GRADIENTS[8] = vec2[](
+	vec2( 1.0,  0.0), vec2( 0.70710678,  0.70710678),
+	vec2( 0.0,  1.0), vec2(-0.70710678,  0.70710678),
+	vec2(-1.0,  0.0), vec2(-0.70710678, -0.70710678),
+	vec2( 0.0, -1.0), vec2( 0.70710678, -0.70710678));
+
+vec2 tf3d_gradient2(vec2 cell, float seed)
 {
-	return seed * 0.071421;
+	int gradientIndex = int(floor(tf3d_hash12(cell, seed) * 8.0));
+	return TF3D_NOISE_GRADIENTS[gradientIndex];
 }
 
 float tf3d_simplex2_raw(vec2 p, float seed)
 {
 	const float K1 = 0.366025404;
 	const float K2 = 0.211324865;
-	vec2 seedOffset = vec2(tf3d_noise_seed_offset(seed), seed * 0.11317);
-	p += seedOffset;
 	vec2 i = floor(p + (p.x + p.y) * K1);
 	vec2 a = p - i + (i.x + i.y) * K2;
 	float m = step(a.y, a.x);
@@ -38,10 +37,13 @@ float tf3d_simplex2_raw(vec2 p, float seed)
 	vec2 b = a - o + K2;
 	vec2 c = a - 1.0 + 2.0 * K2;
 	vec3 h = max(0.5 - vec3(dot(a, a), dot(b, b), dot(c, c)), 0.0);
+	vec2 g0 = tf3d_gradient2(i, seed);
+	vec2 g1 = tf3d_gradient2(i + o, seed);
+	vec2 g2 = tf3d_gradient2(i + 1.0, seed);
 	vec3 n = h * h * h * h * vec3(
-		dot(a, tf3d_hash2(i + vec2(seed))),
-		dot(b, tf3d_hash2(i + o + vec2(seed))),
-		dot(c, tf3d_hash2(i + 1.0 + vec2(seed))));
+		dot(a, g0),
+		dot(b, g1),
+		dot(c, g2));
 	return clamp(dot(n, vec3(70.0)), -1.0, 1.0);
 }
 
@@ -49,7 +51,7 @@ float tf3d_value2(vec2 p, float seed)
 {
 	vec2 cell = floor(p);
 	vec2 local = fract(p);
-	vec2 smoothLocal = local * local * (3.0 - 2.0 * local);
+	vec2 smoothLocal = local * local * local * (local * (local * 6.0 - 15.0) + 10.0);
 	float a = tf3d_hash12(cell, seed);
 	float b = tf3d_hash12(cell + vec2(1.0, 0.0), seed);
 	float c = tf3d_hash12(cell + vec2(0.0, 1.0), seed);
@@ -62,26 +64,21 @@ float tf3d_perlin2(vec2 p, float seed)
 	vec2 cell = floor(p);
 	vec2 local = fract(p);
 	vec2 fade = local * local * local * (local * (local * 6.0 - 15.0) + 10.0);
-	vec2 seedOffset = vec2(seed * 0.071421, seed * 0.11317);
-	vec2 g00 = tf3d_hash2(cell + seedOffset);
-	vec2 g10 = tf3d_hash2(cell + vec2(1.0, 0.0) + seedOffset);
-	vec2 g01 = tf3d_hash2(cell + vec2(0.0, 1.0) + seedOffset);
-	vec2 g11 = tf3d_hash2(cell + vec2(1.0) + seedOffset);
-	g00 /= max(length(g00), 0.001);
-	g10 /= max(length(g10), 0.001);
-	g01 /= max(length(g01), 0.001);
-	g11 /= max(length(g11), 0.001);
+	vec2 g00 = tf3d_gradient2(cell, seed);
+	vec2 g10 = tf3d_gradient2(cell + vec2(1.0, 0.0), seed);
+	vec2 g01 = tf3d_gradient2(cell + vec2(0.0, 1.0), seed);
+	vec2 g11 = tf3d_gradient2(cell + vec2(1.0), seed);
 	float n00 = dot(g00, local);
 	float n10 = dot(g10, local - vec2(1.0, 0.0));
 	float n01 = dot(g01, local - vec2(0.0, 1.0));
 	float n11 = dot(g11, local - vec2(1.0));
-	return clamp(2.0 * mix(mix(n00, n10, fade.x), mix(n01, n11, fade.x), fade.y), -1.0, 1.0);
+	return clamp(1.41421356 * mix(mix(n00, n10, fade.x), mix(n01, n11, fade.x), fade.y), -1.0, 1.0);
 }
 
 vec2 tf3d_feature_point(vec2 cell, float jitter, float seed)
 {
 	vec2 randomPoint = tf3d_hash22(cell, seed) - vec2(0.5);
-	return cell + vec2(0.5) + randomPoint * clamp(jitter, 0.0, 1.0);
+	return cell + mix(vec2(0.5), vec2(0.5) + randomPoint, clamp(jitter, 0.0, 1.0));
 }
 
 float tf3d_worley2(vec2 p, float jitter, float seed)
@@ -122,41 +119,45 @@ float tf3d_voronoi2(vec2 p, float jitter, float seed)
 		}
 	}
 	float edgeDistance = secondDistance - firstDistance;
-	return clamp(1.0 - edgeDistance * 4.0, -1.0, 1.0);
+	return 1.0 - 2.0 * smoothstep(0.0, 0.70710678, edgeDistance);
 }
 
 float tf3d_gabor2(vec2 p, float jitter, float seed)
 {
 	vec2 cell = floor(p);
 	float sum = 0.0;
-	float weightSum = 0.0;
-	for (int y = -1; y <= 1; ++y)
+	float energy = 0.0;
+	float placement = clamp(jitter, 0.0, 1.0);
+	const float supportRadius = 1.75;
+	const float bandwidth = 1.15;
+	const float principalFrequency = 0.95;
+	for (int y = -2; y <= 2; ++y)
 	{
-		for (int x = -1; x <= 1; ++x)
+		for (int x = -2; x <= 2; ++x)
 		{
 			vec2 neighbour = cell + vec2(x, y);
 			vec2 randomPoint = tf3d_hash22(neighbour, seed);
-			vec2 feature = neighbour + randomPoint;
-			vec2 direction = tf3d_hash2(neighbour + vec2(seed));
-			direction /= max(length(direction), 0.001);
+			vec2 feature = neighbour + mix(vec2(0.5), randomPoint, placement);
+			vec2 direction = tf3d_gradient2(neighbour + vec2(11.0, 29.0), seed + 7.0);
 			vec2 delta = p - feature;
-			float kernel = exp(-dot(delta, delta) / 0.72);
-			float frequency = mix(0.55, 1.55, randomPoint.y);
-			float phase = randomPoint.x * TF3D_NOISE_PI2;
-			sum += kernel * cos(TF3D_NOISE_PI2 * frequency * dot(delta, direction) + phase);
-			weightSum += kernel;
+			float radiusSquared = dot(delta, delta);
+			if (radiusSquared < supportRadius * supportRadius)
+			{
+				float kernel = exp(-TF3D_NOISE_PI2 * bandwidth * bandwidth * radiusSquared);
+				float weight = tf3d_hash12(neighbour + vec2(47.0, 71.0), seed) * 2.0 - 1.0;
+				sum += weight * kernel * cos(TF3D_NOISE_PI2 * principalFrequency * dot(delta, direction));
+				energy += kernel * kernel;
+			}
 		}
 	}
-	return clamp(sum / max(weightSum, 0.0001) * 1.35, -1.0, 1.0);
+	return clamp(sum / sqrt(max(energy, 0.0001)) * 0.72, -1.0, 1.0);
 }
 
 float tf3d_phasor2(vec2 p, float jitter, float seed)
 {
-	vec2 phaseCell = floor(p * 0.5);
-	vec2 direction = tf3d_hash2(phaseCell + vec2(seed));
-	direction /= max(length(direction), 0.001);
-	float phase = 0.5 + 0.5 * tf3d_value2(p * (0.45 + jitter * 0.35) + vec2(7.0, 13.0), seed + 31.0);
-	float carrier = dot(p, direction) * (0.75 + jitter * 0.75) + phase * 1.7;
+	vec2 direction = tf3d_gradient2(vec2(19.0, 37.0), seed + 53.0);
+	float phaseModulation = 0.28 * tf3d_value2(p * 0.35 + vec2(7.0, 13.0), seed + 31.0);
+	float carrier = dot(p, direction) * 0.9 + phaseModulation;
 	return sin(TF3D_NOISE_PI2 * carrier);
 }
 
