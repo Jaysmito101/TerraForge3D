@@ -177,6 +177,10 @@ public:
 
 	inline const std::array<glm::vec2, CustomInspectorMaxPathPoints>& GetPathPoints() const { return m_PathPoints; }
 	inline int GetPathPointCount() const { return m_PathPointCount; }
+	inline void SetInt(int value)
+	{
+		if (m_Type == CustomInspectorValueType_Int) m_IntValue = value;
+	}
 	inline void SetVector2(glm::vec2 value)
 	{
 		if (m_Type != CustomInspectorValueType_Vector2) return;

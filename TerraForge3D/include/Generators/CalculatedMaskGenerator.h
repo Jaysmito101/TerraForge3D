@@ -3,6 +3,7 @@
 #include "Base/Base.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
+#include "Misc/CustomInspector.h"
 
 class ApplicationState;
 class ComputeShader;
@@ -34,6 +35,7 @@ struct CalculatedMaskSettings
 	static constexpr int MaxPathPoints = 16;
 
 	CalculatedMaskType type = CalculatedMaskType::HeightRange;
+	int shaderMode = 0;
 	float minimum = 0.25f;
 	float maximum = 0.75f;
 	float softness = 0.05f;
@@ -63,15 +65,26 @@ public:
 	void Invalidate();
 	bool ShowSettings();
 	bool Update(GeneratorData* sourceData);
+	SerializerNode Save() const;
+	void Load(SerializerNode data);
 
 	inline GeneratorTexture* GetTexture() const { return m_Texture.get(); }
 	inline const CalculatedMaskSettings& GetSettings() const { return m_Settings; }
 
 private:
+	bool LoadMetadata();
+	bool LoadInspectorForType(int typeIndex);
+	void SyncSettingsFromInspector();
+	int GetSelectedTypeIndex() const;
+	int FindTypeIndexByID(const std::string& id) const;
+
 	ApplicationState* m_AppState = nullptr;
 	std::shared_ptr<ComputeShader> m_Shader;
 	std::shared_ptr<GeneratorTexture> m_Texture;
+	std::shared_ptr<CustomInspector> m_Inspector;
+	nlohmann::json m_Metadata;
 	CalculatedMaskSettings m_Settings;
 	int m_Size = 256;
 	bool m_Dirty = true;
+	bool m_MetadataLoaded = false;
 };
