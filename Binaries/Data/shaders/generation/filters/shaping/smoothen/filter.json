@@ -46,7 +46,7 @@
             "Default": 2,
             "Widget": "Slider",
             "Constraints": [
-                0.01,
+                1.0,
                 8
             ],
             "Label": "Exponent",
