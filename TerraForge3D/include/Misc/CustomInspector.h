@@ -225,6 +225,7 @@ private:
 	bool m_BoolValue = false, m_DefaultBoolValue = false;
 	std::string m_StringValue = "", m_DefaultStringValue = "";
 	std::shared_ptr<Texture2D> m_TextureValue = nullptr, m_DefaultTextureValue = nullptr;
+	bool m_TextureLoadAs16Bit = false;
 	float m_VectorValue[4] = { 0.0f, 0.0f, 0.0f, 0.0f }, m_DefaultVectorValue[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	std::array<glm::vec2, CustomInspectorMaxPathPoints> m_PathPoints{};
 	std::array<glm::vec2, CustomInspectorMaxPathPoints> m_DefaultPathPoints{};

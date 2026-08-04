@@ -122,6 +122,7 @@ SerializerNode CustomInspectorValue::Save() const
 	case CustomInspectorValueType_Texture:
 		node->SetFile("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
 		node->SetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "null");
+		node->SetInteger("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8);
 		break;
 	case CustomInspectorValueType_Path:
 		node->SetInteger("PathPointCount", m_PathPointCount);
@@ -199,11 +200,16 @@ void CustomInspectorValue::Load(const SerializerNode& node)
 		break;
 	case CustomInspectorValueType_Texture:
 	{
+		m_TextureLoadAs16Bit = node->GetInteger("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8) >= 16;
 		const auto& defaultPath = node->GetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
 		const auto& path = node->GetFile("Value", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
-		// delete m_DefaultTextureValue; delete m_TextureValue;
-		m_DefaultTextureValue = std::make_shared<Texture2D>(defaultPath);
-		m_TextureValue = std::make_shared<Texture2D>(path);
+		auto loadTexture = [this](const std::string& texturePath) -> std::shared_ptr<Texture2D>
+		{
+			if (texturePath.empty() || texturePath == "null") return nullptr;
+			return std::make_shared<Texture2D>(texturePath, false, false, m_TextureLoadAs16Bit);
+		};
+		m_DefaultTextureValue = loadTexture(defaultPath);
+		m_TextureValue = loadTexture(path);
 		break;
 	}
 	case CustomInspectorValueType_Path:
@@ -486,7 +492,20 @@ CustomInspectorValue& CustomInspector::AddVairableFromConfig(const nlohmann::jso
 	case CustomInspectorValueType_Vector2:	{ auto& var = AddVector2Variable(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f)); var.m_Name = name; return var; }
 	case CustomInspectorValueType_Vector3:	{ auto& var = AddVector3Variable(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f)); var.m_Name = name; return var; }
 	case CustomInspectorValueType_Vector4:	{ auto& var = AddVector4Variable(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f)); var.m_Name = name; return var; }
-	case CustomInspectorValueType_Texture:  { auto& var = AddTextureVariable(name, hasDefaultValue ? std::make_shared<Texture2D>(config["Default"].get<std::string>()) : nullptr); var.m_Name = name; return var; }
+	case CustomInspectorValueType_Texture:
+	{
+		const bool loadAs16Bit = config.value("BitDepth", 8) >= 16;
+		std::shared_ptr<Texture2D> defaultTexture = nullptr;
+		if (hasDefaultValue && config["Default"].is_string())
+		{
+			const std::string path = config["Default"].get<std::string>();
+			if (!path.empty() && path != "null") defaultTexture = std::make_shared<Texture2D>(path, true, false, loadAs16Bit);
+		}
+		auto& var = AddTextureVariable(name, defaultTexture);
+		var.m_TextureLoadAs16Bit = loadAs16Bit;
+		var.m_Name = name;
+		return var;
+	}
 	case CustomInspectorValueType_Path:
 	{
 		std::array<glm::vec2, CustomInspectorMaxPathPoints> points{};
@@ -711,6 +730,12 @@ SerializerNode CustomInspector::SaveData() const
 
 void CustomInspector::LoadData(SerializerNode node)
 {
+	std::unordered_map<std::string, bool> textureBitDepths;
+	for (const auto& [name, existingValue] : m_Values)
+	{
+		if (existingValue.GetType() == CustomInspectorValueType_Texture && existingValue.m_TextureLoadAs16Bit)
+			textureBitDepths[name] = true;
+	}
 	m_Values.clear();
 	int32_t valueCount = node->GetInteger("ValueCount");
 	auto subNodes = node->GetNodeArray("Values");
@@ -719,6 +744,7 @@ void CustomInspector::LoadData(SerializerNode node)
 	{
 		std::string name = subNode->GetString("GName");
 		CustomInspectorValue value;
+		if (textureBitDepths.contains(name)) value.m_TextureLoadAs16Bit = true;
 		value.Load(subNode);
 		m_Values[name] = value;
 	}
@@ -1083,7 +1109,7 @@ bool CustomInspector::RenderTexture(const CustomInspectorWidget& widget)
 		std::string path = ShowOpenFileDialog("*.*");
 		if (path.size() > 3)
 		{
-			value.m_TextureValue = std::make_shared<Texture2D>(path, false);
+			value.m_TextureValue = std::make_shared<Texture2D>(path, false, false, value.m_TextureLoadAs16Bit);
 			hasChanged = true;
 		}
 	}
