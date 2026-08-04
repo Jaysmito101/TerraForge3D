@@ -1,0 +1,86 @@
+{
+    "ID": "clip",
+    "Name": "Clip",
+    "Category": "Shaping",
+    "Implementation": "PhaseChain",
+    "Description": "Clips terrain values from the bottom or top with an IQ-style smooth minimum or maximum around the threshold.",
+    "Phases": {
+        "Clip": "clip",
+        "Merge": "../../common/merge"
+    },
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "Clipped",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Clip",
+                "Input": "Current",
+                "Output": "Clipped",
+                "Uniforms": {
+                    "u_Threshold": {
+                        "Parameter": "Threshold"
+                    },
+                    "u_Side": {
+                        "Parameter": "Side"
+                    },
+                    "u_Softness": {
+                        "Parameter": "Softness"
+                    }
+                }
+            }
+        ],
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "Clipped",
+            "Output": "Next"
+        }
+    },
+    "Params": [
+        {
+            "Name": "Side",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Dropdown",
+            "Options": [
+                "Bottom",
+                "Top"
+            ],
+            "Label": "Clip side",
+            "Description": "Selects whether values below or above the threshold are clipped."
+        },
+        {
+            "Name": "Threshold",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                -100,
+                100
+            ],
+            "Label": "Threshold",
+            "Description": "The height at which clipping begins.",
+            "Tooltip": "Bottom clipping raises values below the threshold; top clipping lowers values above it."
+        },
+        {
+            "Name": "Softness",
+            "Type": "Float",
+            "Default": 0.05,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1
+            ],
+            "Label": "Softness",
+            "Description": "Blend width used by the smooth minimum or maximum around the threshold.",
+            "Tooltip": "Zero creates a hard min/max clip. Larger values make the transition smoother."
+        }
+    ]
+}
