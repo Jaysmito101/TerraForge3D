@@ -20,6 +20,7 @@ public:
 	BiomeBaseShapeGenerator(ApplicationState* appState);
 	~BiomeBaseShapeGenerator();
 	bool LoadConfig(const std::string& config);
+	bool LoadConfig(const nlohmann::json& config, const std::string& source, const std::string& shaderPath);
 	bool ShowSettings();
 	void Update(GeneratorData* buffer, GeneratorTexture* seedTexture);
 	void Load(SerializerNode data);
@@ -27,6 +28,7 @@ public:
 	
 	inline const std::string& GetName() const { return m_Name; }
 	inline const std::string& GetID() const { return m_ID; }
+	inline const std::string& GetDescription() const { return m_Description; }
 	inline const std::string& GetSource() const { return m_Source; }
 	inline bool RequireUpdation() const { return m_RequireUpdation; }
 
@@ -41,6 +43,8 @@ protected:
 	std::shared_ptr<CustomInspector> m_Inspector;
 	std::string m_Name = "";
 	std::string m_ID = "";
+	std::string m_Description = "";
 	std::string m_Source = "";
+	std::string m_ShaderPath = "";
 	bool m_RequireUpdation = true;
 };

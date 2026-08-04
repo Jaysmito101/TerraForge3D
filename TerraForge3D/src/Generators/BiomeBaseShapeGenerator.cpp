@@ -7,6 +7,7 @@ BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState* appState)
 	m_AppState = appState;
 	m_ID = GenerateId(8);
 	m_Source = "";
+	m_ShaderPath = "";
 	m_Name = "";
 	m_Inspector = std::make_shared<CustomInspector>();
 }
@@ -18,6 +19,11 @@ BiomeBaseShapeGenerator::~BiomeBaseShapeGenerator()
 bool BiomeBaseShapeGenerator::ShowSettings()
 {
 	ImGui::PushID(m_ID.c_str());
+	if (!m_Description.empty())
+	{
+		ImGui::TextWrapped("%s", m_Description.c_str());
+		ImGui::Separator();
+	}
 	BIOME_UI_PROPERTY(m_Inspector->Render());
 	ImGui::PopID();
 	return m_RequireUpdation;
@@ -60,7 +66,9 @@ void BiomeBaseShapeGenerator::Load(SerializerNode data)
 {
 	m_Name = data->GetString("Name", "Default Name");
 	m_ID = data->GetString("ID", GenerateId(8));
+	m_Description = data->GetString("Description", m_Description);
 	m_Source = data->GetString("Source");
+	m_ShaderPath = data->GetString("ShaderPath", "");
 	auto inspector = data->GetChildNode("Inspector");
 	if (inspector) m_Inspector->Load(inspector);
 	else TF3D_LOG_ERROR("Failed to load inspector data for generator '{}'", m_Name);
@@ -74,7 +82,9 @@ SerializerNode BiomeBaseShapeGenerator::Save()
 	SerializerNode node = CreateSerializerNode();
 	node->SetString("Name", m_Name);
 	node->SetString("ID", m_ID);
+	node->SetString("Description", m_Description);
 	node->SetString("Source", m_Source);
+	node->SetString("ShaderPath", m_ShaderPath);
 	node->SetChildNode("Inspector", m_Inspector->Save());
 	return node;
 }
@@ -145,8 +155,8 @@ std::string BiomeBaseShapeGenerator::BuildShaderSource()
 	source += "{\n\treturn y * u_Resolution + x;\n}\n\n";
 	source += "// body\n";
 	bool includeSuccess = false;
-	const auto expandedSource = m_AppState->resourceManager->PreprocessShaderSource(
-		m_Source, "generation/base_shape/" + m_Name + ".glsl", &includeSuccess);
+	const std::string shaderPath = m_ShaderPath.empty() ? "generation/base_shape/" + m_Name + ".glsl" : m_ShaderPath;
+	const auto expandedSource = m_AppState->resourceManager->PreprocessShaderSource(m_Source, shaderPath, &includeSuccess);
 	if (includeSuccess) source += expandedSource;
 	else source += m_Source;
 	source += "\n\n";
@@ -170,8 +180,23 @@ bool BiomeBaseShapeGenerator::LoadConfig(const std::string& config)
 		TF3D_LOG_ERROR("Failed to load base-shape generator configuration: {}", metaData["ErrorMessage"].get<std::string>());
 		return false;
 	}
-	if (!LoadInspectorFromConfig(metaData)) return false;
-	// m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
-	m_Shader = m_AppState->resourceManager->GetComputeShader("BaseShapeGen_" + m_Name, BuildShaderSource());
-	return true;
+	const std::string source = m_Source;
+	return LoadConfig(metaData, source, "generation/base_shape/" + m_Name + ".glsl");
+}
+
+bool BiomeBaseShapeGenerator::LoadConfig(const nlohmann::json& config, const std::string& source, const std::string& shaderPath)
+{
+	if (!config.is_object())
+	{
+		TF3D_LOG_ERROR("Failed to load base-shape generator: metadata is not an object.");
+		return false;
+	}
+	m_ID = config.value("ID", m_ID.empty() ? GenerateId(8) : m_ID);
+	m_Description = config.value("Description", "");
+	m_Source = source;
+	m_ShaderPath = shaderPath;
+	if (!LoadInspectorFromConfig(config)) return false;
+	m_Shader = m_AppState->resourceManager->GetComputeShader("BaseShapeGen_" + m_ID, BuildShaderSource());
+	m_RequireUpdation = true;
+	return m_Shader != nullptr;
 }

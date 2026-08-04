@@ -4,6 +4,9 @@
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
 
+#include <algorithm>
+#include <filesystem>
+
 #include "Generators/BiomeBaseShapeGenerator.h"
 
 bool BiomeManager::AddBaseShapeGenerator(const std::string& config)
@@ -12,17 +15,62 @@ bool BiomeManager::AddBaseShapeGenerator(const std::string& config)
 	return m_BaseShapeGenerators.back()->LoadConfig(config);
 }
 
+bool BiomeManager::AddBaseShapeGenerator(const nlohmann::json& config, const std::string& source, const std::string& shaderPath)
+{
+	m_BaseShapeGenerators.push_back(std::make_shared<BiomeBaseShapeGenerator>(m_AppState));
+	return m_BaseShapeGenerators.back()->LoadConfig(config, source, shaderPath);
+}
+
 bool BiomeManager::LoadUpResources()
 {
 	const std::string baseShapeGeneratorsDir = m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape";
-	for (auto& directoryEntry : std::filesystem::recursive_directory_iterator(baseShapeGeneratorsDir))
+	std::vector<std::filesystem::path> definitionPaths;
+	std::vector<std::filesystem::path> legacyShaderPaths;
+	for (const auto& directoryEntry : std::filesystem::recursive_directory_iterator(baseShapeGeneratorsDir))
 	{
-		if (!directoryEntry.is_directory() && directoryEntry.path().extension() == ".glsl")
+		if (directoryEntry.is_directory()) continue;
+		if (directoryEntry.path().filename() == "base_shape.json")
 		{
-			const std::string config = ReadShaderSourceFile(directoryEntry.path().string(), &s_TempBool);
-			if (!s_TempBool) continue;
-			if (!AddBaseShapeGenerator(config)) TF3D_LOG_ERROR("Failed to load base-shape generator '{}'", directoryEntry.path().string());
+			definitionPaths.push_back(directoryEntry.path());
 		}
+		else if (directoryEntry.path().parent_path() == std::filesystem::path(baseShapeGeneratorsDir) &&
+			directoryEntry.path().extension() == ".glsl")
+		{
+			legacyShaderPaths.push_back(directoryEntry.path());
+		}
+	}
+	std::sort(definitionPaths.begin(), definitionPaths.end());
+	std::sort(legacyShaderPaths.begin(), legacyShaderPaths.end());
+	for (const auto& definitionPath : definitionPaths)
+	{
+		bool loaded = false;
+		const std::string configSource = ReadShaderSourceFile(definitionPath.string(), &loaded);
+		if (!loaded) continue;
+		try
+		{
+			const auto config = nlohmann::json::parse(configSource);
+			const std::string shaderName = config.value("Shader", "shape.glsl");
+			const auto shaderPath = definitionPath.parent_path() / shaderName;
+			const std::string source = ReadShaderSourceFile(shaderPath.string(), &loaded);
+			if (!loaded)
+			{
+				TF3D_LOG_ERROR("Failed to load base-shape shader '{}'.", shaderPath.string());
+				continue;
+			}
+			const auto relativeShaderPath = std::filesystem::relative(shaderPath, m_AppState->constants.shadersDir).generic_string();
+			if (!AddBaseShapeGenerator(config, source, relativeShaderPath))
+				TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", definitionPath.string());
+		}
+		catch (const nlohmann::json::exception& exception)
+		{
+			TF3D_LOG_ERROR("Failed to parse base-shape metadata '{}': {}", definitionPath.string(), exception.what());
+		}
+	}
+	for (const auto& shaderPath : legacyShaderPaths)
+	{
+		const std::string config = ReadShaderSourceFile(shaderPath.string(), &s_TempBool);
+		if (!s_TempBool) continue;
+		if (!AddBaseShapeGenerator(config)) TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", shaderPath.string());
 	}
 	m_BaseNoiseGenerator = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
 	m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);

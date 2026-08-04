@@ -56,6 +56,7 @@ public:
 	inline GeneratorTexture* GetMaskPreviewTexture() const { return m_MaskTool->GetPreviewTexture(); }
 
 	bool AddBaseShapeGenerator(const std::string& config);
+	bool AddBaseShapeGenerator(const nlohmann::json& config, const std::string& source, const std::string& shaderPath);
 	int AddFilter(const std::shared_ptr<BiomeFilterDefinition>& definition);
 	bool LoadUpResources();
 
