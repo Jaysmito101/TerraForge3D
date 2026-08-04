@@ -240,6 +240,13 @@ int BiomeManager::AddFilter(const std::shared_ptr<BiomeFilterDefinition>& defini
 	return index;
 }
 
+bool BiomeManager::RemoveFilter(int filterIndex)
+{
+	if (m_FilterStack == nullptr || !m_FilterStack->RemoveFilter(filterIndex)) return false;
+	m_RequireUpdation = true;
+	return true;
+}
+
 bool BiomeManager::ShowFilterSettings(int filterIndex)
 {
 	BIOME_UI_PROPERTY(m_FilterStack->ShowSettings(filterIndex));

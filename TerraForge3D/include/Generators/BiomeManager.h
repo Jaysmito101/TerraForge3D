@@ -58,6 +58,7 @@ public:
 	bool AddBaseShapeGenerator(const std::string& config);
 	bool AddBaseShapeGenerator(const nlohmann::json& config, const std::string& source, const std::string& shaderPath);
 	int AddFilter(const std::shared_ptr<BiomeFilterDefinition>& definition);
+	bool RemoveFilter(int filterIndex);
 	bool LoadUpResources();
 
 private:

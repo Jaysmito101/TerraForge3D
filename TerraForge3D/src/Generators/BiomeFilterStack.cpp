@@ -44,6 +44,14 @@ int BiomeFilterStack::AddFilter(const std::shared_ptr<BiomeFilterDefinition>& de
 	return static_cast<int>(m_Filters.size()) - 1;
 }
 
+bool BiomeFilterStack::RemoveFilter(int filterIndex)
+{
+	if (filterIndex < 0 || filterIndex >= static_cast<int>(m_Filters.size())) return false;
+	m_Filters.erase(m_Filters.begin() + filterIndex);
+	m_RequireUpdation = true;
+	return true;
+}
+
 bool BiomeFilterStack::ShowSettings(int filterIndex)
 {
 	if (filterIndex < 0 || filterIndex >= static_cast<int>(m_Filters.size())) return false;

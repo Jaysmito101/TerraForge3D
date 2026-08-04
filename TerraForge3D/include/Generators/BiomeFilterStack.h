@@ -17,6 +17,7 @@ public:
 	void Update(GeneratorData* baseResult);
 	bool ShowSettings(int filterIndex);
 	int AddFilter(const std::shared_ptr<BiomeFilterDefinition>& definition);
+	bool RemoveFilter(int filterIndex);
 	void Load(SerializerNode data);
 	SerializerNode Save() const;
 

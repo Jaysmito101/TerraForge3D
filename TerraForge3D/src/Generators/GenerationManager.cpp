@@ -301,9 +301,11 @@ void GenerationManager::ShowSettingsInspector()
 				{
 					const auto& filters = biome->GetFilters();
 					if (filters.size() == 0) ImGui::Text("No Filters Added!");
+					bool filterWasRemoved = false;
 					for (int filterIndex = 0; filterIndex < static_cast<int>(filters.size()); filterIndex++)
 					{
 						const auto& filter = filters[filterIndex];
+						ImGui::PushID(filter->GetID().c_str());
 						const bool selected = m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
 							m_SelectedNodeUI.m_BiomeIndex == i && m_SelectedNodeUI.m_FilterIndex == filterIndex;
 						if (ImGui::Selectable(filter->GetName().c_str(), selected))
@@ -314,6 +316,30 @@ void GenerationManager::ShowSettingsInspector()
 							m_SelectedNodeUI.m_ID = filter->GetID();
 							m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_Filter;
 						}
+						ImGui::SameLine();
+						if (ImGui::SmallButton("Delete"))
+						{
+							if (biome->RemoveFilter(filterIndex))
+							{
+								if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
+									m_SelectedNodeUI.m_BiomeIndex == i &&
+									m_SelectedNodeUI.m_FilterIndex == filterIndex)
+								{
+									SetUINodeData(i, General);
+									m_SelectedNodeUI.m_BiomeID = biome->GetBiomeID();
+								}
+								else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
+									m_SelectedNodeUI.m_BiomeIndex == i &&
+									m_SelectedNodeUI.m_FilterIndex > filterIndex)
+								{
+									m_SelectedNodeUI.m_FilterIndex--;
+								}
+								m_RequireUpdation = true;
+								filterWasRemoved = true;
+							}
+						}
+						ImGui::PopID();
+						if (filterWasRemoved) break;
 					}
 					ImGui::TreePop();
 				}
