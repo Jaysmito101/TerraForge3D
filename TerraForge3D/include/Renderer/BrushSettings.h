@@ -15,5 +15,6 @@ struct DrawBrushSettings
 	int32_t m_MaskTexture = -1;
 	glm::vec3 m_MaskColor = glm::vec3(1.0f);
 	bool m_ShowMask = false;
+	bool m_InvertMask = false;
 	bool m_ShowBrushCursor = false;
 };
