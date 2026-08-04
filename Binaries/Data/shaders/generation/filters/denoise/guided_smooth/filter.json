@@ -1,0 +1,65 @@
+{
+  "ID": "guided_smooth",
+  "Name": "Guided Smooth",
+  "Category": "Denoise",
+  "Implementation": "PhaseChain",
+  "Description": "Uses a local linear model to smooth flat detail while retaining terrain edges.",
+  "Phases": {
+    "Filter": "guided",
+    "Merge": "../../common/merge"
+  },
+  "Resources": {
+    "Temps": [
+      { "Name": "GuidedA", "Type": "Field" },
+      { "Name": "GuidedB", "Type": "Field" }
+    ]
+  },
+  "Execution": {
+    "Passes": [
+      {
+        "Phase": "Filter",
+        "Input": "Current",
+        "Output": "GuidedA",
+        "Uniforms": {
+          "u_Radius": { "Parameter": "Radius" },
+          "u_Epsilon": { "Parameter": "Epsilon" }
+        }
+      }
+    ],
+    "IterationMode": "PingPong",
+    "IterationBuffers": ["GuidedA", "GuidedB"],
+    "IterationsParameter": "Iterations",
+    "Merge": {
+      "Phase": "Merge",
+      "Input": "Current",
+      "Operation": "IterationResult",
+      "Output": "Next"
+    }
+  },
+  "Params": [
+    {
+      "Name": "Radius",
+      "Type": "Int",
+      "Default": 3,
+      "Widget": "Slider",
+      "Constraints": [1, 24, 0, 0],
+      "Description": "The local model radius in texels. Larger windows remove broader detail but cost more GPU work."
+    },
+    {
+      "Name": "Epsilon",
+      "Type": "Float",
+      "Default": 0.002,
+      "Widget": "Slider",
+      "Constraints": [0.0001, 0.25, 0, 0],
+      "Description": "Regularizes the local linear model. Larger values smooth more aggressively across low-contrast features."
+    },
+    {
+      "Name": "Iterations",
+      "Type": "Int",
+      "Default": 1,
+      "Widget": "Slider",
+      "Constraints": [1, 4, 0, 0],
+      "Description": "Repeats the guided operation. One pass is normally enough for terrain cleanup."
+    }
+  ]
+}
