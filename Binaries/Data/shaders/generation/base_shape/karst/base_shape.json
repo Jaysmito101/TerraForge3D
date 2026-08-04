@@ -128,11 +128,11 @@
         {
             "Name": "Softness",
             "Type": "Float",
-            "Default": 0.4,
+            "Default": 0.8,
             "Widget": "Slider",
             "Constraints": [
-                0.001,
-                1,
+                0.5,
+                2.0,
                 0,
                 0
             ],

@@ -12,7 +12,7 @@
         {
             "Name": "NoiseScale",
             "Type": "Float",
-            "Default": 0.15,
+            "Default": 1.0,
             "Widget": "Drag",
             "Sensitivity": 0.00025,
             "Constraints": [

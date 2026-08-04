@@ -12,7 +12,7 @@
         {
             "Name": "NoiseScale",
             "Type": "Float",
-            "Default": 0.15,
+            "Default": 0.54,
             "Widget": "Drag",
             "Sensitivity": 0.00025,
             "Constraints": [
@@ -26,7 +26,7 @@
         {
             "Name": "NoiseSeed",
             "Type": "Int",
-            "Default": 0,
+            "Default": 24,
             "Widget": "Input",
             "Label": "Noise Seed",
             "Description": "Rearranges canyon wall and floor variation while preserving the canyon form.",
@@ -99,7 +99,7 @@
             "Name": "Width",
             "Label": "Canyon Width",
             "Type": "Float",
-            "Default": 0.22,
+            "Default": 0.386,
             "Widget": "Slider",
             "Constraints": [
                 0.01,
@@ -113,7 +113,7 @@
         {
             "Name": "Depth",
             "Type": "Float",
-            "Default": 0.7,
+            "Default": 0.858,
             "Widget": "Slider",
             "Constraints": [
                 0,
@@ -127,7 +127,7 @@
         {
             "Name": "Waviness",
             "Type": "Float",
-            "Default": 0.45,
+            "Default": 1.0,
             "Widget": "Slider",
             "Constraints": [
                 0,

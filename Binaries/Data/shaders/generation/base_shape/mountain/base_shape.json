@@ -12,7 +12,7 @@
         {
             "Name": "NoiseScale",
             "Type": "Float",
-            "Default": 0.15,
+            "Default": 2.0,
             "Widget": "Drag",
             "Sensitivity": 0.00025,
             "Constraints": [
@@ -68,7 +68,7 @@
         {
             "Name": "Strength",
             "Type": "Float",
-            "Default": 0.3,
+            "Default": 0.5,
             "Widget": "Drag",
             "Sensitivity": 0.01,
             "Constraints": [

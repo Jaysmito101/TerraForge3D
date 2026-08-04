@@ -12,7 +12,7 @@
         {
             "Name": "NoiseScale",
             "Type": "Float",
-            "Default": 0.15,
+            "Default": 0.480,
             "Widget": "Drag",
             "Sensitivity": 0.00025,
             "Constraints": [
@@ -83,7 +83,7 @@
         {
             "Name": "Scale",
             "Type": "Float",
-            "Default": 1,
+            "Default": 2.0,
             "Widget": "Drag",
             "Sensitivity": 0.01,
             "Constraints": [
@@ -99,7 +99,7 @@
             "Name": "PlateauWidth",
             "Label": "Plateau Width",
             "Type": "Float",
-            "Default": 0.6,
+            "Default": 0.74,
             "Widget": "Slider",
             "Constraints": [
                 0.05,
