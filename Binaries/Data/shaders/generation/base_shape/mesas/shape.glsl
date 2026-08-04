@@ -1,70 +1,3 @@
-{
-	"Name": "Mesas",
-	"Params": [
-		{
-			"Name": "Strength",
-			"Type": "Float",
-			"Default": 1.0,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.0, 4.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Scale",
-			"Type": "Float",
-			"Default": 1.0,
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [0.001, 16.0, 0.0, 0.0]
-		},
-		{
-			"Name": "PlateauWidth",
-			"Label": "Plateau Width",
-			"Type": "Float",
-			"Default": 0.6,
-			"Widget": "Slider",
-			"Constraints": [0.05, 0.95, 0.0, 0.0]
-		},
-		{
-			"Name": "EdgeSoftness",
-			"Label": "Edge Softness",
-			"Type": "Float",
-			"Default": 0.35,
-			"Widget": "Slider",
-			"Constraints": [0.001, 1.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Erosion",
-			"Type": "Float",
-			"Default": 0.3,
-			"Widget": "Slider",
-			"Constraints": [0.0, 1.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Seed",
-			"Type": "Int",
-			"Default": 42,
-			"Widget": "Seed"
-		},
-		{
-			"Name": "Offset",
-			"Type": "Vector2",
-			"Default": [0.0, 0.0],
-			"Widget": "Drag",
-			"Sensitivity": 0.01,
-			"Constraints": [-8.0, 8.0, 0.0, 0.0]
-		},
-		{
-			"Name": "Rotation",
-			"Type": "Float",
-			"Default": 0.0,
-			"Widget": "Slider",
-			"Constraints": [-180.0, 180.0, 0.0, 0.0]
-		}
-	]
-}
-// CODE
-
 #include "common/noise_2d.glsl"
 #include "common/base_shape_helpers.glsl"
 #include "common/base_shape_terrain_helpers.glsl"
@@ -98,3 +31,4 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	float height = base * 0.16f + mesaMask * topHeight * 0.84f;
 	return clamp(height, 0.0f, 1.0f) * clamp(u_Strength, 0.0f, 4.0f);
 }
+
