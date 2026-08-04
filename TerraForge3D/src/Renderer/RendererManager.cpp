@@ -6,7 +6,6 @@ RendererManager::RendererManager(ApplicationState* appState)
 	m_AppState = appState;
 	m_ObjectRenderer = std::make_shared<ObjectRenderer>(appState);
 	m_HeightmapRenderer = std::make_shared<HeightmapRenderer>(appState);
-	m_ShadedRenderer = std::make_shared<ShadedRenderer>(appState);
 	m_TextureSlotRenderer = std::make_shared<TextureSlotRenderer>(appState);
 	m_WireframeRenderer = std::make_shared<WireframeRenderer>(appState);
 
@@ -31,7 +30,6 @@ void RendererManager::Render(RendererViewport* viewport)
 	case RendererViewportMode_Object: m_ObjectRenderer->Render(viewport); break;
 	case RendererViewportMode_Wireframe: m_WireframeRenderer->Render(viewport); break;
 	case RendererViewportMode_Heightmap: m_HeightmapRenderer->Render(viewport); break;
-	case RendererViewportMode_Shaded: m_ShadedRenderer->Render(viewport); break;
 	case RendererViewportMode_TextureSlot: m_TextureSlotRenderer->Render(viewport); break;
 	default: break;
 	}
@@ -65,13 +63,6 @@ void RendererManager::ShowSettings()
 			{
 				ImGui::PushID("Core Settings Type->Heightmap");
 				m_HeightmapRenderer->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Shaded"))
-			{
-				ImGui::PushID("Core Settings Type->Shaded");
-				m_ShadedRenderer->ShowSettings();
 				ImGui::PopID();
 				ImGui::EndTabItem();
 			}

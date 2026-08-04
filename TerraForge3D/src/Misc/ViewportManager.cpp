@@ -112,7 +112,6 @@ void ViewportManager::ShowSettingPopUp()
 			"Object",
 			"Wireframe",
 			"Heightmap",
-			"Shaded",
 			"TextureSlot"
 		};
 		

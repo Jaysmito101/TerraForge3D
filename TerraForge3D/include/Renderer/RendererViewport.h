@@ -8,7 +8,6 @@ enum RendererViewportMode
 	RendererViewportMode_Object = 0,
 	RendererViewportMode_Wireframe,
 	RendererViewportMode_Heightmap,
-	RendererViewportMode_Shaded,
 	RendererViewportMode_TextureSlot,
 	RendererViewportMode_COUNT
 };
