@@ -139,12 +139,14 @@ void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter>& filte
 	}
 }
 
-void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& pass, GeneratorData* input, GeneratorData* output)
+void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& pass,
+	GeneratorData* input, GeneratorData* output, GeneratorData* reference)
 {
 	const std::string phase = pass.value("Phase", "");
 	const auto shader = filter->GetPhaseShader(m_AppState, phase);
 	if (shader == nullptr) return;
 	input->Bind(0);
+	if (reference != nullptr) reference->Bind(1);
 	output->Bind(2);
 	shader->Bind();
 	shader->SetUniform1i("u_Resolution", m_Resolution);
@@ -244,6 +246,50 @@ void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter>& filter, Gen
 		resources.emplace(name, m_TempBuffers[tempIndex].get());
 	}
 
+	const bool pingPongIterations = execution.value("IterationMode", "") == "PingPong";
+	std::vector<GeneratorData*> iterationBuffers;
+	if (pingPongIterations)
+	{
+		const auto bufferNames = execution.value("IterationBuffers", nlohmann::json::array());
+		if (!bufferNames.is_array() || bufferNames.size() < 2)
+		{
+			TF3D_LOG_ERROR("Filter '{}' has an incomplete PingPong iteration buffer declaration.", filter->GetName());
+			input->CopyTo(output);
+			return;
+		}
+
+		for (size_t bufferIndex = 0; bufferIndex < 2; bufferIndex++)
+		{
+			if (!bufferNames[bufferIndex].is_string())
+			{
+				TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong iteration buffer name.", filter->GetName());
+				input->CopyTo(output);
+				return;
+			}
+			const auto resource = resources.find(bufferNames[bufferIndex].get<std::string>());
+			if (resource == resources.end() || resource->second == nullptr)
+			{
+				TF3D_LOG_ERROR("Filter '{}' references an unknown PingPong iteration buffer '{}'.", filter->GetName(), bufferNames[bufferIndex].get<std::string>());
+				input->CopyTo(output);
+				return;
+			}
+			iterationBuffers.push_back(resource->second);
+		}
+		if (iterationBuffers[0] == iterationBuffers[1])
+		{
+			TF3D_LOG_ERROR("Filter '{}' uses the same resource for both PingPong iteration buffers.", filter->GetName());
+			input->CopyTo(output);
+			return;
+		}
+		if (resources.find("IterationResult") != resources.end())
+		{
+			TF3D_LOG_ERROR("Filter '{}' reserves the resource name 'IterationResult'.", filter->GetName());
+			input->CopyTo(output);
+			return;
+		}
+		resources.emplace("IterationResult", nullptr);
+	}
+
 	const std::string iterationsParameter = execution.value("IterationsParameter", "");
 	const int iterations = glm::clamp(iterationsParameter.empty() ? 1 : filter->GetIntegerParameter(iterationsParameter, 1), 0, 64);
 	if (iterations == 0 || filter->GetStrength() <= 0.0f)
@@ -275,6 +321,39 @@ void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter>& filter, Gen
 			return;
 		}
 	}
+	const nlohmann::json setup = execution.value("Setup", nlohmann::json::object());
+	if (pingPongIterations && !setup.empty())
+	{
+		if (!setup.is_object())
+		{
+			TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup phase.", filter->GetName());
+			input->CopyTo(output);
+			return;
+		}
+		const std::string setupPhase = setup.value("Phase", "");
+		if (setupPhase.empty() || filter->GetPhaseShader(m_AppState, setupPhase) == nullptr)
+		{
+			TF3D_LOG_ERROR("Filter '{}' is missing its PingPong setup phase '{}'.", filter->GetName(), setupPhase);
+			input->CopyTo(output);
+			return;
+		}
+		const std::string setupInputName = setup.value("Input", "");
+		const std::string setupOutputName = setup.value("Output", "");
+		if (setupInputName.empty() || setupOutputName.empty()
+			|| resources.find(setupInputName) == resources.end()
+			|| resources.find(setupOutputName) == resources.end())
+		{
+			TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup resource declaration.", filter->GetName());
+			input->CopyTo(output);
+			return;
+		}
+	}
+	if (pingPongIterations && passes.size() != 1)
+	{
+		TF3D_LOG_ERROR("Filter '{}' PingPong execution supports exactly one iterative pass.", filter->GetName());
+		input->CopyTo(output);
+		return;
+	}
 	if (filter->GetPhaseShader(m_AppState, merge.value("Phase", "")) == nullptr)
 	{
 		TF3D_LOG_ERROR("Filter '{}' is missing merge phase '{}'.", filter->GetName(), merge.value("Phase", ""));
@@ -285,24 +364,51 @@ void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter>& filter, Gen
 	const std::string mergeOperationName = merge.value("Operation", "");
 	const std::string mergeOutputName = merge.value("Output", "");
 	if (mergeInputName.empty() || mergeOperationName.empty() || mergeOutputName.empty()
+		|| (pingPongIterations && mergeOperationName != "IterationResult")
 		|| resources.find(mergeInputName) == resources.end()
 		|| resources.find(mergeOperationName) == resources.end()
 		|| resources.find(mergeOutputName) == resources.end()
 		|| resources.at(mergeOutputName) != output
-		|| resources.at(mergeOperationName) == output)
+		|| resources.at(mergeOperationName) == output
+		|| (!pingPongIterations && resources.at(mergeOperationName) == nullptr))
 	{
 		TF3D_LOG_ERROR("Filter '{}' has a merge with an unknown or missing Input/Operation/Output resource.", filter->GetName());
 		input->CopyTo(output);
 		return;
 	}
 
-	for (int iteration = 0; iteration < iterations; iteration++)
+	if (pingPongIterations)
 	{
-		for (const auto& pass : passes)
+		GeneratorData* iterationInput = input;
+		GeneratorData* iterationOutput = iterationBuffers[0];
+		if (!setup.empty())
 		{
-			const std::string inputName = pass.value("Input", "");
-			const std::string outputName = pass.value("Output", "");
-			RunPhase(filter, pass, resources.at(inputName), resources.at(outputName));
+			const std::string setupInputName = setup.value("Input", "");
+			const std::string setupOutputName = setup.value("Output", "");
+			RunPhase(filter, setup, resources.at(setupInputName), resources.at(setupOutputName));
+			iterationInput = resources.at(setupOutputName);
+			iterationOutput = iterationInput == iterationBuffers[0] ? iterationBuffers[1] : iterationBuffers[0];
+		}
+
+		const bool useOriginalInput = execution.value("UseOriginalInput", false);
+		for (int iteration = 0; iteration < iterations; iteration++)
+		{
+			RunPhase(filter, passes.front(), iterationInput, iterationOutput, useOriginalInput ? input : nullptr);
+			iterationInput = iterationOutput;
+			iterationOutput = iterationOutput == iterationBuffers[0] ? iterationBuffers[1] : iterationBuffers[0];
+		}
+		resources["IterationResult"] = iterationInput;
+	}
+	else
+	{
+		for (int iteration = 0; iteration < iterations; iteration++)
+		{
+			for (const auto& pass : passes)
+			{
+				const std::string inputName = pass.value("Input", "");
+				const std::string outputName = pass.value("Output", "");
+				RunPhase(filter, pass, resources.at(inputName), resources.at(outputName));
+			}
 		}
 	}
 	RunMergePhase(filter, merge, resources.at(mergeInputName), resources.at(mergeOperationName), resources.at(mergeOutputName));

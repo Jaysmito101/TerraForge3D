@@ -11,6 +11,22 @@ enum class CalculatedMaskType
 {
 	HeightRange,
 	SlopeRange,
+	Aspect,
+	Curvature,
+	Roughness,
+	Flatness,
+	RidgeValley,
+	Coastline,
+	DistanceFromCoast,
+	FlowWetness,
+	AmbientOcclusion,
+	Exposure,
+	DistanceFromBorder,
+	DistanceFromPointPath,
+	HeightContour,
+	ProceduralNoise,
+	RadialGradient,
+	Count,
 };
 
 struct CalculatedMaskSettings
@@ -19,6 +35,15 @@ struct CalculatedMaskSettings
 	float minimum = 0.25f;
 	float maximum = 0.75f;
 	float softness = 0.05f;
+	float angle = 0.0f;
+	float angleWidth = 45.0f;
+	float scale = 4.0f;
+	float seed = 42.0f;
+	float seaLevel = 0.0f;
+	glm::vec2 center = glm::vec2(0.5f);
+	glm::vec2 pathEnd = glm::vec2(0.75f, 0.5f);
+	bool usePath = false;
+	bool selectValleys = false;
 };
 
 class CalculatedMaskGenerator

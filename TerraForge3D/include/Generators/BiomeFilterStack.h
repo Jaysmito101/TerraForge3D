@@ -26,7 +26,8 @@ public:
 
 private:
 	void RunFilter(const std::shared_ptr<BiomeFilter>& filter, GeneratorData* input, GeneratorData* output);
-	void RunPhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& pass, GeneratorData* input, GeneratorData* output);
+	void RunPhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& pass,
+		GeneratorData* input, GeneratorData* output, GeneratorData* reference = nullptr);
 	void RunMergePhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& merge, GeneratorData* input, GeneratorData* operation, GeneratorData* output);
 	void SetPassUniforms(const std::shared_ptr<BiomeFilter>& filter, const std::shared_ptr<ComputeShader>& shader, const nlohmann::json& bindings);
 	void EnsureTempBufferCount(size_t count);
