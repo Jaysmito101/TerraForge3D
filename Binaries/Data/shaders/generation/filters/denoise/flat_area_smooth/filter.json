@@ -1,71 +1,102 @@
 {
-  "ID": "flat_area_smooth",
-  "Name": "Flat-Area Smooth",
-  "Category": "Denoise",
-  "Implementation": "PhaseChain",
-  "Description": "Applies bilateral smoothing mainly to low-slope areas while protecting ridges and cliffs.",
-  "Phases": {
-    "Filter": "bilateral_flat",
-    "Merge": "../../common/merge"
-  },
-  "Resources": {
-    "Temps": [
-      { "Name": "FlatArea", "Type": "Field" }
-    ]
-  },
-  "Execution": {
-    "Passes": [
-      {
-        "Phase": "Filter",
-        "Input": "Current",
-        "Output": "FlatArea",
-        "Uniforms": {
-          "u_Radius": { "Parameter": "Radius" },
-          "u_RangeSigma": { "Parameter": "RangeSigma" },
-          "u_SlopeLimit": { "Parameter": "SlopeLimit" },
-          "u_SlopeSoftness": { "Parameter": "SlopeSoftness" }
+    "ID": "flat_area_smooth",
+    "Name": "Flat-Area Smooth",
+    "Category": "Denoise",
+    "Implementation": "PhaseChain",
+    "Description": "Applies bilateral smoothing mainly to low-slope areas while protecting ridges and cliffs.",
+    "Phases": {
+        "Filter": "bilateral_flat",
+        "Merge": "../../common/merge"
+    },
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "FlatArea",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Filter",
+                "Input": "Current",
+                "Output": "FlatArea",
+                "Uniforms": {
+                    "u_Radius": {
+                        "Parameter": "Radius"
+                    },
+                    "u_RangeSigma": {
+                        "Parameter": "RangeSigma"
+                    },
+                    "u_SlopeLimit": {
+                        "Parameter": "SlopeLimit"
+                    },
+                    "u_SlopeSoftness": {
+                        "Parameter": "SlopeSoftness"
+                    }
+                }
+            }
+        ],
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "FlatArea",
+            "Output": "Next"
         }
-      }
-    ],
-    "Merge": {
-      "Phase": "Merge",
-      "Input": "Current",
-      "Operation": "FlatArea",
-      "Output": "Next"
-    }
-  },
-  "Params": [
-    {
-      "Name": "Radius",
-      "Type": "Int",
-      "Default": 3,
-      "Widget": "Slider",
-      "Constraints": [1, 24, 0, 0],
-      "Description": "The bilateral neighborhood radius in texels. Larger values clean broader plains but cost more GPU work."
     },
-    {
-      "Name": "RangeSigma",
-      "Type": "Float",
-      "Default": 0.04,
-      "Widget": "Slider",
-      "Constraints": [0.001, 1.0, 0, 0],
-      "Description": "The allowed height difference for neighboring samples. Lower values protect sharper transitions."
-    },
-    {
-      "Name": "SlopeLimit",
-      "Type": "Float",
-      "Default": 0.08,
-      "Widget": "Slider",
-      "Constraints": [0.0, 1.0, 0, 0],
-      "Description": "Full smoothing is allowed below this local slope. Increase it when gentle hills should also be cleaned."
-    },
-    {
-      "Name": "SlopeSoftness",
-      "Type": "Float",
-      "Default": 0.08,
-      "Widget": "Slider",
-      "Constraints": [0.001, 0.5, 0, 0],
-      "Description": "Soft transition from full flat-area smoothing to no smoothing near slopes and ridges."
-    }
-  ]
+    "Params": [
+        {
+            "Name": "Radius",
+            "Type": "Int",
+            "Default": 3,
+            "Widget": "Slider",
+            "Constraints": [
+                1,
+                24,
+                0,
+                0
+            ],
+            "Description": "The bilateral neighborhood radius in texels. Larger values clean broader plains but cost more GPU work."
+        },
+        {
+            "Name": "RangeSigma",
+            "Type": "Float",
+            "Default": 0.04,
+            "Widget": "Slider",
+            "Constraints": [
+                0.001,
+                1,
+                0,
+                0
+            ],
+            "Description": "The allowed height difference for neighboring samples. Lower values protect sharper transitions."
+        },
+        {
+            "Name": "SlopeLimit",
+            "Type": "Float",
+            "Default": 0.08,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Full smoothing is allowed below this local slope. Increase it when gentle hills should also be cleaned."
+        },
+        {
+            "Name": "SlopeSoftness",
+            "Type": "Float",
+            "Default": 0.08,
+            "Widget": "Slider",
+            "Constraints": [
+                0.001,
+                0.5,
+                0,
+                0
+            ],
+            "Description": "Soft transition from full flat-area smoothing to no smoothing near slopes and ridges."
+        }
+    ]
 }

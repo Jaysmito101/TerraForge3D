@@ -1,15 +1,65 @@
 {
-  "Default": "Simplex",
-  "Algorithms": [
-    { "Id": 0, "Token": "BILLOW", "Label": "Billow", "Description": "Folded simplex noise remapped into rounded, cloud-like positive lobes." },
-    { "Id": 1, "Token": "SIMPLEX", "Label": "Simplex", "Description": "Gustavson-style triangular-lattice gradient noise with smooth organic variation." },
-    { "Id": 2, "Token": "PERLIN", "Label": "Perlin", "Description": "Improved lattice gradient noise using a quintic fade for smooth terrain detail." },
-    { "Id": 3, "Token": "GABOR", "Label": "Gabor", "Description": "Sparse Gaussian-windowed wave impulses with randomized orientation and frequency." },
-    { "Id": 4, "Token": "VALUE", "Label": "Value", "Description": "Deterministic random values at lattice corners blended with quintic interpolation." },
-    { "Id": 5, "Token": "PHASOR", "Label": "Phasor", "Description": "A periodic carrier evaluated through a smooth, spatially varying phase field." },
-    { "Id": 6, "Token": "RIDGED", "Label": "Ridged", "Description": "Inverted folded simplex noise that concentrates energy into mountain-like crests." },
-    { "Id": 7, "Token": "VORONOI", "Label": "Voronoi", "Description": "Continuous cell-edge distance from the gap between the nearest two feature points." },
-    { "Id": 8, "Token": "WHITE", "Label": "White", "Description": "Piecewise-constant hashed grain: crisp, intentionally unfiltered local contrast." },
-    { "Id": 9, "Token": "WORLEY", "Label": "Worley", "Description": "Normalized distance to the nearest jittered feature point in a cellular lattice." }
-  ]
+    "Default": "Simplex",
+    "Algorithms": [
+        {
+            "Id": 0,
+            "Token": "BILLOW",
+            "Label": "Billow",
+            "Description": "Folded simplex noise remapped into rounded, cloud-like positive lobes."
+        },
+        {
+            "Id": 1,
+            "Token": "SIMPLEX",
+            "Label": "Simplex",
+            "Description": "Gustavson-style triangular-lattice gradient noise with smooth organic variation."
+        },
+        {
+            "Id": 2,
+            "Token": "PERLIN",
+            "Label": "Perlin",
+            "Description": "Improved lattice gradient noise using a quintic fade for smooth terrain detail."
+        },
+        {
+            "Id": 3,
+            "Token": "GABOR",
+            "Label": "Gabor",
+            "Description": "Sparse Gaussian-windowed wave impulses with randomized orientation and frequency."
+        },
+        {
+            "Id": 4,
+            "Token": "VALUE",
+            "Label": "Value",
+            "Description": "Deterministic random values at lattice corners blended with quintic interpolation."
+        },
+        {
+            "Id": 5,
+            "Token": "PHASOR",
+            "Label": "Phasor",
+            "Description": "A periodic carrier evaluated through a smooth, spatially varying phase field."
+        },
+        {
+            "Id": 6,
+            "Token": "RIDGED",
+            "Label": "Ridged",
+            "Description": "Inverted folded simplex noise that concentrates energy into mountain-like crests."
+        },
+        {
+            "Id": 7,
+            "Token": "VORONOI",
+            "Label": "Voronoi",
+            "Description": "Continuous cell-edge distance from the gap between the nearest two feature points."
+        },
+        {
+            "Id": 8,
+            "Token": "WHITE",
+            "Label": "White",
+            "Description": "Piecewise-constant hashed grain: crisp, intentionally unfiltered local contrast."
+        },
+        {
+            "Id": 9,
+            "Token": "WORLEY",
+            "Label": "Worley",
+            "Description": "Normalized distance to the nearest jittered feature point in a cellular lattice."
+        }
+    ]
 }

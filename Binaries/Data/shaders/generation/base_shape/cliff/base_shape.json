@@ -1,130 +1,176 @@
 {
-  "Name": "Cliff",
-  "Params": [
-    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that roughens the cliff face and softens its height transitions." },
-    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges the cliff-face breakup while keeping the cliff profile intact.", "Tooltip": "Change the seed to explore different cliff textures." },
-    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends the cliff distortion field to avoid straight, repeated ledges.", "Tooltip": "Increase it for more irregular cliff contours." },
-    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in the cliff breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes where cliff variations appear." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
-    {
-      "Name": "Strength",
-      "Type": "Float",
-      "Default": 0.5,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        -4,
-        4,
-        0,
-        0
-      ],
-      "Description": "Scales the overall height amplitude of the generated shape.",
-      "Tooltip": "Adjust the overall strength of this base shape."
-    },
-    {
-      "Name": "Rotation",
-      "Type": "Float",
-      "Default": 0,
-      "Widget": "Slider",
-      "Constraints": [
-        -180,
-        180,
-        0,
-        0
-      ],
-      "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-      "Tooltip": "Use rotation to change the direction of directional features."
-    },
-    {
-      "Name": "Thickness",
-      "Type": "Float",
-      "Default": 0.55,
-      "Widget": "Slider",
-      "Constraints": [
-        0.001,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the thickness of the generated band or wall.",
-      "Tooltip": "Increase thickness to widen the feature."
-    },
-    {
-      "Name": "Position",
-      "Type": "Float",
-      "Default": 0.65,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        -2,
-        2,
-        0,
-        0
-      ],
-      "Description": "Controls the normalized location of the primary feature.",
-      "Tooltip": "Move the feature within the terrain using its normalized coordinates."
-    },
-    {
-      "Name": "Distortion",
-      "Type": "Float",
-      "Default": 0.23,
-      "Widget": "Slider",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the amount of procedural warping applied to the shape.",
-      "Tooltip": "Increase distortion for a less regular silhouette."
-    },
-    {
-      "Name": "DistortionScale",
-      "Type": "Float",
-      "Default": 1.16,
-      "Label": "Distortion Scale",
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        0.001,
-        8,
-        0,
-        0
-      ],
-      "Description": "Controls the size of the distortion pattern.",
-      "Tooltip": "Higher values generally create finer distortion."
-    },
-    {
-      "Name": "Noise",
-      "Type": "Float",
-      "Default": 0.13,
-      "Widget": "Slider",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the amount of noise mixed into the shape.",
-      "Tooltip": "Increase noise to add more irregular variation."
-    },
-    {
-      "Name": "NoiseScale",
-      "Type": "Float",
-      "Default": 0.15,
-      "Label": "Noise Scale",
-      "Widget": "Drag",
-      "Sensitivity": 0.00025,
-      "Constraints": [
-        0.001,
-        8,
-        0,
-        0
-      ],
-      "Description": "Sets the size of the noise that roughens the cliff face and height transition.",
-      "Tooltip": "Higher values pack more cliff breakup into the same face."
-    }
-  ],
-  "ID": "cliff",
-  "Description": "Generates a cliff-style procedural base shape with controls for its main form and variation.",
-  "Shader": "shape.glsl"
+    "Name": "Cliff",
+    "Params": [
+        {
+            "Name": "NoiseAlgorithm",
+            "Type": "Int",
+            "Default": "Simplex",
+            "Widget": "Dropdown",
+            "Label": "Noise Algorithm",
+            "Description": "Chooses the noise that roughens the cliff face and softens its height transitions."
+        },
+        {
+            "Name": "NoiseSeed",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Input",
+            "Label": "Noise Seed",
+            "Description": "Rearranges the cliff-face breakup while keeping the cliff profile intact.",
+            "Tooltip": "Change the seed to explore different cliff textures."
+        },
+        {
+            "Name": "NoiseWarp",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4
+            ],
+            "Label": "Noise Warp",
+            "Description": "Bends the cliff distortion field to avoid straight, repeated ledges.",
+            "Tooltip": "Increase it for more irregular cliff contours."
+        },
+        {
+            "Name": "NoiseJitter",
+            "Type": "Float",
+            "Default": 0.75,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1
+            ],
+            "Label": "Noise Jitter",
+            "Description": "Offsets cellular feature points in the cliff breakup.",
+            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes where cliff variations appear.",
+            "Conditional": "NoiseAlgorithm",
+            "ConditionalValues": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+            ]
+        },
+        {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                -4,
+                4,
+                0,
+                0
+            ],
+            "Description": "Scales the overall height amplitude of the generated shape.",
+            "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+            "Name": "Rotation",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Slider",
+            "Constraints": [
+                -180,
+                180,
+                0,
+                0
+            ],
+            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+            "Tooltip": "Use rotation to change the direction of directional features."
+        },
+        {
+            "Name": "Thickness",
+            "Type": "Float",
+            "Default": 0.55,
+            "Widget": "Slider",
+            "Constraints": [
+                0.001,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the thickness of the generated band or wall.",
+            "Tooltip": "Increase thickness to widen the feature."
+        },
+        {
+            "Name": "Position",
+            "Type": "Float",
+            "Default": 0.65,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                -2,
+                2,
+                0,
+                0
+            ],
+            "Description": "Controls the normalized location of the primary feature.",
+            "Tooltip": "Move the feature within the terrain using its normalized coordinates."
+        },
+        {
+            "Name": "Distortion",
+            "Type": "Float",
+            "Default": 0.23,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the amount of procedural warping applied to the shape.",
+            "Tooltip": "Increase distortion for a less regular silhouette."
+        },
+        {
+            "Name": "DistortionScale",
+            "Type": "Float",
+            "Default": 1.16,
+            "Label": "Distortion Scale",
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0.001,
+                8,
+                0,
+                0
+            ],
+            "Description": "Controls the size of the distortion pattern.",
+            "Tooltip": "Higher values generally create finer distortion."
+        },
+        {
+            "Name": "Noise",
+            "Type": "Float",
+            "Default": 0.13,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the amount of noise mixed into the shape.",
+            "Tooltip": "Increase noise to add more irregular variation."
+        },
+        {
+            "Name": "NoiseScale",
+            "Type": "Float",
+            "Default": 0.15,
+            "Label": "Noise Scale",
+            "Widget": "Drag",
+            "Sensitivity": 0.00025,
+            "Constraints": [
+                0.001,
+                8,
+                0,
+                0
+            ],
+            "Description": "Sets the size of the noise that roughens the cliff face and height transition.",
+            "Tooltip": "Higher values pack more cliff breakup into the same face."
+        }
+    ],
+    "ID": "cliff",
+    "Description": "Generates a cliff-style procedural base shape with controls for its main form and variation.",
+    "Shader": "shape.glsl"
 }

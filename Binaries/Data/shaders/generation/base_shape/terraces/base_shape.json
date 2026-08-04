@@ -1,126 +1,185 @@
 {
-  "Name": "Terraces",
-  "Params": [
-    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that determines where terraces step, soften, and break apart." },
-    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.00025, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the spacing of terrace bands and the size of breakup along each step.", "Tooltip": "Higher values create more closely spaced terrace detail." },
-    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges terrace edges and surface variation without changing the terrace scale.", "Tooltip": "Use a new seed for a different stepped terrain pattern." },
-    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends terrace bands and step edges so they do not form uniform rings.", "Tooltip": "Increase it for more weathered, irregular terraces." },
-    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in terrace edge breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local step variation placement.", "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
-    {
-      "Name": "Strength",
-      "Type": "Float",
-      "Default": 1,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        0,
-        4,
-        0,
-        0
-      ],
-      "Description": "Scales the overall height amplitude of the generated shape.",
-      "Tooltip": "Adjust the overall strength of this base shape."
-    },
-    {
-      "Name": "Scale",
-      "Type": "Float",
-      "Default": 1,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        0.001,
-        16,
-        0,
-        0
-      ],
-      "Description": "Controls the scale of the coordinate space used by the shape.",
-      "Tooltip": "Higher values generally create smaller, more frequent features."
-    },
-    {
-      "Name": "Levels",
-      "Type": "Int",
-      "Default": 8,
-      "Widget": "Slider",
-      "Constraints": [
-        2,
-        32,
-        0,
-        0
-      ],
-      "Description": "Controls the number of recursive detail levels used by the shape.",
-      "Tooltip": "More levels add detail and increase generation cost."
-    },
-    {
-      "Name": "Smoothness",
-      "Type": "Float",
-      "Default": 0.35,
-      "Widget": "Slider",
-      "Constraints": [
-        0.001,
-        1,
-        0,
-        0
-      ],
-      "Tooltip": "Higher values produce softer, less abrupt transitions.",
-      "Description": "Controls how softly the shape transitions between regions."
-    },
-    {
-      "Name": "NoiseStrength",
-      "Label": "Noise Strength",
-      "Type": "Float",
-      "Default": 0.15,
-      "Widget": "Slider",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the amplitude of the added noise detail.",
-      "Tooltip": "Increase this value for stronger noise variation."
-    },
-    {
-      "Name": "Seed",
-      "Type": "Int",
-      "Default": 42,
-      "Widget": "Seed",
-      "Description": "Selects the deterministic random pattern used by the generator.",
-      "Tooltip": "Change the seed to create a different reproducible layout."
-    },
-    {
-      "Name": "Offset",
-      "Type": "Vector2",
-      "Default": [
-        0,
-        0
-      ],
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        -8,
-        8,
-        0,
-        0
-      ],
-      "Description": "Translates the sampling coordinates without changing the shape's scale.",
-      "Tooltip": "Use the offset to move through the procedural field."
-    },
-    {
-      "Name": "Rotation",
-      "Type": "Float",
-      "Default": 0,
-      "Widget": "Slider",
-      "Constraints": [
-        -180,
-        180,
-        0,
-        0
-      ],
-      "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-      "Tooltip": "Use rotation to change the direction of directional features."
-    }
-  ],
-  "ID": "terraces",
-  "Description": "Generates a terraces-style procedural base shape with controls for its main form and variation.",
-  "Shader": "shape.glsl"
+    "Name": "Terraces",
+    "Params": [
+        {
+            "Name": "NoiseAlgorithm",
+            "Type": "Int",
+            "Default": "Simplex",
+            "Widget": "Dropdown",
+            "Label": "Noise Algorithm",
+            "Description": "Chooses the noise that determines where terraces step, soften, and break apart."
+        },
+        {
+            "Name": "NoiseScale",
+            "Type": "Float",
+            "Default": 0.15,
+            "Widget": "Drag",
+            "Sensitivity": 0.00025,
+            "Constraints": [
+                0.001,
+                64
+            ],
+            "Label": "Noise Scale",
+            "Description": "Sets the spacing of terrace bands and the size of breakup along each step.",
+            "Tooltip": "Higher values create more closely spaced terrace detail."
+        },
+        {
+            "Name": "NoiseSeed",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Input",
+            "Label": "Noise Seed",
+            "Description": "Rearranges terrace edges and surface variation without changing the terrace scale.",
+            "Tooltip": "Use a new seed for a different stepped terrain pattern."
+        },
+        {
+            "Name": "NoiseWarp",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4
+            ],
+            "Label": "Noise Warp",
+            "Description": "Bends terrace bands and step edges so they do not form uniform rings.",
+            "Tooltip": "Increase it for more weathered, irregular terraces."
+        },
+        {
+            "Name": "NoiseJitter",
+            "Type": "Float",
+            "Default": 0.75,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1
+            ],
+            "Label": "Noise Jitter",
+            "Description": "Offsets cellular feature points in terrace edge breakup.",
+            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local step variation placement.",
+            "Conditional": "NoiseAlgorithm",
+            "ConditionalValues": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+            ]
+        },
+        {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 1,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4,
+                0,
+                0
+            ],
+            "Description": "Scales the overall height amplitude of the generated shape.",
+            "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+            "Name": "Scale",
+            "Type": "Float",
+            "Default": 1,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0.001,
+                16,
+                0,
+                0
+            ],
+            "Description": "Controls the scale of the coordinate space used by the shape.",
+            "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+            "Name": "Levels",
+            "Type": "Int",
+            "Default": 8,
+            "Widget": "Slider",
+            "Constraints": [
+                2,
+                32,
+                0,
+                0
+            ],
+            "Description": "Controls the number of recursive detail levels used by the shape.",
+            "Tooltip": "More levels add detail and increase generation cost."
+        },
+        {
+            "Name": "Smoothness",
+            "Type": "Float",
+            "Default": 0.35,
+            "Widget": "Slider",
+            "Constraints": [
+                0.001,
+                1,
+                0,
+                0
+            ],
+            "Tooltip": "Higher values produce softer, less abrupt transitions.",
+            "Description": "Controls how softly the shape transitions between regions."
+        },
+        {
+            "Name": "NoiseStrength",
+            "Label": "Noise Strength",
+            "Type": "Float",
+            "Default": 0.15,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the amplitude of the added noise detail.",
+            "Tooltip": "Increase this value for stronger noise variation."
+        },
+        {
+            "Name": "Seed",
+            "Type": "Int",
+            "Default": 42,
+            "Widget": "Seed",
+            "Description": "Selects the deterministic random pattern used by the generator.",
+            "Tooltip": "Change the seed to create a different reproducible layout."
+        },
+        {
+            "Name": "Offset",
+            "Type": "Vector2",
+            "Default": [
+                0,
+                0
+            ],
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                -8,
+                8,
+                0,
+                0
+            ],
+            "Description": "Translates the sampling coordinates without changing the shape's scale.",
+            "Tooltip": "Use the offset to move through the procedural field."
+        },
+        {
+            "Name": "Rotation",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Slider",
+            "Constraints": [
+                -180,
+                180,
+                0,
+                0
+            ],
+            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+            "Tooltip": "Use rotation to change the direction of directional features."
+        }
+    ],
+    "ID": "terraces",
+    "Description": "Generates a terraces-style procedural base shape with controls for its main form and variation.",
+    "Shader": "shape.glsl"
 }

@@ -1,121 +1,180 @@
 {
-  "Name": "Dunes",
-  "Params": [
-    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that bends dune ridges and creates secondary sand bands." },
-    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.00025, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the spacing of dune ridges and the scale of their surface breakup.", "Tooltip": "Higher values create more closely spaced dune variation." },
-    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Changes the phase and placement of dune variation without changing its overall scale.", "Tooltip": "Use a new seed for a different dune field." },
-    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends dune ridges so they meander instead of forming straight repeated lines.", "Tooltip": "Increase it for more wind-shaped dune flow." },
-    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points used to break up dune bands.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local dune feature placement." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
-    {
-      "Name": "Strength",
-      "Type": "Float",
-      "Default": 0.5,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        0,
-        4,
-        0,
-        0
-      ],
-      "Description": "Scales the overall height amplitude of the generated shape.",
-      "Tooltip": "Adjust the overall strength of this base shape."
-    },
-    {
-      "Name": "Scale",
-      "Type": "Float",
-      "Default": 1,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        0.001,
-        16,
-        0,
-        0
-      ],
-      "Description": "Controls the scale of the coordinate space used by the shape.",
-      "Tooltip": "Higher values generally create smaller, more frequent features."
-    },
-    {
-      "Name": "Smoothness",
-      "Type": "Float",
-      "Default": 0.14,
-      "Widget": "Slider",
-      "Label": "Edge Smoothness",
-      "Constraints": [
-        0.001,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls how softly the shape transitions between regions.",
-      "Tooltip": "Higher values produce softer, less abrupt transitions."
-    },
-    {
-      "Name": "Rotation",
-      "Type": "Float",
-      "Default": 0,
-      "Widget": "Slider",
-      "Constraints": [
-        -180,
-        180,
-        0,
-        0
-      ],
-      "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-      "Tooltip": "Use rotation to change the direction of directional features."
-    },
-    {
-      "Name": "Seed",
-      "Type": "Int",
-      "Default": 42,
-      "Widget": "Seed",
-      "Description": "Selects the deterministic random pattern used by the generator.",
-      "Tooltip": "Change the seed to create a different reproducible layout."
-    },
-    {
-      "Name": "Offset",
-      "Type": "Vector2",
-      "Default": [
-        0,
-        0
-      ],
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Description": "Translates the sampling coordinates without changing the shape's scale.",
-      "Tooltip": "Use the offset to move through the procedural field."
-    },
-    {
-      "Name": "Distortion",
-      "Type": "Float",
-      "Default": 0.2,
-      "Widget": "Slider",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the amount of procedural warping applied to the shape.",
-      "Tooltip": "Increase distortion for a less regular silhouette."
-    },
-    {
-      "Name": "DistortionScale",
-      "Type": "Float",
-      "Default": 0.4,
-      "Widget": "Slider",
-      "Label": "Distortion Scale",
-      "Constraints": [
-        0.001,
-        8,
-        0,
-        0
-      ],
-      "Description": "Controls the size of the distortion pattern.",
-      "Tooltip": "Higher values generally create finer distortion."
-    }
-  ],
-  "ID": "dunes",
-  "Description": "Generates a dunes-style procedural base shape with controls for its main form and variation.",
-  "Shader": "shape.glsl"
+    "Name": "Dunes",
+    "Params": [
+        {
+            "Name": "NoiseAlgorithm",
+            "Type": "Int",
+            "Default": "Simplex",
+            "Widget": "Dropdown",
+            "Label": "Noise Algorithm",
+            "Description": "Chooses the noise that bends dune ridges and creates secondary sand bands."
+        },
+        {
+            "Name": "NoiseScale",
+            "Type": "Float",
+            "Default": 0.15,
+            "Widget": "Drag",
+            "Sensitivity": 0.00025,
+            "Constraints": [
+                0.001,
+                64
+            ],
+            "Label": "Noise Scale",
+            "Description": "Sets the spacing of dune ridges and the scale of their surface breakup.",
+            "Tooltip": "Higher values create more closely spaced dune variation."
+        },
+        {
+            "Name": "NoiseSeed",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Input",
+            "Label": "Noise Seed",
+            "Description": "Changes the phase and placement of dune variation without changing its overall scale.",
+            "Tooltip": "Use a new seed for a different dune field."
+        },
+        {
+            "Name": "NoiseWarp",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4
+            ],
+            "Label": "Noise Warp",
+            "Description": "Bends dune ridges so they meander instead of forming straight repeated lines.",
+            "Tooltip": "Increase it for more wind-shaped dune flow."
+        },
+        {
+            "Name": "NoiseJitter",
+            "Type": "Float",
+            "Default": 0.75,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1
+            ],
+            "Label": "Noise Jitter",
+            "Description": "Offsets cellular feature points used to break up dune bands.",
+            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local dune feature placement.",
+            "Conditional": "NoiseAlgorithm",
+            "ConditionalValues": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+            ]
+        },
+        {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4,
+                0,
+                0
+            ],
+            "Description": "Scales the overall height amplitude of the generated shape.",
+            "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+            "Name": "Scale",
+            "Type": "Float",
+            "Default": 1,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0.001,
+                16,
+                0,
+                0
+            ],
+            "Description": "Controls the scale of the coordinate space used by the shape.",
+            "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+            "Name": "Smoothness",
+            "Type": "Float",
+            "Default": 0.14,
+            "Widget": "Slider",
+            "Label": "Edge Smoothness",
+            "Constraints": [
+                0.001,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls how softly the shape transitions between regions.",
+            "Tooltip": "Higher values produce softer, less abrupt transitions."
+        },
+        {
+            "Name": "Rotation",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Slider",
+            "Constraints": [
+                -180,
+                180,
+                0,
+                0
+            ],
+            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+            "Tooltip": "Use rotation to change the direction of directional features."
+        },
+        {
+            "Name": "Seed",
+            "Type": "Int",
+            "Default": 42,
+            "Widget": "Seed",
+            "Description": "Selects the deterministic random pattern used by the generator.",
+            "Tooltip": "Change the seed to create a different reproducible layout."
+        },
+        {
+            "Name": "Offset",
+            "Type": "Vector2",
+            "Default": [
+                0,
+                0
+            ],
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Description": "Translates the sampling coordinates without changing the shape's scale.",
+            "Tooltip": "Use the offset to move through the procedural field."
+        },
+        {
+            "Name": "Distortion",
+            "Type": "Float",
+            "Default": 0.2,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the amount of procedural warping applied to the shape.",
+            "Tooltip": "Increase distortion for a less regular silhouette."
+        },
+        {
+            "Name": "DistortionScale",
+            "Type": "Float",
+            "Default": 0.4,
+            "Widget": "Slider",
+            "Label": "Distortion Scale",
+            "Constraints": [
+                0.001,
+                8,
+                0,
+                0
+            ],
+            "Description": "Controls the size of the distortion pattern.",
+            "Tooltip": "Higher values generally create finer distortion."
+        }
+    ],
+    "ID": "dunes",
+    "Description": "Generates a dunes-style procedural base shape with controls for its main form and variation.",
+    "Shader": "shape.glsl"
 }

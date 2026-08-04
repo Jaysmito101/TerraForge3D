@@ -1,229 +1,288 @@
 {
-  "Name": "Crater",
-  "Params": [
-    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that breaks up crater rims, floors, and the terrain around each crater." },
-    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.00025, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the size of the breakup around crater rims and across crater floors.", "Tooltip": "Higher values pack more variation around each crater." },
-    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges crater rim and floor variation without changing crater placement.", "Tooltip": "Use a new seed for a different crater surface pattern." },
-    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends the crater breakup field so rims and floors do not repeat evenly.", "Tooltip": "Increase it for more irregular crater shapes and surfaces." },
-    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in crater surface breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; crater placement is unchanged." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
-    {
-      "Name": "Strength",
-      "Type": "Float",
-      "Default": 0.5,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [
-        0,
-        4,
-        0,
-        0
-      ],
-      "Description": "Scales the overall height amplitude of the generated shape.",
-      "Tooltip": "Adjust the overall strength of this base shape."
-    },
-    {
-      "Name": "Rotation",
-      "Type": "Float",
-      "Default": 0,
-      "Widget": "Slider",
-      "Constraints": [
-        -180,
-        180,
-        0,
-        0
-      ],
-      "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-      "Tooltip": "Use rotation to change the direction of directional features."
-    },
-    {
-      "Name": "Position",
-      "Type": "Vector2",
-      "Default": [
-        0,
-        0
-      ],
-      "Widget": "Slider",
-      "Constraints": [
-        -1,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the normalized location of the primary feature.",
-      "Tooltip": "Move the feature within the terrain using its normalized coordinates."
-    },
-    {
-      "Name": "Radius",
-      "Type": "Float",
-      "Default": 0.4,
-      "Widget": "Slider",
-      "Constraints": [
-        0.03,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the size of the primary radial feature.",
-      "Tooltip": "Increase radius to affect a larger area."
-    },
-    {
-      "Name": "Depth",
-      "Type": "Float",
-      "Default": 0.634,
-      "Widget": "Slider",
-      "Constraints": [
-        0,
-        2,
-        0,
-        0
-      ],
-      "Description": "Controls how deeply the generated feature cuts into the terrain.",
-      "Tooltip": "Increase depth for a stronger depression or relief."
-    },
-    {
-      "Name": "InnerFalloff",
-      "Type": "Float",
-      "Default": 0,
-      "Widget": "Slider",
-      "Label": "Inner Falloff",
-      "Constraints": [
-        0,
-        0.999,
-        0,
-        0
-      ],
-      "Description": "Controls the inner falloff value used by the Crater base shape.",
-      "Tooltip": "Adjust inner falloff to change the generated terrain."
-    },
-    {
-      "Name": "Height",
-      "Type": "Float",
-      "Default": 0.179,
-      "Widget": "Slider",
-      "Constraints": [
-        0,
-        2,
-        0,
-        0
-      ],
-      "Description": "Controls the vertical height of the generated feature.",
-      "Tooltip": "Adjust the feature's elevation contribution."
-    },
-    {
-      "Name": "OuterFalloff",
-      "Type": "Float",
-      "Default": 0.8,
-      "Widget": "Slider",
-      "Label": "Outer Falloff",
-      "Constraints": [
-        0.01,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the outer falloff value used by the Crater base shape.",
-      "Tooltip": "Adjust outer falloff to change the generated terrain."
-    },
-    {
-      "Name": "Seed",
-      "Type": "Int",
-      "Default": 0,
-      "Widget": "Seed",
-      "Description": "Selects the deterministic random pattern used by the generator.",
-      "Tooltip": "Change the seed to create a different reproducible layout."
-    },
-    {
-      "Name": "LargeDistortion",
-      "Type": "Float",
-      "Default": 0.2,
-      "Widget": "Slider",
-      "Label": "Large Distortion",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the amount of broad-scale distortion.",
-      "Tooltip": "Increase this value for larger irregular shape changes."
-    },
-    {
-      "Name": "SmallDistortion",
-      "Type": "Float",
-      "Default": 0.7,
-      "Widget": "Slider",
-      "Label": "Small Distortion",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls the amount of fine-scale distortion.",
-      "Tooltip": "Increase this value for more detailed irregularity."
-    },
-    {
-      "Name": "LargeNoise",
-      "Type": "Float",
-      "Default": 0.2,
-      "Widget": "Slider",
-      "Label": "Large Noise",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls broad noise variation in the shape.",
-      "Tooltip": "Increase this value for stronger large-scale noise."
-    },
-    {
-      "Name": "SmallNoise",
-      "Type": "Float",
-      "Default": 0.7,
-      "Widget": "Slider",
-      "Label": "Small Noise",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls fine noise variation in the shape.",
-      "Tooltip": "Increase this value for stronger small-scale noise."
-    },
-    {
-      "Name": "InsideNoise",
-      "Type": "Float",
-      "Default": 0,
-      "Widget": "Slider",
-      "Label": "Inside Noise",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls noise applied inside the primary feature.",
-      "Tooltip": "Increase this value to make the interior more varied."
-    },
-    {
-      "Name": "OutsideNoise",
-      "Type": "Float",
-      "Default": 0.5,
-      "Widget": "Slider",
-      "Label": "Outside Noise",
-      "Constraints": [
-        0,
-        1,
-        0,
-        0
-      ],
-      "Description": "Controls noise applied outside the primary feature.",
-      "Tooltip": "Increase this value to add more surrounding terrain variation."
-    }
-  ],
-  "ID": "crater",
-  "Description": "Generates a crater-style procedural base shape with controls for its main form and variation.",
-  "Shader": "shape.glsl"
+    "Name": "Crater",
+    "Params": [
+        {
+            "Name": "NoiseAlgorithm",
+            "Type": "Int",
+            "Default": "Simplex",
+            "Widget": "Dropdown",
+            "Label": "Noise Algorithm",
+            "Description": "Chooses the noise that breaks up crater rims, floors, and the terrain around each crater."
+        },
+        {
+            "Name": "NoiseScale",
+            "Type": "Float",
+            "Default": 0.15,
+            "Widget": "Drag",
+            "Sensitivity": 0.00025,
+            "Constraints": [
+                0.001,
+                64
+            ],
+            "Label": "Noise Scale",
+            "Description": "Sets the size of the breakup around crater rims and across crater floors.",
+            "Tooltip": "Higher values pack more variation around each crater."
+        },
+        {
+            "Name": "NoiseSeed",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Input",
+            "Label": "Noise Seed",
+            "Description": "Rearranges crater rim and floor variation without changing crater placement.",
+            "Tooltip": "Use a new seed for a different crater surface pattern."
+        },
+        {
+            "Name": "NoiseWarp",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4
+            ],
+            "Label": "Noise Warp",
+            "Description": "Bends the crater breakup field so rims and floors do not repeat evenly.",
+            "Tooltip": "Increase it for more irregular crater shapes and surfaces."
+        },
+        {
+            "Name": "NoiseJitter",
+            "Type": "Float",
+            "Default": 0.75,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1
+            ],
+            "Label": "Noise Jitter",
+            "Description": "Offsets cellular feature points in crater surface breakup.",
+            "Tooltip": "Only affects Gabor, Voronoi, and Worley; crater placement is unchanged.",
+            "Conditional": "NoiseAlgorithm",
+            "ConditionalValues": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+            ]
+        },
+        {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4,
+                0,
+                0
+            ],
+            "Description": "Scales the overall height amplitude of the generated shape.",
+            "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+            "Name": "Rotation",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Slider",
+            "Constraints": [
+                -180,
+                180,
+                0,
+                0
+            ],
+            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+            "Tooltip": "Use rotation to change the direction of directional features."
+        },
+        {
+            "Name": "Position",
+            "Type": "Vector2",
+            "Default": [
+                0,
+                0
+            ],
+            "Widget": "Slider",
+            "Constraints": [
+                -1,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the normalized location of the primary feature.",
+            "Tooltip": "Move the feature within the terrain using its normalized coordinates."
+        },
+        {
+            "Name": "Radius",
+            "Type": "Float",
+            "Default": 0.4,
+            "Widget": "Slider",
+            "Constraints": [
+                0.03,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the size of the primary radial feature.",
+            "Tooltip": "Increase radius to affect a larger area."
+        },
+        {
+            "Name": "Depth",
+            "Type": "Float",
+            "Default": 0.634,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                2,
+                0,
+                0
+            ],
+            "Description": "Controls how deeply the generated feature cuts into the terrain.",
+            "Tooltip": "Increase depth for a stronger depression or relief."
+        },
+        {
+            "Name": "InnerFalloff",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Slider",
+            "Label": "Inner Falloff",
+            "Constraints": [
+                0,
+                0.999,
+                0,
+                0
+            ],
+            "Description": "Controls the inner falloff value used by the Crater base shape.",
+            "Tooltip": "Adjust inner falloff to change the generated terrain."
+        },
+        {
+            "Name": "Height",
+            "Type": "Float",
+            "Default": 0.179,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                2,
+                0,
+                0
+            ],
+            "Description": "Controls the vertical height of the generated feature.",
+            "Tooltip": "Adjust the feature's elevation contribution."
+        },
+        {
+            "Name": "OuterFalloff",
+            "Type": "Float",
+            "Default": 0.8,
+            "Widget": "Slider",
+            "Label": "Outer Falloff",
+            "Constraints": [
+                0.01,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the outer falloff value used by the Crater base shape.",
+            "Tooltip": "Adjust outer falloff to change the generated terrain."
+        },
+        {
+            "Name": "Seed",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Seed",
+            "Description": "Selects the deterministic random pattern used by the generator.",
+            "Tooltip": "Change the seed to create a different reproducible layout."
+        },
+        {
+            "Name": "LargeDistortion",
+            "Type": "Float",
+            "Default": 0.2,
+            "Widget": "Slider",
+            "Label": "Large Distortion",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the amount of broad-scale distortion.",
+            "Tooltip": "Increase this value for larger irregular shape changes."
+        },
+        {
+            "Name": "SmallDistortion",
+            "Type": "Float",
+            "Default": 0.7,
+            "Widget": "Slider",
+            "Label": "Small Distortion",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls the amount of fine-scale distortion.",
+            "Tooltip": "Increase this value for more detailed irregularity."
+        },
+        {
+            "Name": "LargeNoise",
+            "Type": "Float",
+            "Default": 0.2,
+            "Widget": "Slider",
+            "Label": "Large Noise",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls broad noise variation in the shape.",
+            "Tooltip": "Increase this value for stronger large-scale noise."
+        },
+        {
+            "Name": "SmallNoise",
+            "Type": "Float",
+            "Default": 0.7,
+            "Widget": "Slider",
+            "Label": "Small Noise",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls fine noise variation in the shape.",
+            "Tooltip": "Increase this value for stronger small-scale noise."
+        },
+        {
+            "Name": "InsideNoise",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Slider",
+            "Label": "Inside Noise",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls noise applied inside the primary feature.",
+            "Tooltip": "Increase this value to make the interior more varied."
+        },
+        {
+            "Name": "OutsideNoise",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Slider",
+            "Label": "Outside Noise",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "Controls noise applied outside the primary feature.",
+            "Tooltip": "Increase this value to add more surrounding terrain variation."
+        }
+    ],
+    "ID": "crater",
+    "Description": "Generates a crater-style procedural base shape with controls for its main form and variation.",
+    "Shader": "shape.glsl"
 }

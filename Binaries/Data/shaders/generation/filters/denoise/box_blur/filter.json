@@ -1,55 +1,76 @@
 {
-  "ID": "box_blur",
-  "Name": "Box Blur",
-  "Category": "Denoise",
-  "Implementation": "PhaseChain",
-  "Description": "A fast uniform blur for inexpensive broad smoothing and mask cleanup.",
-  "Phases": {
-    "Blur": "blur",
-    "Merge": "../../common/merge"
-  },
-  "Resources": {
-    "Temps": [
-      { "Name": "BlurA", "Type": "Field" },
-      { "Name": "BlurB", "Type": "Field" }
+    "ID": "box_blur",
+    "Name": "Box Blur",
+    "Category": "Denoise",
+    "Implementation": "PhaseChain",
+    "Description": "A fast uniform blur for inexpensive broad smoothing and mask cleanup.",
+    "Phases": {
+        "Blur": "blur",
+        "Merge": "../../common/merge"
+    },
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "BlurA",
+                "Type": "Field"
+            },
+            {
+                "Name": "BlurB",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Blur",
+                "Input": "Current",
+                "Output": "BlurA",
+                "Uniforms": {
+                    "u_Axis": {
+                        "Value": 0,
+                        "Type": "Int"
+                    },
+                    "u_Radius": {
+                        "Parameter": "Radius"
+                    }
+                }
+            },
+            {
+                "Phase": "Blur",
+                "Input": "BlurA",
+                "Output": "BlurB",
+                "Uniforms": {
+                    "u_Axis": {
+                        "Value": 1,
+                        "Type": "Int"
+                    },
+                    "u_Radius": {
+                        "Parameter": "Radius"
+                    }
+                }
+            }
+        ],
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "BlurB",
+            "Output": "Next"
+        }
+    },
+    "Params": [
+        {
+            "Name": "Radius",
+            "Type": "Int",
+            "Default": 3,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                128,
+                0,
+                0
+            ],
+            "Description": "The radius of the uniform neighborhood in texels. It is fast and predictable but softer than Gaussian smoothing."
+        }
     ]
-  },
-  "Execution": {
-    "Passes": [
-      {
-        "Phase": "Blur",
-        "Input": "Current",
-        "Output": "BlurA",
-        "Uniforms": {
-          "u_Axis": { "Value": 0, "Type": "Int" },
-          "u_Radius": { "Parameter": "Radius" }
-        }
-      },
-      {
-        "Phase": "Blur",
-        "Input": "BlurA",
-        "Output": "BlurB",
-        "Uniforms": {
-          "u_Axis": { "Value": 1, "Type": "Int" },
-          "u_Radius": { "Parameter": "Radius" }
-        }
-      }
-    ],
-    "Merge": {
-      "Phase": "Merge",
-      "Input": "Current",
-      "Operation": "BlurB",
-      "Output": "Next"
-    }
-  },
-  "Params": [
-    {
-      "Name": "Radius",
-      "Type": "Int",
-      "Default": 3,
-      "Widget": "Slider",
-      "Constraints": [0, 128, 0, 0],
-      "Description": "The radius of the uniform neighborhood in texels. It is fast and predictable but softer than Gaussian smoothing."
-    }
-  ]
 }

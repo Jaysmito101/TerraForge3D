@@ -1,281 +1,1298 @@
 {
-  "ID": "calculated_mask",
-  "Name": "Calculated terrain mask",
-  "Description": "Builds a read-only terrain mask from the generated height field. Each source exposes only the controls that affect that calculation.",
-  "Source": {
-    "Name": "MaskType",
-    "Type": "Int",
-    "Default": 0,
-    "Widget": "Dropdown",
-    "Label": "Source",
-    "Description": "Select the terrain measurement used to calculate this mask.",
-    "Tooltip": "Calculated masks are generated from the current terrain and can be copied into the painted mask for manual editing."
-  },
-  "Buttons": [
-    {
-      "Action": "ResetRecommended",
-      "Label": "Reset recommended",
-      "Description": "Restore the recommended starting values for the selected mask source."
-    }
-  ],
-  "Types": [
-    {
-      "ID": "height_range",
-      "Mode": 0,
-      "ShaderSymbol": "TF3D_MASK_HEIGHT_RANGE",
-      "Name": "Height range",
-      "Description": "Selects terrain whose height falls inside the chosen interval.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.25, 0.75], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [-100.0, 100.0], "Label": "Range", "Description": "Minimum and maximum terrain height to include.", "Tooltip": "The range is softly feathered at both ends." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the range edges as a fraction of the selected range width.", "Tooltip": "Higher values make the mask transition gradually instead of cutting off abruptly." }
-      ]
+    "ID": "calculated_mask",
+    "Name": "Calculated terrain mask",
+    "Description": "Builds a read-only terrain mask from the generated height field. Each source exposes only the controls that affect that calculation.",
+    "Source": {
+        "Name": "MaskType",
+        "Type": "Int",
+        "Default": 0,
+        "Widget": "Dropdown",
+        "Label": "Source",
+        "Description": "Select the terrain measurement used to calculate this mask.",
+        "Tooltip": "Calculated masks are generated from the current terrain and can be copied into the painted mask for manual editing."
     },
-    {
-      "ID": "slope_range",
-      "Mode": 1,
-      "ShaderSymbol": "TF3D_MASK_SLOPE_RANGE",
-      "Name": "Slope range",
-      "Description": "Selects terrain by slope angle in degrees.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [5.0, 35.0], "Widget": "Drag", "Sensitivity": 0.25, "Constraints": [0.0, 90.0], "Label": "Slope degrees", "Description": "Minimum and maximum slope angle to include.", "Tooltip": "0 degrees is flat and 90 degrees is vertical." },
-        { "Name": "SampleRadius", "Type": "Float", "Default": 3.0, "Widget": "Slider", "Constraints": [1.0, 8.0], "Label": "Slope sample radius", "Description": "Controls the terrain distance used for the stable slope estimate.", "Tooltip": "Larger values reduce small-scale noise but soften narrow features." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers both ends of the slope interval relative to its width.", "Tooltip": "Use a small value to keep slope boundaries crisp without creating speckle." }
-      ]
-    },
-    {
-      "ID": "aspect",
-      "Mode": 2,
-      "ShaderSymbol": "TF3D_MASK_ASPECT",
-      "Name": "Aspect / direction",
-      "Description": "Selects slopes facing a chosen compass direction.",
-      "Params": [
-        { "Name": "Direction", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Direction", "Description": "Center direction in degrees around the terrain map.", "Tooltip": "Directions wrap around, so -10 degrees and 350 degrees are equivalent." },
-        { "Name": "DirectionWidth", "Type": "Float", "Default": 45.0, "Widget": "Slider", "Constraints": [0.0, 180.0], "Label": "Direction width", "Description": "Angular width on either side of the selected direction.", "Tooltip": "Wider values include more slope orientations." },
-        { "Name": "EdgeSoftness", "Type": "Float", "Default": 10.0, "Widget": "Slider", "Constraints": [0.0, 90.0], "Label": "Edge softness", "Description": "Softens the directional boundary in degrees.", "Tooltip": "This is an angular softness, not a normalized range feather." }
-      ]
-    },
-    {
-      "ID": "curvature",
-      "Mode": 3,
-      "ShaderSymbol": "TF3D_MASK_CURVATURE",
-      "Name": "Curvature",
-      "Description": "Selects convex and concave terrain based on local second-order height change.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.20, 0.80], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Normalized range", "Description": "Range of normalized curvature magnitude to include.", "Tooltip": "Higher curvature magnitude indicates stronger local bowls or ridges." },
-        { "Name": "CurvatureSensitivity", "Type": "Float", "Default": 32.0, "Widget": "Slider", "Constraints": [1.0, 128.0], "Label": "Curvature sensitivity", "Description": "Controls how quickly raw curvature reaches the normalized response.", "Tooltip": "Increase this when the preview is mostly black; reduce it when nearly everything is white." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the normalized curvature interval.", "Tooltip": "A moderate feather avoids isolated one-pixel curvature spots." }
-      ]
-    },
-    {
-      "ID": "roughness",
-      "Mode": 4,
-      "ShaderSymbol": "TF3D_MASK_ROUGHNESS",
-      "Name": "Roughness / local variance",
-      "Description": "Selects areas with strong local height variation.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.35, 0.65], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Normalized range", "Description": "Local roughness response interval to include.", "Tooltip": "Useful for separating smooth ground from scree and rock detail." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the roughness interval relative to its width.", "Tooltip": "Use a larger feather for broad material transitions." }
-      ]
-    },
-    {
-      "ID": "flatness",
-      "Mode": 5,
-      "ShaderSymbol": "TF3D_MASK_FLATNESS",
-      "Name": "Flatness",
-      "Description": "Selects relatively level ground using the inverse of normalized slope.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.65, 1.0], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Normalized range", "Description": "Flatness interval to include.", "Tooltip": "Values near one are flatter; values near zero are steeper." },
-        { "Name": "SampleRadius", "Type": "Float", "Default": 3.0, "Widget": "Slider", "Constraints": [1.0, 8.0], "Label": "Slope sample radius", "Description": "Controls the neighborhood used for the flatness estimate.", "Tooltip": "Larger values make the result more suitable for broad settlement or farmland masks." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the flatness interval.", "Tooltip": "Avoids a harsh boundary between level and sloped terrain." }
-      ]
-    },
-    {
-      "ID": "ridge_valley",
-      "Mode": 6,
-      "ShaderSymbol": "TF3D_MASK_RIDGE_VALLEY",
-      "Name": "Ridge / valley",
-      "Description": "Selects strong positive or negative local curvature features.",
-      "Params": [
-        { "Name": "Feature", "Type": "Int", "Default": 0, "Widget": "Dropdown", "Options": ["Ridge", "Valley"], "Label": "Feature", "Description": "Chooses convex ridges or concave valleys.", "Tooltip": "Ridge and valley strength are evaluated from the same stable curvature signal." },
-        { "Name": "Range", "Type": "Float", "Default": 0.20, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Minimum feature strength", "Description": "Minimum normalized ridge or valley response to include.", "Tooltip": "Raise this to reject weak broad curvature and keep only pronounced features." },
-        { "Name": "CurvatureSensitivity", "Type": "Float", "Default": 32.0, "Widget": "Slider", "Constraints": [1.0, 128.0], "Label": "Curvature sensitivity", "Description": "Controls the conversion from raw curvature to feature strength.", "Tooltip": "Tune this before changing the minimum feature strength." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.08, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Feature feather", "Description": "Softens the minimum feature threshold.", "Tooltip": "A small feather gives stable feature edges without spreading the mask across the whole terrain." }
-      ]
-    },
-    {
-      "ID": "coastline",
-      "Mode": 7,
-      "ShaderSymbol": "TF3D_MASK_COASTLINE",
-      "Name": "Coastline / sea-level band",
-      "Description": "Selects a band of terrain heights around a configurable sea level.",
-      "Params": [
-        { "Name": "SeaLevel", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [-100.0, 100.0], "Label": "Sea level", "Description": "Height treated as the coastline reference level.", "Tooltip": "Move this to match the waterline of the current terrain." },
-        { "Name": "Range", "Type": "Vector2", "Default": [-0.05, 0.05], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [-100.0, 100.0], "Label": "Height band", "Description": "Signed height interval around sea level to include.", "Tooltip": "Negative values are below sea level and positive values are above it." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.15, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the two edges of the coastal height band.", "Tooltip": "Use a modest feather to avoid a hard shoreline seam." }
-      ]
-    },
-    {
-      "ID": "distance_from_coast",
-      "Mode": 8,
-      "ShaderSymbol": "TF3D_MASK_DISTANCE_FROM_COAST",
-      "Name": "Distance from coast",
-      "Description": "Selects terrain by absolute height distance from the sea level reference.",
-      "Params": [
-        { "Name": "SeaLevel", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [-100.0, 100.0], "Label": "Sea level", "Description": "Height treated as the coastline reference level.", "Tooltip": "Set this to the same level used by the water or coastline mask." },
-        { "Name": "Range", "Type": "Vector2", "Default": [0.0, 0.25], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Distance range", "Description": "Absolute height distance from sea level to include.", "Tooltip": "This is height distance in terrain units, not map-space distance." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the distance band edges.", "Tooltip": "Keep this below half the range width for a controlled transition." }
-      ]
-    },
-    {
-      "ID": "flow_wetness",
-      "Mode": 9,
-      "ShaderSymbol": "TF3D_MASK_FLOW_WETNESS",
-      "Name": "Flow accumulation / wetness",
-      "Description": "Approximates wet lowlands using local depression, low height, and gentle slope signals.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.35, 0.65], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Normalized range", "Description": "Combined wetness response interval to include.", "Tooltip": "This is a local wetness approximation, not a full hydrology simulation." },
-        { "Name": "SampleRadius", "Type": "Float", "Default": 3.0, "Widget": "Slider", "Constraints": [1.0, 8.0], "Label": "Slope sample radius", "Description": "Controls the neighborhood used for the supporting slope estimate.", "Tooltip": "Increase it to make wetness less sensitive to tiny surface noise." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the wetness interval.", "Tooltip": "A moderate feather helps connect nearby wet areas." }
-      ]
-    },
-    {
-      "ID": "ambient_occlusion",
-      "Mode": 10,
-      "ShaderSymbol": "TF3D_MASK_AMBIENT_OCCLUSION",
-      "Name": "Ambient occlusion / cavity",
-      "Description": "Selects sheltered depressions where the surrounding terrain is higher than the sample.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.15, 1.0], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Normalized range", "Description": "Cavity response interval to include.", "Tooltip": "The response is normalized from a local multi-sample depression estimate." },
-        { "Name": "CavitySensitivity", "Type": "Float", "Default": 48.0, "Widget": "Slider", "Constraints": [1.0, 128.0], "Label": "Cavity sensitivity", "Description": "Controls how quickly a depression reaches the normalized cavity response.", "Tooltip": "Lower it when the mask is overwhelmingly white; raise it when cavities are too faint." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the cavity response interval.", "Tooltip": "This controls the selected response range, not the cavity sampling radius." }
-      ]
-    },
-    {
-      "ID": "exposure",
-      "Mode": 11,
-      "ShaderSymbol": "TF3D_MASK_EXPOSURE",
-      "Name": "Exposure",
-      "Description": "Selects terrain whose slope gradient faces a chosen direction and falls inside a response range.",
-      "Params": [
-        { "Name": "Direction", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Direction", "Description": "Preferred windward or sun-facing direction in degrees.", "Tooltip": "Use this for exposed slopes, windward terrain, or sun-facing vegetation." },
-        { "Name": "DirectionWidth", "Type": "Float", "Default": 45.0, "Widget": "Slider", "Constraints": [0.0, 180.0], "Label": "Direction width", "Description": "Angular width around the preferred direction.", "Tooltip": "Wider values include more orientations before the response range is applied." },
-        { "Name": "Range", "Type": "Vector2", "Default": [0.35, 0.65], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Normalized range", "Description": "Exposure response interval to include.", "Tooltip": "The exposure signal is derived from gradient alignment." },
-        { "Name": "SampleRadius", "Type": "Float", "Default": 3.0, "Widget": "Slider", "Constraints": [1.0, 8.0], "Label": "Slope sample radius", "Description": "Controls the neighborhood used for the exposure gradient.", "Tooltip": "Larger values produce a calmer, broader exposure mask." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Feathers the normalized exposure interval.", "Tooltip": "Use a small value for directional material boundaries." }
-      ]
-    },
-    {
-      "ID": "distance_from_border",
-      "Mode": 12,
-      "ShaderSymbol": "TF3D_MASK_DISTANCE_FROM_BORDER",
-      "Name": "Distance from border",
-      "Description": "Selects terrain by normalized distance from the nearest map edge.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.0, 0.35], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Distance range", "Description": "Normalized distance from the border to include.", "Tooltip": "Useful for island falloff, edge cleanup, and border-aware detailing." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the border-distance interval.", "Tooltip": "This feather is relative to the selected normalized distance range." }
-      ]
-    },
-    {
-      "ID": "distance_from_point_path",
-      "Mode": 13,
-      "ShaderSymbol": "TF3D_MASK_DISTANCE_FROM_POINT_PATH",
-      "Name": "Distance from point / path",
-      "Description": "Selects terrain near a normalized map point or an editable polyline path.",
-      "Params": [
-        { "Name": "UsePath", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Use point path", "Description": "Use the path editor instead of a single center point.", "Tooltip": "The path is evaluated as the minimum distance to any segment." },
-        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Normalized map coordinate used when point-path mode is disabled.", "Tooltip": "The origin is the bottom-left of the normalized map." , "Conditional": "UsePath", "ConditionalValue": 0},
-        { "Name": "Path", "Type": "Path", "Default": [[0.25, 0.5], [0.75, 0.5]], "PointCount": 2, "Widget": "Path", "Label": "Path editor", "Description": "Shape a reusable normalized polyline with draggable handles.", "Tooltip": "Drag handles to reshape the path. Double-click empty space to add a point; double-click a handle to remove it.", "Conditional": "UsePath", "ConditionalValue": 1},
-        { "Name": "Range", "Type": "Vector2", "Default": [0.0, 0.2], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Distance range", "Description": "Distance interval from the point or path to include.", "Tooltip": "The distance is measured in normalized map coordinates." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the distance interval relative to its width.", "Tooltip": "Use a small feather to keep narrow roads or river corridors defined." }
-      ]
-    },
-    {
-      "ID": "height_contour",
-      "Mode": 14,
-      "ShaderSymbol": "TF3D_MASK_HEIGHT_CONTOUR",
-      "Name": "Height contour band",
-      "Description": "Selects terrain in a height band, useful for terraces and geological strata.",
-      "Params": [
-        { "Name": "Range", "Type": "Vector2", "Default": [0.45, 0.55], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [-100.0, 100.0], "Label": "Height band", "Description": "Height interval used for the contour band.", "Tooltip": "Narrow bands isolate a contour; widen it to make a broader geological layer." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.15, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens both sides of the height contour band.", "Tooltip": "A modest feather avoids a pixel-hard contour edge." }
-      ]
-    },
-    {
-      "ID": "procedural_noise",
-      "Mode": 15,
-      "ShaderSymbol": "TF3D_MASK_PROCEDURAL_NOISE",
-      "Name": "Procedural noise",
-      "Description": "Creates a deterministic breakup mask from the shared procedural noise library.",
-      "Params": [
-        { "Name": "Scale", "Type": "Float", "Default": 4.0, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.01, 64.0], "Label": "Noise scale", "Description": "Sampling scale of the procedural breakup.", "Tooltip": "Higher values create smaller, more frequent patches." },
-        { "Name": "Seed", "Type": "Int", "Default": 42, "Widget": "Seed", "Label": "Noise seed", "Description": "Deterministically changes the procedural noise pattern.", "Tooltip": "Use a new seed for a different breakup layout without changing its scale." },
-        { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise algorithm", "Description": "Selects the shared noise model used to build the mask." },
-        { "Name": "NoiseOctaves", "Type": "Int", "Default": 5, "Widget": "Slider", "Constraints": [1, 16], "Label": "Noise octaves", "Description": "Controls how many frequency layers are combined.", "Tooltip": "More octaves add detail at a higher shader cost." },
-        { "Name": "NoiseLacunarity", "Type": "Float", "Default": 2.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [1.0, 4.0], "Label": "Noise lacunarity", "Description": "Controls the frequency multiplier between layers.", "Tooltip": "Higher values separate the detail scales more strongly." },
-        { "Name": "NoisePersistence", "Type": "Float", "Default": 0.5, "Widget": "Slider", "Constraints": [0.0, 0.99], "Label": "Noise persistence", "Description": "Controls how much amplitude each layer retains.", "Tooltip": "Higher values keep more fine detail visible." },
-        { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise warp", "Description": "Bends the sampling domain before evaluating noise.", "Tooltip": "Use this to make otherwise regular patterns more organic." },
-        { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise jitter", "Description": "Offsets feature points for the mask's cellular patterns.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local feature placement.", "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
-        { "Name": "Range", "Type": "Vector2", "Default": [0.35, 0.65], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Noise range", "Description": "Noise response interval to include.", "Tooltip": "The range controls which noise values become active." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the selected noise response interval.", "Tooltip": "Use a larger value for less binary breakup." }
-      ]
-    },
-    {
-      "ID": "radial_gradient",
-      "Mode": 16,
-      "ShaderSymbol": "TF3D_MASK_RADIAL_GRADIENT",
-      "Name": "Radial / gradient",
-      "Description": "Selects a circular band around a normalized map center.",
-      "Params": [
-        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Normalized center of the radial mask.", "Tooltip": "The center can be moved outside the map only by using a different mask type." },
-        { "Name": "Range", "Type": "Vector2", "Default": [0.0, 0.2], "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 1.0], "Label": "Distance range", "Description": "Inner and outer normalized radius of the radial gradient.", "Tooltip": "The mask is strongest inside the inner radius and fades out past the outer radius." },
-        { "Name": "EdgeFeather", "Type": "Float", "Default": 0.10, "Widget": "Slider", "Constraints": [0.0, 0.5], "Label": "Edge feather", "Description": "Softens the radial band as a fraction of its width.", "Tooltip": "This keeps the gradient proportional when the radius changes." }
-      ]
-    },
-    {
-      "ID": "spiral",
-      "Mode": 17,
-      "ShaderSymbol": "TF3D_MASK_SPIRAL",
-      "Name": "Spiral",
-      "Description": "Creates a smooth spiral band mask around a normalized map center for concentric or winding distributions.",
-      "Params": [
-        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Sets the origin around which the spiral winds.", "Tooltip": "Move the center to place the spiral over a particular terrain region." },
-        { "Name": "SpiralArms", "Type": "Float", "Default": 1.0, "Widget": "Slider", "Constraints": [1.0, 8.0], "Label": "Arms", "Description": "Controls how many parallel arms run through the spiral.", "Tooltip": "One arm makes a single continuous coil; higher values create evenly spaced parallel coils." },
-        { "Name": "SpiralTurns", "Type": "Float", "Default": 8.0, "Widget": "Slider", "Constraints": [0.0, 32.0], "Label": "Turns", "Description": "Controls how many times the arm winds from the center toward the edge.", "Tooltip": "Higher values pack the spiral bands more tightly across the map." },
-        { "Name": "SpiralThickness", "Type": "Float", "Default": 0.08, "Widget": "Slider", "Constraints": [0.005, 0.5], "Label": "Band thickness", "Description": "Controls the width of the solid part of each spiral band.", "Tooltip": "Increase it for broad distribution zones; lower it for narrow lines." },
-        { "Name": "SpiralSoftness", "Type": "Float", "Default": 0.03, "Widget": "Slider", "Constraints": [0.0, 0.25], "Label": "Band softness", "Description": "Controls how gently each spiral band fades into its surroundings.", "Tooltip": "A small amount removes harsh pixel edges while preserving a readable band." },
-        { "Name": "SpiralRotation", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Rotation", "Description": "Rotates the spiral around its center in degrees.", "Tooltip": "Use this to align the spiral arms with a preferred world or map direction." },
-        { "Name": "SpiralInvert", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Invert", "Description": "Swaps the spiral bands and the space between them.", "Tooltip": "Use the inverted result when the surrounding area should be selected instead of the spiral lines." }
-      ]
-    },
-    {
-      "ID": "grid",
-      "Mode": 18,
-      "ShaderSymbol": "TF3D_MASK_GRID",
-      "Name": "Grid",
-      "Description": "Creates a regular square grid mask around a normalized map center for tiled or lattice-like distributions.",
-      "Params": [
-        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Sets the point where the grid lines cross and from which the grid is aligned.", "Tooltip": "Move the center to align the grid with a feature or region on the terrain." },
-        { "Name": "GridCells", "Type": "Float", "Default": 12.0, "Widget": "Slider", "Constraints": [1.0, 64.0], "Label": "Cells across map", "Description": "Controls the number of grid cells across the normalized map.", "Tooltip": "Higher values create smaller, more frequent tiles." },
-        { "Name": "GridThickness", "Type": "Float", "Default": 0.08, "Widget": "Slider", "Constraints": [0.005, 0.5], "Label": "Line thickness", "Description": "Controls the width of the solid part of each grid line.", "Tooltip": "Increase it for broad bands; lower it for fine lattice lines." },
-        { "Name": "GridSoftness", "Type": "Float", "Default": 0.03, "Widget": "Slider", "Constraints": [0.0, 0.25], "Label": "Line softness", "Description": "Controls how gently each grid line fades into the surrounding cells.", "Tooltip": "A small amount keeps the grid readable while avoiding harsh pixel edges." },
-        { "Name": "GridRotation", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Rotation", "Description": "Rotates the entire grid around its center in degrees.", "Tooltip": "Use this to create a diagonal or world-aligned lattice." },
-        { "Name": "GridInvert", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Invert", "Description": "Swaps the grid lines and the space between them.", "Tooltip": "Use the inverted result when the cells should be selected instead of the grid lines." }
-      ]
-    },
-    {
-      "ID": "dots",
-      "Mode": 19,
-      "ShaderSymbol": "TF3D_MASK_DOTS",
-      "Name": "Dots",
-      "Description": "Creates a regular field of soft circular dots around a normalized map center for polka-dot or tiled distributions.",
-      "Params": [
-        { "Name": "Center", "Type": "Vector2", "Default": [0.5, 0.5], "Widget": "Drag", "Sensitivity": 0.005, "Constraints": [0.0, 1.0], "Label": "Center", "Description": "Sets the origin used to align the dot lattice.", "Tooltip": "Move the center to align the dot pattern with a terrain feature or region." },
-        { "Name": "DotCells", "Type": "Float", "Default": 12.0, "Widget": "Slider", "Constraints": [1.0, 64.0], "Label": "Dots across map", "Description": "Controls the number of dot cells across the normalized map.", "Tooltip": "Higher values create smaller, more frequent dots." },
-        { "Name": "DotRadius", "Type": "Float", "Default": 0.24, "Widget": "Slider", "Constraints": [0.005, 0.5], "Label": "Dot radius", "Description": "Controls the radius of each solid circular dot relative to its cell.", "Tooltip": "Increase it for larger dots; values near half a cell almost fill each tile." },
-        { "Name": "DotSoftness", "Type": "Float", "Default": 0.03, "Widget": "Slider", "Constraints": [0.0, 0.25], "Label": "Dot softness", "Description": "Controls how gently each dot fades into the surrounding space.", "Tooltip": "A small amount keeps the dots smooth without making them look blurry." },
-        { "Name": "DotRotation", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.5, "Constraints": [-360.0, 360.0], "Label": "Rotation", "Description": "Rotates the dot lattice around its center in degrees.", "Tooltip": "Circular dots stay round while their lattice alignment rotates." },
-        { "Name": "DotInvert", "Type": "Bool", "Default": false, "Widget": "Checkbox", "Label": "Invert", "Description": "Swaps the dots and the space between them.", "Tooltip": "Use the inverted result when the background cells should be selected instead of the dots." }
-      ]
-    }
-  ]
+    "Buttons": [
+        {
+            "Action": "ResetRecommended",
+            "Label": "Reset recommended",
+            "Description": "Restore the recommended starting values for the selected mask source."
+        }
+    ],
+    "Types": [
+        {
+            "ID": "height_range",
+            "Mode": 0,
+            "ShaderSymbol": "TF3D_MASK_HEIGHT_RANGE",
+            "Name": "Height range",
+            "Description": "Selects terrain whose height falls inside the chosen interval.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.25,
+                        0.75
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        -100,
+                        100
+                    ],
+                    "Label": "Range",
+                    "Description": "Minimum and maximum terrain height to include.",
+                    "Tooltip": "The range is softly feathered at both ends."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the range edges as a fraction of the selected range width.",
+                    "Tooltip": "Higher values make the mask transition gradually instead of cutting off abruptly."
+                }
+            ]
+        },
+        {
+            "ID": "slope_range",
+            "Mode": 1,
+            "ShaderSymbol": "TF3D_MASK_SLOPE_RANGE",
+            "Name": "Slope range",
+            "Description": "Selects terrain by slope angle in degrees.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        5,
+                        35
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.25,
+                    "Constraints": [
+                        0,
+                        90
+                    ],
+                    "Label": "Slope degrees",
+                    "Description": "Minimum and maximum slope angle to include.",
+                    "Tooltip": "0 degrees is flat and 90 degrees is vertical."
+                },
+                {
+                    "Name": "SampleRadius",
+                    "Type": "Float",
+                    "Default": 3,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        8
+                    ],
+                    "Label": "Slope sample radius",
+                    "Description": "Controls the terrain distance used for the stable slope estimate.",
+                    "Tooltip": "Larger values reduce small-scale noise but soften narrow features."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers both ends of the slope interval relative to its width.",
+                    "Tooltip": "Use a small value to keep slope boundaries crisp without creating speckle."
+                }
+            ]
+        },
+        {
+            "ID": "aspect",
+            "Mode": 2,
+            "ShaderSymbol": "TF3D_MASK_ASPECT",
+            "Name": "Aspect / direction",
+            "Description": "Selects slopes facing a chosen compass direction.",
+            "Params": [
+                {
+                    "Name": "Direction",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.5,
+                    "Constraints": [
+                        -360,
+                        360
+                    ],
+                    "Label": "Direction",
+                    "Description": "Center direction in degrees around the terrain map.",
+                    "Tooltip": "Directions wrap around, so -10 degrees and 350 degrees are equivalent."
+                },
+                {
+                    "Name": "DirectionWidth",
+                    "Type": "Float",
+                    "Default": 45,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        180
+                    ],
+                    "Label": "Direction width",
+                    "Description": "Angular width on either side of the selected direction.",
+                    "Tooltip": "Wider values include more slope orientations."
+                },
+                {
+                    "Name": "EdgeSoftness",
+                    "Type": "Float",
+                    "Default": 10,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        90
+                    ],
+                    "Label": "Edge softness",
+                    "Description": "Softens the directional boundary in degrees.",
+                    "Tooltip": "This is an angular softness, not a normalized range feather."
+                }
+            ]
+        },
+        {
+            "ID": "curvature",
+            "Mode": 3,
+            "ShaderSymbol": "TF3D_MASK_CURVATURE",
+            "Name": "Curvature",
+            "Description": "Selects convex and concave terrain based on local second-order height change.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.2,
+                        0.8
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Normalized range",
+                    "Description": "Range of normalized curvature magnitude to include.",
+                    "Tooltip": "Higher curvature magnitude indicates stronger local bowls or ridges."
+                },
+                {
+                    "Name": "CurvatureSensitivity",
+                    "Type": "Float",
+                    "Default": 32,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        128
+                    ],
+                    "Label": "Curvature sensitivity",
+                    "Description": "Controls how quickly raw curvature reaches the normalized response.",
+                    "Tooltip": "Increase this when the preview is mostly black; reduce it when nearly everything is white."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the normalized curvature interval.",
+                    "Tooltip": "A moderate feather avoids isolated one-pixel curvature spots."
+                }
+            ]
+        },
+        {
+            "ID": "roughness",
+            "Mode": 4,
+            "ShaderSymbol": "TF3D_MASK_ROUGHNESS",
+            "Name": "Roughness / local variance",
+            "Description": "Selects areas with strong local height variation.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.35,
+                        0.65
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Normalized range",
+                    "Description": "Local roughness response interval to include.",
+                    "Tooltip": "Useful for separating smooth ground from scree and rock detail."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the roughness interval relative to its width.",
+                    "Tooltip": "Use a larger feather for broad material transitions."
+                }
+            ]
+        },
+        {
+            "ID": "flatness",
+            "Mode": 5,
+            "ShaderSymbol": "TF3D_MASK_FLATNESS",
+            "Name": "Flatness",
+            "Description": "Selects relatively level ground using the inverse of normalized slope.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.65,
+                        1
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Normalized range",
+                    "Description": "Flatness interval to include.",
+                    "Tooltip": "Values near one are flatter; values near zero are steeper."
+                },
+                {
+                    "Name": "SampleRadius",
+                    "Type": "Float",
+                    "Default": 3,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        8
+                    ],
+                    "Label": "Slope sample radius",
+                    "Description": "Controls the neighborhood used for the flatness estimate.",
+                    "Tooltip": "Larger values make the result more suitable for broad settlement or farmland masks."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the flatness interval.",
+                    "Tooltip": "Avoids a harsh boundary between level and sloped terrain."
+                }
+            ]
+        },
+        {
+            "ID": "ridge_valley",
+            "Mode": 6,
+            "ShaderSymbol": "TF3D_MASK_RIDGE_VALLEY",
+            "Name": "Ridge / valley",
+            "Description": "Selects strong positive or negative local curvature features.",
+            "Params": [
+                {
+                    "Name": "Feature",
+                    "Type": "Int",
+                    "Default": 0,
+                    "Widget": "Dropdown",
+                    "Options": [
+                        "Ridge",
+                        "Valley"
+                    ],
+                    "Label": "Feature",
+                    "Description": "Chooses convex ridges or concave valleys.",
+                    "Tooltip": "Ridge and valley strength are evaluated from the same stable curvature signal."
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Float",
+                    "Default": 0.2,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Minimum feature strength",
+                    "Description": "Minimum normalized ridge or valley response to include.",
+                    "Tooltip": "Raise this to reject weak broad curvature and keep only pronounced features."
+                },
+                {
+                    "Name": "CurvatureSensitivity",
+                    "Type": "Float",
+                    "Default": 32,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        128
+                    ],
+                    "Label": "Curvature sensitivity",
+                    "Description": "Controls the conversion from raw curvature to feature strength.",
+                    "Tooltip": "Tune this before changing the minimum feature strength."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.08,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Feature feather",
+                    "Description": "Softens the minimum feature threshold.",
+                    "Tooltip": "A small feather gives stable feature edges without spreading the mask across the whole terrain."
+                }
+            ]
+        },
+        {
+            "ID": "coastline",
+            "Mode": 7,
+            "ShaderSymbol": "TF3D_MASK_COASTLINE",
+            "Name": "Coastline / sea-level band",
+            "Description": "Selects a band of terrain heights around a configurable sea level.",
+            "Params": [
+                {
+                    "Name": "SeaLevel",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        -100,
+                        100
+                    ],
+                    "Label": "Sea level",
+                    "Description": "Height treated as the coastline reference level.",
+                    "Tooltip": "Move this to match the waterline of the current terrain."
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        -0.05,
+                        0.05
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        -100,
+                        100
+                    ],
+                    "Label": "Height band",
+                    "Description": "Signed height interval around sea level to include.",
+                    "Tooltip": "Negative values are below sea level and positive values are above it."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.15,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens the two edges of the coastal height band.",
+                    "Tooltip": "Use a modest feather to avoid a hard shoreline seam."
+                }
+            ]
+        },
+        {
+            "ID": "distance_from_coast",
+            "Mode": 8,
+            "ShaderSymbol": "TF3D_MASK_DISTANCE_FROM_COAST",
+            "Name": "Distance from coast",
+            "Description": "Selects terrain by absolute height distance from the sea level reference.",
+            "Params": [
+                {
+                    "Name": "SeaLevel",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        -100,
+                        100
+                    ],
+                    "Label": "Sea level",
+                    "Description": "Height treated as the coastline reference level.",
+                    "Tooltip": "Set this to the same level used by the water or coastline mask."
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0,
+                        0.25
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Distance range",
+                    "Description": "Absolute height distance from sea level to include.",
+                    "Tooltip": "This is height distance in terrain units, not map-space distance."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens the distance band edges.",
+                    "Tooltip": "Keep this below half the range width for a controlled transition."
+                }
+            ]
+        },
+        {
+            "ID": "flow_wetness",
+            "Mode": 9,
+            "ShaderSymbol": "TF3D_MASK_FLOW_WETNESS",
+            "Name": "Flow accumulation / wetness",
+            "Description": "Approximates wet lowlands using local depression, low height, and gentle slope signals.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.35,
+                        0.65
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Normalized range",
+                    "Description": "Combined wetness response interval to include.",
+                    "Tooltip": "This is a local wetness approximation, not a full hydrology simulation."
+                },
+                {
+                    "Name": "SampleRadius",
+                    "Type": "Float",
+                    "Default": 3,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        8
+                    ],
+                    "Label": "Slope sample radius",
+                    "Description": "Controls the neighborhood used for the supporting slope estimate.",
+                    "Tooltip": "Increase it to make wetness less sensitive to tiny surface noise."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the wetness interval.",
+                    "Tooltip": "A moderate feather helps connect nearby wet areas."
+                }
+            ]
+        },
+        {
+            "ID": "ambient_occlusion",
+            "Mode": 10,
+            "ShaderSymbol": "TF3D_MASK_AMBIENT_OCCLUSION",
+            "Name": "Ambient occlusion / cavity",
+            "Description": "Selects sheltered depressions where the surrounding terrain is higher than the sample.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.15,
+                        1
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Normalized range",
+                    "Description": "Cavity response interval to include.",
+                    "Tooltip": "The response is normalized from a local multi-sample depression estimate."
+                },
+                {
+                    "Name": "CavitySensitivity",
+                    "Type": "Float",
+                    "Default": 48,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        128
+                    ],
+                    "Label": "Cavity sensitivity",
+                    "Description": "Controls how quickly a depression reaches the normalized cavity response.",
+                    "Tooltip": "Lower it when the mask is overwhelmingly white; raise it when cavities are too faint."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the cavity response interval.",
+                    "Tooltip": "This controls the selected response range, not the cavity sampling radius."
+                }
+            ]
+        },
+        {
+            "ID": "exposure",
+            "Mode": 11,
+            "ShaderSymbol": "TF3D_MASK_EXPOSURE",
+            "Name": "Exposure",
+            "Description": "Selects terrain whose slope gradient faces a chosen direction and falls inside a response range.",
+            "Params": [
+                {
+                    "Name": "Direction",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.5,
+                    "Constraints": [
+                        -360,
+                        360
+                    ],
+                    "Label": "Direction",
+                    "Description": "Preferred windward or sun-facing direction in degrees.",
+                    "Tooltip": "Use this for exposed slopes, windward terrain, or sun-facing vegetation."
+                },
+                {
+                    "Name": "DirectionWidth",
+                    "Type": "Float",
+                    "Default": 45,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        180
+                    ],
+                    "Label": "Direction width",
+                    "Description": "Angular width around the preferred direction.",
+                    "Tooltip": "Wider values include more orientations before the response range is applied."
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.35,
+                        0.65
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Normalized range",
+                    "Description": "Exposure response interval to include.",
+                    "Tooltip": "The exposure signal is derived from gradient alignment."
+                },
+                {
+                    "Name": "SampleRadius",
+                    "Type": "Float",
+                    "Default": 3,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        8
+                    ],
+                    "Label": "Slope sample radius",
+                    "Description": "Controls the neighborhood used for the exposure gradient.",
+                    "Tooltip": "Larger values produce a calmer, broader exposure mask."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Feathers the normalized exposure interval.",
+                    "Tooltip": "Use a small value for directional material boundaries."
+                }
+            ]
+        },
+        {
+            "ID": "distance_from_border",
+            "Mode": 12,
+            "ShaderSymbol": "TF3D_MASK_DISTANCE_FROM_BORDER",
+            "Name": "Distance from border",
+            "Description": "Selects terrain by normalized distance from the nearest map edge.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0,
+                        0.35
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Distance range",
+                    "Description": "Normalized distance from the border to include.",
+                    "Tooltip": "Useful for island falloff, edge cleanup, and border-aware detailing."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens the border-distance interval.",
+                    "Tooltip": "This feather is relative to the selected normalized distance range."
+                }
+            ]
+        },
+        {
+            "ID": "distance_from_point_path",
+            "Mode": 13,
+            "ShaderSymbol": "TF3D_MASK_DISTANCE_FROM_POINT_PATH",
+            "Name": "Distance from point / path",
+            "Description": "Selects terrain near a normalized map point or an editable polyline path.",
+            "Params": [
+                {
+                    "Name": "UsePath",
+                    "Type": "Bool",
+                    "Default": false,
+                    "Widget": "Checkbox",
+                    "Label": "Use point path",
+                    "Description": "Use the path editor instead of a single center point.",
+                    "Tooltip": "The path is evaluated as the minimum distance to any segment."
+                },
+                {
+                    "Name": "Center",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.5,
+                        0.5
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.005,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Center",
+                    "Description": "Normalized map coordinate used when point-path mode is disabled.",
+                    "Tooltip": "The origin is the bottom-left of the normalized map.",
+                    "Conditional": "UsePath",
+                    "ConditionalValue": 0
+                },
+                {
+                    "Name": "Path",
+                    "Type": "Path",
+                    "Default": [
+                        [
+                            0.25,
+                            0.5
+                        ],
+                        [
+                            0.75,
+                            0.5
+                        ]
+                    ],
+                    "PointCount": 2,
+                    "Widget": "Path",
+                    "Label": "Path editor",
+                    "Description": "Shape a reusable normalized polyline with draggable handles.",
+                    "Tooltip": "Drag handles to reshape the path. Double-click empty space to add a point; double-click a handle to remove it.",
+                    "Conditional": "UsePath",
+                    "ConditionalValue": 1
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0,
+                        0.2
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Distance range",
+                    "Description": "Distance interval from the point or path to include.",
+                    "Tooltip": "The distance is measured in normalized map coordinates."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens the distance interval relative to its width.",
+                    "Tooltip": "Use a small feather to keep narrow roads or river corridors defined."
+                }
+            ]
+        },
+        {
+            "ID": "height_contour",
+            "Mode": 14,
+            "ShaderSymbol": "TF3D_MASK_HEIGHT_CONTOUR",
+            "Name": "Height contour band",
+            "Description": "Selects terrain in a height band, useful for terraces and geological strata.",
+            "Params": [
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.45,
+                        0.55
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        -100,
+                        100
+                    ],
+                    "Label": "Height band",
+                    "Description": "Height interval used for the contour band.",
+                    "Tooltip": "Narrow bands isolate a contour; widen it to make a broader geological layer."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.15,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens both sides of the height contour band.",
+                    "Tooltip": "A modest feather avoids a pixel-hard contour edge."
+                }
+            ]
+        },
+        {
+            "ID": "procedural_noise",
+            "Mode": 15,
+            "ShaderSymbol": "TF3D_MASK_PROCEDURAL_NOISE",
+            "Name": "Procedural noise",
+            "Description": "Creates a deterministic breakup mask from the shared procedural noise library.",
+            "Params": [
+                {
+                    "Name": "Scale",
+                    "Type": "Float",
+                    "Default": 4,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.001,
+                    "Constraints": [
+                        0.01,
+                        64
+                    ],
+                    "Label": "Noise scale",
+                    "Description": "Sampling scale of the procedural breakup.",
+                    "Tooltip": "Higher values create smaller, more frequent patches."
+                },
+                {
+                    "Name": "Seed",
+                    "Type": "Int",
+                    "Default": 42,
+                    "Widget": "Seed",
+                    "Label": "Noise seed",
+                    "Description": "Deterministically changes the procedural noise pattern.",
+                    "Tooltip": "Use a new seed for a different breakup layout without changing its scale."
+                },
+                {
+                    "Name": "NoiseAlgorithm",
+                    "Type": "Int",
+                    "Default": "Simplex",
+                    "Widget": "Dropdown",
+                    "Label": "Noise algorithm",
+                    "Description": "Selects the shared noise model used to build the mask."
+                },
+                {
+                    "Name": "NoiseOctaves",
+                    "Type": "Int",
+                    "Default": 5,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        16
+                    ],
+                    "Label": "Noise octaves",
+                    "Description": "Controls how many frequency layers are combined.",
+                    "Tooltip": "More octaves add detail at a higher shader cost."
+                },
+                {
+                    "Name": "NoiseLacunarity",
+                    "Type": "Float",
+                    "Default": 2,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        1,
+                        4
+                    ],
+                    "Label": "Noise lacunarity",
+                    "Description": "Controls the frequency multiplier between layers.",
+                    "Tooltip": "Higher values separate the detail scales more strongly."
+                },
+                {
+                    "Name": "NoisePersistence",
+                    "Type": "Float",
+                    "Default": 0.5,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.99
+                    ],
+                    "Label": "Noise persistence",
+                    "Description": "Controls how much amplitude each layer retains.",
+                    "Tooltip": "Higher values keep more fine detail visible."
+                },
+                {
+                    "Name": "NoiseWarp",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        4
+                    ],
+                    "Label": "Noise warp",
+                    "Description": "Bends the sampling domain before evaluating noise.",
+                    "Tooltip": "Use this to make otherwise regular patterns more organic."
+                },
+                {
+                    "Name": "NoiseJitter",
+                    "Type": "Float",
+                    "Default": 0.75,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Noise jitter",
+                    "Description": "Offsets feature points for the mask's cellular patterns.",
+                    "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local feature placement.",
+                    "Conditional": "NoiseAlgorithm",
+                    "ConditionalValues": [
+                        "Gabor",
+                        "Voronoi",
+                        "Worley"
+                    ]
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.35,
+                        0.65
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Noise range",
+                    "Description": "Noise response interval to include.",
+                    "Tooltip": "The range controls which noise values become active."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens the selected noise response interval.",
+                    "Tooltip": "Use a larger value for less binary breakup."
+                }
+            ]
+        },
+        {
+            "ID": "radial_gradient",
+            "Mode": 16,
+            "ShaderSymbol": "TF3D_MASK_RADIAL_GRADIENT",
+            "Name": "Radial / gradient",
+            "Description": "Selects a circular band around a normalized map center.",
+            "Params": [
+                {
+                    "Name": "Center",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.5,
+                        0.5
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.005,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Center",
+                    "Description": "Normalized center of the radial mask.",
+                    "Tooltip": "The center can be moved outside the map only by using a different mask type."
+                },
+                {
+                    "Name": "Range",
+                    "Type": "Vector2",
+                    "Default": [
+                        0,
+                        0.2
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Distance range",
+                    "Description": "Inner and outer normalized radius of the radial gradient.",
+                    "Tooltip": "The mask is strongest inside the inner radius and fades out past the outer radius."
+                },
+                {
+                    "Name": "EdgeFeather",
+                    "Type": "Float",
+                    "Default": 0.1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.5
+                    ],
+                    "Label": "Edge feather",
+                    "Description": "Softens the radial band as a fraction of its width.",
+                    "Tooltip": "This keeps the gradient proportional when the radius changes."
+                }
+            ]
+        },
+        {
+            "ID": "spiral",
+            "Mode": 17,
+            "ShaderSymbol": "TF3D_MASK_SPIRAL",
+            "Name": "Spiral",
+            "Description": "Creates a smooth spiral band mask around a normalized map center for concentric or winding distributions.",
+            "Params": [
+                {
+                    "Name": "Center",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.5,
+                        0.5
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.005,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Center",
+                    "Description": "Sets the origin around which the spiral winds.",
+                    "Tooltip": "Move the center to place the spiral over a particular terrain region."
+                },
+                {
+                    "Name": "SpiralArms",
+                    "Type": "Float",
+                    "Default": 1,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        8
+                    ],
+                    "Label": "Arms",
+                    "Description": "Controls how many parallel arms run through the spiral.",
+                    "Tooltip": "One arm makes a single continuous coil; higher values create evenly spaced parallel coils."
+                },
+                {
+                    "Name": "SpiralTurns",
+                    "Type": "Float",
+                    "Default": 8,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        32
+                    ],
+                    "Label": "Turns",
+                    "Description": "Controls how many times the arm winds from the center toward the edge.",
+                    "Tooltip": "Higher values pack the spiral bands more tightly across the map."
+                },
+                {
+                    "Name": "SpiralThickness",
+                    "Type": "Float",
+                    "Default": 0.08,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0.005,
+                        0.5
+                    ],
+                    "Label": "Band thickness",
+                    "Description": "Controls the width of the solid part of each spiral band.",
+                    "Tooltip": "Increase it for broad distribution zones; lower it for narrow lines."
+                },
+                {
+                    "Name": "SpiralSoftness",
+                    "Type": "Float",
+                    "Default": 0.03,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.25
+                    ],
+                    "Label": "Band softness",
+                    "Description": "Controls how gently each spiral band fades into its surroundings.",
+                    "Tooltip": "A small amount removes harsh pixel edges while preserving a readable band."
+                },
+                {
+                    "Name": "SpiralRotation",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.5,
+                    "Constraints": [
+                        -360,
+                        360
+                    ],
+                    "Label": "Rotation",
+                    "Description": "Rotates the spiral around its center in degrees.",
+                    "Tooltip": "Use this to align the spiral arms with a preferred world or map direction."
+                },
+                {
+                    "Name": "SpiralInvert",
+                    "Type": "Bool",
+                    "Default": false,
+                    "Widget": "Checkbox",
+                    "Label": "Invert",
+                    "Description": "Swaps the spiral bands and the space between them.",
+                    "Tooltip": "Use the inverted result when the surrounding area should be selected instead of the spiral lines."
+                }
+            ]
+        },
+        {
+            "ID": "grid",
+            "Mode": 18,
+            "ShaderSymbol": "TF3D_MASK_GRID",
+            "Name": "Grid",
+            "Description": "Creates a regular square grid mask around a normalized map center for tiled or lattice-like distributions.",
+            "Params": [
+                {
+                    "Name": "Center",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.5,
+                        0.5
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.005,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Center",
+                    "Description": "Sets the point where the grid lines cross and from which the grid is aligned.",
+                    "Tooltip": "Move the center to align the grid with a feature or region on the terrain."
+                },
+                {
+                    "Name": "GridCells",
+                    "Type": "Float",
+                    "Default": 12,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        64
+                    ],
+                    "Label": "Cells across map",
+                    "Description": "Controls the number of grid cells across the normalized map.",
+                    "Tooltip": "Higher values create smaller, more frequent tiles."
+                },
+                {
+                    "Name": "GridThickness",
+                    "Type": "Float",
+                    "Default": 0.08,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0.005,
+                        0.5
+                    ],
+                    "Label": "Line thickness",
+                    "Description": "Controls the width of the solid part of each grid line.",
+                    "Tooltip": "Increase it for broad bands; lower it for fine lattice lines."
+                },
+                {
+                    "Name": "GridSoftness",
+                    "Type": "Float",
+                    "Default": 0.03,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.25
+                    ],
+                    "Label": "Line softness",
+                    "Description": "Controls how gently each grid line fades into the surrounding cells.",
+                    "Tooltip": "A small amount keeps the grid readable while avoiding harsh pixel edges."
+                },
+                {
+                    "Name": "GridRotation",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.5,
+                    "Constraints": [
+                        -360,
+                        360
+                    ],
+                    "Label": "Rotation",
+                    "Description": "Rotates the entire grid around its center in degrees.",
+                    "Tooltip": "Use this to create a diagonal or world-aligned lattice."
+                },
+                {
+                    "Name": "GridInvert",
+                    "Type": "Bool",
+                    "Default": false,
+                    "Widget": "Checkbox",
+                    "Label": "Invert",
+                    "Description": "Swaps the grid lines and the space between them.",
+                    "Tooltip": "Use the inverted result when the cells should be selected instead of the grid lines."
+                }
+            ]
+        },
+        {
+            "ID": "dots",
+            "Mode": 19,
+            "ShaderSymbol": "TF3D_MASK_DOTS",
+            "Name": "Dots",
+            "Description": "Creates a regular field of soft circular dots around a normalized map center for polka-dot or tiled distributions.",
+            "Params": [
+                {
+                    "Name": "Center",
+                    "Type": "Vector2",
+                    "Default": [
+                        0.5,
+                        0.5
+                    ],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.005,
+                    "Constraints": [
+                        0,
+                        1
+                    ],
+                    "Label": "Center",
+                    "Description": "Sets the origin used to align the dot lattice.",
+                    "Tooltip": "Move the center to align the dot pattern with a terrain feature or region."
+                },
+                {
+                    "Name": "DotCells",
+                    "Type": "Float",
+                    "Default": 12,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        1,
+                        64
+                    ],
+                    "Label": "Dots across map",
+                    "Description": "Controls the number of dot cells across the normalized map.",
+                    "Tooltip": "Higher values create smaller, more frequent dots."
+                },
+                {
+                    "Name": "DotRadius",
+                    "Type": "Float",
+                    "Default": 0.24,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0.005,
+                        0.5
+                    ],
+                    "Label": "Dot radius",
+                    "Description": "Controls the radius of each solid circular dot relative to its cell.",
+                    "Tooltip": "Increase it for larger dots; values near half a cell almost fill each tile."
+                },
+                {
+                    "Name": "DotSoftness",
+                    "Type": "Float",
+                    "Default": 0.03,
+                    "Widget": "Slider",
+                    "Constraints": [
+                        0,
+                        0.25
+                    ],
+                    "Label": "Dot softness",
+                    "Description": "Controls how gently each dot fades into the surrounding space.",
+                    "Tooltip": "A small amount keeps the dots smooth without making them look blurry."
+                },
+                {
+                    "Name": "DotRotation",
+                    "Type": "Float",
+                    "Default": 0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.5,
+                    "Constraints": [
+                        -360,
+                        360
+                    ],
+                    "Label": "Rotation",
+                    "Description": "Rotates the dot lattice around its center in degrees.",
+                    "Tooltip": "Circular dots stay round while their lattice alignment rotates."
+                },
+                {
+                    "Name": "DotInvert",
+                    "Type": "Bool",
+                    "Default": false,
+                    "Widget": "Checkbox",
+                    "Label": "Invert",
+                    "Description": "Swaps the dots and the space between them.",
+                    "Tooltip": "Use the inverted result when the background cells should be selected instead of the dots."
+                }
+            ]
+        }
+    ]
 }

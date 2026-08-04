@@ -1,56 +1,77 @@
 {
-  "ID": "laplacian_smooth",
-  "Name": "Laplacian Smooth",
-  "Category": "Denoise",
-  "Implementation": "PhaseChain",
-  "Description": "Relaxes each sample toward its four-neighbor average with a stability-limited step.",
-  "Phases": {
-    "Filter": "laplacian",
-    "Merge": "../../common/merge"
-  },
-  "Resources": {
-    "Temps": [
-      { "Name": "LaplacianA", "Type": "Field" },
-      { "Name": "LaplacianB", "Type": "Field" }
-    ]
-  },
-  "Execution": {
-    "Passes": [
-      {
-        "Phase": "Filter",
-        "Input": "Current",
-        "Output": "LaplacianA",
-        "Uniforms": {
-          "u_Weight": { "Parameter": "Weight" }
-        }
-      }
-    ],
-    "IterationMode": "PingPong",
-    "IterationBuffers": ["LaplacianA", "LaplacianB"],
-    "IterationsParameter": "Iterations",
-    "Merge": {
-      "Phase": "Merge",
-      "Input": "Current",
-      "Operation": "IterationResult",
-      "Output": "Next"
-    }
-  },
-  "Params": [
-    {
-      "Name": "Weight",
-      "Type": "Float",
-      "Default": 0.2,
-      "Widget": "Slider",
-      "Constraints": [0.0, 1.0, 0, 0],
-      "Description": "The per-step relaxation weight. It is capped at 0.25 to keep the four-neighbor update stable."
+    "ID": "laplacian_smooth",
+    "Name": "Laplacian Smooth",
+    "Category": "Denoise",
+    "Implementation": "PhaseChain",
+    "Description": "Relaxes each sample toward its four-neighbor average with a stability-limited step.",
+    "Phases": {
+        "Filter": "laplacian",
+        "Merge": "../../common/merge"
     },
-    {
-      "Name": "Iterations",
-      "Type": "Int",
-      "Default": 2,
-      "Widget": "Slider",
-      "Constraints": [1, 32, 0, 0],
-      "Description": "The number of relaxation steps. More steps smooth more but gradually reduce terrain relief."
-    }
-  ]
+    "Resources": {
+        "Temps": [
+            {
+                "Name": "LaplacianA",
+                "Type": "Field"
+            },
+            {
+                "Name": "LaplacianB",
+                "Type": "Field"
+            }
+        ]
+    },
+    "Execution": {
+        "Passes": [
+            {
+                "Phase": "Filter",
+                "Input": "Current",
+                "Output": "LaplacianA",
+                "Uniforms": {
+                    "u_Weight": {
+                        "Parameter": "Weight"
+                    }
+                }
+            }
+        ],
+        "IterationMode": "PingPong",
+        "IterationBuffers": [
+            "LaplacianA",
+            "LaplacianB"
+        ],
+        "IterationsParameter": "Iterations",
+        "Merge": {
+            "Phase": "Merge",
+            "Input": "Current",
+            "Operation": "IterationResult",
+            "Output": "Next"
+        }
+    },
+    "Params": [
+        {
+            "Name": "Weight",
+            "Type": "Float",
+            "Default": 0.2,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1,
+                0,
+                0
+            ],
+            "Description": "The per-step relaxation weight. It is capped at 0.25 to keep the four-neighbor update stable."
+        },
+        {
+            "Name": "Iterations",
+            "Type": "Int",
+            "Default": 2,
+            "Widget": "Slider",
+            "Constraints": [
+                1,
+                32,
+                0,
+                0
+            ],
+            "Description": "The number of relaxation steps. More steps smooth more but gradually reduce terrain relief."
+        }
+    ]
 }

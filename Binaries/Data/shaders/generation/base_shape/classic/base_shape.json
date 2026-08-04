@@ -1,82 +1,160 @@
 {
-  "ID": "classic",
-  "Name": "Classic",
-  "Description": "Generates a signed procedural noise landscape with optional recursive detail, absolute-value shaping, and squared-value shaping.",
-  "Shader": "shape.glsl",
-  "Params": [
-    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the signed noise field that Classic reshapes into its terrain profile." },
-    { "Name": "NoiseScale", "Type": "Float", "Default": 0.413, "Widget": "Drag", "Sensitivity": 0.00025, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the size of the broad Classic terrain features before its shaping modes are applied.", "Tooltip": "Higher values create more closely spaced Classic features." },
-    { "Name": "NoiseSeed", "Type": "Int", "Default": 4, "Widget": "Input", "Label": "Noise Seed", "Description": "Changes the Classic terrain arrangement without changing the feature size.", "Tooltip": "Use a new seed to get a different signed landscape." },
-    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Distorts the Classic sampling field before absolute or squared shaping.", "Tooltip": "Increase it to break up smooth, predictable terrain contours." },
-    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points used by the Classic noise field.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes feature placement." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
-    {
-      "Name": "Strength",
-      "Type": "Float",
-      "Default": 0.410,
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Constraints": [-4.0, 4.0, 0.0, 0.0],
-      "Label": "Strength",
-      "Description": "Scales the final signed height produced by the noise field. Positive values preserve the normal shape; negative values invert it.",
-      "Tooltip": "Overall amplitude and sign of the generated terrain."
-    },
-    {
-      "Name": "Scale",
-      "Type": "Float",
-      "Default": 1.0,
-      "Widget": "Drag",
-      "Sensitivity": 0.001,
-      "Constraints": [0.001, 16.0, 0.0, 0.0],
-      "Label": "Scale",
-      "Description": "Scales the sampling coordinates before evaluating noise, changing the size of the terrain features.",
-      "Tooltip": "Higher values produce smaller, more frequent features; lower values produce broader features."
-    },
-    {
-      "Name": "Levels",
-      "Type": "Int",
-      "Default": 1,
-      "Widget": "Slider",
-      "Constraints": [0.0, 6.0, 0.0, 0.0],
-      "Label": "Levels",
-      "Description": "Controls how many recursive coordinate-warping noise levels are applied before the final sample.",
-      "Tooltip": "More levels add complex detail and increase the generator's cost."
-    },
-    {
-      "Name": "Seed",
-      "Type": "Int",
-      "Default": 42,
-      "Widget": "Seed",
-      "Label": "Seed",
-      "Description": "Selects the deterministic noise pattern used by the generator.",
-      "Tooltip": "Change the seed to create a different reproducible terrain layout."
-    },
-    {
-      "Name": "Offset",
-      "Type": "Vector3",
-      "Default": [0.0, 0.0, 0.0],
-      "Widget": "Drag",
-      "Sensitivity": 0.01,
-      "Label": "Offset",
-      "Description": "Translates the three-dimensional noise sampling position without changing the terrain scale.",
-      "Tooltip": "Use the offset to move through the noise field or align this shape with another generator."
-    },
-    {
-      "Name": "SquareValue",
-      "Type": "Bool",
-      "Default": false,
-      "Widget": "Checkbox",
-      "Label": "Square Value",
-      "Description": "Squares the sampled noise value after the optional absolute-value operation, changing the profile of hills and valleys.",
-      "Tooltip": "Enable to bias values toward zero and create a sharper value response."
-    },
-    {
-      "Name": "AbsoluteValue",
-      "Type": "Bool",
-      "Default": false,
-      "Widget": "Checkbox",
-      "Label": "Absolute Value",
-      "Description": "Reflects negative noise values into the positive range before applying strength.",
-      "Tooltip": "Enable to remove negative valleys and keep both sides of the noise field above zero."
-    }
-  ]
+    "ID": "classic",
+    "Name": "Classic",
+    "Description": "Generates a signed procedural noise landscape with optional recursive detail, absolute-value shaping, and squared-value shaping.",
+    "Shader": "shape.glsl",
+    "Params": [
+        {
+            "Name": "NoiseAlgorithm",
+            "Type": "Int",
+            "Default": "Simplex",
+            "Widget": "Dropdown",
+            "Label": "Noise Algorithm",
+            "Description": "Chooses the signed noise field that Classic reshapes into its terrain profile."
+        },
+        {
+            "Name": "NoiseScale",
+            "Type": "Float",
+            "Default": 0.413,
+            "Widget": "Drag",
+            "Sensitivity": 0.00025,
+            "Constraints": [
+                0.001,
+                64
+            ],
+            "Label": "Noise Scale",
+            "Description": "Sets the size of the broad Classic terrain features before its shaping modes are applied.",
+            "Tooltip": "Higher values create more closely spaced Classic features."
+        },
+        {
+            "Name": "NoiseSeed",
+            "Type": "Int",
+            "Default": 4,
+            "Widget": "Input",
+            "Label": "Noise Seed",
+            "Description": "Changes the Classic terrain arrangement without changing the feature size.",
+            "Tooltip": "Use a new seed to get a different signed landscape."
+        },
+        {
+            "Name": "NoiseWarp",
+            "Type": "Float",
+            "Default": 0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                0,
+                4
+            ],
+            "Label": "Noise Warp",
+            "Description": "Distorts the Classic sampling field before absolute or squared shaping.",
+            "Tooltip": "Increase it to break up smooth, predictable terrain contours."
+        },
+        {
+            "Name": "NoiseJitter",
+            "Type": "Float",
+            "Default": 0.75,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                1
+            ],
+            "Label": "Noise Jitter",
+            "Description": "Offsets cellular feature points used by the Classic noise field.",
+            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes feature placement.",
+            "Conditional": "NoiseAlgorithm",
+            "ConditionalValues": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+            ]
+        },
+        {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 0.41,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+                -4,
+                4,
+                0,
+                0
+            ],
+            "Label": "Strength",
+            "Description": "Scales the final signed height produced by the noise field. Positive values preserve the normal shape; negative values invert it.",
+            "Tooltip": "Overall amplitude and sign of the generated terrain."
+        },
+        {
+            "Name": "Scale",
+            "Type": "Float",
+            "Default": 1,
+            "Widget": "Drag",
+            "Sensitivity": 0.001,
+            "Constraints": [
+                0.001,
+                16,
+                0,
+                0
+            ],
+            "Label": "Scale",
+            "Description": "Scales the sampling coordinates before evaluating noise, changing the size of the terrain features.",
+            "Tooltip": "Higher values produce smaller, more frequent features; lower values produce broader features."
+        },
+        {
+            "Name": "Levels",
+            "Type": "Int",
+            "Default": 1,
+            "Widget": "Slider",
+            "Constraints": [
+                0,
+                6,
+                0,
+                0
+            ],
+            "Label": "Levels",
+            "Description": "Controls how many recursive coordinate-warping noise levels are applied before the final sample.",
+            "Tooltip": "More levels add complex detail and increase the generator's cost."
+        },
+        {
+            "Name": "Seed",
+            "Type": "Int",
+            "Default": 42,
+            "Widget": "Seed",
+            "Label": "Seed",
+            "Description": "Selects the deterministic noise pattern used by the generator.",
+            "Tooltip": "Change the seed to create a different reproducible terrain layout."
+        },
+        {
+            "Name": "Offset",
+            "Type": "Vector3",
+            "Default": [
+                0,
+                0,
+                0
+            ],
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Label": "Offset",
+            "Description": "Translates the three-dimensional noise sampling position without changing the terrain scale.",
+            "Tooltip": "Use the offset to move through the noise field or align this shape with another generator."
+        },
+        {
+            "Name": "SquareValue",
+            "Type": "Bool",
+            "Default": false,
+            "Widget": "Checkbox",
+            "Label": "Square Value",
+            "Description": "Squares the sampled noise value after the optional absolute-value operation, changing the profile of hills and valleys.",
+            "Tooltip": "Enable to bias values toward zero and create a sharper value response."
+        },
+        {
+            "Name": "AbsoluteValue",
+            "Type": "Bool",
+            "Default": false,
+            "Widget": "Checkbox",
+            "Label": "Absolute Value",
+            "Description": "Reflects negative noise values into the positive range before applying strength.",
+            "Tooltip": "Enable to remove negative valleys and keep both sides of the noise field above zero."
+        }
+    ]
 }
