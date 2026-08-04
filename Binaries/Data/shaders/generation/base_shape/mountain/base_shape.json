@@ -1,6 +1,11 @@
 {
   "Name": "Mountain",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that shapes the mountain's main ridges, shoulders, and valleys." },
+    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the spacing of mountain ridges and the size of their surface breakup.", "Tooltip": "Higher values create more closely spaced mountain features." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges mountain ridges and valleys while preserving their overall scale.", "Tooltip": "Use a new seed for a different mountain arrangement." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends mountain ridges and valleys into less regular paths.", "Tooltip": "Increase it for more natural, winding mountain structure." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in mountain ridge breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local ridge detail placement." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",

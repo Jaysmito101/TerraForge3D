@@ -1,6 +1,11 @@
 {
   "Name": "Terraces",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that determines where terraces step, soften, and break apart." },
+    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the spacing of terrace bands and the size of breakup along each step.", "Tooltip": "Higher values create more closely spaced terrace detail." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges terrace edges and surface variation without changing the terrace scale.", "Tooltip": "Use a new seed for a different stepped terrain pattern." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends terrace bands and step edges so they do not form uniform rings.", "Tooltip": "Increase it for more weathered, irregular terraces." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in terrace edge breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local step variation placement.", "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",

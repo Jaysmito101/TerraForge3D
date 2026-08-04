@@ -1,6 +1,14 @@
 {
   "Name": "Islands",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the terrain noise used to build the island's beach, forest, and mountain bands." },
+    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the size of the terrain bands that define the island's beaches, forests, and mountains.", "Tooltip": "Higher values create more closely spaced island terrain features." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges the beach, forest, and mountain terrain while preserving the island outline.", "Tooltip": "Use a new seed for a different island landscape." },
+    { "Name": "NoiseOctaves", "Type": "Int", "Default": 5, "Widget": "Slider", "Constraints": [1, 16], "Label": "Noise Octaves", "Description": "Controls how many layers build the beach, forest, and mountain terrain bands.", "Tooltip": "More layers add richer island terrain detail." },
+    { "Name": "NoiseLacunarity", "Type": "Float", "Default": 2.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [1.0, 4.0], "Label": "Noise Lacunarity", "Description": "Controls the spacing between broad island regions and finer terrain breakup.", "Tooltip": "Higher values make successive island details smaller." },
+    { "Name": "NoisePersistence", "Type": "Float", "Default": 0.5, "Widget": "Slider", "Constraints": [0.0, 0.99], "Label": "Noise Persistence", "Description": "Controls how strongly fine beach, forest, and mountain variation remains visible.", "Tooltip": "Higher values preserve more small-scale island detail." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends the island terrain bands so coast, forest, and mountain boundaries feel more natural.", "Tooltip": "Increase it for less regular terrain boundaries." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in the island terrain bands.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local terrain placement." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "CoverageMode",
       "Type": "Int",

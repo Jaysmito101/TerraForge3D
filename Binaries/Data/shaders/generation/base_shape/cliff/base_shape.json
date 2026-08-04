@@ -1,6 +1,10 @@
 {
   "Name": "Cliff",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that roughens the cliff face and softens its height transitions." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges the cliff-face breakup while keeping the cliff profile intact.", "Tooltip": "Change the seed to explore different cliff textures." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends the cliff distortion field to avoid straight, repeated ledges.", "Tooltip": "Increase it for more irregular cliff contours." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in the cliff breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes where cliff variations appear." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",
@@ -106,7 +110,7 @@
     {
       "Name": "NoiseScale",
       "Type": "Float",
-      "Default": 0.7,
+      "Default": 0.15,
       "Label": "Noise Scale",
       "Widget": "Drag",
       "Sensitivity": 0.001,
@@ -116,8 +120,8 @@
         0,
         0
       ],
-      "Description": "Controls the size of the noise features.",
-      "Tooltip": "Higher values generally make noise features smaller."
+      "Description": "Sets the size of the noise that roughens the cliff face and height transition.",
+      "Tooltip": "Higher values pack more cliff breakup into the same face."
     }
   ],
   "ID": "cliff",

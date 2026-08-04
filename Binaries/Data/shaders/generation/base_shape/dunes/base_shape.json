@@ -1,6 +1,11 @@
 {
   "Name": "Dunes",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that bends dune ridges and creates secondary sand bands." },
+    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the spacing of dune ridges and the scale of their surface breakup.", "Tooltip": "Higher values create more closely spaced dune variation." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Changes the phase and placement of dune variation without changing its overall scale.", "Tooltip": "Use a new seed for a different dune field." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends dune ridges so they meander instead of forming straight repeated lines.", "Tooltip": "Increase it for more wind-shaped dune flow." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points used to break up dune bands.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local dune feature placement." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",

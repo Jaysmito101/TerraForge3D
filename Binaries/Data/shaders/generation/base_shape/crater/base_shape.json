@@ -1,6 +1,11 @@
 {
   "Name": "Crater",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the noise that breaks up crater rims, floors, and the terrain around each crater." },
+    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the size of the breakup around crater rims and across crater floors.", "Tooltip": "Higher values pack more variation around each crater." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges crater rim and floor variation without changing crater placement.", "Tooltip": "Use a new seed for a different crater surface pattern." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends the crater breakup field so rims and floors do not repeat evenly.", "Tooltip": "Increase it for more irregular crater shapes and surfaces." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in crater surface breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; crater placement is unchanged." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",

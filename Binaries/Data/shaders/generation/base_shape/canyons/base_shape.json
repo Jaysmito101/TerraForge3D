@@ -1,6 +1,11 @@
 {
   "Name": "Canyons",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the pattern used to break up canyon walls, floors, and transitions." },
+    { "Name": "NoiseScale", "Type": "Float", "Default": 0.15, "Widget": "Drag", "Sensitivity": 0.001, "Constraints": [0.001, 64.0], "Label": "Noise Scale", "Description": "Sets the size of the breakup carried across the canyon walls and floor.", "Tooltip": "Higher values pack more variation into the canyon." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Rearranges canyon wall and floor variation while preserving the canyon form.", "Tooltip": "Use this to try a different canyon layout without changing its scale." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Bends the canyon sampling path to make walls and floors less uniform.", "Tooltip": "Increase it for more winding, irregular canyon variation." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points that shape canyon breakup.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes cell placement in the canyon detail.", "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",

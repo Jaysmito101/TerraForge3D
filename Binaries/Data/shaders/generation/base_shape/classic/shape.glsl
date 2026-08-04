@@ -1,4 +1,4 @@
-#include "common/noise_3d.glsl"
+#include "common/noise_2d.glsl"
 #include "common/base_shape_helpers.glsl"
 
 float evaluateBaseShape(vec2 uv, vec3 seed)
@@ -10,12 +10,12 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	int levels = clamp(u_Levels, 0, 6);
 	for(int i = 0 ; i < levels ; i++)
 	{
-		seed = vec3(tf3d_cnoise(seed + vec3(0.0f, 0.0f, 0.0f)),
-			tf3d_cnoise(seed + vec3(1.0f, 2.0f, 0.0f)),
-			tf3d_cnoise(seed + vec3(3.0f, 4.0f, 0.0f))
+		seed = vec3(tf3d_snoise2(seed.xy + vec2(seed.z)),
+			tf3d_snoise2(seed.xy + vec2(1.0f, 2.0f + seed.z)),
+			tf3d_snoise2(seed.xy + vec2(3.0f, 4.0f + seed.z))
 		);
 	}
-	n = clamp(tf3d_cnoise(seed), -1.0f, 1.0f);
+	n = clamp(tf3d_snoise2(seed.xy + vec2(seed.z)), -1.0f, 1.0f);
 	if(u_AbsoluteValue) n = abs(n);
 	if(u_SquareValue) n = n * n;
 	return n * clamp(u_Strength, -4.0f, 4.0f);

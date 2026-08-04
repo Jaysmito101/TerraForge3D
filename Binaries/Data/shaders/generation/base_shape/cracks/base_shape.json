@@ -1,6 +1,10 @@
 {
   "Name": "Cracks",
   "Params": [
+    { "Name": "NoiseAlgorithm", "Type": "Int", "Default": "Simplex", "Widget": "Dropdown", "Label": "Noise Algorithm", "Description": "Chooses the secondary noise that roughens the surface inside the crack pattern." },
+    { "Name": "NoiseSeed", "Type": "Int", "Default": 0, "Widget": "Input", "Label": "Noise Seed", "Description": "Changes the small-scale variation inside the cracks without moving the crack network.", "Tooltip": "Use this to vary crack surface texture independently." },
+    { "Name": "NoiseWarp", "Type": "Float", "Default": 0.0, "Widget": "Drag", "Sensitivity": 0.01, "Constraints": [0.0, 4.0], "Label": "Noise Warp", "Description": "Distorts the crack-surface detail field without changing the main crack geometry.", "Tooltip": "Increase it to break up repeated interior patterns." },
+    { "Name": "NoiseJitter", "Type": "Float", "Default": 0.75, "Widget": "Slider", "Constraints": [0.0, 1.0], "Label": "Noise Jitter", "Description": "Offsets cellular feature points in the crack interior detail.", "Tooltip": "Only affects Gabor, Voronoi, and Worley; the main crack Voronoi layout is separate." , "Conditional": "NoiseAlgorithm", "ConditionalValues": ["Gabor", "Voronoi", "Worley"] },
     {
       "Name": "Strength",
       "Type": "Float",
@@ -107,7 +111,7 @@
     {
       "Name": "NoiseScale",
       "Type": "Float",
-      "Default": 1,
+      "Default": 0.15,
       "Widget": "Drag",
       "Sensitivity": 0.001,
       "Constraints": [
@@ -116,8 +120,8 @@
         0,
         0
       ],
-      "Description": "Controls the size of the noise features.",
-      "Tooltip": "Higher values generally make noise features smaller."
+      "Description": "Sets the size of the secondary noise added inside the crack pattern.",
+      "Tooltip": "Higher values pack more crack-surface detail into the same pattern."
     },
     {
       "Name": "Seed",
