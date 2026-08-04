@@ -14,16 +14,10 @@ vec2 tf3d_hash22(vec2 p, float seed)
 		tf3d_hash12(p + vec2(5.0, 29.0), seed + 19.19));
 }
 
-const vec2 TF3D_NOISE_GRADIENTS[8] = vec2[](
-	vec2( 1.0,  0.0), vec2( 0.70710678,  0.70710678),
-	vec2( 0.0,  1.0), vec2(-0.70710678,  0.70710678),
-	vec2(-1.0,  0.0), vec2(-0.70710678, -0.70710678),
-	vec2( 0.0, -1.0), vec2( 0.70710678, -0.70710678));
-
 vec2 tf3d_gradient2(vec2 cell, float seed)
 {
-	int gradientIndex = int(floor(tf3d_hash12(cell, seed) * 8.0));
-	return TF3D_NOISE_GRADIENTS[gradientIndex];
+	float angle = tf3d_hash12(cell + vec2(17.0, 41.0), seed + 7.13) * TF3D_NOISE_PI2;
+	return vec2(cos(angle), sin(angle));
 }
 
 float tf3d_simplex2_raw(vec2 p, float seed)
@@ -246,11 +240,12 @@ float tf3d_noise2_fbm(
 	float value = 0.0;
 	float amplitude = 1.0;
 	float amplitudeSum = 0.0;
+	const mat2 octaveRotation = mat2(0.8, -0.6, 0.6, 0.8);
 	for (int octave = 0; octave < octaveCount; ++octave)
 	{
 		value += tf3d_noise2(domain, algorithm, jitter, seed + float(octave) * 11.73) * amplitude;
 		amplitudeSum += amplitude;
-		domain = domain * safeLacunarity + vec2(17.13, 9.71);
+		domain = octaveRotation * domain * safeLacunarity + vec2(17.13, 9.71);
 		amplitude *= safePersistence;
 	}
 	return value / max(amplitudeSum, 0.0001);
