@@ -72,8 +72,7 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	float heightVariation = (randomHeight - 0.5f) * heightRange
 		* clamp(u_RandomHeights, 0.0f, 8.0f) * crackMask;
 
-	float noiseScale = tf3d_shape_positive(u_NoiseScale, 0.001f);
-	float detail = tf3d_snoise2(domain.xy * 2.0f * noiseScale + vec2(domain.z)) * 0.06f * clamp(u_NoiseStrength, 0.0f, 4.0f);
+	float detail = tf3d_snoise2(domain.xy * 2.0f + vec2(domain.z)) * 0.06f * clamp(u_NoiseStrength, 0.0f, 4.0f);
 	detail *= mix(0.35f, 1.0f, crackMask);
 	return baseHeight + heightVariation + detail;
 }

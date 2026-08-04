@@ -27,13 +27,11 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 
 	float thickness = tf3d_shape_positive(u_Thickness, 0.001f);
 	float distortionScale = tf3d_shape_positive(u_DistortionScale, 0.001f);
-	float noiseScale = tf3d_shape_positive(u_NoiseScale, 0.001f);
 	float position = clamp(u_Position, -4.0f, 4.0f);
 	float distortion = clamp(u_Distortion, 0.0f, 1.0f) * noise(uv * distortionScale);
 	float x = (1.0f - uv.x - position - distortion) / thickness;
 	float clampedX = clamp(x, 0.0f, 1.0f);
 	float ns = pow(0.5f * clampedX * clampedX * clampedX - 1.5f * clampedX, 2.0f);
-	ns += noise(uv * noiseScale + vec2(1.0f, 2.0f)) * clamp(u_Noise, 0.0f, 1.0f);
+	ns += noise(uv + vec2(1.0f, 2.0f)) * clamp(u_Noise, 0.0f, 1.0f);
 	return ns * clamp(u_Strength, -4.0f, 4.0f);
 }
-

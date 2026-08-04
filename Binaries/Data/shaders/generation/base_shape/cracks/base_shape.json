@@ -113,7 +113,7 @@
       "Type": "Float",
       "Default": 0.15,
       "Widget": "Drag",
-      "Sensitivity": 0.001,
+      "Sensitivity": 0.00025,
       "Constraints": [
         0.001,
         16,
