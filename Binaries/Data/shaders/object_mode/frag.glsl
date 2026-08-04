@@ -49,6 +49,7 @@ uniform bool u_RequiresDrawBrush;
 uniform vec4 u_BrushSettings0;
 uniform vec3 u_MaskColor;
 uniform bool u_DrawMask;
+uniform bool u_InvertMask;
 uniform sampler2D u_MaskTexture;
 
 int PixelCoordToDataOffset(int x, int y)
@@ -140,6 +141,7 @@ void main()
 	if (u_DrawMask)
 	{
 		float maskValue = texture(u_MaskTexture, fragmentInput.texCoord).r;
+		if (u_InvertMask) maskValue = 1.0f - maskValue;
 		outputColor = mix(outputColor, u_MaskColor, clamp(maskValue * 0.65f, 0.0f, 1.0f));
 	}
 

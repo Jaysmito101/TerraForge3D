@@ -40,6 +40,7 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	{
 		glUniform4f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrushSettings0"), m_DrawBrushSettings->m_BrushPositionX, m_DrawBrushSettings->m_BrushPositionY, m_DrawBrushSettings->m_BrushSize, m_DrawBrushSettings->m_BrushFalloff);
 		glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskColor"), m_DrawBrushSettings->m_MaskColor.x, m_DrawBrushSettings->m_MaskColor.y, m_DrawBrushSettings->m_MaskColor.z);
+		glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertMask"), m_DrawBrushSettings->m_InvertMask ? 1 : 0);
 
 		if (m_DrawBrushSettings->m_MaskTexture != -1)
 		{
