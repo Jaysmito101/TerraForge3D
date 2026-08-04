@@ -1,8 +1,6 @@
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Data/ApplicationState.h"
 
-#define LOAD_VALUE_FROM_CONFIG(jsonName, varName, jsonValueName, defaultValue) if (jsonName.contains(jsonValueName)) varName = jsonName[jsonValueName].get<decltype(varName)>(); else varName = defaultValue;
-
 BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState* appState)
 {
 	m_RequireUpdation = false;
@@ -103,37 +101,8 @@ nlohmann::json BiomeBaseShapeGenerator::ParseData(const std::string& config)
 
 bool BiomeBaseShapeGenerator::LoadInspectorFromConfig(const nlohmann::json& config)
 {
-	m_Inspector->Clear();
-	LOAD_VALUE_FROM_CONFIG(config, m_Name, "Name", "Unnamed");
-	if (config.contains("Params"))
-	{
-		std::string widgetTypeName, widgetLabel;
-		const auto& parametersArray = config["Params"];
-		for (size_t i = 0; i < parametersArray.size(); i++)
-		{
-			const auto& parameter = parametersArray[i];
-			const auto& value = m_Inspector->AddVairableFromConfig(parameter);
-			LOAD_VALUE_FROM_CONFIG(parameter, widgetTypeName, "Widget", "Input");
-			LOAD_VALUE_FROM_CONFIG(parameter, widgetLabel, "Label", value.GetName());
-			auto& widget = m_Inspector->AddWidgetFromString(widgetLabel, widgetTypeName, value.GetName());
-			if (parameter.contains("Sensitivity")) widget.SetSpeed(parameter["Sensitivity"].get<float>());
-			if (parameter.contains("Options")) widget.SetDropdownOptions(parameter["Options"].get<std::vector<std::string>>());
-			if (parameter.contains("Constraints")) widget.SetConstraints(parameter["Constraints"][0].get<float>(), parameter["Constraints"][1].get<float>(), parameter["Constraints"][2].get<float>(), parameter["Constraints"][3].get<float>());
-		    if (parameter.contains("Tooltip")) widget.SetTooltip(parameter["Tooltip"].get<std::string>());
-			if (parameter.contains("Conditional"))
-			{
-				int32_t conditionValue = 1;
-				LOAD_VALUE_FROM_CONFIG(parameter, conditionValue, "ConditionalValue", 1);
-				widget.SetRenderOnCondition(parameter["Conditional"].get<std::string>(), conditionValue);
-			}
-		}
-	}
-	else
-	{
-		m_Inspector->AddTextWidget("No parameters available");
-	}
-
-	return true;
+	m_Name = config.value("Name", "Unnamed");
+	return m_Inspector->LoadConfig(config);
 }
 
 std::string BiomeBaseShapeGenerator::BuildShaderSource()

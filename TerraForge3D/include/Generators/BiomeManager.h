@@ -8,6 +8,7 @@
 #include "Generators/GeneratorTexture.h"
 #include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/MaskTool.h"
+#include "Generators/BiomeFilterStack.h"
 #include "Base/Base.h"
 
 class ApplicationState;
@@ -37,6 +38,7 @@ public:
 	bool ShowGeneralSettings();
 	bool ShowBaseNoiseSettings();
 	bool ShowMaskToolSettings();
+	bool ShowFilterSettings(int filterIndex);
 
 	inline const bool IsEnabled() const { return m_IsEnabled; }
 	inline const char* GetBiomeName() const { return m_BiomeName; }
@@ -45,14 +47,16 @@ public:
 	inline const bool IsUsingCustomBaseShape() const { return m_UseCustomBaseShape; }
 	inline GeneratorData* GetBiomeData() const { return m_Data.get(); }
 	inline const ImVec4& GetColor() const { return m_Color; }
-	inline const int GetFiltersCount() const { return 0; }
-	inline const std::vector<int>& GetFilters() const { return m_Filters; }
+	inline const int GetFiltersCount() const { return static_cast<int>(m_FilterStack->GetFilters().size()); }
+	inline const std::vector<std::shared_ptr<BiomeFilter>>& GetFilters() const { return m_FilterStack->GetFilters(); }
+	inline const std::vector<std::shared_ptr<BiomeFilterDefinition>>& GetFilterDefinitions() const { return m_FilterStack->GetDefinitions(); }
 	inline const std::string& GetBiomeID() const { return m_BiomeID; }
 	inline void SetName(const std::string& name) { strcpy(m_BiomeName, name.c_str()); }
 	inline GeneratorTexture* GetMaskTexture() const { return m_MaskTool->GetTexture(); }
 	inline GeneratorTexture* GetMaskPreviewTexture() const { return m_MaskTool->GetPreviewTexture(); }
 
 	bool AddBaseShapeGenerator(const std::string& config);
+	int AddFilter(const std::shared_ptr<BiomeFilterDefinition>& definition);
 	bool LoadUpResources();
 
 private:
@@ -67,7 +71,7 @@ private:
 	std::shared_ptr<GeneratorData> m_Data;
 	int32_t m_SelectedBaseShapeGenerator = 0;
 	BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
-	std::vector<int> m_Filters;
+	std::shared_ptr<BiomeFilterStack> m_FilterStack;
 	std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
 	std::shared_ptr<CalculatedMaskGenerator> m_CalculatedMaskGenerator;
 

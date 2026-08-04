@@ -29,6 +29,7 @@ bool BiomeManager::LoadUpResources()
 	m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
 	m_CustomBaseShape = std::make_shared<BiomeCustomBaseShape>(m_AppState);
 	m_MaskTool = std::make_shared<MaskTool>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
+	m_FilterStack = std::make_shared<BiomeFilterStack>(m_AppState);
 	return true;
 }
 
@@ -65,6 +66,7 @@ void BiomeManager::Resize()
 	m_CustomBaseShape->Resize();
 	m_CalculatedMaskGenerator->Resize(m_AppState->mainMap.tileResolution);
 	m_MaskTool->Resize(m_AppState->mainMap.tileResolution);
+	m_FilterStack->Resize(size, m_AppState->mainMap.tileResolution);
 	m_RequireUpdation = true;
 }
 
@@ -95,6 +97,7 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	// optimized when filters are implemented
 
 	m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture);
+	m_FilterStack->Update(m_Data.get());
 	m_CalculatedMaskGenerator->Invalidate();
 
 
@@ -179,6 +182,19 @@ bool BiomeManager::ShowMaskToolSettings()
 	m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated terrain mask");
 	BIOME_UI_PROPERTY(m_MaskTool->ShowSettings());
 	ImGui::PopID();
+	return m_RequireUpdation;
+}
+
+int BiomeManager::AddFilter(const std::shared_ptr<BiomeFilterDefinition>& definition)
+{
+	const int index = m_FilterStack->AddFilter(definition);
+	if (index >= 0) m_RequireUpdation = true;
+	return index;
+}
+
+bool BiomeManager::ShowFilterSettings(int filterIndex)
+{
+	BIOME_UI_PROPERTY(m_FilterStack->ShowSettings(filterIndex));
 	return m_RequireUpdation;
 }
 

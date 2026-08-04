@@ -4,6 +4,7 @@
 #include "Utils/Utils.h"
 #include "Profiler.h"
 #include <GLFW/glfw3.h>
+#include <map>
 
 GenerationManager::GenerationManager(ApplicationState* appState)
 {
@@ -243,14 +244,76 @@ void GenerationManager::ShowSettingsInspector()
 				}
 				s_TempBoolean = ImGui::TreeNodeEx("Filters", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
 				ImGui::SameLine();
+				const std::string addFilterPopupID = "Add Filter##" + biome->GetBiomeID();
+				static char filterSearch[128] = {};
 				if (ImGui::Button("Add##BiomeFilterAdd"))
 				{
-					// TODO
+					filterSearch[0] = '\0';
+					ImGui::OpenPopup(addFilterPopupID.c_str());
+				}
+				if (ImGui::BeginPopup(addFilterPopupID.c_str()))
+				{
+					ImGui::SetNextItemWidth(240.0f);
+					ImGui::InputText("Search filters", filterSearch, IM_ARRAYSIZE(filterSearch));
+					ImGui::Separator();
+
+					std::map<std::string, std::vector<int>> visibleFiltersByCategory;
+					const auto& definitions = biome->GetFilterDefinitions();
+					for (int definitionIndex = 0; definitionIndex < static_cast<int>(definitions.size()); definitionIndex++)
+					{
+						if (FuzzyFilterMatch(filterSearch, definitions[definitionIndex]->GetSearchText()))
+							visibleFiltersByCategory[definitions[definitionIndex]->GetCategory()].push_back(definitionIndex);
+					}
+
+					if (visibleFiltersByCategory.empty()) ImGui::TextDisabled("No filters match the search.");
+					for (const auto& [category, categoryDefinitions] : visibleFiltersByCategory)
+					{
+						const std::string categoryLabel = category + "##FilterCategory";
+						const bool categoryOpen = ImGui::TreeNodeEx(categoryLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth);
+						if (categoryOpen)
+						{
+							for (const int definitionIndex : categoryDefinitions)
+							{
+								const auto& definition = definitions[definitionIndex];
+								const std::string filterLabel = definition->GetName() + "##" + definition->GetID();
+								if (ImGui::Selectable(filterLabel.c_str()))
+								{
+									const int filterIndex = biome->AddFilter(definition);
+									if (filterIndex >= 0)
+									{
+										m_SelectedNodeUI.m_BiomeIndex = i;
+										m_SelectedNodeUI.m_FilterIndex = filterIndex;
+										m_SelectedNodeUI.m_BiomeID = biome->GetBiomeID();
+										m_SelectedNodeUI.m_ID = biome->GetFilters()[filterIndex]->GetID();
+										m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_Filter;
+										m_RequireUpdation = true;
+								}
+									ImGui::CloseCurrentPopup();
+								}
+							}
+							ImGui::TreePop();
+						}
+					}
+					ImGui::EndPopup();
 				}
 				if (s_TempBoolean)
 				{
 					const auto& filters = biome->GetFilters();
 					if (filters.size() == 0) ImGui::Text("No Filters Added!");
+					for (int filterIndex = 0; filterIndex < static_cast<int>(filters.size()); filterIndex++)
+					{
+						const auto& filter = filters[filterIndex];
+						const bool selected = m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
+							m_SelectedNodeUI.m_BiomeIndex == i && m_SelectedNodeUI.m_FilterIndex == filterIndex;
+						if (ImGui::Selectable(filter->GetName().c_str(), selected))
+						{
+							m_SelectedNodeUI.m_BiomeIndex = i;
+							m_SelectedNodeUI.m_FilterIndex = filterIndex;
+							m_SelectedNodeUI.m_BiomeID = biome->GetBiomeID();
+							m_SelectedNodeUI.m_ID = filter->GetID();
+							m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_Filter;
+						}
+					}
 					ImGui::TreePop();
 				}
 				ImGui::TreePop();
@@ -274,6 +337,9 @@ void GenerationManager::ShowSettingsDetailed()
 	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowCustomBaseShapeSettings() || m_RequireUpdation;
 	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseNoiseSettings() || m_RequireUpdation;
 	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_MaskTool) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowMaskToolSettings() || m_RequireUpdation;
+	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
+		m_SelectedNodeUI.m_BiomeIndex >= 0 && m_SelectedNodeUI.m_BiomeIndex < static_cast<int>(m_BiomeManagers.size()))
+		m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowFilterSettings(m_SelectedNodeUI.m_FilterIndex) || m_RequireUpdation;
 
 	ImGui::End();
 }

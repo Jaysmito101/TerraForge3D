@@ -20,12 +20,14 @@ enum SelectedUINodeObjectType
 	SelectedUINodeObjectType_BaseShape,
 	SelectedUINodeObjectType_CustomBaseShape,
 	SelectedUINodeObjectType_MaskTool,
+	SelectedUINodeObjectType_Filter,
 	SelectedUINodeObjectType_Material
 };
 
 struct SelectedUINode
 {
-	int m_BiomeIndex;
+	int m_BiomeIndex = -1;
+	int m_FilterIndex = -1;
 	std::string m_BiomeID;
 	SelectedUINodeObjectType m_ObjectName;
 	std::string m_ID;
@@ -37,6 +39,7 @@ struct SelectedUINode
 #define SetUINodeData(index, objectname) \
 { \
 	m_SelectedNodeUI.m_BiomeIndex = index; \
+	m_SelectedNodeUI.m_FilterIndex = -1; \
 	m_SelectedNodeUI.m_ID = MakeUINodeID(index, objectname); \
 	m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_##objectname; \
 }
