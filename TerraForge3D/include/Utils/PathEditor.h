@@ -14,10 +14,10 @@ namespace TerraForge3D::UI
 
 		ImGui::PushID(label);
 		ImGui::TextUnformatted(label);
-		ImGui::TextDisabled("Drag the numbered handles to shape the path.");
+		ImGui::TextDisabled("Drag handles. Double-click empty space to add; double-click a handle to remove.");
 
 		const float width = std::max(ImGui::GetContentRegionAvail().x, 160.0f);
-		const float height = std::clamp(width * 0.48f, 120.0f, 220.0f);
+		const float height = width;
 		const ImVec2 canvasMin = ImGui::GetCursorScreenPos();
 		const ImVec2 canvasSize(width, height);
 		ImGui::InvisibleButton("PathCanvas", canvasSize, ImGuiButtonFlags_MouseButtonLeft);
@@ -58,7 +58,39 @@ namespace TerraForge3D::UI
 		const ImGuiID activePointKey = ImGui::GetID("ActivePathPoint");
 		int* draggedPoint = state->GetIntRef(activePointKey, -1);
 		const bool hovered = ImGui::IsItemHovered();
-		if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		if (hovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+		{
+			const ImVec2 mouse = ImGui::GetIO().MousePos;
+			int closestPoint = -1;
+			float closestDistanceSquared = 10.0f * 10.0f;
+			for (int pointIndex = 0; pointIndex < pointCount; ++pointIndex)
+			{
+				const ImVec2 screenPoint = toScreen(points[pointIndex]);
+				const float dx = screenPoint.x - mouse.x;
+				const float dy = screenPoint.y - mouse.y;
+				const float distanceSquared = dx * dx + dy * dy;
+				if (distanceSquared <= closestDistanceSquared)
+				{
+					closestDistanceSquared = distanceSquared;
+					closestPoint = pointIndex;
+				}
+			}
+			if (closestPoint >= 0 && pointCount > minimum)
+			{
+				for (int pointIndex = closestPoint; pointIndex + 1 < pointCount; ++pointIndex)
+					points[pointIndex] = points[pointIndex + 1];
+				--pointCount;
+				*draggedPoint = -1;
+				changed = true;
+			}
+			else if (closestPoint < 0 && pointCount < static_cast<int>(MaxPoints))
+			{
+				points[pointCount] = toNormalized(mouse);
+				++pointCount;
+				changed = true;
+			}
+		}
+		else if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 		{
 			const ImVec2 mouse = ImGui::GetIO().MousePos;
 			float closestDistanceSquared = 10.0f * 10.0f;
@@ -116,15 +148,6 @@ namespace TerraForge3D::UI
 		}
 		ImGui::SameLine();
 		ImGui::TextDisabled("%d / %d points", pointCount, static_cast<int>(MaxPoints));
-
-		for (int pointIndex = 0; pointIndex < pointCount; ++pointIndex)
-		{
-			ImGui::PushID(pointIndex);
-			ImGui::Text("Point %d", pointIndex + 1);
-			ImGui::SameLine();
-			if (ImGui::DragFloat2("##Position", &points[pointIndex].x, 0.005f, 0.0f, 1.0f, "%.3f")) changed = true;
-			ImGui::PopID();
-		}
 		ImGui::PopID();
 		return changed;
 	}
