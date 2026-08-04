@@ -18,6 +18,7 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 		GeneratorData::SetDefaultStorage(configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
 	}
 	m_FieldStorageUiMode = GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0;
+	m_FieldStatistics = std::make_shared<GeneratorDataStatistics>(m_AppState);
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_HeightmapData = std::make_shared<GeneratorData>();
@@ -65,6 +66,7 @@ void GenerationManager::Update()
 			m_RequireUpdation = false;
 			ExecuteGeneration(true);
 			m_HeightmapData.swap(m_WorkingHeightmapData);
+			UpdateFieldStatistics();
 		}
 		return;
 	}
@@ -78,6 +80,7 @@ void GenerationManager::Update()
 		{
 			m_HeightmapData.swap(m_WorkingHeightmapData);
 			m_GenerationCompleted.store(false, std::memory_order_release);
+			UpdateFieldStatistics();
 		}
 	}
 
@@ -406,6 +409,7 @@ void GenerationManager::ShowSettingsGlobalOptions()
 	if (m_FieldStorageRestartPending) {
 		ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.2f, 1.0f), "Restart required to apply storage change.");
 	}
+	ShowFieldStatistics();
 
 	ImGui::Checkbox("Use Seed Texture", &m_UseSeedFromActiveMesh);
 	ImGui::Checkbox("Auto Updation Paused", &m_UpdationPaused);
@@ -442,6 +446,32 @@ void GenerationManager::ShowSettingsGlobalOptions()
 			ImGui::EndChild();
 		}
 	}
+}
+
+void GenerationManager::UpdateFieldStatistics()
+{
+	if (m_FieldStatistics == nullptr || m_HeightmapData == nullptr) return;
+	m_FieldStatistics->Compute(m_HeightmapData.get(), m_AppState->mainMap.tileResolution, m_FieldStatisticsSampleStride);
+	glFinish();
+	m_FieldStatisticsResult = m_FieldStatistics->Read();
+}
+
+void GenerationManager::ShowFieldStatistics()
+{
+	ImGui::Separator();
+	ImGui::TextUnformatted("Final Field Statistics");
+	if (!m_FieldStatisticsResult.valid)
+	{
+		ImGui::TextDisabled("No completed statistics yet.");
+		return;
+	}
+
+	ImGui::Text("Minimum: %.6f", m_FieldStatisticsResult.minimum);
+	ImGui::Text("Maximum: %.6f", m_FieldStatisticsResult.maximum);
+	ImGui::TextDisabled("Histogram sampled every %d pixels", m_FieldStatisticsSampleStride);
+	ImGui::PlotLines("##FinalFieldHistogram", m_FieldStatisticsResult.histogram.data(),
+		static_cast<int>(m_FieldStatisticsResult.histogram.size()), 0, "Height distribution", 0.0f, 1.0f,
+		ImVec2(-1.0f, 120.0f));
 }
 
 

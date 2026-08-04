@@ -3,7 +3,10 @@
 #include "Generators/GeneratorTexture.h"
 #include "Generators/BiomeManager.h"
 #include "Generators/BiomeMixer.h"
+#include "Generators/GeneratorDataStatistics.h"
 #include "Base/Base.h"
+
+#include <array>
 
 class ApplicationState;
 class ComputeShader;
@@ -70,6 +73,8 @@ private:
 	void ShowSettingsInspector();
 	void ShowSettingsDetailed();
 	void ShowSettingsGlobalOptions();
+	void ShowFieldStatistics();
+	void UpdateFieldStatistics();
 	void RequestGeneration(bool force);
 	void GenerationWorkerLoop();
 	void ExecuteGeneration(bool force);
@@ -82,6 +87,7 @@ private:
 	std::shared_ptr<GeneratorData> m_SwapBuffer;
 	std::shared_ptr<GeneratorTexture> m_SeedTexture;
 	std::shared_ptr<BiomeMixer> m_BiomeMixer;
+	std::shared_ptr<GeneratorDataStatistics> m_FieldStatistics;
 
 	std::vector<std::shared_ptr<BiomeManager>> m_BiomeManagers;
 
@@ -103,5 +109,7 @@ private:
 	int32_t m_SeedTextureResolution = 256;
 	int m_FieldStorageUiMode = 0;
 	bool m_FieldStorageRestartPending = false;
+	GeneratorDataStatisticsResult m_FieldStatisticsResult;
+	int m_FieldStatisticsSampleStride = 4;
 	SelectedUINode m_SelectedNodeUI;
 };

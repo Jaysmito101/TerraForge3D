@@ -95,11 +95,13 @@ void Dashboard::ShowChooseBaseModelPopup()
 			// plane
 			static int resolution = 1024;
 			static float scale = 1.0f;
+			static float solidDepth = 0.1f;
 			ImGui::DragFloat("Scale##GenBasePlane", &scale, 0.01f, 0.05f, 10000.0f);
+			ImGui::DragFloat("Solid Depth##GenBasePlane", &solidDepth, 0.01f, 0.001f, 10000.0f);
 			PowerOfTwoDropDown("Resolution##GenBasePlane", &resolution, 1, 17);
 			if (ImGui::Button("Generate Plane##GenBasePlane"))
 			{
-				m_AppState->mainModel->mesh->GeneratePlane(resolution, scale);
+				m_AppState->mainModel->mesh->GeneratePlane(resolution, scale, 1.0f, solidDepth);
 				m_AppState->mainModel->mesh->RecalculateNormals();
 				m_AppState->mainModel->SetupMeshOnGPU();
 				m_AppState->mainModel->UploadToGPU();
