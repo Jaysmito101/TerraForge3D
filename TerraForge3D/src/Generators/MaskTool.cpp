@@ -14,6 +14,7 @@ MaskTool::MaskTool(ApplicationState* state, glm::vec3 vizColor)
 {
 	m_BaseTexture = std::make_shared<GeneratorTexture>(m_Size, m_Size, GeneratorTextureStorage::R16);
 	m_PaintedTexture = std::make_shared<GeneratorTexture>(m_Size, m_Size, GeneratorTextureStorage::R16);
+	m_VisualizationTexture = std::make_shared<GeneratorTexture>(m_Size, m_Size, GeneratorTextureStorage::R16);
 	m_RasterizeShader = m_AppState->resourceManager->LoadComputeShader("generation/utils/mask_editor");
 	m_CopyShader = m_AppState->resourceManager->LoadComputeShader("generation/utils/mask_copy");
 	m_StrokeSettingsBuffer = std::make_shared<ShaderStorageBuffer>();
@@ -36,6 +37,7 @@ void MaskTool::Resize(int size)
 	m_HasActiveStroke = false;
 	m_BaseTexture->Resize(size, size);
 	m_PaintedTexture->Resize(size, size);
+	m_VisualizationTexture->Resize(size, size);
 }
 
 void MaskTool::SetPreviewMode(MaskPreviewMode mode)
@@ -68,6 +70,7 @@ bool MaskTool::CopyGeneratedMaskToPainted()
 	m_CopyShader->Bind();
 	m_CopyShader->SetUniform1i("u_Resolution", m_Size);
 	m_CopyShader->SetUniform1i("u_SourceMask", 0);
+	m_CopyShader->SetUniform1i("u_Invert", 0);
 	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	const auto dispatchSize = (m_Size + workgroupSize - 1) / workgroupSize;
 	m_CopyShader->Dispatch(dispatchSize, dispatchSize, 1);
@@ -88,6 +91,22 @@ bool MaskTool::CopyGeneratedMaskToPainted()
 	s_CurrentlyEditingMaskTool = this;
 	m_RequireUpdation = true;
 	return true;
+}
+
+void MaskTool::UpdateVisualizationTexture(GeneratorTexture* sourceTexture)
+{
+	if (sourceTexture == nullptr || !m_InvertPreview) return;
+
+	sourceTexture->Bind(0);
+	m_VisualizationTexture->BindForCompute(1);
+	m_CopyShader->Bind();
+	m_CopyShader->SetUniform1i("u_Resolution", m_Size);
+	m_CopyShader->SetUniform1i("u_SourceMask", 0);
+	m_CopyShader->SetUniform1i("u_Invert", 1);
+	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
+	const auto dispatchSize = (m_Size + workgroupSize - 1) / workgroupSize;
+	m_CopyShader->Dispatch(dispatchSize, dispatchSize, 1);
+	m_CopyShader->SetMemoryBarrier();
 }
 
 void MaskTool::RasterizeStrokes()
@@ -209,11 +228,12 @@ bool MaskTool::ApplyDrawingShaders()
 	return true;
 }
 
-void MaskTool::UpdateViewportOverlay(bool showBrush)
+void MaskTool::UpdateViewportOverlay(bool showBrush, bool showMask)
 {
 	m_DrawSettings.m_MaskTexture = GetPreviewTexture() != nullptr ? GetPreviewTexture()->GetRendererID() : -1;
 	m_DrawSettings.m_MaskColor = m_VizColor;
-	m_DrawSettings.m_ShowMask = true;
+	m_DrawSettings.m_ShowMask = showMask;
+	m_DrawSettings.m_InvertMask = m_InvertPreview;
 	m_DrawSettings.m_ShowBrushCursor = showBrush;
 	m_AppState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(&m_DrawSettings);
 }
@@ -221,7 +241,7 @@ void MaskTool::UpdateViewportOverlay(bool showBrush)
 bool MaskTool::ShowPaintedSettings()
 {
 	bool changed = false;
-	if (!m_IsEditing && ImGui::Button("Edit painted mask"))
+	if (!m_IsEditing && ImGui::Button("Edit mask"))
 	{
 		if (s_CurrentlyEditingMaskTool != nullptr)
 		{
@@ -269,7 +289,7 @@ bool MaskTool::ShowPaintedSettings()
 	return changed;
 }
 
-bool MaskTool::ShowSettings()
+bool MaskTool::ShowSettings(bool showViewportMask)
 {
 	m_RequireUpdation = false;
 
@@ -295,8 +315,10 @@ bool MaskTool::ShowSettings()
 	GeneratorTexture* previewTexture = GetPreviewTexture();
 	if (previewTexture != nullptr)
 	{
+		UpdateVisualizationTexture(previewTexture);
+		GeneratorTexture* displayTexture = m_InvertPreview ? m_VisualizationTexture.get() : previewTexture;
 		const float previewSize = glm::clamp(ImGui::GetContentRegionAvail().x, 160.0f, 512.0f);
-		ImGui::Image(previewTexture->GetTextureID(), ImVec2(previewSize, previewSize));
+		ImGui::Image(displayTexture->GetTextureID(), ImVec2(previewSize, previewSize));
 	}
 
 	bool changed = false;
@@ -370,7 +392,9 @@ bool MaskTool::ShowSettings()
 		}
 	}
 
-	UpdateViewportOverlay(showBrush);
+	// Filter settings can inspect the mask without tinting the terrain. Once the
+	// user enters painted editing, the overlay becomes active for that tool.
+	UpdateViewportOverlay(showBrush, showViewportMask || m_IsEditing);
 
 	if (changed) m_RequireUpdation = true;
 	return m_RequireUpdation;

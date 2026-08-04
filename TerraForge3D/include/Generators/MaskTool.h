@@ -23,7 +23,7 @@ public:
 
 	void Resize(int size);
 
-	bool ShowSettings();
+	bool ShowSettings(bool showViewportMask = true);
 	bool ApplyDrawingShaders();
 
 	void SetGeneratedMaskTexture(GeneratorTexture* texture, const char* label = "Filter mask");
@@ -31,6 +31,7 @@ public:
 	bool CopyGeneratedMaskToPainted();
 
 	inline void SetVizColor(float r, float g, float b) { m_VizColor = glm::vec3(r, g, b); }
+	inline void SetInvertPreview(bool invert) { m_InvertPreview = invert; }
 	inline GeneratorTexture* GetTexture() const { return m_PaintedTexture.get(); }
 	inline GeneratorTexture* GetPreviewTexture() const;
 	inline bool IsShowingGeneratedMask() const { return m_PreviewMode == MaskPreviewMode::Generated; }
@@ -46,7 +47,8 @@ private:
 	};
 
 	void SetPreviewMode(MaskPreviewMode mode);
-	void UpdateViewportOverlay(bool showBrush);
+	void UpdateViewportOverlay(bool showBrush, bool showMask);
+	void UpdateVisualizationTexture(GeneratorTexture* sourceTexture);
 	bool ShowPaintedSettings();
 	bool UndoLastStroke();
 	void RasterizeStrokes();
@@ -62,12 +64,14 @@ private:
 	std::shared_ptr<ShaderStorageBuffer> m_StrokePointsBuffer;
 	std::shared_ptr<GeneratorTexture> m_BaseTexture;
 	std::shared_ptr<GeneratorTexture> m_PaintedTexture;
+	std::shared_ptr<GeneratorTexture> m_VisualizationTexture;
 	GeneratorTexture* m_ExternalGeneratedTexture = nullptr;
 	std::vector<MaskStroke> m_Strokes;
 	MaskStroke m_ActiveStroke;
 	bool m_HasActiveStroke = false;
 
 	glm::vec3 m_VizColor = glm::vec3(0.2f, 0.2f, 0.2f);
+	bool m_InvertPreview = false;
 	DrawBrushSettings m_DrawSettings;
 	MaskPreviewMode m_PreviewMode = MaskPreviewMode::Painted;
 	std::string m_GeneratedMaskLabel = "Generated mask";
