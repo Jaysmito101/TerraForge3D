@@ -20,12 +20,14 @@ float tf3d_terrain_fbm2(
     float value = 0.0f;
     float amplitude = 1.0f;
     float amplitudeSum = 0.0f;
+    vec2 domain = p * frequency;
+    const mat2 octaveRotation = mat2(0.8f, -0.6f, 0.6f, 0.8f);
 
     for (int i = 0; i < octaveCount; ++i)
     {
-        value += tf3d_snoise2(p * frequency) * amplitude;
+        value += tf3d_snoise2(domain) * amplitude;
         amplitudeSum += amplitude;
-        frequency *= safeLacunarity;
+        domain = octaveRotation * domain * safeLacunarity + vec2(17.13f, 9.71f);
         amplitude *= safePersistence;
     }
 
@@ -46,13 +48,15 @@ float tf3d_terrain_ridge2(
     float value = 0.0f;
     float amplitude = 1.0f;
     float amplitudeSum = 0.0f;
+    vec2 domain = p * frequency;
+    const mat2 octaveRotation = mat2(0.8f, -0.6f, 0.6f, 0.8f);
 
     for (int i = 0; i < octaveCount; ++i)
     {
-        float ridge = 1.0f - abs(clamp(tf3d_snoise2(p * frequency), -1.0f, 1.0f));
+        float ridge = 1.0f - abs(clamp(tf3d_snoise2(domain), -1.0f, 1.0f));
         value += smoothstep(0.0f, 1.0f, ridge) * amplitude;
         amplitudeSum += amplitude;
-        frequency *= safeLacunarity;
+        domain = octaveRotation * domain * safeLacunarity + vec2(17.13f, 9.71f);
         amplitude *= safePersistence;
     }
 
