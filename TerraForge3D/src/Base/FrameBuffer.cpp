@@ -11,7 +11,7 @@ FrameBuffer::FrameBuffer(int w, int h)
 	height = h;
 	GLint maxSamples = 1;
 	glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
-	const GLsizei samples = std::max<GLsizei>(1, std::min(4, static_cast<GLsizei>(maxSamples)));
+	const GLsizei samples = std::max<GLsizei>(1, std::min(8, static_cast<GLsizei>(maxSamples)));
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
