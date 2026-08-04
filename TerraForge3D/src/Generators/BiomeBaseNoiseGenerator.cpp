@@ -90,9 +90,18 @@ bool BiomeBaseNoiseGenerator::ShowSettings()
 	}
 
 	BIOME_UI_PROPERTY(m_Inspector->Render());
-	BIOME_UI_PROPERTY(DrawOctaveStrengthProfile("Octave Strengths", {
-		m_NoiseOctaveStrengths.data(), m_NoiseOctaveStrengths.size(), 0.0f, 1.0f
-	}));
+
+	ImGui::Text("Noise Octaves Strengths: ");
+	ImGui::PushID("##NoiseOctaves");
+	for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++)
+	{
+		ImGui::PushID(i);
+		BIOME_UI_PROPERTY(ImGui::VSliderFloat("##Octave", ImVec2(20, 200), &m_NoiseOctaveStrengths[i], 0.0f, 1.0f));
+		ImGui::PopID();
+		ImGui::SameLine();
+	}
+	ImGui::PopID();
+	ImGui::NewLine();
 
 	return m_RequireUpdation;
 }
