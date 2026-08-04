@@ -1,5 +1,6 @@
 #include "Generators/BiomeBaseNoiseGenerator.h"
 #include "Data/ApplicationState.h"
+#include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 #include "Profiler.h"
 
@@ -13,10 +14,8 @@ BiomeBaseNoiseGenerator::BiomeBaseNoiseGenerator(ApplicationState* appState)
 
 	m_Inspector = std::make_shared<CustomInspector>();
 
-
-	std::fill_n(m_NoiseOctaveStrengths, BIOME_BASE_NOISE_OCTAVE_COUNT, 1.0f);
+	m_NoiseOctaveStrengths.fill(1.0f);
 	m_NoiseOctaveStrengths[0] = m_NoiseOctaveStrengths[1] = 0.0f;
-
 	{
 		m_Inspector->AddIntegerVariable("Seed", 152);
 		m_Inspector->AddSeedWidget("Seed", "Seed");
@@ -75,19 +74,9 @@ bool BiomeBaseNoiseGenerator::ShowSettings()
 	}
 
 	BIOME_UI_PROPERTY(m_Inspector->Render());
-
-	ImGui::Text("Noise Octaves Strengths: ");
-	ImGui::PushID("##NoiseOctaves");
-	for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++)
-	{
-		ImGui::PushID(i);
-		// ImGui::SliderFloat("##Octave", &m_NoiseOctaveStrengths[i], 0.0f, 1.0f);
-		BIOME_UI_PROPERTY(ImGui::VSliderFloat("##Octave", ImVec2(20, 200), &m_NoiseOctaveStrengths[i], 0.0f, 1.0f));
-		ImGui::PopID();
-		ImGui::SameLine();
-	}
-	ImGui::PopID();
-	ImGui::NewLine();
+	BIOME_UI_PROPERTY(DrawOctaveStrengthProfile("Octave Strengths", {
+		m_NoiseOctaveStrengths.data(), m_NoiseOctaveStrengths.size(), 0.0f, 1.0f
+	}));
 
 	return m_RequireUpdation;
 }
@@ -137,14 +126,23 @@ void BiomeBaseNoiseGenerator::Load(SerializerNode data)
 {
 	m_Inspector->LoadData(data->GetChildNode("Inspector"));
 	auto noiseOctavesVector = data->GetFloatArray("OctaveStrengths");
-	for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++) m_NoiseOctaveStrengths[i] = noiseOctavesVector[i];
+	for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++)
+	{
+		const std::string variableName = "NoiseOctaveStrength" + std::to_string(i);
+		const float defaultValue = i < 2 ? 0.0f : 1.0f;
+		const float inspectorValue = m_Inspector->HasVariable(variableName) ? m_Inspector->GetValues().at(variableName).GetFloat() : defaultValue;
+		const float savedValue = i < static_cast<int>(noiseOctavesVector.size()) ? noiseOctavesVector[i] : inspectorValue;
+		m_NoiseOctaveStrengths[i] = glm::clamp(savedValue, 0.0f, 1.0f);
+		// Remove values written by the previous generic CustomInspector octave UI.
+		if (m_Inspector->HasVariable(variableName)) m_Inspector->RemoveVariable(variableName);
+	}
 }
 
 SerializerNode BiomeBaseNoiseGenerator::Save()
 {
 	auto node = CreateSerializerNode();
 	node->SetChildNode("Inspector", m_Inspector->SaveData());
-	const auto noiseOctavesVector = std::vector<float>(m_NoiseOctaveStrengths, m_NoiseOctaveStrengths + BIOME_BASE_NOISE_OCTAVE_COUNT);
+	const auto noiseOctavesVector = std::vector<float>(m_NoiseOctaveStrengths.begin(), m_NoiseOctaveStrengths.end());
 	node->SetFloatArray("OctaveStrengths", noiseOctavesVector);
 	return node;
 }

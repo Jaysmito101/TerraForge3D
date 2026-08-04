@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <nlohmann/json.hpp>
 #include "Base/Base.h"
 #include "Utils/Utils.h"
@@ -35,7 +36,5 @@ private:
 	bool m_RequireUpdation = true;
 	std::shared_ptr<ComputeShader> m_Shader;
 	std::shared_ptr<CustomInspector> m_Inspector;
-	// this is not stored inside the inspector because we dont need any 
-	// fancy ui for it and this will be more efficient
-	float m_NoiseOctaveStrengths[BIOME_BASE_NOISE_OCTAVE_COUNT];
+	std::array<float, BIOME_BASE_NOISE_OCTAVE_COUNT> m_NoiseOctaveStrengths{};
 };
