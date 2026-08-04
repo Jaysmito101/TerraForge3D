@@ -10,6 +10,30 @@
 #undef max
 #endif
 
+	void RenderInspectorTooltip(const std::string& label, const std::string& description)
+	{
+		if (description.empty() || ImGui::IsItemActive()
+			|| !ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_NoSharedDelay))
+			return;
+
+		ImGui::SetNextWindowSizeConstraints(ImVec2(220.0f, 0.0f), ImVec2(380.0f, 1000.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 8.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
+		if (ImGui::BeginTooltip())
+		{
+			ImGui::PushTextWrapPos(350.0f);
+			if (!label.empty())
+			{
+				ImGui::TextUnformatted(label.c_str());
+				ImGui::Separator();
+			}
+			ImGui::TextUnformatted(description.c_str());
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+		ImGui::PopStyleVar(2);
+	}
+
 std::string CustomInspectorValue::CustomInspectorValueTypeToString(CustomInspectorValueType type)
 {
 	switch (type)
@@ -692,7 +716,7 @@ bool CustomInspector::Render()
 		else if (widget.m_Type == CustomInspectorWidgetType_Seperator) ImGui::Separator();
 		else if (widget.m_Type == CustomInspectorWidgetType_NewLine) ImGui::NewLine();
 		if (widget.m_FontName.size() > 0) ImGui::PopFont();
-		if (widget.m_Tooltip.size() > 0 && ImGui::IsItemHovered()) ImGui::SetTooltip("%s", widget.m_Tooltip.c_str());
+		RenderInspectorTooltip(widget.m_Label, widget.m_Tooltip);
 		if (widget.m_Type != CustomInspectorWidgetType_Seed)
 		{
 			if (ImGui::BeginPopupContextItem(widget.m_ID.c_str()))
