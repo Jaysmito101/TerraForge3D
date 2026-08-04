@@ -177,7 +177,7 @@ void main(void)
 	{
 		float octaveStrength = clamp(u_NoiseOctaveStrengths[i], 0.0f, 1.0f);
 		float pixelsPerFeature = float(u_Resolution) / max(2.0f * octaveFrequency, 0.0001f);
-		float antiAliasWeight = smoothstep(8.0f, 16.0f, pixelsPerFeature);
+		float antiAliasWeight = smoothstep(2.0f, 4.0f, pixelsPerFeature);
 		float effectiveStrength = octaveStrength * antiAliasWeight;
 		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + float(i) * 11.73f)
 			* amplitude * effectiveStrength;
