@@ -19,6 +19,12 @@ uniform int u_Resolution;
 uniform int u_Seed;
 uniform bool u_UseSeedTexture;
 uniform sampler2D u_SeedTexture;
+uniform int u_NoiseAlgorithm;
+uniform float u_NoiseScale;
+uniform float u_NoiseSeed;
+uniform int u_NoiseOctaves;
+uniform float u_NoiseWarp;
+uniform float u_NoiseJitter;
 uniform float u_Strength;
 uniform float u_Influence;
 uniform float u_Frequency;
@@ -34,6 +40,7 @@ uniform vec2 u_TransformRange;
 uniform float u_SlopeSamplingRadius;
 uniform bool m_UseGaussianPreFilter;
 
+#include "common/noise_2d.glsl"
 #include "common/noise_3d.glsl"
 #include "common/base_shape_helpers.glsl"
 
@@ -150,16 +157,29 @@ void main(void)
 	vec3 offsetInput = clamp(u_Offset, vec3(-10000.0f), vec3(10000.0f));
 	seed = seed * frequencyInput + offsetInput + vec3(u_Seed % 100);
 
-	float n = 0.0f;
-	float frequency = 1.0f;
-	float amplitude = 1.0f;
-	int octaveCount = clamp(u_NoiseOctaveStrengthsCount, 0, 16);
-	for (int i = 0 ; i < octaveCount ; i++)
+	vec2 noiseDomain = seed.xy;
+	float safeWarp = clamp(abs(u_NoiseWarp), 0.0f, 4.0f);
+	if (safeWarp > 0.0001f)
 	{
-		n += tf3d_cnoise(seed * frequency) * amplitude * u_NoiseOctaveStrengths[i];
-		frequency *= lacunarity;
+		noiseDomain += vec2(
+			tf3d_noise2(noiseDomain * 0.5f + vec2(17.0f, 5.0f), u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + 13.0f),
+			tf3d_noise2(noiseDomain * 0.5f + vec2(-7.0f, 23.0f), u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + 37.0f)) * safeWarp;
+	}
+
+	float n = 0.0f;
+	float amplitude = 1.0f;
+	float amplitudeSum = 0.0f;
+	int octaveCount = clamp(min(u_NoiseOctaves, u_NoiseOctaveStrengthsCount), 0, 16);
+	for (int i = 0; i < octaveCount; ++i)
+	{
+		float octaveStrength = clamp(u_NoiseOctaveStrengths[i], 0.0f, 1.0f);
+		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + float(i) * 11.73f)
+			* amplitude * octaveStrength;
+		amplitudeSum += amplitude * octaveStrength;
+		noiseDomain = noiseDomain * lacunarity + vec2(17.13f, 9.71f);
 		amplitude *= persistence;
 	}
+	n /= max(amplitudeSum, 0.0001f);
 
 
 	if ( u_TransformFactor == 1) n = n * calculateSlopeFactor();
@@ -178,4 +198,3 @@ void main(void)
 	else dataTarget[offset] = dataSource[offset];
 
 }
-
