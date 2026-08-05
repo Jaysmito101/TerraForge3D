@@ -2,6 +2,8 @@
 
 #include "Base/Logging/Logger.h"
 
+#include <nlohmann/json.hpp>
+
 #include <memory>
 
 #include "Base/Base.h"

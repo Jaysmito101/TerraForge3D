@@ -1,4 +1,5 @@
 #include "Base/Camera.h"
+#include "Exporters/Serializer.h"
 
 #include "imgui/imgui.h"
 
@@ -105,40 +106,42 @@ void Camera::UpdateCamera()
 	m_ProjectionView = m_Projection * m_View;
 }
 
-nlohmann::json Camera::Save() const
+std::shared_ptr<SerializerNodeInternal> Camera::Save() const
 {
-	nlohmann::json data;
-	data["CameraID"] = m_CameraID;
-	data["Perspective"] = m_Perspective;
-	data["AutomaticClipping"] = m_AutomaticClipping;
-	data["Target"] = {{"X", m_Target.x}, {"Y", m_Target.y}, {"Z", m_Target.z}};
-	data["Distance"] = m_Distance;
-	data["Azimuth"] = glm::degrees(m_Azimuth);
-	data["Elevation"] = glm::degrees(m_Elevation);
-	data["FieldOfView"] = m_FieldOfView;
-	data["NearClip"] = m_NearClip;
-	data["FarClip"] = m_FarClip;
-	data["AspectRatio"] = m_AspectRatio;
-	return data;
+	SerializerNode node = CreateSerializerNode();
+	node->SetInteger("CameraID", m_CameraID);
+	node->SetInteger("Perspective", m_Perspective ? 1 : 0);
+	node->SetInteger("AutomaticClipping", m_AutomaticClipping ? 1 : 0);
+	node->SetFloat("TargetX", m_Target.x);
+	node->SetFloat("TargetY", m_Target.y);
+	node->SetFloat("TargetZ", m_Target.z);
+	node->SetFloat("Distance", m_Distance);
+	node->SetFloat("Azimuth", glm::degrees(m_Azimuth));
+	node->SetFloat("Elevation", glm::degrees(m_Elevation));
+	node->SetFloat("FieldOfView", m_FieldOfView);
+	node->SetFloat("NearClip", m_NearClip);
+	node->SetFloat("FarClip", m_FarClip);
+	node->SetFloat("AspectRatio", m_AspectRatio);
+	return node;
 }
 
-void Camera::Load(const nlohmann::json& data)
+void Camera::Load(std::shared_ptr<SerializerNodeInternal> data)
 {
-	m_CameraID = data.value("CameraID", m_CameraID);
-	m_Perspective = data.value("Perspective", m_Perspective);
-	m_AutomaticClipping = data.value("AutomaticClipping", m_AutomaticClipping);
-	if (data.contains("Target"))
-	{
-		const auto& target = data["Target"];
-		m_Target = glm::vec3(target.value("X", 0.0f), target.value("Y", 0.0f), target.value("Z", 0.0f));
-	}
-	m_Distance = data.value("Distance", m_Distance);
-	m_Azimuth = glm::radians(data.value("Azimuth", glm::degrees(m_Azimuth)));
-	m_Elevation = glm::radians(data.value("Elevation", glm::degrees(m_Elevation)));
-	m_FieldOfView = data.value("FieldOfView", m_FieldOfView);
-	m_NearClip = data.value("NearClip", m_NearClip);
-	m_FarClip = data.value("FarClip", m_FarClip);
-	m_AspectRatio = data.value("AspectRatio", m_AspectRatio);
+	if (!data) return;
+	m_CameraID = data->GetInteger("CameraID", m_CameraID);
+	m_Perspective = data->GetInteger("Perspective", m_Perspective ? 1 : 0) != 0;
+	m_AutomaticClipping = data->GetInteger("AutomaticClipping", m_AutomaticClipping ? 1 : 0) != 0;
+	m_Target = glm::vec3(
+		data->GetFloat("TargetX", m_Target.x),
+		data->GetFloat("TargetY", m_Target.y),
+		data->GetFloat("TargetZ", m_Target.z));
+	m_Distance = data->GetFloat("Distance", m_Distance);
+	m_Azimuth = glm::radians(data->GetFloat("Azimuth", glm::degrees(m_Azimuth)));
+	m_Elevation = glm::radians(data->GetFloat("Elevation", glm::degrees(m_Elevation)));
+	m_FieldOfView = data->GetFloat("FieldOfView", m_FieldOfView);
+	m_NearClip = data->GetFloat("NearClip", m_NearClip);
+	m_FarClip = data->GetFloat("FarClip", m_FarClip);
+	m_AspectRatio = data->GetFloat("AspectRatio", m_AspectRatio);
 	ClampOrbit();
 	UpdateCamera();
 }

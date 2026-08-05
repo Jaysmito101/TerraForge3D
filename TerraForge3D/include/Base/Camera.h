@@ -1,7 +1,9 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <nlohmann/json.hpp>
+#include <memory>
+
+class SerializerNodeInternal;
 
 class Camera
 {
@@ -15,8 +17,8 @@ public:
 	void Zoom(float wheelDelta);
 	void Reset();
 
-	nlohmann::json Save() const;
-	void Load(const nlohmann::json& data);
+	std::shared_ptr<SerializerNodeInternal> Save() const;
+	void Load(std::shared_ptr<SerializerNodeInternal> data);
 	void ShowSettings(bool renderWindow = false, bool* pOpen = nullptr);
 
 	const glm::mat4& GetViewMatrix() const { return m_View; }
