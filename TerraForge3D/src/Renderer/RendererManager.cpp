@@ -16,6 +16,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 	m_PlanarShadowCache = std::make_shared<PlanarShadowCache>(appState);
 	m_HeightfieldAmbientCache = std::make_shared<HeightfieldAmbientCache>(appState);
 	m_HeightfieldGICache = std::make_shared<HeightfieldGICache>(appState);
+	m_SeaRenderer = std::make_shared<SeaRenderer>(appState);
 }
 
 RendererManager::~RendererManager()
@@ -116,6 +117,12 @@ void RendererManager::Render(RendererViewport* viewport)
 			{
 				TF3D_PROFILE_SCOPE("renderer/scene/object");
 				m_ObjectRenderer->Render(viewport);
+				if (m_SeaRenderer != nullptr && m_SeaRenderer->IsEnabled())
+				{
+					viewport->m_FrameBuffer->ResolveColor();
+					viewport->m_FrameBuffer->ResolveDepth();
+					m_SeaRenderer->Render(viewport);
+				}
 			}
 			break;
 		case RendererViewportMode_Wireframe:
@@ -230,6 +237,7 @@ void RendererManager::ShowSettings()
 				if (ImGui::BeginTabItem("Sea"))
 				{
 					ImGui::PushID("Sea");
+					if (m_SeaRenderer != nullptr) m_SeaRenderer->ShowSettings();
 					ImGui::PopID();
 					ImGui::EndTabItem();
 				}

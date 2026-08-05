@@ -5,6 +5,7 @@
 #include "Renderer/HeightmapRenderer.h"
 #include "Renderer/TextureSlotRenderer.h"
 #include "Renderer/WireframeRenderer.h"
+#include "Renderer/SeaRenderer.h"
 
 #include "Renderer/RendererLights.h"
 #include "Renderer/RendererSky.h"
@@ -40,6 +41,7 @@ public:
 	inline PlanarShadowCache* GetPlanarShadowCache() { return m_PlanarShadowCache.get(); }
 	inline HeightfieldAmbientCache* GetHeightfieldAmbientCache() { return m_HeightfieldAmbientCache.get(); }
 	inline HeightfieldGICache* GetHeightfieldGICache() { return m_HeightfieldGICache.get(); }
+	inline SeaRenderer* GetSeaRenderer() { return m_SeaRenderer.get(); }
 
 	inline ObjectRenderer* GetObjectRenderer() { return static_cast<ObjectRenderer*>(m_ObjectRenderer.get()); }
 	inline HeightmapRenderer* GetHeightmapRenderer() { return static_cast<HeightmapRenderer*>(m_HeightmapRenderer.get()); }
@@ -63,6 +65,7 @@ private:
 	std::shared_ptr<PlanarShadowCache> m_PlanarShadowCache;
 	std::shared_ptr<HeightfieldAmbientCache> m_HeightfieldAmbientCache;
 	std::shared_ptr<HeightfieldGICache> m_HeightfieldGICache;
+	std::shared_ptr<SeaRenderer> m_SeaRenderer;
 	bool m_EnableAmbientAo = true;
 	float m_AmbientAoRadiusFactor = 0.12f;
 	TerrainGISettings m_TerrainGISettings;
