@@ -145,7 +145,7 @@ void main(void)
 	{
 		seed = texture(u_SeedTexture, uv).rgb; 
 	}
-	float frequencyInput = clamp(abs(u_Frequency), 0.001f, 16.0f);
+	float frequencyInput = clamp(abs(u_Frequency), 0.001f, max(float(u_Resolution), 1.0f));
 	float lacunarity = clamp(u_Lacunarity, 1.0f, 4.0f);
 	float persistence = clamp(u_Persistence, 0.0f, 1.0f);
 	vec3 offsetInput = clamp(u_Offset, vec3(-10000.0f), vec3(10000.0f));
