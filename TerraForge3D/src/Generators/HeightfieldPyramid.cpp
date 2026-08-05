@@ -48,7 +48,7 @@ void HeightfieldPyramid::EnsureTexture(int32_t resolution)
 
 	glGenTextures(1, &m_RendererID);
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
-	glTexStorage2D(GL_TEXTURE_2D, m_MipLevels, GL_RG32F, m_Resolution, m_Resolution);
+	glTexStorage2D(GL_TEXTURE_2D, m_MipLevels, GL_RGBA32F, m_Resolution, m_Resolution);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, m_MipLevels - 1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
@@ -86,7 +86,7 @@ bool HeightfieldPyramid::Rebuild(GeneratorData* heightmap)
 		m_Shader->SetUniform1i("u_SourceLevel", sourceIsHeightmap ? 0 : level - 1);
 		m_Shader->SetUniform2f("u_SourceSize", static_cast<float>(sourceWidth), static_cast<float>(sourceHeight));
 		m_Shader->SetUniform2f("u_OutputSize", static_cast<float>(outputWidth), static_cast<float>(outputHeight));
-		glBindImageTexture(0, m_RendererID, level, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG32F);
+		glBindImageTexture(0, m_RendererID, level, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 		glDispatchCompute((outputWidth + WorkgroupSize - 1) / WorkgroupSize,
 			(outputHeight + WorkgroupSize - 1) / WorkgroupSize, 1);
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
