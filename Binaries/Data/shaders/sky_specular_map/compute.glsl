@@ -8,7 +8,8 @@ const float PI = 3.141592f;
 const float TwoPI = 2.0f * PI;
 const float Epsilon = 0.00001f;
 
-const uint NumSamples = 256;
+const uint NumSamples = 1024;
+const float MaxIblSampleLuminance = 32.0;
 
 layout(binding=0) uniform samplerCube inputTexture;
 layout(binding=1, rgba32f) restrict writeonly uniform imageCube outputTexture;
@@ -121,15 +122,17 @@ void main(void)
 
 			// GGX normal distribution function (D term) probability density function.
 			// Scaling by 1/4 is due to change of density in terms of Lh to Li (and since N=V, rest of the scaling factor cancels out).
-			float pdf = ndfGGX(cosLh, filterRoughness) * 0.25;
+			float pdf = max(ndfGGX(cosLh, filterRoughness) * 0.25, Epsilon);
 
 			// Solid angle associated with this sample.
 			float ws = 1.0 / (NumSamples * pdf);
 
 			// Mip level to sample from.
-			float mipLevel = max(0.5 * log2(ws / wt) + 1.0, 0.0);
+			float maxInputLod = max(float(textureQueryLevels(inputTexture) - 1), 0.0);
+			float mipLevel = clamp(0.5 * log2(ws / wt) + 1.0, 0.0, maxInputLod);
 
-			color  += textureLod(inputTexture, Li, mipLevel).rgb * cosLi;
+			vec3 sampleRadiance = textureLod(inputTexture, Li, mipLevel).rgb;
+			color += tf3d_clampRadiance(sampleRadiance, MaxIblSampleLuminance) * cosLi;
 			weight += cosLi;
 		}
 	}
