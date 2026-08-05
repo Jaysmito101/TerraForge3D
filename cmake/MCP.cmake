@@ -73,6 +73,11 @@ function(tf3d_configure_mcp executable_name)
     set_property(TARGET tf3d_mcp PROPERTY INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include;${TF3D_INCLUDE_DIRS}"
     )
+    target_include_directories(tf3d_mcp PRIVATE
+        "$<TARGET_PROPERTY:glad,INTERFACE_INCLUDE_DIRECTORIES>"
+        "$<TARGET_PROPERTY:webp,INTERFACE_INCLUDE_DIRECTORIES>"
+    )
+    add_dependencies(tf3d_mcp glad webp)
     target_compile_definitions(tf3d_mcp PRIVATE
         TF3D_ENABLE_MCP=1
         SPDLOG_FMT_EXTERNAL
