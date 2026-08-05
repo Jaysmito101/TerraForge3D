@@ -76,6 +76,7 @@ private:
 	void ShowSettingsGlobalOptions();
 	void ShowFieldStatistics();
 	void UpdateFieldStatistics();
+	void GenerateHeightmapMipmaps();
 	void RequestGeneration(bool force);
 	void GenerationWorkerLoop();
 	void ExecuteGeneration(bool force);

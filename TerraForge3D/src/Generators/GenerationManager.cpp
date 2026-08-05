@@ -66,6 +66,7 @@ void GenerationManager::Update()
 			m_RequireUpdation = false;
 			ExecuteGeneration(true);
 			m_HeightmapData.swap(m_WorkingHeightmapData);
+			GenerateHeightmapMipmaps();
 			UpdateFieldStatistics();
 		}
 		return;
@@ -80,6 +81,7 @@ void GenerationManager::Update()
 		{
 			m_HeightmapData.swap(m_WorkingHeightmapData);
 			m_GenerationCompleted.store(false, std::memory_order_release);
+			GenerateHeightmapMipmaps();
 			UpdateFieldStatistics();
 		}
 	}
@@ -454,6 +456,22 @@ void GenerationManager::UpdateFieldStatistics()
 	m_FieldStatistics->Compute(m_HeightmapData.get(), m_AppState->mainMap.tileResolution, m_FieldStatisticsSampleStride);
 	glFinish();
 	m_FieldStatisticsResult = m_FieldStatistics->Read();
+}
+
+void GenerationManager::GenerateHeightmapMipmaps()
+{
+	if (m_HeightmapData == nullptr || m_HeightmapData->GetResolution() <= 0) return;
+
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+	m_HeightmapData->BindAsTexture(0);
+	int32_t mipLevels = 1;
+	for (int32_t mipSize = m_HeightmapData->GetResolution(); mipSize > 1; mipSize >>= 1) ++mipLevels;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GenerationManager::ShowFieldStatistics()
