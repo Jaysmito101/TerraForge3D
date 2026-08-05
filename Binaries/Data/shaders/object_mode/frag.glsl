@@ -174,7 +174,7 @@ void main()
 	color = ACESFilm(max(color, vec3(0.0)));
 	color = pow(max(color, vec3(0.0)), vec3(1.0 / 2.2));
 
-	if (u_DrawMask && !isSolidSlab)
+	if (u_DrawMask && fragmentInput.texCoord.z <= 0.5f)
 	{
 		float maskValue = texture(u_MaskTexture, fragmentInput.texCoord.xy).r;
 		if (u_InvertMask) maskValue = 1.0 - maskValue;

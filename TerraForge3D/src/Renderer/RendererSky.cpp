@@ -73,12 +73,27 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	TF3D_LOG_DEBUG("Loading skybox texture '{}'", path);
 
 	int32_t skyboxTextureEquirectWidth = 0, skyboxTextureEquirectHeight = 0;
-	unsigned char* skyboxTextureEquirectData = stbi_load(path.c_str(), &skyboxTextureEquirectWidth, &skyboxTextureEquirectHeight, nullptr, 3);
-	if (!skyboxTextureEquirectData)   
+	int32_t skyboxTextureEquirectChannels = 0;
+	const bool isHDR = stbi_is_hdr(path.c_str()) != 0;
+	float* skyboxTextureEquirectFloatData = nullptr;
+	unsigned char* skyboxTextureEquirectByteData = nullptr;
+	if (isHDR)
 	{
-	TF3D_LOG_ERROR("Failed to load skybox texture '{}'", path);
+		skyboxTextureEquirectFloatData = stbi_loadf(path.c_str(), &skyboxTextureEquirectWidth, &skyboxTextureEquirectHeight, &skyboxTextureEquirectChannels, 4);
+	}
+	else
+	{
+		skyboxTextureEquirectByteData = stbi_load(path.c_str(), &skyboxTextureEquirectWidth, &skyboxTextureEquirectHeight, &skyboxTextureEquirectChannels, 3);
+	}
+	void* skyboxTextureEquirectData = isHDR
+		? static_cast<void*>(skyboxTextureEquirectFloatData)
+		: static_cast<void*>(skyboxTextureEquirectByteData);
+	if (!skyboxTextureEquirectData)
+	{
+		TF3D_LOG_ERROR("Failed to load skybox texture '{}'", path);
 		return false;
 	}
+	TF3D_LOG_DEBUG("Loaded {} skybox texture '{}' ({}x{}, {} channels)", isHDR ? "floating-point HDR" : "8-bit LDR", path, skyboxTextureEquirectWidth, skyboxTextureEquirectHeight, skyboxTextureEquirectChannels);
 	uint32_t skyboxTextureEquirect = -1;
 	glGenTextures(1, &skyboxTextureEquirect);
 	glBindTexture(GL_TEXTURE_2D, skyboxTextureEquirect);
@@ -87,7 +102,14 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, skyboxTextureEquirectWidth, skyboxTextureEquirectHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, skyboxTextureEquirectData);
+	if (isHDR)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, skyboxTextureEquirectWidth, skyboxTextureEquirectHeight, 0, GL_RGBA, GL_FLOAT, skyboxTextureEquirectData);
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, skyboxTextureEquirectWidth, skyboxTextureEquirectHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, skyboxTextureEquirectData);
+	}
 	stbi_image_free(skyboxTextureEquirectData);
 
 	uint32_t skyboxTextureUnfiltered = -1;
