@@ -30,6 +30,9 @@ public:
 	float GetFieldOfView() const { return m_FieldOfView; }
 	float GetNearClip() const { return m_NearClip; }
 	float GetFarClip() const { return m_FarClip; }
+	float GetEffectiveNearClip() const;
+	float GetEffectiveFarClip() const;
+	float GetAspectRatio() const { return m_AspectRatio; }
 	bool IsPerspective() const { return m_Perspective; }
 
 private:

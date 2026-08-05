@@ -72,13 +72,8 @@ void Camera::Zoom(float wheelDelta)
 
 void Camera::RebuildProjection()
 {
-	float nearClip = m_NearClip;
-	float farClip = m_FarClip;
-	if (m_AutomaticClipping)
-	{
-		nearClip = std::clamp(m_Distance * 0.001f, 0.005f, 1.0f);
-		farClip = std::max(1000.0f, m_Distance * 100.0f);
-	}
+	float nearClip = GetEffectiveNearClip();
+	float farClip = GetEffectiveFarClip();
 	farClip = std::max(farClip, nearClip + 0.01f);
 
 	if (m_Perspective) {
@@ -90,6 +85,16 @@ void Camera::RebuildProjection()
 		m_Projection = glm::ortho(-halfHeight * m_AspectRatio, halfHeight * m_AspectRatio,
 			-halfHeight, halfHeight, nearClip, farClip);
 	}
+}
+
+float Camera::GetEffectiveNearClip() const
+{
+	return m_AutomaticClipping ? std::clamp(m_Distance * 0.001f, 0.005f, 1.0f) : m_NearClip;
+}
+
+float Camera::GetEffectiveFarClip() const
+{
+	return m_AutomaticClipping ? std::max(1000.0f, m_Distance * 100.0f) : m_FarClip;
 }
 
 void Camera::UpdateCamera()
