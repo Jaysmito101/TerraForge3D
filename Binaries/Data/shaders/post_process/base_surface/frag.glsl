@@ -9,6 +9,7 @@ uniform vec2 u_ViewportResolution;
 uniform vec3 u_Color;
 uniform sampler2D u_TerrainPlanarShadow;
 uniform bool u_HasTerrainPlanarShadow;
+uniform float u_PlanarShadowSoftness;
 uniform vec2 u_PlanarShadowMinimumXZ;
 uniform vec2 u_PlanarShadowWorldSize;
 uniform bool u_EnableSkyLight;
@@ -20,12 +21,38 @@ uniform float u_SunIntensity;
 
 const float INV_PI = 0.3183098861837907;
 
+float SampleTerrainPlanarShadowAtUv(vec2 shadowUv)
+{
+	if (any(lessThan(shadowUv, vec2(0.0))) || any(greaterThan(shadowUv, vec2(1.0)))) return 1.0;
+	return textureLod(u_TerrainPlanarShadow, shadowUv, 0.0).r;
+}
+
 float SampleTerrainPlanarShadow(vec3 worldPosition)
 {
 	if (!u_HasTerrainPlanarShadow) return 1.0;
 	vec2 shadowUv = (worldPosition.xz - u_PlanarShadowMinimumXZ) / u_PlanarShadowWorldSize;
 	if (any(lessThan(shadowUv, vec2(0.0))) || any(greaterThan(shadowUv, vec2(1.0)))) return 1.0;
-	return texture(u_TerrainPlanarShadow, shadowUv).r;
+
+	float softness = max(u_PlanarShadowSoftness, 0.0);
+	if (softness <= 0.001) return SampleTerrainPlanarShadowAtUv(shadowUv);
+
+	vec2 texelSize = 1.0 / vec2(textureSize(u_TerrainPlanarShadow, 0));
+	const vec2 sampleOffsets[9] = vec2[](
+		vec2(-1.0, -1.0), vec2( 0.0, -1.0), vec2( 1.0, -1.0),
+		vec2(-1.0,  0.0), vec2( 0.0,  0.0), vec2( 1.0,  0.0),
+		vec2(-1.0,  1.0), vec2( 0.0,  1.0), vec2( 1.0,  1.0));
+	const float sampleWeights[9] = float[](1.0, 2.0, 1.0, 2.0, 4.0, 2.0, 1.0, 2.0, 1.0);
+
+	float visibility = 0.0;
+	float weightSum = 0.0;
+	for (int sampleIndex = 0; sampleIndex < 9; ++sampleIndex)
+	{
+		float weight = sampleWeights[sampleIndex];
+		visibility += SampleTerrainPlanarShadowAtUv(
+			shadowUv + sampleOffsets[sampleIndex] * texelSize * softness) * weight;
+		weightSum += weight;
+	}
+	return visibility / weightSum;
 }
 
 void main()

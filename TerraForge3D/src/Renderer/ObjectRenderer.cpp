@@ -139,6 +139,8 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 		}
 		glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_TerrainPlanarShadow"), 7);
 		glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_HasTerrainPlanarShadow"), hasPlanarShadow ? 1 : 0);
+		glUniform1f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_PlanarShadowSoftness"),
+			m_AppState->rendererManager->GetPlanarShadowSoftness());
 		if (hasPlanarShadow)
 		{
 			const auto atlasMinimum = planarShadowCache->GetAtlasMinimumXZ();

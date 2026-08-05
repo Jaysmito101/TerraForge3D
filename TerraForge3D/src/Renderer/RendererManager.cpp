@@ -205,6 +205,7 @@ void RendererManager::ShowSettings()
 					ImGui::PushID("Terrain");
 					ImGui::Checkbox("Enable Terrain AO", &m_EnableAmbientAo);
 					ImGui::SliderFloat("AO Radius (Terrain Scale)", &m_AmbientAoRadiusFactor, 0.01f, 0.5f, "%.3f");
+					ImGui::SliderFloat("Base-Plane Shadow Softness", &m_PlanarShadowSoftness, 0.0f, 12.0f, "%.1f");
 					ImGui::Separator();
 					ImGui::Checkbox("Enable Terrain GI", &m_TerrainGISettings.enabled);
 					ImGui::SliderInt("GI Resolution", &m_TerrainGISettings.resolution, 32, 256);

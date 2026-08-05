@@ -39,6 +39,7 @@ public:
 	inline RendererSky* GetSkyRenderer() { return m_RendererSky.get(); }
 	inline TerrainSelfShadow* GetTerrainSelfShadow() { return m_TerrainSelfShadow.get(); }
 	inline PlanarShadowCache* GetPlanarShadowCache() { return m_PlanarShadowCache.get(); }
+	inline float GetPlanarShadowSoftness() const { return m_PlanarShadowSoftness; }
 	inline HeightfieldAmbientCache* GetHeightfieldAmbientCache() { return m_HeightfieldAmbientCache.get(); }
 	inline HeightfieldGICache* GetHeightfieldGICache() { return m_HeightfieldGICache.get(); }
 	inline SeaRenderer* GetSeaRenderer() { return m_SeaRenderer.get(); }
@@ -68,6 +69,7 @@ private:
 	std::shared_ptr<SeaRenderer> m_SeaRenderer;
 	bool m_EnableAmbientAo = true;
 	float m_AmbientAoRadiusFactor = 0.12f;
+	float m_PlanarShadowSoftness = 4.0f;
 	TerrainGISettings m_TerrainGISettings;
 };
 
