@@ -1,5 +1,6 @@
 #include "Renderer/ObjectRenderer.h"
 #include "Data/ApplicationState.h"
+#include "Profiler.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
@@ -22,6 +23,8 @@ ObjectRenderer::~ObjectRenderer()
 
 void ObjectRenderer::Render(RendererViewport* viewport)
 {
+	TF3D_PROFILE_SCOPE("renderer/object");
+	TF3D_PROFILE_BEGIN(objectSetupProfile, "renderer/object/setup");
 	glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LESS); glDepthMask(GL_TRUE); glDepthRange(0.0f, 1.0f);
 	m_Shader->Bind();
 	m_AppState->generationManager->GetHeightmapData()->Bind(0);
@@ -98,8 +101,11 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_FieldMinimum"), fieldMinimum);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightOffset"), isPlane ? -fieldMinimum + solidDepth : 0.0f);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SolidDepth"), solidDepth);
-	if (isPlane && m_PostProcessShader != nullptr && viewport->m_Camera.GetPosition().y > 0.0f)
+	TF3D_PROFILE_END(objectSetupProfile);
 	{
+		TF3D_PROFILE_SCOPE("renderer/object/post-process");
+		if (isPlane && m_PostProcessShader != nullptr && viewport->m_Camera.GetPosition().y > 0.0f)
+		{
 		m_PostProcessShader->Bind();
 		const glm::mat4 inverseProjectionView = glm::inverse(viewport->m_Camera.GetProjectionViewMatrix());
 		glUniformMatrix4fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_InverseProjectionView"), 1, GL_FALSE, glm::value_ptr(inverseProjectionView));
@@ -145,8 +151,10 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 		glBindVertexArray(0);
 
 		m_Shader->Bind();
+		}
 	}
 	
+	TF3D_PROFILE_BEGIN(objectMaterialStateProfile, "renderer/object/material-state");
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IsViewportActive"), (viewport->m_MousePosition[0] >= 0.0f && viewport->m_MousePosition[1] >= 0.0f) ? 1 : 0);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MousePos"), viewport->m_MousePosition[0], viewport->m_MousePosition[1]);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewportResolution"), viewport->m_Width, viewport->m_Height);
@@ -183,10 +191,13 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetBrdfLut() : 0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrdfLut"), 3);
+	TF3D_PROFILE_END(objectMaterialStateProfile);
 	
-	m_AppState->mainModel->Render();
-
-	m_SharedMemoryBuffer->GetData(viewport->m_PosOnTerrain, sizeof(float) * 4);
+	{
+		TF3D_PROFILE_SCOPE("renderer/object/terrain-draw");
+		m_AppState->mainModel->Render();
+		m_SharedMemoryBuffer->GetData(viewport->m_PosOnTerrain, sizeof(float) * 4);
+	}
 
 	// m_CustomBaseShapeDrawSettings = nullptr;
 }

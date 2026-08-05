@@ -3,6 +3,7 @@
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
+#include "Profiler.h"
 
 #include "stb/stb_image.h"
 
@@ -45,7 +46,8 @@ void RendererSky::ShowSettings()
  
 void RendererSky::Render(RendererViewport* viewport)
 {
-	if (!m_IsSkyReady || !m_RenderSky) return; 
+	TF3D_PROFILE_SCOPE("renderer/sky/draw");
+	if (!m_IsSkyReady || !m_RenderSky) return;
 	glDisable(GL_DEPTH_TEST);
 	m_SkyboxShader->Bind();
 	glActiveTexture(GL_TEXTURE0);

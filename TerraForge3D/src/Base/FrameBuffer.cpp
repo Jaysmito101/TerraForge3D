@@ -54,13 +54,18 @@ void FrameBuffer::Begin()
 	glViewport(0, 0, width, height);
 }
 
-void FrameBuffer::Resolve()
+void FrameBuffer::ResolveColor()
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFbo);
 	glReadBuffer(GL_COLOR_ATTACHMENT0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
+void FrameBuffer::Resolve()
+{
+	ResolveColor();
 }
 
 uint32_t FrameBuffer::End()

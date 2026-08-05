@@ -25,12 +25,18 @@ RendererManager::~RendererManager()
 void RendererManager::Render(RendererViewport* viewport)
 {
 	TF3D_PROFILE_SCOPE("renderer/viewport");
-	glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
-	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
-	glEnable(GL_MULTISAMPLE);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	viewport->m_Camera.UpdateCamera();
-	m_RendererSky->Render(viewport);
+	{
+		TF3D_PROFILE_SCOPE("renderer/setup");
+		glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
+		glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
+		glEnable(GL_MULTISAMPLE);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		viewport->m_Camera.UpdateCamera();
+	}
+	{
+		TF3D_PROFILE_SCOPE("renderer/sky");
+		m_RendererSky->Render(viewport);
+	}
 	{
 		TF3D_PROFILE_SCOPE("renderer/lighting-caches");
 		if (m_TerrainSelfShadow != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
@@ -101,16 +107,42 @@ void RendererManager::Render(RendererViewport* viewport)
 		}
 		}
 	}
-	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
-	switch (viewport->m_ViewportMode)
 	{
-	case RendererViewportMode_Object: m_ObjectRenderer->Render(viewport); break;
-	case RendererViewportMode_Wireframe: m_WireframeRenderer->Render(viewport); break;
-	case RendererViewportMode_Heightmap: m_HeightmapRenderer->Render(viewport); break;
-	case RendererViewportMode_TextureSlot: m_TextureSlotRenderer->Render(viewport); break;
-	default: break;
+		TF3D_PROFILE_SCOPE("renderer/scene");
+		viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
+		switch (viewport->m_ViewportMode)
+		{
+		case RendererViewportMode_Object:
+			{
+				TF3D_PROFILE_SCOPE("renderer/scene/object");
+				m_ObjectRenderer->Render(viewport);
+			}
+			break;
+		case RendererViewportMode_Wireframe:
+			{
+				TF3D_PROFILE_SCOPE("renderer/scene/wireframe");
+				m_WireframeRenderer->Render(viewport);
+			}
+			break;
+		case RendererViewportMode_Heightmap:
+			{
+				TF3D_PROFILE_SCOPE("renderer/scene/heightmap");
+				m_HeightmapRenderer->Render(viewport);
+			}
+			break;
+		case RendererViewportMode_TextureSlot:
+			{
+				TF3D_PROFILE_SCOPE("renderer/scene/texture-slot");
+				m_TextureSlotRenderer->Render(viewport);
+			}
+			break;
+		default: break;
+		}
 	}
-	viewport->m_FrameBuffer->Resolve();
+	{
+		TF3D_PROFILE_SCOPE("renderer/resolve");
+		viewport->m_FrameBuffer->Resolve();
+	}
 }
 
 void RendererManager::ShowSettings()
