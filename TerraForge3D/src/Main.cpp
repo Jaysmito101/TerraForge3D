@@ -313,7 +313,7 @@ public:
 		appState->eventManager->RaiseEvent("OnStartUpComplete");
 
 	#ifdef TF3D_ENABLE_MCP
-		appState->mcpServer = new TerraForgeMcpServer(appState);
+		appState->mcpServer = new TerraForgeMcpServer(appState, appState->constants.logsDir);
 		if (appState->mcpEnabled && !appState->mcpServer->Start())
 		{
 			TF3D_LOG_ERROR("Failed to start the TerraForge3D MCP server");

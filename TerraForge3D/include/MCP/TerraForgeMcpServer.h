@@ -29,7 +29,7 @@ class ApplicationState;
 	class TerraForgeMcpServer
 	{
 	public:
-		explicit TerraForgeMcpServer(ApplicationState* applicationState);
+		TerraForgeMcpServer(ApplicationState* applicationState, std::string logsDirectory);
 		~TerraForgeMcpServer();
 
 		TerraForgeMcpServer(const TerraForgeMcpServer&) = delete;

@@ -7,7 +7,6 @@
 #include "MCP/ResourceRegistry.h"
 #include "MCP/TerraForgeMcpServer.h"
 
-#include "Data/ApplicationState.h"
 #include "Data/VersionInfo.h"
 #include "Base/Logging/Logger.h"
 
@@ -21,6 +20,7 @@
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
 
 namespace
 {
@@ -143,8 +143,8 @@ namespace
 class TerraForgeMcpServer::Impl
 	{
 	public:
-		explicit Impl(ApplicationState* applicationState)
-			: applicationState(applicationState), port(ReadMcpPort())
+		Impl(ApplicationState* applicationState, std::string logsDirectory)
+			: applicationState(applicationState), logsDirectory(std::move(logsDirectory)), port(ReadMcpPort())
 		{
 			endpoint = "http://" + host + ":" + std::to_string(port) + "/mcp";
 			RegisterCoreEntries();
@@ -239,12 +239,12 @@ class TerraForgeMcpServer::Impl
 	private:
 		void OpenCallHistory()
 		{
-			if (applicationState == nullptr || applicationState->constants.logsDir.empty()) return;
+			if (logsDirectory.empty()) return;
 
 			try
 			{
-				const std::filesystem::path logsDirectory(applicationState->constants.logsDir);
-				const std::filesystem::path callsDirectory = logsDirectory.parent_path() / "McpCalls";
+				const std::filesystem::path logPath(logsDirectory);
+				const std::filesystem::path callsDirectory = logPath.parent_path() / "McpCalls";
 				std::filesystem::create_directories(callsDirectory);
 
 				const auto now = std::chrono::system_clock::now();
@@ -450,6 +450,7 @@ class TerraForgeMcpServer::Impl
 		}
 
 		ApplicationState* applicationState;
+		std::string logsDirectory;
 		const std::string host = "127.0.0.1";
 		int port;
 		std::string endpoint;
@@ -464,8 +465,8 @@ class TerraForgeMcpServer::Impl
 		std::vector<McpCommandLogEntry> commandLog;
 	};
 
-	TerraForgeMcpServer::TerraForgeMcpServer(ApplicationState* applicationState)
-		: implementation(std::make_unique<Impl>(applicationState))
+TerraForgeMcpServer::TerraForgeMcpServer(ApplicationState* applicationState, std::string logsDirectory)
+		: implementation(std::make_unique<Impl>(applicationState, std::move(logsDirectory)))
 	{
 	}
 
