@@ -16,7 +16,7 @@ public:
 	void SetLightPos(glm::vec3 &);
 	void SetLightCol(float *);
 	void SetTime(float *);
-	void SetMPV(glm::mat4 &);
+	void SetMPV(const glm::mat4&);
 
 	void SetUniformf(std::string name, float value);
 	void SetUniform3f(std::string name, float *value);
