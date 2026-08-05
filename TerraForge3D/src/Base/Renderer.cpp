@@ -9,7 +9,7 @@ void RenderModel(Model *model, Camera *camera, FrameBuffer *framebuffer, Shader 
 	framebuffer->Begin();
 	shader->Bind();
 	shader->SetTime(&time);
-	shader->SetMPV(camera->pv);
+	shader->SetMPV(camera->GetProjectionViewMatrix());
 	shader->SetUniformMat4("_Model", model->modelMatrix);
 	shader->SetLightCol(lightColor);
 	shader->SetLightPos(lightPosition);
@@ -38,7 +38,7 @@ void RenderModels(std::vector<Model *> models, Camera *camera, FrameBuffer *fram
 	{
 		shader->Bind();
 		shader->SetTime(&time);
-		shader->SetMPV(camera->pv);
+		shader->SetMPV(camera->GetProjectionViewMatrix());
 		shader->SetUniformMat4("_Model", models[i]->modelMatrix);
 		shader->SetLightCol(lightColor);
 		shader->SetLightPos(lightPosition);

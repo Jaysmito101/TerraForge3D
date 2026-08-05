@@ -106,7 +106,7 @@ void Shader::SetTime(float *time)
 	glUniform1fv(m_TimeUniformID, 1, time);
 }
 
-void Shader::SetMPV(glm::mat4 &pv)
+void Shader::SetMPV(const glm::mat4& pv)
 {
 	if (m_UniformId <= 0)
 	{
