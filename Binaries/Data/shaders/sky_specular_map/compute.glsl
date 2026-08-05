@@ -8,17 +8,12 @@ const float PI = 3.141592f;
 const float TwoPI = 2.0f * PI;
 const float Epsilon = 0.00001f;
 
-const uint NumSamples = 1024;
-const float InvNumSamples = 1.0f / float(NumSamples);
+const uint NumSamples = 256;
 
-const int NumMipLevels = 1;
 layout(binding=0) uniform samplerCube inputTexture;
-layout(binding=0, rgba16f) restrict writeonly uniform imageCube outputTexture[NumMipLevels];
+layout(binding=1, rgba32f) restrict writeonly uniform imageCube outputTexture;
 
 layout(location=0) uniform float roughness;
-
-#define PARAM_LEVEL     0
-#define PARAM_ROUGHNESS roughness
 
 
 // Importance sample GGX normal distribution function for a fixed roughness value.
@@ -53,7 +48,7 @@ float ndfGGX(float cosLh, float roughness)
 // See: OpenGL core profile specs, section 8.13.
 vec3 getSamplingVector()
 {
-    vec2 st = gl_GlobalInvocationID.xy/vec2(imageSize(outputTexture[PARAM_LEVEL]));
+	vec2 st = (vec2(gl_GlobalInvocationID.xy) + vec2(0.5)) / vec2(imageSize(outputTexture));
     vec2 uv = 2.0 * vec2(st.x, 1.0-st.y) - vec2(1.0);
 
     vec3 ret;
@@ -87,7 +82,7 @@ vec3 tangentToWorld(const vec3 v, const vec3 N, const vec3 S, const vec3 T)
 void main(void)
 {
 	// Make sure we won't write past output when computing higher mipmap levels.
-	ivec2 outputSize = imageSize(outputTexture[PARAM_LEVEL]);
+	ivec2 outputSize = imageSize(outputTexture);
 	if(gl_GlobalInvocationID.x >= outputSize.x || gl_GlobalInvocationID.y >= outputSize.y) {
 		return;
 	}
@@ -105,13 +100,14 @@ void main(void)
 	computeBasisVectors(N, S, T);
 
 	vec3 color = vec3(0);
-	float weight = 0;
+	float weight = 0.0;
+	float filterRoughness = max(roughness, 0.04);
 
 	// Convolve environment map using GGX NDF importance sampling.
 	// Weight by cosine term since Epic claims it generally improves quality.
 	for(uint i=0; i<NumSamples; ++i) {
 		vec2 u = tf3d_sampleHammersley(i, NumSamples);
-		vec3 Lh = tangentToWorld(sampleGGX(u.x, u.y, PARAM_ROUGHNESS), N, S, T);
+		vec3 Lh = tangentToWorld(sampleGGX(u.x, u.y, filterRoughness), N, S, T);
 
 		// Compute incident direction (Li) by reflecting viewing direction (Lo) around half-vector (Lh).
 		vec3 Li = 2.0 * dot(Lo, Lh) * Lh - Lo;
@@ -125,7 +121,7 @@ void main(void)
 
 			// GGX normal distribution function (D term) probability density function.
 			// Scaling by 1/4 is due to change of density in terms of Lh to Li (and since N=V, rest of the scaling factor cancels out).
-			float pdf = ndfGGX(cosLh, PARAM_ROUGHNESS) * 0.25;
+			float pdf = ndfGGX(cosLh, filterRoughness) * 0.25;
 
 			// Solid angle associated with this sample.
 			float ws = 1.0 / (NumSamples * pdf);
@@ -137,7 +133,7 @@ void main(void)
 			weight += cosLi;
 		}
 	}
-	color /= weight;
+	color /= max(weight, Epsilon);
 
-	imageStore(outputTexture[PARAM_LEVEL], ivec3(gl_GlobalInvocationID), vec4(color, 1.0));
+	imageStore(outputTexture, ivec3(gl_GlobalInvocationID), vec4(color, 1.0));
 }

@@ -24,6 +24,8 @@ RendererSky::~RendererSky()
 {
 	if (m_SkyboxTextureID > -1) glDeleteTextures(1, &m_SkyboxTextureID);
 	if (m_IrradianceMapTextureID > -1) glDeleteTextures(1, &m_IrradianceMapTextureID);
+	if (m_SpecularMapTextureID > -1) glDeleteTextures(1, &m_SpecularMapTextureID);
+	if (m_BrdfLutTextureID > -1) glDeleteTextures(1, &m_BrdfLutTextureID);
 	delete m_SkyboxModel;
 }
 
@@ -60,6 +62,7 @@ void RendererSky::ReloadShaders()
 	m_EquirectToCube = m_AppState->resourceManager->LoadComputeShader("equirect_to_cube/compute", true);
 	m_SpecularMap = m_AppState->resourceManager->LoadComputeShader("sky_specular_map/compute", true);
 	m_IrradianceMap = m_AppState->resourceManager->LoadComputeShader("sky_irradiance_map/compute", true);
+	m_BrdfLut = m_AppState->resourceManager->LoadComputeShader("sky_brdf_lut/compute", true);
 	m_SkyboxShader = m_AppState->resourceManager->LoadShader("skybox", true);
 }
 
@@ -67,8 +70,11 @@ void RendererSky::ReloadShaders()
 bool RendererSky::LoadSkyboxTexture(const std::string& path)
 {
 	if (path.size() < 3) return false;
+	m_IsSkyReady = false;
 	if (m_SkyboxTextureID > -1) glDeleteTextures(1, &m_SkyboxTextureID);
-	if (m_IrradianceMapTextureID > -1) glDeleteTextures(1, &m_IrradianceMapTextureID); 
+	if (m_IrradianceMapTextureID > -1) glDeleteTextures(1, &m_IrradianceMapTextureID);
+	if (m_SpecularMapTextureID > -1) glDeleteTextures(1, &m_SpecularMapTextureID);
+	if (m_BrdfLutTextureID > -1) glDeleteTextures(1, &m_BrdfLutTextureID);
 
 	TF3D_LOG_DEBUG("Loading skybox texture '{}'", path);
 
@@ -115,7 +121,9 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	uint32_t skyboxTextureUnfiltered = -1;
 	glGenTextures(1, &skyboxTextureUnfiltered);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
-	glTexStorage2D(GL_TEXTURE_CUBE_MAP, 6, GL_RGBA32F, m_SkyboxSize, m_SkyboxSize);
+	int32_t skyboxMipLevels = 1;
+	for (int32_t mipSize = m_SkyboxSize; mipSize > 1; mipSize >>= 1) ++skyboxMipLevels;
+	glTexStorage2D(GL_TEXTURE_CUBE_MAP, skyboxMipLevels, GL_RGBA32F, m_SkyboxSize, m_SkyboxSize);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -138,7 +146,48 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 
 	m_SkyboxTextureID = skyboxTextureUnfiltered; // TODO : Update this line
 
-	
+	const int32_t specularMapSize = m_SkyboxSize < 256 ? m_SkyboxSize : 256;
+	int32_t specularMipLevels = 1;
+	for (int32_t mipSize = specularMapSize; mipSize > 1; mipSize >>= 1) ++specularMipLevels;
+
+	glGenTextures(1, &m_SpecularMapTextureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_SpecularMapTextureID);
+	glTexStorage2D(GL_TEXTURE_CUBE_MAP, specularMipLevels, GL_RGBA32F, specularMapSize, specularMapSize);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	m_SpecularMap->Bind();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
+	glUniform1i(glGetUniformLocation(m_SpecularMap->GetNativeShader(), "inputTexture"), 0);
+	const GLint roughnessLocation = glGetUniformLocation(m_SpecularMap->GetNativeShader(), "roughness");
+	for (int32_t mip = 0; mip < specularMipLevels; ++mip)
+	{
+		const int32_t mipSize = specularMapSize >> mip;
+		glBindImageTexture(1, m_SpecularMapTextureID, mip, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		const float roughness = specularMipLevels > 1 ? static_cast<float>(mip) / static_cast<float>(specularMipLevels - 1) : 0.0f;
+		glUniform1f(roughnessLocation, roughness);
+		glDispatchCompute((mipSize + 15) / 16, (mipSize + 15) / 16, 6);
+	}
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
+	constexpr int32_t brdfLutSize = 256;
+	glGenTextures(1, &m_BrdfLutTextureID);
+	glBindTexture(GL_TEXTURE_2D, m_BrdfLutTextureID);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RG16F, brdfLutSize, brdfLutSize);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	m_BrdfLut->Bind();
+	glBindImageTexture(0, m_BrdfLutTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16F);
+	glDispatchCompute((brdfLutSize + 15) / 16, (brdfLutSize + 15) / 16, 1);
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
 	glGenTextures(1, &m_IrradianceMapTextureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_IrradianceMapTextureID);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); glPixelStorei(GL_PACK_ALIGNMENT, 1);

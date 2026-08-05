@@ -72,9 +72,9 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 
 		if (m_DrawBrushSettings->m_MaskTexture != -1)
 		{
-			glActiveTexture(GL_TEXTURE2);
+			glActiveTexture(GL_TEXTURE4);
 			glBindTexture(GL_TEXTURE_2D, m_DrawBrushSettings->m_MaskTexture);
-			glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskTexture"), 2);
+			glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskTexture"), 4);
 		}
 	}
 
@@ -90,8 +90,11 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap() : 0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IrradianceMap"), 1);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetSkyboxMap() : 0);
-	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SkyboxMap"), 2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetSpecularMap() : 0);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SpecularMap"), 2);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetBrdfLut() : 0);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrdfLut"), 3);
 	
 	m_AppState->mainModel->Render();
 

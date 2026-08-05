@@ -36,7 +36,8 @@ uniform float u_SunIntensity;
 uniform bool u_EnableSkyLight;
 uniform float u_SkyLightIntensity;
 uniform samplerCube u_IrradianceMap;
-uniform samplerCube u_SkyboxMap;
+uniform samplerCube u_SpecularMap;
+uniform sampler2D u_BrdfLut;
 
 uniform bool u_IsViewportActive;
 uniform vec2 u_MousePos;
@@ -135,12 +136,13 @@ vec3 EvaluateImageBasedLighting(vec3 N, vec3 V, vec3 albedo, float metallic, flo
 	vec3 irradiance = texture(u_IrradianceMap, N).rgb;
 	vec3 diffuse = irradiance * albedo * kD * INV_PI;
 
-	// The sky cubemap has generated mip levels. Sampling a roughness-dependent
-	// mip gives the prefiltered environment term until a full split-sum BRDF
-	// LUT is added to the material system.
+	// The prefiltered cubemap contains the environment convolution for each
+	// roughness mip. The BRDF LUT supplies the view/Fresnel integration term.
 	vec3 reflectionDirection = reflect(-V, N);
-	vec3 prefilteredEnvironment = textureLod(u_SkyboxMap, reflectionDirection, roughness * 5.0).rgb;
-	vec3 specular = prefilteredEnvironment * F;
+	float maxSpecularLod = max(float(textureQueryLevels(u_SpecularMap) - 1), 0.0);
+	vec3 prefilteredEnvironment = textureLod(u_SpecularMap, reflectionDirection, roughness * maxSpecularLod).rgb;
+	vec2 brdf = texture(u_BrdfLut, vec2(nDotV, roughness)).rg;
+	vec3 specular = prefilteredEnvironment * (F * brdf.x + brdf.y);
 	return (diffuse + specular) * u_SkyLightIntensity;
 }
 

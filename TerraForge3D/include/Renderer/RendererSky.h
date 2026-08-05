@@ -15,6 +15,8 @@ public:
 	void Render(RendererViewport* viewport);
 
 	inline int32_t GetIrradianceMap() { return m_IrradianceMapTextureID; }
+	inline int32_t GetSpecularMap() { return m_SpecularMapTextureID; }
+	inline int32_t GetBrdfLut() { return m_BrdfLutTextureID; }
 	inline int32_t GetSkyboxMap() { return m_SkyboxTextureID; }
 	inline bool IsSkyReady() { return m_IsSkyReady; }
 
@@ -27,6 +29,7 @@ private:
 	std::shared_ptr<ComputeShader> m_EquirectToCube = nullptr;
 	std::shared_ptr<ComputeShader> m_SpecularMap = nullptr;
 	std::shared_ptr<ComputeShader> m_IrradianceMap = nullptr;
+	std::shared_ptr<ComputeShader> m_BrdfLut = nullptr;
 	std::shared_ptr<Shader> m_SkyboxShader = nullptr;
 	Model* m_SkyboxModel = nullptr;
 	bool m_RenderSky = true;
@@ -34,6 +37,8 @@ private:
 	std::string m_SkyboxTexturePath = "";
 	uint32_t m_SkyboxTextureID = -1;
 	uint32_t m_IrradianceMapTextureID = -1;
+	uint32_t m_SpecularMapTextureID = -1;
+	uint32_t m_BrdfLutTextureID = -1;
 	int32_t m_SkyboxSize = 512;
 	int32_t m_IrradianceMapSize = 32;
 };
