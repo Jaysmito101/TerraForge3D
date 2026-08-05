@@ -4,6 +4,7 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <utility>
 
@@ -14,7 +15,7 @@ class GenerationWorker
 public:
 	using WorkCallback = std::function<void(bool force)>;
 
-	explicit GenerationWorker(WorkCallback callback);
+	GenerationWorker(std::string name, WorkCallback callback);
 	~GenerationWorker();
 
 	GenerationWorker(const GenerationWorker&) = delete;
@@ -41,5 +42,6 @@ private:
 	std::atomic_bool m_Running = false;
 	std::atomic_bool m_Completed = false;
 	std::atomic_bool m_StopRequested = false;
+	std::string m_Name;
 	WorkCallback m_Callback;
 };

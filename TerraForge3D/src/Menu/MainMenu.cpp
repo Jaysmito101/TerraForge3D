@@ -3,6 +3,7 @@
 #include "imgui/imgui.h"
 
 #include "Utils/Utils.h"
+#include "Profiler.h"
 #include "Misc/AppStyles.h"
 #include "Data/ApplicationState.h"
 #include "Platform.h"
@@ -64,7 +65,7 @@ void MainMenu::ShowFileMenu()
 	// if (ImGui::MenuItem("Pack Project")) appState->serailizer->PackProject(ShowSaveFileDialog("*.terr3dpack"));
 	// if (ImGui::MenuItem("Load Packed Project")) appState->serailizer->LoadPackedProject(ShowOpenFileDialog("*.terr3dpack"));
 	// if (ImGui::MenuItem("Load Auto Saved Project")) appState->serailizer->LoadFile(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave" PATH_SEPARATOR "autosave.terr3d");
-	if (ImGui::MenuItem("Exit")) exit(0);
+	if (ImGui::MenuItem("Exit")) appState->mainApp->Close();
 }
 
 void MainMenu::ShowOptionsMenu()
@@ -168,6 +169,7 @@ void MainMenu::ShowWindowsMenu()
 	ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
 	ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
 	ShowWindowMenuItem("Job Manager", appState->jobManager->IsWindowOpenPtr());
+	ShowWindowMenuItem("Performance Monitor", PerformanceMonitor::Get().IsWindowOpenPtr());
 	ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);

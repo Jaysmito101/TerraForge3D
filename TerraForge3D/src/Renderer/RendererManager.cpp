@@ -1,5 +1,6 @@
 #include "Renderer/RendererManager.h"
 #include "Data/ApplicationState.h"
+#include "Profiler.h"
 
 RendererManager::RendererManager(ApplicationState* appState)
 {
@@ -23,23 +24,26 @@ RendererManager::~RendererManager()
 
 void RendererManager::Render(RendererViewport* viewport)
 {
+	TF3D_PROFILE_SCOPE("renderer/viewport");
 	glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
 	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
 	glEnable(GL_MULTISAMPLE);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	viewport->m_Camera.UpdateCamera();
 	m_RendererSky->Render(viewport);
-	if (m_TerrainSelfShadow != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
 	{
+		TF3D_PROFILE_SCOPE("renderer/lighting-caches");
+		if (m_TerrainSelfShadow != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
+		{
 		m_TerrainSelfShadow->Update(
 			m_AppState->generationManager->GetHeightmapData(),
 			m_AppState->generationManager->GetHeightPyramid(),
 			m_AppState->generationManager->GetTerrainRevision(),
 			m_RendererLights->m_Sun.direction,
 			std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f));
-	}
-	if (m_PlanarShadowCache != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
-	{
+		}
+		if (m_PlanarShadowCache != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
+		{
 		const bool isPlane = m_AppState->mainModel != nullptr && m_AppState->mainModel->isGeneratedPlane;
 		const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
 		const float fieldMinimum = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
@@ -56,9 +60,9 @@ void RendererManager::Render(RendererViewport* viewport)
 			terrainHeightOffset,
 			fieldMaximum,
 			0.0f);
-	}
-	if (m_HeightfieldAmbientCache != nullptr && m_AppState->generationManager != nullptr)
-	{
+		}
+		if (m_HeightfieldAmbientCache != nullptr && m_AppState->generationManager != nullptr)
+		{
 		m_HeightfieldAmbientCache->SetEnabled(m_EnableAmbientAo);
 		const float terrainWorldSize = std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f);
 		if (m_EnableAmbientAo)
@@ -69,10 +73,10 @@ void RendererManager::Render(RendererViewport* viewport)
 				terrainWorldSize,
 				terrainWorldSize * m_AmbientAoRadiusFactor);
 		}
-	}
-	if (m_HeightfieldGICache != nullptr && m_AppState->generationManager != nullptr &&
-		m_RendererLights != nullptr && m_RendererSky != nullptr)
-	{
+		}
+		if (m_HeightfieldGICache != nullptr && m_AppState->generationManager != nullptr &&
+			m_RendererLights != nullptr && m_RendererSky != nullptr)
+		{
 		m_HeightfieldGICache->SetEnabled(m_TerrainGISettings.enabled);
 		if (m_TerrainGISettings.enabled)
 		{
@@ -94,6 +98,7 @@ void RendererManager::Render(RendererViewport* viewport)
 				m_TerrainGISettings.resolution,
 				m_TerrainGISettings.targetSamples,
 				m_TerrainGISettings.samplesPerDispatch);
+		}
 		}
 	}
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;

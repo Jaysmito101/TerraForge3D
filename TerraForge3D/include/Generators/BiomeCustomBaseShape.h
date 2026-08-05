@@ -46,6 +46,5 @@ private:
 	std::shared_ptr<ComputeShader> m_Shader;
 	std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
 	std::shared_ptr<GeneratorTexture> m_PreviewTexture;
-	float m_CalculationTime = 0.0f;
 	DrawBrushSettings m_DrawSettings;
 };

@@ -65,7 +65,6 @@ bool DEMBaseShapeGenerator::ShowSettings()
 
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
-		ImGui::Text("Time Taken : %f", m_CalculationTime);
 		ImGui::Text("Tiles Using : %d", m_TilesUsingCount);
 	}
 	ImGui::TextDisabled("Elevation provider: MapTiler Cloud (Terrain RGB)");
@@ -250,7 +249,7 @@ int32_t DEMBaseShapeGenerator::GetEffectiveZoomResolution() const
 
 void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seedTexture)
 {
-	START_PROFILER();
+	TF3D_PROFILE_SCOPE("generation/dem-base-shape");
 	auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	const auto now = std::chrono::steady_clock::now();
 	if (m_ViewInteractionPending
@@ -355,7 +354,6 @@ void DEMBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seed
 	m_MapVisualzeTexture->BindForCompute(1);
 	m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
 	m_Shader->SetMemoryBarrier();
-	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
 

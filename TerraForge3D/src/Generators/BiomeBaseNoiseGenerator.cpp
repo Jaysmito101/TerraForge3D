@@ -120,11 +120,6 @@ BiomeBaseNoiseGenerator::~BiomeBaseNoiseGenerator()
 
 bool BiomeBaseNoiseGenerator::ShowSettings()
 {
-	if (ImGui::CollapsingHeader("Statistics"))
-	{
-		ImGui::Text("Time Take: %f", m_CalculationTime);
-	}
-
 	BIOME_UI_PROPERTY(m_Inspector->Render());
 
 	ImGui::Text("Noise Octaves Strengths: ");
@@ -144,7 +139,7 @@ bool BiomeBaseNoiseGenerator::ShowSettings()
 
 void BiomeBaseNoiseGenerator::Update(GeneratorData* sourceBuffer, GeneratorData* targetBuffer, GeneratorTexture* seedTexture)
 {
-	START_PROFILER();
+	TF3D_PROFILE_SCOPE("generation/base-noise");
 
 
 	sourceBuffer->Bind(0);
@@ -186,7 +181,6 @@ void BiomeBaseNoiseGenerator::Update(GeneratorData* sourceBuffer, GeneratorData*
 	m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
 	m_Shader->SetMemoryBarrier();
 
-	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 }
 

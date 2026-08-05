@@ -1,6 +1,7 @@
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/NoiseAlgorithmConfig.h"
 #include "Data/ApplicationState.h"
+#include "Profiler.h"
 
 BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState* appState)
 {
@@ -36,6 +37,7 @@ bool BiomeBaseShapeGenerator::ShowSettings()
 
 void BiomeBaseShapeGenerator::Update(GeneratorData* buffer, GeneratorTexture* seedTexture)
 {
+	TF3D_PROFILE_SCOPE(std::string("generation/base-shape/") + m_Name);
 	buffer->Bind(0);
 	m_Shader->Bind();
 	const auto& values = m_Inspector->GetValues();

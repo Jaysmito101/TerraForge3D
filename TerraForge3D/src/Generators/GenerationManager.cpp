@@ -28,13 +28,14 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	m_Field.biomeMixer = std::make_shared<BiomeMixer>(m_AppState);
 	m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
 	m_Field.biomeManagers.back()->SetName("Default Global");
-	m_Worker = std::make_unique<GenerationWorker>([this](bool force) { ExecuteGeneration(force); });
+	m_Worker = std::make_unique<GenerationWorker>("Generation Worker", [this](bool force) { ExecuteGeneration(force); });
 }
 
 GenerationManager::~GenerationManager() = default;
 
 void GenerationManager::Update()
 {
+	TF3D_PROFILE_SCOPE("generation/update");
 	if (m_Ui.updationPaused) return;
 	if (!m_Worker->HasContext())
 	{
@@ -87,6 +88,7 @@ void GenerationManager::WaitForGenerationWorker()
 
 void GenerationManager::ExecuteGeneration(bool forceUpdate)
 {
+	TF3D_PROFILE_SCOPE("generation/execute");
 	auto hasAnythingUpdated = false;
 	for (auto biome : m_Field.biomeManagers)
 	{

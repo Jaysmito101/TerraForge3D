@@ -1,5 +1,6 @@
 #include "Base/Application.h"
 #include "Base/Logging/Logger.h"
+#include "Profiler.h"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -142,6 +143,8 @@ void Application::Run(std::string loadFile)
 
 	while (isActive)
 	{
+		PerformanceMonitor::Get().BeginFrame();
+		TF3D_PROFILE_BEGIN(frameProfile, "app/frame");
 		float currentTime = (float)glfwGetTime();
 		float deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
@@ -156,6 +159,8 @@ void Application::Run(std::string loadFile)
 
 		Render();
 		m_Window->Update();
+		frameProfile.End();
+		PerformanceMonitor::Get().EndFrame();
 	}
 
 	OnEnd();

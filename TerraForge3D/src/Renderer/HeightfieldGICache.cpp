@@ -202,7 +202,7 @@ void HeightfieldGICache::SetEnabled(bool enabled)
 
 	if (m_Worker == nullptr)
 	{
-		m_Worker = std::make_unique<GenerationWorker>([this](bool) { RunWorkerBuild(); });
+		m_Worker = std::make_unique<GenerationWorker>("Heightfield GI Worker", [this](bool) { RunWorkerBuild(); });
 	}
 	m_IsReady = m_HasPublishedOutput;
 }

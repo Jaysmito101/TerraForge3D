@@ -32,8 +32,6 @@ public:
 
 private:
 	ApplicationState* m_AppState = nullptr;
-	float m_CalculationTime = 0.0f;
-
 	bool m_RequireUpdation = true;
 	std::shared_ptr<ComputeShader> m_Shader;
 	std::shared_ptr<CustomInspector> m_Inspector;

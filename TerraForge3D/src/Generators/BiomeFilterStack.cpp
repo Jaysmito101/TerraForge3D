@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Utils/Utils.h"
+#include "Profiler.h"
 
 #include <unordered_map>
 
@@ -180,6 +181,7 @@ void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter>& filter, cons
 	GeneratorData* input, GeneratorData* output, GeneratorData* reference)
 {
 	const std::string phase = pass.value("Phase", "");
+	TF3D_PROFILE_SCOPE(std::string("generation/filter-phase/") + filter->GetName() + "/" + phase);
 	const auto shader = filter->GetPhaseShader(m_AppState, phase);
 	if (shader == nullptr) return;
 	input->Bind(0);
@@ -198,6 +200,7 @@ void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter>& filter, cons
 void BiomeFilterStack::RunMergePhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& merge, GeneratorData* input, GeneratorData* operation, GeneratorData* output)
 {
 	const std::string phase = merge.value("Phase", "");
+	TF3D_PROFILE_SCOPE(std::string("generation/filter-merge/") + filter->GetName() + "/" + phase);
 	const auto shader = filter->GetPhaseShader(m_AppState, phase);
 	if (shader == nullptr) return;
 	input->Bind(0);
@@ -497,9 +500,11 @@ void BiomeFilterStack::Update(GeneratorData* baseResult)
 	GeneratorData* current = baseResult;
 	GeneratorData* next = m_ResultA.get();
 	bool applied = false;
-	for (const auto& filter : m_Filters)
+	for (int filterIndex = 0; filterIndex < static_cast<int>(m_Filters.size()); filterIndex++)
 	{
+		const auto& filter = m_Filters[filterIndex];
 		if (!filter->IsEnabled()) continue;
+		TF3D_PROFILE_SCOPE(std::string("generation/filter/") + std::to_string(filterIndex) + "/" + filter->GetName());
 		filter->UpdateGeneratedMask(current);
 		RunFilter(filter, current, next);
 		current = next;

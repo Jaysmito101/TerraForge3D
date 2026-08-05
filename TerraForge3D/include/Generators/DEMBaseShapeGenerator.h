@@ -65,7 +65,6 @@ private:
 	int32_t m_EffectiveZoomResolution = 0;
 	float m_ZoomOnMap = 1.0f;
 	float m_MapStrength = 1.0f;
-	float m_CalculationTime = 0.0f;
 	int m_TilesUsingCount = 0;
 	int m_TilesFallbackCount = 0;
 	int m_VisibleTileCount = 0;

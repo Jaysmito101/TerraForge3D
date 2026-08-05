@@ -117,7 +117,7 @@ void HeightfieldAmbientCache::SetEnabled(bool enabled)
 	if (!enabled) m_IsReady = false;
 	else if (m_Worker == nullptr)
 	{
-		m_Worker = std::make_unique<GenerationWorker>([this](bool) { RunWorkerBuild(); });
+		m_Worker = std::make_unique<GenerationWorker>("Heightfield Ambient Worker", [this](bool) { RunWorkerBuild(); });
 	}
 }
 

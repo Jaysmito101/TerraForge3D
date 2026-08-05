@@ -16,6 +16,7 @@
 #include "Misc/SupportersTribute.h"
 #include "Platform.h"
 #include "Utils/Utils.h"
+#include "Profiler.h"
 #undef cNear
 #undef cFar
 #include <nlohmann/json.hpp>
@@ -50,9 +51,11 @@ class MyApp : public Application
 public:
 	virtual void OnPreload() override
 	{
+		PerformanceMonitor::Get().SetCurrentThreadName("Main Thread");
 		SetTitle("TerraForge3D - Jaysmito Mukherjee");
 		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs");
 		SetLogsDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs");
+		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs");
 		SetWindowConfigPath(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "windowconfigs.terr3d");
 		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave");
 		MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "temp");
@@ -60,12 +63,19 @@ public:
 
 	virtual void OnUpdate(float deltatime) override
 	{
+		TF3D_PROFILE_SCOPE("app/update");
 		if (!appState->states.ruinning) return;
-		appState->jobSystem->Update();
-		appState->dashboard->Update();
-		appState->exportManager->Update(); 
-		appState->generationManager->Update();
-		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
+		{
+			TF3D_PROFILE_SCOPE("app/update/jobs");
+			appState->jobSystem->Update();
+			appState->dashboard->Update();
+			appState->exportManager->Update();
+			appState->generationManager->Update();
+		}
+		{
+			TF3D_PROFILE_SCOPE("app/update/viewports");
+			for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
+		}
 
 		// NOTE: This is a temporary hack to fix the brush not working on all viewports
 		appState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(nullptr);
@@ -79,7 +89,7 @@ public:
 			// if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
 
 			// Exit Shortcut
-			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) exit(0);
+			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_Q)) Close();
 
 			// Save Shortcut
 			if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_S))
@@ -104,7 +114,7 @@ public:
 				else
 				{
 					TF3D_LOG_INFO("Shutdown requested");
-					exit(0);
+					Close();
 				}
 			}
 
@@ -122,7 +132,10 @@ public:
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		RenderImGui();
+		{
+			TF3D_PROFILE_SCOPE("app/ui");
+			RenderImGui();
+		}
 	}
 
 	virtual void OnOneSecondTick() override
@@ -148,7 +161,8 @@ public:
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Show();
 		appState->exportManager->ShowSettings();
 		appState->jobManager->ShowSettings();
-		appState->rendererManager->ShowSettings(); 
+		appState->rendererManager->ShowSettings();
+		PerformanceMonitor::Get().RenderUI();
 		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);

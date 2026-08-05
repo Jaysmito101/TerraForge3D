@@ -30,11 +30,6 @@ BiomeCustomBaseShape::~BiomeCustomBaseShape()
 
 bool BiomeCustomBaseShape::ShowShettings()
 {
-	if (ImGui::CollapsingHeader("Statistics"))
-	{
-		ImGui::Text("Time Taken: %f ms", m_CalculationTime);
-	}
-
 	bool enabledSwitch = (ImGui::Checkbox("Enabled", &m_Enabled));
 
 	if (ImGui::Button("Reload Base Shape"))
@@ -75,7 +70,7 @@ bool BiomeCustomBaseShape::ShowShettings()
 
 void BiomeCustomBaseShape::Update(GeneratorData* sourceBuffer, GeneratorData* targetBuffer, GeneratorData* swapBuffer)
 {
-	START_PROFILER();
+	TF3D_PROFILE_SCOPE("generation/custom-base-shape");
 
 	if (m_RequireBaseShapeUpdate)
 	{
@@ -102,8 +97,6 @@ void BiomeCustomBaseShape::Update(GeneratorData* sourceBuffer, GeneratorData* ta
 	m_Shader->SetMemoryBarrier();
 
 	// m_WorkingDataBuffer->CopyTo(sourceBuffer);
-
-	END_PROFILER(m_CalculationTime);
 
 	m_RequireUpdation = false;
 }

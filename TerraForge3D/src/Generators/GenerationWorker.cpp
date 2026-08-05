@@ -1,11 +1,13 @@
 #include "Generators/GenerationWorker.h"
 
 #include "Utils/Utils.h"
+#include "Profiler.h"
 
 #include <GLFW/glfw3.h>
 
-GenerationWorker::GenerationWorker(WorkCallback callback)
-	: m_Callback(std::move(callback))
+GenerationWorker::GenerationWorker(std::string name, WorkCallback callback)
+	: m_Name(name.empty() ? "Generation Worker" : std::move(name)),
+	  m_Callback(std::move(callback))
 {
 	GLFWwindow* renderWindow = glfwGetCurrentContext();
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -66,6 +68,7 @@ bool GenerationWorker::ConsumeCompleted()
 void GenerationWorker::Run()
 {
 	glfwMakeContextCurrent(m_Window);
+	PerformanceMonitor::Get().SetCurrentThreadName(m_Name);
 	while (true)
 	{
 		bool force = false;
@@ -83,7 +86,10 @@ void GenerationWorker::Run()
 			m_Running = true;
 		}
 
-		if (m_Callback) m_Callback(force);
+		{
+			TF3D_PROFILE_SCOPE("generation/worker");
+			if (m_Callback) m_Callback(force);
+		}
 
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		glFinish();

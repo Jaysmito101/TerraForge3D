@@ -123,7 +123,7 @@ void BiomeManager::Resize()
 void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTexture)
 {
 	if (!m_IsEnabled) return;
-	START_PROFILER();
+	TF3D_PROFILE_SCOPE(std::string("generation/biome/") + m_BiomeName);
 	// m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
 
 	if (!m_CustomBaseShape->IsEnabled() || m_CustomBaseShape->RequiresBaseShapeUpdate())
@@ -152,7 +152,6 @@ void BiomeManager::Update(GeneratorData* swapBuffer, GeneratorTexture* seedTextu
 	m_CalculatedMaskGenerator->Update(m_Data.get());
 
 
-	END_PROFILER(m_CalculationTime);
 	m_RequireUpdation = false;
 	m_StatisticsDirty = true;
 }
@@ -217,7 +216,6 @@ bool BiomeManager::ShowGeneralSettings()
 
 	if (ImGui::CollapsingHeader("Statistics"))
 	{
-		ImGui::Text("Time Taken: %f", m_CalculationTime);
 		if (m_StatisticsDirty && m_Statistics != nullptr && m_Data != nullptr)
 		{
 			m_Statistics->Compute(m_Data.get(), m_AppState->mainMap.tileResolution, m_StatisticsSampleStride);
