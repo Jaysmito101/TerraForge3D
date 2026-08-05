@@ -137,8 +137,11 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	glBindTexture(GL_TEXTURE_2D, skyboxTextureEquirect);
 	glUniform1i(glGetUniformLocation(m_EquirectToCube->GetNativeShader(), "u_InputTexture"), 1);
 	glDispatchCompute(m_SkyboxSize / 16, m_SkyboxSize / 16, 6);
-	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+		GL_TEXTURE_UPDATE_BARRIER_BIT |
+		GL_TEXTURE_FETCH_BARRIER_BIT);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
 	glDeleteTextures(1, &skyboxTextureEquirect);
 	 
