@@ -78,6 +78,15 @@ if(TF3D_ENABLE_MCP)
         httplib=${TF3D_CPP_MCP_HTTPLIB_NAMESPACE}
     )
 
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(mcp PRIVATE
+            -Wno-deprecated-declarations
+            -Wno-reorder-ctor
+            -Wno-unused-function
+            -Wno-unused-private-field
+        )
+    endif()
+
     set_property(TARGET mcp PROPERTY INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include"
     )
@@ -135,6 +144,9 @@ if(TF3D_ENABLE_MCP)
         httplib=${TF3D_CPP_MCP_HTTPLIB_NAMESPACE}
         ${_cpp_mcp_configuration_definitions}
     )
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(tf3d_mcp PRIVATE -Wno-deprecated-declarations)
+    endif()
     target_link_libraries(tf3d_mcp PRIVATE mcp)
 
     target_compile_definitions(${EXECUTABLE_NAME} PRIVATE TF3D_ENABLE_MCP=1)
