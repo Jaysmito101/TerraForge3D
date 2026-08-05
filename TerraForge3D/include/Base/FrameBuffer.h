@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 class FrameBuffer
 {
@@ -13,6 +14,7 @@ public:
     void ResolveColor();
     void ResolveDepth();
     void Resolve();
+    bool DownloadColorToU8(std::vector<uint8_t> &pixels, bool flipVertically = true);
     uint32_t End();
 
     uint32_t GetColorTexture();

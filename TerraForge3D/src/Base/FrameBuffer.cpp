@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 
 #include <algorithm>
+#include <utility>
 
 FrameBuffer::FrameBuffer(int w, int h)
 {
@@ -92,6 +93,47 @@ uint32_t FrameBuffer::End()
 {
     Resolve();
     return colorTexture;
+}
+
+bool FrameBuffer::DownloadColorToU8(std::vector<uint8_t> &pixels, bool flipVertically)
+{
+    pixels.clear();
+    if (resolveFbo == 0 || width <= 0 || height <= 0)
+        return false;
+
+    ResolveColor();
+
+    const size_t rowSize = static_cast<size_t>(width) * 3;
+    std::vector<uint8_t> rawPixels(rowSize * static_cast<size_t>(height));
+
+    GLint previousReadFramebuffer = 0;
+    GLint previousDrawFramebuffer = 0;
+    GLint previousPackAlignment   = 4;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
+    glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, resolveFbo);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, rawPixels.data());
+
+    glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
+
+    if (!flipVertically) {
+        pixels = std::move(rawPixels);
+        return true;
+    }
+
+    pixels.resize(rawPixels.size());
+    for (int row = 0; row < height; ++row) {
+        const size_t sourceOffset = static_cast<size_t>(height - row - 1) * rowSize;
+        const size_t targetOffset = static_cast<size_t>(row) * rowSize;
+        std::copy_n(rawPixels.data() + sourceOffset, rowSize, pixels.data() + targetOffset);
+    }
+    return true;
 }
 
 uint32_t FrameBuffer::GetColorTexture()
