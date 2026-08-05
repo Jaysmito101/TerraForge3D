@@ -1,11 +1,23 @@
 #pragma once
 
+#include "MCP/ActionRegistry.h"
+#include "MCP/MainThreadRequestQueue.h"
+#include "MCP/ResourceRegistry.h"
+
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
 class ApplicationState;
+
+namespace mcp
+{
+	class server;
+}
 
 	struct McpCommandLogEntry
 	{
@@ -44,6 +56,27 @@ class ApplicationState;
 		void ClearCommandLog();
 
 	private:
-		class Impl;
-		std::unique_ptr<Impl> implementation;
+		void OpenCallHistory();
+		void CloseCallHistory();
+		void RecordCommand(
+			const std::string& method,
+			const nlohmann::json& params,
+			const std::string& sessionId);
+		void RegisterCoreEntries();
+		void RegisterEntries();
+
+		ApplicationState* applicationState = nullptr;
+		std::string logsDirectory;
+		const std::string host = "127.0.0.1";
+		int port = 9823;
+		std::string endpoint;
+		ActionRegistry actions;
+		ResourceRegistry resources;
+		MainThreadRequestQueue requestQueue;
+		std::unique_ptr<mcp::server> server;
+		std::ofstream callHistory;
+		std::filesystem::path callHistoryPath;
+		mutable std::mutex statsMutex;
+		std::uint64_t commandCount = 0;
+		std::vector<McpCommandLogEntry> commandLog;
 	};

@@ -149,22 +149,24 @@ namespace
 	};
 }
 
-class TerraForgeMcpServer::Impl
+
+TerraForgeMcpServer::TerraForgeMcpServer(
+	ApplicationState* applicationState,
+	std::string logsDirectory)
+	: applicationState(applicationState)
+	, logsDirectory(std::move(logsDirectory))
+	, port(ReadMcpPort())
 	{
-	public:
-		Impl(ApplicationState* applicationState, std::string logsDirectory)
-			: applicationState(applicationState), logsDirectory(std::move(logsDirectory)), port(ReadMcpPort())
-		{
-			endpoint = "http://" + host + ":" + std::to_string(port) + "/mcp";
-			RegisterCoreEntries();
-		}
+		endpoint = "http://" + host + ":" + std::to_string(port) + "/mcp";
+		RegisterCoreEntries();
+	}
 
-		~Impl()
-		{
-			Stop();
-		}
+TerraForgeMcpServer::~TerraForgeMcpServer()
+	{
+		Stop();
+	}
 
-		bool Start()
+bool TerraForgeMcpServer::Start()
 		{
 			if (server && server->is_running()) return true;
 			InstallMcpLogBridge();
@@ -199,12 +201,12 @@ class TerraForgeMcpServer::Impl
 			return true;
 		}
 
-		void Update()
+		void TerraForgeMcpServer::Update()
 		{
 			requestQueue.Drain();
 		}
 
-		void Stop()
+		void TerraForgeMcpServer::Stop()
 		{
 			requestQueue.Shutdown();
 			if (server)
@@ -216,12 +218,12 @@ class TerraForgeMcpServer::Impl
 			RemoveMcpLogBridge();
 		}
 
-		bool IsRunning() const
+		bool TerraForgeMcpServer::IsRunning() const
 		{
 			return server != nullptr && server->is_running();
 		}
 
-		McpServerStats GetStats() const
+		McpServerStats TerraForgeMcpServer::GetStats() const
 		{
 			McpServerStats snapshot;
 			snapshot.running = IsRunning();
@@ -236,15 +238,14 @@ class TerraForgeMcpServer::Impl
 			return snapshot;
 		}
 
-		void ClearCommandLog()
+		void TerraForgeMcpServer::ClearCommandLog()
 		{
 			std::lock_guard<std::mutex> lock(statsMutex);
 			commandCount = 0;
 			commandLog.clear();
 		}
 
-	private:
-		void OpenCallHistory()
+	void TerraForgeMcpServer::OpenCallHistory()
 		{
 			if (logsDirectory.empty()) return;
 
@@ -293,7 +294,7 @@ class TerraForgeMcpServer::Impl
 			}
 		}
 
-		void CloseCallHistory()
+	void TerraForgeMcpServer::CloseCallHistory()
 		{
 			if (callHistory.is_open())
 			{
@@ -302,7 +303,7 @@ class TerraForgeMcpServer::Impl
 			}
 		}
 
-		void RecordCommand(
+	void TerraForgeMcpServer::RecordCommand(
 			const std::string& method,
 			const nlohmann::json& params,
 			const std::string& sessionId)
@@ -355,7 +356,7 @@ class TerraForgeMcpServer::Impl
 			}
 		}
 
-		void RegisterCoreEntries()
+	void TerraForgeMcpServer::RegisterCoreEntries()
 		{
 			actions.Register({
 				"tf3d.mcp.status",
@@ -399,7 +400,7 @@ class TerraForgeMcpServer::Impl
 			});
 		}
 
-		void RegisterEntries()
+	void TerraForgeMcpServer::RegisterEntries()
 		{
 			nlohmann::json capabilities = nlohmann::json::object();
 			const auto actionEntries = actions.Snapshot();
@@ -482,56 +483,3 @@ class TerraForgeMcpServer::Impl
 					});
 			}
 		}
-
-		ApplicationState* applicationState;
-		std::string logsDirectory;
-		const std::string host = "127.0.0.1";
-		int port;
-		std::string endpoint;
-		ActionRegistry actions;
-		ResourceRegistry resources;
-		MainThreadRequestQueue requestQueue;
-		std::unique_ptr<mcp::server> server;
-		std::ofstream callHistory;
-		std::filesystem::path callHistoryPath;
-		mutable std::mutex statsMutex;
-		std::uint64_t commandCount = 0;
-		std::vector<McpCommandLogEntry> commandLog;
-	};
-
-TerraForgeMcpServer::TerraForgeMcpServer(ApplicationState* applicationState, std::string logsDirectory)
-		: implementation(std::make_unique<Impl>(applicationState, std::move(logsDirectory)))
-	{
-	}
-
-	TerraForgeMcpServer::~TerraForgeMcpServer() = default;
-
-	bool TerraForgeMcpServer::Start()
-	{
-		return implementation->Start();
-	}
-
-	void TerraForgeMcpServer::Update()
-	{
-		implementation->Update();
-	}
-
-	void TerraForgeMcpServer::Stop()
-	{
-		implementation->Stop();
-	}
-
-	bool TerraForgeMcpServer::IsRunning() const
-	{
-		return implementation->IsRunning();
-	}
-
-	McpServerStats TerraForgeMcpServer::GetStats() const
-	{
-		return implementation->GetStats();
-	}
-
-	void TerraForgeMcpServer::ClearCommandLog()
-	{
-		implementation->ClearCommandLog();
-	}
