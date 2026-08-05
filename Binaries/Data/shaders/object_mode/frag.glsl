@@ -21,6 +21,8 @@ uniform sampler2D u_SlopeTexture;
 uniform bool u_HasSlopeTexture;
 uniform sampler2D u_TerrainSelfShadow;
 uniform bool u_HasTerrainSelfShadow;
+uniform sampler2D u_TerrainAmbient;
+uniform bool u_HasTerrainAmbient;
 
 const float PI = 3.141592653589793;
 const float INV_PI = 0.3183098861837907;
@@ -38,6 +40,8 @@ uniform vec3 u_CameraPosition;
 uniform bool u_ViewNormals;
 uniform bool u_ViewSlope;
 uniform bool u_ViewTerrainSelfShadow;
+uniform bool u_ViewTerrainAmbient;
+uniform bool u_ViewTerrainBentNormal;
 
 uniform vec3 u_SunDirection;
 uniform vec3 u_SunColor;
@@ -65,6 +69,7 @@ int PixelCoordToDataOffset(int x, int y)
 }
 
 #include "common/height_sampling.glsl"
+#include "common/heightfield_pyramid_sampling.glsl"
 
 vec2 SampleTerrainGradient(vec2 texCoord)
 {
@@ -158,6 +163,18 @@ float SampleTerrainSelfShadow()
 	return texture(u_TerrainSelfShadow, clamp(fragmentInput.texCoord.xy, vec2(0.0), vec2(1.0))).r;
 }
 
+float SampleTerrainAmbientVisibility()
+{
+	if (!u_HasTerrainAmbient || fragmentInput.texCoord.z > 0.5f) return 1.0;
+	return texture(u_TerrainAmbient, clamp(fragmentInput.texCoord.xy, vec2(0.0), vec2(1.0))).r;
+}
+
+vec3 SampleTerrainBentNormal(vec3 fallbackNormal)
+{
+	if (!u_HasTerrainAmbient || fragmentInput.texCoord.z > 0.5f) return fallbackNormal;
+	return TF3D_OctahedralDecode(texture(u_TerrainAmbient, clamp(fragmentInput.texCoord.xy, vec2(0.0), vec2(1.0))).gb);
+}
+
 vec3 EvaluateSun(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
 {
 	vec3 L = normalize(-u_SunDirection);
@@ -178,7 +195,7 @@ vec3 EvaluateSun(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
 	return (diffuse + specular) * radiance * nDotL * SampleTerrainSelfShadow();
 }
 
-vec3 EvaluateImageBasedLighting(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
+vec3 EvaluateImageBasedLighting(vec3 N, vec3 diffuseNormal, vec3 V, vec3 albedo, float metallic, float roughness, float ambientVisibility)
 {
 	if (!u_EnableSkyLight) return vec3(0.0);
 
@@ -189,7 +206,7 @@ vec3 EvaluateImageBasedLighting(vec3 N, vec3 V, vec3 albedo, float metallic, flo
 	vec3 kD = (1.0 - kS) * (1.0 - metallic);
 
 	// The irradiance precompute stores the integrated incoming diffuse light.
-	vec3 irradiance = textureLod(u_IrradianceMap, N, 0.0).rgb;
+	vec3 irradiance = textureLod(u_IrradianceMap, diffuseNormal, 0.0).rgb * ambientVisibility;
 	vec3 diffuse = irradiance * albedo * kD * INV_PI;
 
 	// The prefiltered cubemap contains the environment convolution for each
@@ -244,11 +261,24 @@ void main()
 		FragColor = vec4(vec3(visibility), 1.0);
 		return;
 	}
+
+	float ambientVisibility = SampleTerrainAmbientVisibility();
+	vec3 bentNormal = SampleTerrainBentNormal(normal);
+	if (u_ViewTerrainAmbient)
+	{
+		FragColor = vec4(vec3(ambientVisibility), 1.0);
+		return;
+	}
+	if (u_ViewTerrainBentNormal)
+	{
+		FragColor = vec4(bentNormal * 0.5 + 0.5, 1.0);
+		return;
+	}
 	
 	float specularRoughness = CalculateSpecularRoughness(normal);
 	vec3 viewDirection = normalize(u_CameraPosition - fragmentInput.position);
 	vec3 color = EvaluateSun(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness);
-		color += EvaluateImageBasedLighting(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness);
+	color += EvaluateImageBasedLighting(normal, bentNormal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness, ambientVisibility);
 
 	color = ACESFilm(max(color, vec3(0.0)));
 	color = pow(max(color, vec3(0.0)), vec3(1.0 / 2.2));

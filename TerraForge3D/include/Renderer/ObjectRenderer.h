@@ -24,6 +24,8 @@ private:
 	bool m_ViewNormals = false;
 	bool m_ViewSlope = false;
 	bool m_ViewTerrainSelfShadow = false;
+	bool m_ViewTerrainAmbient = false;
+	bool m_ViewTerrainBentNormal = false;
 	std::shared_ptr<ShaderStorageBuffer> m_SharedMemoryBuffer;
 	std::shared_ptr<Shader> m_PostProcessShader;
 	uint32_t m_PostProcessVao = 0;

@@ -10,6 +10,7 @@
 #include "Renderer/RendererSky.h"
 #include "Renderer/PlanarShadowCache.h"
 #include "Renderer/TerrainSelfShadow.h"
+#include "Renderer/HeightfieldAmbientCache.h"
 
 class ApplicationState;
 
@@ -28,6 +29,7 @@ public:
 	inline RendererSky* GetSkyRenderer() { return m_RendererSky.get(); }
 	inline TerrainSelfShadow* GetTerrainSelfShadow() { return m_TerrainSelfShadow.get(); }
 	inline PlanarShadowCache* GetPlanarShadowCache() { return m_PlanarShadowCache.get(); }
+	inline HeightfieldAmbientCache* GetHeightfieldAmbientCache() { return m_HeightfieldAmbientCache.get(); }
 
 	inline ObjectRenderer* GetObjectRenderer() { return static_cast<ObjectRenderer*>(m_ObjectRenderer.get()); }
 	inline HeightmapRenderer* GetHeightmapRenderer() { return static_cast<HeightmapRenderer*>(m_HeightmapRenderer.get()); }
@@ -49,5 +51,8 @@ private:
 	std::shared_ptr<RendererSky> m_RendererSky;
 	std::shared_ptr<TerrainSelfShadow> m_TerrainSelfShadow;
 	std::shared_ptr<PlanarShadowCache> m_PlanarShadowCache;
+	std::shared_ptr<HeightfieldAmbientCache> m_HeightfieldAmbientCache;
+	bool m_EnableAmbientAo = true;
+	float m_AmbientAoRadiusFactor = 0.12f;
 };
 

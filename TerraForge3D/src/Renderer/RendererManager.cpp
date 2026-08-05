@@ -13,6 +13,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 	m_RendererSky = std::make_shared<RendererSky>(appState);
 	m_TerrainSelfShadow = std::make_shared<TerrainSelfShadow>(appState);
 	m_PlanarShadowCache = std::make_shared<PlanarShadowCache>(appState);
+	m_HeightfieldAmbientCache = std::make_shared<HeightfieldAmbientCache>(appState);
 }
 
 RendererManager::~RendererManager()
@@ -54,6 +55,19 @@ void RendererManager::Render(RendererViewport* viewport)
 			terrainHeightOffset,
 			fieldMaximum,
 			0.0f);
+	}
+	if (m_HeightfieldAmbientCache != nullptr && m_AppState->generationManager != nullptr)
+	{
+		m_HeightfieldAmbientCache->SetEnabled(m_EnableAmbientAo);
+		const float terrainWorldSize = std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f);
+		if (m_EnableAmbientAo)
+		{
+			m_HeightfieldAmbientCache->Update(
+				m_AppState->generationManager->GetHeightPyramid(),
+				m_AppState->generationManager->GetTerrainRevision(),
+				terrainWorldSize,
+				terrainWorldSize * m_AmbientAoRadiusFactor);
+		}
 	}
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
 	switch (viewport->m_ViewportMode)
@@ -118,6 +132,8 @@ void RendererManager::ShowSettings()
 				if (ImGui::BeginTabItem("Terrain"))
 				{
 					ImGui::PushID("Terrain");
+					ImGui::Checkbox("Enable Terrain AO", &m_EnableAmbientAo);
+					ImGui::SliderFloat("AO Radius (Terrain Scale)", &m_AmbientAoRadiusFactor, 0.01f, 0.5f, "%.3f");
 					ImGui::PopID();
 					ImGui::EndTabItem();
 				}
