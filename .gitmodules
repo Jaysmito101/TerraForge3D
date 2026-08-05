@@ -43,3 +43,6 @@
 [submodule "TerraForge3D/vendor/spdlog"]
 	path = TerraForge3D/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "TerraForge3D/vendor/cpp-mcp"]
+	path = TerraForge3D/vendor/cpp-mcp
+	url = https://github.com/hkr04/cpp-mcp.git
