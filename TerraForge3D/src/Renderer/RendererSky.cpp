@@ -194,7 +194,9 @@ bool RendererSky::LoadSkyboxTexture(const std::string& path)
 	glGenTextures(1, &m_IrradianceMapTextureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_IrradianceMapTextureID);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glTexStorage2D(GL_TEXTURE_CUBE_MAP, 6, GL_RGBA32F, m_IrradianceMapSize, m_IrradianceMapSize);
+	// Irradiance is only sampled at level zero; allocating a mip chain here
+	// also becomes invalid for a 16x16 cube (which has only five legal levels).
+	glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA32F, m_IrradianceMapSize, m_IrradianceMapSize);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
