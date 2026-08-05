@@ -136,7 +136,7 @@ if(TF3D_ENABLE_MCP)
     set_property(TARGET tf3d_mcp PROPERTY CXX_STANDARD 20)
     set_property(TARGET tf3d_mcp PROPERTY CXX_STANDARD_REQUIRED ON)
     set_property(TARGET tf3d_mcp PROPERTY INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include;${TF3D_INCLUDE_DIRS}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include;${CMAKE_CURRENT_BINARY_DIR}/gladsources/glad/include;${TF3D_INCLUDE_DIRS}"
     )
     target_compile_definitions(tf3d_mcp PRIVATE
         TF3D_ENABLE_MCP=1

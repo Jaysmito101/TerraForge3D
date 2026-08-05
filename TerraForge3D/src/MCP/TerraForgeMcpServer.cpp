@@ -7,12 +7,15 @@
 #include "MCP/ResourceRegistry.h"
 #include "MCP/TerraForgeMcpServer.h"
 
+#include "Data/ApplicationState.h"
 #include "Data/VersionInfo.h"
 #include "Base/Logging/Logger.h"
 
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <memory>
 #include <mutex>
@@ -170,14 +173,16 @@ class TerraForgeMcpServer::Impl
 			server->set_server_info(configuration.name, configuration.version);
 			server->set_instructions(
 				"TerraForge3D exposes registered actions as MCP tools and readable state as MCP resources.");
-			server->set_request_observer([this](const mcp::request& request, const std::string&) {
-				RecordCommand(request);
+			server->set_request_observer([this](const mcp::request& request, const std::string& sessionId) {
+				RecordCommand(request, sessionId);
 			});
 
 			RegisterEntries();
+			OpenCallHistory();
 			if (!server->start(false))
 			{
 				server.reset();
+				CloseCallHistory();
 				mcp::set_log_handler(mcp::log_handler{});
 				return false;
 			}
@@ -200,6 +205,7 @@ class TerraForgeMcpServer::Impl
 				server->stop();
 				server.reset();
 			}
+			CloseCallHistory();
 			mcp::set_log_handler(mcp::log_handler{});
 		}
 
@@ -231,7 +237,65 @@ class TerraForgeMcpServer::Impl
 		}
 
 	private:
-		void RecordCommand(const mcp::request& request)
+		void OpenCallHistory()
+		{
+			if (applicationState == nullptr || applicationState->constants.logsDir.empty()) return;
+
+			try
+			{
+				const std::filesystem::path logsDirectory(applicationState->constants.logsDir);
+				const std::filesystem::path callsDirectory = logsDirectory.parent_path() / "McpCalls";
+				std::filesystem::create_directories(callsDirectory);
+
+				const auto now = std::chrono::system_clock::now();
+				const auto nowTime = std::chrono::system_clock::to_time_t(now);
+				const auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+					now.time_since_epoch()).count() % 1000;
+				std::tm localTime{};
+#ifdef _WIN32
+				localtime_s(&localTime, &nowTime);
+#else
+				localtime_r(&nowTime, &localTime);
+#endif
+				std::ostringstream filename;
+				filename << std::put_time(&localTime, "%Y-%m-%d_%H-%M-%S")
+					<< "_" << std::setfill('0') << std::setw(3) << milliseconds << ".jsonl";
+
+				callHistoryPath = callsDirectory / filename.str();
+				callHistory.open(callHistoryPath, std::ios::out | std::ios::app);
+				if (!callHistory.is_open())
+				{
+					TF3D_LOG_ERROR("Could not open MCP call history file '{}'", callHistoryPath.string());
+					return;
+				}
+
+				const Json sessionHeader = {
+					{"type", "session"},
+					{"startedAt", FormatCommandTimestamp()},
+					{"application", "TerraForge3D"},
+					{"version", TERR3D_VERSION_STRING},
+					{"protocolVersion", mcp::MCP_VERSION}
+				};
+				callHistory << sessionHeader.dump() << '\n';
+				callHistory.flush();
+				TF3D_LOG_INFO("MCP call history file: {}", callHistoryPath.string());
+			}
+			catch (const std::exception& exception)
+			{
+				TF3D_LOG_ERROR("Could not initialize MCP call history: {}", exception.what());
+			}
+		}
+
+		void CloseCallHistory()
+		{
+			if (callHistory.is_open())
+			{
+				callHistory.flush();
+				callHistory.close();
+			}
+		}
+
+		void RecordCommand(const mcp::request& request, const std::string& sessionId)
 		{
 			std::string parameters;
 			std::string requestJson;
@@ -246,6 +310,21 @@ class TerraForgeMcpServer::Impl
 				requestJson = parameters;
 			}
 
+			Json historyEntry = {
+				{"type", "request"},
+				{"timestamp", FormatCommandTimestamp()},
+				{"sessionId", sessionId},
+				{"method", request.method}
+			};
+			try
+			{
+				historyEntry["request"] = request.to_json();
+			}
+			catch (...)
+			{
+				historyEntry["request"] = requestJson;
+			}
+
 			std::lock_guard<std::mutex> lock(statsMutex);
 			++commandCount;
 			commandLog.push_back({
@@ -254,6 +333,11 @@ class TerraForgeMcpServer::Impl
 				std::move(parameters),
 				std::move(requestJson)
 			});
+			if (callHistory.is_open())
+			{
+				callHistory << historyEntry.dump() << '\n';
+				callHistory.flush();
+			}
 		}
 
 		void RegisterCoreEntries()
@@ -373,6 +457,8 @@ class TerraForgeMcpServer::Impl
 		ResourceRegistry resources;
 		MainThreadRequestQueue requestQueue;
 		std::unique_ptr<mcp::server> server;
+		std::ofstream callHistory;
+		std::filesystem::path callHistoryPath;
 		mutable std::mutex statsMutex;
 		std::uint64_t commandCount = 0;
 		std::vector<McpCommandLogEntry> commandLog;
