@@ -4,27 +4,10 @@
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
 #include "Base/ShaderStorageBuffer.h"
+#include "Utils/Utils.h"
 
 #include <algorithm>
-#include <cstring>
 #include <vector>
-
-	float OrderedUintToFloat(uint32_t value)
-	{
-		const uint32_t bits = (value & 0x80000000u) != 0u
-			? value ^ 0x80000000u
-			: ~value;
-		float result = 0.0f;
-		std::memcpy(&result, &bits, sizeof(result));
-		return result;
-	}
-
-	float RawUintToFloat(uint32_t value)
-	{
-		float result = 0.0f;
-		std::memcpy(&result, &value, sizeof(result));
-		return result;
-	}
 
 GeneratorDataStatistics::GeneratorDataStatistics(ApplicationState* appState)
 	: m_AppState(appState)

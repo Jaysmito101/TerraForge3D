@@ -54,6 +54,8 @@ struct Hash
 void HashCombine64(uint64_t& hash, uint64_t value);
 uint64_t QuantizeFloatForHash(float value,
 	float precision = 0.00001f);
+float OrderedUintToFloat(uint32_t value);
+float RawUintToFloat(uint32_t value);
 
 
 #ifndef MAX

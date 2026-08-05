@@ -43,6 +43,23 @@ uint64_t QuantizeFloatForHash(float value, float precision)
 		static_cast<double>(value) / static_cast<double>(precision)));
 }
 
+float OrderedUintToFloat(uint32_t value)
+{
+	const uint32_t bits = (value & 0x80000000u) != 0u
+		? value ^ 0x80000000u
+		: ~value;
+	float result = 0.0f;
+	std::memcpy(&result, &bits, sizeof(result));
+	return result;
+}
+
+float RawUintToFloat(uint32_t value)
+{
+	float result = 0.0f;
+	std::memcpy(&result, &value, sizeof(result));
+	return result;
+}
+
 //SAF_Handle.cpp line:458 old line:INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
 #ifdef __linux__
 //  INFILE = _open(infilename, _O_RDONLY);
