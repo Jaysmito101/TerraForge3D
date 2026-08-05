@@ -7,6 +7,7 @@ layout (location = 2) in vec4 aTexCoord;
 out VertexData
 {
   vec3 position;
+  vec3 basePosition;
   vec3 normal;
   vec4 texCoord;
 } vertexOutput;
@@ -36,7 +37,8 @@ void main()
 {
     vec2 texCoord = aTexCoord.xy;
     float height = SampleHeightBilinear(texCoord);
-    vec3 position = aPosition.xyz;
+    vec3 basePosition = aPosition.xyz;
+    vec3 position = basePosition;
 	if (aTexCoord.z > 0.5f)
     {
         if (aTexCoord.w > 0.5f) position.y += height + u_HeightOffset;
@@ -50,6 +52,7 @@ void main()
     //vec3 position = aPosition.xyz + aNormal.xyz * data0[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;
+	vertexOutput.basePosition = basePosition;
 	vertexOutput.normal = aNormal.xyz;
     vertexOutput.texCoord = aTexCoord;
     gl_Position = u_ProjectionView * vec4(position, 1.0);

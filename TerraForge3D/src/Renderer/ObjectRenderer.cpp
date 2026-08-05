@@ -26,12 +26,26 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	m_Shader->Bind();
 	m_AppState->generationManager->GetHeightmapData()->Bind(0);
 	m_SharedMemoryBuffer->Bind(1);
+	auto* slopeTexture = m_AppState->generationManager->GetSlopeTexture();
+	const bool hasSlopeTexture = m_AppState->generationManager->HasSlopeTexture();
+	if (slopeTexture && hasSlopeTexture) {
+		slopeTexture->Bind(5);
+	}
+	else
+	{
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SlopeTexture"), 5);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasSlopeTexture"), hasSlopeTexture ? 1 : 0);
 	//glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Projection"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.pers));
 	//glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_View"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.view));
 	glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.GetProjectionViewMatrix()));
 	glUniform3fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->m_Camera.GetPosition()));
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertNormals"), m_InvertNormals);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewNormals"), m_ViewNormals ? 1 : 0);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewSlope"), m_ViewSlope ? 1 : 0);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
 	const bool isPlane = m_AppState->mainModel != nullptr && m_AppState->mainModel->isGeneratedPlane;
@@ -106,6 +120,8 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 void ObjectRenderer::ShowSettings()
 {
 	ImGui::Checkbox("Invert Normals", &m_InvertNormals);
+	if (ImGui::Checkbox("View Normals", &m_ViewNormals) && m_ViewNormals) m_ViewSlope = false;
+	if (ImGui::Checkbox("View Slope", &m_ViewSlope) && m_ViewSlope) m_ViewNormals = false;
 	if (ImGui::Button("Reload Shaders")) ReloadShaders();
 }
 

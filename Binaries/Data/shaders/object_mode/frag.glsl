@@ -5,6 +5,7 @@ out vec4 FragColor;
 in VertexData
 {
   vec3 position;
+  vec3 basePosition;
   vec3 normal;
   vec4 texCoord;
 } fragmentInput;
@@ -16,9 +17,13 @@ layout(std430, binding = 1) buffer SharedDataBuffer1
 	vec4 sharedData1;
 };
 
+uniform sampler2D u_SlopeTexture;
+uniform bool u_HasSlopeTexture;
+
 const float PI = 3.141592653589793;
 const float INV_PI = 0.3183098861837907;
 const float EPSILON = 0.0001;
+const float UV_DETERMINANT_EPSILON = 1e-12;
 
 const vec3 MATERIAL_ALBEDO = vec3(0.98, 0.96, 0.90);
 const float MATERIAL_METALLIC = 0.0;
@@ -28,6 +33,8 @@ uniform int u_Resolution;
 uniform float u_TileSize;
 uniform bool u_InvertNormals;
 uniform vec3 u_CameraPosition;
+uniform bool u_ViewNormals;
+uniform bool u_ViewSlope;
 
 uniform vec3 u_SunDirection;
 uniform vec3 u_SunColor;
@@ -56,6 +63,19 @@ int PixelCoordToDataOffset(int x, int y)
 
 #include "common/height_sampling.glsl"
 
+vec2 SampleTerrainGradient(vec2 texCoord)
+{
+	if (!u_HasSlopeTexture) return SampleHeightGradient(texCoord);
+
+	vec2 texCoordDx = dFdx(texCoord);
+	vec2 texCoordDy = dFdy(texCoord);
+	vec2 sampledGradient = textureGrad(u_SlopeTexture, texCoord, texCoordDx, texCoordDy).rg;
+	bool finiteGradient = all(equal(sampledGradient, sampledGradient)) &&
+		all(lessThan(abs(sampledGradient), vec2(1000000.0)));
+	bool hasGradientSignal = dot(abs(sampledGradient), vec2(1.0)) > 0.0000001;
+	return finiteGradient && hasGradientSignal ? sampledGradient : SampleHeightGradient(texCoord);
+}
+
 vec3 calculateNormal()
 {
 	if (fragmentInput.texCoord.z > 0.5f)
@@ -63,14 +83,41 @@ vec3 calculateNormal()
 		vec3 solidNormal = normalize(fragmentInput.normal);
 		return u_InvertNormals ? -solidNormal : solidNormal;
 	}
-	vec3 up = normalize(fragmentInput.normal);
-	float height = SampleHeightBilinear(fragmentInput.texCoord.xy);
-	vec3 basePosition = fragmentInput.position - up * height;
-	vec2 heightGradient = SampleHeightGradient(fragmentInput.texCoord.xy);
-	vec3 dx = dFdx(basePosition) + up * dot(heightGradient, dFdx(fragmentInput.texCoord.xy));
-	vec3 dy = dFdy(basePosition) + up * dot(heightGradient, dFdy(fragmentInput.texCoord.xy));
-	vec3 normal = normalize(cross(dx, dy));
+	vec3 baseNormal = normalize(fragmentInput.normal);
+	vec2 texCoord = fragmentInput.texCoord.xy;
+	vec2 texCoordDx = dFdx(texCoord);
+	vec2 texCoordDy = dFdy(texCoord);
+	vec3 basePositionDx = dFdx(fragmentInput.basePosition);
+	vec3 basePositionDy = dFdy(fragmentInput.basePosition);
+
+	float uvDeterminant = texCoordDx.x * texCoordDy.y - texCoordDx.y * texCoordDy.x;
+	if (abs(uvDeterminant) < UV_DETERMINANT_EPSILON)
+	{
+		vec3 fallbackCross = cross(basePositionDx, basePositionDy);
+		vec3 fallbackNormal = length(fallbackCross) > EPSILON ? normalize(fallbackCross) : baseNormal;
+		if (dot(fallbackNormal, baseNormal) < 0.0) fallbackNormal = -fallbackNormal;
+		return u_InvertNormals ? -fallbackNormal : fallbackNormal;
+	}
+	vec3 baseTangentU = (basePositionDx * texCoordDy.y - basePositionDy * texCoordDx.y) / uvDeterminant;
+	vec3 baseTangentV = (basePositionDy * texCoordDx.x - basePositionDx * texCoordDy.x) / uvDeterminant;
+
+	vec2 heightGradient = SampleTerrainGradient(texCoord);
+	vec3 terrainTangentU = baseTangentU + baseNormal * heightGradient.x;
+	vec3 terrainTangentV = baseTangentV + baseNormal * heightGradient.y;
+	vec3 normal = normalize(cross(terrainTangentU, terrainTangentV));
+	if (dot(normal, baseNormal) < 0.0) normal = -normal;
 	return u_InvertNormals ? -normal : normal;
+}
+
+float CalculateSpecularRoughness(vec3 normal)
+{
+	float normalVariance = 0.5 * (
+		dot(dFdx(normal), dFdx(normal)) +
+		dot(dFdy(normal), dFdy(normal)));
+	const float specularAAStrength = 0.35;
+	const float maxVarianceContribution = 0.20;
+	float varianceContribution = min(max(normalVariance, 0.0) * specularAAStrength, maxVarianceContribution);
+	return sqrt(clamp(MATERIAL_ROUGHNESS * MATERIAL_ROUGHNESS + varianceContribution, 0.0, 1.0));
 }
 
 float DistributionGGX(float nDotH, float roughness)
@@ -133,7 +180,7 @@ vec3 EvaluateImageBasedLighting(vec3 N, vec3 V, vec3 albedo, float metallic, flo
 	vec3 kD = (1.0 - kS) * (1.0 - metallic);
 
 	// The irradiance precompute stores the integrated incoming diffuse light.
-	vec3 irradiance = texture(u_IrradianceMap, N).rgb;
+	vec3 irradiance = textureLod(u_IrradianceMap, N, 0.0).rgb;
 	vec3 diffuse = irradiance * albedo * kD * INV_PI;
 
 	// The prefiltered cubemap contains the environment convolution for each
@@ -169,9 +216,23 @@ void main()
 	}
 
 	vec3 normal = calculateNormal();
+	if (u_ViewSlope)
+	{
+		vec2 gradient = SampleTerrainGradient(fragmentInput.texCoord.xy);
+		FragColor = vec4(clamp(gradient * 0.035 + 0.5, 0.0, 1.0), 0.0, 1.0);
+		return;
+	}
+
+	if (u_ViewNormals)
+	{
+		FragColor = vec4(normal * 0.5 + 0.5, 1.0);
+		return;
+	}
+	
+	float specularRoughness = CalculateSpecularRoughness(normal);
 	vec3 viewDirection = normalize(u_CameraPosition - fragmentInput.position);
-	vec3 color = EvaluateSun(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, MATERIAL_ROUGHNESS);
-		color += EvaluateImageBasedLighting(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, MATERIAL_ROUGHNESS);
+	vec3 color = EvaluateSun(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness);
+		color += EvaluateImageBasedLighting(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness);
 
 	color = ACESFilm(max(color, vec3(0.0)));
 	color = pow(max(color, vec3(0.0)), vec3(1.0 / 2.2));
