@@ -12,6 +12,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 	m_RendererLights = std::make_shared<RendererLights>(appState);
 	m_RendererSky = std::make_shared<RendererSky>(appState);
 	m_TerrainSelfShadow = std::make_shared<TerrainSelfShadow>(appState);
+	m_PlanarShadowCache = std::make_shared<PlanarShadowCache>(appState);
 }
 
 RendererManager::~RendererManager()
@@ -34,6 +35,25 @@ void RendererManager::Render(RendererViewport* viewport)
 			m_AppState->generationManager->GetTerrainRevision(),
 			m_RendererLights->m_Sun.direction,
 			std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f));
+	}
+	if (m_PlanarShadowCache != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
+	{
+		const bool isPlane = m_AppState->mainModel != nullptr && m_AppState->mainModel->isGeneratedPlane;
+		const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
+		const float fieldMinimum = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
+		const float fieldMaximum = fieldStatistics.valid ? fieldStatistics.maximum : 0.0f;
+		const float solidDepth = isPlane ? std::max(m_AppState->mainModel->planeSolidDepth, 0.0001f) : 0.0f;
+		const float terrainWorldSize = std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f);
+		const float terrainHeightOffset = isPlane ? -fieldMinimum + solidDepth : 0.0f;
+		m_PlanarShadowCache->Update(
+			isPlane ? m_AppState->generationManager->GetHeightPyramid() : nullptr,
+			m_AppState->generationManager->GetTerrainRevision(),
+			m_RendererLights->m_Sun.direction,
+			glm::vec2(-terrainWorldSize * 0.5f),
+			terrainWorldSize,
+			terrainHeightOffset,
+			fieldMaximum,
+			0.0f);
 	}
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
 	switch (viewport->m_ViewportMode)

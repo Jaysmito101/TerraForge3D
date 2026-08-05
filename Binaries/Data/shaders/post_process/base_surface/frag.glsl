@@ -7,6 +7,26 @@ uniform mat4 u_ProjectionView;
 uniform vec3 u_CameraPosition;
 uniform vec2 u_ViewportResolution;
 uniform vec3 u_Color;
+uniform sampler2D u_TerrainPlanarShadow;
+uniform bool u_HasTerrainPlanarShadow;
+uniform vec2 u_PlanarShadowMinimumXZ;
+uniform vec2 u_PlanarShadowWorldSize;
+uniform bool u_EnableSkyLight;
+uniform samplerCube u_IrradianceMap;
+uniform float u_SkyLightIntensity;
+uniform vec3 u_SunDirection;
+uniform vec3 u_SunColor;
+uniform float u_SunIntensity;
+
+const float INV_PI = 0.3183098861837907;
+
+float SampleTerrainPlanarShadow(vec3 worldPosition)
+{
+	if (!u_HasTerrainPlanarShadow) return 1.0;
+	vec2 shadowUv = (worldPosition.xz - u_PlanarShadowMinimumXZ) / u_PlanarShadowWorldSize;
+	if (any(lessThan(shadowUv, vec2(0.0))) || any(greaterThan(shadowUv, vec2(1.0)))) return 1.0;
+	return texture(u_TerrainPlanarShadow, shadowUv).r;
+}
 
 void main()
 {
@@ -29,5 +49,12 @@ void main()
 	if (depth < 0.0 || depth > 1.0) discard;
 
 	gl_FragDepth = depth;
-	FragColor = vec4(u_Color, 1.0);
+	float terrainVisibility = SampleTerrainPlanarShadow(surfacePosition);
+	vec3 lightDirection = normalize(-u_SunDirection);
+	float nDotL = max(lightDirection.y, 0.0);
+	vec3 directLighting = u_SunColor * u_SunIntensity * nDotL * terrainVisibility;
+	vec3 skyLighting = u_EnableSkyLight
+		? textureLod(u_IrradianceMap, vec3(0.0, 1.0, 0.0), 0.0).rgb * u_SkyLightIntensity
+		: vec3(0.0);
+	FragColor = vec4(u_Color * (directLighting + skyLighting) * INV_PI, 1.0);
 }

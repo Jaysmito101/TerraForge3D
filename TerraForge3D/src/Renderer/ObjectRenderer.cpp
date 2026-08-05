@@ -80,6 +80,38 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 		glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ViewportResolution"), viewport->m_Width, viewport->m_Height);
 		glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_Color"),
 			67.0f / 255.0f, 88.0f / 255.0f, 114.0f / 255.0f);
+		auto* rendererLights = m_AppState->rendererManager->GetRendererLights();
+		auto* skyRenderer = m_AppState->rendererManager->GetSkyRenderer();
+		const bool enableSkyLight = rendererLights->m_UseSkyLight && skyRenderer->IsSkyReady();
+		const auto& baseSun = rendererLights->m_Sun;
+		glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_EnableSkyLight"), enableSkyLight ? 1 : 0);
+		glUniform1f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SkyLightIntensity"), rendererLights->m_SkyLightIntensity);
+		glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SunDirection"), baseSun.direction.x, baseSun.direction.y, baseSun.direction.z);
+		glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SunColor"), baseSun.color.x, baseSun.color.y, baseSun.color.z);
+		glUniform1f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SunIntensity"), baseSun.intensity);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, enableSkyLight ? skyRenderer->GetIrradianceMap() : 0);
+		glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_IrradianceMap"), 1);
+		auto* planarShadowCache = m_AppState->rendererManager->GetPlanarShadowCache();
+		const bool hasPlanarShadow = planarShadowCache != nullptr && planarShadowCache->IsReady();
+		if (hasPlanarShadow)
+		{
+			planarShadowCache->Bind(7);
+		}
+		else
+		{
+			glActiveTexture(GL_TEXTURE7);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_TerrainPlanarShadow"), 7);
+		glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_HasTerrainPlanarShadow"), hasPlanarShadow ? 1 : 0);
+		if (hasPlanarShadow)
+		{
+			const auto atlasMinimum = planarShadowCache->GetAtlasMinimumXZ();
+			const auto atlasWorldSize = planarShadowCache->GetAtlasWorldSize();
+			glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_PlanarShadowMinimumXZ"), atlasMinimum.x, atlasMinimum.y);
+			glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_PlanarShadowWorldSize"), atlasWorldSize.x, atlasWorldSize.y);
+		}
 		glBindVertexArray(m_PostProcessVao);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
