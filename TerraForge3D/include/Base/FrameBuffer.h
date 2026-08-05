@@ -11,11 +11,14 @@ public:
 	~FrameBuffer();
 
 	void Begin();
+	void ResolveColor();
+	void ResolveDepth();
 	void Resolve();
 	uint32_t End();
 
 	uint32_t GetColorTexture();
 	uint32_t GetDepthTexture();
+	uint32_t GetResolvedDepthTexture();
 	uint32_t GetRendererID();
 
 	inline int GetWidth()
@@ -28,6 +31,11 @@ public:
 	}
 
 private:
-	uint32_t colorTexture, multisampleColorTexture, depthTexture, fbo, resolveFbo;
+	uint32_t colorTexture = 0;
+	uint32_t multisampleColorTexture = 0;
+	uint32_t depthTexture = 0;
+	uint32_t resolvedDepthTexture = 0;
+	uint32_t fbo = 0;
+	uint32_t resolveFbo = 0;
 	int width, height;
 };

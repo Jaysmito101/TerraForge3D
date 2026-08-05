@@ -36,6 +36,17 @@ FrameBuffer::FrameBuffer(int w, int h)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
 
+	glGenTextures(1, &resolvedDepthTexture);
+	glBindTexture(GL_TEXTURE_2D, resolvedDepthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, w, h, 0,
+		GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+		resolvedDepthTexture, 0);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -44,6 +55,7 @@ FrameBuffer::~FrameBuffer()
 	glDeleteTextures(1, &colorTexture);
 	glDeleteTextures(1, &multisampleColorTexture);
 	glDeleteTextures(1, &depthTexture);
+	glDeleteTextures(1, &resolvedDepthTexture);
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteFramebuffers(1, &resolveFbo);
 }
@@ -63,9 +75,18 @@ void FrameBuffer::ResolveColor()
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
+void FrameBuffer::ResolveDepth()
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFbo);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+}
+
 void FrameBuffer::Resolve()
 {
 	ResolveColor();
+	ResolveDepth();
 }
 
 uint32_t FrameBuffer::End()
@@ -82,6 +103,11 @@ uint32_t FrameBuffer::GetColorTexture()
 uint32_t FrameBuffer::GetDepthTexture()
 {
 	return depthTexture;
+}
+
+uint32_t FrameBuffer::GetResolvedDepthTexture()
+{
+	return resolvedDepthTexture;
 }
 
 uint32_t FrameBuffer::GetRendererID()
