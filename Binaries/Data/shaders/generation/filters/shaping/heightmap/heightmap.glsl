@@ -9,6 +9,7 @@ layout(binding = 4) uniform sampler2D u_Heightmap;
 uniform bool u_HasHeightmap;
 uniform float u_HeightScale;
 uniform float u_HeightOffset;
+uniform bool u_FitToFieldRange;
 uniform float u_MapScale;
 uniform vec2 u_MapPosition;
 uniform float u_MapRotation;
@@ -47,5 +48,6 @@ void main()
 	if (u_Invert) height = 1.0f - height;
 
 	float importedHeight = height * u_HeightScale + u_HeightOffset;
+	if (u_FitToFieldRange) importedHeight = tf3dFieldDenormalize(importedHeight);
 	writeOutput(coordinate, mix(sampleInput(coordinate), importedHeight, coverage));
 }

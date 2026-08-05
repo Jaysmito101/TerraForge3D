@@ -1,3 +1,5 @@
+#include "field_statistics.glsl"
+
 layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D InputData;
 layout(TF3D_FIELD_FORMAT, binding = 2) writeonly uniform image2D OutputData;
 

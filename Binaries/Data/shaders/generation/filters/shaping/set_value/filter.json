@@ -4,6 +4,11 @@
     "Category": "Shaping",
     "Implementation": "PhaseChain",
     "Description": "Creates a constant operation field. The standard merge stage then applies it using the selected strength, mask, and merge mode.",
+    "Statistics": {
+        "NeedsMinMax": true,
+        "NeedsHistogram": true,
+        "RequestedPercentileParameter": "Value"
+    },
     "Phases": {
         "Value": "set_value",
         "Merge": "../../common/merge"
@@ -25,6 +30,9 @@
                 "Uniforms": {
                     "u_Value": {
                         "Parameter": "Value"
+                    },
+                    "u_ValueMode": {
+                        "Parameter": "ValueMode"
                     }
                 }
             }
@@ -37,6 +45,19 @@
         }
     },
     "Params": [
+        {
+            "Name": "ValueMode",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Dropdown",
+            "Options": [
+                "Absolute",
+                "Normalized range",
+                "Percentile"
+            ],
+            "Label": "Value mode",
+            "Description": "Chooses whether Value is an absolute height, a normalized position in the field range, or a histogram percentile."
+        },
         {
             "Name": "Value",
             "Type": "Float",

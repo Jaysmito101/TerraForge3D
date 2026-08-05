@@ -12,10 +12,8 @@ void main()
 	ivec2 coordinate = ivec2(gl_GlobalInvocationID.xy);
 	if (coordinate.x >= u_Resolution || coordinate.y >= u_Resolution) return;
 
-	float value = sampleInput(coordinate);
-	if (u_Abs) {
-		value = abs(value);
-	}
+	float value = tf3dFieldNormalize(sampleInput(coordinate));
+	if (u_Abs) value = abs(value);
 	float exponent = max(u_Exponent, 0.0001f);
-	writeOutput(coordinate, pow(max(value, 0.0f), exponent));
+	writeOutput(coordinate, tf3dFieldDenormalize(pow(max(value, 0.0f), exponent)));
 }

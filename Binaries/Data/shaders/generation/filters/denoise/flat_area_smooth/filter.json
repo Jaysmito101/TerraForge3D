@@ -4,6 +4,10 @@
     "Category": "Denoise",
     "Implementation": "PhaseChain",
     "Description": "Applies bilateral smoothing mainly to low-slope areas while protecting ridges and cliffs.",
+    "Statistics": {
+        "NeedsMinMax": true,
+        "NeedsHistogram": true
+    },
     "Phases": {
         "Filter": "bilateral_flat",
         "Merge": "../../common/merge"

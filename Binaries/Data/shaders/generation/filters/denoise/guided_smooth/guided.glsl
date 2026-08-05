@@ -31,7 +31,8 @@ void main()
 	meanSquare /= max(float(sampleCount), 1.0f);
 
 	float variance = max(meanSquare - mean * mean, 0.0f);
-	float epsilon = max(u_Epsilon, 0.000001f);
+	float statisticsRange = tf3dFieldScaleRange();
+	float epsilon = max(u_Epsilon * statisticsRange * statisticsRange, 0.000001f);
 	float coefficient = variance / (variance + epsilon);
 	float offset = mean - coefficient * mean;
 	float center = sampleInput(coordinate);

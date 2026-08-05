@@ -4,6 +4,10 @@
     "Category": "Shaping",
     "Implementation": "PhaseChain",
     "Description": "Applies a power curve followed by smoothstep, with an optional absolute-value step and no upward value overshoot.",
+    "Statistics": {
+        "NeedsMinMax": true,
+        "NeedsHistogram": false
+    },
     "Phases": {
         "Smoothen": "smoothen",
         "Merge": "../../common/merge"
@@ -24,7 +28,7 @@
                 "Output": "Smoothened",
                 "Uniforms": {
                     "u_Exponent": {
-                        "Parameter": "Exponent"
+                        "Parameter": "Smoothing"
                     },
                     "u_Abs": {
                         "Parameter": "Abs"

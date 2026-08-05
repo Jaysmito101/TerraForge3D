@@ -5,6 +5,10 @@
     "Implementation": "PhaseChain",
     "DefaultMergeMode": "Override",
     "Description": "Loads an image as a terrain field. The red channel is sampled across the full terrain area and can be scaled, offset, or inverted before merging.",
+    "Statistics": {
+        "NeedsMinMax": true,
+        "NeedsHistogram": false
+    },
     "Phases": {
         "Heightmap": "heightmap",
         "Merge": "../../common/merge"
@@ -33,6 +37,9 @@
                     },
                     "u_HeightOffset": {
                         "Parameter": "HeightOffset"
+                    },
+                    "u_FitToFieldRange": {
+                        "Parameter": "FitToFieldRange"
                     },
                     "u_MapScale": {
                         "Parameter": "MapScale"
@@ -139,6 +146,14 @@
             "Label": "Height offset",
             "Description": "Adds a constant offset to the sampled height values.",
             "Tooltip": "Shifts the imported heightmap up or down before the merge stage."
+        },
+        {
+            "Name": "FitToFieldRange",
+            "Type": "Bool",
+            "Default": false,
+            "Widget": "Checkbox",
+            "Label": "Fit to field range",
+            "Description": "Maps the imported normalized height into the current terrain min/max range before merging."
         },
         {
             "Name": "Invert",

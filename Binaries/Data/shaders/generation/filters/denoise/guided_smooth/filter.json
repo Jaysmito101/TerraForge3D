@@ -4,6 +4,10 @@
     "Category": "Denoise",
     "Implementation": "PhaseChain",
     "Description": "Uses a local linear model to smooth flat detail while retaining terrain edges.",
+    "Statistics": {
+        "NeedsMinMax": true,
+        "NeedsHistogram": true
+    },
     "Phases": {
         "Filter": "guided",
         "Merge": "../../common/merge"

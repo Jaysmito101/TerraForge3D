@@ -16,7 +16,8 @@ void main()
 
 	int radius = clamp(u_Radius, 1, 6);
 	float spatialSigma = max(float(radius) * 0.5f, 0.5f);
-	float rangeSigma = max(u_RangeSigma, 0.000001f);
+	float statisticsRange = tf3dFieldScaleRange();
+	float rangeSigma = max(u_RangeSigma * statisticsRange, 0.000001f);
 	float center = sampleInput(coordinate);
 	float filtered = 0.0f;
 	float weightSum = 0.0f;
@@ -39,7 +40,7 @@ void main()
 
 	float dx = 0.5f * (sampleInput(coordinate + ivec2(1, 0)) - sampleInput(coordinate + ivec2(-1, 0)));
 	float dy = 0.5f * (sampleInput(coordinate + ivec2(0, 1)) - sampleInput(coordinate + ivec2(0, -1)));
-	float slope = length(vec2(dx, dy));
+	float slope = length(vec2(dx, dy)) / statisticsRange;
 	float slopeEnd = u_SlopeLimit + max(u_SlopeSoftness, 0.000001f);
 	float flatInfluence = 1.0f - smoothstep(max(u_SlopeLimit, 0.0f), slopeEnd, slope);
 	writeOutput(coordinate, mix(center, filtered, clamp(flatInfluence, 0.0f, 1.0f)));

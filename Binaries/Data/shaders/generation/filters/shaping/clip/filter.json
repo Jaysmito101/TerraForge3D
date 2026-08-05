@@ -4,6 +4,11 @@
     "Category": "Shaping",
     "Implementation": "PhaseChain",
     "Description": "Clips terrain values from the bottom or top with an IQ-style smooth minimum or maximum around the threshold.",
+    "Statistics": {
+        "NeedsMinMax": true,
+        "NeedsHistogram": true,
+        "RequestedPercentileParameter": "Threshold"
+    },
     "Phases": {
         "Clip": "clip",
         "Merge": "../../common/merge"
@@ -31,6 +36,9 @@
                     },
                     "u_Softness": {
                         "Parameter": "Softness"
+                    },
+                    "u_ThresholdMode": {
+                        "Parameter": "ThresholdMode"
                     }
                 }
             }
@@ -54,6 +62,19 @@
             ],
             "Label": "Clip side",
             "Description": "Selects whether values below or above the threshold are clipped."
+        },
+        {
+            "Name": "ThresholdMode",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Dropdown",
+            "Options": [
+                "Absolute",
+                "Normalized range",
+                "Percentile"
+            ],
+            "Label": "Threshold mode",
+            "Description": "Chooses whether Threshold is an absolute height, a normalized position in the field range, or a histogram percentile."
         },
         {
             "Name": "Threshold",
