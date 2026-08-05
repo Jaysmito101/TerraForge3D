@@ -18,8 +18,8 @@ void main()
 
 	ivec2 sourceSize = ivec2(u_SourceSize);
 	ivec2 sourceOrigin = u_SourceIsHeightmap ? outputCoordinate : outputCoordinate * 2;
-	float minimumHeight = 3.402+38;
-	float maximumHeight = -3.402+38;
+	float minimumHeight = 3.402823466e+38;
+	float maximumHeight = -3.402823466e+38;
 
 	int sampleCount = u_SourceIsHeightmap ? 1 : 4;
 	for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex)
