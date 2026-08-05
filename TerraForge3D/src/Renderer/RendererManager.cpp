@@ -11,6 +11,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 
 	m_RendererLights = std::make_shared<RendererLights>(appState);
 	m_RendererSky = std::make_shared<RendererSky>(appState);
+	m_TerrainSelfShadow = std::make_shared<TerrainSelfShadow>(appState);
 }
 
 RendererManager::~RendererManager()
@@ -25,6 +26,15 @@ void RendererManager::Render(RendererViewport* viewport)
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	viewport->m_Camera.UpdateCamera();
 	m_RendererSky->Render(viewport);
+	if (m_TerrainSelfShadow != nullptr && m_AppState->generationManager != nullptr && m_RendererLights != nullptr)
+	{
+		m_TerrainSelfShadow->Update(
+			m_AppState->generationManager->GetHeightmapData(),
+			m_AppState->generationManager->GetHeightPyramid(),
+			m_AppState->generationManager->GetTerrainRevision(),
+			m_RendererLights->m_Sun.direction,
+			std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f));
+	}
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
 	switch (viewport->m_ViewportMode)
 	{
@@ -39,88 +49,89 @@ void RendererManager::Render(RendererViewport* viewport)
 
 void RendererManager::ShowSettings()
 {
-	if (!this->m_IsWindowVisible) return;
-	ImGui::Begin("Renderer Settings", &this->m_IsWindowVisible);
-	ImGui::PushID("Renderer Settings");
-	if (ImGui::CollapsingHeader("Core Settings"))
+	if (this->m_IsWindowVisible)
 	{
-		if (ImGui::BeginTabBar("Core Settings Type"))
+		ImGui::Begin("Renderer Settings", &this->m_IsWindowVisible);
+		ImGui::PushID("Renderer Settings");
+		if (ImGui::CollapsingHeader("Core Settings"))
 		{
-			if (ImGui::BeginTabItem("Object"))
+			if (ImGui::BeginTabBar("Core Settings Type"))
 			{
-				ImGui::PushID("Core Settings Type->Object");
-				m_ObjectRenderer->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
+				if (ImGui::BeginTabItem("Object"))
+				{
+					ImGui::PushID("Core Settings Type->Object");
+					m_ObjectRenderer->ShowSettings();
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Wireframe"))
+				{
+					ImGui::PushID("Core Settings Type->Wireframe");
+					m_WireframeRenderer->ShowSettings();
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Heightmap"))
+				{
+					ImGui::PushID("Core Settings Type->Heightmap");
+					m_HeightmapRenderer->ShowSettings();
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Texture Slot"))
+				{
+					ImGui::PushID("Core Settings Type->Texture Slot");
+					m_TextureSlotRenderer->ShowSettings();
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
 			}
-			if (ImGui::BeginTabItem("Wireframe")) 
-			{
-				ImGui::PushID("Core Settings Type->Wireframe");
-				m_WireframeRenderer->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Heightmap"))
-			{
-				ImGui::PushID("Core Settings Type->Heightmap");
-				m_HeightmapRenderer->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Texture Slot"))
-			{
-				ImGui::PushID("Core Settings Type->Texture Slot");
-				m_TextureSlotRenderer->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			ImGui::EndTabBar();
 		}
-	}
-	ImGui::PopID();
-	ImGui::Separator();
-	ImGui::PushID("Items Settings");
-	if (ImGui::CollapsingHeader("Items")) 
-	{
-		if (ImGui::BeginTabBar("Items Settings"))
+		ImGui::PopID();
+		ImGui::Separator();
+		ImGui::PushID("Items Settings");
+		if (ImGui::CollapsingHeader("Items"))
 		{
-			if (ImGui::BeginTabItem("Terrain"))
+			if (ImGui::BeginTabBar("Items Settings"))
 			{
-				ImGui::PushID("Terrain");
-				
-				ImGui::PopID();
-				ImGui::EndTabItem();
+				if (ImGui::BeginTabItem("Terrain"))
+				{
+					ImGui::PushID("Terrain");
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Lights"))
+				{
+					ImGui::PushID("Lights");
+					m_RendererLights->ShowSettings();
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Sky"))
+				{
+					ImGui::PushID("Sky");
+					m_RendererSky->ShowSettings();
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Sea"))
+				{
+					ImGui::PushID("Sea");
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Objects"))
+				{
+					ImGui::PushID("Objects");
+					ImGui::PopID();
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
 			}
-			if (ImGui::BeginTabItem("Lights"))
-			{
-				ImGui::PushID("Lights");
-				m_RendererLights->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Sky"))
-			{
-				ImGui::PushID("Sky");
-				m_RendererSky->ShowSettings();
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Sea"))
-			{
-				ImGui::PushID("Sea");
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Objects"))
-			{
-				ImGui::PushID("Objects");
-				ImGui::PopID();
-				ImGui::EndTabItem();
-			}
-			ImGui::EndTabBar();
 		}
+		ImGui::PopID();
+		ImGui::Separator();
+		ImGui::End();
 	}
-	ImGui::PopID();
-	ImGui::Separator();
-	ImGui::End();
 }

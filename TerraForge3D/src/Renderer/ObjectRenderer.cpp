@@ -36,6 +36,19 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	auto* terrainSelfShadow = m_AppState->rendererManager->GetTerrainSelfShadow();
+	const bool hasTerrainSelfShadow = terrainSelfShadow != nullptr && terrainSelfShadow->IsReady();
+	if (hasTerrainSelfShadow)
+	{
+		terrainSelfShadow->Bind(6);
+	}
+	else
+	{
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TerrainSelfShadow"), 6);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainSelfShadow"), hasTerrainSelfShadow ? 1 : 0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SlopeTexture"), 5);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasSlopeTexture"), hasSlopeTexture ? 1 : 0);
 	//glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Projection"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.pers));
@@ -46,6 +59,7 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertNormals"), m_InvertNormals);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewNormals"), m_ViewNormals ? 1 : 0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewSlope"), m_ViewSlope ? 1 : 0);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewTerrainSelfShadow"), m_ViewTerrainSelfShadow ? 1 : 0);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
 	const bool isPlane = m_AppState->mainModel != nullptr && m_AppState->mainModel->isGeneratedPlane;
@@ -122,6 +136,7 @@ void ObjectRenderer::ShowSettings()
 	ImGui::Checkbox("Invert Normals", &m_InvertNormals);
 	if (ImGui::Checkbox("View Normals", &m_ViewNormals) && m_ViewNormals) m_ViewSlope = false;
 	if (ImGui::Checkbox("View Slope", &m_ViewSlope) && m_ViewSlope) m_ViewNormals = false;
+	ImGui::Checkbox("View Terrain Self Shadow", &m_ViewTerrainSelfShadow);
 	if (ImGui::Button("Reload Shaders")) ReloadShaders();
 }
 

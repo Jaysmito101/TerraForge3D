@@ -19,6 +19,8 @@ layout(std430, binding = 1) buffer SharedDataBuffer1
 
 uniform sampler2D u_SlopeTexture;
 uniform bool u_HasSlopeTexture;
+uniform sampler2D u_TerrainSelfShadow;
+uniform bool u_HasTerrainSelfShadow;
 
 const float PI = 3.141592653589793;
 const float INV_PI = 0.3183098861837907;
@@ -35,6 +37,7 @@ uniform bool u_InvertNormals;
 uniform vec3 u_CameraPosition;
 uniform bool u_ViewNormals;
 uniform bool u_ViewSlope;
+uniform bool u_ViewTerrainSelfShadow;
 
 uniform vec3 u_SunDirection;
 uniform vec3 u_SunColor;
@@ -149,6 +152,12 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+float SampleTerrainSelfShadow()
+{
+	if (!u_HasTerrainSelfShadow || fragmentInput.texCoord.z > 0.5f) return 1.0;
+	return texture(u_TerrainSelfShadow, clamp(fragmentInput.texCoord.xy, vec2(0.0), vec2(1.0))).r;
+}
+
 vec3 EvaluateSun(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
 {
 	vec3 L = normalize(-u_SunDirection);
@@ -166,7 +175,7 @@ vec3 EvaluateSun(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
 	vec3 specular = (D * G * F) / max(4.0 * nDotV * nDotL, EPSILON);
 	vec3 diffuse = (1.0 - F) * (1.0 - metallic) * albedo * INV_PI;
 	vec3 radiance = u_SunColor * u_SunIntensity;
-	return (diffuse + specular) * radiance * nDotL;
+	return (diffuse + specular) * radiance * nDotL * SampleTerrainSelfShadow();
 }
 
 vec3 EvaluateImageBasedLighting(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
@@ -226,6 +235,13 @@ void main()
 	if (u_ViewNormals)
 	{
 		FragColor = vec4(normal * 0.5 + 0.5, 1.0);
+		return;
+	}
+
+	if (u_ViewTerrainSelfShadow)
+	{
+		float visibility = SampleTerrainSelfShadow();
+		FragColor = vec4(vec3(visibility), 1.0);
 		return;
 	}
 	

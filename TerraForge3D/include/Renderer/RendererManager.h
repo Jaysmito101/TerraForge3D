@@ -8,6 +8,7 @@
 
 #include "Renderer/RendererLights.h"
 #include "Renderer/RendererSky.h"
+#include "Renderer/TerrainSelfShadow.h"
 
 class ApplicationState;
 
@@ -24,6 +25,7 @@ public:
 
 	inline RendererLights* GetRendererLights() { return m_RendererLights.get(); }
 	inline RendererSky* GetSkyRenderer() { return m_RendererSky.get(); }
+	inline TerrainSelfShadow* GetTerrainSelfShadow() { return m_TerrainSelfShadow.get(); }
 
 	inline ObjectRenderer* GetObjectRenderer() { return static_cast<ObjectRenderer*>(m_ObjectRenderer.get()); }
 	inline HeightmapRenderer* GetHeightmapRenderer() { return static_cast<HeightmapRenderer*>(m_HeightmapRenderer.get()); }
@@ -43,5 +45,6 @@ private:
 
 	std::shared_ptr<RendererLights> m_RendererLights;
 	std::shared_ptr<RendererSky> m_RendererSky;
+	std::shared_ptr<TerrainSelfShadow> m_TerrainSelfShadow;
 };
 
