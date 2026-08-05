@@ -8,7 +8,7 @@ out VertexData
 {
   vec3 position;
   vec3 normal;
-  vec2 texCoord;
+  vec4 texCoord;
 } vertexOutput;
 
 layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D u_Heightmap;
@@ -19,6 +19,10 @@ uniform vec2 u_TileOffset;
 uniform mat4 u_Projection;
 uniform mat4 u_View;
 uniform mat4 u_ProjectionView;
+uniform bool u_PlaneMode;
+uniform float u_FieldMinimum;
+uniform float u_HeightOffset;
+uniform float u_SolidDepth;
 
 
 int PixelCoordToDataOffset(int x, int y)
@@ -31,11 +35,22 @@ int PixelCoordToDataOffset(int x, int y)
 void main()
 {
     vec2 texCoord = aTexCoord.xy;
-    vec3 position = aPosition.xyz + aNormal.xyz * SampleHeightBilinear(texCoord);
+    float height = SampleHeightBilinear(texCoord);
+    vec3 position = aPosition.xyz;
+	if (aTexCoord.z > 0.5f)
+    {
+        if (aTexCoord.w > 0.5f) position.y += height + u_HeightOffset;
+		else if (u_PlaneMode) position.y = u_FieldMinimum - u_SolidDepth + u_HeightOffset;
+    }
+    else
+    {
+        position += aNormal.xyz * height;
+		if (u_PlaneMode) position.y += u_HeightOffset;
+    }
     //vec3 position = aPosition.xyz + aNormal.xyz * data0[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;
-    vertexOutput.normal = aNormal.xyz;
-    vertexOutput.texCoord = texCoord;
+	vertexOutput.normal = aNormal.xyz;
+    vertexOutput.texCoord = aTexCoord;
     gl_Position = u_ProjectionView * vec4(position, 1.0);
 }

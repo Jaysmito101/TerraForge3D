@@ -6,7 +6,7 @@ in VertexData
 {
   vec3 position;
   vec3 normal;
-  vec2 texCoord;
+  vec4 texCoord;
 } fragmentInput;
 
 layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D u_Heightmap;
@@ -20,9 +20,7 @@ const float PI = 3.141592653589793;
 const float INV_PI = 0.3183098861837907;
 const float EPSILON = 0.0001;
 
-// Temporary terrain material. These become material inputs when material
-// textures and inspector parameters are introduced.
-const vec3 MATERIAL_ALBEDO = vec3(1.0);
+const vec3 MATERIAL_ALBEDO = vec3(0.98, 0.96, 0.90);
 const float MATERIAL_METALLIC = 0.0;
 const float MATERIAL_ROUGHNESS = 0.58;
 
@@ -31,8 +29,6 @@ uniform float u_TileSize;
 uniform bool u_InvertNormals;
 uniform vec3 u_CameraPosition;
 
-// Direction points from the sun toward the scene. The incoming light vector
-// is therefore -u_SunDirection.
 uniform vec3 u_SunDirection;
 uniform vec3 u_SunColor;
 uniform float u_SunIntensity;
@@ -61,12 +57,17 @@ int PixelCoordToDataOffset(int x, int y)
 
 vec3 calculateNormal()
 {
+	if (fragmentInput.texCoord.z > 0.5f)
+	{
+		vec3 solidNormal = normalize(fragmentInput.normal);
+		return u_InvertNormals ? -solidNormal : solidNormal;
+	}
 	vec3 up = normalize(fragmentInput.normal);
-	float height = SampleHeightBilinear(fragmentInput.texCoord);
+	float height = SampleHeightBilinear(fragmentInput.texCoord.xy);
 	vec3 basePosition = fragmentInput.position - up * height;
-	vec2 heightGradient = SampleHeightGradient(fragmentInput.texCoord);
-	vec3 dx = dFdx(basePosition) + up * dot(heightGradient, dFdx(fragmentInput.texCoord));
-	vec3 dy = dFdy(basePosition) + up * dot(heightGradient, dFdy(fragmentInput.texCoord));
+	vec2 heightGradient = SampleHeightGradient(fragmentInput.texCoord.xy);
+	vec3 dx = dFdx(basePosition) + up * dot(heightGradient, dFdx(fragmentInput.texCoord.xy));
+	vec3 dy = dFdy(basePosition) + up * dot(heightGradient, dFdy(fragmentInput.texCoord.xy));
 	vec3 normal = normalize(cross(dx, dy));
 	return u_InvertNormals ? -normal : normal;
 }
@@ -161,21 +162,21 @@ void main()
 		float distanceVal = length(gl_FragCoord.xy / u_ViewportResolution - u_MousePos);
 		if (distanceVal < 1.0 / u_ViewportResolution.x)
 		{
-			sharedData1 = vec4(fragmentInput.texCoord, 0.0, distanceVal);
+		sharedData1 = vec4(fragmentInput.texCoord.xy, 0.0, distanceVal);
 		}
 	}
 
 	vec3 normal = calculateNormal();
 	vec3 viewDirection = normalize(u_CameraPosition - fragmentInput.position);
 	vec3 color = EvaluateSun(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, MATERIAL_ROUGHNESS);
-	color += EvaluateImageBasedLighting(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, MATERIAL_ROUGHNESS);
+		color += EvaluateImageBasedLighting(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, MATERIAL_ROUGHNESS);
 
 	color = ACESFilm(max(color, vec3(0.0)));
 	color = pow(max(color, vec3(0.0)), vec3(1.0 / 2.2));
 
-	if (u_DrawMask)
+	if (u_DrawMask && !isSolidSlab)
 	{
-		float maskValue = texture(u_MaskTexture, fragmentInput.texCoord).r;
+		float maskValue = texture(u_MaskTexture, fragmentInput.texCoord.xy).r;
 		if (u_InvertMask) maskValue = 1.0 - maskValue;
 		color = mix(color, u_MaskColor, clamp(maskValue * 0.65, 0.0, 1.0));
 	}
@@ -183,7 +184,7 @@ void main()
 	if (u_RequiresDrawBrush)
 	{
 		const vec3 brushColor = vec3(1.0, 0.0, 0.0);
-		float distanceVal = length(fragmentInput.texCoord - u_BrushSettings0.xy);
+		float distanceVal = length(fragmentInput.texCoord.xy - u_BrushSettings0.xy);
 		float falloff = smoothstep(u_BrushSettings0.z * (1.0 - u_BrushSettings0.w), u_BrushSettings0.z, distanceVal);
 		color = mix(color, brushColor, (1.0 - falloff) * 0.75);
 	}

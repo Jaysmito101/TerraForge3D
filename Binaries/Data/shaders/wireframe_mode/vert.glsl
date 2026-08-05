@@ -31,7 +31,15 @@ void main()
 {
     vec2 texCoord = aTexCoord.xy;
     ivec2 pointCoord = ivec2(texCoord * 0.975f * u_Resolution);
-	vec3 position = aPosition.xyz + aNormal.xyz * imageLoad(u_Heightmap, pointCoord).r;
+    vec3 position = aPosition.xyz;
+    if (aTexCoord.z > 0.5f)
+    {
+        if (aTexCoord.w > 0.5f) position.y += imageLoad(u_Heightmap, pointCoord).r;
+    }
+    else
+    {
+        position += aNormal.xyz * imageLoad(u_Heightmap, pointCoord).r;
+    }
     //vec3 position = aPosition.xyz + aNormal.xyz * position_normals[pointCoord.y * u_Resolution + pointCoord.x].x;
     //vec3 position = aPosition.xyz + aNormal.xyz * sin(pointCoord.y * 0.2);
     vertexOutput.position = position;

@@ -23,6 +23,7 @@ void RendererManager::Render(RendererViewport* viewport)
 	glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
 	glEnable(GL_MULTISAMPLE);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	viewport->m_Camera.UpdateCamera();
 	m_RendererSky->Render(viewport);
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
 	switch (viewport->m_ViewportMode)
