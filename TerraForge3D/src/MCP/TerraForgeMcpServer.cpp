@@ -1,11 +1,9 @@
-#include "mcp_resource.h"
 #include "mcp_server.h"
-#include "mcp_tool.h"
 
-#include "MCP/ActionRegistry.h"
-#include "MCP/MainThreadRequestQueue.h"
-#include "MCP/ResourceRegistry.h"
+#include "MCP/Resources/CoreResources.h"
 #include "MCP/TerraForgeMcpServer.h"
+#include "MCP/Tools/CoreTools.h"
+#include "MCP/McpTransport.h"
 
 #include "Base/Logging/Logger.h"
 #include "Data/VersionInfo.h"
@@ -15,12 +13,10 @@
 #include <ctime>
 #include <filesystem>
 #include <fstream>
-#include <functional>
 #include <iomanip>
 #include <memory>
 #include <mutex>
 #include <sstream>
-#include <stdexcept>
 #include <utility>
 
 namespace
@@ -81,81 +77,16 @@ namespace
         mcp::set_log_sink({});
     }
 
-    nlohmann::json CreateResourceContent(
-        const ResourceEntry &entry,
-        const McpResult &result)
-    {
-        if (!result.ok)
-            throw std::runtime_error(result.ToErrorMessage());
-
-        nlohmann::json content = result.value;
-        if (!content.is_object()) {
-            content = {
-                {"uri", entry.uriOrTemplate},
-                {"mimeType", entry.mimeType},
-                {"text", content.dump()}};
-        }
-        if (!content.contains("uri"))
-            content["uri"] = entry.uriOrTemplate;
-        if (!content.contains("mimeType"))
-            content["mimeType"] = entry.mimeType;
-        return content;
-    }
-
-    class RegistryResource final : public mcp::resource
-    {
-    public:
-        RegistryResource(
-            ResourceEntry entry,
-            MainThreadRequestQueue *requestQueue,
-            std::function<void()> onRead)
-            : entry(std::move(entry)), requestQueue(requestQueue), onRead(std::move(onRead))
-        {
-        }
-
-        mcp::json get_metadata() const override
-        {
-            return {
-                {"uri", entry.uriOrTemplate},
-                {"name", entry.name},
-                {"description", entry.description},
-                {"mimeType", entry.mimeType}};
-        }
-
-        mcp::json read() const override
-        {
-            if (onRead)
-                onRead();
-            const auto result = requestQueue->Execute([entry = entry]() {
-                return entry.read({entry.uriOrTemplate, {}});
-            });
-            return CreateResourceContent(entry, result);
-        }
-
-        bool is_modified() const override
-        {
-            return false;
-        }
-
-        std::string get_uri() const override
-        {
-            return entry.uriOrTemplate;
-        }
-
-    private:
-        ResourceEntry entry;
-        MainThreadRequestQueue *requestQueue;
-        std::function<void()> onRead;
-    };
-} // namespace
+}
 
 TerraForgeMcpServer::TerraForgeMcpServer(
     ApplicationState *applicationState,
     std::string logsDirectory)
-    : applicationState(applicationState), logsDirectory(std::move(logsDirectory)), port(ReadMcpPort())
+    : logsDirectory(std::move(logsDirectory)), port(ReadMcpPort())
 {
     endpoint = "http://" + host + ":" + std::to_string(port) + "/mcp";
-    RegisterCoreEntries();
+    RegisterMcpCoreTools(actions, applicationState);
+    RegisterMcpCoreResources(resources, applicationState);
 }
 
 TerraForgeMcpServer::~TerraForgeMcpServer()
@@ -184,7 +115,20 @@ bool TerraForgeMcpServer::Start()
     server->set_instructions(
         "TerraForge3D exposes registered actions as MCP tools and readable state as MCP resources.");
 
-    RegisterEntries();
+    RegisterMcpTransport(
+        *server,
+        actions,
+        resources,
+        requestQueue,
+        [this](const std::string &method,
+               const std::string &paramsJson,
+               const std::string &sessionId) {
+            try {
+                RecordCommand(method, nlohmann::json::parse(paramsJson), sessionId);
+            } catch (...) {
+                RecordCommand(method, nlohmann::json{{"raw", paramsJson}}, sessionId);
+            }
+        });
     OpenCallHistory();
     if (!server->start(false)) {
         server.reset();
@@ -337,118 +281,5 @@ void TerraForgeMcpServer::RecordCommand(
     if (callHistory.is_open()) {
         callHistory << historyEntry.dump() << '\n';
         callHistory.flush();
-    }
-}
-
-void TerraForgeMcpServer::RegisterCoreEntries()
-{
-    actions.Register({"tf3d.mcp.status",
-                      "MCP status",
-                      "Return the TerraForge3D MCP bridge status and protocol revision.",
-                      nlohmann::json{
-                          {"type", "object"},
-                          {"properties", nlohmann::json::object()}},
-                      nlohmann::json{{"readOnlyHint", true}},
-                      ActionFlags::ReadOnly,
-                      [this](const nlohmann::json &) {
-                          return McpResult::Success({{"applicationAttached", applicationState != nullptr},
-                                                     {"version", TERR3D_VERSION_STRING},
-                                                     {"protocolVersion", mcp::MCP_VERSION},
-                                                     {"transport", "streamable-http"}});
-                      }});
-
-    resources.Register({"terraforge://mcp/status",
-                        "MCP status",
-                        "Current TerraForge3D MCP bridge status.",
-                        "application/json",
-                        false,
-                        [this](const ResourceRequest &request) {
-                            const nlohmann::json status = {
-                                {"applicationAttached", applicationState != nullptr},
-                                {"version", TERR3D_VERSION_STRING},
-                                {"protocolVersion", mcp::MCP_VERSION},
-                                {"transport", "streamable-http"}};
-                            return McpResult::Success({{"uri", request.uri},
-                                                       {"mimeType", "application/json"},
-                                                       {"text", status.dump()}});
-                        }});
-}
-
-void TerraForgeMcpServer::RegisterEntries()
-{
-    nlohmann::json capabilities = nlohmann::json::object();
-    const auto actionEntries    = actions.Snapshot();
-    const auto resourceEntries  = resources.Snapshot();
-    if (!actionEntries.empty())
-        capabilities["tools"] = nlohmann::json::object();
-    if (!resourceEntries.empty())
-        capabilities["resources"] = nlohmann::json::object();
-    server->set_capabilities(capabilities);
-
-    for (const auto &entry : actionEntries) {
-        mcp::tool tool{
-            entry.name,
-            entry.description,
-            entry.inputSchema,
-            entry.annotations};
-
-        server->register_tool(tool, [this, name = entry.name](const nlohmann::json &arguments, const std::string &sessionId) {
-            RecordCommand(
-                "tools/call",
-                nlohmann::json{
-                    {"name", name},
-                    {"arguments", nlohmann::json::parse(arguments.dump())}},
-                sessionId);
-            const auto registeredAction = actions.Find(name);
-            if (!registeredAction) {
-                throw std::runtime_error("MCP action is no longer registered: " + name);
-            }
-
-            const McpResult result = requestQueue.Execute([registeredAction = *registeredAction,
-                                                           arguments]() {
-                return registeredAction.invoke(arguments);
-            });
-            if (!result.ok)
-                throw std::runtime_error(result.ToErrorMessage());
-            return result.ToToolContent();
-        });
-    }
-
-    for (const auto &entry : resourceEntries) {
-        if (!entry.isTemplate) {
-            server->register_resource(
-                entry.uriOrTemplate,
-                std::make_shared<RegistryResource>(
-                    entry,
-                    &requestQueue,
-                    [this, uri = entry.uriOrTemplate]() {
-                        RecordCommand(
-                            "resources/read",
-                            nlohmann::json{{"uri", uri}},
-                            "");
-                    }));
-            continue;
-        }
-
-        server->register_resource_template(
-            entry.uriOrTemplate,
-            entry.name,
-            entry.mimeType,
-            entry.description,
-            [this, entry](
-                const std::string &uri,
-                const std::map<std::string, std::string> &parameters,
-                const std::string &sessionId) {
-                RecordCommand(
-                    "resources/read",
-                    nlohmann::json{{"uri", uri}},
-                    sessionId);
-                const McpResult result = requestQueue.Execute([entry,
-                                                               uri,
-                                                               parameters]() {
-                    return entry.read({uri, parameters});
-                });
-                return CreateResourceContent(entry, result);
-            });
     }
 }

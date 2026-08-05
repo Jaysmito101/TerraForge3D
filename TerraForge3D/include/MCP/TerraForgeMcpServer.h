@@ -60,10 +60,7 @@ private:
         const std::string &method,
         const nlohmann::json &params,
         const std::string &sessionId);
-    void RegisterCoreEntries();
-    void RegisterEntries();
 
-    ApplicationState *applicationState = nullptr;
     std::string logsDirectory;
     const std::string host = "127.0.0.1";
     int port               = 9823;
