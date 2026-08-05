@@ -67,23 +67,35 @@ public:
 		if (!appState->states.ruinning) return;
 		{
 			TF3D_PROFILE_SCOPE("app/update/jobs");
-			appState->jobSystem->Update();
-			appState->dashboard->Update();
-			appState->exportManager->Update();
-			appState->generationManager->Update();
+			{
+				TF3D_PROFILE_SCOPE("app/update/jobsystem");
+				appState->jobSystem->Update();
+			}
+			{
+				TF3D_PROFILE_SCOPE("app/update/dashboard");
+				appState->dashboard->Update();
+			}
+			{
+				TF3D_PROFILE_SCOPE("app/update/export");
+				appState->exportManager->Update();
+			}
+			{
+				TF3D_PROFILE_SCOPE("app/update/generation");
+				appState->generationManager->Update();
+			}
 		}
 		{
 			TF3D_PROFILE_SCOPE("app/update/viewports");
 			for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) appState->viewportManagers[i]->Update();
 		}
 
-		// NOTE: This is a temporary hack to fix the brush not working on all viewports
-		appState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(nullptr);
+		{
+			TF3D_PROFILE_SCOPE("app/update/misc");
+			// NOTE: This is a temporary hack to fix the brush not working on all viewports
+			appState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(nullptr);
 
-
-
-		// CTRL Shortcuts
-		if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))
+			// CTRL Shortcuts
+			if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL)))
 		{
 			// Open Shortcut
 			// if (glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_O)) appState->serailizer->LoadFile(ShowOpenFileDialog("*.terr3d"));
@@ -128,10 +140,10 @@ public:
 					// appState->serailizer->SaveFile(ShowSaveFileDialog("*.terr3d"));
 				}
 			}
+			}
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
-
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		{
 			TF3D_PROFILE_SCOPE("app/ui");
 			RenderImGui();

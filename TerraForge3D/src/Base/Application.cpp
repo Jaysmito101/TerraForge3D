@@ -153,12 +153,19 @@ void Application::Run(std::string loadFile)
 
 		if (oneSecCounter >= 1)
 		{
+			TF3D_PROFILE_SCOPE("app/one-second-tick");
 			OnOneSecondTick();
 			oneSecCounter = 0;
 		}
 
-		Render();
-		m_Window->Update();
+		{
+			TF3D_PROFILE_SCOPE("app/render");
+			Render();
+		}
+		{
+			TF3D_PROFILE_SCOPE("app/present");
+			m_Window->Update();
+		}
 		frameProfile.End();
 		PerformanceMonitor::Get().EndFrame();
 	}

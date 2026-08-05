@@ -1,8 +1,11 @@
 #include "Misc/ViewportManager.h"
 #include "Data/ApplicationState.h"
 #include "Base/Base.h"
+#include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
+
+#include <string>
 
 ViewportManager::ViewportManager(ApplicationState* appState)
 {
@@ -21,6 +24,7 @@ ViewportManager::~ViewportManager()
 
 void ViewportManager::Update()
 {
+	TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/update");
 	if (m_AutoCalculateAspectRatio) m_RendererViewport->m_Camera.SetAspectRatio(m_Width / (m_Height + 0.000000001f));
 	if (m_IsVisible)
 	{
@@ -30,8 +34,15 @@ void ViewportManager::Update()
 		constexpr float renderScale = 1.5f;
 		const uint32_t renderWidth = static_cast<uint32_t>(std::max(m_Width * scaleX * renderScale, 1.0f));
 		const uint32_t renderHeight = static_cast<uint32_t>(std::max(m_Height * scaleY * renderScale, 1.0f));
-		m_RendererViewport->ResizeTo(renderWidth, renderHeight);
+		{
+			TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/resize");
+			m_RendererViewport->ResizeTo(renderWidth, renderHeight);
+		}
 		this->m_AppState->rendererManager->Render(this->m_RendererViewport);
+	}
+	else
+	{
+		TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/hidden");
 	}
 	m_IsActive &= m_IsVisible;
 }

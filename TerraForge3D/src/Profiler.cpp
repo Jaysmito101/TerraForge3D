@@ -85,7 +85,6 @@ namespace
 		const std::string displayName = ShortTaskName(node.key);
 		const std::string label = displayName + "##" + path;
 		const bool open = ImGui::TreeNodeEx(label.c_str(), flags);
-		// if (ImGui::IsItemHovered() && displayName != node.key) ImGui::SetTooltip("%s", node.key.c_str());
 		ImGui::TableSetColumnIndex(1);
 		ImGui::Text("%.3f ms", node.recordedMs);
 		ImGui::TableSetColumnIndex(2);
