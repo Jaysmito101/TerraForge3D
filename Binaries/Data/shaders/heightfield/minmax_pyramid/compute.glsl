@@ -2,7 +2,7 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(binding = 0, rg32f) writeonly uniform image2D u_Output;
+layout(binding = 0, rgba32f) writeonly uniform image2D u_Output;
 
 uniform sampler2D u_Heightmap;
 uniform sampler2D u_Pyramid;
@@ -20,27 +20,28 @@ void main()
 	ivec2 sourceOrigin = u_SourceIsHeightmap ? outputCoordinate : outputCoordinate * 2;
 	float minimumHeight = 3.402823466e+38;
 	float maximumHeight = -3.402823466e+38;
+	float averageHeight = 0.0;
 
-	int sampleCount = u_SourceIsHeightmap ? 1 : 4;
-	for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex)
+	if (u_SourceIsHeightmap)
 	{
-		ivec2 offset = u_SourceIsHeightmap
-			? ivec2(0)
-			: ivec2(sampleIndex & 1, sampleIndex >> 1);
-		ivec2 sourceCoordinate = clamp(sourceOrigin + offset, ivec2(0), sourceSize - 1);
-		if (u_SourceIsHeightmap)
+		float height = texelFetch(u_Heightmap, sourceOrigin, 0).r;
+		minimumHeight = height;
+		maximumHeight = height;
+		averageHeight = height;
+	}
+	else
+	{
+		for (int sampleIndex = 0; sampleIndex < 4; ++sampleIndex)
 		{
-			float height = texelFetch(u_Heightmap, sourceCoordinate, 0).r;
-			minimumHeight = min(minimumHeight, height);
-			maximumHeight = max(maximumHeight, height);
-		}
-		else
-		{
+			ivec2 offset = ivec2(sampleIndex & 1, sampleIndex >> 1);
+			ivec2 sourceCoordinate = clamp(sourceOrigin + offset, ivec2(0), sourceSize - 1);
 			vec2 bounds = texelFetch(u_Pyramid, sourceCoordinate, u_SourceLevel).rg;
 			minimumHeight = min(minimumHeight, bounds.x);
 			maximumHeight = max(maximumHeight, bounds.y);
+			averageHeight += texelFetch(u_Pyramid, sourceCoordinate, u_SourceLevel).b;
 		}
+		averageHeight *= 0.25;
 	}
 
-	imageStore(u_Output, outputCoordinate, vec4(minimumHeight, maximumHeight, 0.0, 1.0));
+	imageStore(u_Output, outputCoordinate, vec4(minimumHeight, maximumHeight, averageHeight, 1.0));
 }
