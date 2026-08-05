@@ -14,7 +14,9 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
 
+#include <algorithm>
 #include <cmath>
+#include <cstdio>
 
 /* To use, add this prototype somewhere..
 
@@ -470,18 +472,25 @@ namespace ImGui
 // key format (for dim == 3) is (t0,x0,y0,z0,t1,x1,y1,z1 ...)
 void spline(const float *key, int num, int dim, float t, float *v)
 {
-	static signed char coefs[16] = { -1, 2, -1, 0, 3, -5, 0, 2, -3, 4, 1, 0, 1, -1, 0, 0 };
-	const int size = dim + 1;
-	// find key
-	int k = 0;
-
-	while (key[k * size] < t)
+	if (key == nullptr || v == nullptr || num <= 0 || dim <= 0) return;
+	if (num == 1)
 	{
-		k++;
+		for (int component = 0; component < dim; ++component)
+			v[component] = key[component + 1];
+		return;
 	}
 
-	// interpolant
-	const float h = (t - key[(k - 1) * size]) / (key[k * size] - key[(k - 1) * size]);
+	static signed char coefs[16] = { -1, 2, -1, 0, 3, -5, 0, 2, -3, 4, 1, 0, 1, -1, 0, 0 };
+	const int size = dim + 1;
+	int k = 1;
+	while (k < num - 1 && key[k * size] < t) ++k;
+
+	const float left = key[(k - 1) * size];
+	const float right = key[k * size];
+	const float denominator = right - left;
+	const float h = std::abs(denominator) > 0.000001f
+		? std::clamp((t - left) / denominator, 0.0f, 1.0f)
+		: 0.0f;
 
 	// init result
 	for (int i = 0; i < dim; i++)
@@ -516,63 +525,49 @@ void spline(const float *key, int num, int dim, float t, float *v)
 
 float CurveValueSmooth(float p, int maxpoints, const ImVec2 *points)
 {
-	if (maxpoints < 2 || points == 0)
-	{
-		return 0;
-	}
+	if (maxpoints < 2 || points == nullptr) return 0.0f;
+	if (!std::isfinite(p)) return points[0].y;
+	if (p <= points[0].x) return points[0].y;
+	if (p >= points[maxpoints - 1].x) return points[maxpoints - 1].y;
 
-	if (p < 0)
-	{
-		return points[0].y;
-	}
+	int rightIndex = 1;
+	while (rightIndex < maxpoints && points[rightIndex].x < p) ++rightIndex;
+	if (rightIndex >= maxpoints) return points[maxpoints - 1].y;
 
-	float *input = new float[maxpoints * 2];
-	float output[4];
+	const int leftIndex = rightIndex - 1;
+	const float segmentWidth = points[rightIndex].x - points[leftIndex].x;
+	if (segmentWidth <= 0.000001f) return points[rightIndex].y;
 
-	for (int i = 0; i < maxpoints; ++i)
-	{
-		input[i * 2 + 0] = points[i].x;
-		input[i * 2 + 1] = points[i].y;
-	}
-
-	spline(input, maxpoints, 1, p, output);
-	delete[] input;
-	return output[0];
+	const float t = std::clamp((p - points[leftIndex].x) / segmentWidth, 0.0f, 1.0f);
+	const float t2 = t * t;
+	const float t3 = t2 * t;
+	const int previousIndex = std::max(leftIndex - 1, 0);
+	const int nextIndex = std::min(rightIndex + 1, maxpoints - 1);
+	const float a = -0.5f * t3 + t2 - 0.5f * t;
+	const float b = 1.5f * t3 - 2.5f * t2 + 1.0f;
+	const float c = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
+	const float d = 0.5f * t3 - 0.5f * t2;
+	return a * points[previousIndex].y + b * points[leftIndex].y
+		+ c * points[rightIndex].y + d * points[nextIndex].y;
 }
 
 float CurveValue(float p, int maxpoints, const ImVec2 *points)
 {
-	if (maxpoints < 2 || points == 0)
-	{
-		return 0;
-	}
+	if (maxpoints < 2 || points == nullptr) return 0.0f;
+	if (!std::isfinite(p) || p <= points[0].x) return points[0].y;
+	if (p >= points[maxpoints - 1].x) return points[maxpoints - 1].y;
 
-	if (p < 0)
-	{
-		return points[0].y;
-	}
+	int rightIndex = 1;
+	while (rightIndex < maxpoints && points[rightIndex].x < p) ++rightIndex;
+	if (rightIndex >= maxpoints) return points[maxpoints - 1].y;
 
-	int left = 0;
-
-	while (left < maxpoints && points[left].x < p && points[left].x != -1)
-	{
-		left++;
-	}
-
-	if (left)
-	{
-		left--;
-	}
-
-	if (left == maxpoints - 1)
-	{
-		return points[maxpoints - 1].y;
-	}
-
-	float d = (p - points[left].x) / (points[left + 1].x - points[left].x);
-	return points[left].y + (points[left + 1].y - points[left].y) * d;
+	const int leftIndex = rightIndex - 1;
+	const float segmentWidth = points[rightIndex].x - points[leftIndex].x;
+	if (segmentWidth <= 0.000001f) return points[rightIndex].y;
+	const float t = std::clamp((p - points[leftIndex].x) / segmentWidth, 0.0f, 1.0f);
+	return points[leftIndex].y + (points[rightIndex].y - points[leftIndex].y) * t;
 }
-
+#if 0
 int Curve(const char *label, const ImVec2 &size, const int maxpoints, ImVec2 *points)
 {
 	int modified = 0;
@@ -843,6 +838,265 @@ int Curve(const char *label, const ImVec2 &size, const int maxpoints, ImVec2 *po
 	}
 
 	RenderTextClipped(ImVec2(bb.Min.x, bb.Min.y + style.FramePadding.y), bb.Max, str, NULL, NULL, ImVec2(0.5f, 0.5f));
+	return modified;
+}
+#endif
+
+int Curve(const char *label, const ImVec2 &size, const int maxpoints, ImVec2 *points)
+{
+	if (maxpoints < 2 || points == nullptr) return 0;
+
+	int modified = 0;
+	const char *safeLabel = label != nullptr ? label : "Curve";
+	const float minimumSpacing = 1.0f / 256.0f;
+
+	auto resetCurve = [&]()
+	{
+		for (int index = 0; index < maxpoints; ++index) points[index] = ImVec2(-1.0f, -1.0f);
+		points[0] = ImVec2(0.0f, 0.0f);
+		points[1] = ImVec2(1.0f, 1.0f);
+		modified = 1;
+	};
+
+	if (!std::isfinite(points[0].x) || points[0].x < 0.0f
+		|| !std::isfinite(points[1].x) || points[1].x < 0.0f)
+		resetCurve();
+
+	int pointCount = 0;
+	while (pointCount < maxpoints && std::isfinite(points[pointCount].x) && points[pointCount].x >= 0.0f)
+		++pointCount;
+	if (pointCount < 2)
+	{
+		resetCurve();
+		pointCount = 2;
+	}
+
+	pointCount = std::clamp(pointCount, 2, maxpoints);
+	for (int index = 0; index < pointCount; ++index)
+	{
+		const ImVec2 previous = points[index];
+		if (!std::isfinite(points[index].x)) points[index].x = index / static_cast<float>(pointCount - 1);
+		if (!std::isfinite(points[index].y)) points[index].y = index / static_cast<float>(pointCount - 1);
+		points[index].x = std::clamp(points[index].x, 0.0f, 1.0f);
+		points[index].y = std::clamp(points[index].y, 0.0f, 1.0f);
+		if (std::abs(previous.x - points[index].x) > 0.000001f || std::abs(previous.y - points[index].y) > 0.000001f)
+			modified = 1;
+	}
+
+	points[0].x = 0.0f;
+	points[pointCount - 1].x = 1.0f;
+	for (int index = 1; index < pointCount - 1; ++index)
+	{
+		const float minimumX = points[index - 1].x + minimumSpacing;
+		const float maximumX = 1.0f - minimumSpacing * static_cast<float>(pointCount - 1 - index);
+		const float clampedX = std::clamp(points[index].x, minimumX, std::max(minimumX, maximumX));
+		if (std::abs(points[index].x - clampedX) > 0.000001f) modified = 1;
+		points[index].x = clampedX;
+	}
+	for (int index = pointCount; index < maxpoints; ++index)
+	{
+		if (points[index].x >= 0.0f || points[index].y >= 0.0f) modified = 1;
+		points[index] = ImVec2(-1.0f, -1.0f);
+	}
+	auto enforcePointOrdering = [&]()
+	{
+		points[0].x = 0.0f;
+		points[pointCount - 1].x = 1.0f;
+		for (int index = 1; index < pointCount - 1; ++index)
+		{
+			const float minimumX = points[index - 1].x + minimumSpacing;
+			const float maximumX = points[index + 1].x - minimumSpacing;
+			points[index].x = maximumX >= minimumX
+				? std::clamp(points[index].x, minimumX, maximumX)
+				: (points[index - 1].x + points[index + 1].x) * 0.5f;
+		}
+	};
+	enforcePointOrdering();
+
+	ImGuiWindow *window = GetCurrentWindow();
+	ImGuiContext &g = *GImGui;
+	const ImGuiStyle &style = g.Style;
+	const ImGuiID id = window->GetID(safeLabel);
+	if (window->SkipItems) return modified;
+
+	const ImVec2 graphSize(std::max(size.x, 1.0f), std::max(size.y, 1.0f));
+	const ImVec2 graphExtent = graphSize;
+	ImRect bb(window->DC.CursorPos, window->DC.CursorPos + graphExtent);
+	ItemSize(bb);
+	if (!ItemAdd(bb, id, nullptr)) return modified;
+
+	const bool hovered = ImGui::ItemHoverable(bb, id);
+	if (hovered) SetHoveredID(id);
+
+	auto mouseToCurve = [&]()
+	{
+		const ImVec2 extent = bb.Max - bb.Min;
+		ImVec2 position = (g.IO.MousePos - bb.Min) / extent;
+		position.x = std::clamp(position.x, 0.0f, 1.0f);
+		position.y = std::clamp(1.0f - position.y, 0.0f, 1.0f);
+		return position;
+	};
+
+	static ImGuiID draggingCurveId = 0;
+	static int draggingPointIndex = -1;
+
+	if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	{
+		const ImVec2 position = mouseToCurve();
+		int closestPoint = -1;
+		float closestDistanceSquared = 0.06f * 0.06f;
+		for (int index = 0; index < pointCount; ++index)
+		{
+			const ImVec2 delta = points[index] - position;
+			const float distanceSquared = delta.x * delta.x + delta.y * delta.y;
+			if (distanceSquared <= closestDistanceSquared)
+			{
+				closestPoint = index;
+				closestDistanceSquared = distanceSquared;
+			}
+		}
+
+		if (closestPoint >= 0)
+		{
+			draggingCurveId = id;
+			draggingPointIndex = closestPoint;
+		}
+		else if (pointCount < maxpoints)
+		{
+			int insertIndex = 1;
+			while (insertIndex < pointCount - 1 && points[insertIndex].x < position.x) ++insertIndex;
+			for (int index = pointCount; index > insertIndex; --index) points[index] = points[index - 1];
+			points[insertIndex] = position;
+			++pointCount;
+			enforcePointOrdering();
+			draggingCurveId = id;
+			draggingPointIndex = insertIndex;
+			modified = 1;
+		}
+	}
+
+	if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+	{
+		const ImVec2 position = mouseToCurve();
+		int closestPoint = -1;
+		float closestDistanceSquared = 0.06f * 0.06f;
+		for (int index = 1; index < pointCount - 1; ++index)
+		{
+			const ImVec2 delta = points[index] - position;
+			const float distanceSquared = delta.x * delta.x + delta.y * delta.y;
+			if (distanceSquared <= closestDistanceSquared)
+			{
+				closestPoint = index;
+				closestDistanceSquared = distanceSquared;
+			}
+		}
+		if (closestPoint >= 0)
+		{
+			for (int index = closestPoint + 1; index < pointCount; ++index) points[index - 1] = points[index];
+			--pointCount;
+			points[pointCount] = ImVec2(-1.0f, -1.0f);
+			if (draggingCurveId == id) { draggingCurveId = 0; draggingPointIndex = -1; }
+			modified = 1;
+		}
+	}
+
+	if (draggingCurveId == id && g.IO.MouseDown[ImGuiMouseButton_Left])
+	{
+		const int index = std::clamp(draggingPointIndex, 0, pointCount - 1);
+		const ImVec2 position = mouseToCurve();
+		const float oldX = points[index].x;
+		const float oldY = points[index].y;
+		points[index].y = position.y;
+		if (index == 0) points[index].x = 0.0f;
+		else if (index == pointCount - 1) points[index].x = 1.0f;
+		else
+		{
+			const float minimumX = points[index - 1].x + minimumSpacing;
+			const float maximumX = points[index + 1].x - minimumSpacing;
+			points[index].x = maximumX >= minimumX
+				? std::clamp(position.x, minimumX, maximumX)
+				: (points[index - 1].x + points[index + 1].x) * 0.5f;
+		}
+		enforcePointOrdering();
+		if (std::abs(oldX - points[index].x) > 0.000001f || std::abs(oldY - points[index].y) > 0.000001f)
+			modified = 1;
+	}
+	else if (draggingCurveId == id && !g.IO.MouseDown[ImGuiMouseButton_Left])
+	{
+		draggingCurveId = 0;
+		draggingPointIndex = -1;
+	}
+
+	RenderFrame(bb.Min, bb.Max, GetColorU32(ImGuiCol_FrameBg, 1), true, style.FrameRounding);
+	const float height = bb.Max.y - bb.Min.y;
+	const float width = bb.Max.x - bb.Min.x;
+
+	window->DrawList->AddLine(ImVec2(bb.Min.x, bb.Min.y + height * 0.5f), ImVec2(bb.Max.x, bb.Min.y + height * 0.5f),
+		GetColorU32(ImGuiCol_TextDisabled), 3.0f);
+	window->DrawList->AddLine(ImVec2(bb.Min.x, bb.Min.y + height * 0.25f), ImVec2(bb.Max.x, bb.Min.y + height * 0.25f),
+		GetColorU32(ImGuiCol_TextDisabled));
+	window->DrawList->AddLine(ImVec2(bb.Min.x, bb.Min.y + height * 0.75f), ImVec2(bb.Max.x, bb.Min.y + height * 0.75f),
+		GetColorU32(ImGuiCol_TextDisabled));
+	for (int index = 1; index < 10; ++index)
+	{
+		const float x = bb.Min.x + width * (static_cast<float>(index) / 10.0f);
+		window->DrawList->AddLine(ImVec2(x, bb.Min.y), ImVec2(x, bb.Max.y), GetColorU32(ImGuiCol_TextDisabled));
+	}
+
+	constexpr int smoothness = 256;
+	for (int index = 0; index < smoothness; ++index)
+	{
+		const float p0 = static_cast<float>(index) / static_cast<float>(smoothness);
+		const float p1 = static_cast<float>(index + 1) / static_cast<float>(smoothness);
+		const float y0 = 1.0f - std::clamp(CurveValueSmooth(p0, pointCount, points), 0.0f, 1.0f);
+		const float y1 = 1.0f - std::clamp(CurveValueSmooth(p1, pointCount, points), 0.0f, 1.0f);
+		const ImVec2 start(bb.Min.x + p0 * width, bb.Min.y + y0 * height);
+		const ImVec2 end(bb.Min.x + p1 * width, bb.Min.y + y1 * height);
+		window->DrawList->AddLine(start, end, GetColorU32(ImGuiCol_PlotLines));
+	}
+
+	for (int index = 1; index < pointCount; ++index)
+	{
+		ImVec2 start = points[index - 1];
+		ImVec2 end = points[index];
+		start.y = 1.0f - start.y;
+		end.y = 1.0f - end.y;
+		start = start * (bb.Max - bb.Min) + bb.Min;
+		end = end * (bb.Max - bb.Min) + bb.Min;
+		window->DrawList->AddLine(start, end, GetColorU32(ImGuiCol_PlotLinesHovered));
+	}
+
+	if (hovered || draggingCurveId == id)
+	{
+		for (int index = 0; index < pointCount; ++index)
+		{
+			ImVec2 point = points[index];
+			point.y = 1.0f - point.y;
+			point = point * (bb.Max - bb.Min) + bb.Min;
+			window->DrawList->AddRect(point - ImVec2(3.0f, 3.0f), point + ImVec2(3.0f, 3.0f),
+				GetColorU32(ImGuiCol_PlotLinesHovered));
+		}
+	}
+
+	ImGui::PushID(id);
+	if (ImGui::Button("Flip##CurveFlip"))
+	{
+		for (int index = 0; index < pointCount; ++index) points[index].y = 1.0f - points[index].y;
+		modified = 1;
+	}
+	ImGui::SameLine();
+	ImGui::TextDisabled("Right-click a point to remove it");
+	ImGui::PopID();
+
+	char buffer[128];
+	const char *displayLabel = safeLabel;
+	if (hovered)
+	{
+		const ImVec2 position = mouseToCurve();
+		std::snprintf(buffer, sizeof(buffer), "%s (%.3f, %.3f)", safeLabel, position.x, position.y);
+		displayLabel = buffer;
+	}
+	RenderTextClipped(ImVec2(bb.Min.x, bb.Min.y + style.FramePadding.y), bb.Max, displayLabel, nullptr, nullptr, ImVec2(0.5f, 0.5f));
 	return modified;
 }
 
