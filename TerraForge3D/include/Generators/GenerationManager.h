@@ -4,6 +4,7 @@
 #include "Generators/BiomeManager.h"
 #include "Generators/BiomeMixer.h"
 #include "Generators/GeneratorDataStatistics.h"
+#include "Generators/HeightfieldPyramid.h"
 #include "Generators/SlopeGenerator.h"
 #include "Generators/GenerationWorker.h"
 #include "Base/Base.h"
@@ -51,6 +52,7 @@ struct FieldState
 	std::shared_ptr<SlopeGenerator> slopeGenerator;
 	std::shared_ptr<BiomeMixer> biomeMixer;
 	std::shared_ptr<GeneratorDataStatistics> statistics;
+	std::shared_ptr<HeightfieldPyramid> heightPyramid;
 	std::vector<std::shared_ptr<BiomeManager>> biomeManagers;
 	GeneratorDataStatisticsResult statisticsResult;
 	int statisticsSampleStride = 4;
@@ -96,6 +98,8 @@ public:
 	inline void SetWindowVisible(bool visible) { m_Ui.windowVisible = visible; }
 	inline bool* IsWindowVisiblePtr() { return &m_Ui.windowVisible; }
 	inline GeneratorData* GetHeightmapData() const { return m_Field.heightmapData.get(); }
+	inline HeightfieldPyramid* GetHeightPyramid() const { return m_Field.heightPyramid.get(); }
+	inline uint64_t GetTerrainRevision() const { return m_TerrainRevision.load(std::memory_order_acquire); }
 	inline GeneratorTexture* GetSlopeTexture() const { return m_Field.slopeGenerator != nullptr ? m_Field.slopeGenerator->GetTexture() : nullptr; }
 	inline bool HasSlopeTexture() const
 	{
@@ -115,6 +119,7 @@ private:
 	void ShowFieldStatistics();
 	void UpdateFieldStatistics();
 	void GenerateHeightmapMipmaps();
+	void CommitHeightfield();
 	void RequestGeneration(bool force);
 	void ExecuteGeneration(bool force);
 
@@ -124,4 +129,5 @@ private:
 	UiState m_Ui;
 	
 	std::unique_ptr<GenerationWorker> m_Worker;
+	std::atomic<uint64_t> m_TerrainRevision = 0;
 };

@@ -18,6 +18,7 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	}
 	m_Ui.fieldStorageUiMode = GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0;
 	m_Field.statistics = std::make_shared<GeneratorDataStatistics>(m_AppState);
+	m_Field.heightPyramid = std::make_shared<HeightfieldPyramid>(m_AppState);
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
 	m_Field.heightmapData = std::make_shared<GeneratorData>();
@@ -42,9 +43,7 @@ void GenerationManager::Update()
 		{
 			m_Ui.requireUpdation = false;
 			ExecuteGeneration(true);
-			m_Field.heightmapData.swap(m_Field.workingHeightmapData);
-			GenerateHeightmapMipmaps();
-			UpdateFieldStatistics();
+			CommitHeightfield();
 		}
 		return;
 	}
@@ -53,9 +52,7 @@ void GenerationManager::Update()
 	{
 		if (m_Worker->ConsumeCompleted())
 		{
-			m_Field.heightmapData.swap(m_Field.workingHeightmapData);
-			GenerateHeightmapMipmaps();
-			UpdateFieldStatistics();
+			CommitHeightfield();
 		}
 	}
 
@@ -391,6 +388,18 @@ void GenerationManager::UpdateFieldStatistics()
 	m_Field.statistics->Compute(m_Field.heightmapData.get(), m_AppState->mainMap.tileResolution, m_Field.statisticsSampleStride);
 	glFinish();
 	m_Field.statisticsResult = m_Field.statistics->Read();
+}
+
+void GenerationManager::CommitHeightfield()
+{
+	m_Field.heightmapData.swap(m_Field.workingHeightmapData);
+	m_TerrainRevision.fetch_add(1, std::memory_order_release);
+	GenerateHeightmapMipmaps();
+	if (m_Field.heightPyramid != nullptr)
+	{
+		m_Field.heightPyramid->Rebuild(m_Field.heightmapData.get());
+	}
+	UpdateFieldStatistics();
 }
 
 void GenerationManager::GenerateHeightmapMipmaps()
