@@ -23,6 +23,8 @@ uniform sampler2D u_TerrainSelfShadow;
 uniform bool u_HasTerrainSelfShadow;
 uniform sampler2D u_TerrainAmbient;
 uniform bool u_HasTerrainAmbient;
+uniform sampler2D u_TerrainGI;
+uniform bool u_HasTerrainGI;
 
 const float PI = 3.141592653589793;
 const float INV_PI = 0.3183098861837907;
@@ -31,7 +33,7 @@ const float UV_DETERMINANT_EPSILON = 1e-12;
 
 const vec3 MATERIAL_ALBEDO = vec3(0.98, 0.96, 0.90);
 const float MATERIAL_METALLIC = 0.0;
-const float MATERIAL_ROUGHNESS = 0.58;
+const float MATERIAL_ROUGHNESS = 0.8;
 
 uniform int u_Resolution;
 uniform float u_TileSize;
@@ -175,6 +177,12 @@ vec3 SampleTerrainBentNormal(vec3 fallbackNormal)
 	return TF3D_OctahedralDecode(texture(u_TerrainAmbient, clamp(fragmentInput.texCoord.xy, vec2(0.0), vec2(1.0))).gb);
 }
 
+vec3 SampleTerrainGI()
+{
+	if (!u_HasTerrainGI || fragmentInput.texCoord.z > 0.5f) return vec3(0.0);
+	return max(texture(u_TerrainGI, clamp(fragmentInput.texCoord.xy, vec2(0.0), vec2(1.0))).rgb, vec3(0.0));
+}
+
 vec3 EvaluateSun(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness)
 {
 	vec3 L = normalize(-u_SunDirection);
@@ -279,6 +287,7 @@ void main()
 	vec3 viewDirection = normalize(u_CameraPosition - fragmentInput.position);
 	vec3 color = EvaluateSun(normal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness);
 	color += EvaluateImageBasedLighting(normal, bentNormal, viewDirection, MATERIAL_ALBEDO, MATERIAL_METALLIC, specularRoughness, ambientVisibility);
+	color += SampleTerrainGI() * MATERIAL_ALBEDO * (1.0 - MATERIAL_METALLIC) * INV_PI;
 
 	color = ACESFilm(max(color, vec3(0.0)));
 	color = pow(max(color, vec3(0.0)), vec3(1.0 / 2.2));

@@ -62,6 +62,19 @@ void ObjectRenderer::Render(RendererViewport* viewport)
 	}
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TerrainAmbient"), 8);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainAmbient"), hasHeightfieldAmbient ? 1 : 0);
+	auto* heightfieldGI = m_AppState->rendererManager->GetHeightfieldGICache();
+	const bool hasHeightfieldGI = heightfieldGI != nullptr && heightfieldGI->IsReady();
+	if (hasHeightfieldGI)
+	{
+		heightfieldGI->Bind(9);
+	}
+	else
+	{
+		glActiveTexture(GL_TEXTURE9);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TerrainGI"), 9);
+	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainGI"), hasHeightfieldGI ? 1 : 0);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SlopeTexture"), 5);
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasSlopeTexture"), hasSlopeTexture ? 1 : 0);
 	//glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Projection"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.pers));

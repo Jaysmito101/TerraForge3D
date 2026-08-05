@@ -14,6 +14,7 @@ RendererManager::RendererManager(ApplicationState* appState)
 	m_TerrainSelfShadow = std::make_shared<TerrainSelfShadow>(appState);
 	m_PlanarShadowCache = std::make_shared<PlanarShadowCache>(appState);
 	m_HeightfieldAmbientCache = std::make_shared<HeightfieldAmbientCache>(appState);
+	m_HeightfieldGICache = std::make_shared<HeightfieldGICache>(appState);
 }
 
 RendererManager::~RendererManager()
@@ -67,6 +68,32 @@ void RendererManager::Render(RendererViewport* viewport)
 				m_AppState->generationManager->GetTerrainRevision(),
 				terrainWorldSize,
 				terrainWorldSize * m_AmbientAoRadiusFactor);
+		}
+	}
+	if (m_HeightfieldGICache != nullptr && m_AppState->generationManager != nullptr &&
+		m_RendererLights != nullptr && m_RendererSky != nullptr)
+	{
+		m_HeightfieldGICache->SetEnabled(m_TerrainGISettings.enabled);
+		if (m_TerrainGISettings.enabled)
+		{
+			const bool hasSkyLight = m_RendererLights->m_UseSkyLight && m_RendererSky->IsSkyReady();
+			const bool hasTerrainSelfShadow = m_TerrainSelfShadow != nullptr && m_TerrainSelfShadow->IsReady();
+			m_HeightfieldGICache->Update(
+				m_AppState->generationManager->GetHeightPyramid(),
+				m_AppState->generationManager->GetTerrainRevision(),
+				std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f),
+				m_RendererLights->m_Sun.direction,
+				m_RendererLights->m_Sun.color,
+				m_RendererLights->m_Sun.intensity,
+				hasSkyLight,
+				m_RendererLights->m_SkyLightIntensity,
+				hasSkyLight ? m_RendererSky->GetSkyboxMap() : -1,
+				hasSkyLight ? m_RendererSky->GetIrradianceMap() : -1,
+				hasTerrainSelfShadow,
+				hasTerrainSelfShadow ? static_cast<int32_t>(m_TerrainSelfShadow->GetRendererID()) : -1,
+				m_TerrainGISettings.resolution,
+				m_TerrainGISettings.targetSamples,
+				m_TerrainGISettings.samplesPerDispatch);
 		}
 	}
 	viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
@@ -134,6 +161,18 @@ void RendererManager::ShowSettings()
 					ImGui::PushID("Terrain");
 					ImGui::Checkbox("Enable Terrain AO", &m_EnableAmbientAo);
 					ImGui::SliderFloat("AO Radius (Terrain Scale)", &m_AmbientAoRadiusFactor, 0.01f, 0.5f, "%.3f");
+					ImGui::Separator();
+					ImGui::Checkbox("Enable Terrain GI", &m_TerrainGISettings.enabled);
+					ImGui::SliderInt("GI Resolution", &m_TerrainGISettings.resolution, 32, 256);
+					ImGui::SliderInt("GI Target Samples", &m_TerrainGISettings.targetSamples, 1, 256);
+					ImGui::SliderInt("GI Samples / Dispatch", &m_TerrainGISettings.samplesPerDispatch, 1, 8);
+					if (m_HeightfieldGICache != nullptr)
+					{
+						ImGui::Text("GI Progress: %.1f%% (%d / %d)",
+							m_HeightfieldGICache->GetProgress() * 100.0f,
+							m_HeightfieldGICache->GetAccumulatedSamples(),
+							m_HeightfieldGICache->GetTargetSamples());
+					}
 					ImGui::PopID();
 					ImGui::EndTabItem();
 				}

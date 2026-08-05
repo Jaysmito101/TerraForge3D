@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <cctype>
+#include <cmath>
 #include <sys/stat.h>
 #include  <cstdio>
 #include  <cstdlib>
@@ -25,6 +26,23 @@
 #define _lseek lseek
 #define stricmp strcasecmp
 #endif
+
+void HashCombine64(uint64_t& hash, uint64_t value)
+{
+	hash ^= value;
+	hash *= 1099511628211ull;
+}
+
+uint64_t QuantizeFloatForHash(float value, float precision)
+{
+	if (std::isnan(value)) return 0x7ff8000000000000ull;
+	if (std::isinf(value)) return value > 0.0f
+		? 0x7ff0000000000000ull
+		: 0xfff0000000000000ull;
+	return static_cast<uint64_t>(std::llround(
+		static_cast<double>(value) / static_cast<double>(precision)));
+}
+
 //SAF_Handle.cpp line:458 old line:INFILE = _open(infilename, _O_RDONLY | _O_BINARY);
 #ifdef __linux__
 //  INFILE = _open(infilename, _O_RDONLY);

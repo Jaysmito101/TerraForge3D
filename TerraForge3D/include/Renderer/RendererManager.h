@@ -11,8 +11,17 @@
 #include "Renderer/PlanarShadowCache.h"
 #include "Renderer/TerrainSelfShadow.h"
 #include "Renderer/HeightfieldAmbientCache.h"
+#include "Renderer/HeightfieldGICache.h"
 
 class ApplicationState;
+
+struct TerrainGISettings
+{
+	bool enabled = false;
+	int32_t resolution = 128;
+	int32_t targetSamples = 32;
+	int32_t samplesPerDispatch = 1;
+};
 
 class RendererManager
 {
@@ -30,6 +39,7 @@ public:
 	inline TerrainSelfShadow* GetTerrainSelfShadow() { return m_TerrainSelfShadow.get(); }
 	inline PlanarShadowCache* GetPlanarShadowCache() { return m_PlanarShadowCache.get(); }
 	inline HeightfieldAmbientCache* GetHeightfieldAmbientCache() { return m_HeightfieldAmbientCache.get(); }
+	inline HeightfieldGICache* GetHeightfieldGICache() { return m_HeightfieldGICache.get(); }
 
 	inline ObjectRenderer* GetObjectRenderer() { return static_cast<ObjectRenderer*>(m_ObjectRenderer.get()); }
 	inline HeightmapRenderer* GetHeightmapRenderer() { return static_cast<HeightmapRenderer*>(m_HeightmapRenderer.get()); }
@@ -52,7 +62,9 @@ private:
 	std::shared_ptr<TerrainSelfShadow> m_TerrainSelfShadow;
 	std::shared_ptr<PlanarShadowCache> m_PlanarShadowCache;
 	std::shared_ptr<HeightfieldAmbientCache> m_HeightfieldAmbientCache;
+	std::shared_ptr<HeightfieldGICache> m_HeightfieldGICache;
 	bool m_EnableAmbientAo = true;
 	float m_AmbientAoRadiusFactor = 0.12f;
+	TerrainGISettings m_TerrainGISettings;
 };
 
