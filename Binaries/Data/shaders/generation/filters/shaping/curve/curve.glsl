@@ -8,6 +8,7 @@ const int TF3D_CURVE_MAX_POINTS = 16;
 
 uniform vec2 u_Curve[TF3D_CURVE_MAX_POINTS];
 uniform int u_CurvePointCount;
+uniform float u_Softness;
 
 float evaluateCurve(float inputValue)
 {
@@ -25,6 +26,11 @@ float evaluateCurve(float inputValue)
 			float segmentWidth = rightPoint.x - leftPoint.x;
 			if (segmentWidth <= 0.000001f) return rightPoint.y;
 			float segmentPosition = clamp((inputValue - leftPoint.x) / segmentWidth, 0.0f, 1.0f);
+			float smootherPosition = segmentPosition * segmentPosition * segmentPosition
+				* (segmentPosition * (segmentPosition * 6.0f - 15.0f) + 10.0f);
+			float softness = clamp(u_Softness, 0.0f, 1.0f);
+			float softnessInfluence = clamp(softness * 1.5f, 0.0f, 1.0f);
+			segmentPosition = mix(segmentPosition, smootherPosition, softnessInfluence);
 			return mix(leftPoint.y, rightPoint.y, segmentPosition);
 		}
 	}

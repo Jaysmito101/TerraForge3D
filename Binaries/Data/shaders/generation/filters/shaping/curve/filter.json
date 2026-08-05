@@ -31,6 +31,9 @@
                     "u_Curve": {
                         "Parameter": "Curve",
                         "PointCountUniform": "u_CurvePointCount"
+                    },
+                    "u_Softness": {
+                        "Parameter": "Softness"
                     }
                 }
             }
@@ -55,6 +58,16 @@
             "Label": "Noise curve",
             "Description": "Maps normalized input noise on the horizontal axis to normalized output noise on the vertical axis.",
             "Tooltip": "Drag points to reshape the field. The default diagonal leaves the input unchanged; the result is mapped back to the current field min/max range."
+        },
+        {
+            "Name": "Softness",
+            "Type": "Float",
+            "Default": 0.0,
+            "Widget": "Slider",
+            "Constraints": [0.0, 1.0],
+            "Label": "Softness",
+            "Description": "Blends each straight segment toward a stronger smootherstep transition between its control points.",
+            "Tooltip": "Zero keeps the control points piecewise-linear. Higher values create a more pronounced eased transition while still passing through every control point."
         }
     ]
 }
