@@ -1,18 +1,17 @@
 #pragma once
-#include <string>
 #include <sstream>
+#include <string>
 
 class RawTextureExporter
 {
 public:
-	RawTextureExporter();
-	~RawTextureExporter();
+    RawTextureExporter();
+    ~RawTextureExporter();
 
-	bool ExportHeightmap(const std::string& path, float* data, int bitDepth, int resolution, float* progress = nullptr);
-
-private:
+    bool ExportHeightmap(const std::string &path, float *data, int bitDepth, int resolution, float *progress = nullptr);
 
 private:
-	float m_Progress = 0.0f;
-	char buffer[4096] = {};
+private:
+    float m_Progress  = 0.0f;
+    char buffer[4096] = {};
 };

@@ -1,16 +1,16 @@
 #pragma once
 
-#include <array>
-#include <nlohmann/json.hpp>
 #include "Base/Base.h"
-#include "Utils/Utils.h"
+#include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
-#include "Exporters/Serializer.h"
-#include "Misc/CustomInspector.h"
 #include "Generators/NoiseAlgorithmCatalog.h"
+#include "Misc/CustomInspector.h"
+#include "Utils/Utils.h"
+#include <array>
+#include <nlohmann/json.hpp>
 
-#define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
+#define BASE_SHAPE_UI_PROPERTY(x)     m_RequireUpdation = x || m_RequireUpdation
 
 #define BIOME_BASE_NOISE_OCTAVE_COUNT 10
 
@@ -19,22 +19,25 @@ class ApplicationState;
 class BiomeBaseNoiseGenerator
 {
 public:
-	BiomeBaseNoiseGenerator(ApplicationState* appState);
-	~BiomeBaseNoiseGenerator();
+    BiomeBaseNoiseGenerator(ApplicationState *appState);
+    ~BiomeBaseNoiseGenerator();
 
-	bool ShowSettings();
-	void Update(GeneratorData* sourceBuffer, GeneratorData* targetBuffer, GeneratorTexture* seedTexture);
+    bool ShowSettings();
+    void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorTexture *seedTexture);
 
-	void Load(SerializerNode data);
-	SerializerNode Save();
+    void Load(SerializerNode data);
+    SerializerNode Save();
 
-	inline bool RequireUpdation() const { return m_RequireUpdation; }
+    inline bool RequireUpdation() const
+    {
+        return m_RequireUpdation;
+    }
 
 private:
-	ApplicationState* m_AppState = nullptr;
-	bool m_RequireUpdation = true;
-	std::shared_ptr<ComputeShader> m_Shader;
-	std::shared_ptr<CustomInspector> m_Inspector;
-	NoiseAlgorithmCatalog m_NoiseAlgorithms;
-	std::array<float, BIOME_BASE_NOISE_OCTAVE_COUNT> m_NoiseOctaveStrengths{};
+    ApplicationState *m_AppState = nullptr;
+    bool m_RequireUpdation       = true;
+    std::shared_ptr<ComputeShader> m_Shader;
+    std::shared_ptr<CustomInspector> m_Inspector;
+    NoiseAlgorithmCatalog m_NoiseAlgorithms;
+    std::array<float, BIOME_BASE_NOISE_OCTAVE_COUNT> m_NoiseOctaveStrengths{};
 };

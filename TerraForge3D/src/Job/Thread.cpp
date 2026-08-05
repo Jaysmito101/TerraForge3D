@@ -1,107 +1,100 @@
-#include "Job/Job.h"
 #include "Job/Thread.h"
+#include "Job/Job.h"
 
 static uint32_t threadId = 0;
-
 
 namespace JobSystem
 {
 
+    Thread::Thread()
+    {
+        this->id = threadId++;
+        worker   = std::thread([this]() -> void {
+            this->Run();
+        });
+        worker.detach();
+    }
 
+    Thread::~Thread()
+    {
+        if (isAlive)
+            this->Shutdown();
+    }
 
-	Thread::Thread()
-	{
-		this->id = threadId++;
-		worker = std::thread([this]()->void {
-			this->Run();
-			});
-		worker.detach();
-	}
+    void Thread::Run()
+    {
+        while (isAlive) {
+            std::unique_lock lock(mutex);
+            condVar.wait(lock, [this]() -> bool {
+                return hasNewJob;
+            });
 
-	Thread::~Thread()
-	{
-		if (isAlive)
-			this->Shutdown();
-	}
+            hasNewJob    = false;
+            isRunningJob = true;
 
-	void Thread::Run()
-	{
-		while (isAlive)
-		{
-			std::unique_lock lock(mutex);
-			condVar.wait(lock, [this]()->bool {
-				return hasNewJob;
-				});
+            if (currentJob) {
+                currentJob->status = JobStatus_OnGoing;
 
-			hasNewJob = false;
-			isRunningJob = true;
+                if (currentJob->onRun) {
+                    if (currentJob->onRun(currentJob))
+                        currentJob->status = JobStatus_Success;
+                    else
+                        currentJob->status = JobStatus_Faliure;
+                }
+            }
 
-			if (currentJob)
-			{
-				currentJob->status = JobStatus_OnGoing;
+            isRunningJob    = false;
+            hasCompletedJob = true;
+        }
+    }
 
-				if (currentJob->onRun)
-				{
-					if (currentJob->onRun(currentJob))
-						currentJob->status = JobStatus_Success;
-					else
-						currentJob->status = JobStatus_Faliure;
-				}
-			}
+    void Thread::Join()
+    {
+        if (worker.joinable())
+            worker.join();
+    }
 
-			isRunningJob = false;
-			hasCompletedJob = true;
-		}
-	}
+    void Thread::AssignJob(Job *job)
+    {
+        // TF3D_ASSERT(currentJob == nullptr, "Current Job not yet cleared");
 
-	void Thread::Join()
-	{
-		if (worker.joinable())
-			worker.join();
-	}
+        {
+            std::lock_guard lock(mutex);
+            hasCompletedJob = false;
+            currentJob      = job;
+            hasNewJob       = true;
+            condVar.notify_one();
+        }
+    }
 
-	void Thread::AssignJob(Job* job)
-	{
-		// TF3D_ASSERT(currentJob == nullptr, "Current Job not yet cleared");
+    void Thread::Shutdown()
+    {
+        isAlive = false;
+        this->Join();
+    }
 
-		{
-			std::lock_guard lock(mutex);
-			hasCompletedJob = false;
-			currentJob = job;
-			hasNewJob = true;
-			condVar.notify_one();
-		}
-	}
+    Job *Thread::FinishPendingJob(bool wait)
+    {
+        // TF3D_ASSERT(currentJob, "No Job assigned");
 
-	void Thread::Shutdown()
-	{
-		isAlive = false;
-		this->Join();
-	}
+        // TODO : fix me use something better
+        if (wait)
+            while (isRunningJob)
+                ; // Wait for current job to finish
 
-	Job* Thread::FinishPendingJob(bool wait)
-	{
-		// TF3D_ASSERT(currentJob, "No Job assigned");
+        if (hasCompletedJob) {
+            hasCompletedJob = false;
+            Job *job        = currentJob;
+            currentJob      = nullptr;
+            return job;
+        }
 
-		// TODO : fix me use something better
-		if (wait)
-			while (isRunningJob); // Wait for current job to finish
+        return nullptr;
+    }
 
-		if (hasCompletedJob)
-		{
-			hasCompletedJob = false;
-			Job* job = currentJob;
-			currentJob = nullptr;
-			return job;
-		}
+    bool Thread::IsFree()
+    {
+        return currentJob == nullptr;
+    }
 
-		return nullptr;
-	}
-
-	bool Thread::IsFree()
-	{
-		return currentJob == nullptr;
-	}
-
-}
-
+} // namespace JobSystem

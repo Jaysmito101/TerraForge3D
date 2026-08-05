@@ -3,54 +3,53 @@
 #include "Base/Window.h"
 #include <string>
 
-
 class Application
 {
 public:
-	Application();
-	virtual ~Application();
-	virtual void OnUpdate(float) {};
-	virtual void OnOneSecondTick() {};
-	virtual void OnImGuiRender() {};
-	virtual void OnStart(std::string loadFile) {};
-	virtual void OnEnd() {};
-	virtual void OnPreload() {};
+    Application();
+    virtual ~Application();
+    virtual void OnUpdate(float) {};
+    virtual void OnOneSecondTick() {};
+    virtual void OnImGuiRender() {};
+    virtual void OnStart(std::string loadFile) {};
+    virtual void OnEnd() {};
+    virtual void OnPreload() {};
 
+    void SetWindowConfigPath(std::string title);
+    void SetTitle(std::string title);
+    void SetLogsDir(std::string ld);
+    void Init();
+    bool IsActive();
+    void RenderImGui();
+    void Render();
+    void ImGuiRenderBegin();
+    void ImGuiRenderEnd();
+    void Run(std::string loadFile = "");
 
-	void SetWindowConfigPath(std::string title);
-	void SetTitle(std::string title);
-	void SetLogsDir(std::string ld);
-	void Init();
-	bool IsActive();
-	void RenderImGui();
-	void Render();
-	void ImGuiRenderBegin();
-	void ImGuiRenderEnd();
-	void Run(std::string loadFile = "");
+    inline void Close()
+    {
+        isActive = false;
+    }
 
-	inline void Close()
-	{
-		isActive = false;
-	}
+    Window *GetWindow()
+    {
+        return m_Window;
+    }
 
-	Window *GetWindow()
-	{
-		return m_Window;
-	}
+    static inline Application *Get()
+    {
+        return s_App;
+    }
 
-	static inline Application *Get()
-	{
-		return s_App;
-	}
-
-	std::string logsDir = "";
+    std::string logsDir = "";
 
 private:
-	std::string m_WindowTitle = "Main Window";
-	std::string windowConfigPath = "windowconfigs.terr3d";
-	float previousTime;
-	bool isActive;
-	Window *m_Window;
+    std::string m_WindowTitle    = "Main Window";
+    std::string windowConfigPath = "windowconfigs.terr3d";
+    float previousTime;
+    bool isActive;
+    Window *m_Window;
+
 private:
-	static Application *s_App;
+    static Application *s_App;
 };

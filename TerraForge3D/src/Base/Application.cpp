@@ -2,10 +2,9 @@
 #include "Base/Logging/Logger.h"
 #include "Profiler.h"
 
-#include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
-
+#include <imgui/imgui.h>
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -14,85 +13,81 @@
 
 static void InitGlad()
 {
-	if (!gladLoadGL(glfwGetProcAddress))
-	{
-		TF3D_LOG_ERROR("Failed to initialize GLAD");
-		exit(-1);
-	}
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        TF3D_LOG_ERROR("Failed to initialize GLAD");
+        exit(-1);
+    }
 }
 
 static void InitImGui(std::string &configPath)
 {
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO &io = ImGui::GetIO();
-	(void)io;
-	io.IniFilename = configPath.c_str();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+    io.IniFilename = configPath.c_str();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 #ifdef TERR3D_WIN32 // Multiviewport is not supported stable on linux
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 #endif
-	io.ConfigViewportsNoTaskBarIcon = false;
-	io.ConfigViewportsNoAutoMerge = true;
-	ImGui::StyleColorsDark();
-	ImGuiStyle &style = ImGui::GetStyle();
+    io.ConfigViewportsNoTaskBarIcon = false;
+    io.ConfigViewportsNoAutoMerge   = true;
+    ImGui::StyleColorsDark();
+    ImGuiStyle &style = ImGui::GetStyle();
 
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        style.WindowRounding              = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 
-	ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(Application::Get()->GetWindow()->GetNativeWindow()), true);
-	ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(Application::Get()->GetWindow()->GetNativeWindow()), true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 static void ImGuiShutdown()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	if (io.IniFilename != nullptr) ImGui::SaveIniSettingsToDisk(io.IniFilename);
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+    ImGuiIO &io = ImGui::GetIO();
+    if (io.IniFilename != nullptr)
+        ImGui::SaveIniSettingsToDisk(io.IniFilename);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 Application *Application::s_App;
 
-
-
 Application::Application()
 {
-	isActive = false;
-	m_Window = nullptr;
-	previousTime = 0.0f;
+    isActive     = false;
+    m_Window     = nullptr;
+    previousTime = 0.0f;
 }
-
 
 void Application::SetWindowConfigPath(std::string path)
 {
-	windowConfigPath = path;
+    windowConfigPath = path;
 }
 
 void Application::SetLogsDir(std::string ld)
 {
-	logsDir = ld;
+    logsDir = ld;
 }
 
 void Application::SetTitle(std::string title)
 {
-	m_WindowTitle = title;
+    m_WindowTitle = title;
 }
 
 void Application::Init()
 {
-	m_Window = new Window(m_WindowTitle);
-	m_Window->SetVSync(true);
-	m_Window->SetVisible(false);
-	isActive = true;
-	s_App = this;
-	InitGlad();
-	InitImGui(windowConfigPath);
+    m_Window = new Window(m_WindowTitle);
+    m_Window->SetVSync(true);
+    m_Window->SetVisible(false);
+    isActive = true;
+    s_App    = this;
+    InitGlad();
+    InitImGui(windowConfigPath);
 }
 
 void Application::Render()
@@ -101,82 +96,78 @@ void Application::Render()
 
 void Application::ImGuiRenderBegin()
 {
-	ImGui_ImplGlfw_NewFrame();
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui::NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
 }
 
 void Application::ImGuiRenderEnd()
 {
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	ImGuiIO &io = ImGui::GetIO();
+    ImGui::EndFrame();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGuiIO &io = ImGui::GetIO();
 
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		GLFWwindow *backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        GLFWwindow *backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
 }
 
 bool Application::IsActive()
 {
-	return isActive;
+    return isActive;
 }
 
 void Application::RenderImGui()
 {
-	glEnable(GL_BLEND);
-	ImGuiRenderBegin();
-	OnImGuiRender();
-	ImGuiRenderEnd();
-	glDisable(GL_BLEND);
+    glEnable(GL_BLEND);
+    ImGuiRenderBegin();
+    OnImGuiRender();
+    ImGuiRenderEnd();
+    glDisable(GL_BLEND);
 }
 
 void Application::Run(std::string loadFile)
 {
-	m_Window->SetVisible(true);
-	float oneSecCounter = 0;
+    m_Window->SetVisible(true);
+    float oneSecCounter = 0;
 
-	while (isActive)
-	{
-		PerformanceMonitor::Get().BeginFrame();
-		TF3D_PROFILE_BEGIN(frameProfile, "app/frame");
-		float currentTime = (float)glfwGetTime();
-		float deltaTime = currentTime - previousTime;
-		previousTime = currentTime;
-		oneSecCounter += deltaTime;
-		OnUpdate(deltaTime);
+    while (isActive) {
+        PerformanceMonitor::Get().BeginFrame();
+        TF3D_PROFILE_BEGIN(frameProfile, "app/frame");
+        float currentTime = (float)glfwGetTime();
+        float deltaTime   = currentTime - previousTime;
+        previousTime      = currentTime;
+        oneSecCounter += deltaTime;
+        OnUpdate(deltaTime);
 
-		if (oneSecCounter >= 1)
-		{
-			TF3D_PROFILE_SCOPE("app/one-second-tick");
-			OnOneSecondTick();
-			oneSecCounter = 0;
-		}
+        if (oneSecCounter >= 1) {
+            TF3D_PROFILE_SCOPE("app/one-second-tick");
+            OnOneSecondTick();
+            oneSecCounter = 0;
+        }
 
-		{
-			TF3D_PROFILE_SCOPE("app/render");
-			Render();
-		}
-		{
-			TF3D_PROFILE_SCOPE("app/present");
-			m_Window->Update();
-		}
-		frameProfile.End();
-		PerformanceMonitor::Get().EndFrame();
-	}
+        {
+            TF3D_PROFILE_SCOPE("app/render");
+            Render();
+        }
+        {
+            TF3D_PROFILE_SCOPE("app/present");
+            m_Window->Update();
+        }
+        frameProfile.End();
+        PerformanceMonitor::Get().EndFrame();
+    }
 
-	OnEnd();
-	ImGuiShutdown();
+    OnEnd();
+    ImGuiShutdown();
 }
-
 
 Application::~Application()
 {
-	TF3D_LOG_INFO("Application shutdown complete");
-	delete m_Window;
+    TF3D_LOG_INFO("Application shutdown complete");
+    delete m_Window;
 }

@@ -3,41 +3,39 @@
 #include "Base/Base.h"
 #include <condition_variable>
 
-
 namespace JobSystem
 {
-	class Job;
+    class Job;
 
-	class Thread
-	{
-	public:
-		Thread();
-		~Thread();
+    class Thread
+    {
+    public:
+        Thread();
+        ~Thread();
 
-		void Run();
-		void Join();
+        void Run();
+        void Join();
 
-		void AssignJob(Job* job);
+        void AssignJob(Job *job);
 
-		void Shutdown();
+        void Shutdown();
 
-		Job* FinishPendingJob(bool wait = false);
+        Job *FinishPendingJob(bool wait = false);
 
-		bool IsFree();
+        bool IsFree();
 
-	public:
-		bool isAlive = true;
-		bool isRunningJob = false;
-		bool hasNewJob = false;
-		bool hasCompletedJob = false;
-		Job* currentJob = nullptr;
-		uint32_t id = 0;
+    public:
+        bool isAlive         = true;
+        bool isRunningJob    = false;
+        bool hasNewJob       = false;
+        bool hasCompletedJob = false;
+        Job *currentJob      = nullptr;
+        uint32_t id          = 0;
 
-	private:
-		std::mutex mutex;
-		std::thread worker;
-		std::condition_variable condVar;
-	};
+    private:
+        std::mutex mutex;
+        std::thread worker;
+        std::condition_variable condVar;
+    };
 
-}
-
+} // namespace JobSystem

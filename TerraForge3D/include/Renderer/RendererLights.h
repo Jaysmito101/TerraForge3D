@@ -4,27 +4,26 @@
 
 class ApplicationState;
 
-struct RendererSunData
-{
-	char name[1024];
-	glm::vec3 direction = glm::vec3(2.260f, -2.440f, -0.740f);
-	glm::vec3 color = glm::vec3(1.0f);
-	float intensity = 2.0f;
+struct RendererSunData {
+    char name[1024];
+    glm::vec3 direction = glm::vec3(2.260f, -2.440f, -0.740f);
+    glm::vec3 color     = glm::vec3(1.0f);
+    float intensity     = 2.0f;
 };
 
 class RendererLights
 {
 public:
-	RendererLights(ApplicationState* appState);
-	~RendererLights();
+    RendererLights(ApplicationState *appState);
+    ~RendererLights();
 
-	void ShowSettings();
+    void ShowSettings();
 
 public:
-	RendererSunData m_Sun;
-	bool m_UseSkyLight = true;
-	float m_SkyLightIntensity = 0.24f;
+    RendererSunData m_Sun;
+    bool m_UseSkyLight        = true;
+    float m_SkyLightIntensity = 0.24f;
 
 private:
-	ApplicationState* m_AppState = nullptr;
+    ApplicationState *m_AppState = nullptr;
 };

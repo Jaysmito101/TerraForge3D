@@ -1,98 +1,105 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Exporters/Serializer.h"
 #include "Generators/GeneratorTexture.h"
 #include "Renderer/BrushSettings.h"
-#include "Exporters/Serializer.h"
 
 #include <vector>
 
 class ApplicationState;
 class ComputeShader;
 
-enum class MaskPreviewMode
-{
-	Painted,
-	Generated,
+enum class MaskPreviewMode {
+    Painted,
+    Generated,
 };
 
 class MaskTool
 {
 public:
-	MaskTool(ApplicationState* state, glm::vec3 vizColor);
-	~MaskTool();
+    MaskTool(ApplicationState *state, glm::vec3 vizColor);
+    ~MaskTool();
 
-	void Resize(int size);
+    void Resize(int size);
 
-	bool ShowSettings(bool showViewportMask = true);
-	bool ApplyDrawingShaders();
-	SerializerNode Save() const;
-	void Load(SerializerNode data);
+    bool ShowSettings(bool showViewportMask = true);
+    bool ApplyDrawingShaders();
+    SerializerNode Save() const;
+    void Load(SerializerNode data);
 
-	void SetGeneratedMaskTexture(GeneratorTexture* texture, const char* label = "Filter mask");
-	void ClearGeneratedMaskTexture();
-	bool CopyGeneratedMaskToPainted();
+    void SetGeneratedMaskTexture(GeneratorTexture *texture, const char *label = "Filter mask");
+    void ClearGeneratedMaskTexture();
+    bool CopyGeneratedMaskToPainted();
 
-	inline void SetVizColor(float r, float g, float b) { m_VizColor = glm::vec3(r, g, b); }
-	inline void SetInvertPreview(bool invert) { m_InvertPreview = invert; }
-	inline GeneratorTexture* GetTexture() const
-	{
-		return m_PreviewMode == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
-			? m_ExternalGeneratedTexture
-			: m_PaintedTexture.get();
-	}
-	inline GeneratorTexture* GetPreviewTexture() const;
-	inline bool IsShowingGeneratedMask() const { return m_PreviewMode == MaskPreviewMode::Generated; }
+    inline void SetVizColor(float r, float g, float b)
+    {
+        m_VizColor = glm::vec3(r, g, b);
+    }
+    inline void SetInvertPreview(bool invert)
+    {
+        m_InvertPreview = invert;
+    }
+    inline GeneratorTexture *GetTexture() const
+    {
+        return m_PreviewMode == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
+                   ? m_ExternalGeneratedTexture
+                   : m_PaintedTexture.get();
+    }
+    inline GeneratorTexture *GetPreviewTexture() const;
+    inline bool IsShowingGeneratedMask() const
+    {
+        return m_PreviewMode == MaskPreviewMode::Generated;
+    }
 
 private:
-	struct MaskStroke
-	{
-		std::vector<glm::vec2> points;
-		float strength = 0.0f;
-		float size = 0.0f;
-		float falloff = 0.0f;
-		int mode = 0;
-	};
+    struct MaskStroke {
+        std::vector<glm::vec2> points;
+        float strength = 0.0f;
+        float size     = 0.0f;
+        float falloff  = 0.0f;
+        int mode       = 0;
+    };
 
-	void SetPreviewMode(MaskPreviewMode mode);
-	void UpdateViewportOverlay(bool showBrush, bool showMask);
-	void UpdateVisualizationTexture(GeneratorTexture* sourceTexture);
-	bool ShowPaintedSettings();
-	bool UndoLastStroke();
-	void RasterizeStrokes();
-	void FinishActiveStroke();
-	void StartActiveStroke(const glm::vec2& position);
-	void AppendActiveStrokePoint(const glm::vec2& position);
+    void SetPreviewMode(MaskPreviewMode mode);
+    void UpdateViewportOverlay(bool showBrush, bool showMask);
+    void UpdateVisualizationTexture(GeneratorTexture *sourceTexture);
+    bool ShowPaintedSettings();
+    bool UndoLastStroke();
+    void RasterizeStrokes();
+    void FinishActiveStroke();
+    void StartActiveStroke(const glm::vec2 &position);
+    void AppendActiveStrokePoint(const glm::vec2 &position);
 
-	ApplicationState* m_AppState = nullptr;
-	std::shared_ptr<ComputeShader> m_RasterizeShader;
-	std::shared_ptr<ComputeShader> m_CopyShader;
-	std::shared_ptr<ShaderStorageBuffer> m_StrokeSettingsBuffer;
-	std::shared_ptr<ShaderStorageBuffer> m_StrokeRangesBuffer;
-	std::shared_ptr<ShaderStorageBuffer> m_StrokePointsBuffer;
-	std::shared_ptr<GeneratorTexture> m_BaseTexture;
-	std::shared_ptr<GeneratorTexture> m_PaintedTexture;
-	std::shared_ptr<GeneratorTexture> m_VisualizationTexture;
-	GeneratorTexture* m_ExternalGeneratedTexture = nullptr;
-	std::vector<MaskStroke> m_Strokes;
-	MaskStroke m_ActiveStroke;
-	bool m_HasActiveStroke = false;
+    ApplicationState *m_AppState = nullptr;
+    std::shared_ptr<ComputeShader> m_RasterizeShader;
+    std::shared_ptr<ComputeShader> m_CopyShader;
+    std::shared_ptr<ShaderStorageBuffer> m_StrokeSettingsBuffer;
+    std::shared_ptr<ShaderStorageBuffer> m_StrokeRangesBuffer;
+    std::shared_ptr<ShaderStorageBuffer> m_StrokePointsBuffer;
+    std::shared_ptr<GeneratorTexture> m_BaseTexture;
+    std::shared_ptr<GeneratorTexture> m_PaintedTexture;
+    std::shared_ptr<GeneratorTexture> m_VisualizationTexture;
+    GeneratorTexture *m_ExternalGeneratedTexture = nullptr;
+    std::vector<MaskStroke> m_Strokes;
+    MaskStroke m_ActiveStroke;
+    bool m_HasActiveStroke = false;
 
-	glm::vec3 m_VizColor = glm::vec3(0.2f, 0.2f, 0.2f);
-	bool m_InvertPreview = false;
-	DrawBrushSettings m_DrawSettings;
-	MaskPreviewMode m_PreviewMode = MaskPreviewMode::Painted;
-	std::string m_GeneratedMaskLabel = "Generated mask";
+    glm::vec3 m_VizColor = glm::vec3(0.2f, 0.2f, 0.2f);
+    bool m_InvertPreview = false;
+    DrawBrushSettings m_DrawSettings;
+    MaskPreviewMode m_PreviewMode    = MaskPreviewMode::Painted;
+    std::string m_GeneratedMaskLabel = "Generated mask";
 
-	int m_Size = 256;
-	bool m_RequireUpdation = true;
-	bool m_IsEditing = false;
-	int m_PreviousBrushMode = 0;
+    int m_Size              = 256;
+    bool m_RequireUpdation  = true;
+    bool m_IsEditing        = false;
+    int m_PreviousBrushMode = 0;
 
-	static MaskTool* s_CurrentlyEditingMaskTool;
+    static MaskTool *s_CurrentlyEditingMaskTool;
 };
 
-inline GeneratorTexture* MaskTool::GetPreviewTexture() const
+inline GeneratorTexture *MaskTool::GetPreviewTexture() const
 {
-	return GetTexture();
+    return GetTexture();
 }

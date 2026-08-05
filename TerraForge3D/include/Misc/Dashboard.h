@@ -1,27 +1,35 @@
 #pragma once
 
-
 class ApplicationState;
 
 class Dashboard
 {
 public:
-	Dashboard(ApplicationState* appState);
-	~Dashboard();
+    Dashboard(ApplicationState *appState);
+    ~Dashboard();
 
-	void Update();
-	void ShowSettings();
+    void Update();
+    void ShowSettings();
 
-	inline bool IsWindowVisible() const { return m_IsWindowVisible; }
-	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; } // For ImGui::Checkbox
-	inline void SetWindowVisible(bool visible) { m_IsWindowVisible = visible; }
+    inline bool IsWindowVisible() const
+    {
+        return m_IsWindowVisible;
+    }
+    inline bool *IsWindowVisiblePtr()
+    {
+        return &m_IsWindowVisible;
+    } // For ImGui::Checkbox
+    inline void SetWindowVisible(bool visible)
+    {
+        m_IsWindowVisible = visible;
+    }
 
 private:
-	void CalculateTileSizeAndOffset();
-	void ShowChooseBaseModelPopup();
+    void CalculateTileSizeAndOffset();
+    void ShowChooseBaseModelPopup();
 
 private:
-	ApplicationState* m_AppState = nullptr;
-	bool m_IsWindowVisible = true;
-	bool m_ForceUpdate = false;
+    ApplicationState *m_AppState = nullptr;
+    bool m_IsWindowVisible       = true;
+    bool m_ForceUpdate           = false;
 };

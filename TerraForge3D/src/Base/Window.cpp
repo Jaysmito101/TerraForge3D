@@ -1,5 +1,5 @@
-#include <Window.h>
 #include "Base/Logging/Logger.h"
+#include <Window.h>
 
 #include <GLFW/glfw3.h>
 
@@ -9,175 +9,158 @@ static bool isGLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char *description)
 {
-	TF3D_LOG_ERROR("GLFW error {}: {}", error, description ? description : "unknown error");
+    TF3D_LOG_ERROR("GLFW error {}: {}", error, description ? description : "unknown error");
 }
 
 static void InitGLFW()
 {
-	if (isGLFWInitialized)
-	{
-		return;
-	}
+    if (isGLFWInitialized) {
+        return;
+    }
 
-	if (!glfwInit())
-	{
-	TF3D_LOG_ERROR("Failed to initialize GLFW");
-		exit(-1);
-	}
+    if (!glfwInit()) {
+        TF3D_LOG_ERROR("Failed to initialize GLFW");
+        exit(-1);
+    }
 
-	glfwSetErrorCallback(GLFWErrorCallback);
-	glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	isGLFWInitialized = true;
+    glfwSetErrorCallback(GLFWErrorCallback);
+    glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    isGLFWInitialized = true;
 }
-
 
 Window::Window(std::string title)
 {
-	InitGLFW();
-	m_Window = glfwCreateWindow(640, 480, title.c_str(), NULL, NULL);
+    InitGLFW();
+    m_Window = glfwCreateWindow(640, 480, title.c_str(), NULL, NULL);
 
-	if (!m_Window)
-	{
-		glfwTerminate();
-		TF3D_LOG_ERROR("Failed to create application window");
-		exit(-1);
-	}
+    if (!m_Window) {
+        glfwTerminate();
+        TF3D_LOG_ERROR("Failed to create application window");
+        exit(-1);
+    }
 
-	isActive = true;
-	glfwMakeContextCurrent(m_Window);
+    isActive = true;
+    glfwMakeContextCurrent(m_Window);
 }
 
 void Window::SetVSync(bool enabled)
 {
-	if (enabled == vSyncState)
-	{
-		return;
-	}
+    if (enabled == vSyncState) {
+        return;
+    }
 
-	if (enabled)
-	{
-		glfwSwapInterval(1);
-		vSyncState = enabled;
-	}
+    if (enabled) {
+        glfwSwapInterval(1);
+        vSyncState = enabled;
+    }
 
-	else
-	{
-		glfwSwapInterval(0);
-		vSyncState = enabled;
-	}
+    else {
+        glfwSwapInterval(0);
+        vSyncState = enabled;
+    }
 }
 
 void Window::Clear()
 {
-	glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::SetFullScreen(bool fullscreen)
 {
-	if (isFullscreen == fullscreen)
-	{
-		return;
-	}
+    if (isFullscreen == fullscreen) {
+        return;
+    }
 
-	static int x, y;
-	static int sx, sy;
-	isFullscreen = fullscreen;
+    static int x, y;
+    static int sx, sy;
+    isFullscreen = fullscreen;
 
-	if (fullscreen)
-	{
-		// backup window position and window size
-		glfwGetWindowPos(m_Window, &x, &y);
-		glfwGetWindowSize(m_Window, &sx, &sy);
-		// get resolution of monitor
-		const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		// switch to full screen
-		glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
-	}
+    if (fullscreen) {
+        // backup window position and window size
+        glfwGetWindowPos(m_Window, &x, &y);
+        glfwGetWindowSize(m_Window, &sx, &sy);
+        // get resolution of monitor
+        const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        // switch to full screen
+        glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
+    }
 
-	else
-	{
-		// restore last window size and position
-		glfwSetWindowMonitor(m_Window, nullptr, x, y, sx, sy, 0);
-	}
+    else {
+        // restore last window size and position
+        glfwSetWindowMonitor(m_Window, nullptr, x, y, sx, sy, 0);
+    }
 }
 
 void Window::SetVisible(bool visibility)
 {
-	if (visibility)
-	{
-		glfwShowWindow(m_Window);
-	}
+    if (visibility) {
+        glfwShowWindow(m_Window);
+    }
 
-	else
-	{
-		glfwHideWindow(m_Window);
-	}
+    else {
+        glfwHideWindow(m_Window);
+    }
 }
 
 void Window::Update()
 {
-	if (!isActive)
-	{
-		return;
-	}
+    if (!isActive) {
+        return;
+    }
 
-	if (glfwWindowShouldClose(m_Window))
-	{
-		if(m_CloseEventCallback)
-		{
-			m_CloseEventCallback(0, 0);
-		}
+    if (glfwWindowShouldClose(m_Window)) {
+        if (m_CloseEventCallback) {
+            m_CloseEventCallback(0, 0);
+        }
 
-		isActive = false;
-	}
+        isActive = false;
+    }
 
-	glfwSwapBuffers(m_Window);
-	glfwPollEvents();
+    glfwSwapBuffers(m_Window);
+    glfwPollEvents();
 }
 
 void Window::SetMouseCallback(EventFn callback)
 {
-	m_MouseEventCallback = callback;
+    m_MouseEventCallback = callback;
 }
 
 void Window::SetResizeCallback(EventFn callback)
 {
-	m_ResizeEventCallback = callback;
+    m_ResizeEventCallback = callback;
 }
 
 void Window::SetShouldCloseCallback(EventFn callback)
 {
-	m_CloseEventCallback = callback;
+    m_CloseEventCallback = callback;
 }
 
 void Window::SetClearColor(ClearColor color)
 {
-	m_ClearColor = color;
+    m_ClearColor = color;
 }
 
 void Window::MakeCurrentContext()
 {
-	if (m_Window)
-	{
-		glfwMakeContextCurrent(m_Window);
-	}
+    if (m_Window) {
+        glfwMakeContextCurrent(m_Window);
+    }
 }
 
 Window::~Window()
 {
-	Close();
-	TF3D_LOG_DEBUG("Destroying application window");
+    Close();
+    TF3D_LOG_DEBUG("Destroying application window");
 }
 
 void Window::Close()
 {
-	if (m_Window)
-	{
-		glfwDestroyWindow(m_Window);
-	}
+    if (m_Window) {
+        glfwDestroyWindow(m_Window);
+    }
 }

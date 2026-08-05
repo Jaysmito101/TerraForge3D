@@ -13,49 +13,60 @@ class HeightfieldPyramid;
 class HeightfieldAmbientCache
 {
 public:
-	 explicit HeightfieldAmbientCache(ApplicationState* appState);
-	~HeightfieldAmbientCache();
+    explicit HeightfieldAmbientCache(ApplicationState *appState);
+    ~HeightfieldAmbientCache();
 
-	bool Update(HeightfieldPyramid* heightPyramid, uint64_t terrainRevision,
-		float terrainWorldSize, float aoRadius);
-	void Bind(uint32_t textureSlot) const;
-	void SetEnabled(bool enabled);
+    bool Update(HeightfieldPyramid *heightPyramid, uint64_t terrainRevision,
+                float terrainWorldSize, float aoRadius);
+    void Bind(uint32_t textureSlot) const;
+    void SetEnabled(bool enabled);
 
-	inline uint32_t GetRendererID() const { return m_RendererID; }
-	inline int32_t GetResolution() const { return m_Resolution; }
-	inline bool IsReady() const { return m_IsReady; }
-	inline bool IsEnabled() const { return m_Enabled; }
+    inline uint32_t GetRendererID() const
+    {
+        return m_RendererID;
+    }
+    inline int32_t GetResolution() const
+    {
+        return m_Resolution;
+    }
+    inline bool IsReady() const
+    {
+        return m_IsReady;
+    }
+    inline bool IsEnabled() const
+    {
+        return m_Enabled;
+    }
 
 private:
-	struct WorkParameters
-	{
-		HeightfieldPyramid* heightPyramid = nullptr;
-		uint64_t terrainRevision = 0;
-		float terrainWorldSize = 0.0f;
-		float aoRadius = 0.0f;
-		uint32_t outputRendererID = 0;
-		int32_t outputResolution = 0;
-	};
+    struct WorkParameters {
+        HeightfieldPyramid *heightPyramid = nullptr;
+        uint64_t terrainRevision          = 0;
+        float terrainWorldSize            = 0.0f;
+        float aoRadius                    = 0.0f;
+        uint32_t outputRendererID         = 0;
+        int32_t outputResolution          = 0;
+    };
 
-	void EnsureTextures(int32_t resolution);
-	void ReleaseTextures();
-	void RunWorkerBuild();
-	void PollWorkerCompletion();
+    void EnsureTextures(int32_t resolution);
+    void ReleaseTextures();
+    void RunWorkerBuild();
+    void PollWorkerCompletion();
 
-	ApplicationState* m_AppState = nullptr;
-	std::shared_ptr<ComputeShader> m_GenerateShader;
-	std::unique_ptr<GenerationWorker> m_Worker;
-	uint32_t m_RendererID = 0;
-	uint32_t m_WorkingRendererID = 0;
-	int32_t m_Resolution = 0;
-	bool m_IsReady = false;
-	bool m_Enabled = false;
-	uint64_t m_TerrainRevision = 0;
-	float m_TerrainWorldSize = 0.0f;
-	float m_AoRadius = 0.0f;
-	std::mutex m_WorkMutex;
-	WorkParameters m_PendingWork;
-	WorkParameters m_CompletedWork;
-	bool m_WorkPending = false;
-	bool m_WorkComplete = false;
+    ApplicationState *m_AppState = nullptr;
+    std::shared_ptr<ComputeShader> m_GenerateShader;
+    std::unique_ptr<GenerationWorker> m_Worker;
+    uint32_t m_RendererID        = 0;
+    uint32_t m_WorkingRendererID = 0;
+    int32_t m_Resolution         = 0;
+    bool m_IsReady               = false;
+    bool m_Enabled               = false;
+    uint64_t m_TerrainRevision   = 0;
+    float m_TerrainWorldSize     = 0.0f;
+    float m_AoRadius             = 0.0f;
+    std::mutex m_WorkMutex;
+    WorkParameters m_PendingWork;
+    WorkParameters m_CompletedWork;
+    bool m_WorkPending  = false;
+    bool m_WorkComplete = false;
 };

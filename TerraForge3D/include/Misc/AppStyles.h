@@ -10,7 +10,7 @@ void LoadMayaStyle();
 void ShowStyleEditor(bool *pOpen);
 
 std::string GetCurrentThemeName();
-void SetCurrentThemeName(const std::string& name);
+void SetCurrentThemeName(const std::string &name);
 void CaptureCurrentThemeDefaults();
 void ResetCurrentThemeToDefaults();
 

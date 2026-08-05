@@ -1,22 +1,19 @@
 #pragma once
-#include <string>
 #include <sstream>
-
+#include <string>
 
 #include <webp/encode.h>
-
 
 class WebpTextureExporter
 {
 public:
-	WebpTextureExporter();
-	~WebpTextureExporter();
+    WebpTextureExporter();
+    ~WebpTextureExporter();
 
-	bool ExportHeightmap(const std::string& path, float* data, int bitDepth, int resolution, float* progress = nullptr);
-
-private:
+    bool ExportHeightmap(const std::string &path, float *data, int bitDepth, int resolution, float *progress = nullptr);
 
 private:
-	float m_Progress = 0.0f;
-	char buffer[4096] = {};
+private:
+    float m_Progress  = 0.0f;
+    char buffer[4096] = {};
 };

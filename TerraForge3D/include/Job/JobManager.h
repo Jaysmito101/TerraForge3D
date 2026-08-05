@@ -5,25 +5,30 @@
 #include "Job/JobSystem.h"
 #include "Job/Thread.h"
 
-
 class ApplicationState;
 
 namespace JobSystem
 {
-	class JobManager
-	{
-	public:
-		JobManager(ApplicationState* appState);
-		virtual ~JobManager();
+    class JobManager
+    {
+    public:
+        JobManager(ApplicationState *appState);
+        virtual ~JobManager();
 
-		virtual void ShowSettings();
+        virtual void ShowSettings();
 
-		inline bool* IsWindowOpenPtr() { return &m_IsVisible; }
-		inline bool IsWindowOpen() const { return m_IsVisible; }
+        inline bool *IsWindowOpenPtr()
+        {
+            return &m_IsVisible;
+        }
+        inline bool IsWindowOpen() const
+        {
+            return m_IsVisible;
+        }
 
-	private:
-		ApplicationState* m_AppState = nullptr;
-		bool m_IsVisible = false;
-	};
+    private:
+        ApplicationState *m_AppState = nullptr;
+        bool m_IsVisible             = false;
+    };
 
-}
+} // namespace JobSystem

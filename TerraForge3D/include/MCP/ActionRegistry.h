@@ -10,38 +10,35 @@
 #include <string>
 #include <vector>
 
-enum class ActionFlags : uint32_t
-	{
-		None = 0,
-		ReadOnly = 1u << 0,
-		Destructive = 1u << 1,
-		LongRunning = 1u << 2
-	};
+enum class ActionFlags : uint32_t {
+    None        = 0,
+    ReadOnly    = 1u << 0,
+    Destructive = 1u << 1,
+    LongRunning = 1u << 2
+};
 
-	struct ActionEntry
-	{
-		std::string name;
-		std::string title;
-		std::string description;
-		nlohmann::json inputSchema = nlohmann::json{
-			{"type", "object"},
-			{"properties", nlohmann::json::object()}
-		};
-		nlohmann::json annotations = nlohmann::json::object();
-		ActionFlags flags = ActionFlags::None;
-		std::function<McpResult(const nlohmann::json&)> invoke;
-	};
+struct ActionEntry {
+    std::string name;
+    std::string title;
+    std::string description;
+    nlohmann::json inputSchema = nlohmann::json{
+        {"type", "object"},
+        {"properties", nlohmann::json::object()}};
+    nlohmann::json annotations = nlohmann::json::object();
+    ActionFlags flags          = ActionFlags::None;
+    std::function<McpResult(const nlohmann::json &)> invoke;
+};
 
-	class ActionRegistry
-	{
-	public:
-		bool Register(ActionEntry entry);
-		bool Unregister(const std::string& name);
-		std::optional<ActionEntry> Find(const std::string& name) const;
-		std::vector<ActionEntry> Snapshot() const;
-		void Clear();
+class ActionRegistry
+{
+public:
+    bool Register(ActionEntry entry);
+    bool Unregister(const std::string &name);
+    std::optional<ActionEntry> Find(const std::string &name) const;
+    std::vector<ActionEntry> Snapshot() const;
+    void Clear();
 
-	private:
-		mutable std::mutex mutex;
-		std::map<std::string, ActionEntry> entries;
-	};
+private:
+    mutable std::mutex mutex;
+    std::map<std::string, ActionEntry> entries;
+};

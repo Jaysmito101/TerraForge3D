@@ -1,8 +1,8 @@
 #pragma once
-#include <string>
-#include <vector>
 #include "Base/BaseMath.h"
 #include "Base/Texture2D.h"
+#include <string>
+#include <vector>
 
 #define TEXTURE_CUBEMAP_PX 0
 #define TEXTURE_CUBEMAP_NX 1
@@ -11,25 +11,23 @@
 #define TEXTURE_CUBEMAP_PZ 4
 #define TEXTURE_CUBEMAP_NZ 5
 
-
-
 class TextureCubemap
 {
 public:
-	TextureCubemap();
-	~TextureCubemap();
+    TextureCubemap();
+    ~TextureCubemap();
 
-	void SetUpOnGPU();
-	bool LoadFaces(std::vector<std::string> paths);
-	bool LoadFace(std::string path, int face);
-	void DeleteData();
-	bool UploadFaceToGPU(int face);
-	void UploadDataToGPU();
-	void Bind(int slot);
+    void SetUpOnGPU();
+    bool LoadFaces(std::vector<std::string> paths);
+    bool LoadFace(std::string path, int face);
+    void DeleteData();
+    bool UploadFaceToGPU(int face);
+    void UploadDataToGPU();
+    void Bind(int slot);
 
-	Texture2D *textures[6];
-	unsigned char *facesData[6];
-	IVec2 facesSizes[6];
-	uint32_t rendereID;
-	std::vector<std::string> faces;
+    Texture2D *textures[6];
+    unsigned char *facesData[6];
+    IVec2 facesSizes[6];
+    uint32_t rendereID;
+    std::vector<std::string> faces;
 };

@@ -4,142 +4,129 @@
 namespace JobSystem
 {
 
+    JobSystem::JobSystem(ApplicationState *appState)
+    {
+        this->appState = appState;
+        this->jobs.clear();
+        this->threadPoolSize = std::thread::hardware_concurrency();
+    }
 
+    JobSystem::~JobSystem()
+    {
+        WaitAll();
+        for (auto &[_, value] : jobs) {
+            if (value->onDelete)
+                value->onDelete(value.get());
+        }
+        this->jobs.clear();
+    }
 
-	JobSystem::JobSystem(ApplicationState* appState)
-	{
-		this->appState = appState;
-		this->jobs.clear();
-		this->threadPoolSize = std::thread::hardware_concurrency();
-	}
+    void JobSystem::Update()
+    {
+        // Assign Jobs for AsyncOnMainThread
+        UpdateAsyncOnMainThreadJobs();
 
-	JobSystem::~JobSystem()
-	{
-		WaitAll();
-		for (auto& [_, value] : jobs)
-		{
-			if (value->onDelete)
-				value->onDelete(value.get());
-		}
-		this->jobs.clear();
-	}
+        // Assign Jobs for Async
+        UpdateAsyncJobs();
 
-	void JobSystem::Update()
-	{
-		// Assign Jobs for AsyncOnMainThread
-		UpdateAsyncOnMainThreadJobs();
+        // Delete Completed Jobs execeding maxCompletedJobQueueSize
+        if (completedJobs.size() == maxCompletedJobQueueSize) {
+            auto job = jobs[completedJobs.front()];
+            completedJobs.pop();
+            jobs.erase(job->id);
+            if (job->onDelete)
+                job->onDelete(job.get());
+        }
+    }
 
-		// Assign Jobs for Async
-		UpdateAsyncJobs();
+    std::shared_ptr<Job> JobSystem::AddNewJob(std::shared_ptr<Job> job)
+    {
+        // TF3D_ASSERT(job, "job is NULL");
 
-		// Delete Completed Jobs execeding maxCompletedJobQueueSize
-		if (completedJobs.size() == maxCompletedJobQueueSize)
-		{
-			auto job = jobs[completedJobs.front()];
-			completedJobs.pop();
-			jobs.erase(job->id);
-			if (job->onDelete)
-				job->onDelete(job.get());
-		}
-	}
+        // if (job->onSetup)
+        //  	job->onSetup(job);
 
-	std::shared_ptr<Job> JobSystem::AddNewJob(std::shared_ptr<Job> job)
-	{
-		// TF3D_ASSERT(job, "job is NULL");
+        jobs[job->id] = job;
 
-		// if (job->onSetup)
-		//  	job->onSetup(job);
+        if (job->excutionModel == JobExecutionModel_Async)
+            asyncJobsQueue.push(job->id);
+        else if (job->excutionModel == JobExecutionModel_AsyncOnMainThread)
+            asyncOnMTJobsQueue.push(job->id);
 
-		jobs[job->id] = job;
+        job->status = JobStatus_Queued;
 
-		if (job->excutionModel == JobExecutionModel_Async)
-			asyncJobsQueue.push(job->id);
-		else if (job->excutionModel == JobExecutionModel_AsyncOnMainThread)
-			asyncOnMTJobsQueue.push(job->id);
+        return job;
+    }
 
-		job->status = JobStatus_Queued;
+    std::shared_ptr<Job> JobSystem::AddFunctionWorker(std::function<void()> func, JobExecutionModel excutionModel)
+    {
+        auto job   = std::make_shared<Job>();
+        job->onRun = [func](Job *) -> bool { func(); return true; };
+        return AddNewJob(job);
+    }
 
-		return job;
-	}
+    void JobSystem::WaitAll()
+    {
+        for (int i = 0; i < threadPoolSize; i++) {
+            threadPool[i].FinishPendingJob(true);
+        }
+    }
 
-	std::shared_ptr<Job> JobSystem::AddFunctionWorker(std::function<void()> func, JobExecutionModel excutionModel)
-	{
-		auto job = std::make_shared<Job>();
-		job->onRun = [func](Job*) -> bool { func(); return true; };
-		return AddNewJob(job);
-	}
+    void JobSystem::UpdateAsyncOnMainThreadJobs()
+    {
+        auto currTime = std::chrono::high_resolution_clock::now();
+        deltaTime     = std::chrono::duration<double>(currTime - prevTime).count();
+        prevTime      = currTime;
+        totalTime += deltaTime;
 
-	void JobSystem::WaitAll()
-	{
-		for (int i = 0; i < threadPoolSize; i++)
-		{
-			threadPool[i].FinishPendingJob(true);
-		}
-	}
+        if (totalTime >= flushMTJobsEvery) {
+            totalTime = 0.0f;
 
-	void JobSystem::UpdateAsyncOnMainThreadJobs()
-	{
-		auto currTime = std::chrono::high_resolution_clock::now();
-		deltaTime = std::chrono::duration<double>(currTime - prevTime).count();
-		prevTime = currTime;
-		totalTime += deltaTime;
+            // Flush the jobs
+            double timeTaken     = 0.0f;
+            auto mtJobsBeginTime = std::chrono::high_resolution_clock::now();
+            while (asyncOnMTJobsQueue.size() > 0) {
+                auto job = jobs[asyncOnMTJobsQueue.front()];
+                asyncOnMTJobsQueue.pop();
+                job->status = JobStatus_OnGoing;
 
-		if (totalTime >= flushMTJobsEvery)
-		{
-			totalTime = 0.0f;
+                if (job->onRun) {
+                    if (job->onRun(job.get()))
+                        job->status = JobStatus_Success;
+                    else
+                        job->status = JobStatus_Faliure;
+                }
+                if (job->onComplete)
+                    job->onComplete(job.get());
+                completedJobs.push(job->id);
+                auto mtJobEndTime = std::chrono::high_resolution_clock::now();
+                timeTaken         = std::chrono::duration<double>(mtJobEndTime - mtJobsBeginTime).count();
+                if (timeTaken > maxMTJobExecutionTime)
+                    break;
+            }
+        }
+    }
 
-			// Flush the jobs
-			double timeTaken = 0.0f;
-			auto mtJobsBeginTime = std::chrono::high_resolution_clock::now();
-			while (asyncOnMTJobsQueue.size() > 0)
-			{
-				auto job = jobs[asyncOnMTJobsQueue.front()];
-				asyncOnMTJobsQueue.pop();
-				job->status = JobStatus_OnGoing;
+    void JobSystem::UpdateAsyncJobs()
+    {
+        // Recover the finished Jobs
+        for (int i = 0; i < threadPoolSize; i++) {
+            if (threadPool[i].hasCompletedJob) {
+                Job *job = threadPool[i].FinishPendingJob();
+                if (job->onComplete)
+                    job->onComplete(job);
+                completedJobs.push(job->id);
+            }
+        }
 
-				if (job->onRun)
-				{
-					if (job->onRun(job.get()))
-						job->status = JobStatus_Success;
-					else
-						job->status = JobStatus_Faliure;
-				}
-				if (job->onComplete)
-					job->onComplete(job.get());
-				completedJobs.push(job->id);
-				auto mtJobEndTime = std::chrono::high_resolution_clock::now();
-				timeTaken = std::chrono::duration<double>(mtJobEndTime - mtJobsBeginTime).count();
-				if (timeTaken > maxMTJobExecutionTime)
-					break;
-			}
-		}
-	}
+        // Assign the Jobs
+        for (int i = 0; i < threadPoolSize && !asyncJobsQueue.empty(); i++) {
+            if (threadPool[i].IsFree()) {
+                auto job = jobs[asyncJobsQueue.front()];
+                asyncJobsQueue.pop();
+                threadPool[i].AssignJob(job.get());
+            }
+        }
+    }
 
-	void JobSystem::UpdateAsyncJobs()
-	{
-		// Recover the finished Jobs
-		for (int i = 0; i < threadPoolSize; i++)
-		{
-			if (threadPool[i].hasCompletedJob)
-			{
-				Job* job = threadPool[i].FinishPendingJob();
-				if (job->onComplete)
-					job->onComplete(job);
-				completedJobs.push(job->id);
-			}
-		}
-
-		// Assign the Jobs
-		for (int i = 0; i < threadPoolSize && !asyncJobsQueue.empty(); i++)
-		{
-			if (threadPool[i].IsFree())
-			{
-				auto job = jobs[asyncJobsQueue.front()];
-				asyncJobsQueue.pop();
-				threadPool[i].AssignJob(job.get());
-			}
-		}
-	}
-
-}
-
+} // namespace JobSystem

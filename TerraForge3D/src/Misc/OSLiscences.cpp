@@ -2,58 +2,54 @@
 
 #include "imgui.h"
 
+#include <filesystem>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <filesystem>
 
-#include "Utils/Utils.h"
 #include "Data/ApplicationState.h"
+#include "Utils/Utils.h"
 
 namespace fs = std::filesystem;
 
 OSLiscences::~OSLiscences()
 {
-	osls.clear();
+    osls.clear();
 }
 
 OSLiscences::OSLiscences(ApplicationState *as)
 {
-	appState = as;
-	std::string path = appState->constants.liscensesDir;
+    appState         = as;
+    std::string path = appState->constants.liscensesDir;
 
-	for (const auto& entry : fs::directory_iterator(path))
-	{
-		std::string path = entry.path().string();
-		std::string name = entry.path().filename().string();
-		bool tmp = false;
-		name = name.substr(0, name.size() - 3);
-		osls.push_back(std::make_pair(name, ReadShaderSourceFile(path, &tmp)));
-	}
+    for (const auto &entry : fs::directory_iterator(path)) {
+        std::string path = entry.path().string();
+        std::string name = entry.path().filename().string();
+        bool tmp         = false;
+        name             = name.substr(0, name.size() - 3);
+        osls.push_back(std::make_pair(name, ReadShaderSourceFile(path, &tmp)));
+    }
 }
 
 void OSLiscences::ShowLisc(std::string &name, std::string &content, int id)
 {
-	bool state = ImGui::CollapsingHeader(("##LiscItem" + std::to_string(id)).c_str());
-	ImGui::SameLine();
-	ImGui::Text("%s", name.c_str());
+    bool state = ImGui::CollapsingHeader(("##LiscItem" + std::to_string(id)).c_str());
+    ImGui::SameLine();
+    ImGui::Text("%s", name.c_str());
 
-	if (state)
-	{
-		ImGui::Text("%s", content.c_str());
-	}
+    if (state) {
+        ImGui::Text("%s", content.c_str());
+    }
 }
-
 
 void OSLiscences::ShowSettings(bool *pOpen)
 {
-	ImGui::Begin("Open Source LICENSES", pOpen);
-	int id = 0;
+    ImGui::Begin("Open Source LICENSES", pOpen);
+    int id = 0;
 
-	for (auto &item : osls)
-	{
-		ShowLisc(item.first, item.second, id++);
-	}
+    for (auto &item : osls) {
+        ShowLisc(item.first, item.second, id++);
+    }
 
-	ImGui::End();
+    ImGui::End();
 }

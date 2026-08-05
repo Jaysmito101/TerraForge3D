@@ -2,8 +2,8 @@
 #include "Base/BinaryFileWriter.h"
 #include "Utils/Utils.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 
 // This is not really a good way to do this but I dont really want to take the pains
 // of implementing this with a proper XML writer as of now if you are interesed in improving
@@ -84,53 +84,58 @@ ColladaExporter::~ColladaExporter()
 {
 }
 
-bool ColladaExporter::Export(const std::string& path, Mesh* mesh, float* progress)
+bool ColladaExporter::Export(const std::string &path, Mesh *mesh, float *progress)
 {
-	if (!progress) progress = &m_Progress;
-	std::stringstream vts, txs, ind;
+    if (!progress)
+        progress = &m_Progress;
+    std::stringstream vts, txs, ind;
     *progress = 0.0f;
-	if (!PrepareVertices(mesh, vts)) return false; *progress = 0.3f;
-    if (!PrepareTexCoords(mesh, txs)) return false; *progress = 0.6f;
-    if (!PrepareIndices(mesh, ind)) return false; *progress = 0.9f;
-    std::ofstream out_file; out_file.open(path);
-	if (!out_file.is_open()) return false;
+    if (!PrepareVertices(mesh, vts))
+        return false;
+    *progress = 0.3f;
+    if (!PrepareTexCoords(mesh, txs))
+        return false;
+    *progress = 0.6f;
+    if (!PrepareIndices(mesh, ind))
+        return false;
+    *progress = 0.9f;
+    std::ofstream out_file;
+    out_file.open(path);
+    if (!out_file.is_open())
+        return false;
     out_file << PART_0 << GetTimeStamp() << PART_1 << GetTimeStamp() << PART_2;
-	out_file << (mesh->GetVertexCount() * 3) << R"(">)" << vts.str() << PART_3;
+    out_file << (mesh->GetVertexCount() * 3) << R"(">)" << vts.str() << PART_3;
     out_file << mesh->GetVertexCount() << PART_4 << (mesh->GetVertexCount() * 2) << R"(">)";
     out_file << txs.str() << PART_5 << mesh->GetVertexCount() << PART_6 << (mesh->GetFaceCount());
     out_file << PART_7 << ind.str() << PART_8;
-	out_file.close();
-	*progress = 1.0f;
-	return true;
+    out_file.close();
+    *progress = 1.0f;
+    return true;
 }
 
-bool ColladaExporter::PrepareTexCoords(Mesh* mesh, std::stringstream& strm)
+bool ColladaExporter::PrepareTexCoords(Mesh *mesh, std::stringstream &strm)
 {
-    for (int i = 0; i < mesh->GetVertexCount(); i++)
-    {
-        const auto& texCoord = mesh->GetTexCoord(i);
+    for (int i = 0; i < mesh->GetVertexCount(); i++) {
+        const auto &texCoord = mesh->GetTexCoord(i);
         strm << texCoord.x << ' ' << texCoord.y << ' ';
     }
-	return true;
+    return true;
 }
 
-bool ColladaExporter::PrepareVertices(Mesh* mesh, std::stringstream& strm)
+bool ColladaExporter::PrepareVertices(Mesh *mesh, std::stringstream &strm)
 {
-    for (int i = 0; i < mesh->GetVertexCount(); i++)
-    {
-        const auto& pos = mesh->GetPosition(i);
+    for (int i = 0; i < mesh->GetVertexCount(); i++) {
+        const auto &pos = mesh->GetPosition(i);
         strm << pos.x << ' ' << pos.y << ' ' << pos.z << ' ';
     }
     return true;
 }
 
-bool ColladaExporter::PrepareIndices(Mesh* mesh, std::stringstream& strm)
+bool ColladaExporter::PrepareIndices(Mesh *mesh, std::stringstream &strm)
 {
-    for (int i = 0; i < mesh->GetFaceCount(); i++)
-    {
-        const auto& face = mesh->GetFace(i);
+    for (int i = 0; i < mesh->GetFaceCount(); i++) {
+        const auto &face = mesh->GetFace(i);
         strm << face.a << ' ' << face.a << ' ' << face.b << ' ' << face.b << ' ' << face.c << ' ' << face.c << ' ';
     }
-	return true;
+    return true;
 }
-

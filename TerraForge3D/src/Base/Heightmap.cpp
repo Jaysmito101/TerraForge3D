@@ -1,26 +1,25 @@
 #include "Heightmap.h"
 #include "Base/Logging/Logger.h"
-#include <string>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <string>
 
-#include <stb/stb_image.h>
 #include <glad/gl.h>
+#include <stb/stb_image.h>
 
 Heightmap::Heightmap(const std::string path)
 {
     m_Path = path;
-	int width, height, channels;
-	stbi_set_flip_vertically_on_load(0);
-	void* data = stbi_load_16(path.c_str(), &width, &height, &channels, 1);
-    if (!data)
-    {
-		TF3D_LOG_ERROR("Failed to load heightmap '{}': {}", path, stbi_failure_reason());
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(0);
+    void *data = stbi_load_16(path.c_str(), &width, &height, &channels, 1);
+    if (!data) {
+        TF3D_LOG_ERROR("Failed to load heightmap '{}': {}", path, stbi_failure_reason());
         return;
     }
-    m_Data = static_cast<uint16_t*>(data);
-    m_Width = width;
+    m_Data   = static_cast<uint16_t *>(data);
+    m_Width  = width;
     m_Height = height;
 
     glGenTextures(1, &m_RendererID);
@@ -28,8 +27,7 @@ Heightmap::Heightmap(const std::string path)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     std::vector<uint8_t> texData;
-    for (int i = 0; i < width * height; ++i)
-    {
+    for (int i = 0; i < width * height; ++i) {
         uint8_t value = (uint8_t)(static_cast<float>(m_Data[i]) / (2 << 15) * 255);
         texData.push_back(value);
         texData.push_back(value);
@@ -47,11 +45,10 @@ Heightmap::Heightmap(const std::string path)
 
 Heightmap::~Heightmap()
 {
-	if (m_Data)
-	{
-		glDeleteTextures(1, &m_RendererID);
+    if (m_Data) {
+        glDeleteTextures(1, &m_RendererID);
         free(m_Data);
-	}
+    }
 }
 
 uint16_t Heightmap::Sample(float x, float y, bool interpolated) const
@@ -66,10 +63,10 @@ uint16_t Heightmap::Sample(float x, float y, bool interpolated) const
 
     const float sampleX = x * (m_Width - 1);
     const float sampleY = y * (m_Height - 1);
-    const uint32_t x1 = static_cast<uint32_t>(std::floor(sampleX));
-    const uint32_t y1 = static_cast<uint32_t>(std::floor(sampleY));
-    const uint32_t x2 = std::min(x1 + 1, m_Width - 1);
-    const uint32_t y2 = std::min(y1 + 1, m_Height - 1);
+    const uint32_t x1   = static_cast<uint32_t>(std::floor(sampleX));
+    const uint32_t y1   = static_cast<uint32_t>(std::floor(sampleY));
+    const uint32_t x2   = std::min(x1 + 1, m_Width - 1);
+    const uint32_t y2   = std::min(y1 + 1, m_Height - 1);
 
     const float xp = sampleX - x1;
     const float yp = sampleY - y1;
@@ -81,14 +78,13 @@ uint16_t Heightmap::Sample(float x, float y, bool interpolated) const
 
     auto v1 = lerp(h11, h21, xp);
     auto v2 = lerp(h12, h22, xp);
-    auto h = lerp(v1, v2, yp);
+    auto h  = lerp(v1, v2, yp);
     if (h < 0)
         h = 0;
-    return (uint16_t) h;
-
+    return (uint16_t)h;
 }
 
-uint16_t Heightmap::Get(uint32_t x, uint32_t y) const 
+uint16_t Heightmap::Get(uint32_t x, uint32_t y) const
 {
     return m_Data[x + m_Width * y];
 }

@@ -3,22 +3,25 @@
 // Splash screen not supported on linux
 #ifdef _WIN32
 
-#include <windows.h>
 #include <string>
+#include <windows.h>
 
 namespace SplashScreen
 {
 
-
-void Init();
-void Destory();
-void SetSplashMessage(std::string message);
-void HideSplashScreen();
-void ShowSplashScreen();
-}
+    void Init();
+    void Destory();
+    void SetSplashMessage(std::string message);
+    void HideSplashScreen();
+    void ShowSplashScreen();
+} // namespace SplashScreen
 
 #else
 
-namespace SplashScreen { void Init(); void Destory(); }
+namespace SplashScreen
+{
+    void Init();
+    void Destory();
+} // namespace SplashScreen
 
 #endif

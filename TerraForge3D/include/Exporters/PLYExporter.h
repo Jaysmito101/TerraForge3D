@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include <sstream>
+#include <string>
 
 class Mesh;
 class BinaryFileWriter;
@@ -8,16 +8,16 @@ class BinaryFileWriter;
 class PLYExporter
 {
 public:
-	PLYExporter();
-	~PLYExporter();
+    PLYExporter();
+    ~PLYExporter();
 
-	bool ExportASCII(const std::string& path, Mesh* mesh, float* progress = nullptr);
-	bool ExportBinary(const std::string& path, Mesh* mesh, float* progress = nullptr);
-
-private:
-	bool WriteHeader(BinaryFileWriter* writer, const std::string& format, Mesh* mesh);
+    bool ExportASCII(const std::string &path, Mesh *mesh, float *progress = nullptr);
+    bool ExportBinary(const std::string &path, Mesh *mesh, float *progress = nullptr);
 
 private:
-	float m_Progress = 0.0f;
-	char buffer[4096] = {};
+    bool WriteHeader(BinaryFileWriter *writer, const std::string &format, Mesh *mesh);
+
+private:
+    float m_Progress  = 0.0f;
+    char buffer[4096] = {};
 };

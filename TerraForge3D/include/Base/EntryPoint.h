@@ -3,7 +3,6 @@
 
 extern Application *CreateApplication();
 
-
 #ifdef TERR3D_WIN32
 #include <windows.h>
 
