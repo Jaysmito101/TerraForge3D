@@ -88,6 +88,12 @@ int BiomeFilter::GetIntegerParameter(const std::string& name, int defaultValue) 
 	return m_Inspector->GetVariable(name).GetInt();
 }
 
+float BiomeFilter::GetFloatParameter(const std::string& name, float defaultValue) const
+{
+	if (m_Inspector == nullptr || !m_Inspector->HasVariable(name)) return defaultValue;
+	return m_Inspector->GetVariable(name).GetFloat();
+}
+
 void BiomeFilter::Load(SerializerNode data)
 {
 	if (data == nullptr) return;

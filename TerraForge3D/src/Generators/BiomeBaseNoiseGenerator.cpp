@@ -182,7 +182,8 @@ void BiomeBaseNoiseGenerator::Update(GeneratorData* sourceBuffer, GeneratorData*
 	m_Shader->SetUniform1i("u_UseSeedTexture", (seedTexture != nullptr && values.at("AutoUseSeedTexture").GetBool()) ? 1 : 0);
 	if (seedTexture) m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
 	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-	m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+	const auto dispatchSize = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
+	m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
 	m_Shader->SetMemoryBarrier();
 
 	END_PROFILER(m_CalculationTime);

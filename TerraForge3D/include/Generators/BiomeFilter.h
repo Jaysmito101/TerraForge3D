@@ -41,7 +41,14 @@ public:
 	inline bool IsEnabled() const { return m_Enabled; }
 	inline bool UsesMask() const { return m_UseMask; }
 	inline bool InvertsMask() const { return m_InvertMask; }
+	inline bool NeedsFieldStatistics() const { return m_Definition != nullptr && m_Definition->NeedsFieldStatistics(); }
+	inline bool NeedsHistogram() const { return m_Definition != nullptr && m_Definition->NeedsHistogram(); }
+	inline std::string GetRequestedPercentileParameter() const
+	{
+		return m_Definition != nullptr ? m_Definition->GetRequestedPercentileParameter() : std::string();
+	}
 	int GetIntegerParameter(const std::string& name, int defaultValue = 0) const;
+	float GetFloatParameter(const std::string& name, float defaultValue = 0.0f) const;
 	inline float GetStrength() const { return m_Strength; }
 	inline BiomeFilterMergeMode GetMergeMode() const { return m_MergeMode; }
 	inline GeneratorTexture* GetMaskTexture() const { return m_MaskTool->GetPreviewTexture(); }

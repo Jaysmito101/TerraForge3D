@@ -73,6 +73,25 @@ bool BiomeFilterDefinition::BuildInspector(CustomInspector& inspector) const
 	return inspector.LoadConfig(m_Metadata);
 }
 
+bool BiomeFilterDefinition::NeedsFieldStatistics() const
+{
+	const auto statistics = m_Metadata.value("Statistics", nlohmann::json::object());
+	return statistics.is_object() &&
+		(statistics.value("NeedsMinMax", false) || statistics.value("NeedsHistogram", false));
+}
+
+bool BiomeFilterDefinition::NeedsHistogram() const
+{
+	const auto statistics = m_Metadata.value("Statistics", nlohmann::json::object());
+	return statistics.is_object() && statistics.value("NeedsHistogram", false);
+}
+
+std::string BiomeFilterDefinition::GetRequestedPercentileParameter() const
+{
+	const auto statistics = m_Metadata.value("Statistics", nlohmann::json::object());
+	return statistics.is_object() ? statistics.value("RequestedPercentileParameter", "") : "";
+}
+
 std::shared_ptr<ComputeShader> BiomeFilterDefinition::GetPhaseShader(ApplicationState* appState, const std::string& phase) const
 {
 	const auto path = m_PhaseShaderPaths.find(phase);

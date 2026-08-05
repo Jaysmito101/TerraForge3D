@@ -19,6 +19,9 @@ public:
 
 	bool BuildInspector(CustomInspector& inspector) const;
 	std::shared_ptr<ComputeShader> GetPhaseShader(ApplicationState* appState, const std::string& phase) const;
+	bool NeedsFieldStatistics() const;
+	bool NeedsHistogram() const;
+	std::string GetRequestedPercentileParameter() const;
 
 	inline const std::string& GetID() const { return m_ID; }
 	inline const std::string& GetName() const { return m_Name; }

@@ -12,6 +12,7 @@ BiomeFilterStack::BiomeFilterStack(ApplicationState* appState)
 	m_Catalog = std::make_shared<BiomeFilterCatalog>(m_AppState);
 	m_ResultA = std::make_shared<GeneratorData>();
 	m_ResultB = std::make_shared<GeneratorData>();
+	m_Statistics = std::make_shared<GeneratorDataStatistics>(m_AppState);
 }
 
 void BiomeFilterStack::Resize(size_t dataSize, int resolution)
@@ -168,6 +169,13 @@ void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter>& filte
 	}
 }
 
+void BiomeFilterStack::BindFieldStatistics(const std::shared_ptr<BiomeFilter>& filter, const std::shared_ptr<ComputeShader>& shader)
+{
+	if (filter == nullptr || shader == nullptr || m_Statistics == nullptr || !filter->NeedsFieldStatistics()) return;
+	m_Statistics->Bind(FieldStatisticsBinding);
+	shader->SetUniform1i("u_HasFieldHistogram", filter->NeedsHistogram() ? 1 : 0);
+}
+
 void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter>& filter, const nlohmann::json& pass,
 	GeneratorData* input, GeneratorData* output, GeneratorData* reference)
 {
@@ -179,6 +187,7 @@ void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter>& filter, cons
 	output->Bind(2);
 	shader->Bind();
 	shader->SetUniform1i("u_Resolution", m_Resolution);
+	BindFieldStatistics(filter, shader);
 	SetPassUniforms(filter, shader, pass.value("Uniforms", nlohmann::json::object()));
 	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	const auto dispatchSize = (m_Resolution + workgroupSize - 1) / workgroupSize;
@@ -196,6 +205,7 @@ void BiomeFilterStack::RunMergePhase(const std::shared_ptr<BiomeFilter>& filter,
 	output->Bind(2);
 	shader->Bind();
 	shader->SetUniform1i("u_Resolution", m_Resolution);
+	BindFieldStatistics(filter, shader);
 	shader->SetUniform1f("u_Strength", filter->GetStrength());
 	shader->SetUniform1i("u_MergeMode", static_cast<int>(filter->GetMergeMode()));
 	shader->SetUniform1i("u_UseMask", filter->UsesMask() ? 1 : 0);
@@ -404,6 +414,18 @@ void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter>& filter, Gen
 		TF3D_LOG_ERROR("Filter '{}' has a merge with an unknown or missing Input/Operation/Output resource.", filter->GetName());
 		input->CopyTo(output);
 		return;
+	}
+
+	if (filter->NeedsFieldStatistics() && m_Statistics != nullptr)
+	{
+		float requestedPercentile = -1.0f;
+		if (filter->NeedsHistogram())
+		{
+			const std::string percentileParameter = filter->GetRequestedPercentileParameter();
+			if (!percentileParameter.empty() && filter->GetParameters().find(percentileParameter) != filter->GetParameters().end())
+				requestedPercentile = filter->GetFloatParameter(percentileParameter, -1.0f);
+		}
+		m_Statistics->Compute(input, m_Resolution, m_StatisticsSampleStride, filter->NeedsHistogram(), requestedPercentile);
 	}
 
 	if (pingPongIterations)
