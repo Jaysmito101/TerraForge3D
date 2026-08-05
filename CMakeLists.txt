@@ -7,6 +7,8 @@ project(TerraForge3D C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(TF3D_ENABLE_MCP "Enable the optional cpp-mcp integration" OFF)
+
 if(APPLE)
     set(EXECUTABLE_NAME "tf3d")
 else()
@@ -53,6 +55,41 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ImGui.cmake)
 add_subdirectory(./TerraForge3D/vendor/libwebp)
 add_subdirectory(./TerraForge3D/vendor/fmt)
 
+if(TF3D_ENABLE_MCP)
+    set(MCP_BUILD_TESTS OFF CACHE BOOL "Build cpp-mcp tests" FORCE)
+    set(MCP_SSL OFF CACHE BOOL "Enable cpp-mcp SSL support" FORCE)
+
+    add_subdirectory(
+        ./TerraForge3D/vendor/cpp-mcp
+        ${CMAKE_CURRENT_BINARY_DIR}/cpp-mcp
+        EXCLUDE_FROM_ALL
+    )
+
+    target_include_directories(mcp BEFORE PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common
+        ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include
+    )
+
+    set_property(TARGET mcp PROPERTY INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include"
+    )
+
+    get_target_property(_cpp_mcp_configuration_definitions
+        mcp INTERFACE_COMPILE_DEFINITIONS
+    )
+    set_property(TARGET mcp PROPERTY INTERFACE_COMPILE_DEFINITIONS "")
+
+    get_property(_cpp_mcp_example_targets
+        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/examples"
+        PROPERTY BUILDSYSTEM_TARGETS
+    )
+    foreach(_cpp_mcp_example_target IN LISTS _cpp_mcp_example_targets)
+        target_compile_definitions(${_cpp_mcp_example_target} PRIVATE
+            ${_cpp_mcp_configuration_definitions}
+        )
+    endforeach()
+endif()
+
 if( MSVC )
     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
 endif()
@@ -68,6 +105,9 @@ list(REMOVE_DUPLICATES SOURCES)
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_opengl3.cpp)
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
+
+set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)
+set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${EXECUTABLE_NAME} PRIVATE
@@ -104,6 +144,10 @@ target_link_libraries(${EXECUTABLE_NAME} OpenSSL::SSL)
 target_link_libraries(${EXECUTABLE_NAME} OpenSSL::Crypto)
 target_link_libraries(${EXECUTABLE_NAME} fmt::fmt)
 target_link_libraries(${EXECUTABLE_NAME} webp)
+
+if(TF3D_ENABLE_MCP)
+    target_link_libraries(${EXECUTABLE_NAME} mcp)
+endif()
 
 add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
