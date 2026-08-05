@@ -29,9 +29,7 @@ void main(void)
 	vec3 v = getSamplingVector();
 	float phi   = atan(v.z, v.x);
 	float theta = acos(v.y);
-	// atan() returns [-PI, PI], while an equirectangular texture uses [0, 1].
-	// The missing half-turn here caused the panorama to wrap over itself.
 	vec2 uv = vec2(phi / TwoPI + 0.5, theta / PI);
-	vec4 color = texture(u_InputTexture, uv);
+	vec4 color = textureLod(u_InputTexture, uv, 0.0);
     imageStore(outputTexture, ivec3(gl_GlobalInvocationID), color);
 }
