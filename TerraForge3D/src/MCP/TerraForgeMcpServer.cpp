@@ -56,6 +56,32 @@ namespace
 		return formatted.str();
 	}
 
+	void InstallMcpLogBridge()
+	{
+		mcp::set_log_sink([](mcp::log_level level, const std::string& message) {
+			switch (level)
+			{
+			case mcp::log_level::debug:
+				TF3D_LOG_DEBUG("[MCP] {}", message);
+				break;
+			case mcp::log_level::info:
+				TF3D_LOG_INFO("[MCP] {}", message);
+				break;
+			case mcp::log_level::warning:
+				TF3D_LOG_WARN("[MCP] {}", message);
+				break;
+			case mcp::log_level::error:
+				TF3D_LOG_ERROR("[MCP] {}", message);
+				break;
+			}
+		});
+	}
+
+	void RemoveMcpLogBridge()
+	{
+		mcp::set_log_sink({});
+	}
+
 	nlohmann::json CreateResourceContent(
 		const ResourceEntry& entry,
 		const McpResult& result)
@@ -141,9 +167,8 @@ class TerraForgeMcpServer::Impl
 		bool Start()
 		{
 			if (server && server->is_running()) return true;
-			// Keep cpp-mcp's internal diagnostics quiet; actionable MCP requests are
-			// recorded through TerraForge3D's logger and command history below.
-			mcp::set_log_level(mcp::log_level::error);
+			InstallMcpLogBridge();
+			mcp::set_log_level(mcp::log_level::debug);
 
 			mcp::server::configuration configuration;
 			configuration.host = host;
@@ -165,6 +190,7 @@ class TerraForgeMcpServer::Impl
 			{
 				server.reset();
 				CloseCallHistory();
+				RemoveMcpLogBridge();
 				return false;
 			}
 
@@ -187,6 +213,7 @@ class TerraForgeMcpServer::Impl
 				server.reset();
 			}
 			CloseCallHistory();
+			RemoveMcpLogBridge();
 		}
 
 		bool IsRunning() const
@@ -321,7 +348,6 @@ class TerraForgeMcpServer::Impl
 				std::move(parameters),
 				std::move(requestJson)
 			});
-			TF3D_LOG_INFO("[MCP] {} {}", method, commandLog.back().parameters);
 			if (callHistory.is_open())
 			{
 				callHistory << historyEntry.dump() << '\n';

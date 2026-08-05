@@ -72,11 +72,22 @@ if(TF3D_ENABLE_MCP)
     target_include_directories(mcp BEFORE PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common
         ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/spdlog/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/fmt/include
     )
 
     target_compile_definitions(mcp PRIVATE
         httplib=${TF3D_CPP_MCP_HTTPLIB_NAMESPACE}
+        SPDLOG_FMT_EXTERNAL
     )
+
+    set(TF3D_MCP_LOGGER_SHIM
+        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/include/MCP/Compat/mcp_logger.h")
+    if(MSVC)
+        target_compile_options(mcp PRIVATE "/FI${TF3D_MCP_LOGGER_SHIM}")
+    else()
+        target_compile_options(mcp PRIVATE "-include${TF3D_MCP_LOGGER_SHIM}")
+    endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(mcp PRIVATE
@@ -88,7 +99,7 @@ if(TF3D_ENABLE_MCP)
     endif()
 
     set_property(TARGET mcp PROPERTY INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/spdlog/include;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/fmt/include"
     )
 
     get_target_property(_cpp_mcp_configuration_definitions
@@ -144,6 +155,11 @@ if(TF3D_ENABLE_MCP)
         httplib=${TF3D_CPP_MCP_HTTPLIB_NAMESPACE}
         ${_cpp_mcp_configuration_definitions}
     )
+    if(MSVC)
+        target_compile_options(tf3d_mcp PRIVATE "/FI${TF3D_MCP_LOGGER_SHIM}")
+    else()
+        target_compile_options(tf3d_mcp PRIVATE "-include${TF3D_MCP_LOGGER_SHIM}")
+    endif()
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(tf3d_mcp PRIVATE -Wno-deprecated-declarations)
     endif()
