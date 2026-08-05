@@ -29,6 +29,7 @@ public:
     RendererManager(ApplicationState *appState);
     ~RendererManager();
 
+    void Update();
     void Render(RendererViewport *viewport);
     void ShowSettings();
     inline bool IsWindowVisible()
@@ -91,6 +92,11 @@ public:
     }
 
 private:
+    void UpdateTerrainSelfShadowCache();
+    void UpdatePlanarShadowCache();
+    void UpdateHeightfieldAmbientCache();
+    void UpdateHeightfieldGICache();
+
     ApplicationState *m_AppState = nullptr;
     bool m_IsWindowVisible       = true;
     // std::shared_ptr<ObjectRenderer> m_ObjectRenderer;
