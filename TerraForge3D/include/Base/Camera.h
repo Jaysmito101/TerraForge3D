@@ -1,44 +1,54 @@
 #pragma once
 
 #include <glm/glm.hpp>
-
 #include <nlohmann/json.hpp>
-
 
 class Camera
 {
 public:
-	glm::mat4 view;
-	glm::mat4 pers;
-	glm::mat4 pv;
-	glm::vec3 mposition;
-	glm::vec3 mrotation;
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	float pitch;
-	float yaw;
-	float roll;
-
-	float fov;
-	float cFar;
-	float cNear;
-	float aspect;
-
-	int camID; // May be removed in future
-
-	float position[3];
-	float rotation[3];
-
-	bool perspective;
-
-	Camera(bool perspective = true);
-
-	nlohmann::json  Save();
-
-	void Load(nlohmann::json data);
-
-	void ShowSettings(bool renderWindow = false, bool *pOpen = nullptr);
+	 explicit Camera(bool perspective = true);
 
 	void UpdateCamera();
+	void SetAspectRatio(float aspectRatio);
+	void Orbit(float deltaX, float deltaY, float sensitivity = 0.005f);
+	void Pan(float deltaX, float deltaY, float viewportHeight);
+	void Zoom(float wheelDelta);
+	void Reset();
+
+	nlohmann::json Save() const;
+	void Load(const nlohmann::json& data);
+	void ShowSettings(bool renderWindow = false, bool* pOpen = nullptr);
+
+	const glm::mat4& GetViewMatrix() const { return m_View; }
+	const glm::mat4& GetProjectionMatrix() const { return m_Projection; }
+	const glm::mat4& GetProjectionViewMatrix() const { return m_ProjectionView; }
+	const glm::vec3& GetPosition() const { return m_Position; }
+	const glm::vec3& GetTarget() const { return m_Target; }
+
+	float GetFieldOfView() const { return m_FieldOfView; }
+	float GetNearClip() const { return m_NearClip; }
+	float GetFarClip() const { return m_FarClip; }
+	bool IsPerspective() const { return m_Perspective; }
+
+private:
+	void RebuildProjection();
+	void ClampOrbit();
+
+	glm::mat4 m_View = glm::mat4(1.0f);
+	glm::mat4 m_Projection = glm::mat4(1.0f);
+	glm::mat4 m_ProjectionView = glm::mat4(1.0f);
+	glm::vec3 m_Position = glm::vec3(0.0f, 1.5f, 3.1f);
+	glm::vec3 m_Target = glm::vec3(0.0f);
+	glm::vec3 m_WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	float m_Distance = 3.1f;
+	float m_Azimuth = 0.0f;
+	float m_Elevation = glm::radians(28.0f);
+	float m_FieldOfView = 45.0f;
+	float m_NearClip = 0.01f;
+	float m_FarClip = 10000.0f;
+	float m_AspectRatio = 16.0f / 9.0f;
+	bool m_Perspective = true;
+	bool m_AutomaticClipping = true;
+	int m_CameraID = 0;
 };

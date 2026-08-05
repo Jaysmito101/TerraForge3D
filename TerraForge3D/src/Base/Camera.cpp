@@ -1,108 +1,170 @@
 #include "Base/Camera.h"
 
 #include "imgui/imgui.h"
+
+#include <algorithm>
+#include <cmath>
 #include <string>
 
-
 #include <glm/gtc/constants.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/ext/matrix_relational.hpp>
-#include <glm/ext/vector_relational.hpp>
-#include <glm/ext/scalar_relational.hpp>
 
-static int ID = 0;
+constexpr float MinElevation = glm::radians(2.0f);
+constexpr float MaxElevation = glm::radians(89.0f);
+constexpr float MinDistance = 0.01f;
+constexpr float MaxDistance = 1000000.0f;
 
-Camera::Camera(bool ps)
+
+Camera::Camera(bool perspective)
+: m_Perspective(perspective)
 {
-	perspective = ps;
-	fov = 45;
-	cNear = 0.01f;
-	cFar = 200.0f;
-	aspect = 16.0f / 9.0f;
-	pitch = yaw = roll = 0;
-	view = glm::mat4(1.0f);
-	pv = glm::mat4(1.0f);
-	pers = glm::perspective(fov, 16.0f / 9.0f, cNear, cFar);
-	mposition = glm::vec3(0.0f, 0.0f, 3.0f);
-	mrotation = glm::vec3(1.0f);
-	position[0] = 0.0f;
-	position[1] = 0.2f;
-	position[2] = 3.1f;
-	rotation[0] = 1.0f;
-	rotation[1] = 2530.0f;
-	rotation[2] = 1.0f;
-	camID = ID++;
+	static int s_NextCameraID = 0;
+	m_CameraID = s_NextCameraID++;
+	Reset();
 }
 
-nlohmann::json Camera::Save()
+void Camera::Reset()
 {
-	nlohmann::json data;
-	data["cNear"] = cNear;
-	data["cFar"] = cFar;
-	data["aspect"] = aspect;
-	data["fov"] = fov;
-	data["ID"] = camID;
-	nlohmann::json tmp;
-	tmp["x"] = position[0];
-	tmp["y"] = position[1];
-	tmp["z"] = position[2];
-	data["position"] = tmp;
-	tmp = nlohmann::json();
-	tmp["x"] = rotation[0];
-	tmp["y"] = rotation[1];
-	tmp["z"] = rotation[2];
-	data["rotation"] = tmp;
-	return data;
+	m_Target = glm::vec3(0.0f);
+	m_Distance = 3.1f;
+	m_Azimuth = 0.0f;
+	m_Elevation = glm::radians(28.0f);
+	ClampOrbit();
+	UpdateCamera();
 }
 
-void Camera::Load(nlohmann::json data)
+void Camera::ClampOrbit()
 {
-	cNear = data["cNear"];
-	cFar = data["cFar"];
-	aspect = data["aspect"];
-	fov = data["fov"];
-	camID = data["ID"];
-	position[0] = data["position"]["x"];
-	position[1] = data["position"]["y"];
-	position[2] = data["position"]["z"];
-	rotation[0] = data["rotation"]["x"];
-	rotation[1] = data["rotation"]["y"];
-	rotation[2] = data["rotation"]["z"];
+	m_Distance = std::clamp(m_Distance, MinDistance, MaxDistance);
+	m_Elevation = std::clamp(m_Elevation, MinElevation, MaxElevation);
+	m_Azimuth = std::remainder(m_Azimuth, glm::two_pi<float>());
+}
+
+void Camera::SetAspectRatio(float aspectRatio)
+{
+	m_AspectRatio = std::max(std::abs(aspectRatio), 0.001f);
+}
+
+void Camera::Orbit(float deltaX, float deltaY, float sensitivity)
+{
+	m_Azimuth -= deltaX * sensitivity;
+	m_Elevation -= deltaY * sensitivity;
+	ClampOrbit();
+}
+
+void Camera::Pan(float deltaX, float deltaY, float viewportHeight)
+{
+	if (viewportHeight <= 0.0f) return;
+	const glm::vec3 forward = glm::normalize(m_Target - m_Position);
+	const glm::vec3 right = glm::normalize(glm::cross(forward, m_WorldUp));
+	const glm::vec3 up = glm::normalize(glm::cross(right, forward));
+	const float worldPerPixel = 2.0f * m_Distance * std::tan(glm::radians(m_FieldOfView) * 0.5f) / viewportHeight;
+	m_Target += (-deltaX * right + deltaY * up) * worldPerPixel;
+}
+
+void Camera::Zoom(float wheelDelta)
+{
+	if (std::abs(wheelDelta) < 0.000001f) return;
+	m_Distance *= std::pow(0.85f, wheelDelta);
+	ClampOrbit();
+}
+
+void Camera::RebuildProjection()
+{
+	float nearClip = m_NearClip;
+	float farClip = m_FarClip;
+	if (m_AutomaticClipping)
+	{
+		nearClip = std::clamp(m_Distance * 0.001f, 0.005f, 1.0f);
+		farClip = std::max(1000.0f, m_Distance * 100.0f);
+	}
+	farClip = std::max(farClip, nearClip + 0.01f);
+
+	if (m_Perspective) {
+		m_Projection = glm::perspective(glm::radians(m_FieldOfView), m_AspectRatio, nearClip, farClip);
+	}
+	else
+	{
+		const float halfHeight = m_Distance * std::tan(glm::radians(m_FieldOfView) * 0.5f);
+		m_Projection = glm::ortho(-halfHeight * m_AspectRatio, halfHeight * m_AspectRatio,
+			-halfHeight, halfHeight, nearClip, farClip);
+	}
 }
 
 void Camera::UpdateCamera()
 {
-	mposition.x = position[0]; mposition.y = position[1]; mposition.z = position[2];
-	mrotation.x = glm::radians(rotation[0]); mrotation.y = glm::radians(rotation[1]); mrotation.z = glm::radians(rotation[2]);
-	pitch = mrotation.x; yaw = mrotation.y; roll = mrotation.z;
-	view = glm::lookAt(mposition, mposition + cameraFront, cameraUp);
-	view = glm::rotate(view, glm::radians(mrotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
-	view = glm::rotate(view, glm::radians(mrotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-	if (aspect > 200 || aspect < -200) aspect = 16.0f / 9.0f;
-	if(perspective) pers = glm::perspective(glm::radians(fov), (float)(fabs(aspect) < 100 ? fabs(aspect) : 1.0f), cNear, cFar);
-	else pers = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, cNear, cFar);
-	pv = pers * view;
+	ClampOrbit();
+	const float cosElevation = std::cos(m_Elevation);
+	const glm::vec3 orbitDirection(
+		std::sin(m_Azimuth) * cosElevation,
+		std::sin(m_Elevation),
+		std::cos(m_Azimuth) * cosElevation);
+	m_Position = m_Target + orbitDirection * m_Distance;
+	m_View = glm::lookAt(m_Position, m_Target, m_WorldUp);
+	RebuildProjection();
+	m_ProjectionView = m_Projection * m_View;
 }
 
-void Camera::ShowSettings(bool renderWindow, bool *pOpen)
+nlohmann::json Camera::Save() const
 {
-	if(pOpen == nullptr || *pOpen)
-	{
-		if (renderWindow) ImGui::Begin(("Camera Controls##" + std::to_string(camID)).c_str(), pOpen);
-		ImGui::Text("Camera Position");
-		ImGui::DragFloat3("##cameraPosition", position, 0.1f);
-		ImGui::Separator();
-		ImGui::Text("Camera Rotation");
-		ImGui::DragFloat3("##cameraRotation", rotation, 10);
-		ImGui::Separator();
-		ImGui::Text("Projection Settings");
-		ImGui::Separator();
-		ImGui::DragFloat("FOV", &fov, 0.01f);
-		ImGui::DragFloat("Aspect Ratio", &aspect, 0.01f);
-		ImGui::DragFloat("Near Clipping", &cNear, 0.01f);
-		ImGui::DragFloat("Far Clipping", &cFar, 0.01f);
-		if (renderWindow) ImGui::End();
-	}
+	nlohmann::json data;
+	data["CameraID"] = m_CameraID;
+	data["Perspective"] = m_Perspective;
+	data["AutomaticClipping"] = m_AutomaticClipping;
+	data["Target"] = {{"X", m_Target.x}, {"Y", m_Target.y}, {"Z", m_Target.z}};
+	data["Distance"] = m_Distance;
+	data["Azimuth"] = glm::degrees(m_Azimuth);
+	data["Elevation"] = glm::degrees(m_Elevation);
+	data["FieldOfView"] = m_FieldOfView;
+	data["NearClip"] = m_NearClip;
+	data["FarClip"] = m_FarClip;
+	data["AspectRatio"] = m_AspectRatio;
+	return data;
 }
- 
+
+void Camera::Load(const nlohmann::json& data)
+{
+	m_CameraID = data.value("CameraID", m_CameraID);
+	m_Perspective = data.value("Perspective", m_Perspective);
+	m_AutomaticClipping = data.value("AutomaticClipping", m_AutomaticClipping);
+	if (data.contains("Target"))
+	{
+		const auto& target = data["Target"];
+		m_Target = glm::vec3(target.value("X", 0.0f), target.value("Y", 0.0f), target.value("Z", 0.0f));
+	}
+	m_Distance = data.value("Distance", m_Distance);
+	m_Azimuth = glm::radians(data.value("Azimuth", glm::degrees(m_Azimuth)));
+	m_Elevation = glm::radians(data.value("Elevation", glm::degrees(m_Elevation)));
+	m_FieldOfView = data.value("FieldOfView", m_FieldOfView);
+	m_NearClip = data.value("NearClip", m_NearClip);
+	m_FarClip = data.value("FarClip", m_FarClip);
+	m_AspectRatio = data.value("AspectRatio", m_AspectRatio);
+	ClampOrbit();
+	UpdateCamera();
+}
+
+void Camera::ShowSettings(bool renderWindow, bool* pOpen)
+{
+	if (pOpen != nullptr && !*pOpen) return;
+	if (renderWindow) ImGui::Begin(("Camera Controls##" + std::to_string(m_CameraID)).c_str(), pOpen);
+
+	ImGui::TextUnformatted("Orbit Camera");
+	ImGui::DragFloat3("Target", &m_Target.x, 0.01f);
+	ImGui::DragFloat("Distance", &m_Distance, 0.01f, MinDistance, MaxDistance, "%.3f");
+	float azimuthDegrees = glm::degrees(m_Azimuth);
+	float elevationDegrees = glm::degrees(m_Elevation);
+	if (ImGui::DragFloat("Azimuth", &azimuthDegrees, 0.25f)) m_Azimuth = glm::radians(azimuthDegrees);
+	if (ImGui::DragFloat("Elevation", &elevationDegrees, 0.25f, glm::degrees(MinElevation), glm::degrees(MaxElevation))) m_Elevation = glm::radians(elevationDegrees);
+	ImGui::DragFloat("Field of View", &m_FieldOfView, 0.1f, 10.0f, 120.0f);
+	ImGui::Checkbox("Perspective", &m_Perspective);
+	ImGui::Checkbox("Automatic Clipping", &m_AutomaticClipping);
+	if (!m_AutomaticClipping)
+	{
+		ImGui::DragFloat("Near Clip", &m_NearClip, 0.001f, 0.0001f, 1000.0f, "%.4f");
+		ImGui::DragFloat("Far Clip", &m_FarClip, 1.0f, 1.0f, MaxDistance, "%.1f");
+	}
+	if (ImGui::Button("Reset Camera")) Reset();
+	ClampOrbit();
+
+	if (renderWindow) ImGui::End();
+}
