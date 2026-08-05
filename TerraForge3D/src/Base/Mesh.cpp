@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <cmath>
+#include <algorithm>
 
 #include <vector>
 
@@ -147,7 +148,7 @@ void Mesh::GenerateSphere(int resolution, float radius)
 	for (auto& vert : m_Vertices) vert.position = glm::normalize(vert.position);
 }
 
-void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
+void Mesh::GeneratePlane(int resolution, float scale, float textureScale, float solidDepth)
 {
 	Clear();
 	for (int y = 0; y < resolution; y++)
@@ -176,6 +177,66 @@ void Mesh::GeneratePlane(int resolution, float scale, float textureScale)
 			}
 		}
 	}
+
+	const float depth = std::max(std::abs(solidDepth), 0.0001f);
+	auto makeSolidVertex = [&](float x, float y, float z, float u, float v, bool displace) -> int
+	{
+		Vert vertex;
+		vertex.position = glm::vec4(x, y, z, 1.0f);
+		vertex.normal = glm::vec4(0.0f);
+		vertex.texCoord = glm::vec4(u * textureScale, v * textureScale, 1.0f, displace ? 1.0f : 0.0f);
+		m_Vertices.push_back(vertex);
+		return static_cast<int>(m_Vertices.size()) - 1;
+	};
+
+	const float minX = -scale;
+	const float maxX = scale;
+	const float minZ = -scale;
+	const float maxZ = scale;
+	const float bottomY = -depth;
+
+	auto addSideSegment = [&](float x0, float z0, float u0, float v0,
+		float x1, float z1, float u1, float v1, bool reverseWinding)
+	{
+		const int top0 = makeSolidVertex(x0, 0.0f, z0, u0, v0, true);
+		const int top1 = makeSolidVertex(x1, 0.0f, z1, u1, v1, true);
+		const int bottom0 = makeSolidVertex(x0, bottomY, z0, u0, v0, false);
+		const int bottom1 = makeSolidVertex(x1, bottomY, z1, u1, v1, false);
+
+		if (!reverseWinding)
+		{
+			m_Faces.push_back({{ top0, bottom0, top1 }});
+			m_Faces.push_back({{ top1, bottom0, bottom1 }});
+		}
+		else
+		{
+			m_Faces.push_back({{ top0, top1, bottom0 }});
+			m_Faces.push_back({{ top1, bottom1, bottom0 }});
+		}
+	};
+
+	for (int i = 0; i < resolution - 1; ++i)
+	{
+		const float t0 = static_cast<float>(i) / static_cast<float>(resolution - 1);
+		const float t1 = static_cast<float>(i + 1) / static_cast<float>(resolution - 1);
+
+		addSideSegment(minX, maxZ - (maxZ - minZ) * t0, 0.0f, t0,
+			minX, maxZ - (maxZ - minZ) * t1, 0.0f, t1, false);
+		addSideSegment(maxX, maxZ - (maxZ - minZ) * t0, 1.0f, t0,
+			maxX, maxZ - (maxZ - minZ) * t1, 1.0f, t1, true);
+
+		addSideSegment(minX + (maxX - minX) * t0, maxZ, t0, 0.0f,
+			minX + (maxX - minX) * t1, maxZ, t1, 0.0f, true);
+		addSideSegment(minX + (maxX - minX) * t0, minZ, t0, 1.0f,
+			minX + (maxX - minX) * t1, minZ, t1, 1.0f, false);
+	}
+
+	const int bottomBackLeft = makeSolidVertex(minX, bottomY, maxZ, 0.0f, 0.0f, false);
+	const int bottomBackRight = makeSolidVertex(maxX, bottomY, maxZ, 1.0f, 0.0f, false);
+	const int bottomFrontLeft = makeSolidVertex(minX, bottomY, minZ, 0.0f, 1.0f, false);
+	const int bottomFrontRight = makeSolidVertex(maxX, bottomY, minZ, 1.0f, 1.0f, false);
+	m_Faces.push_back({{ bottomBackLeft, bottomBackRight, bottomFrontLeft }});
+	m_Faces.push_back({{ bottomBackRight, bottomFrontRight, bottomFrontLeft }});
 }
 
 void Mesh::GenerateScreenQuad(float dist)

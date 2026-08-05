@@ -37,7 +37,7 @@ public:
 	~Mesh();
 	void RecalculateNormals();
 	void Subdivide();
-	void GeneratePlane(int resolution, float scale, float textureScale = 1.0f);
+	void GeneratePlane(int resolution, float scale, float textureScale = 1.0f, float solidDepth = 0.1f);
 	void GenerateScreenQuad(float dist = 0);
 	void GenerateSphere(int resolution, float radius);
 	void GenerateTorus(float outerRadius, float innerRadius, int numSegments, int numRings);
