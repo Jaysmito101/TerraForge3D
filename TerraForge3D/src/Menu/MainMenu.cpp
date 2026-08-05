@@ -8,6 +8,10 @@
 #include "Data/ApplicationState.h"
 #include "Platform.h"
 
+#ifdef TF3D_ENABLE_MCP
+#include "UI/McpControlPanel.h"
+#endif
+
 static void ShowWindowMenuItem(const char *title, bool *val)
 {
 	ImGui::Checkbox(title, val);
@@ -174,6 +178,10 @@ void MainMenu::ShowWindowsMenu()
 	ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
 	ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);
 	ShowWindowMenuItem("Open Source Liscenses", &appState->windows.osLisc);
+#ifdef TF3D_ENABLE_MCP
+	if (appState->mcpControlPanel)
+		ShowWindowMenuItem("MCP Server", appState->mcpControlPanel->IsWindowVisiblePtr());
+#endif
 
 }
 

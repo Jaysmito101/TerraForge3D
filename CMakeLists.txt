@@ -25,25 +25,27 @@ find_package( OpenGL REQUIRED )
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
-include_directories( 
-    ./TerraForge3D/include
-    ./TerraForge3D/include/Base
-    ./TerraForge3D/vendor
-    ./TerraForge3D/vendor/tinyexr
-    ./TerraForge3D/vendor/avir
-    ./TerraForge3D/vendor/delaunator/include
-    ./TerraForge3D/vendor/glfw/include
-    ./TerraForge3D/vendor/fmt/include
-    ./TerraForge3D/vendor/spdlog/include
-    ./TerraForge3D/vendor/glm
-    ./TerraForge3D/vendor/httplib
-    ./TerraForge3D/vendor/imgui
-    ./TerraForge3D/vendor/imgui-node-editor
-    ./TerraForge3D/vendor/json/single_include
-    ./TerraForge3D/vendor/stb
-    ./TerraForge3D/vendor/libpng
+set(TF3D_INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/include/Base
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/tinyexr
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/avir
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/delaunator/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/glfw/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/fmt/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/spdlog/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/glm
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/httplib
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/imgui-node-editor
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/json/single_include
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/stb
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/libpng
     ${OPENSSL_INCLUDE_DIR}
 )
+
+include_directories(${TF3D_INCLUDE_DIRS})
 
 set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
@@ -59,6 +61,8 @@ if(TF3D_ENABLE_MCP)
     set(MCP_BUILD_TESTS OFF CACHE BOOL "Build cpp-mcp tests" FORCE)
     set(MCP_SSL OFF CACHE BOOL "Enable cpp-mcp SSL support" FORCE)
 
+    set(TF3D_CPP_MCP_HTTPLIB_NAMESPACE tf3d_cpp_mcp_httplib)
+
     add_subdirectory(
         ./TerraForge3D/vendor/cpp-mcp
         ${CMAKE_CURRENT_BINARY_DIR}/cpp-mcp
@@ -68,6 +72,10 @@ if(TF3D_ENABLE_MCP)
     target_include_directories(mcp BEFORE PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common
         ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include
+    )
+
+    target_compile_definitions(mcp PRIVATE
+        httplib=${TF3D_CPP_MCP_HTTPLIB_NAMESPACE}
     )
 
     set_property(TARGET mcp PROPERTY INCLUDE_DIRECTORIES
@@ -100,6 +108,7 @@ file(GLOB_RECURSE SOURCES
 )
 
 list(REMOVE_DUPLICATES SOURCES)
+list(FILTER SOURCES EXCLUDE REGEX "/MCP/.*\\.cpp$")
 
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_glfw.cpp)
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_opengl3.cpp)
@@ -108,6 +117,28 @@ add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+
+if(TF3D_ENABLE_MCP)
+    file(GLOB_RECURSE MCP_SOURCES CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/src/MCP/*.cpp
+    )
+
+    add_library(tf3d_mcp STATIC ${MCP_SOURCES})
+    set_property(TARGET tf3d_mcp PROPERTY CXX_STANDARD 20)
+    set_property(TARGET tf3d_mcp PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET tf3d_mcp PROPERTY INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/common;${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/cpp-mcp/include;${TF3D_INCLUDE_DIRS}"
+    )
+    target_compile_definitions(tf3d_mcp PRIVATE
+        TF3D_ENABLE_MCP=1
+        SPDLOG_FMT_EXTERNAL
+        httplib=${TF3D_CPP_MCP_HTTPLIB_NAMESPACE}
+        ${_cpp_mcp_configuration_definitions}
+    )
+    target_link_libraries(tf3d_mcp PRIVATE mcp)
+
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE TF3D_ENABLE_MCP=1)
+endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${EXECUTABLE_NAME} PRIVATE
@@ -146,7 +177,7 @@ target_link_libraries(${EXECUTABLE_NAME} fmt::fmt)
 target_link_libraries(${EXECUTABLE_NAME} webp)
 
 if(TF3D_ENABLE_MCP)
-    target_link_libraries(${EXECUTABLE_NAME} mcp)
+    target_link_libraries(${EXECUTABLE_NAME} tf3d_mcp)
 endif()
 
 add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD

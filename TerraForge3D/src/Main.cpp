@@ -24,6 +24,11 @@
 
 #include "Misc/CustomInspector.h"
 
+#ifdef TF3D_ENABLE_MCP
+#include "MCP/TerraForgeMcpServer.h"
+#include "UI/McpControlPanel.h"
+#endif
+
 static ApplicationState* appState;
 static Application* mainApp;
 
@@ -64,6 +69,12 @@ public:
 	virtual void OnUpdate(float deltatime) override
 	{
 		TF3D_PROFILE_SCOPE("app/update");
+	#ifdef TF3D_ENABLE_MCP
+		if (appState->mcpServer) {
+			TF3D_PROFILE_SCOPE("app/update/mcp");
+			appState->mcpServer->Update();
+		}
+	#endif
 		if (!appState->states.ruinning) return;
 		{
 			TF3D_PROFILE_SCOPE("app/update/jobs");
@@ -175,6 +186,9 @@ public:
 		appState->jobManager->ShowSettings();
 		appState->rendererManager->ShowSettings();
 		PerformanceMonitor::Get().RenderUI();
+#ifdef TF3D_ENABLE_MCP
+		if (appState->mcpControlPanel) appState->mcpControlPanel->ShowSettings();
+#endif
 		if (appState->windows.styleEditor) ShowStyleEditor(&appState->windows.styleEditor);
 		if (appState->windows.textureStore) appState->textureStore->ShowSettings(&appState->windows.textureStore);
 		if (appState->windows.osLisc) appState->osLiscences->ShowSettings(&appState->windows.osLisc);
@@ -212,6 +226,10 @@ public:
 		appState->constants.modelsDir = appState->constants.dataDir + PATH_SEPARATOR "models";
 		appState->constants.stylesDir = appState->constants.dataDir + PATH_SEPARATOR "styles";
 		appState->configManager = new ConfigManager();
+	#ifdef TF3D_ENABLE_MCP
+		appState->mcpEnabled = true;
+		appState->configManager->GetBool("mcp", "enabled", appState->mcpEnabled);
+	#endif
 
 		ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 		
@@ -294,11 +312,34 @@ public:
 		appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
 		appState->eventManager->RaiseEvent("OnStartUpComplete");
 
+	#ifdef TF3D_ENABLE_MCP
+		appState->mcpServer = new TerraForgeMcpServer(appState);
+		if (appState->mcpEnabled && !appState->mcpServer->Start())
+		{
+			TF3D_LOG_ERROR("Failed to start the TerraForge3D MCP server");
+		}
+		else if (!appState->mcpEnabled)
+		{
+			TF3D_LOG_INFO("TerraForge3D MCP server is disabled in the user config");
+		}
+		appState->mcpControlPanel = new McpControlPanel(appState);
+	#endif
+
 
 	}
 
 	void OnEnd() override
 	{
+	#ifdef TF3D_ENABLE_MCP
+		if (appState->mcpServer)
+		{
+			appState->mcpServer->Stop();
+			delete appState->mcpServer;
+			appState->mcpServer = nullptr;
+		}
+		delete appState->mcpControlPanel;
+		appState->mcpControlPanel = nullptr;
+	#endif
 		appState->eventManager->RaiseEvent("OnEnd");
 		for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) delete appState->viewportManagers[i];
 		appState->jobSystem->WaitAll();

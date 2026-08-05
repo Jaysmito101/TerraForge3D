@@ -25,6 +25,11 @@
 
 #include <nlohmann/json.hpp>
 
+#ifdef TF3D_ENABLE_MCP
+class TerraForgeMcpServer;
+class McpControlPanel;
+#endif
+
 #ifndef MAX_VIEWPORT_COUNT
 #define MAX_VIEWPORT_COUNT 8
 #endif
@@ -111,6 +116,12 @@ public:
 	EventManager* eventManager = nullptr;
 	ResourceManager* resourceManager = nullptr;
 	ConfigManager* configManager = nullptr;
+
+#ifdef TF3D_ENABLE_MCP
+	bool mcpEnabled = true;
+	TerraForgeMcpServer* mcpServer = nullptr;
+	McpControlPanel* mcpControlPanel = nullptr;
+#endif
 
 	struct
 	{
