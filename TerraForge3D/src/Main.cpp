@@ -48,7 +48,7 @@ void SetUpIcon()
 #endif
 }
 
-class MyApp : public Application
+class TerraForrge3D : public Application
 {
 public:
     virtual void OnPreload() override
@@ -358,5 +358,5 @@ public:
 
 Application *CreateApplication()
 {
-    return (mainApp = new MyApp());
+    return (mainApp = new TerraForrge3D());
 }
