@@ -34,8 +34,6 @@ void TextureSlotRenderer::Render(RendererViewport* viewport)
 
 void TextureSlotRenderer::ShowSettings()
 {
-	ImGui::DragFloat("Heightmap Min", &m_HeightmapMin, 0.01f);
-	ImGui::DragFloat("Heightmap Max", &m_HeightmapMax, 0.01f);
 	if (ImGui::Button("Reload Shaders")) ReloadShaders();
 }
 

@@ -6,6 +6,8 @@
 #include <sstream>
 #include <fstream>
 
+#include <algorithm>
+
 #include <iostream>
 #include <string>
 #include <stdio.h>
@@ -17,21 +19,27 @@ void ExportManager::UpdateHeightmapVisualizer()
 	m_AppState->generationManager->GetHeightmapData()->Bind(0);	
 	m_VisualzeTexture->BindForCompute(1);
 	m_VisualzeShader->Bind();
-	m_VisualzeShader->SetUniform2f("u_HmapMinMax", m_ExportHeightmapMinMaxHeight[0], m_ExportHeightmapMinMaxHeight[1]);
+	const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
+	const float fieldMinimum = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
+	const float fieldMaximum = fieldStatistics.valid ? fieldStatistics.maximum : 1.0f;
+	m_VisualzeShader->SetUniform2f("u_HmapMinMax", fieldMinimum, fieldMaximum);
 	m_VisualzeShader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
 	const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
 	m_VisualzeShader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
 	m_VisualzeShader->SetMemoryBarrier();
 }
 
-float* ExportManager::ApplyHeightmapTextureTransform(float* data, float* minMax)
+float* ExportManager::ApplyHeightmapTextureTransform(float* data)
 {
 	auto resolution = m_AppState->mainMap.tileResolution;
-	auto minHeight = minMax, maxHeight = minMax + 1;
-	
+	const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
+	const float minHeight = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
+	const float maxHeight = fieldStatistics.valid ? fieldStatistics.maximum : 1.0f;
+	const float range = std::max(maxHeight - minHeight, 0.000001f);
+
 	// transform the heightmap data
 	for (int i = 0 ; i < resolution * resolution ; i++)
-		data[i] = (data[i] - *minHeight) / (*maxHeight - *minHeight);
+		data[i] = (data[i] - minHeight) / range;
 	
 	// flip the heightmap data
 	for (int i = 0 ; i < resolution / 2 ; i++)
@@ -70,7 +78,7 @@ void ExportManager::ExportTextureCurrentTile(std::string path, int format, int b
 		this->SetStatusMessage("Exporting : " + path);
 		m_ExportProgress = 0.01f;
 		
-		if (!ExportHeightmapTexture(path, ApplyHeightmapTextureTransform(heightMapData, m_ExportHeightmapMinMaxHeight), format, bitDepth, m_AppState->mainMap.tileResolution)) this->SetStatusMessage("Failed to export : " + path);
+		if (!ExportHeightmapTexture(path, ApplyHeightmapTextureTransform(heightMapData), format, bitDepth, m_AppState->mainMap.tileResolution)) this->SetStatusMessage("Failed to export : " + path);
 		else this->SetStatusMessage("");
 		
 		m_ExportProgress = 1.1f;

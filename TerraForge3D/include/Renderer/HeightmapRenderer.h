@@ -17,6 +17,4 @@ private:
 
 private:
 	std::shared_ptr<Model> m_ScreenQuad = nullptr;
-	float m_HeightmapMin = -1.0f;
-	float m_HeightmapMax = 1.0f;
 };

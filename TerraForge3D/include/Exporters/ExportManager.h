@@ -44,7 +44,7 @@ public:
 	bool ExportMesh(std::string path, Mesh* mesh, int format);
 
 	void UpdateHeightmapVisualizer();
-	float* ApplyHeightmapTextureTransform(float* data, float* minMax);
+	float* ApplyHeightmapTextureTransform(float* data);
 	bool ExportHeightmapTexture(std::string path, float* data, int format, int bitDepth, int resolution);
 	
 	
@@ -62,7 +62,6 @@ private:
 	int m_ExportMeshFormat = 0;
 	int m_ExportTextureFormat = 0;
 	int m_ExportTextureBitDepth = 0;
-	float m_ExportHeightmapMinMaxHeight[2] = { -1.0f, 1.0f };
 	bool m_HideExportControls = false;
 	bool m_IsWindowOpen = false;
 

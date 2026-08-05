@@ -131,17 +131,11 @@ void ExportManager::ShowTextureExportSettings()
 		ImGui::EndCombo();
 	}
 
-	ImGui::DragFloat2("Heightmap Min Max", m_ExportHeightmapMinMaxHeight, 0.01f);
-
-	if (ImGui::Button("Auto Calculate Min Max"))
-	{
-		auto heightmapData = m_AppState->generationManager->GetHeightmapData()->GetCPUCopy();
-		auto resolution = m_AppState->mainMap.tileResolution;
-		auto [minHeight, maxHeight] = std::minmax_element(heightmapData, heightmapData + resolution * resolution);
-		m_ExportHeightmapMinMaxHeight[0] = *minHeight; m_ExportHeightmapMinMaxHeight[1] = *maxHeight;
-		delete[] heightmapData;
-	}
-	ImGui::Text("This option sometimes gives bad results with high resolution maps.");
+	const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
+	if (fieldStatistics.valid)
+		ImGui::Text("Final field range: %.4f to %.4f", fieldStatistics.minimum, fieldStatistics.maximum);
+	else
+		ImGui::TextUnformatted("Final field range unavailable");
 
 
 	UpdateHeightmapVisualizer();

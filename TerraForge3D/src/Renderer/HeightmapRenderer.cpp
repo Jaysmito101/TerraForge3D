@@ -20,11 +20,14 @@ void HeightmapRenderer::Render(RendererViewport* viewport)
 {
 	m_Shader->Bind();
 	m_AppState->generationManager->GetHeightmapData()->Bind(0);
+	const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
+	const float fieldMinimum = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
+	const float fieldMaximum = fieldStatistics.valid ? fieldStatistics.maximum : 1.0f;
 	glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
-	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMin"), m_HeightmapMin);
-	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMax"), m_HeightmapMax);
+	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMin"), fieldMinimum);
+	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMax"), fieldMaximum);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_AspectRatio"), ((float)viewport->m_AspectRatio));
 	glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Offset"), viewport->m_OffsetX, viewport->m_OffsetY);
 	glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Scale"), viewport->m_Scale);
@@ -33,8 +36,11 @@ void HeightmapRenderer::Render(RendererViewport* viewport)
 
 void HeightmapRenderer::ShowSettings()
 {
-	ImGui::DragFloat("Heightmap Min", &m_HeightmapMin, 0.01f);
-	ImGui::DragFloat("Heightmap Max", &m_HeightmapMax, 0.01f);
+	const auto& fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
+	if (fieldStatistics.valid)
+		ImGui::Text("Using final field range: %.4f to %.4f", fieldStatistics.minimum, fieldStatistics.maximum);
+	else
+		ImGui::TextUnformatted("Final field range unavailable");
 	if (ImGui::Button("Reload Shaders")) ReloadShaders();
 }
 
