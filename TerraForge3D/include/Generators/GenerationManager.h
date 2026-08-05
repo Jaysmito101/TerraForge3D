@@ -4,13 +4,19 @@
 #include "Generators/BiomeManager.h"
 #include "Generators/BiomeMixer.h"
 #include "Generators/GeneratorDataStatistics.h"
+#include "Generators/SlopeGenerator.h"
+#include "Generators/GenerationWorker.h"
 #include "Base/Base.h"
 
 #include <array>
+#include <atomic>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
 class ApplicationState;
 class ComputeShader;
-struct GLFWwindow;
 
 enum SelectedUINodeObjectType
 {
@@ -32,8 +38,34 @@ struct SelectedUINode
 	int m_BiomeIndex = -1;
 	int m_FilterIndex = -1;
 	std::string m_BiomeID;
-	SelectedUINodeObjectType m_ObjectName;
+	SelectedUINodeObjectType m_ObjectName = SelectedUINodeObjectType_None;
 	std::string m_ID;
+};
+
+struct FieldState
+{
+	std::shared_ptr<GeneratorData> heightmapData;
+	std::shared_ptr<GeneratorData> workingHeightmapData;
+	std::shared_ptr<GeneratorData> swapBuffer;
+	std::shared_ptr<GeneratorTexture> seedTexture;
+	std::shared_ptr<SlopeGenerator> slopeGenerator;
+	std::shared_ptr<BiomeMixer> biomeMixer;
+	std::shared_ptr<GeneratorDataStatistics> statistics;
+	std::vector<std::shared_ptr<BiomeManager>> biomeManagers;
+	GeneratorDataStatisticsResult statisticsResult;
+	int statisticsSampleStride = 4;
+};
+
+struct UiState
+{
+	bool windowVisible = true;
+	bool updationPaused = false;
+	std::atomic_bool requireUpdation = true;
+	bool useSeedFromActiveMesh = false;
+	int32_t seedTextureResolution = 256;
+	int fieldStorageUiMode = 0;
+	bool fieldStorageRestartPending = false;
+	SelectedUINode selectedNode;
 };
 
 #define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + std::string(#objectname))
@@ -41,10 +73,10 @@ struct SelectedUINode
 
 #define SetUINodeData(index, objectname) \
 { \
-	m_SelectedNodeUI.m_BiomeIndex = index; \
-	m_SelectedNodeUI.m_FilterIndex = -1; \
-	m_SelectedNodeUI.m_ID = MakeUINodeID(index, objectname); \
-	m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_##objectname; \
+	m_Ui.selectedNode.m_BiomeIndex = index; \
+	m_Ui.selectedNode.m_FilterIndex = -1; \
+	m_Ui.selectedNode.m_ID = MakeUINodeID(index, objectname); \
+	m_Ui.selectedNode.m_ObjectName = SelectedUINodeObjectType_##objectname; \
 }
 
 class GenerationManager
@@ -58,15 +90,21 @@ public:
 
 	bool OnTileResolutionChange(const std::string params, void* paramsPtr);
 
-	inline const bool IsUpdationPaused() const { return m_UpdationPaused; }
-	inline void SetUpdationPaused(bool paused) { m_UpdationPaused = paused; }
-	inline const bool IsWindowVisible() const { return m_IsWindowVisible; }
-	inline void SetWindowVisible(bool visible) { m_IsWindowVisible = visible; }
-	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
-	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData.get(); }
-	inline const GeneratorDataStatisticsResult& GetFieldStatisticsResult() const { return m_FieldStatisticsResult; }
+	inline const bool IsUpdationPaused() const { return m_Ui.updationPaused; }
+	inline void SetUpdationPaused(bool paused) { m_Ui.updationPaused = paused; }
+	inline const bool IsWindowVisible() const { return m_Ui.windowVisible; }
+	inline void SetWindowVisible(bool visible) { m_Ui.windowVisible = visible; }
+	inline bool* IsWindowVisiblePtr() { return &m_Ui.windowVisible; }
+	inline GeneratorData* GetHeightmapData() const { return m_Field.heightmapData.get(); }
+	inline GeneratorTexture* GetSlopeTexture() const { return m_Field.slopeGenerator != nullptr ? m_Field.slopeGenerator->GetTexture() : nullptr; }
+	inline bool HasSlopeTexture() const
+	{
+		return m_Field.slopeGenerator != nullptr && m_Field.slopeGenerator->IsReady() &&
+			!m_Worker->IsRunning() && !m_Worker->IsRequestPending();
+	}
+	inline const GeneratorDataStatisticsResult& GetFieldStatisticsResult() const { return m_Field.statisticsResult; }
 	bool UpdateInternal(const std::string& params = "", void* paramsPtr = nullptr);
-	inline const std::vector<std::shared_ptr<BiomeManager>>& GetBiomeManagers() const { return m_BiomeManagers; }
+	inline const std::vector<std::shared_ptr<BiomeManager>>& GetBiomeManagers() const { return m_Field.biomeManagers; }
 
 private:
 	void WaitForGenerationWorker();
@@ -78,40 +116,12 @@ private:
 	void UpdateFieldStatistics();
 	void GenerateHeightmapMipmaps();
 	void RequestGeneration(bool force);
-	void GenerationWorkerLoop();
 	void ExecuteGeneration(bool force);
 
 private:
 	ApplicationState* m_AppState = nullptr;
-
-	std::shared_ptr<GeneratorData> m_HeightmapData;
-	std::shared_ptr<GeneratorData> m_WorkingHeightmapData;
-	std::shared_ptr<GeneratorData> m_SwapBuffer;
-	std::shared_ptr<GeneratorTexture> m_SeedTexture;
-	std::shared_ptr<BiomeMixer> m_BiomeMixer;
-	std::shared_ptr<GeneratorDataStatistics> m_FieldStatistics;
-
-	std::vector<std::shared_ptr<BiomeManager>> m_BiomeManagers;
-
-	bool m_IsWindowVisible = true;
-	bool m_UpdationPaused = false;
-	std::atomic_bool m_RequireUpdation = true;
-	bool m_UseSeedFromActiveMesh = false;
-
-	GLFWwindow* m_GenerationWindow = nullptr;
-	std::thread m_GenerationWorker;
-	std::mutex m_GenerationMutex;
-	std::condition_variable m_GenerationCondition;
-	std::atomic_bool m_GenerationRequestPending = false;
-	bool m_GenerationForceRequested = false;
-	std::atomic_bool m_GenerationRunning = false;
-	std::atomic_bool m_GenerationCompleted = false;
-	std::atomic_bool m_StopGenerationWorker = false;
-
-	int32_t m_SeedTextureResolution = 256;
-	int m_FieldStorageUiMode = 0;
-	bool m_FieldStorageRestartPending = false;
-	GeneratorDataStatisticsResult m_FieldStatisticsResult;
-	int m_FieldStatisticsSampleStride = 4;
-	SelectedUINode m_SelectedNodeUI;
+	FieldState m_Field;
+	UiState m_Ui;
+	
+	std::unique_ptr<GenerationWorker> m_Worker;
 };

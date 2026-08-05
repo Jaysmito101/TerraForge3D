@@ -5,7 +5,6 @@
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 #include "Profiler.h"
-#include <GLFW/glfw3.h>
 #include <map>
 
 GenerationManager::GenerationManager(ApplicationState* appState)
@@ -17,78 +16,51 @@ GenerationManager::GenerationManager(ApplicationState* appState)
 	{
 		GeneratorData::SetDefaultStorage(configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
 	}
-	m_FieldStorageUiMode = GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0;
-	m_FieldStatistics = std::make_shared<GeneratorDataStatistics>(m_AppState);
+	m_Ui.fieldStorageUiMode = GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0;
+	m_Field.statistics = std::make_shared<GeneratorDataStatistics>(m_AppState);
 	m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
 	m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
-	m_HeightmapData = std::make_shared<GeneratorData>();
-	m_WorkingHeightmapData = std::make_shared<GeneratorData>();
-	m_SwapBuffer = std::make_shared<GeneratorData>();
-	m_BiomeMixer = std::make_shared<BiomeMixer>(m_AppState);
-	m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
-	m_BiomeManagers.back()->SetName("Default Global");
-
-	GLFWwindow* renderWindow = glfwGetCurrentContext();
-	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-	m_GenerationWindow = glfwCreateWindow(1, 1, "TerraForge3D Generation", nullptr, renderWindow);
-	glfwMakeContextCurrent(renderWindow);
-	if (m_GenerationWindow) {
-		m_GenerationWorker = std::thread(&GenerationManager::GenerationWorkerLoop, this);
-	}
-	else {
-		TF3D_LOG_ERROR("Failed to create shared generation OpenGL context; generation will run on the render thread");
-	}
+	m_Field.heightmapData = std::make_shared<GeneratorData>();
+	m_Field.workingHeightmapData = std::make_shared<GeneratorData>();
+	m_Field.swapBuffer = std::make_shared<GeneratorData>();
+	m_Field.slopeGenerator = std::make_shared<SlopeGenerator>(m_AppState, m_AppState->mainMap.tileResolution);
+	m_Field.biomeMixer = std::make_shared<BiomeMixer>(m_AppState);
+	m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
+	m_Field.biomeManagers.back()->SetName("Default Global");
+	m_Worker = std::make_unique<GenerationWorker>([this](bool force) { ExecuteGeneration(force); });
 }
 
-GenerationManager::~GenerationManager()
-{
-	{
-		std::lock_guard lock(m_GenerationMutex);
-		m_StopGenerationWorker = true;
-	}
-	m_GenerationCondition.notify_one();
-	if (m_GenerationWorker.joinable()) m_GenerationWorker.join();
-	if (m_GenerationWindow)
-	{
-		glfwDestroyWindow(m_GenerationWindow);
-		m_GenerationWindow = nullptr;
-	}
-}
+GenerationManager::~GenerationManager() = default;
 
 void GenerationManager::Update()
 {
-	if (m_UpdationPaused) return;
-	if (!m_GenerationWindow)
+	if (m_Ui.updationPaused) return;
+	if (!m_Worker->HasContext())
 	{
 		// TF3D_LOG_DEBUG("GenerationManager::Update() - Running generation on render thread as no shared OpenGL context is available");
-		if (m_RequireUpdation)
+		if (m_Ui.requireUpdation)
 		{
-			m_RequireUpdation = false;
+			m_Ui.requireUpdation = false;
 			ExecuteGeneration(true);
-			m_HeightmapData.swap(m_WorkingHeightmapData);
+			m_Field.heightmapData.swap(m_Field.workingHeightmapData);
 			GenerateHeightmapMipmaps();
 			UpdateFieldStatistics();
 		}
 		return;
 	}
 
-	if (m_GenerationCompleted.load(std::memory_order_acquire) &&
-		!m_GenerationRunning.load(std::memory_order_acquire))
+	if (m_Worker->IsCompleted() && !m_Worker->IsRunning())
 	{
-		std::lock_guard lock(m_GenerationMutex);
-		if (m_GenerationCompleted.load(std::memory_order_acquire) &&
-			!m_GenerationRunning.load(std::memory_order_acquire))
+		if (m_Worker->ConsumeCompleted())
 		{
-			m_HeightmapData.swap(m_WorkingHeightmapData);
-			m_GenerationCompleted.store(false, std::memory_order_release);
+			m_Field.heightmapData.swap(m_Field.workingHeightmapData);
 			GenerateHeightmapMipmaps();
 			UpdateFieldStatistics();
 		}
 	}
 
-	if (m_RequireUpdation.load(std::memory_order_acquire) &&
-		!m_GenerationRunning.load(std::memory_order_acquire) &&
-		!m_GenerationRequestPending.load(std::memory_order_acquire))
+	if (m_Ui.requireUpdation.load(std::memory_order_acquire) &&
+		!m_Worker->IsRunning() && !m_Worker->IsRequestPending())
 	{
 		RequestGeneration(true);
 	}
@@ -102,89 +74,52 @@ bool GenerationManager::UpdateInternal(const std::string& params, void* paramsPt
 
 void GenerationManager::RequestGeneration(bool force)
 {
-	if (!m_GenerationWindow)
+	if (!m_Worker->Request(force))
 	{
+		m_Ui.requireUpdation = false;
 		ExecuteGeneration(force);
 		return;
 	}
-	{
-		std::lock_guard lock(m_GenerationMutex);
-		m_GenerationRequestPending = true;
-		m_GenerationForceRequested = m_GenerationForceRequested || force;
-		m_RequireUpdation = false;
-	}
-	m_GenerationCondition.notify_one();
+	m_Ui.requireUpdation = false;
 }
 
 void GenerationManager::WaitForGenerationWorker()
 {
-	std::unique_lock lock(m_GenerationMutex);
-	m_GenerationCondition.wait(lock, [this] { return !m_GenerationRunning && !m_GenerationRequestPending; });
-}
-
-void GenerationManager::GenerationWorkerLoop()
-{
-	glfwMakeContextCurrent(m_GenerationWindow);
-	while (true)
-	{
-		bool force = false;
-		{
-			std::unique_lock lock(m_GenerationMutex);
-			m_GenerationCondition.wait(lock, [this] { return m_StopGenerationWorker || m_GenerationRequestPending; });
-			if (m_StopGenerationWorker) break;
-			force = m_GenerationForceRequested;
-			m_GenerationRequestPending = false;
-			m_GenerationForceRequested = false;
-			m_GenerationRunning = true;
-		}
-
-		ExecuteGeneration(force);
-
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-		glFinish();
-
-		{
-			std::lock_guard lock(m_GenerationMutex);
-			m_GenerationRunning = false;
-			m_GenerationCompleted = true;
-		}
-		m_GenerationCondition.notify_all();
-	}
-	glfwMakeContextCurrent(nullptr);
+	m_Worker->WaitForIdle();
 }
 
 void GenerationManager::ExecuteGeneration(bool forceUpdate)
 {
 	auto hasAnythingUpdated = false;
-	for (auto biome : m_BiomeManagers)
+	for (auto biome : m_Field.biomeManagers)
 	{
 		if (biome->IsUpdationRequired() || forceUpdate)
 		{
-			biome->Update(m_SwapBuffer.get(), m_SeedTexture.get());
+			biome->Update(m_Field.swapBuffer.get(), m_Field.seedTexture.get());
 			hasAnythingUpdated = true;
 		}
 	}
-	if (hasAnythingUpdated || m_BiomeMixer->IsUpdationRequired() || forceUpdate)
+	if (hasAnythingUpdated || m_Field.biomeMixer->IsUpdationRequired() || forceUpdate)
 	{
-		m_BiomeMixer->Update(m_WorkingHeightmapData.get(), m_SwapBuffer.get());
+		m_Field.biomeMixer->Update(m_Field.workingHeightmapData.get(), m_Field.swapBuffer.get());
+		m_Field.slopeGenerator->Compute(m_Field.workingHeightmapData.get(), m_Field.workingHeightmapData->GetResolution());
 	}
 }
 
 void GenerationManager::PullSeedTextureFromActiveMesh()
 {
-	if (!m_UseSeedFromActiveMesh) return;
-	m_SeedTexture->MakeCPUCopy();
-	m_SeedTexture->ZeroCPUCopy();
+	if (!m_Ui.useSeedFromActiveMesh) return;
+	m_Field.seedTexture->MakeCPUCopy();
+	m_Field.seedTexture->ZeroCPUCopy();
 	auto mesh = m_AppState->mainModel->mesh;
 	for (auto i = 0; i < mesh->GetVertexCount(); i++)
 	{
 		const auto& vertex = mesh->GetVertex(i);
-		m_SeedTexture->SetPixel(vertex.texCoord.x, vertex.texCoord.y, vertex.position.x, vertex.position.z, vertex.position.y);
+		m_Field.seedTexture->SetPixel(vertex.texCoord.x, vertex.texCoord.y, vertex.position.x, vertex.position.z, vertex.position.y);
 	}
-	m_SeedTexture->UploadCPUCopy();
-	m_SeedTexture->FreeCPUCopy();
+	m_Field.seedTexture->UploadCPUCopy();
+	m_Field.seedTexture->FreeCPUCopy();
 }
-
 
 void GenerationManager::ShowSettings()
 {
@@ -195,63 +130,63 @@ void GenerationManager::ShowSettings()
 void GenerationManager::ShowSettingsInspector()
 {
 	static bool s_TempBoolean = false;
-	ImGui::Begin("Generator Inspector", &m_IsWindowVisible);
+	ImGui::Begin("Generator Inspector", &m_Ui.windowVisible);
 
-	if (ImGui::Selectable("Options", m_SelectedNodeUI.m_ID == "GlobalOptions"))
+	if (ImGui::Selectable("Options", m_Ui.selectedNode.m_ID == "GlobalOptions"))
 	{
-		m_SelectedNodeUI.m_ID = "GlobalOptions";
-		m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_GlobalOptions;
+		m_Ui.selectedNode.m_ID = "GlobalOptions";
+		m_Ui.selectedNode.m_ObjectName = SelectedUINodeObjectType_GlobalOptions;
 	}
 
-	if (ImGui::Selectable("Biome Mixer", m_SelectedNodeUI.m_ID == "GlobalBiomeMixer"))
+	if (ImGui::Selectable("Biome Mixer", m_Ui.selectedNode.m_ID == "GlobalBiomeMixer"))
 	{
-		m_SelectedNodeUI.m_ID = "GlobalBiomeMixer";
-		m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_GlobalBiomeMixer;
+		m_Ui.selectedNode.m_ID = "GlobalBiomeMixer";
+		m_Ui.selectedNode.m_ObjectName = SelectedUINodeObjectType_GlobalBiomeMixer;
 	}
 
 	s_TempBoolean = ImGui::TreeNodeEx("Biomes", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
 	ImGui::SameLine();
 	if (ImGui::Button("Add##BiomeAdd"))
 	{
-		m_BiomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
-		m_BiomeManagers.back()->SetName("Biome " + std::to_string(m_BiomeManagers.size()));
+		m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
+		m_Field.biomeManagers.back()->SetName("Biome " + std::to_string(m_Field.biomeManagers.size()));
 	}
 	if (s_TempBoolean)
 	{
-		if (m_BiomeManagers.size() == 0) ImGui::Text("No Biomes Added!");
-		for (int i = 0; i < m_BiomeManagers.size(); i++)
+		if (m_Field.biomeManagers.size() == 0) ImGui::Text("No Biomes Added!");
+		for (int i = 0; i < m_Field.biomeManagers.size(); i++)
 		{
-			auto biome = m_BiomeManagers[i];
+			auto biome = m_Field.biomeManagers[i];
 			ImGui::PushID(biome->GetBiomeID().c_str());
 			s_TempBoolean = ImGui::TreeNodeEx(biome->GetBiomeName(), ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
 			ImGui::SameLine();
 			if (ImGui::Button("Delete"))
 			{
-				TF3D_LOG_DEBUG("Loaded {} biome managers", m_BiomeManagers.size());
-				m_BiomeManagers.erase(m_BiomeManagers.begin() + i);
-				TF3D_LOG_DEBUG("Active biome managers: {}", m_BiomeManagers.size());
-				m_RequireUpdation = true;
+				TF3D_LOG_DEBUG("Loaded {} biome managers", m_Field.biomeManagers.size());
+				m_Field.biomeManagers.erase(m_Field.biomeManagers.begin() + i);
+				TF3D_LOG_DEBUG("Active biome managers: {}", m_Field.biomeManagers.size());
+				m_Ui.requireUpdation = true;
 				SetUINodeData(-1, None);
 			}
 			if (s_TempBoolean)
 			{
-				if (ImGui::Selectable("General", m_SelectedNodeUI.m_ID == MakeUINodeID(i, General)))
+				if (ImGui::Selectable("General", m_Ui.selectedNode.m_ID == MakeUINodeID(i, General)))
 				{
 					SetUINodeData(i, General);
 				}
-				if (ImGui::Selectable("Mask", m_SelectedNodeUI.m_ID == MakeUINodeID(i, MaskTool)))
+				if (ImGui::Selectable("Mask", m_Ui.selectedNode.m_ID == MakeUINodeID(i, MaskTool)))
 				{
 					SetUINodeData(i, MaskTool);
 				}
-				if (ImGui::Selectable("Base Shape", m_SelectedNodeUI.m_ID == MakeUINodeID(i, BaseShape)))
+				if (ImGui::Selectable("Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, BaseShape)))
 				{
 					SetUINodeData(i, BaseShape);
 				}
-				if (ImGui::Selectable("Custom Base Shape", m_SelectedNodeUI.m_ID == MakeUINodeID(i, CustomBaseShape)))
+				if (ImGui::Selectable("Custom Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, CustomBaseShape)))
 				{
 					SetUINodeData(i, CustomBaseShape);
 				}
-				if (ImGui::Selectable("Base Noise", m_SelectedNodeUI.m_ID == MakeUINodeID(i, BaseNoise)))
+				if (ImGui::Selectable("Base Noise", m_Ui.selectedNode.m_ID == MakeUINodeID(i, BaseNoise)))
 				{
 					SetUINodeData(i, BaseNoise);
 				}
@@ -294,12 +229,12 @@ void GenerationManager::ShowSettingsInspector()
 									const int filterIndex = biome->AddFilter(definition);
 									if (filterIndex >= 0)
 									{
-										m_SelectedNodeUI.m_BiomeIndex = i;
-										m_SelectedNodeUI.m_FilterIndex = filterIndex;
-										m_SelectedNodeUI.m_BiomeID = biome->GetBiomeID();
-										m_SelectedNodeUI.m_ID = biome->GetFilters()[filterIndex]->GetID();
-										m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_Filter;
-										m_RequireUpdation = true;
+										m_Ui.selectedNode.m_BiomeIndex = i;
+										m_Ui.selectedNode.m_FilterIndex = filterIndex;
+										m_Ui.selectedNode.m_BiomeID = biome->GetBiomeID();
+										m_Ui.selectedNode.m_ID = biome->GetFilters()[filterIndex]->GetID();
+										m_Ui.selectedNode.m_ObjectName = SelectedUINodeObjectType_Filter;
+										m_Ui.requireUpdation = true;
 								}
 									ImGui::CloseCurrentPopup();
 								}
@@ -323,18 +258,18 @@ void GenerationManager::ShowSettingsInspector()
 						{
 							const auto& filter = filters[filterIndex];
 							ImGui::PushID(filter->GetID().c_str());
-							const bool selected = m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
-								m_SelectedNodeUI.m_BiomeIndex == i && m_SelectedNodeUI.m_FilterIndex == filterIndex;
+							const bool selected = m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_Filter &&
+								m_Ui.selectedNode.m_BiomeIndex == i && m_Ui.selectedNode.m_FilterIndex == filterIndex;
 
 							ImGui::TableNextRow();
 							ImGui::TableSetColumnIndex(0);
 							if (ImGui::Selectable(filter->GetName().c_str(), selected))
 							{
-								m_SelectedNodeUI.m_BiomeIndex = i;
-								m_SelectedNodeUI.m_FilterIndex = filterIndex;
-								m_SelectedNodeUI.m_BiomeID = biome->GetBiomeID();
-								m_SelectedNodeUI.m_ID = filter->GetID();
-								m_SelectedNodeUI.m_ObjectName = SelectedUINodeObjectType_Filter;
+								m_Ui.selectedNode.m_BiomeIndex = i;
+								m_Ui.selectedNode.m_FilterIndex = filterIndex;
+								m_Ui.selectedNode.m_BiomeID = biome->GetBiomeID();
+								m_Ui.selectedNode.m_ID = filter->GetID();
+								m_Ui.selectedNode.m_ObjectName = SelectedUINodeObjectType_Filter;
 							}
 
 							ImGui::TableSetColumnIndex(1);
@@ -344,20 +279,20 @@ void GenerationManager::ShowSettingsInspector()
 							{
 								if (biome->RemoveFilter(filterIndex))
 								{
-									if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
-										m_SelectedNodeUI.m_BiomeIndex == i &&
-										m_SelectedNodeUI.m_FilterIndex == filterIndex)
+									if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_Filter &&
+										m_Ui.selectedNode.m_BiomeIndex == i &&
+										m_Ui.selectedNode.m_FilterIndex == filterIndex)
 									{
 										SetUINodeData(i, General);
-										m_SelectedNodeUI.m_BiomeID = biome->GetBiomeID();
+										m_Ui.selectedNode.m_BiomeID = biome->GetBiomeID();
 									}
-									else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
-										m_SelectedNodeUI.m_BiomeIndex == i &&
-										m_SelectedNodeUI.m_FilterIndex > filterIndex)
+									else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_Filter &&
+										m_Ui.selectedNode.m_BiomeIndex == i &&
+										m_Ui.selectedNode.m_FilterIndex > filterIndex)
 									{
-										m_SelectedNodeUI.m_FilterIndex--;
+										m_Ui.selectedNode.m_FilterIndex--;
 									}
-									m_RequireUpdation = true;
+									m_Ui.requireUpdation = true;
 									filterWasRemoved = true;
 								}
 							}
@@ -380,54 +315,54 @@ void GenerationManager::ShowSettingsInspector()
 
 void GenerationManager::ShowSettingsDetailed()
 {
-	ImGui::Begin("Generation Settings", &m_IsWindowVisible);
+	ImGui::Begin("Generation Settings", &m_Ui.windowVisible);
 
-	if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_GlobalOptions) ShowSettingsGlobalOptions();
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_GlobalBiomeMixer) m_RequireUpdation = m_BiomeMixer->ShowSettings() || m_RequireUpdation;
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_General) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowGeneralSettings() || m_RequireUpdation;
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseShapeSettings() || m_RequireUpdation;
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowCustomBaseShapeSettings() || m_RequireUpdation;
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowBaseNoiseSettings() || m_RequireUpdation;
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_MaskTool) m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowMaskToolSettings() || m_RequireUpdation;
-	else if (m_SelectedNodeUI.m_ObjectName == SelectedUINodeObjectType_Filter &&
-		m_SelectedNodeUI.m_BiomeIndex >= 0 && m_SelectedNodeUI.m_BiomeIndex < static_cast<int>(m_BiomeManagers.size()))
-		m_RequireUpdation = m_BiomeManagers[m_SelectedNodeUI.m_BiomeIndex]->ShowFilterSettings(m_SelectedNodeUI.m_FilterIndex) || m_RequireUpdation;
+	if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_GlobalOptions) ShowSettingsGlobalOptions();
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_GlobalBiomeMixer) m_Ui.requireUpdation = m_Field.biomeMixer->ShowSettings() || m_Ui.requireUpdation;
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_General) m_Ui.requireUpdation = m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowGeneralSettings() || m_Ui.requireUpdation;
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_BaseShape) m_Ui.requireUpdation = m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowBaseShapeSettings() || m_Ui.requireUpdation;
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) m_Ui.requireUpdation = m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowCustomBaseShapeSettings() || m_Ui.requireUpdation;
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_BaseNoise) m_Ui.requireUpdation = m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowBaseNoiseSettings() || m_Ui.requireUpdation;
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_MaskTool) m_Ui.requireUpdation = m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowMaskToolSettings() || m_Ui.requireUpdation;
+	else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_Filter &&
+		m_Ui.selectedNode.m_BiomeIndex >= 0 && m_Ui.selectedNode.m_BiomeIndex < static_cast<int>(m_Field.biomeManagers.size()))
+		m_Ui.requireUpdation = m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowFilterSettings(m_Ui.selectedNode.m_FilterIndex) || m_Ui.requireUpdation;
 
 	ImGui::End();
 }
 
 void GenerationManager::ShowSettingsGlobalOptions()
 {
-	int storageMode = m_FieldStorageUiMode;
+	int storageMode = m_Ui.fieldStorageUiMode;
 	const char* storageLabels[] = { "R32F (32-bit float)", "R16F (16-bit float)" };
 	if (ImGui::Combo("Field Storage", &storageMode, storageLabels, IM_ARRAYSIZE(storageLabels)))
 	{
-		m_FieldStorageUiMode = storageMode;
-		m_FieldStorageRestartPending = true;
+		m_Ui.fieldStorageUiMode = storageMode;
+		m_Ui.fieldStorageRestartPending = true;
 		if (m_AppState->configManager != nullptr)
 			m_AppState->configManager->SetString("generation", "field_storage", storageMode == 1 ? "R16F" : "R32F");
 	}
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Controls the precision of generated field textures.");
-	if (m_FieldStorageRestartPending) {
+	if (m_Ui.fieldStorageRestartPending) {
 		ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.2f, 1.0f), "Restart required to apply storage change.");
 	}
 	ShowFieldStatistics();
 
-	ImGui::Checkbox("Use Seed Texture", &m_UseSeedFromActiveMesh);
-	ImGui::Checkbox("Auto Updation Paused", &m_UpdationPaused);
+	ImGui::Checkbox("Use Seed Texture", &m_Ui.useSeedFromActiveMesh);
+	ImGui::Checkbox("Auto Updation Paused", &m_Ui.updationPaused);
 
-	if (m_UseSeedFromActiveMesh && m_SeedTexture == nullptr)
+	if (m_Ui.useSeedFromActiveMesh && m_Field.seedTexture == nullptr)
 	{
-		m_SeedTexture = std::make_shared<GeneratorTexture>(m_SeedTextureResolution, m_SeedTextureResolution);
-		m_RequireUpdation = true;
+		m_Field.seedTexture = std::make_shared<GeneratorTexture>(m_Ui.seedTextureResolution, m_Ui.seedTextureResolution);
+		m_Ui.requireUpdation = true;
 	}
-	else if (!m_UseSeedFromActiveMesh && m_SeedTexture != nullptr)
+	else if (!m_Ui.useSeedFromActiveMesh && m_Field.seedTexture != nullptr)
 	{
-		m_SeedTexture = nullptr;
-		m_RequireUpdation = true;
+		m_Field.seedTexture = nullptr;
+		m_Ui.requireUpdation = true;
 	}
 
-	if (m_UseSeedFromActiveMesh)
+	if (m_Ui.useSeedFromActiveMesh)
 	{
 		if (ImGui::CollapsingHeader("Seed Texture Settings"))
 		{
@@ -436,14 +371,14 @@ void GenerationManager::ShowSettingsGlobalOptions()
 			if (ImGui::Button("Pull From Active Mesh"))
 			{
 				PullSeedTextureFromActiveMesh();
-				m_RequireUpdation = true;
+				m_Ui.requireUpdation = true;
 			}
-			if (PowerOfTwoDropDown("Resolution", &m_SeedTextureResolution, 2, 20))
+			if (PowerOfTwoDropDown("Resolution", &m_Ui.seedTextureResolution, 2, 20))
 			{
-				m_SeedTexture->Resize(m_SeedTextureResolution, m_SeedTextureResolution);
-				m_RequireUpdation = true;
+				m_Field.seedTexture->Resize(m_Ui.seedTextureResolution, m_Ui.seedTextureResolution);
+				m_Ui.requireUpdation = true;
 			}
-			ImGui::Image(m_SeedTexture->GetTextureID(), ImVec2(200, 200));
+			ImGui::Image(m_Field.seedTexture->GetTextureID(), ImVec2(200, 200));
 			ImGui::PopID();
 			ImGui::EndChild();
 		}
@@ -452,20 +387,20 @@ void GenerationManager::ShowSettingsGlobalOptions()
 
 void GenerationManager::UpdateFieldStatistics()
 {
-	if (m_FieldStatistics == nullptr || m_HeightmapData == nullptr) return;
-	m_FieldStatistics->Compute(m_HeightmapData.get(), m_AppState->mainMap.tileResolution, m_FieldStatisticsSampleStride);
+	if (m_Field.statistics == nullptr || m_Field.heightmapData == nullptr) return;
+	m_Field.statistics->Compute(m_Field.heightmapData.get(), m_AppState->mainMap.tileResolution, m_Field.statisticsSampleStride);
 	glFinish();
-	m_FieldStatisticsResult = m_FieldStatistics->Read();
+	m_Field.statisticsResult = m_Field.statistics->Read();
 }
 
 void GenerationManager::GenerateHeightmapMipmaps()
 {
-	if (m_HeightmapData == nullptr || m_HeightmapData->GetResolution() <= 0) return;
+	if (m_Field.heightmapData == nullptr || m_Field.heightmapData->GetResolution() <= 0) return;
 
 	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-	m_HeightmapData->BindAsTexture(0);
+	m_Field.heightmapData->BindAsTexture(0);
 	int32_t mipLevels = 1;
-	for (int32_t mipSize = m_HeightmapData->GetResolution(); mipSize > 1; mipSize >>= 1) ++mipLevels;
+	for (int32_t mipSize = m_Field.heightmapData->GetResolution(); mipSize > 1; mipSize >>= 1) ++mipLevels;
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -478,17 +413,17 @@ void GenerationManager::ShowFieldStatistics()
 {
 	ImGui::Separator();
 	ImGui::TextUnformatted("Final Field Statistics");
-	if (!m_FieldStatisticsResult.valid)
+	if (!m_Field.statisticsResult.valid)
 	{
 		ImGui::TextDisabled("No completed statistics yet.");
 		return;
 	}
 
-	ImGui::Text("Minimum: %.6f", m_FieldStatisticsResult.minimum);
-	ImGui::Text("Maximum: %.6f", m_FieldStatisticsResult.maximum);
-	ImGui::TextDisabled("Histogram sampled every %d pixels", m_FieldStatisticsSampleStride);
-	ImGui::PlotLines("##FinalFieldHistogram", m_FieldStatisticsResult.histogram.data(),
-		static_cast<int>(m_FieldStatisticsResult.histogram.size()), 0, "Height distribution", 0.0f, 1.0f,
+	ImGui::Text("Minimum: %.6f", m_Field.statisticsResult.minimum);
+	ImGui::Text("Maximum: %.6f", m_Field.statisticsResult.maximum);
+	ImGui::TextDisabled("Histogram sampled every %d pixels", m_Field.statisticsSampleStride);
+	ImGui::PlotLines("##FinalFieldHistogram", m_Field.statisticsResult.histogram.data(),
+		static_cast<int>(m_Field.statisticsResult.histogram.size()), 0, "Height distribution", 0.0f, 1.0f,
 		ImVec2(-1.0f, 120.0f));
 }
 
@@ -496,16 +431,14 @@ void GenerationManager::ShowFieldStatistics()
 bool GenerationManager::OnTileResolutionChange(const std::string params, void* paramsPtr)
 {
 	WaitForGenerationWorker();
-	{
-		std::lock_guard lock(m_GenerationMutex);
-		m_GenerationCompleted = false;
-	}
+	m_Worker->ConsumeCompleted();
 	auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
-	m_HeightmapData->Resize(size);
-	m_WorkingHeightmapData->Resize(size);
-	m_SwapBuffer->Resize(size);
-	m_RequireUpdation = true;
-	for (auto biome : m_BiomeManagers)
+	m_Field.heightmapData->Resize(size);
+	m_Field.workingHeightmapData->Resize(size);
+	m_Field.swapBuffer->Resize(size);
+	m_Field.slopeGenerator->Resize(m_AppState->mainMap.tileResolution);
+	m_Ui.requireUpdation = true;
+	for (auto biome : m_Field.biomeManagers)
 	{
 		biome->Resize();
 	}
