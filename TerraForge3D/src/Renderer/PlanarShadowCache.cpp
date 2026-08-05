@@ -44,11 +44,15 @@ void PlanarShadowCache::EnsureTexture(int32_t resolution)
 
 	ReleaseTexture();
 	m_Resolution = resolution;
+	int32_t mipLevels = 1;
+	for (int32_t mipSize = m_Resolution; mipSize > 1; mipSize >>= 1) ++mipLevels;
 
 	glGenTextures(1, &m_RendererID);
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, m_Resolution, m_Resolution);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexStorage2D(GL_TEXTURE_2D, mipLevels, GL_R8, m_Resolution, m_Resolution);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -121,7 +125,11 @@ bool PlanarShadowCache::Update(HeightfieldPyramid* heightPyramid, uint64_t terra
 	glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8);
 	glDispatchCompute((m_Resolution + WorkgroupSize - 1) / WorkgroupSize,
 		(m_Resolution + WorkgroupSize - 1) / WorkgroupSize, 1);
-	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_RendererID);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
 	m_Shader->Unbind();
 	glBindTexture(GL_TEXTURE_2D, 0);
