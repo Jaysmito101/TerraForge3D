@@ -49,6 +49,8 @@ static void InitImGui(std::string &configPath)
 
 static void ImGuiShutdown()
 {
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.IniFilename != nullptr) ImGui::SaveIniSettingsToDisk(io.IniFilename);
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
