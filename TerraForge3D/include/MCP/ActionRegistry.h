@@ -23,13 +23,13 @@ enum class ActionFlags : uint32_t
 		std::string name;
 		std::string title;
 		std::string description;
-		Json inputSchema = Json{
+		nlohmann::json inputSchema = nlohmann::json{
 			{"type", "object"},
-			{"properties", Json::object()}
+			{"properties", nlohmann::json::object()}
 		};
-		Json annotations = Json::object();
+		nlohmann::json annotations = nlohmann::json::object();
 		ActionFlags flags = ActionFlags::None;
-		std::function<McpResult(const Json&)> invoke;
+		std::function<McpResult(const nlohmann::json&)> invoke;
 	};
 
 	class ActionRegistry

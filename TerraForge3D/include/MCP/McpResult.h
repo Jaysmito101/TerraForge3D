@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MCP/McpJson.h"
+#include "json.hpp"
 
 #include <string>
 #include <utility>
@@ -10,11 +10,11 @@ inline constexpr const char* MCP_RESULT_REVISION = "tf3d.mcp/v1";
 	struct McpResult
 	{
 		bool ok = true;
-		Json value = Json::object();
-		Json diagnostics = Json::array();
+		nlohmann::json value = nlohmann::json::object();
+		nlohmann::json diagnostics = nlohmann::json::array();
 		std::string operationId;
 
-		static McpResult Success(Json result = Json::object(), std::string operation = {})
+		static McpResult Success(nlohmann::json result = nlohmann::json::object(), std::string operation = {})
 		{
 			McpResult response;
 			response.value = std::move(result);
@@ -25,7 +25,7 @@ inline constexpr const char* MCP_RESULT_REVISION = "tf3d.mcp/v1";
 		static McpResult Failure(
 			std::string code,
 			std::string message,
-			Json details = Json::object())
+			nlohmann::json details = nlohmann::json::object())
 		{
 			McpResult response;
 			response.ok = false;
@@ -37,9 +37,9 @@ inline constexpr const char* MCP_RESULT_REVISION = "tf3d.mcp/v1";
 			return response;
 		}
 
-		Json ToEnvelope() const
+		nlohmann::json ToEnvelope() const
 		{
-			Json envelope = {
+			nlohmann::json envelope = {
 				{"ok", ok},
 				{"revision", MCP_RESULT_REVISION},
 				{"value", value},
@@ -49,9 +49,9 @@ inline constexpr const char* MCP_RESULT_REVISION = "tf3d.mcp/v1";
 			return envelope;
 		}
 
-		Json ToToolContent() const
+		nlohmann::json ToToolContent() const
 		{
-			Json content = Json::array();
+			nlohmann::json content = nlohmann::json::array();
 			content.push_back({
 				{"type", "text"},
 				{"text", ToEnvelope().dump()}
