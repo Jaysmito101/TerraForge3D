@@ -4,6 +4,7 @@
 enum class GeneratorTextureStorage
 {
 	RGBA32F,
+	RG32F, 
 	R8,
 	R16,
 };
@@ -30,6 +31,7 @@ public:
 	inline const uint32_t GetRendererID() const { return m_RendererID; }
 	inline const ImTextureID GetTextureID() const { return (ImTextureID)(intptr_t)m_RendererID; }
 	inline const bool IsSingleChannel() const { return m_Storage == GeneratorTextureStorage::R8 || m_Storage == GeneratorTextureStorage::R16; }
+	inline const bool IsTwoChannel() const { return m_Storage == GeneratorTextureStorage::RG32F; }
 
 
 private:
@@ -41,4 +43,6 @@ private:
 	GLenum m_PixelType = 0;
 	GeneratorTextureStorage m_Storage = GeneratorTextureStorage::RGBA32F;
 	float* m_Data = nullptr;
+	int32_t GetChannelCount() const;
+	void ClearTexture();
 };

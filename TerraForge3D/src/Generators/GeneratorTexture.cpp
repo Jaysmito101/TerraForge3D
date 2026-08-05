@@ -16,6 +16,12 @@ GeneratorTexture::GeneratorTexture(int32_t width, int32_t height, GeneratorTextu
         m_InternalFormat = GL_R16;
         m_PixelType = GL_UNSIGNED_SHORT;
     }
+    else if (m_Storage == GeneratorTextureStorage::RG32F)
+    {
+        m_Format = GL_RG;
+        m_InternalFormat = GL_RG32F;
+        m_PixelType = GL_FLOAT;
+    }
     else
     {
         m_Format = GL_RGBA;
@@ -37,24 +43,7 @@ GeneratorTexture::GeneratorTexture(int32_t width, int32_t height, GeneratorTextu
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
 	}
-	if (IsSingleChannel())
-	{
-		if (m_Storage == GeneratorTextureStorage::R16)
-		{
-			const uint16_t zero = 0;
-			glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
-		}
-		else
-		{
-			const uint8_t zero = 0;
-			glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
-		}
-	}
-	else
-	{
-		const float zero[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, zero);
-	}
+	ClearTexture();
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -70,30 +59,13 @@ void GeneratorTexture::Resize(int32_t width, int32_t height)
     m_Width = width; m_Height = height;
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_Format, m_PixelType, nullptr);
-	if (IsSingleChannel())
-	{
-		if (m_Storage == GeneratorTextureStorage::R16)
-		{
-			const uint16_t zero = 0;
-			glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
-		}
-		else
-		{
-			const uint8_t zero = 0;
-			glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
-		}
-	}
-	else
-	{
-		const float zero[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, zero);
-	}
+	ClearTexture();
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 float* GeneratorTexture::MakeCPUCopy()
 {
-	const int channels = IsSingleChannel() ? 1 : 4;
+    const int channels = GetChannelCount();
 	m_Data = new float[m_Width * m_Height * channels];
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	glGetTexImage(GL_TEXTURE_2D, 0, m_Format, GL_FLOAT, m_Data);
@@ -140,7 +112,7 @@ void GeneratorTexture::ZeroCPUCopy()
 {
     if (m_Data != nullptr)
 	{
-		const int channels = IsSingleChannel() ? 1 : 4;
+        const int channels = GetChannelCount();
 		memset(m_Data, 0, m_Width * m_Height * channels * sizeof(float));
 	}
 }
@@ -163,6 +135,7 @@ void GeneratorTexture::SetPixel(float x, float y, float r, float g, float b, flo
 {
     int32_t pixelX = std::clamp((int32_t)(x * m_Width), 0, m_Width - 1);
     int32_t pixelY = std::clamp((int32_t)(y * m_Height), 0, m_Height - 1);
+    const int channels = GetChannelCount();
     if (m_Data == nullptr)
     {
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
@@ -195,11 +168,37 @@ void GeneratorTexture::SetPixel(float x, float y, float r, float g, float b, flo
 		}
 		else
 		{
-			m_Data[(pixelY * m_Width + pixelX) * 4 + 0] = r;
-			m_Data[(pixelY * m_Width + pixelX) * 4 + 1] = g;
-			m_Data[(pixelY * m_Width + pixelX) * 4 + 2] = b;
-			m_Data[(pixelY * m_Width + pixelX) * 4 + 3] = a;
+			const size_t offset = static_cast<size_t>(pixelY * m_Width + pixelX) * channels;
+			m_Data[offset + 0] = r;
+			if (channels > 1) m_Data[offset + 1] = g;
+			if (channels > 2) m_Data[offset + 2] = b;
+			if (channels > 3) m_Data[offset + 3] = a;
 		}
     }
 }
 
+int32_t GeneratorTexture::GetChannelCount() const
+{
+	return IsSingleChannel() ? 1 : (IsTwoChannel() ? 2 : 4);
+}
+
+void GeneratorTexture::ClearTexture()
+{
+	if (IsSingleChannel())
+	{
+		if (m_Storage == GeneratorTextureStorage::R16)
+		{
+			const uint16_t zero = 0;
+			glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
+		}
+		else
+		{
+			const uint8_t zero = 0;
+			glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
+		}
+		return;
+	}
+
+	const float zero[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glClearTexImage(m_RendererID, 0, m_Format, GL_FLOAT, zero);
+}
