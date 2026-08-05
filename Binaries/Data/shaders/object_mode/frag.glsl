@@ -33,7 +33,7 @@ const float UV_DETERMINANT_EPSILON = 1e-12;
 
 const vec3 MATERIAL_ALBEDO = vec3(0.98, 0.96, 0.90);
 const float MATERIAL_METALLIC = 0.0;
-const float MATERIAL_ROUGHNESS = 0.8;
+const float MATERIAL_ROUGHNESS = 0.58;
 
 uniform int u_Resolution;
 uniform float u_TileSize;
