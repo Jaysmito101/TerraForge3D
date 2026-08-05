@@ -204,6 +204,8 @@ public:
 		GetWindow()->SetClearColor({ 0.1f, 0.1f, 0.1f });
 		appState->mainModel = new Model("Main_Model");
 		appState->mainModel->mesh->GeneratePlane(1024, 1.0f);
+		appState->mainModel->isGeneratedPlane = true;
+		appState->mainModel->planeSolidDepth = 0.1f;
 		appState->mainModel->mesh->RecalculateNormals();
 		appState->mainModel->SetupMeshOnGPU();
 		appState->mainModel->UploadToGPU();

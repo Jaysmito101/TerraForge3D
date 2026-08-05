@@ -22,5 +22,7 @@ private:
 private:
 	bool m_InvertNormals = false;
 	std::shared_ptr<ShaderStorageBuffer> m_SharedMemoryBuffer;
+	std::shared_ptr<Shader> m_PostProcessShader;
+	uint32_t m_PostProcessVao = 0;
 	DrawBrushSettings* m_DrawBrushSettings = nullptr;
 };

@@ -64,6 +64,7 @@ public:
 	inline void SetWindowVisible(bool visible) { m_IsWindowVisible = visible; }
 	inline bool* IsWindowVisiblePtr() { return &m_IsWindowVisible; }
 	inline GeneratorData* GetHeightmapData() const { return m_HeightmapData.get(); }
+	inline const GeneratorDataStatisticsResult& GetFieldStatisticsResult() const { return m_FieldStatisticsResult; }
 	bool UpdateInternal(const std::string& params = "", void* paramsPtr = nullptr);
 	inline const std::vector<std::shared_ptr<BiomeManager>>& GetBiomeManagers() const { return m_BiomeManagers; }
 

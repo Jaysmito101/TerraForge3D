@@ -71,7 +71,7 @@ void Dashboard::ShowChooseBaseModelPopup()
 			if (FileExists(path))
 			{
 				Model* tmp = LoadModel(path);
-				if (tmp) { delete m_AppState->mainModel; m_AppState->mainModel = tmp; tmp->mesh->RecalculateNormals(); tmp->SetupMeshOnGPU(); tmp->UploadToGPU(); }
+				if (tmp) { delete m_AppState->mainModel; m_AppState->mainModel = tmp; tmp->isGeneratedPlane = false; tmp->mesh->RecalculateNormals(); tmp->SetupMeshOnGPU(); tmp->UploadToGPU(); }
 			}
 			ImGui::CloseCurrentPopup();
 		}
@@ -102,6 +102,8 @@ void Dashboard::ShowChooseBaseModelPopup()
 			if (ImGui::Button("Generate Plane##GenBasePlane"))
 			{
 				m_AppState->mainModel->mesh->GeneratePlane(resolution, scale, 1.0f, solidDepth);
+				m_AppState->mainModel->isGeneratedPlane = true;
+				m_AppState->mainModel->planeSolidDepth = solidDepth;
 				m_AppState->mainModel->mesh->RecalculateNormals();
 				m_AppState->mainModel->SetupMeshOnGPU();
 				m_AppState->mainModel->UploadToGPU();
@@ -117,6 +119,7 @@ void Dashboard::ShowChooseBaseModelPopup()
 			if (ImGui::Button("Generate Sphere##GenBaseSphere"))
 			{
 				m_AppState->mainModel->mesh->GenerateSphere(resolution, scale);
+				m_AppState->mainModel->isGeneratedPlane = false;
 				m_AppState->mainModel->mesh->RecalculateNormals();
 				m_AppState->mainModel->SetupMeshOnGPU();
 				m_AppState->mainModel->UploadToGPU();
@@ -135,6 +138,7 @@ void Dashboard::ShowChooseBaseModelPopup()
 			if (ImGui::Button("Generate Torus##GenBaseTorus"))
 			{
 				m_AppState->mainModel->mesh->GenerateTorus(outerRadius, innerRadius, numSegments, numRings);
+				m_AppState->mainModel->isGeneratedPlane = false;
 				m_AppState->mainModel->mesh->RecalculateNormals();
 				m_AppState->mainModel->SetupMeshOnGPU();
 				m_AppState->mainModel->UploadToGPU();
