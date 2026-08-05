@@ -23,7 +23,7 @@ public:
 public:
 	RendererSunData m_Sun;
 	bool m_UseSkyLight = true;
-	float m_SkyLightIntensity = 0.6f;
+	float m_SkyLightIntensity = 0.24f;
 
 private:
 	ApplicationState* m_AppState = nullptr;
