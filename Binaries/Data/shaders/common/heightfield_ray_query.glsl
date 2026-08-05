@@ -199,3 +199,86 @@ bool HeightfieldRayOccludedFromPlane(
 
 	return false;
 }
+
+bool HeightfieldRayIntersect(
+	sampler2D heightPyramid,
+	vec2 startUv,
+	float startHeight,
+	vec3 rayDirection,
+	vec2 terrainWorldSize,
+	float heightBias,
+	int pyramidLevels,
+	out vec2 hitUv,
+	out float hitHeight,
+	out float hitDistance)
+{
+	hitUv = vec2(0.0);
+	hitHeight = 0.0;
+	hitDistance = 0.0;
+	if (rayDirection.y <= HEIGHTFIELD_QUERY_EPSILON) return false;
+
+	vec2 directionUv = vec2(rayDirection.x, -rayDirection.z) / terrainWorldSize;
+	if (dot(directionUv, directionUv) <= HEIGHTFIELD_QUERY_EPSILON * HEIGHTFIELD_QUERY_EPSILON)
+		return false;
+
+	vec2 rayUv = startUv;
+	float rayDistance = 0.0;
+	float maximumDistance = length(terrainWorldSize) /
+		max(length(rayDirection.xz), HEIGHTFIELD_QUERY_EPSILON);
+
+	for (int step = 0; step < HEIGHTFIELD_QUERY_MAX_STEPS; ++step)
+	{
+		if (any(lessThan(rayUv, vec2(0.0))) || any(greaterThan(rayUv, vec2(1.0)))) return false;
+		if (rayDistance > maximumDistance) return false;
+
+		float rayHeight = startHeight + rayDistance * rayDirection.y;
+		bool advanced = false;
+		for (int level = pyramidLevels - 1; level >= 0; --level)
+		{
+			ivec2 levelSize = textureSize(heightPyramid, level);
+			vec2 bounds = textureLod(heightPyramid, rayUv, float(level)).rg;
+
+			if (rayHeight < bounds.x - heightBias)
+			{
+				if (level > 0) continue;
+				hitUv = clamp(rayUv, vec2(0.0), vec2(1.0));
+				hitHeight = textureLod(heightPyramid, hitUv, 0.0).r;
+				hitDistance = rayDistance;
+				return true;
+			}
+
+			if (rayHeight > bounds.y + heightBias)
+			{
+				float distanceToCellExit = HeightfieldCellExitDistance(rayUv, directionUv, levelSize);
+				if (distanceToCellExit > HEIGHTFIELD_QUERY_EPSILON &&
+					distanceToCellExit < HEIGHTFIELD_QUERY_INFINITE_DISTANCE)
+				{
+					rayDistance += distanceToCellExit;
+					rayUv += directionUv * distanceToCellExit;
+					advanced = true;
+					break;
+				}
+			}
+
+			if (level == 0 && rayHeight <= bounds.y + HEIGHTFIELD_QUERY_EPSILON)
+			{
+				hitUv = clamp(rayUv, vec2(0.0), vec2(1.0));
+				hitHeight = textureLod(heightPyramid, hitUv, 0.0).r;
+				hitDistance = rayDistance;
+				return true;
+			}
+		}
+
+		if (!advanced)
+		{
+			float fallbackDistance = HeightfieldCellExitDistance(
+				rayUv, directionUv, textureSize(heightPyramid, 0));
+			if (fallbackDistance >= HEIGHTFIELD_QUERY_INFINITE_DISTANCE) return false;
+			float advanceDistance = max(fallbackDistance, HEIGHTFIELD_QUERY_EPSILON);
+			rayDistance += advanceDistance;
+			rayUv += directionUv * advanceDistance;
+		}
+	}
+
+	return false;
+}
