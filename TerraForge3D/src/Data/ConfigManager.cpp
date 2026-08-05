@@ -100,6 +100,36 @@ bool ConfigManager::SetString(const std::string& section, const std::string& key
 	return false;
 }
 
+bool ConfigManager::GetBool(const std::string& section, const std::string& key, bool& value) const
+{
+	const auto sectionIt = m_Config.find(section);
+	if (sectionIt == m_Config.end() || !sectionIt->is_object()) return false;
+
+	const auto valueIt = sectionIt->find(key);
+	if (valueIt == sectionIt->end() || !valueIt->is_boolean()) return false;
+
+	value = valueIt->get<bool>();
+	return true;
+}
+
+bool ConfigManager::SetBool(const std::string& section, const std::string& key, bool value)
+{
+	const nlohmann::json previousConfig = m_Config;
+	if (!m_Config.is_object()) m_Config = nlohmann::json::object();
+
+	auto& sectionObject = m_Config[section];
+	if (!sectionObject.is_object()) sectionObject = nlohmann::json::object();
+	const auto existingValue = sectionObject.find(key);
+	if (existingValue != sectionObject.end() && existingValue->is_boolean() && existingValue->get<bool>() == value)
+		return true;
+
+	sectionObject[key] = value;
+	if (WriteConfig()) return true;
+
+	m_Config = previousConfig;
+	return false;
+}
+
 bool ConfigManager::SaveLastUsedThemeIfChanged(const std::string& name, const std::string& serializedStyle)
 {
 	if (name == m_LastSavedThemeName && serializedStyle == m_LastSavedThemeData) return false;
