@@ -65,6 +65,7 @@ file(GLOB_RECURSE SOURCES
 # Keep reusable UI components in the build even when the source glob does not
 # notice a newly-created directory in an existing build tree.
 list(APPEND SOURCES ./TerraForge3D/src/UI/ImGuiComponents.cpp)
+list(APPEND SOURCES ./TerraForge3D/src/Generators/GeneratorDataStatistics.cpp)
 list(REMOVE_DUPLICATES SOURCES)
 
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_glfw.cpp)
