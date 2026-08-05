@@ -23,6 +23,7 @@ Usage:
   .\build.ps1 setup
   .\build.ps1 configure --generator visualstudio --configuration Debug
   .\build.ps1 build --generator ninja --configuration Release
+  .\build.ps1 format
   .\build.ps1 run --generator visualstudio --configuration Debug
   .\build.ps1 clean --generator ninja
   .\build.ps1 all --generator visualstudio --configuration Release
@@ -31,6 +32,7 @@ Commands:
   setup       Initialize and update all Git submodules.
   configure   Generate the selected CMake build tree.
   build       Configure when needed, then build terraforge3d.
+  format      Run clang-format on TerraForge3D-owned C/C++ files.
   run         Build when needed, then run terraforge3d.
   clean       Remove generated build/CMake files; use --all for every build tree.
   all         Run setup, configure, and build.
@@ -330,6 +332,7 @@ function Ensure-Configured {
 }
 
 function Invoke-Build {
+    Invoke-Format
     Ensure-Configured
 
     $Arguments = @(
@@ -348,6 +351,76 @@ function Invoke-Build {
 
     Invoke-Checked "cmake" $Arguments
     Sync-CompileCommands
+}
+
+function Get-FormatFiles {
+    $Ripgrep = Get-Command rg -ErrorAction SilentlyContinue
+    if (-not $Ripgrep) {
+        throw "ripgrep (rg) was not found on PATH; it is required to discover files for formatting."
+    }
+
+    $Arguments = @(
+        "--files",
+        "--glob", "*.c",
+        "--glob", "*.cc",
+        "--glob", "*.cpp",
+        "--glob", "*.cxx",
+        "--glob", "*.h",
+        "--glob", "*.hh",
+        "--glob", "*.hpp",
+        "--glob", "*.hxx",
+        "--glob", "*.inl",
+        "--glob", "!vendor/**",
+        "--glob", "!**/vendor/**",
+        "--glob", "!build/**",
+        "--glob", "!**/build/**",
+        "--glob", "!build-*/*",
+        "--glob", "!**/build-*/*"
+    )
+
+    Push-Location -LiteralPath $RootDir
+    try {
+        $RelativeFiles = @(& $Ripgrep.Source @Arguments)
+        $RipgrepExitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+
+    if ($RipgrepExitCode -gt 1) {
+        throw "rg failed while discovering files for formatting with exit code $RipgrepExitCode"
+    }
+
+    return @($RelativeFiles | ForEach-Object {
+        Join-Path $RootDir ([string]$_)
+    })
+}
+
+function Invoke-Format {
+    $ClangFormat = Get-Command clang-format -ErrorAction SilentlyContinue
+    if (-not $ClangFormat) {
+        throw "clang-format was not found on PATH. Install LLVM or add clang-format to PATH."
+    }
+
+    $FormatConfig = Join-Path $RootDir ".clang-format"
+    if (-not (Test-Path -LiteralPath $FormatConfig)) {
+        throw "The clang-format configuration was not found at $FormatConfig"
+    }
+
+    $Files = @(Get-FormatFiles)
+    if ($Files.Count -eq 0) {
+        Write-Host "No project C/C++ files found to format."
+        return
+    }
+
+    Write-Host "Formatting $($Files.Count) project C/C++ files with clang-format..."
+    $Arguments = @(
+        "-i",
+        "--style=file",
+        "--fallback-style=none",
+        "--sort-includes=false"
+    ) + $Files
+    Invoke-Checked $ClangFormat.Source $Arguments
 }
 
 function Get-ExecutablePath {
@@ -487,6 +560,7 @@ if (-not $NoSetup -and $Command -in @("configure", "build", "run", "all")) {
 switch ($Command) {
     "configure" { Invoke-Configure }
     "build" { Invoke-Build }
+    "format" { Invoke-Format }
     "run" { Invoke-Run }
     "clean" { Invoke-Clean }
     "all" {

@@ -25,6 +25,7 @@ Usage:
   ./build.sh setup
   ./build.sh configure --generator ninja --configuration Debug
   ./build.sh build --generator ninja --configuration Release
+  ./build.sh format
   ./build.sh run --generator ninja --configuration Debug
   ./build.sh clean --generator ninja
   ./build.sh all --generator make --configuration Release
@@ -33,6 +34,7 @@ Commands:
   setup       Initialize and update all Git submodules.
   configure   Generate the selected CMake build tree.
   build       Configure when needed, then build terraforge3d.
+  format      Run clang-format on TerraForge3D-owned C/C++ files.
   run         Build when needed, then run terraforge3d.
   clean       Remove generated build/CMake files; use --all for every build tree.
   all         Run setup, configure, and build.
@@ -226,6 +228,7 @@ ensure_configured() {
 }
 
 build_project() {
+    format_project
     ensure_configured
 
     local args=(--build "$BUILD_DIR" --target terraforge3d --parallel)
@@ -238,6 +241,58 @@ build_project() {
 
     cmake "${args[@]}"
     sync_compile_commands
+}
+
+format_project() {
+    require_command clang-format
+    require_command rg
+    [[ -f "$ROOT_DIR/.clang-format" ]] || die "The clang-format configuration was not found at $ROOT_DIR/.clang-format"
+
+    local -a rg_args=(
+        --files
+        --glob '*.c'
+        --glob '*.cc'
+        --glob '*.cpp'
+        --glob '*.cxx'
+        --glob '*.h'
+        --glob '*.hh'
+        --glob '*.hpp'
+        --glob '*.hxx'
+        --glob '*.inl'
+        --glob '!vendor/**'
+        --glob '!**/vendor/**'
+        --glob '!build/**'
+        --glob '!**/build/**'
+        --glob '!build-*/*'
+        --glob '!**/build-*/*'
+    )
+    local relative_files
+    if relative_files="$(cd "$ROOT_DIR" && rg "${rg_args[@]}")"; then
+        :
+    else
+        local rg_status=$?
+        [[ "$rg_status" -eq 1 ]] || die "rg failed while discovering files for formatting with exit code $rg_status"
+    fi
+
+    local -a files=()
+    local relative_file
+    while IFS= read -r relative_file; do
+        [[ -n "$relative_file" ]] || continue
+        files+=("$ROOT_DIR/$relative_file")
+    done <<< "$relative_files"
+
+    if [[ "${#files[@]}" -eq 0 ]]; then
+        echo "No project C/C++ files found to format."
+        return 0
+    fi
+
+    echo "Formatting ${#files[@]} project C/C++ files with clang-format..."
+    clang-format \
+        -i \
+        --style=file \
+        --fallback-style=none \
+        --sort-includes=false \
+        "${files[@]}"
 }
 
 executable_path() {
