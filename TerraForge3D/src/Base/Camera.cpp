@@ -26,9 +26,9 @@ Camera::Camera(bool perspective)
 void Camera::Reset()
 {
 	m_Target = glm::vec3(0.0f);
-	m_Distance = 3.1f;
-	m_Azimuth = 0.0f;
-	m_Elevation = glm::radians(28.0f);
+	m_Distance = 3.65f;
+	m_Azimuth = -9.75f;
+	m_Elevation = glm::radians(57.0f);
 	ClampOrbit();
 	UpdateCamera();
 }
