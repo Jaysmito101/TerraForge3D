@@ -1,5 +1,7 @@
 #include "Generators/GeneratorTexture.h"
 
+#include <algorithm>
+
 GeneratorTexture::GeneratorTexture(int32_t width, int32_t height, GeneratorTextureStorage storage)
 {
     m_Width = width; m_Height = height;
@@ -60,6 +62,26 @@ void GeneratorTexture::Resize(int32_t width, int32_t height)
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_Format, m_PixelType, nullptr);
 	ClearTexture();
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GeneratorTexture::GenerateMipmaps()
+{
+	if (m_RendererID == 0 || m_Width <= 0 || m_Height <= 0) return;
+
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+		GL_TEXTURE_UPDATE_BARRIER_BIT |
+		GL_TEXTURE_FETCH_BARRIER_BIT);
+
+	glBindTexture(GL_TEXTURE_2D, m_RendererID);
+	const int32_t largestDimension = std::max(m_Width, m_Height);
+	int32_t mipLevels = 1;
+	for (int32_t mipSize = largestDimension; mipSize > 1; mipSize >>= 1) ++mipLevels;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
