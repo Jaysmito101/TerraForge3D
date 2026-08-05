@@ -34,3 +34,10 @@ vec3 tf3d_sampleHemisphere(float u1, float u2)
 	float r = sqrt(max(0.0, 1.0 - u1 * u1));
 	return vec3(cos(TF3D_TWO_PI * u2) * r, sin(TF3D_TWO_PI * u2) * r, u1);
 }
+
+vec3 tf3d_clampRadiance(vec3 radiance, float maxLuminance)
+{
+	radiance = max(radiance, vec3(0.0));
+	float luminance = dot(radiance, vec3(0.2126, 0.7152, 0.0722));
+	return radiance * min(1.0, maxLuminance / max(luminance, TF3D_EPSILON));
+}
