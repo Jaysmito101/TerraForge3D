@@ -8,6 +8,7 @@ const float Epsilon = 0.00001;
 
 const uint NumSamples = 64 * 1024;
 const float InvNumSamples = 1.0 / float(NumSamples);
+const float MaxIblSampleLuminance = 32.0;
 
 uniform samplerCube u_InputTexture;
 
@@ -73,7 +74,8 @@ void main(void)
 		vec3 Li = tangentToWorld(tf3d_sampleCosineHemisphere(u.x, u.y), N, S, T);
 
 		// With cosine-weighted sampling, cos(theta) / PDF = PI.
-		irradiance += PI * texture(u_InputTexture, Li).rgb;
+		vec3 sampleRadiance = textureLod(u_InputTexture, Li, 0.0).rgb;
+		irradiance += PI * tf3d_clampRadiance(sampleRadiance, MaxIblSampleLuminance);
 	}
 	irradiance /= vec3(NumSamples);
 
