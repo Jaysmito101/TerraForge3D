@@ -7,9 +7,9 @@ class ApplicationState;
 struct RendererSunData
 {
 	char name[1024];
-	glm::vec3 direction = glm::vec3(-1.0f, -1.0f, -1.0f);
+	glm::vec3 direction = glm::vec3(2.260f, -2.440f, -0.740f);
 	glm::vec3 color = glm::vec3(1.0f);
-	float intensity = 0.5f;
+	float intensity = 2.0f;
 };
 
 class RendererLights
