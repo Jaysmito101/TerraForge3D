@@ -26,8 +26,10 @@ ViewportManager::~ViewportManager()
 void ViewportManager::Update()
 {
     TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/update");
-    if (m_AutoCalculateAspectRatio)
+    if (m_AutoCalculateAspectRatio) {
         m_RendererViewport->m_Camera.SetAspectRatio(m_Width / (m_Height + 0.000000001f));
+    }
+
     if (m_IsVisible) {
         const ImVec2 framebufferScale = ImGui::GetIO().DisplayFramebufferScale;
         const float scaleX            = std::max(framebufferScale.x, 1.0f);

@@ -93,10 +93,17 @@ public:
                 appState->generationManager->Update();
             }
         }
+
+        {
+            TF3D_PROFILE_SCOPE("app/update/renderer");
+            appState->rendererManager->Update();
+        }
+
         {
             TF3D_PROFILE_SCOPE("app/update/viewports");
-            for (int i = 0; i < MAX_VIEWPORT_COUNT; i++)
+            for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) {
                 appState->viewportManagers[i]->Update();
+            }
         }
 
         {
