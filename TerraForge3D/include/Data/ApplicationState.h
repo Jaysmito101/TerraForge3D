@@ -98,7 +98,7 @@ namespace tf3d::data
     class ApplicationState
     {
     public:
-        Application *mainApp;
+        base::Application *mainApp;
 
         ApplicationStateWindows windows;
         ApplicationStateStates states;

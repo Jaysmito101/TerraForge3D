@@ -6,7 +6,6 @@
 #include <GLFW/glfw3native.h>
 #endif
 #include "Base/Base.h"
-#include "Base/EntryPoint.h"
 #include "Data/ApplicationState.h"
 #include "Data/VersionInfo.h"
 #include "Exporters/ExportManager.h"
@@ -17,6 +16,10 @@
 #include "Profiler.h"
 #include "TextureStore/TextureStore.h"
 #include "Utils/Utils.h"
+#include "Base/SplashScreen.h"
+#include <iostream>
+#include <string>
+
 #undef cNear
 #undef cFar
 #include <nlohmann/json.hpp>
@@ -29,8 +32,8 @@
 #include "UI/McpControlPanel.h"
 #endif
 
-static ApplicationState *appState;
-static Application *mainApp;
+static tf3d::data::ApplicationState *appState;
+static tf3d::base::Application *mainApp;
 
 void SetUpIcon()
 {
@@ -51,7 +54,7 @@ void SetUpIcon()
 namespace tf3d
 {
 
-    class TerraForge3D : public Application
+    class TerraForge3D : public base::Application
     {
     public:
         virtual void OnPreload() override
@@ -361,7 +364,23 @@ namespace tf3d
 
 } // namespace tf3d
 
-Application *CreateApplication()
+int main(int argc, char **argv)
 {
-    return (mainApp = new tf3d::TerraForge3D());
+    auto app = std::make_unique<tf3d::TerraForge3D>();
+    app->OnPreload();
+    auto logger = tf3d::base::Logger(app->logsDir);
+    app->Init();
+
+    {
+        std::string args = "";
+
+        if (argc == 2) {
+            args = std::string(argv[1]);
+        }
+
+        tf3d::base::SplashScreen::Init();
+        app->OnStart(args);
+        tf3d::base::SplashScreen::Destory();
+    }
+    app->Run();
 }

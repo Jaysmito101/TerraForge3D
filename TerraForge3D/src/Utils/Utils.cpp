@@ -628,12 +628,12 @@ namespace tf3d::utils
 
     bool IsKeyDown(int key)
     {
-        return glfwGetKey(Application::Get()->GetWindow()->GetNativeWindow(), key) == GLFW_PRESS;
+        return glfwGetKey(base::Application::Get()->GetWindow()->GetNativeWindow(), key) == GLFW_PRESS;
     }
 
     bool IsMouseButtonDown(int button)
     {
-        return glfwGetMouseButton(Application::Get()->GetWindow()->GetNativeWindow(), button);
+        return glfwGetMouseButton(base::Application::Get()->GetWindow()->GetNativeWindow(), button);
     }
 
     void ShowMessageBox(std::string message, std::string title)
