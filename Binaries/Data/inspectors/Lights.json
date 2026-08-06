@@ -1,0 +1,67 @@
+{
+    "Description": "Controls environment lighting and the primary sun light used by the renderer.",
+    "ShowResetButton": false,
+    "Params": [
+        {
+            "Name": "UseSkyLight",
+            "Type": "Bool",
+            "Default": true,
+            "Widget": "Checkbox",
+            "Label": "Use Sky Light",
+            "Description": "Use environment lighting from the loaded skybox when it is available."
+        },
+        {
+            "Name": "SkyLightIntensity",
+            "Type": "Float",
+            "Default": 0.24,
+            "Widget": "Slider",
+            "Constraints": [0.0, 1.0],
+            "Label": "Sky Light Intensity",
+            "Description": "Scales the contribution of environment lighting from the loaded skybox."
+        }
+    ],
+    "Sections": [
+        {
+            "Name": "Sun",
+            "Label": "Sun",
+            "Description": "Controls the direction, color, and intensity of the primary directional light.",
+            "Params": [
+                {
+                    "Name": "Name",
+                    "Type": "String",
+                    "Default": "Sun",
+                    "Widget": "Input",
+                    "Label": "Name",
+                    "Description": "Display name for the primary directional light."
+                },
+                {
+                    "Name": "Direction",
+                    "Type": "Vector3",
+                    "Default": [2.26, -2.44, -0.74],
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Label": "Direction",
+                    "Description": "World-space direction of the primary directional light."
+                },
+                {
+                    "Name": "Color",
+                    "Type": "Vector3",
+                    "Default": [1.0, 1.0, 1.0],
+                    "Widget": "Color",
+                    "Label": "Color",
+                    "Description": "Color of the primary directional light."
+                },
+                {
+                    "Name": "Intensity",
+                    "Type": "Float",
+                    "Default": 2.0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 100.0],
+                    "Label": "Intensity",
+                    "Description": "Strength of the primary directional light."
+                }
+            ]
+        }
+    ]
+}

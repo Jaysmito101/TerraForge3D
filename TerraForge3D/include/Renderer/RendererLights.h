@@ -1,18 +1,13 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Exporters/Serializer.h"
+#include "Misc/CustomInspector.h"
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::renderer
 {
-    struct RendererSunData {
-        char name[1024];
-        glm::vec3 direction = glm::vec3(2.260f, -2.440f, -0.740f);
-        glm::vec3 color     = glm::vec3(1.0f);
-        float intensity     = 2.0f;
-    };
-
     class RendererLights
     {
     public:
@@ -21,13 +16,56 @@ namespace tf3d::renderer
 
         void ShowSettings();
 
-    public:
-        RendererSunData m_Sun;
-        bool m_UseSkyLight        = true;
-        float m_SkyLightIntensity = 0.24f;
+        inline exporters::SerializerNode Save() const
+        {
+            return m_Inspector.SaveState();
+        }
+
+        inline bool Load(exporters::SerializerNode data)
+        {
+            return m_Inspector.LoadState(data);
+        }
+
+        inline nlohmann::json GetSettingsSchema() const
+        {
+            return m_Inspector.BuildSchema();
+        }
+
+        inline bool IsSkyLightEnabled() const
+        {
+            return m_Inspector.Get<bool>("UseSkyLight");
+        }
+
+        inline float GetSkyLightIntensity() const
+        {
+            return m_Inspector.Get<float>("SkyLightIntensity");
+        }
+
+        inline std::string GetSunName() const
+        {
+            return m_Inspector.Get<std::string>("Name");
+        }
+
+        inline glm::vec3 GetSunDirection() const
+        {
+            return m_Inspector.Get<glm::vec3>("Direction");
+        }
+
+        inline glm::vec3 GetSunColor() const
+        {
+            return m_Inspector.Get<glm::vec3>("Color");
+        }
+
+        inline float GetSunIntensity() const
+        {
+            return m_Inspector.Get<float>("Intensity");
+        }
 
     private:
+        void BuildInspector();
+
         ApplicationState *m_AppState = nullptr;
+        CustomInspector m_Inspector;
     };
 
 } // namespace tf3d::renderer

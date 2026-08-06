@@ -110,13 +110,12 @@ namespace tf3d::renderer
                                                   88.0f / 255.0f, 114.0f / 255.0f);
                 auto *rendererLights      = m_AppState->rendererManager->GetRendererLights();
                 auto *skyRenderer         = m_AppState->rendererManager->GetSkyRenderer();
-                const bool enableSkyLight = rendererLights->m_UseSkyLight && skyRenderer->IsSkyReady();
-                const auto &baseSun       = rendererLights->m_Sun;
+                const bool enableSkyLight = rendererLights->IsSkyLightEnabled() && skyRenderer->IsSkyReady();
                 m_PostProcessShader->SetUniform1i("u_EnableSkyLight", enableSkyLight ? 1 : 0);
-                m_PostProcessShader->SetUniform1f("u_SkyLightIntensity", rendererLights->m_SkyLightIntensity);
-                m_PostProcessShader->SetUniform3f("u_SunDirection", baseSun.direction);
-                m_PostProcessShader->SetUniform3f("u_SunColor", baseSun.color);
-                m_PostProcessShader->SetUniform1f("u_SunIntensity", baseSun.intensity);
+                m_PostProcessShader->SetUniform1f("u_SkyLightIntensity", rendererLights->GetSkyLightIntensity());
+                m_PostProcessShader->SetUniform3f("u_SunDirection", rendererLights->GetSunDirection());
+                m_PostProcessShader->SetUniform3f("u_SunColor", rendererLights->GetSunColor());
+                m_PostProcessShader->SetUniform1f("u_SunIntensity", rendererLights->GetSunIntensity());
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, enableSkyLight ? skyRenderer->GetIrradianceMap() : 0);
                 m_PostProcessShader->SetUniform1i("u_IrradianceMap", 1);
@@ -168,17 +167,17 @@ namespace tf3d::renderer
             }
         }
 
-        const auto &sun = m_AppState->rendererManager->GetRendererLights()->m_Sun;
-        m_Shader->SetUniform3f("u_SunDirection", sun.direction);
-        m_Shader->SetUniform3f("u_SunColor", sun.color);
-        m_Shader->SetUniform1f("u_SunIntensity", sun.intensity);
+        auto *rendererLights = m_AppState->rendererManager->GetRendererLights();
+        m_Shader->SetUniform3f("u_SunDirection", rendererLights->GetSunDirection());
+        m_Shader->SetUniform3f("u_SunColor", rendererLights->GetSunColor());
+        m_Shader->SetUniform1f("u_SunIntensity", rendererLights->GetSunIntensity());
         m_Shader->SetUniform1i("u_EnableSkyLight",
-                               (m_AppState->rendererManager->GetRendererLights()->m_UseSkyLight &&
-                                m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady())
-                                   ? 1
-                                   : 0);
+                               (rendererLights->IsSkyLightEnabled() &&
+                                 m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady())
+                                    ? 1
+                                    : 0);
         m_Shader->SetUniform1f("u_SkyLightIntensity",
-                               m_AppState->rendererManager->GetRendererLights()->m_SkyLightIntensity);
+                               rendererLights->GetSkyLightIntensity());
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap() : 0);

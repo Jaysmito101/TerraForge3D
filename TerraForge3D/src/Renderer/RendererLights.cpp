@@ -1,38 +1,49 @@
 #include "Renderer/RendererLights.h"
+#include "Data/ApplicationState.h"
+#include "Data/ResourceManager.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
 namespace tf3d::renderer
 {
 
-    RendererLights::RendererLights(ApplicationState *appState)
+    RendererLights::RendererLights(ApplicationState *appState) : m_AppState(appState)
     {
-        m_AppState = appState;
-        std::sprintf(m_Sun.name, "Sun");
+        BuildInspector();
     }
 
     RendererLights::~RendererLights()
     {
     }
 
+    void RendererLights::BuildInspector()
+    {
+        if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
+            TF3D_LOG_ERROR("Cannot load Renderer Lights inspector metadata without a resource manager");
+            return;
+        }
+
+        const std::string configPath = m_AppState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
+                                       PATH_SEPARATOR + "Lights.json";
+        bool loaded              = false;
+        const std::string source = m_AppState->resourceManager->LoadText(configPath, false, &loaded);
+        if (!loaded) {
+            TF3D_LOG_ERROR("Could not load Renderer Lights inspector metadata '{}'", configPath);
+            return;
+        }
+
+        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
+        if (config.is_discarded()) {
+            TF3D_LOG_ERROR("Could not parse Renderer Lights inspector metadata '{}'", configPath);
+            return;
+        }
+        if (!m_Inspector.LoadConfig(config))
+            TF3D_LOG_ERROR("Could not load Renderer Lights inspector metadata '{}'", configPath);
+    }
+
     void RendererLights::ShowSettings()
     {
-        ImGui::Text("Light Settings");
-        ImGui::Checkbox("Use Sky Light", &m_UseSkyLight);
-        ImGui::SliderFloat("Sky Light Intensity", &m_SkyLightIntensity, 0.0f, 1.0f);
-        if (ImGui::BeginPopupContextItem()) {
-            ImGui::Text("Enabling this will mean using environment lighting from the loaded skybox.");
-            ImGui::EndPopup();
-        }
-        ImGui::Separator();
-        ImGui::TextUnformatted(m_Sun.name);
-        if (ImGui::BeginPopupContextItem()) {
-            ImGui::InputText("Name", m_Sun.name, sizeof(m_Sun.name));
-            ImGui::EndPopup();
-        }
-        ImGui::DragFloat3("Direction", glm::value_ptr(m_Sun.direction), 0.01f);
-        ImGui::ColorEdit3("Color", glm::value_ptr(m_Sun.color));
-        ImGui::DragFloat("Intensity", &m_Sun.intensity, 0.01f, 0.0f, 100.0f);
+        m_Inspector.Render();
     }
 
 } // namespace tf3d::renderer
