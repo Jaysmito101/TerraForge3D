@@ -615,7 +615,14 @@ namespace tf3d::misc
         bool Set(const std::string &name, T value)
         {
             const auto existing = m_Values.find(name);
-            return existing != m_Values.end() && existing->second.Set(std::move(value));
+            if (existing == m_Values.end())
+                return false;
+
+            CustomInspectorValue candidate = existing->second;
+            if (!candidate.Set(std::move(value)) || !ValidateValue(name, candidate))
+                return false;
+            existing->second = std::move(candidate);
+            return true;
         }
 
         template <typename Function>
@@ -725,6 +732,7 @@ namespace tf3d::misc
         CustomInspectorValue &AddCurveVariable(const std::string &name,
                                                const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints = {}, int defaultPointCount = 2);
         CustomInspectorValue &AddVairableFromConfig(const nlohmann::json &config);
+        bool ValidateValue(const std::string &name, const CustomInspectorValue &value) const;
         bool RenderWidget(const std::string &widgetLabel);
         bool RenderSlider(const CustomInspectorWidget &widget);
         bool RenderDrag(const CustomInspectorWidget &widget);

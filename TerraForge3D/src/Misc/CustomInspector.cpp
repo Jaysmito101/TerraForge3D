@@ -5,6 +5,7 @@
 #include "Utils/Utils.h"
 
 #include <algorithm>
+#include <cmath>
 #include <unordered_set>
 
 #ifdef min
@@ -807,6 +808,42 @@ namespace tf3d::misc
         return state;
     }
 
+    bool CustomInspector::ValidateValue(const std::string &name, const CustomInspectorValue &value) const
+    {
+        if (value.GetType() != CustomInspectorValueType::Int &&
+            value.GetType() != CustomInspectorValueType::Float)
+            return true;
+
+        const float numericValue = value.GetType() == CustomInspectorValueType::Int
+                                       ? static_cast<float>(value.Get<int32_t>())
+                                       : value.Get<float>();
+        if (!std::isfinite(numericValue)) {
+            TF3D_LOG_WARN("Invalid CustomInspector value '{}' must be finite", name);
+            return false;
+        }
+
+        for (const auto &[widgetName, widget] : m_Widgets) {
+            if (widget.m_VariableName != name ||
+                (widget.m_Type != CustomInspectorWidgetType_Slider &&
+                 widget.m_Type != CustomInspectorWidgetType_Drag))
+                continue;
+
+            const float minimum = widget.m_Constratins[0];
+            const float maximum = widget.m_Constratins[1];
+            if (minimum == 0.0f && maximum == 0.0f)
+                continue;
+            if (numericValue < minimum || numericValue > maximum) {
+                TF3D_LOG_WARN(
+                    "Invalid CustomInspector value '{}' must be between {} and {}",
+                    name,
+                    minimum,
+                    maximum);
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool CustomInspector::LoadState(SerializerNode node)
     {
         if (!node) {
@@ -856,10 +893,17 @@ namespace tf3d::misc
                 return;
             }
 
-            if (!existing->second.ReadStateValue(source, name)) {
+            CustomInspectorValue candidate = existing->second;
+            if (!candidate.ReadStateValue(source, name)) {
                 TF3D_LOG_WARN("Invalid CustomInspector state type for '{}'", name);
                 valid = false;
+                return;
             }
+            if (!ValidateValue(valueName, candidate)) {
+                valid = false;
+                return;
+            }
+            existing->second = std::move(candidate);
         };
 
         for (const auto &key : node->GetKeys()) {
