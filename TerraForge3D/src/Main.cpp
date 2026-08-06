@@ -36,8 +36,6 @@ namespace tf3d
         {
             PerformanceMonitor::Get().SetCurrentThreadName("Main Thread");
             SetTitle("TerraForge3D - Jaysmito Mukherjee");
-            MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs");
-            SetLogsDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs");
             MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs");
             SetWindowConfigPath(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "windowconfigs.terr3d");
             MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "autosave");
@@ -344,9 +342,12 @@ namespace tf3d
 
 int main(int argc, char **argv)
 {
+    const std::string logsDir = tf3d::utils::GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "logs";
+    tf3d::utils::MkDir(logsDir);
+    tf3d::base::Logger logger(logsDir);
+
     auto app = std::make_unique<tf3d::TerraForge3D>();
     app->OnPreload();
-    auto logger = tf3d::base::Logger(app->logsDir);
     app->Init();
 
     {

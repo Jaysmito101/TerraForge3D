@@ -19,7 +19,6 @@ namespace tf3d::base
 
         void SetWindowConfigPath(std::string title);
         void SetTitle(std::string title);
-        void SetLogsDir(std::string ld);
         void Init();
         bool IsActive();
         void RenderImGui();
@@ -42,8 +41,6 @@ namespace tf3d::base
         {
             return s_App;
         }
-
-        std::string logsDir = "";
 
     private:
         std::string m_WindowTitle    = "Main Window";
