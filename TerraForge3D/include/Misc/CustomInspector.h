@@ -3,6 +3,7 @@
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace tf3d::misc
@@ -423,6 +424,14 @@ namespace tf3d::misc
         std::vector<int32_t> m_RenderOnConditionValues;
     };
 
+    struct CustomInspectorSection {
+        std::string name;
+        std::string label;
+        std::string description;
+        bool collapsible = false;
+        bool defaultOpen = true;
+    };
+
     class CustomInspector
     {
     public:
@@ -473,10 +482,22 @@ namespace tf3d::misc
         CustomInspectorWidget &SetWidgetTooltip(const std::string &label, const std::string &value = "Default Tooltip");
         CustomInspectorWidget &SetWidgetFont(const std::string &label, const std::string &value = "");
 
+        CustomInspectorSection &AddSection(const std::string &name,
+                                           const std::string &label = "",
+                                           bool collapsible         = false,
+                                           bool defaultOpen         = true);
+        void BeginSection(const std::string &name);
+        void EndSection();
+        bool HasSection(const std::string &name) const;
+        CustomInspectorSection &GetSection(const std::string &name);
+
         SerializerNode SaveData() const;
         void LoadData(SerializerNode node);
         SerializerNode Save() const;
         void Load(SerializerNode node);
+        SerializerNode SaveState() const;
+        bool LoadState(SerializerNode node);
+        nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
 
         bool Render();
@@ -502,6 +523,10 @@ namespace tf3d::misc
             m_Values.clear();
             m_Widgets.clear();
             m_WidgetsOrder.clear();
+            m_Sections.clear();
+            m_SectionsOrder.clear();
+            m_WidgetSections.clear();
+            m_CurrentSection.clear();
             m_Description.clear();
             m_LastChangedVariable.clear();
             m_LastAction.clear();
@@ -518,8 +543,21 @@ namespace tf3d::misc
         {
             return m_WidgetsOrder;
         }
+        inline const std::unordered_map<std::string, CustomInspectorSection> &GetSections() const
+        {
+            return m_Sections;
+        }
+        inline const std::vector<std::string> &GetSectionsOrder() const
+        {
+            return m_SectionsOrder;
+        }
+        inline const std::unordered_map<std::string, std::string> &GetWidgetSections() const
+        {
+            return m_WidgetSections;
+        }
 
     private:
+        bool RenderWidget(const std::string &widgetLabel);
         bool RenderSlider(const CustomInspectorWidget &widget);
         bool RenderDrag(const CustomInspectorWidget &widget);
         bool RenderColor(const CustomInspectorWidget &widget);
@@ -536,6 +574,10 @@ namespace tf3d::misc
         std::unordered_map<std::string, CustomInspectorValue> m_Values;
         std::unordered_map<std::string, CustomInspectorWidget> m_Widgets;
         std::vector<std::string> m_WidgetsOrder;
+        std::unordered_map<std::string, CustomInspectorSection> m_Sections;
+        std::vector<std::string> m_SectionsOrder;
+        std::unordered_map<std::string, std::string> m_WidgetSections;
+        std::string m_CurrentSection;
         std::string m_ID = "";
         std::string m_Description;
         std::string m_LastChangedVariable;

@@ -5,6 +5,7 @@
 #include "Utils/Utils.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 #ifdef min
 #undef min
@@ -396,6 +397,46 @@ namespace tf3d::misc
     {
     }
 
+    CustomInspectorSection &CustomInspector::AddSection(const std::string &name,
+                                                        const std::string &label,
+                                                        bool collapsible,
+                                                        bool defaultOpen)
+    {
+        auto [it, inserted] = m_Sections.emplace(name, CustomInspectorSection{});
+        if (inserted) {
+            it->second.name = name;
+            m_SectionsOrder.push_back(name);
+        }
+        it->second.label       = label.empty() ? name : label;
+        it->second.collapsible = collapsible;
+        it->second.defaultOpen = defaultOpen;
+        return it->second;
+    }
+
+    void CustomInspector::BeginSection(const std::string &name)
+    {
+        if (!HasSection(name))
+            AddSection(name);
+        m_CurrentSection = name;
+    }
+
+    void CustomInspector::EndSection()
+    {
+        m_CurrentSection.clear();
+    }
+
+    bool CustomInspector::HasSection(const std::string &name) const
+    {
+        return m_Sections.find(name) != m_Sections.end();
+    }
+
+    CustomInspectorSection &CustomInspector::GetSection(const std::string &name)
+    {
+        if (!HasSection(name))
+            return AddSection(name);
+        return m_Sections.at(name);
+    }
+
     CustomInspectorValue &CustomInspector::GetVariable(const std::string &name)
     {
         return m_Values[name];
@@ -633,6 +674,8 @@ namespace tf3d::misc
             return GetWidget(name);
         m_Widgets[name] = widget;
         m_WidgetsOrder.push_back(name);
+        if (!m_CurrentSection.empty())
+            m_WidgetSections[name] = m_CurrentSection;
         return m_Widgets[name];
     }
 
@@ -826,6 +869,319 @@ namespace tf3d::misc
         }
     }
 
+    SerializerNode CustomInspector::SaveState() const
+    {
+        SerializerNode state = CreateSerializerNode();
+        std::unordered_set<std::string> savedVariables;
+
+        auto saveValue = [&](SerializerNode target,
+                             const std::string &name,
+                             const CustomInspectorValue &value) {
+            switch (value.GetType()) {
+                case CustomInspectorValueType_Int:
+                    target->Set(name, value.m_IntValue);
+                    break;
+                case CustomInspectorValueType_Float:
+                    target->Set(name, value.m_FloatValue);
+                    break;
+                case CustomInspectorValueType_Bool:
+                    target->Set(name, value.m_BoolValue);
+                    break;
+                case CustomInspectorValueType_String:
+                    target->Set(name, value.m_StringValue);
+                    break;
+                case CustomInspectorValueType_Vector2:
+                    target->Set(name, glm::vec2(value.m_VectorValue[0], value.m_VectorValue[1]));
+                    break;
+                case CustomInspectorValueType_Vector3:
+                    target->Set(name, glm::vec3(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2]));
+                    break;
+                case CustomInspectorValueType_Vector4:
+                    target->Set(name, glm::vec4(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]));
+                    break;
+                case CustomInspectorValueType_Texture:
+                    target->Set(name, value.m_TextureValue ? value.m_TextureValue->GetPath() : "");
+                    break;
+                case CustomInspectorValueType_Path: {
+                    std::vector<glm::vec2> points;
+                    points.reserve(static_cast<size_t>(value.m_PathPointCount));
+                    for (int32_t index = 0; index < value.m_PathPointCount; ++index)
+                        points.push_back(value.m_PathPoints[index]);
+                    target->Set(name, points);
+                    break;
+                }
+                case CustomInspectorValueType_Curve: {
+                    std::vector<glm::vec2> points;
+                    points.reserve(static_cast<size_t>(value.m_CurvePointCount));
+                    for (int32_t index = 0; index < value.m_CurvePointCount; ++index)
+                        points.push_back(value.m_CurvePoints[index]);
+                    target->Set(name, points);
+                    break;
+                }
+                case CustomInspectorValueType_Unknown:
+                default:
+                    TF3D_LOG_WARN("Skipping unsupported CustomInspector state field '{}'", name);
+                    break;
+            }
+        };
+
+        for (const auto &sectionName : m_SectionsOrder) {
+            const auto section = m_Sections.find(sectionName);
+            if (section == m_Sections.end())
+                continue;
+
+            SerializerNode sectionState = CreateSerializerNode();
+            for (const auto &widgetLabel : m_WidgetsOrder) {
+                const auto widgetSection = m_WidgetSections.find(widgetLabel);
+                if (widgetSection == m_WidgetSections.end() || widgetSection->second != sectionName)
+                    continue;
+                const auto widget = m_Widgets.find(widgetLabel);
+                if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+                    continue;
+                const auto value = m_Values.find(widget->second.m_VariableName);
+                if (value == m_Values.end() || !savedVariables.insert(value->first).second)
+                    continue;
+                saveValue(sectionState, value->first, value->second);
+            }
+            state->Set(sectionName, sectionState);
+        }
+
+        for (const auto &[name, value] : m_Values) {
+            if (savedVariables.insert(name).second)
+                saveValue(state, name, value);
+        }
+        return state;
+    }
+
+    bool CustomInspector::LoadState(SerializerNode node)
+    {
+        if (!node) {
+            TF3D_LOG_ERROR("Cannot load CustomInspector state from an empty serializer node");
+            return false;
+        }
+
+        bool valid     = true;
+        auto loadValue = [&](const std::string &name, SerializerNode source) {
+            const auto existing = m_Values.find(name);
+            if (existing == m_Values.end()) {
+                TF3D_LOG_WARN("Invalid CustomInspector state field '{}'", name);
+                valid = false;
+                return;
+            }
+
+            auto &value = existing->second;
+            switch (value.GetType()) {
+                case CustomInspectorValueType_Int:
+                    value.m_IntValue = source->Get(name, value.m_IntValue);
+                    break;
+                case CustomInspectorValueType_Float:
+                    value.m_FloatValue = source->Get(name, value.m_FloatValue);
+                    break;
+                case CustomInspectorValueType_Bool:
+                    value.m_BoolValue = source->Get(name, value.m_BoolValue);
+                    break;
+                case CustomInspectorValueType_String:
+                    value.m_StringValue = source->Get(name, value.m_StringValue);
+                    break;
+                case CustomInspectorValueType_Vector2: {
+                    const glm::vec2 result = source->Get(name, glm::vec2(value.m_VectorValue[0], value.m_VectorValue[1]));
+                    value.m_VectorValue[0] = result.x;
+                    value.m_VectorValue[1] = result.y;
+                    break;
+                }
+                case CustomInspectorValueType_Vector3: {
+                    const glm::vec3 result = source->Get(name, glm::vec3(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2]));
+                    value.m_VectorValue[0] = result.x;
+                    value.m_VectorValue[1] = result.y;
+                    value.m_VectorValue[2] = result.z;
+                    break;
+                }
+                case CustomInspectorValueType_Vector4: {
+                    const glm::vec4 result = source->Get(name, glm::vec4(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]));
+                    value.m_VectorValue[0] = result.x;
+                    value.m_VectorValue[1] = result.y;
+                    value.m_VectorValue[2] = result.z;
+                    value.m_VectorValue[3] = result.w;
+                    break;
+                }
+                case CustomInspectorValueType_Texture: {
+                    const std::string path = source->Get(name, value.m_TextureValue ? value.m_TextureValue->GetPath() : "");
+                    value.m_TextureValue   = path.empty() ? nullptr : std::make_shared<Texture2D>(path, false, false, value.m_TextureLoadAs16Bit);
+                    break;
+                }
+                case CustomInspectorValueType_Path: {
+                    const auto points      = source->Get<std::vector<glm::vec2>>(name, {});
+                    value.m_PathPointCount = std::clamp(static_cast<int32_t>(points.size()), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
+                    for (int32_t index = 0; index < value.m_PathPointCount; ++index)
+                        value.m_PathPoints[index] = points[static_cast<size_t>(index)];
+                    break;
+                }
+                case CustomInspectorValueType_Curve: {
+                    const auto points       = source->Get<std::vector<glm::vec2>>(name, {});
+                    value.m_CurvePointCount = std::clamp(static_cast<int32_t>(points.size()), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
+                    for (int32_t index = 0; index < value.m_CurvePointCount; ++index)
+                        value.m_CurvePoints[index] = points[static_cast<size_t>(index)];
+                    break;
+                }
+                case CustomInspectorValueType_Unknown:
+                default:
+                    TF3D_LOG_WARN("Invalid CustomInspector state type for '{}'", name);
+                    valid = false;
+                    break;
+            }
+        };
+
+        for (const auto &key : node->GetKeys()) {
+            const auto section = m_Sections.find(key);
+            if (section != m_Sections.end()) {
+                const SerializerNode sectionState = node->Get<SerializerNode>(key);
+                if (!sectionState) {
+                    TF3D_LOG_WARN("Invalid CustomInspector section '{}': expected an object", key);
+                    valid = false;
+                    continue;
+                }
+                for (const auto &field : sectionState->GetKeys())
+                    loadValue(field, sectionState);
+                continue;
+            }
+            loadValue(key, node);
+        }
+        return valid;
+    }
+
+    nlohmann::json CustomInspector::BuildSchema() const
+    {
+        const auto vectorSchema = [](int dimensions) {
+            nlohmann::json schema = {
+                {"type", "object"},
+                {"additionalProperties", false},
+                {"properties", nlohmann::json::object()},
+                {"required", nlohmann::json::array()}};
+            const char *names[] = {"X", "Y", "Z", "W"};
+            for (int index = 0; index < dimensions; ++index) {
+                schema["properties"][names[index]] = {{"type", "number"}};
+                schema["required"].push_back(names[index]);
+            }
+            return schema;
+        };
+
+        const auto buildValueSchema = [&](const CustomInspectorValue &value,
+                                          const CustomInspectorWidget *widget) {
+            nlohmann::json schema = nlohmann::json::object();
+            switch (value.GetType()) {
+                case CustomInspectorValueType_Int:
+                    schema["type"] = "integer";
+                    break;
+                case CustomInspectorValueType_Float:
+                    schema["type"] = "number";
+                    break;
+                case CustomInspectorValueType_Bool:
+                    schema["type"] = "boolean";
+                    break;
+                case CustomInspectorValueType_String:
+                case CustomInspectorValueType_Texture:
+                    schema["type"] = "string";
+                    break;
+                case CustomInspectorValueType_Vector2:
+                    schema = vectorSchema(2);
+                    break;
+                case CustomInspectorValueType_Vector3:
+                    schema = vectorSchema(3);
+                    break;
+                case CustomInspectorValueType_Vector4:
+                    schema = vectorSchema(4);
+                    break;
+                case CustomInspectorValueType_Path:
+                case CustomInspectorValueType_Curve:
+                    schema = {
+                        {"type", "array"},
+                        {"items", vectorSchema(2)}};
+                    break;
+                case CustomInspectorValueType_Unknown:
+                default:
+                    schema["type"] = "string";
+                    break;
+            }
+
+            if (widget != nullptr) {
+                if (!widget->m_Label.empty())
+                    schema["title"] = widget->m_Label;
+                if (!widget->m_Tooltip.empty())
+                    schema["description"] = widget->m_Tooltip;
+                if ((widget->m_Type == CustomInspectorWidgetType_Slider ||
+                     widget->m_Type == CustomInspectorWidgetType_Drag) &&
+                    (widget->m_Constratins[0] != 0.0f || widget->m_Constratins[1] != 0.0f)) {
+                    schema["minimum"] = widget->m_Constratins[0];
+                    schema["maximum"] = widget->m_Constratins[1];
+                }
+                if (widget->m_Type == CustomInspectorWidgetType_Dropdown &&
+                    !widget->m_DropdownOptions.empty()) {
+                    schema["type"]        = "integer";
+                    schema["enum"]        = nlohmann::json::array();
+                    schema["x-enumNames"] = nlohmann::json::array();
+                    for (size_t index = 0; index < widget->m_DropdownOptions.size(); ++index) {
+                        schema["enum"].push_back(index);
+                        schema["x-enumNames"].push_back(widget->m_DropdownOptions[index]);
+                    }
+                }
+            }
+            return schema;
+        };
+
+        nlohmann::json schema = {
+            {"type", "object"},
+            {"additionalProperties", false},
+            {"properties", nlohmann::json::object()}};
+        std::unordered_set<std::string> emitted;
+
+        auto addVariable = [&](nlohmann::json &target,
+                               const std::string &name,
+                               const CustomInspectorWidget *widget) {
+            const auto value = m_Values.find(name);
+            if (value == m_Values.end() || !emitted.insert(name).second)
+                return;
+            target["properties"][name] = buildValueSchema(value->second, widget);
+        };
+
+        for (const auto &sectionName : m_SectionsOrder) {
+            const auto section = m_Sections.find(sectionName);
+            if (section == m_Sections.end())
+                continue;
+            nlohmann::json sectionSchema = {
+                {"type", "object"},
+                {"additionalProperties", false},
+                {"properties", nlohmann::json::object()}};
+            if (!section->second.label.empty())
+                sectionSchema["title"] = section->second.label;
+            if (!section->second.description.empty()) {
+                sectionSchema["description"] = section->second.description;
+            } else if (!section->second.label.empty()) {
+                sectionSchema["description"] = section->second.label;
+            }
+
+            for (const auto &widgetLabel : m_WidgetsOrder) {
+                const auto widgetSection = m_WidgetSections.find(widgetLabel);
+                if (widgetSection == m_WidgetSections.end() || widgetSection->second != sectionName)
+                    continue;
+                const auto widget = m_Widgets.find(widgetLabel);
+                if (widget != m_Widgets.end() && !widget->second.m_VariableName.empty())
+                    addVariable(sectionSchema, widget->second.m_VariableName, &widget->second);
+            }
+            schema["properties"][sectionName] = sectionSchema;
+        }
+
+        for (const auto &widgetLabel : m_WidgetsOrder) {
+            const auto widget = m_Widgets.find(widgetLabel);
+            if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+                continue;
+            if (!m_WidgetSections.contains(widgetLabel))
+                addVariable(schema, widget->second.m_VariableName, &widget->second);
+        }
+        for (const auto &[name, value] : m_Values)
+            addVariable(schema, name, nullptr);
+        return schema;
+    }
+
     SerializerNode CustomInspector::Save() const
     {
         SerializerNode node = CreateSerializerNode();
@@ -843,6 +1199,30 @@ namespace tf3d::misc
             widgets.push_back(subNode);
         }
         node->Set("Widgets", widgets);
+
+        node->Set("SectionsOrder", m_SectionsOrder);
+        std::vector<SerializerNode> sections;
+        sections.reserve(m_Sections.size());
+        for (const auto &[name, section] : m_Sections) {
+            auto sectionNode = CreateSerializerNode();
+            sectionNode->Set("GName", name);
+            sectionNode->Set("Label", section.label);
+            sectionNode->Set("Description", section.description);
+            sectionNode->Set("Collapsible", section.collapsible);
+            sectionNode->Set("DefaultOpen", section.defaultOpen);
+            sections.push_back(sectionNode);
+        }
+        node->Set("Sections", sections);
+
+        std::vector<SerializerNode> widgetSections;
+        widgetSections.reserve(m_WidgetSections.size());
+        for (const auto &[widget, section] : m_WidgetSections) {
+            auto sectionNode = CreateSerializerNode();
+            sectionNode->Set("Widget", widget);
+            sectionNode->Set("Section", section);
+            widgetSections.push_back(sectionNode);
+        }
+        node->Set("WidgetSections", widgetSections);
         return node;
     }
 
@@ -868,66 +1248,119 @@ namespace tf3d::misc
             for (const auto &subNode : subNodes)
                 m_WidgetsOrder.push_back(subNode->Get<std::string>("GName"));
         }
+
+        m_Sections.clear();
+        m_SectionsOrder     = node->Get<std::vector<std::string>>("SectionsOrder", {});
+        const auto sections = node->Get<std::vector<SerializerNode>>("Sections", {});
+        for (const auto &sectionNode : sections) {
+            if (!sectionNode)
+                continue;
+            const std::string name = sectionNode->Get<std::string>("GName");
+            if (name.empty())
+                continue;
+            auto &section       = m_Sections[name];
+            section.name        = name;
+            section.label       = sectionNode->Get<std::string>("Label", name);
+            section.description = sectionNode->Get<std::string>("Description", "");
+            section.collapsible = sectionNode->Get<bool>("Collapsible", false);
+            section.defaultOpen = sectionNode->Get<bool>("DefaultOpen", true);
+            if (std::find(m_SectionsOrder.begin(), m_SectionsOrder.end(), name) == m_SectionsOrder.end())
+                m_SectionsOrder.push_back(name);
+        }
+        m_WidgetSections.clear();
+        const auto widgetSections = node->Get<std::vector<SerializerNode>>("WidgetSections", {});
+        for (const auto &sectionNode : widgetSections) {
+            if (!sectionNode)
+                continue;
+            const std::string widget  = sectionNode->Get<std::string>("Widget");
+            const std::string section = sectionNode->Get<std::string>("Section");
+            if (!widget.empty() && !section.empty())
+                m_WidgetSections[widget] = section;
+        }
     }
 
     bool CustomInspector::LoadConfig(const nlohmann::json &config)
     {
         Clear();
-        m_Description = config.value("Description", "");
-        if (!config.contains("Params") || !config["Params"].is_array()) {
-            AddTextWidget("No parameters available");
-            return true;
-        }
-
+        m_Description   = config.value("Description", "");
+        bool hasContent = false;
         try {
-            for (const auto &parameter : config["Params"]) {
-                const auto &value             = AddVairableFromConfig(parameter);
-                const std::string widgetType  = parameter.value("Widget", "Input");
-                const std::string widgetLabel = parameter.value("Label", value.GetName());
-                auto &widget                  = AddWidgetFromString(widgetLabel, widgetType, value.GetName());
-                if (parameter.contains("Sensitivity"))
-                    widget.SetSpeed(parameter["Sensitivity"].get<float>());
-                if (parameter.contains("Options"))
-                    widget.SetDropdownOptions(parameter["Options"].get<std::vector<std::string>>());
-                if (parameter.contains("Constraints")) {
-                    const auto &constraints = parameter["Constraints"];
-                    if (constraints.is_array() && constraints.size() >= 2) {
-                        const float c0 = constraints[0].get<float>();
-                        const float c1 = constraints[1].get<float>();
-                        const float c2 = constraints.size() > 2 ? constraints[2].get<float>() : 0.0f;
-                        const float c3 = constraints.size() > 3 ? constraints[3].get<float>() : 0.0f;
-                        widget.SetConstraints(c0, c1, c2, c3);
+            const auto loadGroup = [&](const nlohmann::json &group) {
+                if (group.contains("Params") && group["Params"].is_array()) {
+                    hasContent = true;
+                    for (const auto &parameter : group["Params"]) {
+                        const auto &value             = AddVairableFromConfig(parameter);
+                        const std::string widgetType  = parameter.value("Widget", "Input");
+                        const std::string widgetLabel = parameter.value("Label", value.GetName());
+                        auto &widget                  = AddWidgetFromString(widgetLabel, widgetType, value.GetName());
+                        if (parameter.contains("Sensitivity"))
+                            widget.SetSpeed(parameter["Sensitivity"].get<float>());
+                        if (parameter.contains("Options"))
+                            widget.SetDropdownOptions(parameter["Options"].get<std::vector<std::string>>());
+                        if (parameter.contains("Constraints")) {
+                            const auto &constraints = parameter["Constraints"];
+                            if (constraints.is_array() && constraints.size() >= 2) {
+                                const float c0 = constraints[0].get<float>();
+                                const float c1 = constraints[1].get<float>();
+                                const float c2 = constraints.size() > 2 ? constraints[2].get<float>() : 0.0f;
+                                const float c3 = constraints.size() > 3 ? constraints[3].get<float>() : 0.0f;
+                                widget.SetConstraints(c0, c1, c2, c3);
+                            }
+                        }
+                        if (parameter.contains("Tooltip"))
+                            widget.SetTooltip(parameter["Tooltip"].get<std::string>());
+                        else if (parameter.contains("Description"))
+                            widget.SetTooltip(parameter["Description"].get<std::string>());
+                        if (parameter.contains("Conditional")) {
+                            const std::string conditionName = parameter["Conditional"].get<std::string>();
+                            if (parameter.contains("ConditionalValues") && parameter["ConditionalValues"].is_array())
+                                widget.SetRenderOnConditions(conditionName, parameter["ConditionalValues"].get<std::vector<int32_t>>());
+                            else
+                                widget.SetRenderOnCondition(conditionName, parameter.value("ConditionalValue", 1));
+                        }
                     }
                 }
-                if (parameter.contains("Tooltip"))
-                    widget.SetTooltip(parameter["Tooltip"].get<std::string>());
-                else if (parameter.contains("Description"))
-                    widget.SetTooltip(parameter["Description"].get<std::string>());
-                if (parameter.contains("Conditional")) {
-                    const std::string conditionName = parameter["Conditional"].get<std::string>();
-                    if (parameter.contains("ConditionalValues") && parameter["ConditionalValues"].is_array())
-                        widget.SetRenderOnConditions(conditionName, parameter["ConditionalValues"].get<std::vector<int32_t>>());
-                    else
-                        widget.SetRenderOnCondition(conditionName, parameter.value("ConditionalValue", 1));
+                if (group.contains("Buttons") && group["Buttons"].is_array()) {
+                    hasContent = true;
+                    for (const auto &button : group["Buttons"]) {
+                        if (!button.is_object())
+                            continue;
+                        const std::string action = button.value("Action", button.value("Name", "Action"));
+                        const std::string label  = button.value("Label", action);
+                        auto &widget             = AddButtonWidget(label, action);
+                        if (button.contains("Tooltip"))
+                            widget.SetTooltip(button["Tooltip"].get<std::string>());
+                        else if (button.contains("Description"))
+                            widget.SetTooltip(button["Description"].get<std::string>());
+                    }
                 }
-            }
-            if (config.contains("Buttons") && config["Buttons"].is_array()) {
-                for (const auto &button : config["Buttons"]) {
-                    if (!button.is_object())
+            };
+
+            if (config.is_object())
+                loadGroup(config);
+
+            if (config.contains("Sections") && config["Sections"].is_array()) {
+                for (const auto &sectionConfig : config["Sections"]) {
+                    if (!sectionConfig.is_object())
                         continue;
-                    const std::string action = button.value("Action", button.value("Name", "Action"));
-                    const std::string label  = button.value("Label", action);
-                    auto &widget             = AddButtonWidget(label, action);
-                    if (button.contains("Tooltip"))
-                        widget.SetTooltip(button["Tooltip"].get<std::string>());
-                    else if (button.contains("Description"))
-                        widget.SetTooltip(button["Description"].get<std::string>());
+                    const std::string name = sectionConfig.value("Name", "Section");
+                    auto &section          = AddSection(
+                        name,
+                        sectionConfig.value("Label", name),
+                        sectionConfig.value("Collapsible", false),
+                        sectionConfig.value("DefaultOpen", true));
+                    section.description = sectionConfig.value("Description", "");
+                    BeginSection(name);
+                    loadGroup(sectionConfig);
+                    EndSection();
                 }
             }
         } catch (const std::exception &exception) {
             TF3D_LOG_ERROR("Failed to load inspector metadata: {}", exception.what());
             return false;
         }
+        if (!hasContent)
+            AddTextWidget("No parameters available");
         return true;
     }
 
@@ -970,6 +1403,86 @@ namespace tf3d::misc
         return widget;
     }
 
+    bool CustomInspector::RenderWidget(const std::string &widgetLabel)
+    {
+        const auto widgetIterator = m_Widgets.find(widgetLabel);
+        if (widgetIterator == m_Widgets.end())
+            return false;
+
+        const auto &widget = widgetIterator->second;
+        if (widget.m_UseRenderOnCondition) {
+            if (!HasVariable(widget.m_RenderOnConditionName))
+                return false;
+            const auto &condition     = m_Values.at(widget.m_RenderOnConditionName);
+            const auto &allowedValues = widget.m_RenderOnConditionValues;
+            if (!allowedValues.empty()) {
+                if (std::find(allowedValues.begin(), allowedValues.end(), condition.GetInt()) == allowedValues.end())
+                    return false;
+            } else if (condition.GetInt() != widget.m_RenderOnConditionValue) {
+                return false;
+            }
+        }
+
+        ImGui::PushID(widget.m_ID.c_str());
+        if (!widget.m_FontName.empty())
+            ImGui::PushFont(GetUIFont(widget.m_FontName));
+        bool widgetChanged = false;
+        if (widget.m_Type == CustomInspectorWidgetType_Slider)
+            widgetChanged = RenderSlider(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Drag)
+            widgetChanged = RenderDrag(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Color)
+            widgetChanged = RenderColor(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Texture)
+            widgetChanged = RenderTexture(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Path)
+            widgetChanged = RenderPath(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Curve)
+            widgetChanged = RenderCurve(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Button)
+            widgetChanged = RenderButton(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Checkbox)
+            widgetChanged = RenderCheckbox(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Input)
+            widgetChanged = RenderInput(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Seed)
+            widgetChanged = RenderSeed(m_Widgets[widgetLabel]);
+        else if (widget.m_Type == CustomInspectorWidgetType_Dropdown)
+            widgetChanged = RenderDropdown(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType_Seperator)
+            ImGui::Separator();
+        else if (widget.m_Type == CustomInspectorWidgetType_NewLine)
+            ImGui::NewLine();
+        else if (widget.m_Type == CustomInspectorWidgetType_Text)
+            ImGui::TextWrapped("%s", widget.m_Label.c_str());
+
+        if (widgetChanged) {
+            if (widget.m_Type == CustomInspectorWidgetType_Button)
+                m_LastAction = widget.m_VariableName;
+            else if (!widget.m_VariableName.empty())
+                m_LastChangedVariable = widget.m_VariableName;
+        }
+        if (!widget.m_FontName.empty())
+            ImGui::PopFont();
+        RenderInspectorTooltip(widget.m_Label, widget.m_Tooltip);
+        if (widget.m_Type != CustomInspectorWidgetType_Seed &&
+            widget.m_Type != CustomInspectorWidgetType_Button &&
+            !widget.m_VariableName.empty()) {
+            if (ImGui::BeginPopupContextItem(widget.m_ID.c_str())) {
+                static char s_ResetButtonName[1024];
+                sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
+                if (ImGui::Button(s_ResetButtonName)) {
+                    m_Values[widget.m_VariableName].ResetValue();
+                    widgetChanged         = true;
+                    m_LastChangedVariable = widget.m_VariableName;
+                }
+                ImGui::EndPopup();
+            }
+        }
+        ImGui::PopID();
+        return widgetChanged;
+    }
+
     bool CustomInspector::Render()
     {
         bool hasChanged = false;
@@ -980,78 +1493,47 @@ namespace tf3d::misc
             ImGui::TextWrapped("%s", m_Description.c_str());
             ImGui::Separator();
         }
-        for (const auto &widgetLabel : m_WidgetsOrder) {
-            const auto &widget = m_Widgets[widgetLabel];
-            if (widget.m_UseRenderOnCondition) {
-                if (!HasVariable(widget.m_RenderOnConditionName))
-                    continue;
-                const auto &condition     = m_Values.at(widget.m_RenderOnConditionName);
-                const auto &allowedValues = widget.m_RenderOnConditionValues;
-                if (!allowedValues.empty()) {
-                    if (std::find(allowedValues.begin(), allowedValues.end(), condition.GetInt()) == allowedValues.end())
-                        continue;
-                } else if (condition.GetInt() != widget.m_RenderOnConditionValue)
-                    continue;
+
+        const auto renderWidget = [&](const std::string &widgetLabel) {
+            hasChanged = RenderWidget(widgetLabel) || hasChanged;
+        };
+
+        if (m_SectionsOrder.empty()) {
+            for (const auto &widgetLabel : m_WidgetsOrder)
+                renderWidget(widgetLabel);
+        } else {
+            for (const auto &widgetLabel : m_WidgetsOrder) {
+                if (!m_WidgetSections.contains(widgetLabel))
+                    renderWidget(widgetLabel);
             }
-            ImGui::PushID(widget.m_ID.c_str());
-            if (widget.m_FontName.size() > 0)
-                ImGui::PushFont(GetUIFont(widget.m_FontName));
-            bool widgetChanged = false;
-            if (widget.m_Type == CustomInspectorWidgetType_Slider)
-                widgetChanged = RenderSlider(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Drag)
-                widgetChanged = RenderDrag(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Color)
-                widgetChanged = RenderColor(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Texture)
-                widgetChanged = RenderTexture(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Path)
-                widgetChanged = RenderPath(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Curve)
-                widgetChanged = RenderCurve(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Button)
-                widgetChanged = RenderButton(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Checkbox)
-                widgetChanged = RenderCheckbox(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Input)
-                widgetChanged = RenderInput(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Seed)
-                widgetChanged = RenderSeed(m_Widgets[widgetLabel]);
-            else if (widget.m_Type == CustomInspectorWidgetType_Dropdown)
-                widgetChanged = RenderDropdown(widget);
-            else if (widget.m_Type == CustomInspectorWidgetType_Seperator)
-                ImGui::Separator();
-            else if (widget.m_Type == CustomInspectorWidgetType_NewLine)
-                ImGui::NewLine();
-            else if (widget.m_Type == CustomInspectorWidgetType_Text)
-                ImGui::TextWrapped("%s", widget.m_Label.c_str());
-            if (widgetChanged) {
-                hasChanged = true;
-                if (widget.m_Type == CustomInspectorWidgetType_Button)
-                    m_LastAction = widget.m_VariableName;
-                else if (!widget.m_VariableName.empty())
-                    m_LastChangedVariable = widget.m_VariableName;
-            }
-            if (widget.m_FontName.size() > 0)
-                ImGui::PopFont();
-            RenderInspectorTooltip(widget.m_Label, widget.m_Tooltip);
-            if (widget.m_Type != CustomInspectorWidgetType_Seed &&
-                widget.m_Type != CustomInspectorWidgetType_Button &&
-                !widget.m_VariableName.empty()) {
-                if (ImGui::BeginPopupContextItem(widget.m_ID.c_str())) {
-                    static char s_ResetButtonName[1024];
-                    sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
-                    // BUG: This doesn't work for some reason!
-                    if (ImGui::Button(s_ResetButtonName)) {
-                        m_Values[widget.m_VariableName].ResetValue();
-                        hasChanged            = true;
-                        m_LastChangedVariable = widget.m_VariableName;
-                    }
-                    ImGui::EndPopup();
+
+            for (const auto &sectionName : m_SectionsOrder) {
+                const auto section = m_Sections.find(sectionName);
+                if (section == m_Sections.end())
+                    continue;
+
+                ImGui::PushID(sectionName.c_str());
+                bool renderSection = true;
+                if (section->second.collapsible) {
+                    ImGui::SetNextItemOpen(section->second.defaultOpen, ImGuiCond_Once);
+                    renderSection = ImGui::CollapsingHeader(section->second.label.c_str());
+                } else {
+                    ImGui::TextUnformatted(section->second.label.c_str());
+                    if (!section->second.description.empty())
+                        RenderInspectorTooltip(section->second.label, section->second.description);
+                    ImGui::Separator();
                 }
+                if (renderSection) {
+                    for (const auto &widgetLabel : m_WidgetsOrder) {
+                        const auto widgetSection = m_WidgetSections.find(widgetLabel);
+                        if (widgetSection != m_WidgetSections.end() && widgetSection->second == sectionName)
+                            renderWidget(widgetLabel);
+                    }
+                }
+                ImGui::PopID();
             }
-            ImGui::PopID();
         }
+
         if (m_ShowResetButton && ImGui::Button("Reset to Defaults")) {
             for (auto &it : m_Values)
                 it.second.ResetValue();
