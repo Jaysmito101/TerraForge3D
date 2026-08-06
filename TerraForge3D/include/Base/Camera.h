@@ -1,6 +1,9 @@
 #pragma once
 
 #include <glm/glm.hpp>
+
+#include <algorithm>
+#include <cmath>
 #include <memory>
 
 namespace tf3d::exporters
@@ -19,7 +22,10 @@ namespace tf3d::base
         explicit Camera(bool perspective = true);
 
         void UpdateCamera();
-        void SetAspectRatio(float aspectRatio);
+        void SetAspectRatio(float aspectRatio)
+        {
+            m_AspectRatio = std::max(std::abs(aspectRatio), 0.001f);
+        }
         void Orbit(float deltaX, float deltaY, float sensitivity = 0.005f);
         void Pan(float deltaX, float deltaY, float viewportHeight);
         void Zoom(float wheelDelta);
@@ -45,29 +51,8 @@ namespace tf3d::base
         {
             return m_Position;
         }
-        const glm::vec3 &GetTarget() const
-        {
-            return m_Target;
-        }
-
-        float GetFieldOfView() const
-        {
-            return m_FieldOfView;
-        }
-        float GetNearClip() const
-        {
-            return m_NearClip;
-        }
-        float GetFarClip() const
-        {
-            return m_FarClip;
-        }
         float GetEffectiveNearClip() const;
         float GetEffectiveFarClip() const;
-        float GetAspectRatio() const
-        {
-            return m_AspectRatio;
-        }
         bool IsPerspective() const
         {
             return m_Perspective;

@@ -40,11 +40,6 @@ void Camera::ClampOrbit()
     m_Azimuth   = std::remainder(m_Azimuth, glm::two_pi<float>());
 }
 
-void Camera::SetAspectRatio(float aspectRatio)
-{
-    m_AspectRatio = std::max(std::abs(aspectRatio), 0.001f);
-}
-
 void Camera::Orbit(float deltaX, float deltaY, float sensitivity)
 {
     m_Azimuth -= deltaX * sensitivity;
