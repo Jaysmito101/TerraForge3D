@@ -1,19 +1,19 @@
 {
   "$include": "Common/Object.json",
   "properties": {
-    "CameraID": { "type": "integer" },
-    "Perspective": { "type": "boolean" },
-    "AutomaticClipping": { "type": "boolean" },
-    "Target": { "$include": "Common/Vector3.json" },
-    "Position": { "$include": "Common/Vector3.json" },
-    "Distance": { "type": "number", "exclusiveMinimum": 0.0 },
-    "Azimuth": { "type": "number" },
-    "Elevation": { "type": "number" },
-    "FieldOfView": { "type": "number", "exclusiveMinimum": 0.0 },
-    "NearClip": { "type": "number", "exclusiveMinimum": 0.0 },
-    "FarClip": { "type": "number", "exclusiveMinimum": 0.0 },
-    "AspectRatio": { "type": "number", "exclusiveMinimum": 0.0 },
-    "EffectiveNearClip": { "type": "number", "exclusiveMinimum": 0.0 },
-    "EffectiveFarClip": { "type": "number", "exclusiveMinimum": 0.0 }
+    "CameraID": { "type": "integer", "readOnly": true },
+    "Perspective": { "type": "boolean", "readOnly": true },
+    "AutomaticClipping": { "type": "boolean", "readOnly": true },
+    "Target": { "$include": "Common/Vector3.json", "readOnly": true },
+    "Position": { "$include": "Common/Vector3.json", "readOnly": true },
+    "Distance": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true },
+    "Azimuth": { "type": "number", "readOnly": true },
+    "Elevation": { "type": "number", "readOnly": true },
+    "FieldOfView": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true },
+    "NearClip": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true },
+    "FarClip": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true },
+    "AspectRatio": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true },
+    "EffectiveNearClip": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true },
+    "EffectiveFarClip": { "type": "number", "exclusiveMinimum": 0.0, "readOnly": true }
   }
 }

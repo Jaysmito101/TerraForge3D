@@ -135,15 +135,10 @@ namespace tf3d::mcp_layer
                 }
             }
 
-            if (const auto viewportState = state.value("Viewport", nlohmann::json::object());
-                !viewportState.is_object()) {
-                return McpResult::Failure(McpErrorType::InvalidArguments,
-                                          "'Viewport' state must be an object.");
-            } else if (viewportState.contains("ID") || viewportState.contains("Active") ||
-                       viewportState.contains("Display")) {
+            if (state.contains("Viewport")) {
                 return McpResult::Failure(
                     McpErrorType::InvalidArguments,
-                    "Viewport identity, activity, and display size are read-only.");
+                    "'Viewport' state is read-only.");
             }
 
             const SerializerNode current = manager.Save();

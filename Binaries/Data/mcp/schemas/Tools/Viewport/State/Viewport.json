@@ -1,16 +1,17 @@
 {
   "$include": "Common/Object.json",
   "properties": {
-    "ID": { "type": "integer" },
-    "Visible": { "type": "boolean" },
-    "Active": { "type": "boolean" },
-    "ControlEnabled": { "type": "boolean" },
-    "AutoCalculateAspectRatio": { "type": "boolean" },
+    "ID": { "type": "integer", "readOnly": true },
+    "Visible": { "type": "boolean", "readOnly": true },
+    "Active": { "type": "boolean", "readOnly": true },
+    "ControlEnabled": { "type": "boolean", "readOnly": true },
+    "AutoCalculateAspectRatio": { "type": "boolean", "readOnly": true },
     "Display": {
       "$include": "Common/Object.json",
+      "readOnly": true,
       "properties": {
-        "Width": { "type": "integer", "minimum": 1 },
-        "Height": { "type": "integer", "minimum": 1 }
+        "Width": { "type": "integer", "minimum": 1, "readOnly": true },
+        "Height": { "type": "integer", "minimum": 1, "readOnly": true }
       }
     }
   }

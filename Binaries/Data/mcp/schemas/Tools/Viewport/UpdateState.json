@@ -16,14 +16,6 @@
       }
     },
     "Heightmap": { "$include": "Tools/Viewport/State/Heightmap.json" },
-    "TextureSlot": { "$include": "Tools/Viewport/State/TextureSlot.json" },
-    "Viewport": {
-      "$include": "Common/Object.json",
-      "properties": {
-        "Visible": { "type": "boolean" },
-        "ControlEnabled": { "type": "boolean" },
-        "AutoCalculateAspectRatio": { "type": "boolean" }
-      }
-    }
+    "TextureSlot": { "$include": "Tools/Viewport/State/TextureSlot.json" }
   }
 }
