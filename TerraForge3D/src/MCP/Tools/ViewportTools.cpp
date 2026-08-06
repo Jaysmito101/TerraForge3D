@@ -92,7 +92,8 @@ namespace tf3d::mcp_layer
         }
 
         McpResult UpdateViewportState(ViewportManager &manager,
-                                      const nlohmann::json &state)
+                                      const nlohmann::json &state,
+                                      const nlohmann::json &readOnlySchema)
         {
             if (!state.is_object())
                 return McpResult::Failure(McpErrorType::InvalidArguments,
@@ -112,33 +113,18 @@ namespace tf3d::mcp_layer
                                               "'Mode' is not a supported viewport mode.");
             }
 
-            if (state.contains("PositionOnTerrain") || state.contains("Render") ||
-                state.contains("Interaction")) {
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
-                    "Position, render, and interaction state are read-only.");
-            }
-
-            if (const auto cameraState = state.value("Camera", nlohmann::json::object());
-                !cameraState.is_object()) {
+            if (const auto cameraState = state.find("Camera");
+                cameraState != state.end() && !cameraState->is_object()) {
                 return McpResult::Failure(McpErrorType::InvalidArguments,
                                           "'Camera' state must be an object.");
-            } else {
-                if (cameraState.contains("CameraID") || cameraState.contains("Perspective") ||
-                    cameraState.contains("AutomaticClipping") || cameraState.contains("NearClip") ||
-                    cameraState.contains("FarClip") || cameraState.contains("AspectRatio") ||
-                    cameraState.contains("Position") || cameraState.contains("EffectiveNearClip") ||
-                    cameraState.contains("EffectiveFarClip")) {
-                    return McpResult::Failure(
-                        McpErrorType::InvalidArguments,
-                        "Camera projection, clipping, and derived position fields are read-only.");
-                }
             }
 
-            if (state.contains("Viewport")) {
+            std::string readOnlyError;
+            if (!McpSchemaTemplate::ValidateWritable(
+                    state, readOnlySchema, readOnlyError)) {
                 return McpResult::Failure(
                     McpErrorType::InvalidArguments,
-                    "'Viewport' state is read-only.");
+                    readOnlyError.empty() ? "State contains a read-only field." : readOnlyError);
             }
 
             const SerializerNode current = manager.Save();
@@ -317,6 +303,8 @@ namespace tf3d::mcp_layer
     void RegisterMcpViewportTools(ActionRegistry &actions, ApplicationState *applicationState)
     {
         const McpSchemaRuntimeProvider runtime = BuildViewportSchemaRuntime(applicationState);
+        const auto updateReadOnlySchema =
+            McpSchemaTemplate::ComposeDefault("Tools/Viewport/UpdateStateReadOnly.json");
 
         RegisterActionFromJson(
             actions,
@@ -341,21 +329,24 @@ namespace tf3d::mcp_layer
                     viewport->Save()->ToJson());
             });
 
-        RegisterActionFromJson(
-            actions,
-            McpSchemaTemplate::ComposeDefault(
-                "Tools/Viewport/Actions/UpdateState.json", runtime),
-            [applicationState](const nlohmann::json &arguments) {
-                if (!arguments.contains("State"))
-                    return McpResult::Failure(
-                        McpErrorType::InvalidArguments,
-                        "'State' is required.");
-                ViewportManager *viewport = nullptr;
-                McpResult failure;
-                if (!ResolveViewport(applicationState, arguments, viewport, failure))
-                    return failure;
-                return UpdateViewportState(*viewport, arguments.at("State"));
-            });
+        if (updateReadOnlySchema) {
+            RegisterActionFromJson(
+                actions,
+                McpSchemaTemplate::ComposeDefault(
+                    "Tools/Viewport/Actions/UpdateState.json", runtime),
+                [applicationState, readOnlySchema = *updateReadOnlySchema](
+                    const nlohmann::json &arguments) {
+                    if (!arguments.contains("State"))
+                        return McpResult::Failure(
+                            McpErrorType::InvalidArguments,
+                            "'State' is required.");
+                    ViewportManager *viewport = nullptr;
+                    McpResult failure;
+                    if (!ResolveViewport(applicationState, arguments, viewport, failure))
+                        return failure;
+                    return UpdateViewportState(*viewport, arguments.at("State"), readOnlySchema);
+                });
+        }
 
         RegisterActionFromJson(
             actions,
