@@ -28,6 +28,14 @@ namespace tf3d::renderer
             return m_Inspector.LoadState(data);
         }
 
+        inline bool ResetSettings()
+        {
+            if (!m_Inspector.IsResetEnabled())
+                return false;
+            m_Inspector.Reset();
+            return true;
+        }
+
         inline nlohmann::json GetSettingsSchema() const
         {
             return m_Inspector.BuildSchema();
@@ -38,7 +46,7 @@ namespace tf3d::renderer
             return m_Inspector.Get<bool>("Enabled");
         }
 
-    protected:
+    public:
         void ReloadShaders() override;
 
     private:

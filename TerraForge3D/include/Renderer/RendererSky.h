@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Exporters/Serializer.h"
+#include "Misc/CustomInspector.h"
 #include "Renderer/RendererViewport.h"
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
@@ -16,6 +18,22 @@ namespace tf3d::renderer
 
         void ShowSettings();
         void Render(RendererViewport *viewport);
+
+        inline exporters::SerializerNode Save() const
+        {
+            auto state = m_Inspector.SaveState();
+            state->Set("SkyReady", m_IsSkyReady);
+            return state;
+        }
+
+        bool Load(exporters::SerializerNode data);
+        bool LoadSkyMap(const std::string &path);
+        void ReloadShaders();
+
+        inline nlohmann::json GetSettingsSchema() const
+        {
+            return m_Inspector.BuildSchema();
+        }
 
         inline int32_t GetIrradianceMap()
         {
@@ -39,26 +57,23 @@ namespace tf3d::renderer
         }
 
     private:
+        void BuildInspector();
         bool LoadSkyboxTexture(const std::string &path);
-        void ReloadShaders();
 
     private:
-        ApplicationState *m_AppState                    = nullptr;
+        ApplicationState *m_AppState = nullptr;
+        CustomInspector m_Inspector;
         std::shared_ptr<ComputeShader> m_EquirectToCube = nullptr;
         std::shared_ptr<ComputeShader> m_SpecularMap    = nullptr;
         std::shared_ptr<ComputeShader> m_IrradianceMap  = nullptr;
         std::shared_ptr<ComputeShader> m_BrdfLut        = nullptr;
         std::shared_ptr<Shader> m_SkyboxShader          = nullptr;
         Model *m_SkyboxModel                            = nullptr;
-        bool m_RenderSky                                = true;
         bool m_IsSkyReady                               = false;
-        std::string m_SkyboxTexturePath                 = "";
         uint32_t m_SkyboxTextureID                      = -1;
         uint32_t m_IrradianceMapTextureID               = -1;
         uint32_t m_SpecularMapTextureID                 = -1;
         uint32_t m_BrdfLutTextureID                     = -1;
-        int32_t m_SkyboxSize                            = 512;
-        int32_t m_IrradianceMapSize                     = 32;
     };
 
 } // namespace tf3d::renderer
