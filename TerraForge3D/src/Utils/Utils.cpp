@@ -571,6 +571,9 @@ namespace tf3d::utils
 
 #endif
 
+
+#include "resource.h"
+
     void SetUpIcon()
     {
 #ifdef TERR3D_WIN32
