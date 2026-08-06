@@ -150,7 +150,7 @@ namespace tf3d::mcp_layer
             const SerializerNode updates = CreateSerializerNodeFromJson(state);
             current->Merge(*updates);
             manager.Load(current);
-            return McpResult::Success(manager.Save()->ToJson(), "tf3d.viewport.update_state");
+            return McpResult::Success(manager.Save()->ToJson());
         }
 
         McpResult CaptureViewport(ApplicationState *applicationState,
@@ -240,8 +240,7 @@ namespace tf3d::mcp_layer
                 {{"mimeType", "image/jpeg"},
                  {"Width", outputWidth},
                  {"Height", outputHeight}},
-                std::move(imageContent),
-                "tf3d.viewport.capture");
+                std::move(imageContent));
         }
 
         McpResult ListVisibleViewports(ApplicationState *applicationState)
@@ -260,8 +259,7 @@ namespace tf3d::mcp_layer
                     {"ViewportId", static_cast<int>(viewport->GetID())},
                     {"Visible", true},
                     {"Active", viewport->IsActive()},
-                    {"Display", {{"Width", viewport->GetDisplayWidth()},
-                                  {"Height", viewport->GetDisplayHeight()}}}};
+                    {"Display", {{"Width", viewport->GetDisplayWidth()}, {"Height", viewport->GetDisplayHeight()}}}};
                 if (const auto *rendererViewport = viewport->GetRendererViewport()) {
                     entry["Mode"] = std::string(renderer::RendererViewportModeToString(
                         rendererViewport->GetMode()));
@@ -270,8 +268,7 @@ namespace tf3d::mcp_layer
             }
 
             return McpResult::Success(
-                {{"Viewports", std::move(viewports)}},
-                "tf3d.viewport.list");
+                {{"Viewports", std::move(viewports)}});
         }
 
         McpSchemaRuntimeProvider BuildViewportSchemaRuntime(ApplicationState *applicationState)
@@ -296,13 +293,13 @@ namespace tf3d::mcp_layer
                 }
 
                 if (name == "Viewport.TextureChannelIndices") {
-                    nlohmann::json channels = nlohmann::json::array();
+                    nlohmann::json channels   = nlohmann::json::array();
                     ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
-                    const int channelCount = viewport == nullptr
-                                                 ? 4
-                                                 : static_cast<int>(viewport->GetRendererViewport()
-                                                                        ->GetTextureSlotDetailed()
-                                                                        .size());
+                    const int channelCount    = viewport == nullptr
+                                                    ? 4
+                                                    : static_cast<int>(viewport->GetRendererViewport()
+                                                                           ->GetTextureSlotDetailed()
+                                                                           .size());
                     for (int value = 0; value < channelCount; ++value)
                         channels.push_back(value);
                     return channels;
@@ -324,85 +321,53 @@ namespace tf3d::mcp_layer
 
     void RegisterMcpViewportTools(ActionRegistry &actions, ApplicationState *applicationState)
     {
-        const McpSchemaTemplate schemaTemplates;
         const McpSchemaRuntimeProvider runtime = BuildViewportSchemaRuntime(applicationState);
-        const auto getStateSchema =
-            schemaTemplates.Compose("Tools/Viewport/GetState.json");
-        const auto updateStateSchema =
-            schemaTemplates.Compose("Tools/Viewport/Update.json", runtime);
-        const auto captureSchema =
-            schemaTemplates.Compose("Tools/Viewport/Capture.json");
-        const auto listSchema =
-            schemaTemplates.Compose("Tools/Viewport/List.json");
-        if (!getStateSchema || !updateStateSchema || !captureSchema || !listSchema)
-            return;
 
-        actions.Register({"tf3d.viewport.list",
-                          "List viewports",
-                          "List all currently visible TerraForge3D viewports. "
-                          "Use the returned ViewportId with the get_state, update_state, "
-                          "and capture tools.",
-                          *listSchema,
-                          nlohmann::json{{"readOnlyHint", true}},
-                          ActionFlags::ReadOnly,
-                          [applicationState](const nlohmann::json &) {
-                              return ListVisibleViewports(applicationState);
-                          }});
+        RegisterActionFromJson(
+            actions,
+            McpSchemaTemplate::ComposeDefault("Tools/Viewport/Actions/List.json"),
+            [applicationState](const nlohmann::json &) {
+                return ListVisibleViewports(applicationState);
+            });
 
-        actions.Register({"tf3d.viewport.get_state",
-                          "Get viewport state",
-                          "Return the selected viewport's complete structured state. "
-                          "The state includes viewport layout and lifecycle flags, current mode, "
-                          "camera settings, heightmap controls, texture-slot controls, and interaction state. "
-                          "ViewportId is required.",
-                          *getStateSchema,
-                          nlohmann::json{{"readOnlyHint", true}},
-                          ActionFlags::ReadOnly,
-                          [applicationState](const nlohmann::json &arguments) {
-                              ViewportManager *viewport = nullptr;
-                              McpResult failure;
-                              if (!ResolveViewport(applicationState, arguments, viewport, failure))
-                                  return failure;
-                              if (viewport->GetRendererViewport() == nullptr)
-                                  return McpResult::Failure(McpErrorType::ViewportNotFound,
-                                                            "The requested viewport has no renderer state.");
-                              return McpResult::Success(viewport->Save()->ToJson(),
-                                                        "tf3d.viewport.get_state");
-                          }});
+        RegisterActionFromJson(
+            actions,
+            McpSchemaTemplate::ComposeDefault("Tools/Viewport/Actions/GetState.json"),
+            [applicationState](const nlohmann::json &arguments) {
+                ViewportManager *viewport = nullptr;
+                McpResult failure;
+                if (!ResolveViewport(applicationState, arguments, viewport, failure))
+                    return failure;
+                if (viewport->GetRendererViewport() == nullptr)
+                    return McpResult::Failure(
+                        McpErrorType::ViewportNotFound,
+                        "The requested viewport has no renderer state.");
+                return McpResult::Success(
+                    viewport->Save()->ToJson());
+            });
 
-        actions.Register({"tf3d.viewport.update_state",
-                          "Update viewport state",
-                          "Update selected viewport state using a partial hierarchical object. "
-                          "You can change viewport mode and controls, camera settings, heightmap pan/zoom, "
-                          "or texture-slot settings. ViewportId is required. "
-                          "Read-only fields such as camera projection/clipping settings, render size, "
-                          "mouse position, and terrain hit position are returned by get_state but are "
-                          "not accepted here.",
-                          *updateStateSchema,
-                          nlohmann::json{{"readOnlyHint", false}},
-                          ActionFlags::None,
-                          [applicationState](const nlohmann::json &arguments) {
-                              if (!arguments.contains("State"))
-                                  return McpResult::Failure(McpErrorType::InvalidArguments,
-                                                            "'State' is required.");
-                              ViewportManager *viewport = nullptr;
-                              McpResult failure;
-                              if (!ResolveViewport(applicationState, arguments, viewport, failure))
-                                  return failure;
-                              return UpdateViewportState(*viewport, arguments.at("State"));
-                          }});
+        RegisterActionFromJson(
+            actions,
+            McpSchemaTemplate::ComposeDefault(
+                "Tools/Viewport/Actions/UpdateState.json", runtime),
+            [applicationState](const nlohmann::json &arguments) {
+                if (!arguments.contains("State"))
+                    return McpResult::Failure(
+                        McpErrorType::InvalidArguments,
+                        "'State' is required.");
+                ViewportManager *viewport = nullptr;
+                McpResult failure;
+                if (!ResolveViewport(applicationState, arguments, viewport, failure))
+                    return failure;
+                return UpdateViewportState(*viewport, arguments.at("State"));
+            });
 
-        actions.Register({"tf3d.viewport.capture",
-                          "Capture viewport",
-                          "Return the requested TerraForge3D viewport as a JPEG image. "
-                          "ViewportId is required. "
-                          "Optionally pass MaxDimension to downscale the image before encoding, "
-                          "which reduces image size and token usage; the aspect ratio is preserved "
-                          "and the image is never upscaled.",
-                          *captureSchema,
-                          nlohmann::json{{"readOnlyHint", true}}, ActionFlags::ReadOnly, [applicationState](const nlohmann::json &arguments) {
-                              return CaptureViewport(applicationState, arguments);
-                          }});
+        RegisterActionFromJson(
+            actions,
+            McpSchemaTemplate::ComposeDefault("Tools/Viewport/Actions/Capture.json"),
+            [applicationState](const nlohmann::json &arguments) {
+                return CaptureViewport(applicationState, arguments);
+            });
     }
 
 } // namespace tf3d::mcp_layer
