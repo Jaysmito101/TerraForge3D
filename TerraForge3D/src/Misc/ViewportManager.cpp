@@ -69,15 +69,15 @@ namespace tf3d::misc
             ImGuiIO io = ImGui::GetIO();
 
             if (m_IsControlEnabled) {
-                const bool usesCamera = m_RendererViewport->GetMode() == renderer::RendererViewportMode_Object ||
-                                        m_RendererViewport->GetMode() == renderer::RendererViewportMode_Wireframe;
+                const bool usesCamera = m_RendererViewport->GetMode() == renderer::RendererViewportMode::Object ||
+                                        m_RendererViewport->GetMode() == renderer::RendererViewportMode::Wireframe;
                 if (usesCamera && ImGui::IsKeyPressed(ImGuiKey_Space))
                     m_RendererViewport->GetCamera().Reset();
                 if (io.MouseDown[ImGuiMouseButton_Middle] && (ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift))) {
                     if (usesCamera) {
                         m_RendererViewport->GetCamera().Pan(io.MouseDelta.x * m_MovementSpeed, io.MouseDelta.y * m_MovementSpeed, m_Height);
                     } else {
-                        const bool textureSlotMode = m_RendererViewport->GetMode() == renderer::RendererViewportMode_TextureSlot;
+                        const bool textureSlotMode = m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot;
                         float &offsetX = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetX() : m_RendererViewport->GetHeightmapOffsetX();
                         float &offsetY = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetY() : m_RendererViewport->GetHeightmapOffsetY();
                         offsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
@@ -88,7 +88,7 @@ namespace tf3d::misc
                     if (usesCamera) {
                         m_RendererViewport->GetCamera().Orbit(io.MouseDelta.x * m_RotationSpeed, -io.MouseDelta.y * m_RotationSpeed);
                     } else {
-                        const bool textureSlotMode = m_RendererViewport->GetMode() == renderer::RendererViewportMode_TextureSlot;
+                        const bool textureSlotMode = m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot;
                         float &offsetX = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetX() : m_RendererViewport->GetHeightmapOffsetX();
                         float &offsetY = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetY() : m_RendererViewport->GetHeightmapOffsetY();
                         offsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
@@ -99,7 +99,7 @@ namespace tf3d::misc
                     if (usesCamera) {
                         m_RendererViewport->GetCamera().Zoom(io.MouseWheel * m_ZoomSpeed);
                     } else {
-                        float &scale = m_RendererViewport->GetMode() == renderer::RendererViewportMode_TextureSlot
+                        float &scale = m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot
                                            ? m_RendererViewport->GetTextureSlotScale()
                                            : m_RendererViewport->GetHeightmapScale();
                         scale += m_ZoomSpeed * 0.06f * io.MouseWheel;
@@ -152,22 +152,22 @@ namespace tf3d::misc
             m_RendererViewport->SetMode(static_cast<renderer::RendererViewportMode>(viewportMode));
             ImGui::NewLine();
 
-            if (m_RendererViewport->GetMode() != renderer::RendererViewportMode_Heightmap && m_RendererViewport->GetMode() != renderer::RendererViewportMode_TextureSlot) {
+            if (m_RendererViewport->GetMode() != renderer::RendererViewportMode::Heightmap && m_RendererViewport->GetMode() != renderer::RendererViewportMode::TextureSlot) {
                 ImGui::Text("Camera Settings");
                 ImGui::Separator();
                 m_RendererViewport->GetCamera().ShowSettings();
                 ImGui::Checkbox("Auto Calculate Aspect Ratio", &m_AutoCalculateAspectRatio);
-            } else if (m_RendererViewport->GetMode() == renderer::RendererViewportMode_Heightmap) {
+            } else if (m_RendererViewport->GetMode() == renderer::RendererViewportMode::Heightmap) {
                 ImGui::DragFloat("Offset X", &m_RendererViewport->GetHeightmapOffsetX(), 0.01f);
                 ImGui::DragFloat("Offset Y", &m_RendererViewport->GetHeightmapOffsetY(), 0.01f);
                 ImGui::DragFloat("Scale", &m_RendererViewport->GetHeightmapScale(), 0.01f);
-            } else if (m_RendererViewport->GetMode() == renderer::RendererViewportMode_TextureSlot) {
+            } else if (m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot) {
                 ImGui::DragFloat("Offset X", &m_RendererViewport->GetTextureSlotOffsetX(), 0.01f);
                 ImGui::DragFloat("Offset Y", &m_RendererViewport->GetTextureSlotOffsetY(), 0.01f);
                 ImGui::DragFloat("Scale", &m_RendererViewport->GetTextureSlotScale(), 0.01f);
             }
 
-            if (m_RendererViewport->GetMode() == renderer::RendererViewportMode_TextureSlot) {
+            if (m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot) {
                 auto &textureSlotDetailedMode = m_RendererViewport->GetTextureSlotDetailedMode();
                 auto &textureSlot             = m_RendererViewport->GetTextureSlot();
                 auto &textureSlotDetailed     = m_RendererViewport->GetTextureSlotDetailed();

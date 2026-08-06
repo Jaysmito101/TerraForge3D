@@ -54,6 +54,22 @@ namespace tf3d::misc
         {
             m_IsControlEnabled = enabled;
         }
+        inline float GetDisplayWidth() const
+        {
+            return m_Width;
+        }
+        inline float GetDisplayHeight() const
+        {
+            return m_Height;
+        }
+        inline bool IsAutoCalculateAspectRatio() const
+        {
+            return m_AutoCalculateAspectRatio;
+        }
+        inline void SetAutoCalculateAspectRatio(bool enabled)
+        {
+            m_AutoCalculateAspectRatio = enabled;
+        }
 
     private:
         void ShowSettingPopUp();

@@ -154,7 +154,7 @@ namespace tf3d::renderer
             auto &positionOnTerrain = viewport->GetPositionOnTerrain();
             positionOnTerrain[0] = positionOnTerrain[1] = positionOnTerrain[2] = -1.0f;
             switch (viewport->GetMode()) {
-                case RendererViewportMode_Object: {
+                case RendererViewportMode::Object: {
                     TF3D_PROFILE_SCOPE("renderer/scene/object");
                     m_ObjectRenderer->Render(viewport);
                     if (m_SeaRenderer != nullptr && m_SeaRenderer->IsEnabled()) {
@@ -163,15 +163,15 @@ namespace tf3d::renderer
                         m_SeaRenderer->Render(viewport);
                     }
                 } break;
-                case RendererViewportMode_Wireframe: {
+                case RendererViewportMode::Wireframe: {
                     TF3D_PROFILE_SCOPE("renderer/scene/wireframe");
                     m_WireframeRenderer->Render(viewport);
                 } break;
-                case RendererViewportMode_Heightmap: {
+                case RendererViewportMode::Heightmap: {
                     TF3D_PROFILE_SCOPE("renderer/scene/heightmap");
                     m_HeightmapRenderer->Render(viewport);
                 } break;
-                case RendererViewportMode_TextureSlot: {
+                case RendererViewportMode::TextureSlot: {
                     TF3D_PROFILE_SCOPE("renderer/scene/texture-slot");
                     m_TextureSlotRenderer->Render(viewport);
                 } break;
