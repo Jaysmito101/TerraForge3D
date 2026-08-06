@@ -84,6 +84,13 @@ namespace tf3d::mcp_layer
         return ComposeFile(*resolvedPath, runtime, includeStack);
     }
 
+    std::optional<nlohmann::json> McpSchemaTemplate::ComposeDefault(
+        std::string_view templatePath,
+        McpSchemaRuntimeProvider runtime)
+    {
+        return McpSchemaTemplate().Compose(templatePath, std::move(runtime));
+    }
+
     void McpSchemaTemplate::Merge(nlohmann::json &target, const nlohmann::json &source)
     {
         if (!target.is_object() || !source.is_object()) {

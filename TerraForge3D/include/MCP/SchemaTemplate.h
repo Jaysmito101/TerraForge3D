@@ -23,6 +23,10 @@ namespace tf3d::mcp_layer
             std::string_view templatePath,
             McpSchemaRuntimeProvider runtime = {}) const;
 
+        static std::optional<nlohmann::json> ComposeDefault(
+            std::string_view templatePath,
+            McpSchemaRuntimeProvider runtime = {});
+
         static std::filesystem::path DefaultRoot();
         static void Merge(nlohmann::json &target, const nlohmann::json &source);
 
