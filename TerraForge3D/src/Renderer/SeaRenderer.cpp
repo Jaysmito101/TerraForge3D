@@ -161,7 +161,6 @@ namespace tf3d::renderer
     void SeaRenderer::ShowSettings()
     {
         ImGui::Checkbox("Enable Sea", &m_Settings.enabled);
-        ImGui::TextWrapped("Fullscreen GPU water volume using the heightfield pyramid and resolved scene depth.");
 
         ImGui::Separator();
         ImGui::TextUnformatted("Water Level");
