@@ -427,6 +427,10 @@ namespace tf3d::misc
             node->Set("FontName", m_FontName);
         if (m_Tooltip.size() > 0)
             node->Set("Tooltip", m_Tooltip);
+        if (!m_DropdownOptions.empty())
+            node->Set("DropdownOptions", m_DropdownOptions);
+        if (!m_DropdownValues.empty())
+            node->Set("DropdownValues", m_DropdownValues);
         return node;
     }
 
@@ -452,8 +456,12 @@ namespace tf3d::misc
             if (m_RenderOnConditionValues.empty())
                 m_RenderOnConditionValues.push_back(m_RenderOnConditionValue);
         }
-        m_Tooltip  = node->Get<std::string>("Tooltip", m_Tooltip);
-        m_FontName = node->Get<std::string>("FontName", m_FontName);
+        m_Tooltip         = node->Get<std::string>("Tooltip", m_Tooltip);
+        m_FontName        = node->Get<std::string>("FontName", m_FontName);
+        m_DropdownOptions = node->Get<std::vector<std::string>>("DropdownOptions", m_DropdownOptions);
+        m_DropdownValues  = node->Get<std::vector<int32_t>>("DropdownValues", m_DropdownValues);
+        if (!m_DropdownValues.empty() && m_DropdownValues.size() != m_DropdownOptions.size())
+            m_DropdownValues.clear();
     }
 
     CustomInspector::CustomInspector()
@@ -909,7 +917,10 @@ namespace tf3d::misc
                     schema["enum"]        = nlohmann::json::array();
                     schema["x-enumNames"] = nlohmann::json::array();
                     for (size_t index = 0; index < widget->m_DropdownOptions.size(); ++index) {
-                        schema["enum"].push_back(index);
+                        const int32_t value = widget->m_DropdownValues.size() == widget->m_DropdownOptions.size()
+                                                  ? widget->m_DropdownValues[index]
+                                                  : static_cast<int32_t>(index);
+                        schema["enum"].push_back(value);
                         schema["x-enumNames"].push_back(widget->m_DropdownOptions[index]);
                     }
                 }
@@ -1088,14 +1099,21 @@ namespace tf3d::misc
                 if (group.contains("Params") && group["Params"].is_array()) {
                     hasContent = true;
                     for (const auto &parameter : group["Params"]) {
-                        const auto &value             = AddVairableFromConfig(parameter);
+                        const auto &value = AddVairableFromConfig(parameter);
+                        if (parameter.contains("Visible") && parameter["Visible"].is_boolean() && !parameter["Visible"].get<bool>())
+                            continue;
                         const std::string widgetType  = parameter.value("Widget", "Input");
                         const std::string widgetLabel = parameter.value("Label", value.GetName());
                         auto &widget                  = AddWidgetFromString(widgetLabel, widgetType, value.GetName());
                         if (parameter.contains("Sensitivity"))
                             widget.SetSpeed(parameter["Sensitivity"].get<float>());
-                        if (parameter.contains("Options"))
-                            widget.SetDropdownOptions(parameter["Options"].get<std::vector<std::string>>());
+                        if (parameter.contains("Options")) {
+                            const auto options = parameter["Options"].get<std::vector<std::string>>();
+                            std::vector<int32_t> optionValues;
+                            if (parameter.contains("OptionValues") && parameter["OptionValues"].is_array())
+                                optionValues = parameter["OptionValues"].get<std::vector<int32_t>>();
+                            widget.SetDropdownOptions(options, optionValues);
+                        }
                         if (parameter.contains("Constraints")) {
                             const auto &constraints = parameter["Constraints"];
                             if (constraints.is_array() && constraints.size() >= 2) {
@@ -1153,6 +1171,32 @@ namespace tf3d::misc
                     loadGroup(sectionConfig);
                     EndSection();
                 }
+            }
+
+            if (config.contains("WidgetOrder") && config["WidgetOrder"].is_array()) {
+                std::vector<std::string> orderedWidgets;
+                std::unordered_set<std::string> emittedWidgets;
+                const auto appendWidget = [&](const std::string &identifier) {
+                    if (m_Widgets.contains(identifier) && emittedWidgets.insert(identifier).second) {
+                        orderedWidgets.push_back(identifier);
+                        return;
+                    }
+                    for (const auto &[label, widget] : m_Widgets) {
+                        if (widget.m_VariableName == identifier && emittedWidgets.insert(label).second) {
+                            orderedWidgets.push_back(label);
+                            return;
+                        }
+                    }
+                };
+                for (const auto &identifier : config["WidgetOrder"]) {
+                    if (identifier.is_string())
+                        appendWidget(identifier.get<std::string>());
+                }
+                for (const auto &label : m_WidgetsOrder) {
+                    if (emittedWidgets.insert(label).second)
+                        orderedWidgets.push_back(label);
+                }
+                m_WidgetsOrder = std::move(orderedWidgets);
             }
         } catch (const std::exception &exception) {
             TF3D_LOG_ERROR("Failed to load inspector metadata: {}", exception.what());
@@ -1464,12 +1508,25 @@ namespace tf3d::misc
 
         if (widget.m_DropdownOptions.empty())
             return false;
-        value.m_IntValue = glm::clamp(value.m_IntValue, 0, static_cast<int32_t>(widget.m_DropdownOptions.size()) - 1);
-        if (ImGui::BeginCombo(widget.m_Label.c_str(), widget.m_DropdownOptions[value.m_IntValue].c_str())) {
+        const bool hasMappedValues = widget.m_DropdownValues.size() == widget.m_DropdownOptions.size();
+        int32_t selectedIndex      = 0;
+        if (hasMappedValues) {
+            const auto selected = std::find(widget.m_DropdownValues.begin(), widget.m_DropdownValues.end(), value.m_IntValue);
+            if (selected != widget.m_DropdownValues.end()) {
+                selectedIndex = static_cast<int32_t>(std::distance(widget.m_DropdownValues.begin(), selected));
+            } else {
+                value.m_IntValue = widget.m_DropdownValues.front();
+            }
+        } else {
+            selectedIndex    = glm::clamp(value.m_IntValue, 0, static_cast<int32_t>(widget.m_DropdownOptions.size()) - 1);
+            value.m_IntValue = selectedIndex;
+        }
+
+        if (ImGui::BeginCombo(widget.m_Label.c_str(), widget.m_DropdownOptions[selectedIndex].c_str())) {
             for (int i = 0; i < static_cast<int32_t>(widget.m_DropdownOptions.size()); i++) {
-                bool isSelected = (value.m_IntValue == i);
+                const bool isSelected = (selectedIndex == i);
                 if (ImGui::Selectable(widget.m_DropdownOptions[i].c_str(), isSelected)) {
-                    value.m_IntValue = i;
+                    value.m_IntValue = hasMappedValues ? widget.m_DropdownValues[i] : i;
                     hasChanged       = true;
                 }
                 if (isSelected)

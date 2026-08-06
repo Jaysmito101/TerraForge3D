@@ -514,9 +514,13 @@ namespace tf3d::misc
         {
             m_FontName = fontName;
         }
-        inline void SetDropdownOptions(const std::vector<std::string> &options)
+        inline void SetDropdownOptions(const std::vector<std::string> &options,
+                                       const std::vector<int32_t> &values = {})
         {
             m_DropdownOptions = options;
+            m_DropdownValues  = values;
+            if (!m_DropdownValues.empty() && m_DropdownValues.size() != m_DropdownOptions.size())
+                m_DropdownValues.clear();
         }
         inline void SetSpeed(float speed)
         {
@@ -561,6 +565,7 @@ namespace tf3d::misc
         std::string m_Tooltip            = "";
         std::vector<int32_t> m_SeedHistory;
         std::vector<std::string> m_DropdownOptions;
+        std::vector<int32_t> m_DropdownValues;
         std::string m_ID                    = "";
         bool m_UseRenderOnCondition         = false;
         std::string m_RenderOnConditionName = "";
