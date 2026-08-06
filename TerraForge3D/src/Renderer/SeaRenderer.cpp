@@ -138,15 +138,16 @@ namespace tf3d::renderer
         auto *rendererLights = m_AppState->rendererManager->GetRendererLights();
         auto *skyRenderer    = m_AppState->rendererManager->GetSkyRenderer();
         const bool skyReady  = rendererLights != nullptr && skyRenderer != nullptr &&
-                              rendererLights->m_UseSkyLight && skyRenderer->IsSkyReady();
-        const RendererSunData defaultSun{};
-        const RendererSunData &sun = rendererLights != nullptr ? rendererLights->m_Sun : defaultSun;
+                              rendererLights->IsSkyLightEnabled() && skyRenderer->IsSkyReady();
         m_Shader->SetUniform1i("u_EnableSkyLight", skyReady ? 1 : 0);
         m_Shader->SetUniform1f("u_SkyLightIntensity",
-                               rendererLights != nullptr ? rendererLights->m_SkyLightIntensity : 0.0f);
-        m_Shader->SetUniform3f("u_SunDirection", sun.direction);
-        m_Shader->SetUniform3f("u_SunColor", sun.color);
-        m_Shader->SetUniform1f("u_SunIntensity", sun.intensity);
+                               rendererLights != nullptr ? rendererLights->GetSkyLightIntensity() : 0.0f);
+        m_Shader->SetUniform3f("u_SunDirection",
+                               rendererLights != nullptr ? rendererLights->GetSunDirection() : glm::vec3(0.0f));
+        m_Shader->SetUniform3f("u_SunColor",
+                               rendererLights != nullptr ? rendererLights->GetSunColor() : glm::vec3(0.0f));
+        m_Shader->SetUniform1f("u_SunIntensity",
+                               rendererLights != nullptr ? rendererLights->GetSunIntensity() : 0.0f);
         m_Shader->SetUniform1i("u_SpecularMap", 2);
     }
 
