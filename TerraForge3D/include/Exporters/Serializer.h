@@ -8,6 +8,7 @@
 #include <concepts>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -17,6 +18,70 @@
 
 namespace tf3d::exporters
 {
+
+    enum class SerializerValueType {
+        Boolean,
+        Integer,
+        Float,
+        String,
+        Object,
+        Vector2,
+        Vector3,
+        Vector4,
+        BooleanArray,
+        IntegerArray,
+        FloatArray,
+        StringArray,
+        Vector2Array,
+        Vector3Array,
+        Vector4Array,
+        ObjectArray
+    };
+
+    inline constexpr std::string_view SerializerValueTypeToString(SerializerValueType type)
+    {
+        switch (type) {
+        case SerializerValueType::Boolean: return "Boolean";
+        case SerializerValueType::Integer: return "Integer";
+        case SerializerValueType::Float: return "Float";
+        case SerializerValueType::String: return "String";
+        case SerializerValueType::Object: return "Object";
+        case SerializerValueType::Vector2: return "Vector2";
+        case SerializerValueType::Vector3: return "Vector3";
+        case SerializerValueType::Vector4: return "Vector4";
+        case SerializerValueType::BooleanArray: return "BooleanArray";
+        case SerializerValueType::IntegerArray: return "IntegerArray";
+        case SerializerValueType::FloatArray: return "FloatArray";
+        case SerializerValueType::StringArray: return "StringArray";
+        case SerializerValueType::Vector2Array: return "Vector2Array";
+        case SerializerValueType::Vector3Array: return "Vector3Array";
+        case SerializerValueType::Vector4Array: return "Vector4Array";
+        case SerializerValueType::ObjectArray: return "ObjectArray";
+        }
+        return {};
+    }
+
+    inline constexpr std::optional<SerializerValueType> SerializerValueTypeFromString(
+        std::string_view type)
+    {
+        if (type == "Boolean") return SerializerValueType::Boolean;
+        if (type == "Integer") return SerializerValueType::Integer;
+        if (type == "Float") return SerializerValueType::Float;
+        if (type == "String") return SerializerValueType::String;
+        if (type == "Object") return SerializerValueType::Object;
+        if (type == "Vector2") return SerializerValueType::Vector2;
+        if (type == "Vector3") return SerializerValueType::Vector3;
+        if (type == "Vector4") return SerializerValueType::Vector4;
+        if (type == "BooleanArray") return SerializerValueType::BooleanArray;
+        if (type == "IntegerArray") return SerializerValueType::IntegerArray;
+        if (type == "FloatArray") return SerializerValueType::FloatArray;
+        if (type == "StringArray") return SerializerValueType::StringArray;
+        if (type == "Vector2Array") return SerializerValueType::Vector2Array;
+        if (type == "Vector3Array") return SerializerValueType::Vector3Array;
+        if (type == "Vector4Array") return SerializerValueType::Vector4Array;
+        if (type == "ObjectArray") return SerializerValueType::ObjectArray;
+        return std::nullopt;
+    }
 
     template <typename>
     inline constexpr bool SerializerUnsupportedType = false;
@@ -44,10 +109,12 @@ namespace tf3d::exporters
         }
 
         template <typename T>
-        SerializerNodeInternal *SetTyped(const std::string &key, T &&value, std::string_view typeName)
+        SerializerNodeInternal *SetTyped(const std::string &key,
+                                         T &&value,
+                                         SerializerValueType type)
         {
             nlohmann::json data;
-            data["Type"]  = std::string(typeName);
+            data["Type"]  = std::string(SerializerValueTypeToString(type));
             data["Value"] = std::forward<T>(value);
 
             m_Value[key] = std::move(data);
@@ -57,7 +124,9 @@ namespace tf3d::exporters
         }
 
         template <typename T>
-        T GetTyped(const std::string &key, std::string_view typeName, const T &defaultValue) const
+        T GetTyped(const std::string &key,
+                   SerializerValueType type,
+                   const T &defaultValue) const
         {
             const auto it = m_Value.find(key);
             if (it == m_Value.end()) {
@@ -65,8 +134,9 @@ namespace tf3d::exporters
                     WarnInvalidField(key, "expected a scalar value");
                 return defaultValue;
             }
-            if (!it.value().is_object() || !it.value().contains("Type") ||
-                it.value()["Type"] != std::string(typeName) || !it.value().contains("Value")) {
+            const auto storedType = GetStoredType(key);
+            if (!it.value().is_object() || !storedType || *storedType != type ||
+                !it.value().contains("Value")) {
                 WarnInvalidField(key, "unexpected value type");
                 return defaultValue;
             }
@@ -79,7 +149,7 @@ namespace tf3d::exporters
         }
         template <typename T>
         std::vector<T> GetArray(const std::string &key,
-                                std::string_view typeName,
+                                SerializerValueType type,
                                 const std::vector<T> &defaultValue) const
         {
             const auto it = m_Value.find(key);
@@ -88,8 +158,9 @@ namespace tf3d::exporters
                     WarnInvalidField(key, "expected a value array");
                 return defaultValue;
             }
-            if (!it.value().is_object() || !it.value().contains("Type") ||
-                it.value()["Type"] != std::string(typeName) || !it.value().contains("Value") ||
+            const auto storedType = GetStoredType(key);
+            if (!it.value().is_object() || !storedType || *storedType != type ||
+                !it.value().contains("Value") ||
                 !it.value()["Value"].is_array()) {
                 WarnInvalidField(key, "unexpected array type");
                 return defaultValue;
@@ -122,7 +193,7 @@ namespace tf3d::exporters
 
         template <typename T>
         std::vector<T> GetVectorArray(const std::string &key,
-                                      std::string_view typeName,
+                                      SerializerValueType type,
                                       const std::vector<T> &defaultValue) const
         {
             const auto it = m_Value.find(key);
@@ -131,8 +202,9 @@ namespace tf3d::exporters
                     WarnInvalidField(key, "expected a vector array");
                 return defaultValue;
             }
-            if (!it.value().is_object() || !it.value().contains("Type") ||
-                it.value()["Type"] != std::string(typeName) || !it.value().contains("Value") ||
+            const auto storedType = GetStoredType(key);
+            if (!it.value().is_object() || !storedType || *storedType != type ||
+                !it.value().contains("Value") ||
                 !it.value()["Value"].is_array()) {
                 WarnInvalidField(key, "unexpected vector array type");
                 return defaultValue;
@@ -158,16 +230,23 @@ namespace tf3d::exporters
                 return defaultValue;
             }
         }
-        inline std::string GetStoredType(const std::string &key) const
+        inline std::optional<SerializerValueType> GetStoredType(const std::string &key) const
         {
             const auto it = m_Value.find(key);
             if (it == m_Value.end() || !it.value().is_object() || !it.value().contains("Type"))
-                return {};
+                return std::nullopt;
+            if (!it.value()["Type"].is_string()) {
+                WarnInvalidField(key, "stored type metadata is malformed");
+                return std::nullopt;
+            }
             try {
-                return it.value()["Type"].get<std::string>();
+                const auto type = SerializerValueTypeFromString(it.value()["Type"].get<std::string>());
+                if (!type)
+                    WarnInvalidField(key, "unknown stored type metadata");
+                return type;
             } catch (...) {
                 WarnInvalidField(key, "stored type metadata is malformed");
-                return {};
+                return std::nullopt;
             }
         }
 
@@ -181,33 +260,35 @@ namespace tf3d::exporters
             using Value = std::remove_cvref_t<T>;
 
             if constexpr (std::same_as<Value, bool>) {
-                return SetTyped(key, value, "Boolean");
+                return SetTyped(key, value, SerializerValueType::Boolean);
             } else if constexpr (std::integral<Value> && !std::same_as<Value, bool>) {
-                return SetTyped(key, value, "Integer");
+                return SetTyped(key, value, SerializerValueType::Integer);
             } else if constexpr (std::is_enum_v<Value>) {
                 using Underlying = std::underlying_type_t<Value>;
-                return SetTyped(key, static_cast<Underlying>(value), "Integer");
+                return SetTyped(key, static_cast<Underlying>(value), SerializerValueType::Integer);
             } else if constexpr (std::floating_point<Value>) {
-                return SetTyped(key, value, "Float");
+                return SetTyped(key, value, SerializerValueType::Float);
             } else if constexpr (std::same_as<Value, std::string>) {
-                return SetTyped(key, value, "String");
+                return SetTyped(key, value, SerializerValueType::String);
             } else if constexpr (std::convertible_to<Value, std::string_view>) {
-                return SetTyped(key, std::string_view(value), "String");
+                return SetTyped(key, std::string_view(value), SerializerValueType::String);
             } else if constexpr (std::same_as<Value, std::shared_ptr<SerializerNodeInternal>>) {
                 m_Value.erase(key);
                 m_Arrays.erase(key);
                 m_Children[key] = value;
                 return this;
             } else if constexpr (std::same_as<Value, glm::vec2>) {
-                return SetTyped(key, nlohmann::json{{"X", value.x}, {"Y", value.y}}, "Vector2");
+                return SetTyped(key,
+                                nlohmann::json{{"X", value.x}, {"Y", value.y}},
+                                SerializerValueType::Vector2);
             } else if constexpr (std::same_as<Value, glm::vec3>) {
                 return SetTyped(key,
                                 nlohmann::json{{"X", value.x}, {"Y", value.y}, {"Z", value.z}},
-                                "Vector3");
+                                SerializerValueType::Vector3);
             } else if constexpr (std::same_as<Value, glm::vec4>) {
                 return SetTyped(key,
                                 nlohmann::json{{"X", value.x}, {"Y", value.y}, {"Z", value.z}, {"W", value.w}},
-                                "Vector4");
+                                SerializerValueType::Vector4);
             } else if constexpr (SerializerVectorTraits<Value>::IsVector) {
                 using Element      = typename SerializerVectorTraits<Value>::ElementType;
                 using ElementValue = std::remove_cv_t<Element>;
@@ -224,32 +305,32 @@ namespace tf3d::exporters
                     if constexpr (std::same_as<ElementValue, glm::vec2>) {
                         for (const auto &item : value)
                             encoded.push_back(EncodeVector(item));
-                        return SetTyped(key, std::move(encoded), "Vector2Array");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::Vector2Array);
                     } else if constexpr (std::same_as<ElementValue, glm::vec3>) {
                         for (const auto &item : value)
                             encoded.push_back(EncodeVector(item));
-                        return SetTyped(key, std::move(encoded), "Vector3Array");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::Vector3Array);
                     } else if constexpr (std::same_as<ElementValue, glm::vec4>) {
                         for (const auto &item : value)
                             encoded.push_back(EncodeVector(item));
-                        return SetTyped(key, std::move(encoded), "Vector4Array");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::Vector4Array);
                     } else if constexpr (std::same_as<ElementValue, bool>) {
                         for (const auto &item : value)
                             encoded.push_back(item);
-                        return SetTyped(key, std::move(encoded), "BooleanArray");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::BooleanArray);
                     } else if constexpr (std::integral<ElementValue> || std::is_enum_v<ElementValue>) {
                         for (const auto &item : value)
                             encoded.push_back(item);
-                        return SetTyped(key, std::move(encoded), "IntegerArray");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::IntegerArray);
                     } else if constexpr (std::floating_point<ElementValue>) {
                         for (const auto &item : value)
                             encoded.push_back(item);
-                        return SetTyped(key, std::move(encoded), "FloatArray");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::FloatArray);
                     } else if constexpr (std::same_as<ElementValue, std::string> ||
                                          std::convertible_to<ElementValue, std::string_view>) {
                         for (const auto &item : value)
                             encoded.push_back(std::string_view(item));
-                        return SetTyped(key, std::move(encoded), "StringArray");
+                        return SetTyped(key, std::move(encoded), SerializerValueType::StringArray);
                     } else {
                         static_assert(SerializerUnsupportedType<Value>, "Unsupported serializer vector element type");
                     }
@@ -265,16 +346,17 @@ namespace tf3d::exporters
             using Value = std::remove_cvref_t<T>;
 
             if constexpr (std::same_as<Value, bool>) {
-                return GetTyped<bool>(key, "Boolean", defaultValue);
+                return GetTyped<bool>(key, SerializerValueType::Boolean, defaultValue);
             } else if constexpr (std::integral<Value> && !std::same_as<Value, bool>) {
-                return GetTyped<Value>(key, "Integer", defaultValue);
+                return GetTyped<Value>(key, SerializerValueType::Integer, defaultValue);
             } else if constexpr (std::is_enum_v<Value>) {
                 using Underlying = std::underlying_type_t<Value>;
-                return static_cast<Value>(GetTyped<Underlying>(key, "Integer", static_cast<Underlying>(defaultValue)));
+                return static_cast<Value>(GetTyped<Underlying>(
+                    key, SerializerValueType::Integer, static_cast<Underlying>(defaultValue)));
             } else if constexpr (std::floating_point<Value>) {
-                return GetTyped<Value>(key, "Float", defaultValue);
+                return GetTyped<Value>(key, SerializerValueType::Float, defaultValue);
             } else if constexpr (std::same_as<Value, std::string>) {
-                return GetTyped<std::string>(key, "String", defaultValue);
+                return GetTyped<std::string>(key, SerializerValueType::String, defaultValue);
             } else if constexpr (std::same_as<Value, std::shared_ptr<SerializerNodeInternal>>) {
                 const auto it = m_Children.find(key);
                 if (it != m_Children.end())
@@ -283,7 +365,7 @@ namespace tf3d::exporters
                     WarnInvalidField(key, "expected a child node");
                 return defaultValue;
             } else if constexpr (std::same_as<Value, glm::vec2>) {
-                if (GetStoredType(key) != "Vector2") {
+                if (GetStoredType(key) != SerializerValueType::Vector2) {
                     if (HasKey(key))
                         WarnInvalidField(key, "expected a Vector2 value");
                     return defaultValue;
@@ -296,7 +378,7 @@ namespace tf3d::exporters
                     return defaultValue;
                 }
             } else if constexpr (std::same_as<Value, glm::vec3>) {
-                if (GetStoredType(key) != "Vector3") {
+                if (GetStoredType(key) != SerializerValueType::Vector3) {
                     if (HasKey(key))
                         WarnInvalidField(key, "expected a Vector3 value");
                     return defaultValue;
@@ -310,7 +392,7 @@ namespace tf3d::exporters
                     return defaultValue;
                 }
             } else if constexpr (std::same_as<Value, glm::vec4>) {
-                if (GetStoredType(key) != "Vector4") {
+                if (GetStoredType(key) != SerializerValueType::Vector4) {
                     if (HasKey(key))
                         WarnInvalidField(key, "expected a Vector4 value");
                     return defaultValue;
@@ -335,19 +417,19 @@ namespace tf3d::exporters
                         WarnInvalidField(key, "expected a node array");
                     return defaultValue;
                 } else if constexpr (std::same_as<ElementValue, glm::vec2>)
-                    return GetVectorArray<ElementValue>(key, "Vector2Array", defaultValue);
+                    return GetVectorArray<ElementValue>(key, SerializerValueType::Vector2Array, defaultValue);
                 else if constexpr (std::same_as<ElementValue, glm::vec3>)
-                    return GetVectorArray<ElementValue>(key, "Vector3Array", defaultValue);
+                    return GetVectorArray<ElementValue>(key, SerializerValueType::Vector3Array, defaultValue);
                 else if constexpr (std::same_as<ElementValue, glm::vec4>)
-                    return GetVectorArray<ElementValue>(key, "Vector4Array", defaultValue);
+                    return GetVectorArray<ElementValue>(key, SerializerValueType::Vector4Array, defaultValue);
                 else if constexpr (std::same_as<ElementValue, bool>)
-                    return GetArray<ElementValue>(key, "BooleanArray", defaultValue);
+                    return GetArray<ElementValue>(key, SerializerValueType::BooleanArray, defaultValue);
                 else if constexpr (std::integral<ElementValue> || std::is_enum_v<ElementValue>)
-                    return GetArray<ElementValue>(key, "IntegerArray", defaultValue);
+                    return GetArray<ElementValue>(key, SerializerValueType::IntegerArray, defaultValue);
                 else if constexpr (std::floating_point<ElementValue>)
-                    return GetArray<ElementValue>(key, "FloatArray", defaultValue);
+                    return GetArray<ElementValue>(key, SerializerValueType::FloatArray, defaultValue);
                 else if constexpr (std::same_as<ElementValue, std::string>)
-                    return GetArray<ElementValue>(key, "StringArray", defaultValue);
+                    return GetArray<ElementValue>(key, SerializerValueType::StringArray, defaultValue);
                 else
                     static_assert(SerializerUnsupportedType<Value>, "Unsupported serializer vector element type");
             } else {
@@ -440,7 +522,7 @@ namespace tf3d::exporters
                     continue;
                 }
                 data[it.first] = {
-                    {"Type", "Object"},
+                    {"Type", std::string(SerializerValueTypeToString(SerializerValueType::Object))},
                     {"Value", it.second->ToTypedJson()}};
             }
             for (const auto &it : m_Arrays) {
@@ -453,7 +535,7 @@ namespace tf3d::exporters
                     values.push_back(node->ToTypedJson());
                 }
                 data[it.first] = {
-                    {"Type", "ObjectArray"},
+                    {"Type", std::string(SerializerValueTypeToString(SerializerValueType::ObjectArray))},
                     {"Value", std::move(values)}};
             }
             return data;
@@ -584,8 +666,14 @@ namespace tf3d::exporters
                     continue;
                 }
 
-                const std::string type = value.at("Type").get<std::string>();
-                if (type == "Object") {
+                const auto type = SerializerValueTypeFromString(value.at("Type").get<std::string>());
+                if (!type) {
+                    WarnInvalidField(key, "unknown typed serializer value type");
+                    valid = false;
+                    continue;
+                }
+
+                if (*type == SerializerValueType::Object) {
                     if (!value.at("Value").is_object()) {
                         WarnInvalidField(key, "Object value must be a JSON object");
                         valid = false;
@@ -595,7 +683,7 @@ namespace tf3d::exporters
                     if (!child->LoadTypedJson(value.at("Value")))
                         valid = false;
                     m_Children[key] = std::move(child);
-                } else if (type == "ObjectArray") {
+                } else if (*type == SerializerValueType::ObjectArray) {
                     if (!value.at("Value").is_array()) {
                         WarnInvalidField(key, "ObjectArray value must be a JSON array");
                         valid = false;
@@ -613,15 +701,10 @@ namespace tf3d::exporters
                             valid = false;
                         children.push_back(std::move(child));
                     }
-                } else if (type == "Boolean" || type == "Integer" || type == "Float" ||
-                           type == "String" || type == "Vector2" || type == "Vector3" ||
-                           type == "Vector4" || type == "BooleanArray" || type == "IntegerArray" ||
-                           type == "FloatArray" || type == "StringArray" || type == "Vector2Array" ||
-                           type == "Vector3Array" || type == "Vector4Array") {
-                    m_Value[key] = value;
                 } else {
-                    WarnInvalidField(key, "unknown typed serializer value type");
-                    valid = false;
+                    m_Value[key] = {
+                        {"Type", std::string(SerializerValueTypeToString(*type))},
+                        {"Value", value.at("Value")}};
                 }
             }
             return valid;
@@ -668,3 +751,4 @@ using tf3d::exporters::CreateSerializerNodeFromJson;
 using tf3d::exporters::CreateSerializerNodeFromTypedJson;
 using tf3d::exporters::SerializerNode;
 using tf3d::exporters::SerializerNodeInternal;
+using tf3d::exporters::SerializerValueType;
