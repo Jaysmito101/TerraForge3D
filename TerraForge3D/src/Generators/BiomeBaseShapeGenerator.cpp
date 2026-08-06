@@ -46,30 +46,30 @@ namespace tf3d::generators
         m_Inspector->ForEachValue([&](const auto &valueName, const auto &uniformValue) {
             std::string uniformName = std::string("u_") + valueName;
             switch (uniformValue.GetType()) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     m_Shader->SetUniform1i(uniformName, uniformValue.template Get<int32_t>());
                     break;
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     m_Shader->SetUniform1f(uniformName, uniformValue.template Get<float>());
                     break;
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     m_Shader->SetUniform1i(uniformName, uniformValue.template Get<bool>() ? 1 : 0);
                     break;
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     m_Shader->SetUniform2f(uniformName, uniformValue.template Get<glm::vec2>());
                     break;
-                case CustomInspectorValueType_Vector3:
+                case CustomInspectorValueType::Vector3:
                     m_Shader->SetUniform3f(uniformName, uniformValue.template Get<glm::vec3>());
                     break;
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector4:
                     m_Shader->SetUniform4f(uniformName, uniformValue.template Get<glm::vec4>());
                     break;
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Texture:
                     if (const auto texture = uniformValue.template Get<std::shared_ptr<Texture2D>>())
                         m_Shader->SetUniform1i(uniformName, texture->Bind(textureSlot++));
                     break;
-                case CustomInspectorValueType_String: // for future
-                case CustomInspectorValueType_Unknown:
+                case CustomInspectorValueType::String: // for future
+                case CustomInspectorValueType::Unknown:
                 default:
                     break;
             }
@@ -161,31 +161,31 @@ namespace tf3d::generators
         source += "// custom uniforms\n";
         m_Inspector->ForEachValue([&](const auto &valueName, const auto &uniformValue) {
             switch (uniformValue.GetType()) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     source += "uniform int u_" + valueName + " = 0;\n";
                     break;
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     source += "uniform float u_" + valueName + " = 0.0f;\n";
                     break;
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     source += "uniform bool u_" + valueName + " = false;";
                     break;
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     source += "uniform vec2 u_" + valueName + " = vec2(0.0f);\n";
                     break;
-                case CustomInspectorValueType_Vector3:
+                case CustomInspectorValueType::Vector3:
                     source += "uniform vec3 u_" + valueName + " = vec3(0.0f);\n";
                     break;
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector4:
                     source += "uniform vec4 u_" + valueName + " = vec4(0.0f);\n";
                     break;
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Texture:
                     source += "uniform sampler2D u_" + valueName + ";\n";
                     break;
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::String:
                     source += "// uniform string u_" + valueName + ";\n";
                     break;
-                case CustomInspectorValueType_Unknown:
+                case CustomInspectorValueType::Unknown:
                     source += "// uniform unknownType u_" + valueName + ";\n";
                     break;
                 default:

@@ -64,9 +64,9 @@ namespace tf3d::generators
         {
             return m_Definition;
         }
-        inline const std::unordered_map<std::string, CustomInspectorValue> &GetParameters() const
+        inline const CustomInspectorValue *FindParameter(const std::string &name) const
         {
-            return m_Inspector->GetValues();
+            return m_Inspector == nullptr ? nullptr : m_Inspector->FindValue(name);
         }
         inline bool IsEnabled() const
         {

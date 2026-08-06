@@ -186,7 +186,7 @@ namespace tf3d::generators
         if (m_Inspector == nullptr)
             return;
         if (const auto *range = m_Inspector->FindValue("Range")) {
-            if (range->GetType() == CustomInspectorValueType_Vector2) {
+            if (range->GetType() == CustomInspectorValueType::Vector2) {
                 const glm::vec2 value = range->Get<glm::vec2>();
                 m_Settings.minimum    = std::min(value.x, value.y);
                 m_Settings.maximum    = std::max(value.x, value.y);

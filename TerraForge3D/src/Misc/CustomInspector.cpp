@@ -42,25 +42,25 @@ namespace tf3d::misc
     std::string CustomInspectorValue::CustomInspectorValueTypeToString(CustomInspectorValueType type)
     {
         switch (type) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 return "Int";
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 return "Float";
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Bool:
                 return "Bool";
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 return "String";
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 return "Vector2";
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 return "Vector3";
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 return "Vector4";
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Texture:
                 return "Texture";
-            case CustomInspectorValueType_Path:
+            case CustomInspectorValueType::Path:
                 return "Path";
-            case CustomInspectorValueType_Curve:
+            case CustomInspectorValueType::Curve:
                 return "Curve";
             default:
                 return "Unknown";
@@ -70,26 +70,26 @@ namespace tf3d::misc
     CustomInspectorValueType CustomInspectorValue::CustomInspectorValueTypeFromString(const std::string &type)
     {
         if (type == "Int")
-            return CustomInspectorValueType_Int;
+            return CustomInspectorValueType::Int;
         if (type == "Float")
-            return CustomInspectorValueType_Float;
+            return CustomInspectorValueType::Float;
         if (type == "Bool")
-            return CustomInspectorValueType_Bool;
+            return CustomInspectorValueType::Bool;
         if (type == "String")
-            return CustomInspectorValueType_String;
+            return CustomInspectorValueType::String;
         if (type == "Vector2")
-            return CustomInspectorValueType_Vector2;
+            return CustomInspectorValueType::Vector2;
         if (type == "Vector3")
-            return CustomInspectorValueType_Vector3;
+            return CustomInspectorValueType::Vector3;
         if (type == "Vector4")
-            return CustomInspectorValueType_Vector4;
+            return CustomInspectorValueType::Vector4;
         if (type == "Texture")
-            return CustomInspectorValueType_Texture;
+            return CustomInspectorValueType::Texture;
         if (type == "Path")
-            return CustomInspectorValueType_Path;
+            return CustomInspectorValueType::Path;
         if (type == "Curve")
-            return CustomInspectorValueType_Curve;
-        return CustomInspectorValueType_Unknown;
+            return CustomInspectorValueType::Curve;
+        return CustomInspectorValueType::Unknown;
     }
 
     SerializerNode CustomInspectorValue::Save() const
@@ -99,40 +99,40 @@ namespace tf3d::misc
         node->Set("Type", static_cast<int32_t>(m_Type));
         node->Set("TypeName", CustomInspectorValueTypeToString(m_Type));
         switch (m_Type) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 node->Set("Value", m_IntValue);
                 node->Set("DefaultValue", m_DefaultIntValue);
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 node->Set("Value", m_FloatValue);
                 node->Set("DefaultValue", m_DefaultFloatValue);
                 break;
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Bool:
                 node->Set("Value", m_BoolValue);
                 node->Set("DefaultValue", m_DefaultBoolValue);
                 break;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 node->Set("Value", m_StringValue);
                 node->Set("DefaultValue", m_DefaultStringValue);
                 break;
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 node->Set("Value", glm::vec2(m_VectorValue[0], m_VectorValue[1]));
                 node->Set("DefaultValue", glm::vec2(m_DefaultVectorValue[0], m_DefaultVectorValue[1]));
                 break;
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 node->Set("Value", glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]));
                 node->Set("DefaultValue", glm::vec3(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2]));
                 break;
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 node->Set("Value", glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
                 node->Set("DefaultValue", glm::vec4(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2], m_DefaultVectorValue[3]));
                 break;
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Texture:
                 node->Set("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
                 node->Set("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "null");
                 node->Set("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8);
                 break;
-            case CustomInspectorValueType_Path:
+            case CustomInspectorValueType::Path:
                 node->Set("PathPointCount", m_PathPointCount);
                 node->Set("DefaultPathPointCount", m_DefaultPathPointCount);
                 for (size_t index = 0; index < CustomInspectorMaxPathPoints; ++index) {
@@ -142,7 +142,7 @@ namespace tf3d::misc
                     node->Set("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
                 }
                 break;
-            case CustomInspectorValueType_Curve:
+            case CustomInspectorValueType::Curve:
                 node->Set("CurvePointCount", m_CurvePointCount);
                 node->Set("DefaultCurvePointCount", m_DefaultCurvePointCount);
                 for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index) {
@@ -163,23 +163,23 @@ namespace tf3d::misc
         m_Type = CustomInspectorValueTypeFromString(node->Get<std::string>("TypeName", CustomInspectorValueTypeToString(m_Type)));
         m_Name = node->Get<std::string>("Name");
         switch (m_Type) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 m_DefaultIntValue = node->Get<int>("DefaultValue", m_DefaultIntValue);
                 m_IntValue        = node->Get<int>("Value", m_DefaultIntValue);
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 m_DefaultFloatValue = node->Get<float>("DefaultValue", m_DefaultFloatValue);
                 m_FloatValue        = node->Get<float>("Value", m_DefaultFloatValue);
                 break;
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Bool:
                 m_DefaultBoolValue = node->Get<bool>("DefaultValue", m_DefaultBoolValue);
                 m_BoolValue        = node->Get<bool>("Value", m_DefaultBoolValue);
                 break;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 m_DefaultStringValue = node->Get<std::string>("DefaultValue", m_DefaultStringValue);
                 m_StringValue        = node->Get<std::string>("Value", m_DefaultStringValue);
                 break;
-            case CustomInspectorValueType_Vector2: {
+            case CustomInspectorValueType::Vector2: {
                 const glm::vec2 defaultValue = node->Get<glm::vec2>(
                     "DefaultValue", glm::vec2(m_DefaultVectorValue[0], m_DefaultVectorValue[1]));
                 const glm::vec2 value   = node->Get<glm::vec2>("Value", defaultValue);
@@ -188,7 +188,7 @@ namespace tf3d::misc
                 m_VectorValue[0]        = value.x;
                 m_VectorValue[1]        = value.y;
             } break;
-            case CustomInspectorValueType_Vector3: {
+            case CustomInspectorValueType::Vector3: {
                 const glm::vec3 defaultValue = node->Get<glm::vec3>(
                     "DefaultValue", glm::vec3(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2]));
                 const glm::vec3 value   = node->Get<glm::vec3>("Value", defaultValue);
@@ -199,7 +199,7 @@ namespace tf3d::misc
                 m_VectorValue[1]        = value.y;
                 m_VectorValue[2]        = value.z;
             } break;
-            case CustomInspectorValueType_Vector4: {
+            case CustomInspectorValueType::Vector4: {
                 const glm::vec4 defaultValue = node->Get<glm::vec4>(
                     "DefaultValue", glm::vec4(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2], m_DefaultVectorValue[3]));
                 const glm::vec4 value   = node->Get<glm::vec4>("Value", defaultValue);
@@ -212,7 +212,7 @@ namespace tf3d::misc
                 m_VectorValue[2]        = value.z;
                 m_VectorValue[3]        = value.w;
             } break;
-            case CustomInspectorValueType_Texture: {
+            case CustomInspectorValueType::Texture: {
                 m_TextureLoadAs16Bit   = node->Get<int>("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8) >= 16;
                 const auto defaultPath = node->Get<std::string>("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
                 const auto path        = node->Get<std::string>("Value", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
@@ -225,7 +225,7 @@ namespace tf3d::misc
                 m_TextureValue        = loadTexture(path);
                 break;
             }
-            case CustomInspectorValueType_Path:
+            case CustomInspectorValueType::Path:
                 m_DefaultPathPointCount = glm::clamp(node->Get<int>("DefaultPathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
                 m_PathPointCount        = glm::clamp(node->Get<int>("PathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
                 for (size_t index = 0; index < CustomInspectorMaxPathPoints; ++index) {
@@ -235,7 +235,7 @@ namespace tf3d::misc
                     m_PathPoints[index].y        = node->Get<float>("PathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
                 }
                 break;
-            case CustomInspectorValueType_Curve:
+            case CustomInspectorValueType::Curve:
                 m_DefaultCurvePointCount = glm::clamp(node->Get<int>("DefaultCurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
                 m_CurvePointCount        = glm::clamp(node->Get<int>("CurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
                 for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index) {
@@ -253,37 +253,37 @@ namespace tf3d::misc
     bool CustomInspectorValue::WriteStateValue(SerializerNode target, const std::string &name) const
     {
         switch (m_Type) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 target->Set(name, m_IntValue);
                 return true;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 target->Set(name, m_FloatValue);
                 return true;
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Bool:
                 target->Set(name, m_BoolValue);
                 return true;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 target->Set(name, m_StringValue);
                 return true;
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 target->Set(name, glm::vec2(m_VectorValue[0], m_VectorValue[1]));
                 return true;
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 target->Set(name, glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]));
                 return true;
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 target->Set(name, glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
                 return true;
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Texture:
                 target->Set(name, m_TextureValue ? m_TextureValue->GetPath() : "");
                 return true;
-            case CustomInspectorValueType_Path:
+            case CustomInspectorValueType::Path:
                 target->Set(name, Get<std::vector<glm::vec2>>());
                 return true;
-            case CustomInspectorValueType_Curve:
+            case CustomInspectorValueType::Curve:
                 target->Set(name, Get<std::vector<glm::vec2>>());
                 return true;
-            case CustomInspectorValueType_Unknown:
+            case CustomInspectorValueType::Unknown:
             default:
                 return false;
         }
@@ -292,29 +292,29 @@ namespace tf3d::misc
     bool CustomInspectorValue::ReadStateValue(SerializerNode source, const std::string &name)
     {
         switch (m_Type) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 return Set(source->Get(name, m_IntValue));
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 return Set(source->Get(name, m_FloatValue));
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Bool:
                 return Set(source->Get(name, m_BoolValue));
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 return Set(source->Get(name, m_StringValue));
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 return Set(source->Get(name, GetVector2()));
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 return Set(source->Get(name, GetVector3()));
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 return Set(source->Get(name, GetVector4()));
-            case CustomInspectorValueType_Texture: {
+            case CustomInspectorValueType::Texture: {
                 const std::string path = source->Get(name, m_TextureValue ? m_TextureValue->GetPath() : "");
                 m_TextureValue         = path.empty() ? nullptr : std::make_shared<Texture2D>(path, false, false, m_TextureLoadAs16Bit);
                 return true;
             }
-            case CustomInspectorValueType_Path:
-            case CustomInspectorValueType_Curve:
+            case CustomInspectorValueType::Path:
+            case CustomInspectorValueType::Curve:
                 return Set(source->Get(name, Get<std::vector<glm::vec2>>()));
-            case CustomInspectorValueType_Unknown:
+            case CustomInspectorValueType::Unknown:
             default:
                 return false;
         }
@@ -535,7 +535,7 @@ namespace tf3d::misc
     CustomInspectorValue &CustomInspector::AddPathVariable(const std::string &name,
                                                            const std::array<glm::vec2, CustomInspectorMaxPathPoints> &defaultPoints, int defaultPointCount)
     {
-        CustomInspectorValue value(CustomInspectorValueType_Path);
+        CustomInspectorValue value(CustomInspectorValueType::Path);
         value.m_DefaultPathPoints = value.m_PathPoints = defaultPoints;
         value.m_DefaultPathPointCount = value.m_PathPointCount = glm::clamp(defaultPointCount, 1, static_cast<int>(CustomInspectorMaxPathPoints));
         value.m_Name                                           = name;
@@ -545,7 +545,7 @@ namespace tf3d::misc
     CustomInspectorValue &CustomInspector::AddCurveVariable(const std::string &name,
                                                             const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints, int defaultPointCount)
     {
-        CustomInspectorValue value(CustomInspectorValueType_Curve);
+        CustomInspectorValue value(CustomInspectorValueType::Curve);
         value.m_CurvePoints.fill(glm::vec2(-1.0f));
         value.m_DefaultCurvePoints.fill(glm::vec2(-1.0f));
         const int pointCount = glm::clamp(defaultPointCount, 2, static_cast<int>(CustomInspectorMaxCurvePoints));
@@ -572,42 +572,42 @@ namespace tf3d::misc
         auto valueType       = CustomInspectorValue::CustomInspectorValueTypeFromString(valueTypeName);
         bool hasDefaultValue = config.contains("Default");
         switch (valueType) {
-            case CustomInspectorValueType_Int: {
+            case CustomInspectorValueType::Int: {
                 auto &var  = Add<int32_t>(name, hasDefaultValue ? config["Default"].get<int32_t>() : 0);
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Float: {
+            case CustomInspectorValueType::Float: {
                 auto &var  = Add<float>(name, hasDefaultValue ? config["Default"].get<float>() : 0.0f);
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Bool: {
+            case CustomInspectorValueType::Bool: {
                 auto &var  = Add<bool>(name, hasDefaultValue ? config["Default"].get<bool>() : false);
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_String: {
+            case CustomInspectorValueType::String: {
                 auto &var  = Add<std::string>(name, hasDefaultValue ? config["Default"].get<std::string>() : "");
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Vector2: {
+            case CustomInspectorValueType::Vector2: {
                 auto &var  = Add<glm::vec2>(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f));
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Vector3: {
+            case CustomInspectorValueType::Vector3: {
                 auto &var  = Add<glm::vec3>(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f));
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Vector4: {
+            case CustomInspectorValueType::Vector4: {
                 auto &var  = Add<glm::vec4>(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f));
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Texture: {
+            case CustomInspectorValueType::Texture: {
                 const bool loadAs16Bit                    = config.value("BitDepth", 8) >= 16;
                 std::shared_ptr<Texture2D> defaultTexture = nullptr;
                 if (hasDefaultValue && config["Default"].is_string()) {
@@ -620,7 +620,7 @@ namespace tf3d::misc
                 var.m_Name               = name;
                 return var;
             }
-            case CustomInspectorValueType_Path: {
+            case CustomInspectorValueType::Path: {
                 std::array<glm::vec2, CustomInspectorMaxPathPoints> points{};
                 int pointCount = config.value("PointCount", 2);
                 if (hasDefaultValue && config["Default"].is_array()) {
@@ -636,7 +636,7 @@ namespace tf3d::misc
                 var.m_Name = name;
                 return var;
             }
-            case CustomInspectorValueType_Curve: {
+            case CustomInspectorValueType::Curve: {
                 std::array<glm::vec2, CustomInspectorMaxCurvePoints> points;
                 points.fill(glm::vec2(-1.0f));
                 int pointCount = config.value("PointCount", 2);
@@ -740,7 +740,7 @@ namespace tf3d::misc
     {
         std::unordered_map<std::string, bool> textureBitDepths;
         for (const auto &[name, existingValue] : m_Values) {
-            if (existingValue.GetType() == CustomInspectorValueType_Texture && existingValue.m_TextureLoadAs16Bit)
+            if (existingValue.GetType() == CustomInspectorValueType::Texture && existingValue.m_TextureLoadAs16Bit)
                 textureBitDepths[name] = true;
         }
         m_Values.clear();
@@ -858,35 +858,35 @@ namespace tf3d::misc
                                           const CustomInspectorWidget *widget) {
             nlohmann::json schema = nlohmann::json::object();
             switch (value.GetType()) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     schema["type"] = "integer";
                     break;
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     schema["type"] = "number";
                     break;
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     schema["type"] = "boolean";
                     break;
-                case CustomInspectorValueType_String:
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::String:
+                case CustomInspectorValueType::Texture:
                     schema["type"] = "string";
                     break;
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     schema = vectorSchema(2);
                     break;
-                case CustomInspectorValueType_Vector3:
+                case CustomInspectorValueType::Vector3:
                     schema = vectorSchema(3);
                     break;
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector4:
                     schema = vectorSchema(4);
                     break;
-                case CustomInspectorValueType_Path:
-                case CustomInspectorValueType_Curve:
+                case CustomInspectorValueType::Path:
+                case CustomInspectorValueType::Curve:
                     schema = {
                         {"type", "array"},
                         {"items", vectorSchema(2)}};
                     break;
-                case CustomInspectorValueType_Unknown:
+                case CustomInspectorValueType::Unknown:
                 default:
                     schema["type"] = "string";
                     break;
@@ -1298,24 +1298,24 @@ namespace tf3d::misc
         bool hasChanged = false;
         auto &value     = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 hasChanged = ImGui::SliderInt(widget.m_Label.c_str(), &value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 hasChanged = ImGui::SliderFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 hasChanged = ImGui::SliderFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 hasChanged = ImGui::SliderFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 hasChanged = ImGui::SliderFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_String:
-            case CustomInspectorValueType_Bool:
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::String:
+            case CustomInspectorValueType::Bool:
+            case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Slider"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Slider"));
@@ -1328,26 +1328,26 @@ namespace tf3d::misc
         bool hasChanged = false;
         auto &value     = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 hasChanged = ImGui::DragInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_FSpeed, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
                 value.m_IntValue = std::clamp(value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 hasChanged = ImGui::DragFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
                 value.m_FloatValue = std::clamp(value.m_FloatValue, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 hasChanged = ImGui::DragFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
                 value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
                 value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 hasChanged = ImGui::DragFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
@@ -1355,7 +1355,7 @@ namespace tf3d::misc
                 value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
                 value.m_VectorValue[2] = std::clamp(value.m_VectorValue[2], widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 hasChanged = ImGui::DragFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
@@ -1364,9 +1364,9 @@ namespace tf3d::misc
                 value.m_VectorValue[2] = std::clamp(value.m_VectorValue[2], widget.m_Constratins[0], widget.m_Constratins[1]);
                 value.m_VectorValue[3] = std::clamp(value.m_VectorValue[3], widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
-            case CustomInspectorValueType_String:
-            case CustomInspectorValueType_Bool:
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::String:
+            case CustomInspectorValueType::Bool:
+            case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Drag"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Drag"));
@@ -1379,24 +1379,24 @@ namespace tf3d::misc
         bool hasChanged = false;
         auto &value     = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 hasChanged       = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
                 value.m_IntValue = ImGui::ColorConvertFloat4ToU32(ImVec4(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]));
                 break;
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 hasChanged = ImGui::ColorEdit3(widget.m_Label.c_str(), value.m_VectorValue);
                 break;
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 hasChanged = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
                 break;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 hasChanged          = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
                 value.m_StringValue = ColorConvertToHexString(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]);
                 break;
-            case CustomInspectorValueType_Float:
-            case CustomInspectorValueType_Bool:
-            case CustomInspectorValueType_Vector2:
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Float:
+            case CustomInspectorValueType::Bool:
+            case CustomInspectorValueType::Vector2:
+            case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Color"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Color"));
@@ -1410,14 +1410,14 @@ namespace tf3d::misc
 
         auto &value = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Texture:
                 break;
-            case CustomInspectorValueType_Int:
-            case CustomInspectorValueType_Float:
-            case CustomInspectorValueType_Vector2:
-            case CustomInspectorValueType_Vector3:
-            case CustomInspectorValueType_Vector4:
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Int:
+            case CustomInspectorValueType::Float:
+            case CustomInspectorValueType::Vector2:
+            case CustomInspectorValueType::Vector3:
+            case CustomInspectorValueType::Vector4:
+            case CustomInspectorValueType::Bool:
                 throw std::runtime_error(std::string("Invalid data type for Drag"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Drag"));
@@ -1438,15 +1438,15 @@ namespace tf3d::misc
         bool hasChanged = false;
         auto &value     = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 break;
-            case CustomInspectorValueType_Float:
-            case CustomInspectorValueType_Vector2:
-            case CustomInspectorValueType_Vector3:
-            case CustomInspectorValueType_Vector4:
-            case CustomInspectorValueType_String:
-            case CustomInspectorValueType_Bool:
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Float:
+            case CustomInspectorValueType::Vector2:
+            case CustomInspectorValueType::Vector3:
+            case CustomInspectorValueType::Vector4:
+            case CustomInspectorValueType::String:
+            case CustomInspectorValueType::Bool:
+            case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Dropdown"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Dropdown"));
@@ -1479,7 +1479,7 @@ namespace tf3d::misc
     bool CustomInspector::RenderPath(const CustomInspectorWidget &widget)
     {
         auto &value = m_Values[widget.m_VariableName];
-        if (value.GetType() != CustomInspectorValueType_Path)
+        if (value.GetType() != CustomInspectorValueType::Path)
             throw std::runtime_error("Invalid data type for Path");
         return utils::DrawPathEditor<CustomInspectorMaxPathPoints>(
             widget.m_Label.c_str(), value.m_PathPoints, value.m_PathPointCount);
@@ -1488,7 +1488,7 @@ namespace tf3d::misc
     bool CustomInspector::RenderCurve(const CustomInspectorWidget &widget)
     {
         auto &value = m_Values[widget.m_VariableName];
-        if (value.GetType() != CustomInspectorValueType_Curve)
+        if (value.GetType() != CustomInspectorValueType::Curve)
             throw std::runtime_error("Invalid data type for Curve");
 
         std::array<ImVec2, CustomInspectorMaxCurvePoints> points{};
@@ -1515,27 +1515,27 @@ namespace tf3d::misc
         auto &value     = m_Values[widget.m_VariableName];
         hasChanged      = ImGui::Checkbox(widget.m_Label.c_str(), &value.m_BoolValue);
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 value.m_IntValue = (value.m_BoolValue ? 1 : 0);
                 ;
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 value.m_FloatValue = (value.m_BoolValue ? 1.0f : 0.0f);
                 break;
-            case CustomInspectorValueType_Vector2:
-            case CustomInspectorValueType_Vector3:
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector2:
+            case CustomInspectorValueType::Vector3:
+            case CustomInspectorValueType::Vector4:
                 value.m_VectorValue[0] = (value.m_BoolValue ? 1.0f : 0.0f);
                 value.m_VectorValue[1] = (value.m_BoolValue ? 1.0f : 0.0f);
                 value.m_VectorValue[2] = (value.m_BoolValue ? 1.0f : 0.0f);
                 value.m_VectorValue[3] = (value.m_BoolValue ? 1.0f : 0.0f);
                 break;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 value.m_StringValue = (value.m_BoolValue ? "true" : "false");
                 break;
-            case CustomInspectorValueType_Bool:
+            case CustomInspectorValueType::Bool:
                 break;
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Checkbox"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Checkbox"));
@@ -1548,29 +1548,29 @@ namespace tf3d::misc
         bool hasChanged = false;
         auto &value     = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 hasChanged = ImGui::InputInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_ISpeed, widget.m_ISpeed * 10);
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 hasChanged = ImGui::InputFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_FSpeed, widget.m_FSpeed * 10.0f);
                 break;
-            case CustomInspectorValueType_Vector2:
+            case CustomInspectorValueType::Vector2:
                 hasChanged = ImGui::InputFloat2(widget.m_Label.c_str(), value.m_VectorValue);
                 break;
-            case CustomInspectorValueType_Vector3:
+            case CustomInspectorValueType::Vector3:
                 hasChanged = ImGui::InputFloat3(widget.m_Label.c_str(), value.m_VectorValue);
                 break;
-            case CustomInspectorValueType_Vector4:
+            case CustomInspectorValueType::Vector4:
                 hasChanged = ImGui::InputFloat4(widget.m_Label.c_str(), value.m_VectorValue);
                 break;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 static char s_Buffer[4096];
                 std::strcpy(s_Buffer, value.m_StringValue.c_str());
                 hasChanged          = ImGui::InputText(widget.m_Label.c_str(), s_Buffer, sizeof(s_Buffer));
                 value.m_StringValue = s_Buffer;
                 break;
-            case CustomInspectorValueType_Bool:
-            case CustomInspectorValueType_Texture:
+            case CustomInspectorValueType::Bool:
+            case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Input"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Input"));
@@ -1583,24 +1583,24 @@ namespace tf3d::misc
         bool hasChanged = false;
         auto &value     = m_Values[widget.m_VariableName];
         switch (value.GetType()) {
-            case CustomInspectorValueType_Int:
+            case CustomInspectorValueType::Int:
                 hasChanged = ShowSeedSettings(widget.m_Label, &value.m_IntValue, widget.m_SeedHistory);
                 break;
-            case CustomInspectorValueType_Float:
+            case CustomInspectorValueType::Float:
                 hasChanged         = ShowSeedSettings(widget.m_Label, &value.m_IntValue, widget.m_SeedHistory);
                 value.m_FloatValue = static_cast<float>(value.m_IntValue);
                 break;
-            case CustomInspectorValueType_String:
+            case CustomInspectorValueType::String:
                 if (ImGui::Button(("Seed Value: " + value.m_StringValue + " [Click to change]").c_str())) {
                     value.m_StringValue = GenerateId(8);
                     hasChanged          = true;
                 }
                 break;
-            case CustomInspectorValueType_Vector2:
-            case CustomInspectorValueType_Vector3:
-            case CustomInspectorValueType_Vector4:
-            case CustomInspectorValueType_Bool:
-            case CustomInspectorValueType_Texture: // todo: add seed texture here too
+            case CustomInspectorValueType::Vector2:
+            case CustomInspectorValueType::Vector3:
+            case CustomInspectorValueType::Vector4:
+            case CustomInspectorValueType::Bool:
+            case CustomInspectorValueType::Texture: // todo: add seed texture here too
                 throw std::runtime_error(std::string("Invalid data type for Seed"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Seed"));

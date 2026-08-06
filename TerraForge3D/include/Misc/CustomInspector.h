@@ -13,19 +13,19 @@
 namespace tf3d::misc
 {
 
-    enum CustomInspectorValueType {
-        CustomInspectorValueType_Unknown = 0,
-        CustomInspectorValueType_Int,
-        CustomInspectorValueType_Float,
-        CustomInspectorValueType_Bool,
-        CustomInspectorValueType_String,
-        CustomInspectorValueType_Vector2,
-        CustomInspectorValueType_Vector3,
-        CustomInspectorValueType_Vector4,
-        CustomInspectorValueType_Texture,
-        CustomInspectorValueType_Path,
-        CustomInspectorValueType_Curve,
-        CustomInspectorValueType_Count
+    enum class CustomInspectorValueType {
+        Unknown = 0,
+        Int,
+        Float,
+        Bool,
+        String,
+        Vector2,
+        Vector3,
+        Vector4,
+        Texture,
+        Path,
+        Curve,
+        Count
     };
 
     inline constexpr size_t CustomInspectorMaxPathPoints  = 16;
@@ -34,7 +34,7 @@ namespace tf3d::misc
     class CustomInspectorValue
     {
     public:
-        CustomInspectorValue(CustomInspectorValueType type = CustomInspectorValueType_Unknown)
+        CustomInspectorValue(CustomInspectorValueType type = CustomInspectorValueType::Unknown)
             : m_Type(type)
         {
         }
@@ -57,20 +57,20 @@ namespace tf3d::misc
         inline int32_t GetInt() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return m_IntValue;
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return static_cast<int32_t>(m_FloatValue);
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return m_BoolValue ? 1 : 0;
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::String:
                     return std::atoi(m_StringValue.c_str());
-                case CustomInspectorValueType_Vector2:
-                case CustomInspectorValueType_Vector3:
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector2:
+                case CustomInspectorValueType::Vector3:
+                case CustomInspectorValueType::Vector4:
                     return static_cast<int32_t>(m_VectorValue[0]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Texture:
                 default:
                     return 0;
             }
@@ -80,20 +80,20 @@ namespace tf3d::misc
         inline float GetFloat() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return static_cast<float>(m_IntValue);
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return (m_FloatValue);
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return m_BoolValue ? 1.0f : 0.0f;
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::String:
                     return static_cast<float>(std::atof(m_StringValue.c_str()));
-                case CustomInspectorValueType_Vector2:
-                case CustomInspectorValueType_Vector3:
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector2:
+                case CustomInspectorValueType::Vector3:
+                case CustomInspectorValueType::Vector4:
                     return (m_VectorValue[0]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Texture:
                 default:
                     return 0.0f;
             }
@@ -103,20 +103,20 @@ namespace tf3d::misc
         inline bool GetBool() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return static_cast<bool>(m_IntValue);
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return static_cast<bool>(m_FloatValue);
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return m_BoolValue;
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::String:
                     return m_StringValue == "true";
-                case CustomInspectorValueType_Vector2:
-                case CustomInspectorValueType_Vector3:
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector2:
+                case CustomInspectorValueType::Vector3:
+                case CustomInspectorValueType::Vector4:
                     return static_cast<bool>(m_VectorValue[0]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Texture:
                 default:
                     return false;
             }
@@ -126,22 +126,22 @@ namespace tf3d::misc
         inline std::string GetString() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return std::to_string(m_IntValue);
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return std::to_string(m_FloatValue);
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return m_BoolValue ? "true" : "false";
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::String:
                     return m_StringValue;
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     return std::to_string(m_VectorValue[0]) + " " + std::to_string(m_VectorValue[1]);
-                case CustomInspectorValueType_Vector3:
+                case CustomInspectorValueType::Vector3:
                     return std::to_string(m_VectorValue[0]) + " " + std::to_string(m_VectorValue[1]) + " " + std::to_string(m_VectorValue[2]);
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector4:
                     return std::to_string(m_VectorValue[0]) + " " + std::to_string(m_VectorValue[1]) + " " + std::to_string(m_VectorValue[2]) + " " + std::to_string(m_VectorValue[3]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Texture:
                 default:
                     return "";
             }
@@ -151,19 +151,19 @@ namespace tf3d::misc
         inline glm::vec2 GetVector2() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return glm::vec2(static_cast<float>(m_IntValue));
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return glm::vec2(static_cast<float>(m_FloatValue));
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return glm::vec2(m_BoolValue ? 1.0f : 0.0f);
-                case CustomInspectorValueType_Vector2:
-                case CustomInspectorValueType_Vector3:
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector2:
+                case CustomInspectorValueType::Vector3:
+                case CustomInspectorValueType::Vector4:
                     return glm::vec2(m_VectorValue[0], m_VectorValue[1]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_String:
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::String:
+                case CustomInspectorValueType::Texture:
                 default:
                     return glm::vec2(0.0f);
             }
@@ -173,20 +173,20 @@ namespace tf3d::misc
         inline glm::vec3 GetVector3() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return glm::vec3(static_cast<float>(m_IntValue));
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return glm::vec3(static_cast<float>(m_FloatValue));
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return glm::vec3(m_BoolValue ? 1.0f : 0.0f);
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     return glm::vec3(m_VectorValue[0], m_VectorValue[1], 0.0f);
-                case CustomInspectorValueType_Vector3:
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector3:
+                case CustomInspectorValueType::Vector4:
                     return glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_Texture:
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Texture:
+                case CustomInspectorValueType::String:
                 default:
                     return glm::vec3(0.0f);
             }
@@ -196,21 +196,21 @@ namespace tf3d::misc
         inline glm::vec4 GetVector4() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     return glm::vec4(static_cast<float>(m_IntValue));
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     return glm::vec4(static_cast<float>(m_FloatValue));
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     return glm::vec4(m_BoolValue ? 1.0f : 0.0f);
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     return glm::vec4(m_VectorValue[0], m_VectorValue[1], 0.0f, 0.0f);
-                case CustomInspectorValueType_Vector3:
+                case CustomInspectorValueType::Vector3:
                     return glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], 0.0f);
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector4:
                     return glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]);
-                case CustomInspectorValueType_Unknown:
-                case CustomInspectorValueType_Texture:
-                case CustomInspectorValueType_String:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Texture:
+                case CustomInspectorValueType::String:
                 default:
                     return glm::vec4(0.0f);
             }
@@ -220,16 +220,16 @@ namespace tf3d::misc
         inline std::shared_ptr<Texture2D> GetTexture() const
         {
             switch (m_Type) {
-                case CustomInspectorValueType_Texture:
+                case CustomInspectorValueType::Texture:
                     return m_TextureValue;
-                case CustomInspectorValueType_Int:
-                case CustomInspectorValueType_Float:
-                case CustomInspectorValueType_Bool:
-                case CustomInspectorValueType_String:
-                case CustomInspectorValueType_Vector2:
-                case CustomInspectorValueType_Vector3:
-                case CustomInspectorValueType_Vector4:
-                case CustomInspectorValueType_Unknown:
+                case CustomInspectorValueType::Int:
+                case CustomInspectorValueType::Float:
+                case CustomInspectorValueType::Bool:
+                case CustomInspectorValueType::String:
+                case CustomInspectorValueType::Vector2:
+                case CustomInspectorValueType::Vector3:
+                case CustomInspectorValueType::Vector4:
+                case CustomInspectorValueType::Unknown:
                 default:
                     return nullptr;
             }
@@ -259,23 +259,23 @@ namespace tf3d::misc
         {
             using ValueType = std::decay_t<T>;
             if constexpr (std::is_same_v<ValueType, bool>)
-                return CustomInspectorValueType_Bool;
+                return CustomInspectorValueType::Bool;
             else if constexpr (std::is_integral_v<ValueType>)
-                return CustomInspectorValueType_Int;
+                return CustomInspectorValueType::Int;
             else if constexpr (std::is_floating_point_v<ValueType>)
-                return CustomInspectorValueType_Float;
+                return CustomInspectorValueType::Float;
             else if constexpr (std::is_same_v<ValueType, std::string>)
-                return CustomInspectorValueType_String;
+                return CustomInspectorValueType::String;
             else if constexpr (std::is_same_v<ValueType, glm::vec2>)
-                return CustomInspectorValueType_Vector2;
+                return CustomInspectorValueType::Vector2;
             else if constexpr (std::is_same_v<ValueType, glm::vec3>)
-                return CustomInspectorValueType_Vector3;
+                return CustomInspectorValueType::Vector3;
             else if constexpr (std::is_same_v<ValueType, glm::vec4>)
-                return CustomInspectorValueType_Vector4;
+                return CustomInspectorValueType::Vector4;
             else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>)
-                return CustomInspectorValueType_Texture;
+                return CustomInspectorValueType::Texture;
             else
-                return CustomInspectorValueType_Unknown;
+                return CustomInspectorValueType::Unknown;
         }
 
         template <typename T>
@@ -283,28 +283,28 @@ namespace tf3d::misc
         {
             using ValueType = std::decay_t<T>;
             if constexpr (std::is_same_v<ValueType, bool>) {
-                return m_Type == CustomInspectorValueType_Bool ? GetBool() : fallback;
+                return m_Type == CustomInspectorValueType::Bool ? GetBool() : fallback;
             } else if constexpr (std::is_integral_v<ValueType>) {
-                return m_Type == CustomInspectorValueType_Int ? static_cast<T>(GetInt()) : fallback;
+                return m_Type == CustomInspectorValueType::Int ? static_cast<T>(GetInt()) : fallback;
             } else if constexpr (std::is_floating_point_v<ValueType>) {
-                return m_Type == CustomInspectorValueType_Float ? static_cast<T>(GetFloat()) : fallback;
+                return m_Type == CustomInspectorValueType::Float ? static_cast<T>(GetFloat()) : fallback;
             } else if constexpr (std::is_same_v<ValueType, std::string>) {
-                return m_Type == CustomInspectorValueType_String ? GetString() : fallback;
+                return m_Type == CustomInspectorValueType::String ? GetString() : fallback;
             } else if constexpr (std::is_same_v<ValueType, glm::vec2>) {
-                return m_Type == CustomInspectorValueType_Vector2 ? GetVector2() : fallback;
+                return m_Type == CustomInspectorValueType::Vector2 ? GetVector2() : fallback;
             } else if constexpr (std::is_same_v<ValueType, glm::vec3>) {
-                return m_Type == CustomInspectorValueType_Vector3 ? GetVector3() : fallback;
+                return m_Type == CustomInspectorValueType::Vector3 ? GetVector3() : fallback;
             } else if constexpr (std::is_same_v<ValueType, glm::vec4>) {
-                return m_Type == CustomInspectorValueType_Vector4 ? GetVector4() : fallback;
+                return m_Type == CustomInspectorValueType::Vector4 ? GetVector4() : fallback;
             } else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>) {
-                return m_Type == CustomInspectorValueType_Texture ? GetTexture() : fallback;
+                return m_Type == CustomInspectorValueType::Texture ? GetTexture() : fallback;
             } else if constexpr (std::is_same_v<ValueType, std::vector<glm::vec2>>) {
                 std::vector<glm::vec2> points;
-                if (m_Type == CustomInspectorValueType_Path) {
+                if (m_Type == CustomInspectorValueType::Path) {
                     points.reserve(static_cast<size_t>(m_PathPointCount));
                     for (int index = 0; index < m_PathPointCount; ++index)
                         points.push_back(m_PathPoints[index]);
-                } else if (m_Type == CustomInspectorValueType_Curve) {
+                } else if (m_Type == CustomInspectorValueType::Curve) {
                     points.reserve(static_cast<size_t>(m_CurvePointCount));
                     for (int index = 0; index < m_CurvePointCount; ++index)
                         points.push_back(m_CurvePoints[index]);
@@ -322,51 +322,51 @@ namespace tf3d::misc
         {
             using ValueType = std::decay_t<T>;
             if constexpr (std::is_same_v<ValueType, bool>) {
-                if (m_Type != CustomInspectorValueType_Bool)
+                if (m_Type != CustomInspectorValueType::Bool)
                     return false;
                 m_BoolValue = value;
             } else if constexpr (std::is_integral_v<ValueType>) {
-                if (m_Type != CustomInspectorValueType_Int)
+                if (m_Type != CustomInspectorValueType::Int)
                     return false;
                 m_IntValue = static_cast<int32_t>(value);
             } else if constexpr (std::is_floating_point_v<ValueType>) {
-                if (m_Type != CustomInspectorValueType_Float)
+                if (m_Type != CustomInspectorValueType::Float)
                     return false;
                 m_FloatValue = static_cast<float>(value);
             } else if constexpr (std::is_same_v<ValueType, std::string>) {
-                if (m_Type != CustomInspectorValueType_String)
+                if (m_Type != CustomInspectorValueType::String)
                     return false;
                 m_StringValue = std::move(value);
             } else if constexpr (std::is_same_v<ValueType, glm::vec2>) {
-                if (m_Type != CustomInspectorValueType_Vector2)
+                if (m_Type != CustomInspectorValueType::Vector2)
                     return false;
                 m_VectorValue[0] = value.x;
                 m_VectorValue[1] = value.y;
             } else if constexpr (std::is_same_v<ValueType, glm::vec3>) {
-                if (m_Type != CustomInspectorValueType_Vector3)
+                if (m_Type != CustomInspectorValueType::Vector3)
                     return false;
                 m_VectorValue[0] = value.x;
                 m_VectorValue[1] = value.y;
                 m_VectorValue[2] = value.z;
             } else if constexpr (std::is_same_v<ValueType, glm::vec4>) {
-                if (m_Type != CustomInspectorValueType_Vector4)
+                if (m_Type != CustomInspectorValueType::Vector4)
                     return false;
                 m_VectorValue[0] = value.x;
                 m_VectorValue[1] = value.y;
                 m_VectorValue[2] = value.z;
                 m_VectorValue[3] = value.w;
             } else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>) {
-                if (m_Type != CustomInspectorValueType_Texture)
+                if (m_Type != CustomInspectorValueType::Texture)
                     return false;
                 m_TextureValue = std::move(value);
             } else if constexpr (std::is_same_v<ValueType, std::vector<glm::vec2>>) {
                 if (value.empty())
                     return false;
-                if (m_Type == CustomInspectorValueType_Path) {
+                if (m_Type == CustomInspectorValueType::Path) {
                     m_PathPointCount = std::clamp(static_cast<int32_t>(value.size()), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
                     for (int index = 0; index < m_PathPointCount; ++index)
                         m_PathPoints[index] = value[static_cast<size_t>(index)];
-                } else if (m_Type == CustomInspectorValueType_Curve) {
+                } else if (m_Type == CustomInspectorValueType::Curve) {
                     m_CurvePointCount = std::clamp(static_cast<int32_t>(value.size()), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
                     for (int index = 0; index < m_CurvePointCount; ++index)
                         m_CurvePoints[index] = value[static_cast<size_t>(index)];
@@ -431,7 +431,7 @@ namespace tf3d::misc
 
     private:
         std::string m_Name              = "";
-        CustomInspectorValueType m_Type = CustomInspectorValueType_Unknown;
+        CustomInspectorValueType m_Type = CustomInspectorValueType::Unknown;
         int32_t m_IntValue = 0, m_DefaultIntValue = 0;
         float m_FloatValue = 0.0f, m_DefaultFloatValue = 0.0f;
         bool m_BoolValue = false, m_DefaultBoolValue = false;

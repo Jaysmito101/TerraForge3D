@@ -78,25 +78,25 @@ namespace tf3d::generators
                                      const CustomInspectorValue &value, int &textureSlot, const nlohmann::json *binding = nullptr)
         {
             switch (value.GetType()) {
-                case CustomInspectorValueType_Int:
+                case CustomInspectorValueType::Int:
                     shader->SetUniform1i(uniformName, value.Get<int32_t>());
                     break;
-                case CustomInspectorValueType_Float:
+                case CustomInspectorValueType::Float:
                     shader->SetUniform1f(uniformName, value.Get<float>());
                     break;
-                case CustomInspectorValueType_Bool:
+                case CustomInspectorValueType::Bool:
                     shader->SetUniform1i(uniformName, value.Get<bool>() ? 1 : 0);
                     break;
-                case CustomInspectorValueType_Vector2:
+                case CustomInspectorValueType::Vector2:
                     shader->SetUniform2f(uniformName, value.Get<glm::vec2>());
                     break;
-                case CustomInspectorValueType_Vector3:
+                case CustomInspectorValueType::Vector3:
                     shader->SetUniform3f(uniformName, value.Get<glm::vec3>());
                     break;
-                case CustomInspectorValueType_Vector4:
+                case CustomInspectorValueType::Vector4:
                     shader->SetUniform4f(uniformName, value.Get<glm::vec4>());
                     break;
-                case CustomInspectorValueType_Texture: {
+                case CustomInspectorValueType::Texture: {
                     const auto texture    = value.Get<std::shared_ptr<Texture2D>>();
                     const bool hasTexture = texture != nullptr && texture->IsLoaded();
                     if (hasTexture)
@@ -108,7 +108,7 @@ namespace tf3d::generators
                     }
                     break;
                 }
-                case CustomInspectorValueType_Curve: {
+                case CustomInspectorValueType::Curve: {
                     const auto points                   = value.Get<std::vector<glm::vec2>>();
                     const std::string pointCountUniform = binding != nullptr && binding->is_object()
                                                               ? binding->value("PointCountUniform", uniformName + "PointCount")
@@ -120,8 +120,8 @@ namespace tf3d::generators
                     }
                     break;
                 }
-                case CustomInspectorValueType_String:
-                case CustomInspectorValueType_Unknown:
+                case CustomInspectorValueType::String:
+                case CustomInspectorValueType::Unknown:
                 default:
                     break;
             }
