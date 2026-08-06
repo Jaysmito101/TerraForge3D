@@ -1,6 +1,7 @@
 #include "Renderer/RendererSky.h"
 #include "Base/Base.h"
 #include "Data/ApplicationState.h"
+#include "Data/ResourceManager.h"
 #include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
@@ -10,9 +11,18 @@
 namespace tf3d::renderer
 {
 
+    namespace
+    {
+        bool IsValidPowerOfTwo(int32_t value, int32_t minimum, int32_t maximum)
+        {
+            return value >= minimum && value <= maximum && (value & (value - 1)) == 0;
+        }
+    } // namespace
+
     RendererSky::RendererSky(ApplicationState *appState)
     {
-        m_AppState    = appState;
+        m_AppState = appState;
+        BuildInspector();
         m_SkyboxModel = new Model("Skybox");
         m_SkyboxModel->mesh->GenerateCube();
         m_SkyboxModel->mesh->RecalculateNormals();
@@ -36,27 +46,58 @@ namespace tf3d::renderer
         delete m_SkyboxModel;
     }
 
+    void RendererSky::BuildInspector()
+    {
+        if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
+            TF3D_LOG_ERROR("Cannot load Renderer Sky inspector metadata without a resource manager");
+            return;
+        }
+
+        const std::string configPath = m_AppState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
+                                       PATH_SEPARATOR + "Sky.json";
+        bool loaded              = false;
+        const std::string source = m_AppState->resourceManager->LoadText(configPath, false, &loaded);
+        if (!loaded) {
+            TF3D_LOG_ERROR("Could not load Renderer Sky inspector metadata '{}'", configPath);
+            return;
+        }
+
+        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
+        if (config.is_discarded()) {
+            TF3D_LOG_ERROR("Could not parse Renderer Sky inspector metadata '{}'", configPath);
+            return;
+        }
+        if (!m_Inspector.LoadConfig(config))
+            TF3D_LOG_ERROR("Could not load Renderer Sky inspector metadata '{}'", configPath);
+    }
+
     void RendererSky::ShowSettings()
     {
         ImGui::Text("Is Sky Ready : %s", m_IsSkyReady ? "Yes" : "No");
-        ImGui::Checkbox("Render Sky", &m_RenderSky);
-        if (ImGui::Button("Load Sky Texture")) {
+        const auto previousState = m_Inspector.SaveState();
+        m_Inspector.Render();
+
+        const std::string action = m_Inspector.GetLastAction();
+        if (action == "LoadSkyMap") {
             auto path = ShowOpenFileDialog("*.hdr");
             if (path.size() > 3)
-                LoadSkyboxTexture(path);
+                LoadSkyMap(path);
         }
-        if (ImGui::Button("Reload Shaders"))
+        if (action == "ReloadShaders")
             ReloadShaders();
-        if (PowerOfTwoDropDown("Environment Map Size", &m_SkyboxSize, 6, 12))
-            LoadSkyboxTexture(m_SkyboxTexturePath);
-        if (PowerOfTwoDropDown("Irradiance Map Size", &m_IrradianceMapSize, 4, 8))
-            LoadSkyboxTexture(m_SkyboxTexturePath);
+
+        const std::string changedVariable = m_Inspector.GetLastChangedVariable();
+        if (changedVariable == "SkyboxSize" || changedVariable == "IrradianceMapSize") {
+            const std::string path = m_Inspector.Get<std::string>("SkyMapPath");
+            if (!path.empty() && !LoadSkyMap(path))
+                m_Inspector.LoadState(previousState);
+        }
     }
 
     void RendererSky::Render(RendererViewport *viewport)
     {
         TF3D_PROFILE_SCOPE("renderer/sky/draw");
-        if (!m_IsSkyReady || !m_RenderSky)
+        if (!m_IsSkyReady || !m_Inspector.Get<bool>("RenderSky", true))
             return;
         glDisable(GL_DEPTH_TEST);
         m_SkyboxShader->Bind();
@@ -83,6 +124,14 @@ namespace tf3d::renderer
     {
         if (path.size() < 3)
             return false;
+        const int32_t skyboxSize        = m_Inspector.Get<int32_t>("SkyboxSize", 512);
+        const int32_t irradianceMapSize = m_Inspector.Get<int32_t>("IrradianceMapSize", 32);
+        if (!IsValidPowerOfTwo(skyboxSize, 64, 4096) ||
+            !IsValidPowerOfTwo(irradianceMapSize, 16, 256)) {
+            TF3D_LOG_ERROR("Invalid renderer sky map sizes: SkyboxSize={}, IrradianceMapSize={}",
+                           skyboxSize, irradianceMapSize);
+            return false;
+        }
         m_IsSkyReady = false;
         if (m_SkyboxTextureID > -1)
             glDeleteTextures(1, &m_SkyboxTextureID);
@@ -133,9 +182,9 @@ namespace tf3d::renderer
         glGenTextures(1, &skyboxTextureUnfiltered);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
         int32_t skyboxMipLevels = 1;
-        for (int32_t mipSize = m_SkyboxSize; mipSize > 1; mipSize >>= 1)
+        for (int32_t mipSize = skyboxSize; mipSize > 1; mipSize >>= 1)
             ++skyboxMipLevels;
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, skyboxMipLevels, GL_RGBA32F, m_SkyboxSize, m_SkyboxSize);
+        glTexStorage2D(GL_TEXTURE_CUBE_MAP, skyboxMipLevels, GL_RGBA32F, skyboxSize, skyboxSize);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -147,7 +196,7 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE0 + 1);
         glBindTexture(GL_TEXTURE_2D, skyboxTextureEquirect);
         glUniform1i(glGetUniformLocation(m_EquirectToCube->GetNativeShader(), "u_InputTexture"), 1);
-        glDispatchCompute(m_SkyboxSize / 16, m_SkyboxSize / 16, 6);
+        glDispatchCompute(skyboxSize / 16, skyboxSize / 16, 6);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
                         GL_TEXTURE_UPDATE_BARRIER_BIT |
                         GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -158,7 +207,7 @@ namespace tf3d::renderer
 
         m_SkyboxTextureID = skyboxTextureUnfiltered; // TODO : Update this line
 
-        const int32_t specularMapSize = m_SkyboxSize < 256 ? m_SkyboxSize : 256;
+        const int32_t specularMapSize = skyboxSize < 256 ? skyboxSize : 256;
         int32_t specularMipLevels     = 1;
         for (int32_t mipSize = specularMapSize; mipSize > 1; mipSize >>= 1)
             ++specularMipLevels;
@@ -206,7 +255,7 @@ namespace tf3d::renderer
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         // Irradiance is only sampled at level zero; allocating a mip chain here
         // also becomes invalid for a 16x16 cube (which has only five legal levels).
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA32F, m_IrradianceMapSize, m_IrradianceMapSize);
+        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA32F, irradianceMapSize, irradianceMapSize);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -218,12 +267,67 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
         glUniform1i(glGetUniformLocation(m_IrradianceMap->GetNativeShader(), "u_InputTexture"), 1);
-        glDispatchCompute((m_IrradianceMapSize + 15) / 16, (m_IrradianceMapSize + 15) / 16, 6);
+        glDispatchCompute((irradianceMapSize + 15) / 16, (irradianceMapSize + 15) / 16, 6);
 
         glFinish();
 
-        m_SkyboxTexturePath = path;
-        m_IsSkyReady        = true;
+        m_Inspector.Set("SkyMapPath", path);
+        m_IsSkyReady = true;
+        return true;
+    }
+
+    bool RendererSky::LoadSkyMap(const std::string &path)
+    {
+        if (!LoadSkyboxTexture(path))
+            return false;
+        return m_Inspector.Set("SkyMapPath", path);
+    }
+
+    bool RendererSky::Load(exporters::SerializerNode data)
+    {
+        if (!data) {
+            TF3D_LOG_ERROR("Cannot load renderer sky settings from an empty serializer node");
+            return false;
+        }
+
+        nlohmann::json stateJson = data->ToJson();
+        stateJson.erase("SkyReady");
+        const auto state         = exporters::CreateSerializerNodeFromJson(stateJson);
+        const auto previousState = m_Inspector.SaveState();
+        if (!m_Inspector.LoadState(state)) {
+            m_Inspector.LoadState(previousState);
+            return false;
+        }
+
+        const std::string previousPath          = previousState->Get<std::string>("SkyMapPath", "");
+        const int32_t previousSkyboxSize        = previousState->Get<int32_t>("SkyboxSize", 512);
+        const int32_t previousIrradianceMapSize = previousState->Get<int32_t>("IrradianceMapSize", 32);
+        const std::string path                  = m_Inspector.Get<std::string>("SkyMapPath");
+        const int32_t skyboxSize                = m_Inspector.Get<int32_t>("SkyboxSize");
+        const int32_t irradianceMapSize         = m_Inspector.Get<int32_t>("IrradianceMapSize");
+        if (!IsValidPowerOfTwo(skyboxSize, 64, 4096) ||
+            !IsValidPowerOfTwo(irradianceMapSize, 16, 256)) {
+            TF3D_LOG_ERROR("Invalid renderer sky map sizes: SkyboxSize={}, IrradianceMapSize={}",
+                           skyboxSize, irradianceMapSize);
+            m_Inspector.LoadState(previousState);
+            return false;
+        }
+
+        const bool requiresReload = path != previousPath ||
+                                    skyboxSize != previousSkyboxSize ||
+                                    irradianceMapSize != previousIrradianceMapSize;
+        if (requiresReload) {
+            if (path.empty()) {
+                TF3D_LOG_ERROR("Cannot reload renderer sky without a sky map path");
+                m_Inspector.LoadState(previousState);
+                return false;
+            }
+            if (!LoadSkyMap(path)) {
+                m_Inspector.LoadState(previousState);
+                return false;
+            }
+        }
+
         return true;
     }
 } // namespace tf3d::renderer
