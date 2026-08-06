@@ -124,7 +124,7 @@ namespace tf3d::mcp_layer
 
         const std::string operationId = entry->name;
         McpActionHandler handler      = std::move(entry->invoke);
-        entry->invoke = [operationId, handler = std::move(handler)](
+        entry->invoke                 = [operationId, handler = std::move(handler)](
                             const nlohmann::json &arguments) mutable {
             McpResult result = handler(arguments);
             if (result.operationId.empty())
