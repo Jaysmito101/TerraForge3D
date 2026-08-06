@@ -114,7 +114,7 @@ namespace tf3d::data
         Model *mainModel                           = nullptr;
         renderer::RendererManager *rendererManager = nullptr;
         Dashboard *dashboard                       = nullptr;
-        ViewportManager *viewportManagers[MAX_VIEWPORT_COUNT];
+        misc::ViewportManager *viewportManagers[MAX_VIEWPORT_COUNT];
         Style *styleManager                  = nullptr;
         GenerationManager *generationManager = nullptr;
         JobSystem::JobSystem *jobSystem      = nullptr;

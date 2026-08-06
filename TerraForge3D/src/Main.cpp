@@ -258,7 +258,7 @@ namespace tf3d
             appState->exportManager = new ExportManager(appState);
             appState->styleManager  = new Style();
             for (int i = 0; i < MAX_VIEWPORT_COUNT; i++)
-                appState->viewportManagers[i] = new ViewportManager(appState);
+                appState->viewportManagers[i] = new misc::ViewportManager(appState);
 
             appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
             appState->styleManager->Apply();

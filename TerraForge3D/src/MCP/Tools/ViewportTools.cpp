@@ -91,8 +91,8 @@ namespace tf3d::mcp_layer
             if (requestedMaxDimension > 0 && std::max(width, height) > requestedMaxDimension) {
                 const double scale = static_cast<double>(requestedMaxDimension) /
                                      static_cast<double>(std::max(width, height));
-                outputWidth        = std::max(1, static_cast<int>(std::lround(width * scale)));
-                outputHeight       = std::max(1, static_cast<int>(std::lround(height * scale)));
+                outputWidth  = std::max(1, static_cast<int>(std::lround(width * scale)));
+                outputHeight = std::max(1, static_cast<int>(std::lround(height * scale)));
 
                 std::vector<uint8_t> resized(
                     static_cast<size_t>(outputWidth) * static_cast<size_t>(outputHeight) * 3u);
@@ -145,15 +145,13 @@ namespace tf3d::mcp_layer
                           nlohmann::json{
                               {"type", "object"},
                               {"properties", nlohmann::json{
-                                  {"maxDimension", nlohmann::json{
-                                      {"type", "integer"},
-                                      {"minimum", 1},
-                                      {"description", "Optional maximum width or height in pixels. "
-                                                       "Use this to reduce image size and token usage."}}}}},
+                                                 {"maxDimension", nlohmann::json{
+                                                                      {"type", "integer"},
+                                                                      {"minimum", 1},
+                                                                      {"description", "Optional maximum width or height in pixels. "
+                                                                                      "Use this to reduce image size and token usage."}}}}},
                               {"additionalProperties", false}},
-                          nlohmann::json{{"readOnlyHint", true}},
-                          ActionFlags::ReadOnly,
-                          [applicationState](const nlohmann::json &arguments) {
+                          nlohmann::json{{"readOnlyHint", true}}, ActionFlags::ReadOnly, [applicationState](const nlohmann::json &arguments) {
                               return CaptureActiveViewport(applicationState, arguments);
                           }});
     }
