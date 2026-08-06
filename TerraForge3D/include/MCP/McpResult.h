@@ -11,12 +11,25 @@ struct McpResult {
     bool ok                    = true;
     nlohmann::json value       = nlohmann::json::object();
     nlohmann::json diagnostics = nlohmann::json::array();
+    nlohmann::json toolContent = nlohmann::json::array();
     std::string operationId;
 
     static McpResult Success(nlohmann::json result = nlohmann::json::object(), std::string operation = {})
     {
         McpResult response;
         response.value       = std::move(result);
+        response.operationId = std::move(operation);
+        return response;
+    }
+
+    static McpResult SuccessWithToolContent(
+        nlohmann::json result,
+        nlohmann::json content,
+        std::string operation = {})
+    {
+        McpResult response;
+        response.value       = std::move(result);
+        response.toolContent = std::move(content);
         response.operationId = std::move(operation);
         return response;
     }
@@ -48,6 +61,9 @@ struct McpResult {
 
     nlohmann::json ToToolContent() const
     {
+        if (!toolContent.empty())
+            return toolContent;
+
         nlohmann::json content = nlohmann::json::array();
         content.push_back({{"type", "text"},
                            {"text", ToEnvelope().dump()}});

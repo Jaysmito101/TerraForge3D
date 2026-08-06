@@ -3,6 +3,7 @@
 #include "MCP/Resources/CoreResources.h"
 #include "MCP/TerraForgeMcpServer.h"
 #include "MCP/Tools/CoreTools.h"
+#include "MCP/Tools/ViewportTools.h"
 #include "MCP/McpTransport.h"
 
 #include "Base/Logging/Logger.h"
@@ -86,6 +87,7 @@ TerraForgeMcpServer::TerraForgeMcpServer(
 {
     endpoint = "http://" + host + ":" + std::to_string(port) + "/mcp";
     RegisterMcpCoreTools(actions, applicationState);
+    RegisterMcpViewportTools(actions, applicationState);
     RegisterMcpCoreResources(resources, applicationState);
 }
 
