@@ -1,0 +1,8 @@
+{
+  "Name": "",
+  "Title": "",
+  "Description": "",
+  "InputSchema": { "$include": "Common/Object.json" },
+  "Annotations": {},
+  "Flags": ["None"]
+}

@@ -19,3 +19,7 @@ composition and runtime directives are removed before registration.
 Application data fields use PascalCase, including vector components such as
 `X`, `Y`, and `Z`. JSON Schema keywords remain lowercase as required by the
 JSON Schema specification.
+
+Tool metadata is also template-driven. Action templates under `Tools/**/Actions`
+define `Name`, `Title`, `Description`, `InputSchema`, `Annotations`, and
+`Flags`; C++ only supplies the invocation handler.

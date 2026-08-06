@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.viewport.update_state",
+  "Title": "Update viewport state",
+  "Description": "Update selected viewport state using a partial hierarchical object. You can change viewport mode and controls, camera settings, heightmap pan/zoom, or texture-slot settings. ViewportId is required. Read-only fields such as camera projection/clipping settings, render size, mouse position, and terrain hit position are returned by get_state but are not accepted here.",
+  "InputSchema": { "$include": "Tools/Viewport/Update.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

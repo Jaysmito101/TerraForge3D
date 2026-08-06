@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.viewport.capture",
+  "Title": "Capture viewport",
+  "Description": "Return the requested TerraForge3D viewport as a JPEG image. ViewportId is required. Optionally pass MaxDimension to downscale the image before encoding, which reduces image size and token usage; the aspect ratio is preserved and the image is never upscaled.",
+  "InputSchema": { "$include": "Tools/Viewport/Capture.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

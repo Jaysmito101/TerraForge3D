@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.viewport.list",
+  "Title": "List viewports",
+  "Description": "List all currently visible TerraForge3D viewports. Use the returned ViewportId with the get_state, update_state, and capture tools.",
+  "InputSchema": { "$include": "Tools/Viewport/List.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

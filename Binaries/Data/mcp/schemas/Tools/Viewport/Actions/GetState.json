@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.viewport.get_state",
+  "Title": "Get viewport state",
+  "Description": "Return the selected viewport's complete structured state. The state includes viewport layout and lifecycle flags, current mode, camera settings, heightmap controls, texture-slot controls, and interaction state. ViewportId is required.",
+  "InputSchema": { "$include": "Tools/Viewport/GetState.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

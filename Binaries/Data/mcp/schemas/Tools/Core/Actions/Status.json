@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.mcp.status",
+  "Title": "MCP status",
+  "Description": "Return the TerraForge3D MCP bridge status and protocol revision.",
+  "InputSchema": { "$include": "Tools/Core/Status.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}
