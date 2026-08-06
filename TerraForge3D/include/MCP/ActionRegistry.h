@@ -13,6 +13,8 @@
 namespace tf3d::mcp_layer
 {
 
+    using McpActionHandler = std::function<McpResult(const nlohmann::json &)>;
+
     enum class ActionFlags : uint32_t {
         None        = 0,
         ReadOnly    = 1u << 0,
@@ -29,8 +31,17 @@ namespace tf3d::mcp_layer
             {"properties", nlohmann::json::object()}};
         nlohmann::json annotations = nlohmann::json::object();
         ActionFlags flags          = ActionFlags::None;
-        std::function<McpResult(const nlohmann::json &)> invoke;
+        McpActionHandler invoke;
     };
+
+    std::optional<ActionEntry> CreateActionEntryFromJson(
+        const nlohmann::json &definition,
+        McpActionHandler invoke);
+
+    void RegisterActionFromJson(
+        class ActionRegistry &actions,
+        const std::optional<nlohmann::json> &definition,
+        McpActionHandler invoke);
 
     class ActionRegistry
     {
