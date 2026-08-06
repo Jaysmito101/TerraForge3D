@@ -16,44 +16,44 @@ namespace tf3d::renderer
     SerializerNode RendererViewport::Save() const
     {
         SerializerNode node = CreateSerializerNode();
-        node->Set("mode", std::string(RendererViewportModeToString(m_Mode)));
-        node->Set("camera", m_SceneMode.camera.Save());
+        node->Set("Mode", std::string(RendererViewportModeToString(m_Mode)));
+        node->Set("Camera", m_SceneMode.camera.Save());
         node->Set(
-            "positionOnTerrain",
+            "PositionOnTerrain",
             glm::vec4(m_SceneMode.positionOnTerrain[0], m_SceneMode.positionOnTerrain[1],
                       m_SceneMode.positionOnTerrain[2], m_SceneMode.positionOnTerrain[3]));
 
         SerializerNode heightmap = CreateSerializerNode();
-        heightmap->Set("offset", glm::vec2(m_HeightmapMode.offsetX, m_HeightmapMode.offsetY));
-        heightmap->Set("scale", m_HeightmapMode.scale);
-        node->Set("heightmap", heightmap);
+        heightmap->Set("Offset", glm::vec2(m_HeightmapMode.offsetX, m_HeightmapMode.offsetY));
+        heightmap->Set("Scale", m_HeightmapMode.scale);
+        node->Set("Heightmap", heightmap);
 
         SerializerNode textureSlot = CreateSerializerNode();
-        textureSlot->Set("offset", glm::vec2(m_TextureSlotMode.offsetX, m_TextureSlotMode.offsetY));
-        textureSlot->Set("scale", m_TextureSlotMode.scale);
-        textureSlot->Set("detailedMode", m_TextureSlotMode.detailedMode);
-        textureSlot->Set("textureSlot", m_TextureSlotMode.textureSlot);
+        textureSlot->Set("Offset", glm::vec2(m_TextureSlotMode.offsetX, m_TextureSlotMode.offsetY));
+        textureSlot->Set("Scale", m_TextureSlotMode.scale);
+        textureSlot->Set("DetailedMode", m_TextureSlotMode.detailedMode);
+        textureSlot->Set("TextureSlot", m_TextureSlotMode.textureSlot);
         std::vector<SerializerNode> channels;
         channels.reserve(m_TextureSlotMode.detailed.size());
         for (const auto &[slot, channel] : m_TextureSlotMode.detailed) {
             SerializerNode detail = CreateSerializerNode();
-            detail->Set("textureSlot", slot);
-            detail->Set("channel", channel);
+            detail->Set("TextureSlot", slot);
+            detail->Set("Channel", channel);
             channels.push_back(detail);
         }
-        textureSlot->Set("channels", channels);
-        node->Set("textureSlot", textureSlot);
+        textureSlot->Set("Channels", channels);
+        node->Set("TextureSlot", textureSlot);
 
         SerializerNode render = CreateSerializerNode();
-        render->Set("width", m_Shared.width);
-        render->Set("height", m_Shared.height);
-        render->Set("aspectRatio", m_Shared.aspectRatio);
-        node->Set("render", render);
+        render->Set("Width", m_Shared.width);
+        render->Set("Height", m_Shared.height);
+        render->Set("AspectRatio", m_Shared.aspectRatio);
+        node->Set("Render", render);
 
         SerializerNode interaction = CreateSerializerNode();
-        interaction->Set("mousePosition", glm::vec2(m_Shared.mousePosition[0], m_Shared.mousePosition[1]));
-        interaction->Set("hovered", m_Shared.isHovered);
-        node->Set("interaction", interaction);
+        interaction->Set("MousePosition", glm::vec2(m_Shared.mousePosition[0], m_Shared.mousePosition[1]));
+        interaction->Set("Hovered", m_Shared.isHovered);
+        node->Set("Interaction", interaction);
         return node;
     }
 
@@ -62,50 +62,50 @@ namespace tf3d::renderer
         if (!data)
             return;
 
-        if (data->HasKey("mode")) {
+        if (data->HasKey("Mode")) {
             RendererViewportMode mode;
-            if (TryParseRendererViewportMode(data->Get<std::string>("mode"), mode))
+            if (TryParseRendererViewportMode(data->Get<std::string>("Mode"), mode))
                 m_Mode = mode;
         }
-        if (const SerializerNode camera = data->Get<SerializerNode>("camera"))
+        if (const SerializerNode camera = data->Get<SerializerNode>("Camera"))
             m_SceneMode.camera.Load(camera);
 
-        if (data->HasKey("positionOnTerrain")) {
-            const glm::vec4 position      = data->Get<glm::vec4>("positionOnTerrain");
+        if (data->HasKey("PositionOnTerrain")) {
+            const glm::vec4 position      = data->Get<glm::vec4>("PositionOnTerrain");
             m_SceneMode.positionOnTerrain = {position.x, position.y, position.z, position.w};
         }
 
-        if (const SerializerNode heightmap = data->Get<SerializerNode>("heightmap")) {
+        if (const SerializerNode heightmap = data->Get<SerializerNode>("Heightmap")) {
             const glm::vec2 offset = heightmap->Get<glm::vec2>(
-                "offset", glm::vec2(m_HeightmapMode.offsetX, m_HeightmapMode.offsetY));
+                "Offset", glm::vec2(m_HeightmapMode.offsetX, m_HeightmapMode.offsetY));
             m_HeightmapMode.offsetX = offset.x;
             m_HeightmapMode.offsetY = offset.y;
             m_HeightmapMode.scale   = std::max(
-                heightmap->Get<float>("scale", m_HeightmapMode.scale), 0.0000001f);
+                heightmap->Get<float>("Scale", m_HeightmapMode.scale), 0.0000001f);
         }
 
-        if (const SerializerNode textureSlot = data->Get<SerializerNode>("textureSlot")) {
+        if (const SerializerNode textureSlot = data->Get<SerializerNode>("TextureSlot")) {
             const glm::vec2 offset = textureSlot->Get<glm::vec2>(
-                "offset", glm::vec2(m_TextureSlotMode.offsetX, m_TextureSlotMode.offsetY));
+                "Offset", glm::vec2(m_TextureSlotMode.offsetX, m_TextureSlotMode.offsetY));
             m_TextureSlotMode.offsetX = offset.x;
             m_TextureSlotMode.offsetY = offset.y;
             m_TextureSlotMode.scale   = std::max(
-                textureSlot->Get<float>("scale", m_TextureSlotMode.scale), 0.0000001f);
+                textureSlot->Get<float>("Scale", m_TextureSlotMode.scale), 0.0000001f);
             m_TextureSlotMode.detailedMode = textureSlot->Get<bool>(
-                "detailedMode", m_TextureSlotMode.detailedMode);
+                "DetailedMode", m_TextureSlotMode.detailedMode);
             m_TextureSlotMode.textureSlot = std::clamp(
-                textureSlot->Get<int>("textureSlot", m_TextureSlotMode.textureSlot), 0, 5);
+                textureSlot->Get<int>("TextureSlot", m_TextureSlotMode.textureSlot), 0, 5);
 
-            const auto channels = textureSlot->Get<std::vector<SerializerNode>>("channels");
+            const auto channels = textureSlot->Get<std::vector<SerializerNode>>("Channels");
             if (!channels.empty()) {
                 const size_t count = std::min(channels.size(), m_TextureSlotMode.detailed.size());
                 for (size_t index = 0; index < count; ++index) {
                     m_TextureSlotMode.detailed[index] = {
                         std::clamp(channels[index]->Get<int>(
-                                       "textureSlot", m_TextureSlotMode.detailed[index].first),
+                                       "TextureSlot", m_TextureSlotMode.detailed[index].first),
                                    0, 5),
                         std::clamp(channels[index]->Get<int>(
-                                       "channel", m_TextureSlotMode.detailed[index].second),
+                                       "Channel", m_TextureSlotMode.detailed[index].second),
                                    0, 3)};
                 }
             }

@@ -341,10 +341,10 @@ namespace tf3d::misc
         node->Set("ISpeed", m_ISpeed);
         node->Set("FSeed", m_FSpeed);
         node->Set("ID", m_ID);
-        node->Set("Contraints_0", m_Constratins[0]);
-        node->Set("Contraints_1", m_Constratins[1]);
-        node->Set("Contraints_2", m_Constratins[2]);
-        node->Set("Contraints_3", m_Constratins[3]);
+        node->Set("Constraints0", m_Constratins[0]);
+        node->Set("Constraints1", m_Constratins[1]);
+        node->Set("Constraints2", m_Constratins[2]);
+        node->Set("Constraints3", m_Constratins[3]);
         if (m_UseRenderOnCondition) {
             node->Set("RenderOnConditionValue", m_RenderOnConditionValue);
             node->Set("RenderOnConditionName", m_RenderOnConditionName);
@@ -369,10 +369,10 @@ namespace tf3d::misc
             m_SeedHistory = node->Get<std::vector<int>>("SeedHistory", m_SeedHistory);
         m_ISpeed               = node->Get<int>("ISpeed", m_ISpeed);
         m_FSpeed               = node->Get<float>("FSeed", m_FSpeed);
-        m_Constratins[0]       = node->Get<float>("Contraints_0", m_Constratins[0]);
-        m_Constratins[1]       = node->Get<float>("Contraints_1", m_Constratins[1]);
-        m_Constratins[2]       = node->Get<float>("Contraints_2", m_Constratins[2]);
-        m_Constratins[3]       = node->Get<float>("Contraints_3", m_Constratins[3]);
+        m_Constratins[0]       = node->Get<float>("Constraints0", m_Constratins[0]);
+        m_Constratins[1]       = node->Get<float>("Constraints1", m_Constratins[1]);
+        m_Constratins[2]       = node->Get<float>("Constraints2", m_Constratins[2]);
+        m_Constratins[3]       = node->Get<float>("Constraints3", m_Constratins[3]);
         m_UseRenderOnCondition = node->Get<bool>("UseRenderOnCondition", false);
         if (m_UseRenderOnCondition) {
             m_RenderOnConditionValue  = node->Get<int>("RenderOnConditionValue", m_RenderOnConditionValue);

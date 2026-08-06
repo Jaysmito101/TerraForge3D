@@ -30,17 +30,17 @@ namespace tf3d::misc
     {
         SerializerNode state    = m_RendererViewport->Save();
         SerializerNode viewport = CreateSerializerNode();
-        viewport->Set("id", static_cast<int>(m_ID));
-        viewport->Set("visible", m_IsVisible);
-        viewport->Set("active", m_IsActive);
-        viewport->Set("controlEnabled", m_IsControlEnabled);
-        viewport->Set("autoCalculateAspectRatio", m_AutoCalculateAspectRatio);
+        viewport->Set("ID", static_cast<int>(m_ID));
+        viewport->Set("Visible", m_IsVisible);
+        viewport->Set("Active", m_IsActive);
+        viewport->Set("ControlEnabled", m_IsControlEnabled);
+        viewport->Set("AutoCalculateAspectRatio", m_AutoCalculateAspectRatio);
 
         SerializerNode display = CreateSerializerNode();
-        display->Set("width", m_Width);
-        display->Set("height", m_Height);
-        viewport->Set("display", display);
-        state->Set("viewport", viewport);
+        display->Set("Width", m_Width);
+        display->Set("Height", m_Height);
+        viewport->Set("Display", display);
+        state->Set("Viewport", viewport);
         return state;
     }
 
@@ -49,15 +49,15 @@ namespace tf3d::misc
         if (!data)
             return;
 
-        if (const SerializerNode viewport = data->Get<SerializerNode>("viewport")) {
-            m_IsVisible                = viewport->Get<bool>("visible", m_IsVisible);
-            m_IsActive                 = viewport->Get<bool>("active", m_IsActive);
-            m_IsControlEnabled         = viewport->Get<bool>("controlEnabled", m_IsControlEnabled);
+        if (const SerializerNode viewport = data->Get<SerializerNode>("Viewport")) {
+            m_IsVisible                = viewport->Get<bool>("Visible", m_IsVisible);
+            m_IsActive                 = viewport->Get<bool>("Active", m_IsActive);
+            m_IsControlEnabled         = viewport->Get<bool>("ControlEnabled", m_IsControlEnabled);
             m_AutoCalculateAspectRatio = viewport->Get<bool>(
-                "autoCalculateAspectRatio", m_AutoCalculateAspectRatio);
-            if (const SerializerNode display = viewport->Get<SerializerNode>("display")) {
-                m_Width  = display->Get<float>("width", m_Width);
-                m_Height = display->Get<float>("height", m_Height);
+                "AutoCalculateAspectRatio", m_AutoCalculateAspectRatio);
+            if (const SerializerNode display = viewport->Get<SerializerNode>("Display")) {
+                m_Width  = display->Get<float>("Width", m_Width);
+                m_Height = display->Get<float>("Height", m_Height);
             }
         }
         m_RendererViewport->Load(data);
