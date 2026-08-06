@@ -13,6 +13,11 @@
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
+namespace tf3d::base
+{
+    class Shader;
+}
+
 namespace tf3d::misc
 {
 
@@ -503,6 +508,23 @@ namespace tf3d::misc
         {
             m_VariableName = variableName;
         }
+        inline void SetShaderUniformName(const std::string &uniformName)
+        {
+            m_ShaderUniformName       = uniformName;
+            m_ShaderUniformConfigured = true;
+        }
+        inline void DisableShaderUniform()
+        {
+            SetShaderUniformName("");
+        }
+        inline bool IsShaderUniformConfigured() const
+        {
+            return m_ShaderUniformConfigured;
+        }
+        inline const std::string &GetShaderUniformName() const
+        {
+            return m_ShaderUniformName;
+        }
         inline void SetActionName(const std::string &actionName)
         {
             m_VariableName = actionName;
@@ -565,6 +587,7 @@ namespace tf3d::misc
     private:
         std::string m_Label              = "";
         std::string m_VariableName       = "";
+        std::string m_ShaderUniformName  = "";
         std::string m_FontName           = "";
         CustomInspectorWidgetType m_Type = CustomInspectorWidgetType::Unknown;
         float m_Constratins[4]           = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -575,6 +598,7 @@ namespace tf3d::misc
         std::vector<std::string> m_DropdownOptions;
         std::vector<int32_t> m_DropdownValues;
         std::string m_ID                    = "";
+        bool m_ShaderUniformConfigured      = false;
         bool m_UseRenderOnCondition         = false;
         std::string m_RenderOnConditionName = "";
         int32_t m_RenderOnConditionValue    = 0;
@@ -664,6 +688,7 @@ namespace tf3d::misc
         bool LoadConfig(ApplicationState *appState, std::string_view inspectorName);
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
+        void ApplyToShader(tf3d::base::Shader &shader, std::string_view uniformPrefix = "u_") const;
 
         inline void Reset()
         {

@@ -1,5 +1,6 @@
 #include "Misc/CustomInspector.h"
 #include "Base/Base.h"
+#include "Base/Shader.h"
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "UI/ImGuiComponents.h"
@@ -413,6 +414,9 @@ namespace tf3d::misc
         node->Set("TypeName", CustomInspectorWidgetTypeToString(m_Type));
         node->Set("TargetVariable", m_VariableName);
         node->Set("Label", m_Label);
+        node->Set("ShaderUniformConfigured", m_ShaderUniformConfigured);
+        if (m_ShaderUniformConfigured)
+            node->Set("ShaderUniformName", m_ShaderUniformName);
         if (m_Type == CustomInspectorWidgetType::Seed)
             node->Set("SeedHistory", m_SeedHistory);
         node->Set("ISpeed", m_ISpeed);
@@ -442,10 +446,12 @@ namespace tf3d::misc
 
     void CustomInspectorWidget::Load(SerializerNode node)
     {
-        m_Type         = CustomInspectorWidgetTypeFromString(node->Get<std::string>("TypeName", CustomInspectorWidgetTypeToString(m_Type)));
-        m_VariableName = node->Get<std::string>("TargetVariable", m_VariableName);
-        m_Label        = node->Get<std::string>("Label", m_Label);
-        m_ID           = node->Get<std::string>("ID", m_ID);
+        m_Type                    = CustomInspectorWidgetTypeFromString(node->Get<std::string>("TypeName", CustomInspectorWidgetTypeToString(m_Type)));
+        m_VariableName            = node->Get<std::string>("TargetVariable", m_VariableName);
+        m_Label                   = node->Get<std::string>("Label", m_Label);
+        m_ShaderUniformConfigured = node->Get<bool>("ShaderUniformConfigured", false);
+        m_ShaderUniformName       = node->Get<std::string>("ShaderUniformName", m_ShaderUniformName);
+        m_ID                      = node->Get<std::string>("ID", m_ID);
         if (m_Type == CustomInspectorWidgetType::Seed)
             m_SeedHistory = node->Get<std::vector<int>>("SeedHistory", m_SeedHistory);
         m_ISpeed               = node->Get<int>("ISpeed", m_ISpeed);
@@ -1257,6 +1263,12 @@ namespace tf3d::misc
                                 widget.SetConstraints(c0, c1, c2, c3);
                             }
                         }
+                        if (parameter.contains("ShaderUniform")) {
+                            if (parameter["ShaderUniform"].is_string())
+                                widget.SetShaderUniformName(parameter["ShaderUniform"].get<std::string>());
+                            else
+                                TF3D_LOG_WARN("Inspector parameter '{}' has an invalid ShaderUniform; expected a string", value.GetName());
+                        }
                         if (parameter.contains("Tooltip"))
                             widget.SetTooltip(parameter["Tooltip"].get<std::string>());
                         else if (parameter.contains("Description"))
@@ -1338,6 +1350,59 @@ namespace tf3d::misc
         if (!hasContent)
             AddWidget("No parameters available", CustomInspectorWidgetType::Text);
         return true;
+    }
+
+    void CustomInspector::ApplyToShader(tf3d::base::Shader &shader, std::string_view uniformPrefix) const
+    {
+        for (const auto &[name, value] : m_Values) {
+            const CustomInspectorWidget *widget = nullptr;
+            for (const auto &widgetLabel : m_WidgetsOrder) {
+                const auto widgetIterator = m_Widgets.find(widgetLabel);
+                if (widgetIterator == m_Widgets.end() || widgetIterator->second.m_VariableName != name)
+                    continue;
+                if (widget == nullptr || widgetIterator->second.m_ShaderUniformConfigured)
+                    widget = &widgetIterator->second;
+                if (widget->m_ShaderUniformConfigured)
+                    break;
+            }
+
+            const std::string uniformName = widget != nullptr && widget->m_ShaderUniformConfigured
+                                                ? widget->m_ShaderUniformName
+                                                : std::string(uniformPrefix) + name;
+            if (uniformName.empty())
+                continue;
+
+            switch (value.GetType()) {
+                case CustomInspectorValueType::Int:
+                    shader.SetUniform1i(uniformName, value.Get<int32_t>());
+                    break;
+                case CustomInspectorValueType::Float:
+                    shader.SetUniform1f(uniformName, value.Get<float>());
+                    break;
+                case CustomInspectorValueType::Bool:
+                    shader.SetUniform1i(uniformName, value.Get<bool>() ? 1 : 0);
+                    break;
+                case CustomInspectorValueType::Vector2:
+                    shader.SetUniform2f(uniformName, value.Get<glm::vec2>());
+                    break;
+                case CustomInspectorValueType::Vector3:
+                    shader.SetUniform3f(uniformName, value.Get<glm::vec3>());
+                    break;
+                case CustomInspectorValueType::Vector4: {
+                    const glm::vec4 vector = value.Get<glm::vec4>();
+                    shader.SetUniform4f(uniformName, vector.x, vector.y, vector.z, vector.w);
+                    break;
+                }
+                case CustomInspectorValueType::String:
+                case CustomInspectorValueType::Texture:
+                case CustomInspectorValueType::Path:
+                case CustomInspectorValueType::Curve:
+                case CustomInspectorValueType::Unknown:
+                case CustomInspectorValueType::Count:
+                default:
+                    break;
+            }
+        }
     }
 
     bool CustomInspector::RenderWidget(const std::string &widgetLabel)
