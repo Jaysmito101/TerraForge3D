@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 
+using namespace tf3d::base;
+
 int main(int argc, char **argv)
 {
     Application *app = CreateApplication();

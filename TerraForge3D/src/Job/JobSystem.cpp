@@ -1,7 +1,7 @@
 #include "Job/JobSystem.h"
 #include "Job/Job.h"
 
-namespace JobSystem
+namespace tf3d::job
 {
 
     JobSystem::JobSystem(ApplicationState *appState)
@@ -129,4 +129,4 @@ namespace JobSystem
         }
     }
 
-} // namespace JobSystem
+} // namespace tf3d::job

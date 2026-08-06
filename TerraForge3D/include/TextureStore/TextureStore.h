@@ -3,71 +3,76 @@
 #include <string>
 #include <vector>
 
-#include "Base/Texture2D.h"
+#include "Base/Base.h"
 
 #include <nlohmann/json.hpp>
 
-class ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
-struct TextureStoreItem {
-    std::string name   = "";
-    int download_count = 0;
-
-    std::string thumbnailPath = "";
-    Texture2D *texThumbnail   = nullptr;
-
-    std::string baseDir = "";
-
-    std::string abledo    = "";
-    std::string normal    = "";
-    std::string roughness = "";
-    std::string metallic  = "";
-    std::string ao        = "";
-    std::string arm       = "";
-
-    bool downloaded = false;
-
-    std::vector<std::string> authours = {};
-};
-
-class TextureStore
+namespace tf3d::texture_store
 {
-public:
-    TextureStore(ApplicationState *appState);
-    ~TextureStore();
 
-    void ShowSettings(bool *pOpen);
+    struct TextureStoreItem {
+        std::string name   = "";
+        int download_count = 0;
 
-    void DownloadTexture(int id, int res);
-    void DeleteTexture(int id);
+        std::string thumbnailPath = "";
+        Texture2D *texThumbnail   = nullptr;
 
-    void SaveDownloadsDatabase();
+        std::string baseDir = "";
 
-    inline static TextureStore *Get()
+        std::string abledo    = "";
+        std::string normal    = "";
+        std::string roughness = "";
+        std::string metallic  = "";
+        std::string ao        = "";
+        std::string arm       = "";
+
+        bool downloaded = false;
+
+        std::vector<std::string> authours = {};
+    };
+
+    class TextureStore
     {
-        return sInstance;
-    }
+    public:
+        TextureStore(ApplicationState *appState);
+        ~TextureStore();
 
-private:
-    void LoadTextureThumbs();
-    void VerifyTextureThumbs();
-    void LoadTextureDatabase();
-    nlohmann::json LoadDownloadedTextureDatabaseJ();
-    nlohmann::json LoadTextureDatabaseJ();
+        void ShowSettings(bool *pOpen);
 
-    void ShowAllTexturesSettings();
-    void ShowDownloadedTexturesSettings();
+        void DownloadTexture(int id, int res);
+        void DeleteTexture(int id);
 
-private:
-    static TextureStore *sInstance;
-    nlohmann::json textureDatabaseJ;
-    nlohmann::json downloadedTextureDatabaseJ;
-    std::string uid;
+        void SaveDownloadsDatabase();
 
-    char searchStr[4096];
+        inline static TextureStore *Get()
+        {
+            return sInstance;
+        }
 
-public:
-    std::vector<TextureStoreItem> textureStoreItems;
-    std::vector<int> downloadedTextureStoreItems;
-    ApplicationState *appState;
-};
+    private:
+        void LoadTextureThumbs();
+        void VerifyTextureThumbs();
+        void LoadTextureDatabase();
+        nlohmann::json LoadDownloadedTextureDatabaseJ();
+        nlohmann::json LoadTextureDatabaseJ();
+
+        void ShowAllTexturesSettings();
+        void ShowDownloadedTexturesSettings();
+
+    private:
+        static TextureStore *sInstance;
+        nlohmann::json textureDatabaseJ;
+        nlohmann::json downloadedTextureDatabaseJ;
+        std::string uid;
+
+        char searchStr[4096];
+
+    public:
+        std::vector<TextureStoreItem> textureStoreItems;
+        std::vector<int> downloadedTextureStoreItems;
+        ApplicationState *appState;
+    };
+
+} // namespace tf3d::texture_store

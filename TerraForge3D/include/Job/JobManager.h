@@ -5,9 +5,13 @@
 #include "Job/JobSystem.h"
 #include "Job/Thread.h"
 
-class ApplicationState;
+namespace tf3d::data
+{
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-namespace JobSystem
+namespace tf3d::job
 {
     class JobManager
     {
@@ -31,4 +35,5 @@ namespace JobSystem
         bool m_IsVisible             = false;
     };
 
-} // namespace JobSystem
+} // namespace tf3d::job
+namespace JobSystem = tf3d::job;

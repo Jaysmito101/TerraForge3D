@@ -1,23 +1,29 @@
 #include <fstream>
 #include <iostream>
 
-class LoggingOutputStreambuf : public std::streambuf
+namespace tf3d::base
 {
-    std::streambuf *myDest;
-    std::ofstream myLogFile;
-    std::ostream *myOwner;
 
-protected:
-    int overflow(int ch);
+    class LoggingOutputStreambuf : public std::streambuf
+    {
+        std::streambuf *myDest;
+        std::ofstream myLogFile;
+        std::ostream *myOwner;
 
-public:
-    LoggingOutputStreambuf(
-        std::streambuf *dest,
-        std::string const &logfileName);
+    protected:
+        int overflow(int ch);
 
-    LoggingOutputStreambuf(
-        std::ostream &dest,
-        std::string const &logfileName);
+    public:
+        LoggingOutputStreambuf(
+            std::streambuf *dest,
+            std::string const &logfileName);
 
-    ~LoggingOutputStreambuf();
-};
+        LoggingOutputStreambuf(
+            std::ostream &dest,
+            std::string const &logfileName);
+
+        ~LoggingOutputStreambuf();
+    };
+
+} // namespace tf3d::base
+using tf3d::base::LoggingOutputStreambuf;

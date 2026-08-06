@@ -3,7 +3,7 @@
 #include "Base/Base.h"
 #include <condition_variable>
 
-namespace JobSystem
+namespace tf3d::job
 {
     class Job;
 
@@ -38,4 +38,5 @@ namespace JobSystem
         std::condition_variable condVar;
     };
 
-} // namespace JobSystem
+} // namespace tf3d::job
+namespace JobSystem = tf3d::job;

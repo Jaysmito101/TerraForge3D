@@ -11,23 +11,29 @@
 #define TEXTURE_CUBEMAP_PZ 4
 #define TEXTURE_CUBEMAP_NZ 5
 
-class TextureCubemap
+namespace tf3d::base
 {
-public:
-    TextureCubemap();
-    ~TextureCubemap();
 
-    void SetUpOnGPU();
-    bool LoadFaces(std::vector<std::string> paths);
-    bool LoadFace(std::string path, int face);
-    void DeleteData();
-    bool UploadFaceToGPU(int face);
-    void UploadDataToGPU();
-    void Bind(int slot);
+    class TextureCubemap
+    {
+    public:
+        TextureCubemap();
+        ~TextureCubemap();
 
-    Texture2D *textures[6];
-    unsigned char *facesData[6];
-    IVec2 facesSizes[6];
-    uint32_t rendereID;
-    std::vector<std::string> faces;
-};
+        void SetUpOnGPU();
+        bool LoadFaces(std::vector<std::string> paths);
+        bool LoadFace(std::string path, int face);
+        void DeleteData();
+        bool UploadFaceToGPU(int face);
+        void UploadDataToGPU();
+        void Bind(int slot);
+
+        Texture2D *textures[6];
+        unsigned char *facesData[6];
+        IVec2 facesSizes[6];
+        uint32_t rendereID;
+        std::vector<std::string> faces;
+    };
+
+} // namespace tf3d::base
+using tf3d::base::TextureCubemap;

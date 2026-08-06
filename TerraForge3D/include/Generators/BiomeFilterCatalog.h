@@ -2,21 +2,31 @@
 
 #include "Generators/BiomeFilterDefinition.h"
 
-class ApplicationState;
-
-class BiomeFilterCatalog
+namespace tf3d::data
 {
-public:
-    BiomeFilterCatalog(ApplicationState *appState);
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    bool Reload();
-    inline const std::vector<std::shared_ptr<BiomeFilterDefinition>> &GetDefinitions() const
+namespace tf3d::generators
+{
+
+    class BiomeFilterCatalog
     {
-        return m_Definitions;
-    }
-    std::shared_ptr<BiomeFilterDefinition> FindByID(const std::string &id) const;
+    public:
+        BiomeFilterCatalog(ApplicationState *appState);
 
-private:
-    ApplicationState *m_AppState = nullptr;
-    std::vector<std::shared_ptr<BiomeFilterDefinition>> m_Definitions;
-};
+        bool Reload();
+        inline const std::vector<std::shared_ptr<BiomeFilterDefinition>> &GetDefinitions() const
+        {
+            return m_Definitions;
+        }
+        std::shared_ptr<BiomeFilterDefinition> FindByID(const std::string &id) const;
+
+    private:
+        ApplicationState *m_AppState = nullptr;
+        std::vector<std::shared_ptr<BiomeFilterDefinition>> m_Definitions;
+    };
+
+} // namespace tf3d::generators
+using tf3d::generators::BiomeFilterCatalog;

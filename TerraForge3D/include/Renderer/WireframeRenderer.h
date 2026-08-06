@@ -2,18 +2,21 @@
 
 #include "Renderer/RendererBase.h"
 
-class WireframeRenderer : public RendererBase
+namespace tf3d::renderer
 {
-public:
-    WireframeRenderer(ApplicationState *appState);
-    virtual ~WireframeRenderer();
+    class WireframeRenderer : public RendererBase
+    {
+    public:
+        WireframeRenderer(ApplicationState *appState);
+        virtual ~WireframeRenderer();
 
-    virtual void Render(RendererViewport *viewport) override;
-    virtual void ShowSettings() override;
+        virtual void Render(RendererViewport *viewport) override;
+        virtual void ShowSettings() override;
 
-protected:
-    virtual void ReloadShaders() override;
+    protected:
+        virtual void ReloadShaders() override;
 
-private:
-    bool m_InvertNormals = false;
-};
+    private:
+        bool m_InvertNormals = false;
+    };
+} // namespace tf3d::renderer

@@ -2,22 +2,35 @@
 #include <sstream>
 #include <string>
 
-class Mesh;
-class BinaryFileWriter;
-
-class PLYExporter
+namespace tf3d::base
 {
-public:
-    PLYExporter();
-    ~PLYExporter();
+    class Mesh;
+}
+using tf3d::base::Mesh;
+namespace tf3d::base
+{
+    class BinaryFileWriter;
+}
+using tf3d::base::BinaryFileWriter;
 
-    bool ExportASCII(const std::string &path, Mesh *mesh, float *progress = nullptr);
-    bool ExportBinary(const std::string &path, Mesh *mesh, float *progress = nullptr);
+namespace tf3d::exporters
+{
 
-private:
-    bool WriteHeader(BinaryFileWriter *writer, const std::string &format, Mesh *mesh);
+    class PLYExporter
+    {
+    public:
+        PLYExporter();
+        ~PLYExporter();
 
-private:
-    float m_Progress  = 0.0f;
-    char buffer[4096] = {};
-};
+        bool ExportASCII(const std::string &path, Mesh *mesh, float *progress = nullptr);
+        bool ExportBinary(const std::string &path, Mesh *mesh, float *progress = nullptr);
+
+    private:
+        bool WriteHeader(BinaryFileWriter *writer, const std::string &format, Mesh *mesh);
+
+    private:
+        float m_Progress  = 0.0f;
+        char buffer[4096] = {};
+    };
+} // namespace tf3d::exporters
+using tf3d::exporters::PLYExporter;

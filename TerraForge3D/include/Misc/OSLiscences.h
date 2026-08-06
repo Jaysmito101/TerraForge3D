@@ -3,20 +3,30 @@
 #include <string>
 #include <vector>
 
-class ApplicationState;
-
-class OSLiscences
+namespace tf3d::data
 {
-public:
-    OSLiscences(ApplicationState *appState);
-    ~OSLiscences();
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    void ShowSettings(bool *pOpen);
+namespace tf3d::misc
+{
 
-private:
-    void ShowLisc(std::string &name, std::string &content, int id);
+    class OSLiscences
+    {
+    public:
+        OSLiscences(ApplicationState *appState);
+        ~OSLiscences();
 
-public:
-    ApplicationState *appState;
-    std::vector<std::pair<std::string, std::string>> osls;
-};
+        void ShowSettings(bool *pOpen);
+
+    private:
+        void ShowLisc(std::string &name, std::string &content, int id);
+
+    public:
+        ApplicationState *appState;
+        std::vector<std::pair<std::string, std::string>> osls;
+    };
+
+} // namespace tf3d::misc
+using tf3d::misc::OSLiscences;

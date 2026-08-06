@@ -5,27 +5,33 @@
 
 #include <string>
 
-class Model
+namespace tf3d::base
 {
-public:
-    Model(std::string name);
-    ~Model();
 
-    void Update();
-    void SetupMeshOnGPU();
-    void UploadToGPU();
-    void Render();
+    class Model
+    {
+    public:
+        Model(std::string name);
+        ~Model();
 
-    glm::vec3 position    = glm::vec3(0.0f);
-    glm::vec3 rotation    = glm::vec3(0.0f);
-    glm::vec3 scale       = glm::vec3(1.0f);
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
-    bool isGeneratedPlane = false;
-    float planeSolidDepth = 0.1f;
-    Mesh *mesh;
-    std::string name;
-    uint32_t vao;
-    uint32_t vbo;
-    uint32_t ebo;
-    std::string path = "";
-};
+        void Update();
+        void SetupMeshOnGPU();
+        void UploadToGPU();
+        void Render();
+
+        glm::vec3 position    = glm::vec3(0.0f);
+        glm::vec3 rotation    = glm::vec3(0.0f);
+        glm::vec3 scale       = glm::vec3(1.0f);
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+        bool isGeneratedPlane = false;
+        float planeSolidDepth = 0.1f;
+        Mesh *mesh;
+        std::string name;
+        uint32_t vao;
+        uint32_t vbo;
+        uint32_t ebo;
+        std::string path = "";
+    };
+
+} // namespace tf3d::base
+using tf3d::base::Model;

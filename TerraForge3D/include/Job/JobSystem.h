@@ -5,9 +5,13 @@
 
 #define TERR3D_THREAD_POOL_MAX_SIZE 64
 
-class ApplicationState;
+namespace tf3d::data
+{
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-namespace JobSystem
+namespace tf3d::job
 {
     class Job;
 
@@ -53,4 +57,5 @@ namespace JobSystem
         Thread threadPool[TERR3D_THREAD_POOL_MAX_SIZE];
     };
 
-} // namespace JobSystem
+} // namespace tf3d::job
+namespace JobSystem = tf3d::job;

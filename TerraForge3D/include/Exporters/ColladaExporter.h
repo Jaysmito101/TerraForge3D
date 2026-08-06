@@ -2,22 +2,31 @@
 #include <sstream>
 #include <string>
 
-class Mesh;
-
-class ColladaExporter
+namespace tf3d::base
 {
-public:
-    ColladaExporter();
-    ~ColladaExporter();
+    class Mesh;
+}
+using tf3d::base::Mesh;
 
-    bool Export(const std::string &path, Mesh *mesh, float *progress = nullptr);
+namespace tf3d::exporters
+{
 
-private:
-    bool PrepareTexCoords(Mesh *mesh, std::stringstream &strm);
-    bool PrepareVertices(Mesh *mesh, std::stringstream &strm);
-    bool PrepareIndices(Mesh *mesh, std::stringstream &strm);
+    class ColladaExporter
+    {
+    public:
+        ColladaExporter();
+        ~ColladaExporter();
 
-private:
-    float m_Progress  = 0.0f;
-    char buffer[4096] = {};
-};
+        bool Export(const std::string &path, Mesh *mesh, float *progress = nullptr);
+
+    private:
+        bool PrepareTexCoords(Mesh *mesh, std::stringstream &strm);
+        bool PrepareVertices(Mesh *mesh, std::stringstream &strm);
+        bool PrepareIndices(Mesh *mesh, std::stringstream &strm);
+
+    private:
+        float m_Progress  = 0.0f;
+        char buffer[4096] = {};
+    };
+} // namespace tf3d::exporters
+using tf3d::exporters::ColladaExporter;

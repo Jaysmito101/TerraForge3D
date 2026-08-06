@@ -5,26 +5,37 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 
-class ApplicationState;
-
-struct SimpleBiomeMixerSettings {
-    bool enabled      = true;
-    float strength    = 1.0f;
-    bool useBiomeMask = false;
-};
-
-class SimpleBiomeMixer
+namespace tf3d::data
 {
-public:
-    SimpleBiomeMixer(ApplicationState *state);
-    ~SimpleBiomeMixer();
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    void Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer);
-    bool ShowSettings();
+namespace tf3d::generators
+{
 
-private:
-    ApplicationState *m_AppState = nullptr;
-    std::shared_ptr<ComputeShader> m_Shader;
-    std::unordered_map<std::string, SimpleBiomeMixerSettings> m_BiomeSettings;
-    bool m_RequireUpdation = true;
-};
+    struct SimpleBiomeMixerSettings {
+        bool enabled      = true;
+        float strength    = 1.0f;
+        bool useBiomeMask = false;
+    };
+
+    class SimpleBiomeMixer
+    {
+    public:
+        SimpleBiomeMixer(ApplicationState *state);
+        ~SimpleBiomeMixer();
+
+        void Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer);
+        bool ShowSettings();
+
+    private:
+        ApplicationState *m_AppState = nullptr;
+        std::shared_ptr<ComputeShader> m_Shader;
+        std::unordered_map<std::string, SimpleBiomeMixerSettings> m_BiomeSettings;
+        bool m_RequireUpdation = true;
+    };
+
+} // namespace tf3d::generators
+using tf3d::generators::SimpleBiomeMixer;
+using tf3d::generators::SimpleBiomeMixerSettings;

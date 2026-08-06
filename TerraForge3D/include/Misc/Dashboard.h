@@ -1,35 +1,45 @@
 #pragma once
 
-class ApplicationState;
-
-class Dashboard
+namespace tf3d::data
 {
-public:
-    Dashboard(ApplicationState *appState);
-    ~Dashboard();
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    void Update();
-    void ShowSettings();
+namespace tf3d::misc
+{
 
-    inline bool IsWindowVisible() const
+    class Dashboard
     {
-        return m_IsWindowVisible;
-    }
-    inline bool *IsWindowVisiblePtr()
-    {
-        return &m_IsWindowVisible;
-    } // For ImGui::Checkbox
-    inline void SetWindowVisible(bool visible)
-    {
-        m_IsWindowVisible = visible;
-    }
+    public:
+        Dashboard(ApplicationState *appState);
+        ~Dashboard();
 
-private:
-    void CalculateTileSizeAndOffset();
-    void ShowChooseBaseModelPopup();
+        void Update();
+        void ShowSettings();
 
-private:
-    ApplicationState *m_AppState = nullptr;
-    bool m_IsWindowVisible       = true;
-    bool m_ForceUpdate           = false;
-};
+        inline bool IsWindowVisible() const
+        {
+            return m_IsWindowVisible;
+        }
+        inline bool *IsWindowVisiblePtr()
+        {
+            return &m_IsWindowVisible;
+        } // For ImGui::Checkbox
+        inline void SetWindowVisible(bool visible)
+        {
+            m_IsWindowVisible = visible;
+        }
+
+    private:
+        void CalculateTileSizeAndOffset();
+        void ShowChooseBaseModelPopup();
+
+    private:
+        ApplicationState *m_AppState = nullptr;
+        bool m_IsWindowVisible       = true;
+        bool m_ForceUpdate           = false;
+    };
+
+} // namespace tf3d::misc
+using tf3d::misc::Dashboard;

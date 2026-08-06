@@ -2,24 +2,33 @@
 #include <sstream>
 #include <string>
 
-class Mesh;
-
-class OBJExporter
+namespace tf3d::base
 {
-public:
-    OBJExporter();
-    ~OBJExporter();
+    class Mesh;
+}
+using tf3d::base::Mesh;
 
-    bool Export(const std::string &path, Mesh *mesh, float *progress = nullptr);
+namespace tf3d::exporters
+{
 
-private:
-    bool WriteHeader(std::stringstream &out_strm, Mesh *mesh, float *progress);
-    bool WriteVertices(std::stringstream &out_strm, Mesh *mesh, float *progress);
-    bool WriteNormals(std::stringstream &out_strm, Mesh *mesh, float *progress);
-    bool WriteTextureCoordinates(std::stringstream &out_strm, Mesh *mesh, float *progress);
-    bool WriteFaces(std::stringstream &out_strm, Mesh *mesh, float *progress);
+    class OBJExporter
+    {
+    public:
+        OBJExporter();
+        ~OBJExporter();
 
-private:
-    float m_Progress  = 0.0f;
-    char buffer[4096] = {};
-};
+        bool Export(const std::string &path, Mesh *mesh, float *progress = nullptr);
+
+    private:
+        bool WriteHeader(std::stringstream &out_strm, Mesh *mesh, float *progress);
+        bool WriteVertices(std::stringstream &out_strm, Mesh *mesh, float *progress);
+        bool WriteNormals(std::stringstream &out_strm, Mesh *mesh, float *progress);
+        bool WriteTextureCoordinates(std::stringstream &out_strm, Mesh *mesh, float *progress);
+        bool WriteFaces(std::stringstream &out_strm, Mesh *mesh, float *progress);
+
+    private:
+        float m_Progress  = 0.0f;
+        char buffer[4096] = {};
+    };
+} // namespace tf3d::exporters
+using tf3d::exporters::OBJExporter;

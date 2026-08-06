@@ -5,100 +5,105 @@
 
 #include <GLFW/glfw3.h>
 
-GenerationWorker::GenerationWorker(std::string name, WorkCallback callback)
-    : m_Name(name.empty() ? "Generation Worker" : std::move(name)),
-      m_Callback(std::move(callback))
+namespace tf3d::generators
 {
-    GLFWwindow *renderWindow = glfwGetCurrentContext();
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    m_Window = glfwCreateWindow(1, 1, "TerraForge3D Generation", nullptr, renderWindow);
-    glfwMakeContextCurrent(renderWindow);
-    if (m_Window != nullptr) {
-        m_Thread = std::thread(&GenerationWorker::Run, this);
-    } else {
-        TF3D_LOG_ERROR("Failed to create shared generation OpenGL context; generation will run on the render thread");
-    }
-}
 
-GenerationWorker::~GenerationWorker()
-{
+    GenerationWorker::GenerationWorker(std::string name, WorkCallback callback)
+        : m_Name(name.empty() ? "Generation Worker" : std::move(name)),
+          m_Callback(std::move(callback))
     {
-        std::lock_guard lock(m_Mutex);
-        m_StopRequested = true;
+        GLFWwindow *renderWindow = glfwGetCurrentContext();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        m_Window = glfwCreateWindow(1, 1, "TerraForge3D Generation", nullptr, renderWindow);
+        glfwMakeContextCurrent(renderWindow);
+        if (m_Window != nullptr) {
+            m_Thread = std::thread(&GenerationWorker::Run, this);
+        } else {
+            TF3D_LOG_ERROR("Failed to create shared generation OpenGL context; generation will run on the render thread");
+        }
     }
-    m_Condition.notify_one();
 
-    if (m_Thread.joinable())
-        m_Thread.join();
-    if (m_Window != nullptr) {
-        glfwDestroyWindow(m_Window);
-        m_Window = nullptr;
-    }
-}
-
-bool GenerationWorker::Request(bool force)
-{
-    if (!HasContext())
-        return false;
+    GenerationWorker::~GenerationWorker()
     {
-        std::lock_guard lock(m_Mutex);
-        m_RequestPending = true;
-        m_ForceRequested = m_ForceRequested || force;
-    }
-    m_Condition.notify_one();
-    return true;
-}
-
-void GenerationWorker::WaitForIdle()
-{
-    std::unique_lock lock(m_Mutex);
-    m_Condition.wait(lock, [this] {
-        return !m_Running.load(std::memory_order_acquire) &&
-               !m_RequestPending.load(std::memory_order_acquire);
-    });
-}
-
-bool GenerationWorker::ConsumeCompleted()
-{
-    return m_Completed.exchange(false, std::memory_order_acq_rel);
-}
-
-void GenerationWorker::Run()
-{
-    glfwMakeContextCurrent(m_Window);
-    PerformanceMonitor::Get().SetCurrentThreadName(m_Name);
-    while (true) {
-        bool force = false;
-        {
-            std::unique_lock lock(m_Mutex);
-            m_Condition.wait(lock, [this] {
-                return m_StopRequested.load(std::memory_order_acquire) ||
-                       m_RequestPending.load(std::memory_order_acquire);
-            });
-            if (m_StopRequested.load(std::memory_order_acquire))
-                break;
-
-            force            = m_ForceRequested;
-            m_RequestPending = false;
-            m_ForceRequested = false;
-            m_Running        = true;
-        }
-
-        {
-            TF3D_PROFILE_SCOPE("generation/worker");
-            if (m_Callback)
-                m_Callback(force);
-        }
-
-        glMemoryBarrier(GL_ALL_BARRIER_BITS);
-        glFinish();
-
         {
             std::lock_guard lock(m_Mutex);
-            m_Running   = false;
-            m_Completed = true;
+            m_StopRequested = true;
         }
-        m_Condition.notify_all();
+        m_Condition.notify_one();
+
+        if (m_Thread.joinable())
+            m_Thread.join();
+        if (m_Window != nullptr) {
+            glfwDestroyWindow(m_Window);
+            m_Window = nullptr;
+        }
     }
-    glfwMakeContextCurrent(nullptr);
-}
+
+    bool GenerationWorker::Request(bool force)
+    {
+        if (!HasContext())
+            return false;
+        {
+            std::lock_guard lock(m_Mutex);
+            m_RequestPending = true;
+            m_ForceRequested = m_ForceRequested || force;
+        }
+        m_Condition.notify_one();
+        return true;
+    }
+
+    void GenerationWorker::WaitForIdle()
+    {
+        std::unique_lock lock(m_Mutex);
+        m_Condition.wait(lock, [this] {
+            return !m_Running.load(std::memory_order_acquire) &&
+                   !m_RequestPending.load(std::memory_order_acquire);
+        });
+    }
+
+    bool GenerationWorker::ConsumeCompleted()
+    {
+        return m_Completed.exchange(false, std::memory_order_acq_rel);
+    }
+
+    void GenerationWorker::Run()
+    {
+        glfwMakeContextCurrent(m_Window);
+        PerformanceMonitor::Get().SetCurrentThreadName(m_Name);
+        while (true) {
+            bool force = false;
+            {
+                std::unique_lock lock(m_Mutex);
+                m_Condition.wait(lock, [this] {
+                    return m_StopRequested.load(std::memory_order_acquire) ||
+                           m_RequestPending.load(std::memory_order_acquire);
+                });
+                if (m_StopRequested.load(std::memory_order_acquire))
+                    break;
+
+                force            = m_ForceRequested;
+                m_RequestPending = false;
+                m_ForceRequested = false;
+                m_Running        = true;
+            }
+
+            {
+                TF3D_PROFILE_SCOPE("generation/worker");
+                if (m_Callback)
+                    m_Callback(force);
+            }
+
+            glMemoryBarrier(GL_ALL_BARRIER_BITS);
+            glFinish();
+
+            {
+                std::lock_guard lock(m_Mutex);
+                m_Running   = false;
+                m_Completed = true;
+            }
+            m_Condition.notify_all();
+        }
+        glfwMakeContextCurrent(nullptr);
+    }
+
+} // namespace tf3d::generators

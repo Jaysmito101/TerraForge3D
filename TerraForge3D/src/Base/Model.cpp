@@ -11,80 +11,85 @@
 
 #include <glad/gl.h>
 
-Model::Model(std::string n)
+namespace tf3d::base
 {
-    name = n;
-    mesh = new Mesh();
-}
 
-void Model::SetupMeshOnGPU()
-{
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh.vertexCount, mesh.vert, GL_DYNAMIC_DRAW);
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh.indexCount, mesh.indices, GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, position));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord));
-    glEnableVertexAttribArray(2);
-    // glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1));glEnableVertexAttribArray(3);
-    TF3D_LOG_DEBUG("Uploading model '{}' to GPU", name);
-}
-
-void Model::UploadToGPU()
-{
-    if (!mesh) {
-        TF3D_LOG_WARN("Model '{}' has no mesh", name);
-        return;
+    Model::Model(std::string n)
+    {
+        name = n;
+        mesh = new Mesh();
     }
 
-    if (!mesh->IsValid()) {
-        TF3D_LOG_WARN("Model '{}' contains an invalid mesh", name);
-        return;
+    void Model::SetupMeshOnGPU()
+    {
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        // glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh.vertexCount, mesh.vert, GL_DYNAMIC_DRAW);
+        glGenBuffers(1, &ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh.indexCount, mesh.indices, GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, position));
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord));
+        glEnableVertexAttribArray(2);
+        // glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1));glEnableVertexAttribArray(3);
+        TF3D_LOG_DEBUG("Uploading model '{}' to GPU", name);
     }
 
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh->GetVertexCount(), mesh->GetVerticesPTR(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh->GetIndexCount(), mesh->GetIndicesPTR(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, position));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord));
-    glEnableVertexAttribArray(2);
-    // glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1)); glEnableVertexAttribArray(3);
-}
+    void Model::UploadToGPU()
+    {
+        if (!mesh) {
+            TF3D_LOG_WARN("Model '{}' has no mesh", name);
+            return;
+        }
 
-void Model::Update()
-{
-    modelMatrix = glm::translate(glm::mat4(1.0f), position);
-    modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
-    modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
-    modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
-    modelMatrix = glm::scale(modelMatrix, scale);
-}
+        if (!mesh->IsValid()) {
+            TF3D_LOG_WARN("Model '{}' contains an invalid mesh", name);
+            return;
+        }
 
-void Model::Render()
-{
-    if (!mesh) {
-        return;
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vert) * mesh->GetVertexCount(), mesh->GetVerticesPTR(), GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh->GetIndexCount(), mesh->GetIndicesPTR(), GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, position));
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, normal));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, texCoord));
+        glEnableVertexAttribArray(2);
+        // glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void *)offsetof(Vert, extras1)); glEnableVertexAttribArray(3);
     }
 
-    glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-}
+    void Model::Update()
+    {
+        modelMatrix = glm::translate(glm::mat4(1.0f), position);
+        modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
+        modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
+        modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
+        modelMatrix = glm::scale(modelMatrix, scale);
+    }
 
-Model::~Model()
-{
-    if (mesh)
-        delete mesh;
-}
+    void Model::Render()
+    {
+        if (!mesh) {
+            return;
+        }
+
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+    Model::~Model()
+    {
+        if (mesh)
+            delete mesh;
+    }
+
+} // namespace tf3d::base

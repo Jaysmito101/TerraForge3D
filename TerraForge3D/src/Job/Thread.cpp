@@ -3,7 +3,7 @@
 
 static uint32_t threadId = 0;
 
-namespace JobSystem
+namespace tf3d::job
 {
 
     Thread::Thread()
@@ -97,4 +97,4 @@ namespace JobSystem
         return currentJob == nullptr;
     }
 
-} // namespace JobSystem
+} // namespace tf3d::job

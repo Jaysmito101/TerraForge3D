@@ -2,64 +2,74 @@
 
 #include "Renderer/RendererViewport.h"
 
-class ApplicationState;
-
-class ViewportManager
+namespace tf3d::data
 {
-public:
-    ViewportManager(ApplicationState *appState);
-    ~ViewportManager();
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    void Update();
-    void Show();
+namespace tf3d::misc
+{
 
-    inline bool IsVisible()
+    class ViewportManager
     {
-        return this->m_IsVisible;
-    }
-    inline void SetVisible(bool visible)
-    {
-        this->m_IsVisible = visible;
-    }
-    inline uint32_t GetID()
-    {
-        return this->m_ID;
-    }
+    public:
+        ViewportManager(ApplicationState *appState);
+        ~ViewportManager();
 
-    inline RendererViewport *GetRendererViewport()
-    {
-        return this->m_RendererViewport;
-    }
-    inline bool IsActive()
-    {
-        return this->m_IsActive;
-    }
-    inline const glm::vec2 GetPositionOnTerrain()
-    {
-        return m_IsActive ? glm::vec2(m_RendererViewport->m_PosOnTerrain[0], m_RendererViewport->m_PosOnTerrain[1]) : glm::vec2(-1.0f);
-    }
-    inline bool IsControlEnabled()
-    {
-        return m_IsControlEnabled;
-    }
-    inline void SetControlEnabled(bool enabled)
-    {
-        m_IsControlEnabled = enabled;
-    }
+        void Update();
+        void Show();
 
-private:
-    void ShowSettingPopUp();
-    void ShowTextureSlotDetailsPopup();
+        inline bool IsVisible()
+        {
+            return this->m_IsVisible;
+        }
+        inline void SetVisible(bool visible)
+        {
+            this->m_IsVisible = visible;
+        }
+        inline uint32_t GetID()
+        {
+            return this->m_ID;
+        }
 
-private:
-    ApplicationState *m_AppState         = nullptr;
-    RendererViewport *m_RendererViewport = nullptr;
-    uint32_t m_ID                        = 0;
-    float m_Width = 512.0f, m_Height = 512.0f;
-    float m_MousePosX = 0.0f, m_MousePosY = 0.0f;
-    float m_ZoomSpeed = 1.0f, m_MovementSpeed = 1.0f, m_RotationSpeed = 1.0f;
-    bool m_IsVisible                = true;
-    bool m_AutoCalculateAspectRatio = true;
-    bool m_IsActive                 = false;
-    bool m_IsControlEnabled         = true;
-};
+        inline renderer::RendererViewport *GetRendererViewport()
+        {
+            return this->m_RendererViewport;
+        }
+        inline bool IsActive()
+        {
+            return this->m_IsActive;
+        }
+        inline const glm::vec2 GetPositionOnTerrain()
+        {
+            return m_IsActive ? glm::vec2(m_RendererViewport->m_PosOnTerrain[0], m_RendererViewport->m_PosOnTerrain[1]) : glm::vec2(-1.0f);
+        }
+        inline bool IsControlEnabled()
+        {
+            return m_IsControlEnabled;
+        }
+        inline void SetControlEnabled(bool enabled)
+        {
+            m_IsControlEnabled = enabled;
+        }
+
+    private:
+        void ShowSettingPopUp();
+        void ShowTextureSlotDetailsPopup();
+
+    private:
+        ApplicationState *m_AppState                   = nullptr;
+        renderer::RendererViewport *m_RendererViewport = nullptr;
+        uint32_t m_ID                                  = 0;
+        float m_Width = 512.0f, m_Height = 512.0f;
+        float m_MousePosX = 0.0f, m_MousePosY = 0.0f;
+        float m_ZoomSpeed = 1.0f, m_MovementSpeed = 1.0f, m_RotationSpeed = 1.0f;
+        bool m_IsVisible                = true;
+        bool m_AutoCalculateAspectRatio = true;
+        bool m_IsActive                 = false;
+        bool m_IsControlEnabled         = true;
+    };
+
+} // namespace tf3d::misc
+using tf3d::misc::ViewportManager;

@@ -2,18 +2,21 @@
 
 #include "Renderer/RendererBase.h"
 
-class TextureSlotRenderer : public RendererBase
+namespace tf3d::renderer
 {
-public:
-    TextureSlotRenderer(ApplicationState *appState);
-    virtual ~TextureSlotRenderer();
+    class TextureSlotRenderer : public RendererBase
+    {
+    public:
+        TextureSlotRenderer(ApplicationState *appState);
+        virtual ~TextureSlotRenderer();
 
-    virtual void Render(RendererViewport *viewport) override;
-    virtual void ShowSettings() override;
+        virtual void Render(RendererViewport *viewport) override;
+        virtual void ShowSettings() override;
 
-private:
-    virtual void ReloadShaders() override;
+    private:
+        virtual void ReloadShaders() override;
 
-private:
-    std::shared_ptr<Model> m_ScreenQuad = nullptr;
-};
+    private:
+        std::shared_ptr<Model> m_ScreenQuad = nullptr;
+    };
+} // namespace tf3d::renderer

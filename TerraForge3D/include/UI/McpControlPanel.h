@@ -4,27 +4,35 @@
 
 #include <string>
 
-class ApplicationState;
-
-class McpControlPanel
+namespace tf3d::data
 {
-public:
-    explicit McpControlPanel(ApplicationState *appState);
-    ~McpControlPanel() = default;
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    void ShowSettings();
-    bool *IsWindowVisiblePtr()
+namespace tf3d::ui
+{
+
+    class McpControlPanel
     {
-        return &m_IsWindowVisible;
-    }
+    public:
+        explicit McpControlPanel(ApplicationState *appState);
+        ~McpControlPanel() = default;
 
-private:
-    ApplicationState *m_AppState = nullptr;
-    bool m_IsWindowVisible       = true;
-    bool m_RuntimeEnabled        = false;
-    bool m_RestartRequired       = false;
-    std::string m_LastError;
-    std::string m_CopyMessage;
-};
+        void ShowSettings();
+        bool *IsWindowVisiblePtr()
+        {
+            return &m_IsWindowVisible;
+        }
+
+    private:
+        ApplicationState *m_AppState = nullptr;
+        bool m_IsWindowVisible       = true;
+        bool m_RuntimeEnabled        = false;
+        bool m_RestartRequired       = false;
+        std::string m_LastError;
+        std::string m_CopyMessage;
+    };
+} // namespace tf3d::ui
 
 #endif

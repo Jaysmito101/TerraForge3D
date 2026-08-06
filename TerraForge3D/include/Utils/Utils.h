@@ -8,112 +8,119 @@
 #include <cstring>
 #include <string>
 
-class ProjectManager;
+TF3D_FWD_DEC_CLASS(ProjectManager, tf3d::data)
 
-std::string UChar2Hex(unsigned char c);
+namespace tf3d::utils
+{
 
-struct Hash {
+    std::string UChar2Hex(unsigned char c);
 
-    Hash()
-    {
-        data   = nullptr;
-        length = 0;
-    }
+    struct Hash {
 
-    Hash(unsigned char *d, int l)
-    {
-        length = l;
-        data   = new unsigned char[length];
-        std::memcpy(data, d, length);
-    }
-
-    ~Hash()
-    {
-        // delete[] data;
-    }
-
-    std::string ToString()
-    {
-        std::string hash;
-
-        for (int i = 0; i < length; i++) {
-            hash += UChar2Hex(data[i]);
+        Hash()
+        {
+            data   = nullptr;
+            length = 0;
         }
 
-        return hash;
-    }
+        Hash(unsigned char *d, int l)
+        {
+            length = l;
+            data   = new unsigned char[length];
+            std::memcpy(data, d, length);
+        }
 
-    int length = 0;
-    unsigned char *data;
-};
+        ~Hash()
+        {
+            // delete[] data;
+        }
 
-void HashCombine64(uint64_t &hash, uint64_t value);
-uint64_t QuantizeFloatForHash(float value,
-                              float precision = 0.00001f);
-float OrderedUintToFloat(uint32_t value);
-float RawUintToFloat(uint32_t value);
+        std::string ToString()
+        {
+            std::string hash;
+
+            for (int i = 0; i < length; i++) {
+                hash += UChar2Hex(data[i]);
+            }
+
+            return hash;
+        }
+
+        int length = 0;
+        unsigned char *data;
+    };
+
+    void HashCombine64(uint64_t &hash, uint64_t value);
+    uint64_t QuantizeFloatForHash(float value,
+                                  float precision = 0.00001f);
+    float OrderedUintToFloat(uint32_t value);
+    float RawUintToFloat(uint32_t value);
 
 #ifndef MAX
 #define MAX(x, y) (x > y ? x : y)
 #endif // !MAX
 
 #ifdef TERR3D_WIN32
-std::wstring s2ws(const std::string &s);
+    std::wstring s2ws(const std::string &s);
 #endif
 
-std::string ColorConvertToHexString(float r, float g, float b, float a = 1.0f);
-std::string LowercaseFilterText(const std::string &value);
-bool FuzzyFilterMatch(const std::string &query, const std::string &candidate);
-void OpenURL(std::string url);
-std::string ShowSaveFileDialog(std::string ext = ".terr3d");
-std::string openfilename();
-std::string ShowOpenFileDialog(std::string ext = "*.glsl");
-std::string ReadShaderSourceFile(std::string path, bool *result);
-bool WriteShaderSourceFile(const std::string &path, const std::string &content);
-std::string GetExecutablePath();
-std::string GetExecutableDir();
-std::string GenerateId(uint32_t length);
-std::string FetchURL(std::string baseURL, std::string path, std::string token = "");
-std::string GetTimeStamp();
-float UpdateLayerWithUpdateMethod(float origv, float newv, int method);
-char *UChar2Char(unsigned char *data, int length);
-bool FileExists(std::string path, bool writeAccess = false);
-bool PathExist(const std::string &s);
-bool IsNetWorkConnected();
-char *ReadBinaryFile(std::string path, int *size, int32_t sizeToLoad = INT32_MAX);
-char *ReadBinaryFile(std::string path, int32_t sizeToLoad = INT32_MAX);
-Hash MD5File(std::string path);
-void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
-void SaveToFile(std::string filename, std::string content = "");
+    std::string ColorConvertToHexString(float r, float g, float b, float a = 1.0f);
+    std::string LowercaseFilterText(const std::string &value);
+    bool FuzzyFilterMatch(const std::string &query, const std::string &candidate);
+    void OpenURL(std::string url);
+    std::string ShowSaveFileDialog(std::string ext = ".terr3d");
+    std::string openfilename();
+    std::string ShowOpenFileDialog(std::string ext = "*.glsl");
+    std::string ReadShaderSourceFile(std::string path, bool *result);
+    bool WriteShaderSourceFile(const std::string &path, const std::string &content);
+    std::string GetExecutablePath();
+    std::string GetExecutableDir();
+    std::string GenerateId(uint32_t length);
+    std::string FetchURL(std::string baseURL, std::string path, std::string token = "");
+    std::string GetTimeStamp();
+    float UpdateLayerWithUpdateMethod(float origv, float newv, int method);
+    char *UChar2Char(unsigned char *data, int length);
+    bool FileExists(std::string path, bool writeAccess = false);
+    bool PathExist(const std::string &s);
+    bool IsNetWorkConnected();
+    char *ReadBinaryFile(std::string path, int *size, int32_t sizeToLoad = INT32_MAX);
+    char *ReadBinaryFile(std::string path, int32_t sizeToLoad = INT32_MAX);
+    Hash MD5File(std::string path);
+    void DownloadFile(std::string baseURL, std::string urlPath, std::string path, int size = -1);
+    void SaveToFile(std::string filename, std::string content = "");
 
 #ifdef TERR3D_WIN32
 #include <windows.h>
-void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue);
+    void RegSet(HKEY hkeyHive, const char *pszVar, const char *pszValue);
 #endif
 
-void AccocFileType();
+    void AccocFileType();
 
-void MkDir(std::string path);
+    void MkDir(std::string path);
 
-void CopyFileData(std::string source, std::string destination);
+    void CopyFileData(std::string source, std::string destination);
 
-bool DeleteFileT(std::string path);
+    bool DeleteFileT(std::string path);
 
-bool IsKeyDown(int key);
+    bool IsKeyDown(int key);
 
-bool IsMouseButtonDown(int button);
+    bool IsMouseButtonDown(int button);
 
-void ShowMessageBox(std::string message, std::string title = "Info");
+    void ShowMessageBox(std::string message, std::string title = "Info");
 
-bool LoadTexture(Texture2D *texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false, ProjectManager *projectManager = nullptr);
+    bool LoadTexture(Texture2D *texture, bool loadToAssets = false, bool preserveData = true, bool readAlpha = false, tf3d::data::ProjectManager *projectManager = nullptr);
 
-void ToggleSystemConsole();
+    void ToggleSystemConsole();
 
-void OnBeforeImGuiRender();
+    void OnBeforeImGuiRender();
 
-void OnImGuiRenderEnd();
+    void OnImGuiRenderEnd();
 
-std::string FormatMemoryToString(uint64_t size);
+    std::string FormatMemoryToString(uint64_t size);
+
+} // namespace tf3d::utils
+
+using namespace tf3d::utils;
 
 // KEY DEFINES
 /* The unknown key */

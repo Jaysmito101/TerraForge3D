@@ -8,51 +8,61 @@
 #include "Renderer/ObjectRenderer.h"
 #include "Utils/Utils.h"
 
-class ApplicationState;
-
-enum BiomeCustomBaseShapeEditMode {
-    BiomeCustomBaseShapeEditMode_Draw,
-    BiomeCustomBaseShapeEditMode_Count
-};
-
-class BiomeCustomBaseShape
+namespace tf3d::data
 {
-public:
-    BiomeCustomBaseShape(ApplicationState *appState);
-    ~BiomeCustomBaseShape();
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    bool ShowShettings();
-    void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer);
+namespace tf3d::generators
+{
 
-    SerializerNode Save();
-    void Load(SerializerNode node);
+    enum BiomeCustomBaseShapeEditMode {
+        BiomeCustomBaseShapeEditMode_Draw,
+        BiomeCustomBaseShapeEditMode_Count
+    };
 
-    inline bool RequireUpdation() const
+    class BiomeCustomBaseShape
     {
-        return m_RequireUpdation;
-    }
-    inline bool IsEnabled() const
-    {
-        return m_Enabled;
-    }
-    inline bool RequiresBaseShapeUpdate() const
-    {
-        return m_RequireBaseShapeUpdate;
-    }
+    public:
+        BiomeCustomBaseShape(ApplicationState *appState);
+        ~BiomeCustomBaseShape();
 
-    void Resize();
+        bool ShowShettings();
+        void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer);
 
-private:
-    bool ApplyDrawingShaders();
-    bool ShowDrawEditor();
+        SerializerNode Save();
+        void Load(SerializerNode node);
 
-private:
-    ApplicationState *m_AppState  = nullptr;
-    bool m_RequireUpdation        = true;
-    bool m_Enabled                = false;
-    bool m_RequireBaseShapeUpdate = false;
-    std::shared_ptr<ComputeShader> m_Shader;
-    std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
-    std::shared_ptr<GeneratorTexture> m_PreviewTexture;
-    DrawBrushSettings m_DrawSettings;
-};
+        inline bool RequireUpdation() const
+        {
+            return m_RequireUpdation;
+        }
+        inline bool IsEnabled() const
+        {
+            return m_Enabled;
+        }
+        inline bool RequiresBaseShapeUpdate() const
+        {
+            return m_RequireBaseShapeUpdate;
+        }
+
+        void Resize();
+
+    private:
+        bool ApplyDrawingShaders();
+        bool ShowDrawEditor();
+
+    private:
+        ApplicationState *m_AppState  = nullptr;
+        bool m_RequireUpdation        = true;
+        bool m_Enabled                = false;
+        bool m_RequireBaseShapeUpdate = false;
+        std::shared_ptr<ComputeShader> m_Shader;
+        std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
+        std::shared_ptr<GeneratorTexture> m_PreviewTexture;
+        renderer::DrawBrushSettings m_DrawSettings;
+    };
+
+} // namespace tf3d::generators
+using tf3d::generators::BiomeCustomBaseShape;

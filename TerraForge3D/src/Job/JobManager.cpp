@@ -2,7 +2,7 @@
 #include "Data/ApplicationState.h"
 #include "Job/JobSystem.h"
 
-static void ShowJob(JobSystem::Job *job)
+static void ShowJob(tf3d::job::Job *job)
 {
     ImGui::PushID((job->name + std::to_string(job->id)).data());
     if (ImGui::CollapsingHeader(job->name.data())) {
@@ -11,7 +11,7 @@ static void ShowJob(JobSystem::Job *job)
     ImGui::PopID();
 }
 
-namespace JobSystem
+namespace tf3d::job
 {
 
     JobManager::JobManager(ApplicationState *appState)
@@ -91,4 +91,4 @@ namespace JobSystem
         ImGui::End();
     }
 
-} // namespace JobSystem
+} // namespace tf3d::job

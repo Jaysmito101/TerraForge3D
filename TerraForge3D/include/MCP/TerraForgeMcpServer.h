@@ -12,66 +12,75 @@
 #include <string>
 #include <vector>
 
-class ApplicationState;
+namespace tf3d::data
+{
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
 namespace mcp
 {
     class server;
 }
 
-struct McpCommandLogEntry {
-    std::string timestamp;
-    std::string method;
-    std::string parameters;
-    std::string requestJson;
-};
-
-struct McpServerStats {
-    bool running                 = false;
-    std::string host             = "127.0.0.1";
-    int port                     = 9823;
-    std::string endpoint         = "http://127.0.0.1:9823/mcp";
-    std::uint64_t commandCount   = 0;
-    std::uint64_t activeSessions = 0;
-    std::vector<McpCommandLogEntry> commandLog;
-};
-
-class TerraForgeMcpServer
+namespace tf3d::mcp_layer
 {
-public:
-    TerraForgeMcpServer(ApplicationState *applicationState, std::string logsDirectory);
-    ~TerraForgeMcpServer();
 
-    TerraForgeMcpServer(const TerraForgeMcpServer &)            = delete;
-    TerraForgeMcpServer &operator=(const TerraForgeMcpServer &) = delete;
+    struct McpCommandLogEntry {
+        std::string timestamp;
+        std::string method;
+        std::string parameters;
+        std::string requestJson;
+    };
 
-    bool Start();
-    void Update();
-    void Stop();
+    struct McpServerStats {
+        bool running                 = false;
+        std::string host             = "127.0.0.1";
+        int port                     = 9823;
+        std::string endpoint         = "http://127.0.0.1:9823/mcp";
+        std::uint64_t commandCount   = 0;
+        std::uint64_t activeSessions = 0;
+        std::vector<McpCommandLogEntry> commandLog;
+    };
 
-    bool IsRunning() const;
-    McpServerStats GetStats() const;
-    void ClearCommandLog();
+    class TerraForgeMcpServer
+    {
+    public:
+        TerraForgeMcpServer(ApplicationState *applicationState, std::string logsDirectory);
+        ~TerraForgeMcpServer();
 
-private:
-    void OpenCallHistory();
-    void CloseCallHistory();
-    void RecordCommand(
-        const std::string &method,
-        const nlohmann::json &params,
-        const std::string &sessionId);
+        TerraForgeMcpServer(const TerraForgeMcpServer &)            = delete;
+        TerraForgeMcpServer &operator=(const TerraForgeMcpServer &) = delete;
 
-    std::string logsDirectory;
-    const std::string host = "127.0.0.1";
-    int port               = 9823;
-    std::string endpoint;
-    ActionRegistry actions;
-    ResourceRegistry resources;
-    MainThreadRequestQueue requestQueue;
-    std::unique_ptr<mcp::server> server;
-    std::ofstream callHistory;
-    std::filesystem::path callHistoryPath;
-    mutable std::mutex statsMutex;
-    std::uint64_t commandCount = 0;
-    std::vector<McpCommandLogEntry> commandLog;
-};
+        bool Start();
+        void Update();
+        void Stop();
+
+        bool IsRunning() const;
+        McpServerStats GetStats() const;
+        void ClearCommandLog();
+
+    private:
+        void OpenCallHistory();
+        void CloseCallHistory();
+        void RecordCommand(
+            const std::string &method,
+            const nlohmann::json &params,
+            const std::string &sessionId);
+
+        std::string logsDirectory;
+        const std::string host = "127.0.0.1";
+        int port               = 9823;
+        std::string endpoint;
+        ActionRegistry actions;
+        ResourceRegistry resources;
+        MainThreadRequestQueue requestQueue;
+        std::unique_ptr<::mcp::server> server;
+        std::ofstream callHistory;
+        std::filesystem::path callHistoryPath;
+        mutable std::mutex statsMutex;
+        std::uint64_t commandCount = 0;
+        std::vector<McpCommandLogEntry> commandLog;
+    };
+
+} // namespace tf3d::mcp_layer

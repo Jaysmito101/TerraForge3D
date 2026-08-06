@@ -1,6 +1,10 @@
 #pragma once
 
-class ApplicationState;
+namespace tf3d::data
+{
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
 class MainMenu
 {

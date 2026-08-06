@@ -5,6 +5,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 
-int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name);
+namespace tf3d::base
+{
 
-int CreateProgram();
+    int CompileShader(std::string shaderSrc, GLenum shaderType, std::string name);
+
+    int CreateProgram();
+
+} // namespace tf3d::base
+using tf3d::base::CompileShader;
+using tf3d::base::CreateProgram;

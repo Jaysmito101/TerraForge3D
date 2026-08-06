@@ -2,7 +2,7 @@
 
 #include "Base/Base.h"
 
-namespace JobSystem
+namespace tf3d::job
 {
 
     enum JobExecutionModel {
@@ -46,4 +46,5 @@ namespace JobSystem
     private:
     };
 
-} // namespace JobSystem
+} // namespace tf3d::job
+namespace JobSystem = tf3d::job;

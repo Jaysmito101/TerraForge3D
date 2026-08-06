@@ -4,49 +4,55 @@
 
 #include "imgui/imgui.h"
 
-class Style
+namespace tf3d::misc
 {
-public:
-    Style();
-    ~Style();
 
-    void LoadFromFile(std::string filepath);
-    void LoadFormString(std::string contents);
-    void LoadCurrent();
+    class Style
+    {
+    public:
+        Style();
+        ~Style();
 
-    void SaveToFile(std::string filepath);
-    std::string SaveToString();
-    void Apply();
+        void LoadFromFile(std::string filepath);
+        void LoadFormString(std::string contents);
+        void LoadCurrent();
 
-    inline void SetName(std::string name)
-    {
-        this->name = name;
-    }
-    inline std::string GetName()
-    {
-        return this->name;
-    }
+        void SaveToFile(std::string filepath);
+        std::string SaveToString();
+        void Apply();
 
-    inline void SetStyle(ImGuiStyle style)
-    {
-        this->style = style;
-    }
-    inline ImGuiStyle GetStyle()
-    {
-        return this->style;
-    }
+        inline void SetName(std::string name)
+        {
+            this->name = name;
+        }
+        inline std::string GetName()
+        {
+            return this->name;
+        }
 
-    inline void SetScale(float scale)
-    {
-        this->scale = scale;
-    }
-    inline float GetScale() const
-    {
-        return this->scale;
-    }
+        inline void SetStyle(ImGuiStyle style)
+        {
+            this->style = style;
+        }
+        inline ImGuiStyle GetStyle()
+        {
+            return this->style;
+        }
 
-private:
-    ImGuiStyle style;
-    std::string name = "Style";
-    float scale      = 1.0f;
-};
+        inline void SetScale(float scale)
+        {
+            this->scale = scale;
+        }
+        inline float GetScale() const
+        {
+            return this->scale;
+        }
+
+    private:
+        ImGuiStyle style;
+        std::string name = "Style";
+        float scale      = 1.0f;
+    };
+
+} // namespace tf3d::misc
+using tf3d::misc::Style;

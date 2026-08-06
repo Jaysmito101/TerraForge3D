@@ -3,21 +3,24 @@
 #include "Base/Base.h"
 #include "Renderer/RendererViewport.h"
 
-class ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
-class RendererBase
+namespace tf3d::renderer
 {
-public:
-    RendererBase()          = default;
-    virtual ~RendererBase() = default;
+    class RendererBase
+    {
+    public:
+        RendererBase()          = default;
+        virtual ~RendererBase() = default;
 
-    virtual void Render(RendererViewport *viewport) = 0;
-    virtual void ShowSettings()                     = 0;
+        virtual void Render(RendererViewport *viewport) = 0;
+        virtual void ShowSettings()                     = 0;
 
-protected:
-    virtual void ReloadShaders() = 0;
+    protected:
+        virtual void ReloadShaders() = 0;
 
-protected:
-    ApplicationState *m_AppState     = nullptr;
-    std::shared_ptr<Shader> m_Shader = nullptr;
-};
+    protected:
+        ApplicationState *m_AppState     = nullptr;
+        std::shared_ptr<Shader> m_Shader = nullptr;
+    };
+} // namespace tf3d::renderer

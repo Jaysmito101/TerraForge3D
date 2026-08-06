@@ -7,35 +7,44 @@
 
 #include "Generators/SimpleBiomeMixer.h"
 
-class ApplicationState;
-
-enum BiomeMixerMethod {
-    BiomeMixerMethod_Simple = 0,
-    BiomeMixerMethod_AlphaBlend,
-    BiomeMixerMethod_Count
-};
-
-class BiomeMixer
+namespace tf3d::data
 {
-public:
-    BiomeMixer(ApplicationState *appState);
-    ~BiomeMixer();
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
 
-    void Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer);
-    bool ShowSettings();
+namespace tf3d::generators
+{
 
-    inline bool IsUpdationRequired()
+    enum BiomeMixerMethod {
+        BiomeMixerMethod_Simple = 0,
+        BiomeMixerMethod_AlphaBlend,
+        BiomeMixerMethod_Count
+    };
+
+    class BiomeMixer
     {
-        return m_RequireUpdation;
-    }
+    public:
+        BiomeMixer(ApplicationState *appState);
+        ~BiomeMixer();
 
-private:
-    ApplicationState *m_AppState = nullptr;
-    bool m_RequireUpdation       = true;
-    BiomeMixerMethod m_Method    = BiomeMixerMethod_Simple;
+        void Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer);
+        bool ShowSettings();
 
-    // This part could be sorted ot better with some inheritance
-    // but thats not really worth it for now
-    // maybe someone could create a pull request for this
-    std::shared_ptr<SimpleBiomeMixer> m_SimpleBiomeMixer;
-};
+        inline bool IsUpdationRequired()
+        {
+            return m_RequireUpdation;
+        }
+
+    private:
+        ApplicationState *m_AppState = nullptr;
+        bool m_RequireUpdation       = true;
+        BiomeMixerMethod m_Method    = BiomeMixerMethod_Simple;
+
+        // This part could be sorted ot better with some inheritance
+        // but thats not really worth it for now
+        // maybe someone could create a pull request for this
+        std::shared_ptr<SimpleBiomeMixer> m_SimpleBiomeMixer;
+    };
+} // namespace tf3d::generators
+using tf3d::generators::BiomeMixer;

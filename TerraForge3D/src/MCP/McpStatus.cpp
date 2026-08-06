@@ -4,11 +4,16 @@
 
 #include "mcp_server.h"
 
-nlohmann::json BuildMcpStatus(const ApplicationState *applicationState)
+namespace tf3d::mcp_layer
 {
-    return {
-        {"applicationAttached", applicationState != nullptr},
-        {"version", TERR3D_VERSION_STRING},
-        {"protocolVersion", mcp::MCP_VERSION},
-        {"transport", "streamable-http"}};
-}
+
+    nlohmann::json BuildMcpStatus(const ApplicationState *applicationState)
+    {
+        return {
+            {"applicationAttached", applicationState != nullptr},
+            {"version", TERR3D_VERSION_STRING},
+            {"protocolVersion", ::mcp::MCP_VERSION},
+            {"transport", "streamable-http"}};
+    }
+
+} // namespace tf3d::mcp_layer

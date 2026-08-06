@@ -2,18 +2,22 @@
 
 #include "Renderer/RendererBase.h"
 
-class HeightmapRenderer : public RendererBase
+namespace tf3d::renderer
 {
-public:
-    HeightmapRenderer(ApplicationState *appState);
-    virtual ~HeightmapRenderer();
 
-    virtual void Render(RendererViewport *viewport) override;
-    virtual void ShowSettings() override;
+    class HeightmapRenderer : public RendererBase
+    {
+    public:
+        HeightmapRenderer(ApplicationState *appState);
+        virtual ~HeightmapRenderer();
 
-private:
-    virtual void ReloadShaders() override;
+        virtual void Render(RendererViewport *viewport) override;
+        virtual void ShowSettings() override;
 
-private:
-    std::shared_ptr<Model> m_ScreenQuad = nullptr;
-};
+    private:
+        virtual void ReloadShaders() override;
+
+    private:
+        std::shared_ptr<Model> m_ScreenQuad = nullptr;
+    };
+} // namespace tf3d::renderer

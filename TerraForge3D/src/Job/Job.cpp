@@ -2,7 +2,7 @@
 
 static uint32_t jobIds = 0;
 
-namespace JobSystem
+namespace tf3d::job
 {
 
     Job::Job(std::string name)
@@ -15,4 +15,4 @@ namespace JobSystem
     {
     }
 
-} // namespace JobSystem
+} // namespace tf3d::job

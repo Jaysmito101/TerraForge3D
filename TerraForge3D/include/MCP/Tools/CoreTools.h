@@ -1,6 +1,16 @@
 #pragma once
 
-class ApplicationState;
-class ActionRegistry;
+#include "MCP/ActionRegistry.h"
 
-void RegisterMcpCoreTools(ActionRegistry &actions, ApplicationState *applicationState);
+namespace tf3d::data
+{
+    class ApplicationState;
+}
+using tf3d::data::ApplicationState;
+
+namespace tf3d::mcp_layer
+{
+
+    void RegisterMcpCoreTools(ActionRegistry &actions, ApplicationState *applicationState);
+
+} // namespace tf3d::mcp_layer

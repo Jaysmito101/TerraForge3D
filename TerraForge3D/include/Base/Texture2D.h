@@ -2,48 +2,54 @@
 
 #include <string>
 
-class Texture2D
+namespace tf3d::base
 {
-public:
-    Texture2D(uint32_t width, uint32_t height);
-    Texture2D(const std::string path, bool preserveData = true, bool readAlpha = false, bool loadAs16Bit = false);
-    virtual ~Texture2D();
 
-    virtual uint32_t GetWidth() const
+    class Texture2D
     {
-        return m_Width;
-    }
-    virtual uint32_t GetHeight() const
-    {
-        return m_Height;
-    }
-    virtual uint32_t GetRendererID() const
-    {
-        return m_RendererID;
-    }
-    virtual std::string GetPath() const
-    {
-        return m_Path;
-    }
+    public:
+        Texture2D(uint32_t width, uint32_t height);
+        Texture2D(const std::string path, bool preserveData = true, bool readAlpha = false, bool loadAs16Bit = false);
+        virtual ~Texture2D();
 
-    void Resize(int width, int height, bool resetOpenGL = true);
+        virtual uint32_t GetWidth() const
+        {
+            return m_Width;
+        }
+        virtual uint32_t GetHeight() const
+        {
+            return m_Height;
+        }
+        virtual uint32_t GetRendererID() const
+        {
+            return m_RendererID;
+        }
+        virtual std::string GetPath() const
+        {
+            return m_Path;
+        }
 
-    virtual void SetData(void *data, uint32_t size, bool c = false);
-    virtual void DeleteData();
+        void Resize(int width, int height, bool resetOpenGL = true);
 
-    virtual int32_t Bind(uint32_t slot = 0) const;
-    unsigned char *GetData();
+        virtual void SetData(void *data, uint32_t size, bool c = false);
+        virtual void DeleteData();
 
-    virtual bool IsLoaded() const
-    {
-        return m_IsLoaded;
-    }
+        virtual int32_t Bind(uint32_t slot = 0) const;
+        unsigned char *GetData();
 
-private:
-    unsigned char *m_Data = nullptr;
-    std::string m_Path;
-    bool m_IsLoaded = false;
-    uint32_t m_Width, m_Height;
-    uint32_t m_RendererID;
-    uint32_t m_InternalFormat, m_DataFormat;
-};
+        virtual bool IsLoaded() const
+        {
+            return m_IsLoaded;
+        }
+
+    private:
+        unsigned char *m_Data = nullptr;
+        std::string m_Path;
+        bool m_IsLoaded = false;
+        uint32_t m_Width, m_Height;
+        uint32_t m_RendererID;
+        uint32_t m_InternalFormat, m_DataFormat;
+    };
+
+} // namespace tf3d::base
+using tf3d::base::Texture2D;

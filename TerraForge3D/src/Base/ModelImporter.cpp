@@ -4,12 +4,17 @@
 
 #include "Utils/Utils.h"
 
-Model *LoadModel(std::string path)
+namespace tf3d::base
 {
-    // TODO: Implement this
-    Model *model = new Model("Invalid Model");
-    model->mesh->GeneratePlane(256, 1.0f);
-    model->mesh->RecalculateNormals();
-    model->SetupMeshOnGPU();
-    return model;
-}
+
+    Model *LoadModel(std::string path)
+    {
+        // TODO: Implement this
+        Model *model = new Model("Invalid Model");
+        model->mesh->GeneratePlane(256, 1.0f);
+        model->mesh->RecalculateNormals();
+        model->SetupMeshOnGPU();
+        return model;
+    }
+
+} // namespace tf3d::base

@@ -30,6 +30,20 @@
 
 #include <fmt/core.h>
 
+#define TF3D_FWD_DEC_CLASS(className, namespaceName) \
+    namespace namespaceName                          \
+    {                                                \
+        class className;                             \
+    }                                                \
+    using namespaceName::className;
+
+#define TF3D_FWD_DEC_STRUCT(structName, namespaceName) \
+    namespace namespaceName                            \
+    {                                                  \
+        struct structName;                             \
+    }                                                  \
+    using namespaceName::structName;
+
 // OS Dependent Libraries
 
 // GLM

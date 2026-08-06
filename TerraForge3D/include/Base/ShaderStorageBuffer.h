@@ -2,20 +2,26 @@
 
 #include <cstdint>
 
-class ShaderStorageBuffer
+namespace tf3d::base
 {
 
-public:
-    ShaderStorageBuffer();
-    ~ShaderStorageBuffer();
+    class ShaderStorageBuffer
+    {
 
-    void Bind(int index);
-    void Bind();
-    void Unbind();
-    void SetData(void *data, unsigned int size, bool dynamic = true);
-    void SetData(void *data, unsigned int size, unsigned int offset, bool dynamic = true);
-    void GetData(void *data, int size);
-    void GetData(void *data, unsigned int size, unsigned int offset, bool dynamic = true);
+    public:
+        ShaderStorageBuffer();
+        ~ShaderStorageBuffer();
 
-    uint32_t rendererId;
-};
+        void Bind(int index);
+        void Bind();
+        void Unbind();
+        void SetData(void *data, unsigned int size, bool dynamic = true);
+        void SetData(void *data, unsigned int size, unsigned int offset, bool dynamic = true);
+        void GetData(void *data, int size);
+        void GetData(void *data, unsigned int size, unsigned int offset, bool dynamic = true);
+
+        uint32_t rendererId;
+    };
+
+} // namespace tf3d::base
+using tf3d::base::ShaderStorageBuffer;

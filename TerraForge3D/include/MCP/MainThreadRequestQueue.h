@@ -13,31 +13,36 @@
 #include <queue>
 #include <thread>
 
-class MainThreadRequestQueue
+namespace tf3d::mcp_layer
 {
-public:
-    using Task = std::function<McpResult()>;
 
-    MainThreadRequestQueue();
-    ~MainThreadRequestQueue();
+    class MainThreadRequestQueue
+    {
+    public:
+        using Task = std::function<McpResult()>;
 
-    McpResult Execute(
-        Task task,
-        std::chrono::milliseconds timeout = std::chrono::milliseconds(5000));
+        MainThreadRequestQueue();
+        ~MainThreadRequestQueue();
 
-    std::size_t Drain(std::size_t maxTasks = 64);
-    void Shutdown();
-    bool IsShutdown() const;
+        McpResult Execute(
+            Task task,
+            std::chrono::milliseconds timeout = std::chrono::milliseconds(5000));
 
-private:
-    struct PendingRequest {
-        Task task;
-        std::promise<McpResult> promise;
-        std::atomic<bool> cancelled = false;
+        std::size_t Drain(std::size_t maxTasks = 64);
+        void Shutdown();
+        bool IsShutdown() const;
+
+    private:
+        struct PendingRequest {
+            Task task;
+            std::promise<McpResult> promise;
+            std::atomic<bool> cancelled = false;
+        };
+
+        std::thread::id ownerThread;
+        mutable std::mutex mutex;
+        std::queue<std::shared_ptr<PendingRequest>> requests;
+        bool stopped = false;
     };
 
-    std::thread::id ownerThread;
-    mutable std::mutex mutex;
-    std::queue<std::shared_ptr<PendingRequest>> requests;
-    bool stopped = false;
-};
+} // namespace tf3d::mcp_layer

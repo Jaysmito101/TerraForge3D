@@ -12,14 +12,19 @@ namespace mcp
     class server;
 }
 
-using McpCommandRecorder = std::function<void(
-    const std::string &method,
-    const std::string &paramsJson,
-    const std::string &sessionId)>;
+namespace tf3d::mcp_layer
+{
 
-void RegisterMcpTransport(
-    mcp::server &server,
-    ActionRegistry &actions,
-    ResourceRegistry &resources,
-    MainThreadRequestQueue &requestQueue,
-    McpCommandRecorder recordCommand);
+    using McpCommandRecorder = std::function<void(
+        const std::string &method,
+        const std::string &paramsJson,
+        const std::string &sessionId)>;
+
+    void RegisterMcpTransport(
+        ::mcp::server &server,
+        ActionRegistry &actions,
+        ResourceRegistry &resources,
+        MainThreadRequestQueue &requestQueue,
+        McpCommandRecorder recordCommand);
+
+} // namespace tf3d::mcp_layer

@@ -2,7 +2,7 @@
 
 #include "Base/Base.h"
 
-namespace TerraForge3D::UI
+namespace tf3d::utils
 {
     template <size_t MaxPoints>
     bool DrawPathEditor(const char *label, std::array<glm::vec2, MaxPoints> &points, int &pointCount,
@@ -133,4 +133,4 @@ namespace TerraForge3D::UI
         ImGui::PopID();
         return changed;
     }
-} // namespace TerraForge3D::UI
+} // namespace tf3d::utils

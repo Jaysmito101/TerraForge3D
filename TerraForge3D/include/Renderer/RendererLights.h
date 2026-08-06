@@ -2,28 +2,32 @@
 
 #include "Base/Base.h"
 
-class ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
-struct RendererSunData {
-    char name[1024];
-    glm::vec3 direction = glm::vec3(2.260f, -2.440f, -0.740f);
-    glm::vec3 color     = glm::vec3(1.0f);
-    float intensity     = 2.0f;
-};
-
-class RendererLights
+namespace tf3d::renderer
 {
-public:
-    RendererLights(ApplicationState *appState);
-    ~RendererLights();
+    struct RendererSunData {
+        char name[1024];
+        glm::vec3 direction = glm::vec3(2.260f, -2.440f, -0.740f);
+        glm::vec3 color     = glm::vec3(1.0f);
+        float intensity     = 2.0f;
+    };
 
-    void ShowSettings();
+    class RendererLights
+    {
+    public:
+        RendererLights(ApplicationState *appState);
+        ~RendererLights();
 
-public:
-    RendererSunData m_Sun;
-    bool m_UseSkyLight        = true;
-    float m_SkyLightIntensity = 0.24f;
+        void ShowSettings();
 
-private:
-    ApplicationState *m_AppState = nullptr;
-};
+    public:
+        RendererSunData m_Sun;
+        bool m_UseSkyLight        = true;
+        float m_SkyLightIntensity = 0.24f;
+
+    private:
+        ApplicationState *m_AppState = nullptr;
+    };
+
+} // namespace tf3d::renderer

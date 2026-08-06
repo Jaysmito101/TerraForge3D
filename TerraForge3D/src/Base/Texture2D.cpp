@@ -11,153 +11,158 @@
 #include <glad/gl.h>
 #pragma warning(pop)
 
-Texture2D::Texture2D(uint32_t width, uint32_t height)
-    : m_Width(width), m_Height(height)
+namespace tf3d::base
 {
-    m_InternalFormat = GL_RGB8;
-    m_DataFormat     = GL_RGB;
-    m_Data           = new unsigned char[width * height * 3];
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glGenTextures(1, &m_RendererID);
-    glBindTexture(GL_TEXTURE_2D, m_RendererID);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glGenerateMipmap(GL_TEXTURE_2D);
-}
 
-Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha, bool loadAs16Bit)
-    : m_Path(path), m_Width(0), m_Height(0), m_RendererID(0), m_InternalFormat(0), m_DataFormat(0)
-{
-    int width, height, channels;
-    stbi_set_flip_vertically_on_load(0);
-    unsigned char *data = nullptr;
-    stbi_us *data16     = nullptr;
-
-    if (loadAs16Bit) {
-        data16 = stbi_load_16(path.c_str(), &width, &height, &channels, 1);
-    } else if (readAlpha) {
-        data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-    } else {
-        data = stbi_load(path.c_str(), &width, &height, &channels, 3);
-    }
-
-    if (data || data16) {
-        m_IsLoaded = true;
-        m_Width    = width;
-        m_Height   = height;
+    Texture2D::Texture2D(uint32_t width, uint32_t height)
+        : m_Width(width), m_Height(height)
+    {
+        m_InternalFormat = GL_RGB8;
+        m_DataFormat     = GL_RGB;
+        m_Data           = new unsigned char[width * height * 3];
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glGenTextures(1, &m_RendererID);
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-        if (loadAs16Bit) {
-            m_InternalFormat = GL_R16;
-            m_DataFormat     = GL_RED;
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, width, height, 0, GL_RED, GL_UNSIGNED_SHORT, data16);
-        } else if (readAlpha) {
-            m_InternalFormat = GL_RGB8;
-            m_DataFormat     = GL_RGBA;
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        } else {
-            m_InternalFormat = GL_RGB8;
-            m_DataFormat     = GL_RGB;
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        }
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, loadAs16Bit ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, loadAs16Bit ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
-
-        if (preserveData)
-            m_Data = loadAs16Bit ? reinterpret_cast<unsigned char *>(data16) : data;
-        else
-            stbi_image_free(loadAs16Bit ? reinterpret_cast<void *>(data16) : reinterpret_cast<void *>(data));
-    } else {
-        TF3D_LOG_ERROR("Failed to load texture '{}'", path);
-    }
-}
-
-Texture2D::~Texture2D()
-{
-    if (m_RendererID != 0)
-        glDeleteTextures(1, &m_RendererID);
-}
-
-void Texture2D::SetData(void *data, uint32_t size, bool alpha)
-{
-    glBindTexture(GL_TEXTURE_2D, m_RendererID);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    if (alpha) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     }
 
-    else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    }
+    Texture2D::Texture2D(const std::string path, bool preserveData, bool readAlpha, bool loadAs16Bit)
+        : m_Path(path), m_Width(0), m_Height(0), m_RendererID(0), m_InternalFormat(0), m_DataFormat(0)
+    {
+        int width, height, channels;
+        stbi_set_flip_vertically_on_load(0);
+        unsigned char *data = nullptr;
+        stbi_us *data16     = nullptr;
 
-    glGenerateMipmap(GL_TEXTURE_2D);
-}
-
-void Texture2D::DeleteData()
-{
-    if (m_Data) {
-        stbi_image_free(m_Data);
-    }
-}
-
-int32_t Texture2D::Bind(uint32_t slot) const
-{
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, m_RendererID);
-    return static_cast<int32_t>(slot);
-}
-
-void Texture2D::Resize(int width, int height, bool resetOpenGL)
-{
-    if (m_Width == width && m_Height == height) {
-        return;
-    }
-
-    if (!m_Data) {
-        return;
-    }
-
-    unsigned char *data = (unsigned char *)malloc(width * height * 3 * sizeof(unsigned char));
-    if (!data)
-        return; // TODO: error handling
-    memset(data, 0, width * height * 3 * sizeof(unsigned char));
-    avir::CImageResizer<> ImageResizer(8);
-    ImageResizer.resizeImage(m_Data, m_Width, m_Height, 0, data, width, height, 3, 0);
-
-    if (data) {
-        if (m_Data) {
-            delete m_Data;
+        if (loadAs16Bit) {
+            data16 = stbi_load_16(path.c_str(), &width, &height, &channels, 1);
+        } else if (readAlpha) {
+            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        } else {
+            data = stbi_load(path.c_str(), &width, &height, &channels, 3);
         }
 
-        m_Data   = data;
-        m_Width  = width;
-        m_Height = height;
-
-        if (resetOpenGL) {
+        if (data || data16) {
+            m_IsLoaded = true;
+            m_Width    = width;
+            m_Height   = height;
+            glGenTextures(1, &m_RendererID);
             glBindTexture(GL_TEXTURE_2D, m_RendererID);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+            if (loadAs16Bit) {
+                m_InternalFormat = GL_R16;
+                m_DataFormat     = GL_RED;
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, width, height, 0, GL_RED, GL_UNSIGNED_SHORT, data16);
+            } else if (readAlpha) {
+                m_InternalFormat = GL_RGB8;
+                m_DataFormat     = GL_RGBA;
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            } else {
+                m_InternalFormat = GL_RGB8;
+                m_DataFormat     = GL_RGB;
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            }
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, loadAs16Bit ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, loadAs16Bit ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glGenerateMipmap(GL_TEXTURE_2D);
+
+            if (preserveData)
+                m_Data = loadAs16Bit ? reinterpret_cast<unsigned char *>(data16) : data;
+            else
+                stbi_image_free(loadAs16Bit ? reinterpret_cast<void *>(data16) : reinterpret_cast<void *>(data));
+        } else {
+            TF3D_LOG_ERROR("Failed to load texture '{}'", path);
         }
     }
-}
 
-unsigned char *Texture2D::GetData()
-{
-    if (m_Data) {
-        return m_Data;
+    Texture2D::~Texture2D()
+    {
+        if (m_RendererID != 0)
+            glDeleteTextures(1, &m_RendererID);
     }
 
-    else {
-        return nullptr;
+    void Texture2D::SetData(void *data, uint32_t size, bool alpha)
+    {
+        glBindTexture(GL_TEXTURE_2D, m_RendererID);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        if (alpha) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        }
+
+        else {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        }
+
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
-}
+
+    void Texture2D::DeleteData()
+    {
+        if (m_Data) {
+            stbi_image_free(m_Data);
+        }
+    }
+
+    int32_t Texture2D::Bind(uint32_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        return static_cast<int32_t>(slot);
+    }
+
+    void Texture2D::Resize(int width, int height, bool resetOpenGL)
+    {
+        if (m_Width == width && m_Height == height) {
+            return;
+        }
+
+        if (!m_Data) {
+            return;
+        }
+
+        unsigned char *data = (unsigned char *)malloc(width * height * 3 * sizeof(unsigned char));
+        if (!data)
+            return; // TODO: error handling
+        memset(data, 0, width * height * 3 * sizeof(unsigned char));
+        avir::CImageResizer<> ImageResizer(8);
+        ImageResizer.resizeImage(m_Data, m_Width, m_Height, 0, data, width, height, 3, 0);
+
+        if (data) {
+            if (m_Data) {
+                delete m_Data;
+            }
+
+            m_Data   = data;
+            m_Width  = width;
+            m_Height = height;
+
+            if (resetOpenGL) {
+                glBindTexture(GL_TEXTURE_2D, m_RendererID);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+        }
+    }
+
+    unsigned char *Texture2D::GetData()
+    {
+        if (m_Data) {
+            return m_Data;
+        }
+
+        else {
+            return nullptr;
+        }
+    }
+
+} // namespace tf3d::base
