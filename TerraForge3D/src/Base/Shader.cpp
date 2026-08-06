@@ -111,52 +111,60 @@ namespace tf3d::base
         glUniformMatrix4fv(m_UniformId, 1, GL_FALSE, glm::value_ptr(pv));
     }
 
-    void Shader::SetUniformf(std::string name, float value)
+    int Shader::GetUniformLocation(const std::string &name)
     {
-        if (uniformLocations.find(name) == uniformLocations.end()) {
-            uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
-            uniformLocations.insert(std::make_pair(name, loc));
-            glUniform1f(loc, value);
-        }
+        auto it = uniformLocations.find(name);
+        if (it != uniformLocations.end())
+            return it->second;
 
-        else {
-            uint32_t loc = uniformLocations[name];
-            glUniform1f(loc, value);
-        }
+        const int location = glGetUniformLocation(m_Shader, name.c_str());
+        uniformLocations.emplace(name, location);
+        return location;
     }
 
-    void Shader::SetUniform3f(std::string name, float *value)
+    void Shader::SetUniformf(const std::string &name, float value)
     {
-        if (uniformLocations.find(name) == uniformLocations.end()) {
-            uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
-            uniformLocations.insert(std::make_pair(name, loc));
-            glUniform3f(loc, value[0], value[1], value[2]);
-        }
-
-        else {
-            uint32_t loc = uniformLocations[name];
-            glUniform3f(loc, value[0], value[1], value[2]);
-        }
+        SetUniform1f(name, value);
     }
 
-    void Shader::SetUniformi(std::string name, int value)
+    void Shader::SetUniform1f(const std::string &name, float value)
     {
-        if (uniformLocations.find(name) == uniformLocations.end()) {
-            uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
-            uniformLocations.insert(std::make_pair(name, loc));
-            glUniform1i(loc, value);
-        }
-
-        else {
-            uint32_t loc = uniformLocations[name];
-            glUniform1i(loc, value);
-        }
+        glUniform1f(GetUniformLocation(name), value);
     }
 
-    void Shader::SetUniformMat4(std::string name, glm::mat4 value)
+    void Shader::SetUniform3f(const std::string &name, const float *value)
     {
-        uint32_t loc = glGetUniformLocation(m_Shader, name.c_str());
-        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+        glUniform3f(GetUniformLocation(name), value[0], value[1], value[2]);
+    }
+
+    void Shader::SetUniform3f(const std::string &name, const glm::vec3 &value)
+    {
+        glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
+    }
+
+    void Shader::SetUniform2f(const std::string &name, float value0, float value1)
+    {
+        glUniform2f(GetUniformLocation(name), value0, value1);
+    }
+
+    void Shader::SetUniform2f(const std::string &name, const glm::vec2 &value)
+    {
+        SetUniform2f(name, value.x, value.y);
+    }
+
+    void Shader::SetUniformi(const std::string &name, int value)
+    {
+        SetUniform1i(name, value);
+    }
+
+    void Shader::SetUniform1i(const std::string &name, int value)
+    {
+        glUniform1i(GetUniformLocation(name), value);
+    }
+
+    void Shader::SetUniformMat4(const std::string &name, const glm::mat4 &value)
+    {
+        glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
     }
 
     void Shader::Unbind()
