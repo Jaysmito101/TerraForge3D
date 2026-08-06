@@ -19,7 +19,6 @@ namespace tf3d::mcp_layer
         TaskException,
         Timeout,
         Cancelled,
-        NoActiveViewport,
         ViewportReadFailed,
         JpegEncodeFailed,
         ViewportNotFound
@@ -39,8 +38,6 @@ namespace tf3d::mcp_layer
             return "timeout";
         else if (type == McpErrorType::Cancelled)
             return "cancelled";
-        else if (type == McpErrorType::NoActiveViewport)
-            return "no_active_viewport";
         else if (type == McpErrorType::ViewportReadFailed)
             return "viewport_read_failed";
         else if (type == McpErrorType::JpegEncodeFailed)
