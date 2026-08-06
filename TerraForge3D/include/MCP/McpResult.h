@@ -21,7 +21,8 @@ namespace tf3d::mcp_layer
         Cancelled,
         NoActiveViewport,
         ViewportReadFailed,
-        JpegEncodeFailed
+        JpegEncodeFailed,
+        ViewportNotFound
     };
 
     inline constexpr std::string_view McpErrorTypeToCode(McpErrorType type)
@@ -44,6 +45,8 @@ namespace tf3d::mcp_layer
             return "viewport_read_failed";
         else if (type == McpErrorType::JpegEncodeFailed)
             return "jpeg_encode_failed";
+        else if (type == McpErrorType::ViewportNotFound)
+            return "viewport_not_found";
 
         return "unknown";
     }
