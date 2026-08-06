@@ -1360,8 +1360,7 @@ namespace tf3d::misc
         }
 
         if (m_ShowResetButton && ImGui::Button("Reset to Defaults")) {
-            for (auto &it : m_Values)
-                it.second.ResetValue();
+            Reset();
             hasChanged = true;
         }
         ImGui::PopID();

@@ -649,6 +649,17 @@ namespace tf3d::misc
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
 
+        inline void Reset()
+        {
+            for (auto &[name, value] : m_Values)
+                value.ResetValue();
+        }
+
+        inline bool IsResetEnabled() const
+        {
+            return m_ShowResetButton;
+        }
+
         bool Render();
         inline const std::string &GetDescription() const
         {
