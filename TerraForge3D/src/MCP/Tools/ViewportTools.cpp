@@ -1,6 +1,7 @@
 #include "MCP/Tools/ViewportTools.h"
 
 #include "MCP/ActionRegistry.h"
+#include "MCP/SchemaTemplate.h"
 
 #include "Base/FrameBuffer.h"
 #include "Exporters/Serializer.h"
@@ -16,6 +17,7 @@
 #include <cstdint>
 #include <cmath>
 #include <limits>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,15 +36,14 @@ namespace tf3d::mcp_layer
             jpeg.insert(jpeg.end(), bytes, bytes + size);
         }
 
-        ViewportManager *FindActiveViewport(ApplicationState *applicationState)
+        ViewportManager *FindFirstViewportWithRenderer(ApplicationState *applicationState)
         {
             if (applicationState == nullptr)
                 return nullptr;
 
             for (ViewportManager *viewport : applicationState->viewportManagers) {
-                if (viewport != nullptr && viewport->IsActive()) {
+                if (viewport != nullptr && viewport->GetRendererViewport() != nullptr)
                     return viewport;
-                }
             }
             return nullptr;
         }
@@ -55,43 +56,38 @@ namespace tf3d::mcp_layer
             viewport = nullptr;
             if (applicationState == nullptr) {
                 failure = McpResult::Failure(
-                    McpErrorType::NoActiveViewport,
-                    "TerraForge3D does not currently have an active viewport.");
-                return false;
-            }
-
-            int requestedId = 0;
-            if (arguments.contains("viewportId")) {
-                const auto &id = arguments.at("viewportId");
-                if (!id.is_number_integer() || id.get<int64_t>() <= 0 ||
-                    id.get<int64_t>() > std::numeric_limits<int>::max()) {
-                    failure = McpResult::Failure(
-                        McpErrorType::InvalidArguments,
-                        "'viewportId' must be a positive integer.");
-                    return false;
-                }
-                requestedId = id.get<int>();
-            }
-
-            if (requestedId > 0) {
-                for (ViewportManager *candidate : applicationState->viewportManagers) {
-                    if (candidate != nullptr && static_cast<int>(candidate->GetID()) == requestedId) {
-                        viewport = candidate;
-                        return true;
-                    }
-                }
-                failure = McpResult::Failure(
                     McpErrorType::ViewportNotFound,
-                    "The requested viewport does not exist.");
+                    "TerraForge3D viewport state is unavailable.");
                 return false;
             }
 
-            viewport = FindActiveViewport(applicationState);
-            if (viewport != nullptr)
-                return true;
+            if (!arguments.contains("ViewportId")) {
+                failure = McpResult::Failure(
+                    McpErrorType::InvalidArguments,
+                    "'ViewportId' is required.");
+                return false;
+            }
+
+            const auto &id = arguments.at("ViewportId");
+            if (!id.is_number_integer() || id.get<int64_t>() <= 0 ||
+                id.get<int64_t>() > std::numeric_limits<int>::max()) {
+                failure = McpResult::Failure(
+                    McpErrorType::InvalidArguments,
+                    "'ViewportId' must be a positive integer.");
+                return false;
+            }
+
+            const int requestedId = id.get<int>();
+            for (ViewportManager *candidate : applicationState->viewportManagers) {
+                if (candidate != nullptr && static_cast<int>(candidate->GetID()) == requestedId) {
+                    viewport = candidate;
+                    return true;
+                }
+            }
+
             failure = McpResult::Failure(
-                McpErrorType::NoActiveViewport,
-                "TerraForge3D does not currently have an active viewport.");
+                McpErrorType::ViewportNotFound,
+                "The requested viewport does not exist.");
             return false;
         }
 
@@ -100,16 +96,33 @@ namespace tf3d::mcp_layer
         {
             if (!state.is_object())
                 return McpResult::Failure(McpErrorType::InvalidArguments,
-                                          "'state' must be an object.");
+                                          "'State' must be an object.");
 
             if (manager.GetRendererViewport() == nullptr)
                 return McpResult::Failure(McpErrorType::ViewportNotFound,
                                           "The requested viewport has no renderer state.");
 
-            if (const auto cameraState = state.value("camera", nlohmann::json::object());
+            if (state.contains("Mode")) {
+                if (!state.at("Mode").is_string())
+                    return McpResult::Failure(McpErrorType::InvalidArguments,
+                                              "'Mode' must be a string.");
+                renderer::RendererViewportMode mode;
+                if (!renderer::TryParseRendererViewportMode(state.at("Mode").get<std::string>(), mode))
+                    return McpResult::Failure(McpErrorType::InvalidArguments,
+                                              "'Mode' is not a supported viewport mode.");
+            }
+
+            if (state.contains("PositionOnTerrain") || state.contains("Render") ||
+                state.contains("Interaction")) {
+                return McpResult::Failure(
+                    McpErrorType::InvalidArguments,
+                    "Position, render, and interaction state are read-only.");
+            }
+
+            if (const auto cameraState = state.value("Camera", nlohmann::json::object());
                 !cameraState.is_object()) {
                 return McpResult::Failure(McpErrorType::InvalidArguments,
-                                          "'camera' state must be an object.");
+                                          "'Camera' state must be an object.");
             } else {
                 if (cameraState.contains("CameraID") || cameraState.contains("Perspective") ||
                     cameraState.contains("AutomaticClipping") || cameraState.contains("NearClip") ||
@@ -122,6 +135,17 @@ namespace tf3d::mcp_layer
                 }
             }
 
+            if (const auto viewportState = state.value("Viewport", nlohmann::json::object());
+                !viewportState.is_object()) {
+                return McpResult::Failure(McpErrorType::InvalidArguments,
+                                          "'Viewport' state must be an object.");
+            } else if (viewportState.contains("ID") || viewportState.contains("Active") ||
+                       viewportState.contains("Display")) {
+                return McpResult::Failure(
+                    McpErrorType::InvalidArguments,
+                    "Viewport identity, activity, and display size are read-only.");
+            }
+
             const SerializerNode current = manager.Save();
             const SerializerNode updates = CreateSerializerNodeFromJson(state);
             current->Merge(*updates);
@@ -129,16 +153,16 @@ namespace tf3d::mcp_layer
             return McpResult::Success(manager.Save()->ToJson(), "tf3d.viewport.update_state");
         }
 
-        McpResult CaptureActiveViewport(ApplicationState *applicationState,
-                                        const nlohmann::json &arguments)
+        McpResult CaptureViewport(ApplicationState *applicationState,
+                                  const nlohmann::json &arguments)
         {
             int requestedMaxDimension = 0;
-            if (arguments.contains("maxDimension")) {
-                const auto &maxDimension = arguments.at("maxDimension");
+            if (arguments.contains("MaxDimension")) {
+                const auto &maxDimension = arguments.at("MaxDimension");
                 if (!maxDimension.is_number_integer()) {
                     return McpResult::Failure(
                         McpErrorType::InvalidArguments,
-                        "The optional 'maxDimension' argument must be a positive integer.");
+                        "The optional 'MaxDimension' argument must be a positive integer.");
                 }
 
                 const int64_t requestedValue = maxDimension.get<int64_t>();
@@ -146,17 +170,21 @@ namespace tf3d::mcp_layer
                     requestedValue > static_cast<int64_t>(std::numeric_limits<int>::max())) {
                     return McpResult::Failure(
                         McpErrorType::InvalidArguments,
-                        "The optional 'maxDimension' argument must be a positive integer.");
+                        "The optional 'MaxDimension' argument must be a positive integer.");
                 }
                 requestedMaxDimension = static_cast<int>(requestedValue);
             }
 
-            ViewportManager *viewport = FindActiveViewport(applicationState);
-            if (viewport == nullptr || viewport->GetRendererViewport() == nullptr ||
+            ViewportManager *viewport = nullptr;
+            McpResult failure;
+            if (!ResolveViewport(applicationState, arguments, viewport, failure))
+                return failure;
+
+            if (viewport->GetRendererViewport() == nullptr ||
                 viewport->GetRendererViewport()->GetFrameBuffer() == nullptr) {
                 return McpResult::Failure(
-                    McpErrorType::NoActiveViewport,
-                    "TerraForge3D does not currently have an active viewport.");
+                    McpErrorType::ViewportNotFound,
+                    "The requested viewport has no renderer framebuffer.");
             }
 
             const auto &frameBuffer = viewport->GetRendererViewport()->GetFrameBuffer();
@@ -166,7 +194,7 @@ namespace tf3d::mcp_layer
             if (!frameBuffer->DownloadColorToU8(pixels)) {
                 return McpResult::Failure(
                     McpErrorType::ViewportReadFailed,
-                    "TerraForge3D could not read the active viewport framebuffer.");
+                    "TerraForge3D could not read the requested viewport framebuffer.");
             }
 
             int outputWidth  = width;
@@ -198,7 +226,7 @@ namespace tf3d::mcp_layer
                 jpeg.empty()) {
                 return McpResult::Failure(
                     McpErrorType::JpegEncodeFailed,
-                    "TerraForge3D could not encode the active viewport as JPEG.");
+                    "TerraForge3D could not encode the requested viewport as JPEG.");
             }
 
             const std::string encoded = base64::encode(
@@ -210,73 +238,124 @@ namespace tf3d::mcp_layer
                                     {"mimeType", "image/jpeg"}});
             return McpResult::SuccessWithToolContent(
                 {{"mimeType", "image/jpeg"},
-                 {"width", outputWidth},
-                 {"height", outputHeight}},
+                 {"Width", outputWidth},
+                 {"Height", outputHeight}},
                 std::move(imageContent),
                 "tf3d.viewport.capture");
+        }
+
+        McpResult ListVisibleViewports(ApplicationState *applicationState)
+        {
+            if (applicationState == nullptr)
+                return McpResult::Failure(
+                    McpErrorType::ViewportNotFound,
+                    "TerraForge3D viewport state is unavailable.");
+
+            nlohmann::json viewports = nlohmann::json::array();
+            for (ViewportManager *viewport : applicationState->viewportManagers) {
+                if (viewport == nullptr || !viewport->IsVisible())
+                    continue;
+
+                nlohmann::json entry = {
+                    {"ViewportId", static_cast<int>(viewport->GetID())},
+                    {"Visible", true},
+                    {"Active", viewport->IsActive()},
+                    {"Display", {{"Width", viewport->GetDisplayWidth()},
+                                  {"Height", viewport->GetDisplayHeight()}}}};
+                if (const auto *rendererViewport = viewport->GetRendererViewport()) {
+                    entry["Mode"] = std::string(renderer::RendererViewportModeToString(
+                        rendererViewport->GetMode()));
+                }
+                viewports.push_back(std::move(entry));
+            }
+
+            return McpResult::Success(
+                {{"Viewports", std::move(viewports)}},
+                "tf3d.viewport.list");
+        }
+
+        McpSchemaRuntimeProvider BuildViewportSchemaRuntime(ApplicationState *applicationState)
+        {
+            return [applicationState](std::string_view name) -> std::optional<nlohmann::json> {
+                if (name == "Viewport.Modes") {
+                    nlohmann::json modes = nlohmann::json::array();
+                    for (int value = 0;
+                         value < static_cast<int>(renderer::RendererViewportMode::Count);
+                         ++value) {
+                        modes.push_back(std::string(renderer::RendererViewportModeToString(
+                            static_cast<renderer::RendererViewportMode>(value))));
+                    }
+                    return modes;
+                }
+
+                if (name == "Viewport.TextureSlotIndices") {
+                    nlohmann::json slots = nlohmann::json::array();
+                    for (int value = 0; value < 6; ++value)
+                        slots.push_back(value);
+                    return slots;
+                }
+
+                if (name == "Viewport.TextureChannelIndices") {
+                    nlohmann::json channels = nlohmann::json::array();
+                    ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
+                    const int channelCount = viewport == nullptr
+                                                 ? 4
+                                                 : static_cast<int>(viewport->GetRendererViewport()
+                                                                        ->GetTextureSlotDetailed()
+                                                                        .size());
+                    for (int value = 0; value < channelCount; ++value)
+                        channels.push_back(value);
+                    return channels;
+                }
+
+                if (name == "Viewport.TextureChannelCount") {
+                    ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
+                    return viewport == nullptr
+                               ? 4
+                               : static_cast<int>(viewport->GetRendererViewport()
+                                                      ->GetTextureSlotDetailed()
+                                                      .size());
+                }
+
+                return std::nullopt;
+            };
         }
     } // namespace
 
     void RegisterMcpViewportTools(ActionRegistry &actions, ApplicationState *applicationState)
     {
-        const nlohmann::json viewportIdProperty = {
-            {"type", "integer"},
-            {"minimum", 1},
-            {"description", "Optional viewport ID. Omit it to use the active viewport."}};
+        const McpSchemaTemplate schemaTemplates;
+        const McpSchemaRuntimeProvider runtime = BuildViewportSchemaRuntime(applicationState);
+        const auto getStateSchema =
+            schemaTemplates.Compose("Tools/Viewport/GetState.json");
+        const auto updateStateSchema =
+            schemaTemplates.Compose("Tools/Viewport/Update.json", runtime);
+        const auto captureSchema =
+            schemaTemplates.Compose("Tools/Viewport/Capture.json");
+        const auto listSchema =
+            schemaTemplates.Compose("Tools/Viewport/List.json");
+        if (!getStateSchema || !updateStateSchema || !captureSchema || !listSchema)
+            return;
 
-        const nlohmann::json vector2UpdateSchema = {
-            {"type", "object"},
-            {"properties", {{"x", {{"type", "number"}}}, {"y", {{"type", "number"}}}}},
-            {"required", {"x", "y"}},
-            {"additionalProperties", false}};
-
-        const nlohmann::json vector3UpdateSchema = {
-            {"type", "object"},
-            {"properties", {{"x", {{"type", "number"}}}, {"y", {{"type", "number"}}}, {"z", {{"type", "number"}}}}},
-            {"required", {"x", "y", "z"}},
-            {"additionalProperties", false}};
-
-        const nlohmann::json textureChannelSchema = {
-            {"type", "object"},
-            {"properties", {{"textureSlot", {{"type", "integer"}, {"minimum", 0}, {"maximum", 5}}}, {"channel", {{"type", "integer"}, {"minimum", 0}, {"maximum", 3}}}}},
-            {"required", {"textureSlot", "channel"}},
-            {"additionalProperties", false}};
-
-        nlohmann::json stateSchema = {
-            {"type", "object"},
-            {"properties", nlohmann::json::object()},
-            {"additionalProperties", false}};
-        stateSchema["properties"]["viewport"] = {
-            {"type", "object"},
-            {"properties", {{"mode", {{"type", "string"}, {"enum", {"Object", "Wireframe", "Heightmap", "TextureSlot"}}}}, {"visible", {{"type", "boolean"}}}, {"controlEnabled", {{"type", "boolean"}}}, {"autoCalculateAspectRatio", {{"type", "boolean"}}}}},
-            {"additionalProperties", false}};
-        stateSchema["properties"]["camera"] = {
-            {"type", "object"},
-            {"properties", {{"Target", vector3UpdateSchema}, {"Distance", {{"type", "number"}, {"exclusiveMinimum", 0.0}}}, {"Azimuth", {{"type", "number"}}}, {"Elevation", {{"type", "number"}}}, {"FieldOfView", {{"type", "number"}, {"exclusiveMinimum", 0.0}}}}},
-            {"additionalProperties", false}};
-        stateSchema["properties"]["modes"] = {
-            {"type", "object"},
-            {"properties", nlohmann::json::object()},
-            {"additionalProperties", false}};
-        stateSchema["properties"]["modes"]["properties"]["heightmap"] = {
-            {"type", "object"},
-            {"properties", {{"offset", vector2UpdateSchema}, {"scale", {{"type", "number"}, {"exclusiveMinimum", 0.0}}}}},
-            {"additionalProperties", false}};
-        stateSchema["properties"]["modes"]["properties"]["textureSlot"] = {
-            {"type", "object"},
-            {"properties", {{"offset", vector2UpdateSchema}, {"scale", {{"type", "number"}, {"exclusiveMinimum", 0.0}}}, {"detailedMode", {{"type", "boolean"}}}, {"textureSlot", {{"type", "integer"}, {"minimum", 0}, {"maximum", 5}}}, {"channels", {{"type", "array"}, {"minItems", 4}, {"maxItems", 4}, {"items", textureChannelSchema}}}}},
-            {"additionalProperties", false}};
+        actions.Register({"tf3d.viewport.list",
+                          "List viewports",
+                          "List all currently visible TerraForge3D viewports. "
+                          "Use the returned ViewportId with the get_state, update_state, "
+                          "and capture tools.",
+                          *listSchema,
+                          nlohmann::json{{"readOnlyHint", true}},
+                          ActionFlags::ReadOnly,
+                          [applicationState](const nlohmann::json &) {
+                              return ListVisibleViewports(applicationState);
+                          }});
 
         actions.Register({"tf3d.viewport.get_state",
                           "Get viewport state",
                           "Return the selected viewport's complete structured state. "
                           "The state includes viewport layout and lifecycle flags, current mode, "
                           "camera settings, heightmap controls, texture-slot controls, and interaction state. "
-                          "Omit viewportId to inspect the active viewport.",
-                          nlohmann::json{
-                              {"type", "object"},
-                              {"properties", {{"viewportId", viewportIdProperty}}},
-                              {"additionalProperties", false}},
+                          "ViewportId is required.",
+                          *getStateSchema,
                           nlohmann::json{{"readOnlyHint", true}},
                           ActionFlags::ReadOnly,
                           [applicationState](const nlohmann::json &arguments) {
@@ -295,45 +374,34 @@ namespace tf3d::mcp_layer
                           "Update viewport state",
                           "Update selected viewport state using a partial hierarchical object. "
                           "You can change viewport mode and controls, camera settings, heightmap pan/zoom, "
-                          "or texture-slot settings. Omit viewportId to update the active viewport. "
+                          "or texture-slot settings. ViewportId is required. "
                           "Read-only fields such as camera projection/clipping settings, render size, "
                           "mouse position, and terrain hit position are returned by get_state but are "
                           "not accepted here.",
-                          nlohmann::json{
-                              {"type", "object"},
-                              {"properties", {{"viewportId", viewportIdProperty}, {"state", stateSchema}}},
-                              {"required", {"state"}},
-                              {"additionalProperties", false}},
+                          *updateStateSchema,
                           nlohmann::json{{"readOnlyHint", false}},
                           ActionFlags::None,
                           [applicationState](const nlohmann::json &arguments) {
-                              if (!arguments.contains("state"))
+                              if (!arguments.contains("State"))
                                   return McpResult::Failure(McpErrorType::InvalidArguments,
-                                                            "'state' is required.");
+                                                            "'State' is required.");
                               ViewportManager *viewport = nullptr;
                               McpResult failure;
                               if (!ResolveViewport(applicationState, arguments, viewport, failure))
                                   return failure;
-                              return UpdateViewportState(*viewport, arguments.at("state"));
+                              return UpdateViewportState(*viewport, arguments.at("State"));
                           }});
 
         actions.Register({"tf3d.viewport.capture",
-                          "Capture active viewport",
-                          "Return the currently active TerraForge3D viewport as a JPEG image. "
-                          "Optionally pass maxDimension to downscale the image before encoding, "
+                          "Capture viewport",
+                          "Return the requested TerraForge3D viewport as a JPEG image. "
+                          "ViewportId is required. "
+                          "Optionally pass MaxDimension to downscale the image before encoding, "
                           "which reduces image size and token usage; the aspect ratio is preserved "
                           "and the image is never upscaled.",
-                          nlohmann::json{
-                              {"type", "object"},
-                              {"properties", nlohmann::json{
-                                                 {"maxDimension", nlohmann::json{
-                                                                      {"type", "integer"},
-                                                                      {"minimum", 1},
-                                                                      {"description", "Optional maximum width or height in pixels. "
-                                                                                      "Use this to reduce image size and token usage."}}}}},
-                              {"additionalProperties", false}},
+                          *captureSchema,
                           nlohmann::json{{"readOnlyHint", true}}, ActionFlags::ReadOnly, [applicationState](const nlohmann::json &arguments) {
-                              return CaptureActiveViewport(applicationState, arguments);
+                              return CaptureViewport(applicationState, arguments);
                           }});
     }
 
