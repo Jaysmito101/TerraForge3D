@@ -13,7 +13,8 @@ namespace tf3d::mcp_layer
     inline constexpr const char *MCP_RESULT_REVISION = "tf3d.mcp/v1";
 
     enum class McpErrorType : uint8_t {
-        InvalidTask = 0,
+        InvalidArguments = 0,
+        InvalidTask,
         Shutdown,
         TaskException,
         Timeout,
@@ -25,7 +26,9 @@ namespace tf3d::mcp_layer
 
     inline constexpr std::string_view McpErrorTypeToCode(McpErrorType type)
     {
-        if (type == McpErrorType::InvalidTask)
+        if (type == McpErrorType::InvalidArguments)
+            return "invalid_arguments";
+        else if (type == McpErrorType::InvalidTask)
             return "invalid_task";
         else if (type == McpErrorType::Shutdown)
             return "shutdown";
