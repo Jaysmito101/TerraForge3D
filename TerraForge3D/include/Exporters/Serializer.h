@@ -107,17 +107,17 @@ namespace tf3d::exporters
         }
         inline static nlohmann::json EncodeVector(const glm::vec2 &value)
         {
-            return {{"x", value.x}, {"y", value.y}};
+            return {{"X", value.x}, {"Y", value.y}};
         }
 
         inline static nlohmann::json EncodeVector(const glm::vec3 &value)
         {
-            return {{"x", value.x}, {"y", value.y}, {"z", value.z}};
+            return {{"X", value.x}, {"Y", value.y}, {"Z", value.z}};
         }
 
         inline static nlohmann::json EncodeVector(const glm::vec4 &value)
         {
-            return {{"x", value.x}, {"y", value.y}, {"z", value.z}, {"w", value.w}};
+            return {{"X", value.x}, {"Y", value.y}, {"Z", value.z}, {"W", value.w}};
         }
 
         template <typename T>
@@ -142,13 +142,13 @@ namespace tf3d::exporters
                 result.reserve(it.value()["Value"].size());
                 for (const auto &item : it.value()["Value"]) {
                     if constexpr (std::same_as<T, glm::vec2>)
-                        result.emplace_back(item.at("x").get<float>(), item.at("y").get<float>());
+                        result.emplace_back(item.at("X").get<float>(), item.at("Y").get<float>());
                     else if constexpr (std::same_as<T, glm::vec3>)
-                        result.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
-                                            item.at("z").get<float>());
+                        result.emplace_back(item.at("X").get<float>(), item.at("Y").get<float>(),
+                                            item.at("Z").get<float>());
                     else if constexpr (std::same_as<T, glm::vec4>)
-                        result.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
-                                            item.at("z").get<float>(), item.at("w").get<float>());
+                        result.emplace_back(item.at("X").get<float>(), item.at("Y").get<float>(),
+                                            item.at("Z").get<float>(), item.at("W").get<float>());
                     else
                         static_assert(SerializerUnsupportedType<T>, "Unsupported serializer vector element type");
                 }
@@ -199,14 +199,14 @@ namespace tf3d::exporters
                 m_Children[key] = value;
                 return this;
             } else if constexpr (std::same_as<Value, glm::vec2>) {
-                return SetTyped(key, nlohmann::json{{"x", value.x}, {"y", value.y}}, "Vector2");
+                return SetTyped(key, nlohmann::json{{"X", value.x}, {"Y", value.y}}, "Vector2");
             } else if constexpr (std::same_as<Value, glm::vec3>) {
                 return SetTyped(key,
-                                nlohmann::json{{"x", value.x}, {"y", value.y}, {"z", value.z}},
+                                nlohmann::json{{"X", value.x}, {"Y", value.y}, {"Z", value.z}},
                                 "Vector3");
             } else if constexpr (std::same_as<Value, glm::vec4>) {
                 return SetTyped(key,
-                                nlohmann::json{{"x", value.x}, {"y", value.y}, {"z", value.z}, {"w", value.w}},
+                                nlohmann::json{{"X", value.x}, {"Y", value.y}, {"Z", value.z}, {"W", value.w}},
                                 "Vector4");
             } else if constexpr (SerializerVectorTraits<Value>::IsVector) {
                 using Element      = typename SerializerVectorTraits<Value>::ElementType;
@@ -290,7 +290,7 @@ namespace tf3d::exporters
                 }
                 try {
                     const auto &value = m_Value.at(key).at("Value");
-                    return glm::vec2(value.at("x").get<float>(), value.at("y").get<float>());
+                    return glm::vec2(value.at("X").get<float>(), value.at("Y").get<float>());
                 } catch (...) {
                     WarnInvalidField(key, "Vector2 value is malformed");
                     return defaultValue;
@@ -303,8 +303,8 @@ namespace tf3d::exporters
                 }
                 try {
                     const auto &value = m_Value.at(key).at("Value");
-                    return glm::vec3(value.at("x").get<float>(), value.at("y").get<float>(),
-                                     value.at("z").get<float>());
+                    return glm::vec3(value.at("X").get<float>(), value.at("Y").get<float>(),
+                                     value.at("Z").get<float>());
                 } catch (...) {
                     WarnInvalidField(key, "Vector3 value is malformed");
                     return defaultValue;
@@ -317,8 +317,8 @@ namespace tf3d::exporters
                 }
                 try {
                     const auto &value = m_Value.at(key).at("Value");
-                    return glm::vec4(value.at("x").get<float>(), value.at("y").get<float>(),
-                                     value.at("z").get<float>(), value.at("w").get<float>());
+                    return glm::vec4(value.at("X").get<float>(), value.at("Y").get<float>(),
+                                     value.at("Z").get<float>(), value.at("W").get<float>());
                 } catch (...) {
                     WarnInvalidField(key, "Vector4 value is malformed");
                     return defaultValue;
@@ -412,6 +412,7 @@ namespace tf3d::exporters
             return this;
         }
 
+        // Returns the clean application-facing representation without internal type metadata.
         inline nlohmann::json ToJson() const
         {
             nlohmann::json data = nlohmann::json::object();
@@ -423,6 +424,37 @@ namespace tf3d::exporters
                 data[it.first] = nlohmann::json::array();
                 for (const auto &node : it.second)
                     data[it.first].push_back(node->ToJson());
+            }
+            return data;
+        }
+
+        // Returns the lossless persistence representation, retaining Type/Value metadata.
+        inline nlohmann::json ToTypedJson() const
+        {
+            nlohmann::json data = nlohmann::json::object();
+            for (const auto &it : m_Value.items())
+                data[it.key()] = it.value();
+            for (const auto &it : m_Children) {
+                if (!it.second) {
+                    WarnInvalidField(it.first, "cannot serialize a null child node");
+                    continue;
+                }
+                data[it.first] = {
+                    {"Type", "Object"},
+                    {"Value", it.second->ToTypedJson()}};
+            }
+            for (const auto &it : m_Arrays) {
+                nlohmann::json values = nlohmann::json::array();
+                for (const auto &node : it.second) {
+                    if (!node) {
+                        WarnInvalidField(it.first, "cannot serialize a null node array element");
+                        continue;
+                    }
+                    values.push_back(node->ToTypedJson());
+                }
+                data[it.first] = {
+                    {"Type", "ObjectArray"},
+                    {"Value", std::move(values)}};
             }
             return data;
         }
@@ -465,36 +497,36 @@ namespace tf3d::exporters
                                    })) {
                             Set(key, value.get<std::vector<std::string>>());
                         } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
-                                       return item.is_object() && item.size() == 4 && item.contains("x") && item.contains("y") &&
-                                              item.contains("z") && item.contains("w") && item.at("x").is_number() &&
-                                              item.at("y").is_number() && item.at("z").is_number() &&
-                                              item.at("w").is_number();
+                                       return item.is_object() && item.size() == 4 && item.contains("X") && item.contains("Y") &&
+                                              item.contains("Z") && item.contains("W") && item.at("X").is_number() &&
+                                              item.at("Y").is_number() && item.at("Z").is_number() &&
+                                              item.at("W").is_number();
                                    })) {
                             std::vector<glm::vec4> vectors;
                             vectors.reserve(value.size());
                             for (const auto &item : value)
-                                vectors.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
-                                                     item.at("z").get<float>(), item.at("w").get<float>());
+                                vectors.emplace_back(item.at("X").get<float>(), item.at("Y").get<float>(),
+                                                     item.at("Z").get<float>(), item.at("W").get<float>());
                             Set(key, vectors);
                         } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
-                                       return item.is_object() && item.size() == 3 && item.contains("x") && item.contains("y") &&
-                                              item.contains("z") && item.at("x").is_number() &&
-                                              item.at("y").is_number() && item.at("z").is_number();
+                                       return item.is_object() && item.size() == 3 && item.contains("X") && item.contains("Y") &&
+                                              item.contains("Z") && item.at("X").is_number() &&
+                                              item.at("Y").is_number() && item.at("Z").is_number();
                                    })) {
                             std::vector<glm::vec3> vectors;
                             vectors.reserve(value.size());
                             for (const auto &item : value)
-                                vectors.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
-                                                     item.at("z").get<float>());
+                                vectors.emplace_back(item.at("X").get<float>(), item.at("Y").get<float>(),
+                                                     item.at("Z").get<float>());
                             Set(key, vectors);
                         } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
-                                       return item.is_object() && item.size() == 2 && item.contains("x") && item.contains("y") &&
-                                              item.at("x").is_number() && item.at("y").is_number();
+                                       return item.is_object() && item.size() == 2 && item.contains("X") && item.contains("Y") &&
+                                              item.at("X").is_number() && item.at("Y").is_number();
                                    })) {
                             std::vector<glm::vec2> vectors;
                             vectors.reserve(value.size());
                             for (const auto &item : value)
-                                vectors.emplace_back(item.at("x").get<float>(), item.at("y").get<float>());
+                                vectors.emplace_back(item.at("X").get<float>(), item.at("Y").get<float>());
                             Set(key, vectors);
                         } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
                                        return item.is_object();
@@ -509,18 +541,18 @@ namespace tf3d::exporters
                             WarnInvalidField(key, "unsupported array element types");
                         }
                     } else if (value.is_object()) {
-                        const bool hasX = value.contains("x");
-                        const bool hasY = value.contains("y");
-                        const bool hasZ = value.contains("z");
-                        const bool hasW = value.contains("w");
+                        const bool hasX = value.contains("X");
+                        const bool hasY = value.contains("Y");
+                        const bool hasZ = value.contains("Z");
+                        const bool hasW = value.contains("W");
                         if (hasX && hasY && hasZ && hasW) {
-                            Set(key, glm::vec4(value.at("x").get<float>(), value.at("y").get<float>(),
-                                               value.at("z").get<float>(), value.at("w").get<float>()));
+                            Set(key, glm::vec4(value.at("X").get<float>(), value.at("Y").get<float>(),
+                                               value.at("Z").get<float>(), value.at("W").get<float>()));
                         } else if (hasX && hasY && hasZ) {
-                            Set(key, glm::vec3(value.at("x").get<float>(), value.at("y").get<float>(),
-                                               value.at("z").get<float>()));
+                            Set(key, glm::vec3(value.at("X").get<float>(), value.at("Y").get<float>(),
+                                               value.at("Z").get<float>()));
                         } else if (hasX && hasY) {
-                            Set(key, glm::vec2(value.at("x").get<float>(), value.at("y").get<float>()));
+                            Set(key, glm::vec2(value.at("X").get<float>(), value.at("Y").get<float>()));
                         } else {
                             auto node = CreateSerializerNode();
                             node->LoadJson(value);
@@ -533,6 +565,66 @@ namespace tf3d::exporters
                     WarnInvalidField(key, "JSON value could not be decoded");
                 }
             }
+        }
+
+        inline bool LoadTypedJson(const nlohmann::json &data)
+        {
+            Clear();
+            if (!data.is_object()) {
+                TF3D_LOG_WARN("Invalid typed serializer root: expected a JSON object");
+                return false;
+            }
+
+            bool valid = true;
+            for (const auto &[key, value] : data.items()) {
+                if (!value.is_object() || !value.contains("Type") || !value.at("Type").is_string() ||
+                    !value.contains("Value")) {
+                    WarnInvalidField(key, "typed value must contain Type and Value");
+                    valid = false;
+                    continue;
+                }
+
+                const std::string type = value.at("Type").get<std::string>();
+                if (type == "Object") {
+                    if (!value.at("Value").is_object()) {
+                        WarnInvalidField(key, "Object value must be a JSON object");
+                        valid = false;
+                        continue;
+                    }
+                    auto child = CreateSerializerNode();
+                    if (!child->LoadTypedJson(value.at("Value")))
+                        valid = false;
+                    m_Children[key] = std::move(child);
+                } else if (type == "ObjectArray") {
+                    if (!value.at("Value").is_array()) {
+                        WarnInvalidField(key, "ObjectArray value must be a JSON array");
+                        valid = false;
+                        continue;
+                    }
+                    auto &children = m_Arrays[key];
+                    for (const auto &item : value.at("Value")) {
+                        if (!item.is_object()) {
+                            WarnInvalidField(key, "ObjectArray elements must be JSON objects");
+                            valid = false;
+                            continue;
+                        }
+                        auto child = CreateSerializerNode();
+                        if (!child->LoadTypedJson(item))
+                            valid = false;
+                        children.push_back(std::move(child));
+                    }
+                } else if (type == "Boolean" || type == "Integer" || type == "Float" ||
+                           type == "String" || type == "Vector2" || type == "Vector3" ||
+                           type == "Vector4" || type == "BooleanArray" || type == "IntegerArray" ||
+                           type == "FloatArray" || type == "StringArray" || type == "Vector2Array" ||
+                           type == "Vector3Array" || type == "Vector4Array") {
+                    m_Value[key] = value;
+                } else {
+                    WarnInvalidField(key, "unknown typed serializer value type");
+                    valid = false;
+                }
+            }
+            return valid;
         }
 
         inline void Clear()
@@ -562,9 +654,17 @@ namespace tf3d::exporters
         return node;
     }
 
+    inline static SerializerNode CreateSerializerNodeFromTypedJson(const nlohmann::json &data)
+    {
+        SerializerNode node = CreateSerializerNode();
+        node->LoadTypedJson(data);
+        return node;
+    }
+
 } // namespace tf3d::exporters
 
 using tf3d::exporters::CreateSerializerNode;
 using tf3d::exporters::CreateSerializerNodeFromJson;
+using tf3d::exporters::CreateSerializerNodeFromTypedJson;
 using tf3d::exporters::SerializerNode;
 using tf3d::exporters::SerializerNodeInternal;
