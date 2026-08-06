@@ -4,24 +4,27 @@ namespace tf3d::data
 {
     class ApplicationState;
 }
+
 using tf3d::data::ApplicationState;
 
 namespace tf3d::ui
 {
-class MainMenu
-{
-public:
-    MainMenu(ApplicationState *appState);
-    ~MainMenu();
+    class MainMenu
+    {
+    public:
+        MainMenu(ApplicationState *appState);
+        ~MainMenu();
 
-    void ShowMainMenu();
+        void ShowMainMenu();
 
-    void ShowFileMenu();
-    void ShowOptionsMenu();
-    void ShowWindowsMenu();
-    void ShowHelpMenu();
+        void ShowFileMenu();
+        void ShowOptionsMenu();
+        void ShowWindowsMenu();
+        void ShowHelpMenu();
 
-private:
-    ApplicationState *appState;
-};
-}
+    private:
+        ApplicationState *appState;
+    };
+} // namespace tf3d::ui
+
+using tf3d::ui::MainMenu;

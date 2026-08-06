@@ -14,8 +14,8 @@ namespace tf3d::misc
     {
         static uint32_t s_ViewportID = 1;
         this->m_ID                   = s_ViewportID++;
-        this->m_AppState         = appState;
-        this->m_RendererViewport = new renderer::RendererViewport();
+        this->m_AppState             = appState;
+        this->m_RendererViewport     = new renderer::RendererViewport();
     }
 
     ViewportManager::~ViewportManager()

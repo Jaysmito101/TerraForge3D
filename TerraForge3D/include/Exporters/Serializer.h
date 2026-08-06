@@ -41,22 +41,38 @@ namespace tf3d::exporters
     inline constexpr std::string_view SerializerValueTypeToString(SerializerValueType type)
     {
         switch (type) {
-        case SerializerValueType::Boolean: return "Boolean";
-        case SerializerValueType::Integer: return "Integer";
-        case SerializerValueType::Float: return "Float";
-        case SerializerValueType::String: return "String";
-        case SerializerValueType::Object: return "Object";
-        case SerializerValueType::Vector2: return "Vector2";
-        case SerializerValueType::Vector3: return "Vector3";
-        case SerializerValueType::Vector4: return "Vector4";
-        case SerializerValueType::BooleanArray: return "BooleanArray";
-        case SerializerValueType::IntegerArray: return "IntegerArray";
-        case SerializerValueType::FloatArray: return "FloatArray";
-        case SerializerValueType::StringArray: return "StringArray";
-        case SerializerValueType::Vector2Array: return "Vector2Array";
-        case SerializerValueType::Vector3Array: return "Vector3Array";
-        case SerializerValueType::Vector4Array: return "Vector4Array";
-        case SerializerValueType::ObjectArray: return "ObjectArray";
+            case SerializerValueType::Boolean:
+                return "Boolean";
+            case SerializerValueType::Integer:
+                return "Integer";
+            case SerializerValueType::Float:
+                return "Float";
+            case SerializerValueType::String:
+                return "String";
+            case SerializerValueType::Object:
+                return "Object";
+            case SerializerValueType::Vector2:
+                return "Vector2";
+            case SerializerValueType::Vector3:
+                return "Vector3";
+            case SerializerValueType::Vector4:
+                return "Vector4";
+            case SerializerValueType::BooleanArray:
+                return "BooleanArray";
+            case SerializerValueType::IntegerArray:
+                return "IntegerArray";
+            case SerializerValueType::FloatArray:
+                return "FloatArray";
+            case SerializerValueType::StringArray:
+                return "StringArray";
+            case SerializerValueType::Vector2Array:
+                return "Vector2Array";
+            case SerializerValueType::Vector3Array:
+                return "Vector3Array";
+            case SerializerValueType::Vector4Array:
+                return "Vector4Array";
+            case SerializerValueType::ObjectArray:
+                return "ObjectArray";
         }
         return {};
     }
@@ -64,22 +80,38 @@ namespace tf3d::exporters
     inline constexpr std::optional<SerializerValueType> SerializerValueTypeFromString(
         std::string_view type)
     {
-        if (type == "Boolean") return SerializerValueType::Boolean;
-        if (type == "Integer") return SerializerValueType::Integer;
-        if (type == "Float") return SerializerValueType::Float;
-        if (type == "String") return SerializerValueType::String;
-        if (type == "Object") return SerializerValueType::Object;
-        if (type == "Vector2") return SerializerValueType::Vector2;
-        if (type == "Vector3") return SerializerValueType::Vector3;
-        if (type == "Vector4") return SerializerValueType::Vector4;
-        if (type == "BooleanArray") return SerializerValueType::BooleanArray;
-        if (type == "IntegerArray") return SerializerValueType::IntegerArray;
-        if (type == "FloatArray") return SerializerValueType::FloatArray;
-        if (type == "StringArray") return SerializerValueType::StringArray;
-        if (type == "Vector2Array") return SerializerValueType::Vector2Array;
-        if (type == "Vector3Array") return SerializerValueType::Vector3Array;
-        if (type == "Vector4Array") return SerializerValueType::Vector4Array;
-        if (type == "ObjectArray") return SerializerValueType::ObjectArray;
+        if (type == "Boolean")
+            return SerializerValueType::Boolean;
+        if (type == "Integer")
+            return SerializerValueType::Integer;
+        if (type == "Float")
+            return SerializerValueType::Float;
+        if (type == "String")
+            return SerializerValueType::String;
+        if (type == "Object")
+            return SerializerValueType::Object;
+        if (type == "Vector2")
+            return SerializerValueType::Vector2;
+        if (type == "Vector3")
+            return SerializerValueType::Vector3;
+        if (type == "Vector4")
+            return SerializerValueType::Vector4;
+        if (type == "BooleanArray")
+            return SerializerValueType::BooleanArray;
+        if (type == "IntegerArray")
+            return SerializerValueType::IntegerArray;
+        if (type == "FloatArray")
+            return SerializerValueType::FloatArray;
+        if (type == "StringArray")
+            return SerializerValueType::StringArray;
+        if (type == "Vector2Array")
+            return SerializerValueType::Vector2Array;
+        if (type == "Vector3Array")
+            return SerializerValueType::Vector3Array;
+        if (type == "Vector4Array")
+            return SerializerValueType::Vector4Array;
+        if (type == "ObjectArray")
+            return SerializerValueType::ObjectArray;
         return std::nullopt;
     }
 

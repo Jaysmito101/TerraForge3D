@@ -46,13 +46,13 @@ namespace tf3d::data
 {
 
     struct ApplicationStateWindows {
-        bool dashboard           = true;
-        bool generationManager   = true;
-        bool rendererSettings    = true;
-        bool exportManager       = false;
-        bool jobManager          = false;
-        bool performanceMonitor  = false;
-        bool mcpControlPanel     = true;
+        bool dashboard          = true;
+        bool generationManager  = true;
+        bool rendererSettings   = true;
+        bool exportManager      = false;
+        bool jobManager         = false;
+        bool performanceMonitor = false;
+        bool mcpControlPanel    = true;
 
         bool styleEditor       = false;
         bool textureStore      = false;
@@ -122,10 +122,10 @@ namespace tf3d::data
         ApplicationStateGlobals globals;
         ApplicationStateConstants constants;
 
-        ui::MainMenu *mainMenu                         = nullptr;
+        ui::MainMenu *mainMenu                     = nullptr;
         texture_store::TextureStore *textureStore  = nullptr;
-        misc::SupportersTribute *supportersTribute       = nullptr;
-        misc::OSLiscences *osLiscences                   = nullptr;
+        misc::SupportersTribute *supportersTribute = nullptr;
+        misc::OSLiscences *osLiscences             = nullptr;
         ProjectManager *projectManager             = nullptr;
         ExportManager *exportManager               = nullptr;
         Model *mainModel                           = nullptr;

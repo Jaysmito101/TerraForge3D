@@ -20,7 +20,7 @@ namespace
         }
         target = value->get<bool>();
     }
-}
+} // namespace
 
 namespace tf3d::data
 {
