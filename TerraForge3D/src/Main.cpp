@@ -253,7 +253,7 @@ namespace tf3d
             appState->mainMenu          = new ui::MainMenu(appState);
             // appState->projectManager = new ProjectManager(appState);
             // appState->serailizer = new Serializer(appState);
-            appState->osLiscences   = new OSLiscences(appState);
+            appState->osLiscences   = new misc::OSLiscences(appState);
             appState->textureStore  = new texture_store::TextureStore(appState);
             appState->exportManager = new ExportManager(appState);
             appState->styleManager  = new Style();
