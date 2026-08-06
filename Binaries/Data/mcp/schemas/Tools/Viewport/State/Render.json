@@ -1,0 +1,8 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "Width": { "type": "integer", "minimum": 1 },
+    "Height": { "type": "integer", "minimum": 1 },
+    "AspectRatio": { "type": "number", "exclusiveMinimum": 0.0 }
+  }
+}

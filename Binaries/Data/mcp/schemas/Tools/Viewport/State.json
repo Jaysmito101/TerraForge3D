@@ -1,0 +1,26 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "Mode": {
+      "type": "string",
+      "enum": { "$runtime": "Viewport.Modes" }
+    },
+    "Camera": { "$include": "Tools/Viewport/State/Camera.json" },
+    "PositionOnTerrain": { "$include": "Common/Vector4.json" },
+    "Heightmap": { "$include": "Tools/Viewport/State/Heightmap.json" },
+    "TextureSlot": { "$include": "Tools/Viewport/State/TextureSlot.json" },
+    "Render": { "$include": "Tools/Viewport/State/Render.json" },
+    "Interaction": { "$include": "Tools/Viewport/State/Interaction.json" },
+    "Viewport": { "$include": "Tools/Viewport/State/Viewport.json" }
+  },
+  "required": [
+    "Mode",
+    "Camera",
+    "PositionOnTerrain",
+    "Heightmap",
+    "TextureSlot",
+    "Render",
+    "Interaction",
+    "Viewport"
+  ]
+}

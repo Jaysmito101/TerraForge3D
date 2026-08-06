@@ -1,0 +1,7 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "Offset": { "$include": "Common/Vector2.json" },
+    "Scale": { "type": "number", "exclusiveMinimum": 0.0 }
+  }
+}

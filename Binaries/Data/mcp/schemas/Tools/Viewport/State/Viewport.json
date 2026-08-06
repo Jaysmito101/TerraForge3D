@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "ID": { "type": "integer" },
+    "Visible": { "type": "boolean" },
+    "Active": { "type": "boolean" },
+    "ControlEnabled": { "type": "boolean" },
+    "AutoCalculateAspectRatio": { "type": "boolean" },
+    "Display": {
+      "$include": "Common/Object.json",
+      "properties": {
+        "Width": { "type": "integer", "minimum": 1 },
+        "Height": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

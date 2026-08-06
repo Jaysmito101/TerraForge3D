@@ -1,0 +1,14 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "TextureSlot": {
+      "type": "integer",
+      "enum": { "$runtime": "Viewport.TextureSlotIndices" }
+    },
+    "Channel": {
+      "type": "integer",
+      "enum": { "$runtime": "Viewport.TextureChannelIndices" }
+    }
+  },
+  "required": ["TextureSlot", "Channel"]
+}

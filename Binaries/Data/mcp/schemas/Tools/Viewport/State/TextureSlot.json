@@ -1,0 +1,18 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "Offset": { "$include": "Common/Vector2.json" },
+    "Scale": { "type": "number", "exclusiveMinimum": 0.0 },
+    "DetailedMode": { "type": "boolean" },
+    "TextureSlot": {
+      "type": "integer",
+      "enum": { "$runtime": "Viewport.TextureSlotIndices" }
+    },
+    "Channels": {
+      "type": "array",
+      "minItems": { "$runtime": "Viewport.TextureChannelCount" },
+      "maxItems": { "$runtime": "Viewport.TextureChannelCount" },
+      "items": { "$include": "Common/TextureChannel.json" }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "CameraID": { "type": "integer" },
+    "Perspective": { "type": "boolean" },
+    "AutomaticClipping": { "type": "boolean" },
+    "Target": { "$include": "Common/Vector3.json" },
+    "Position": { "$include": "Common/Vector3.json" },
+    "Distance": { "type": "number", "exclusiveMinimum": 0.0 },
+    "Azimuth": { "type": "number" },
+    "Elevation": { "type": "number" },
+    "FieldOfView": { "type": "number", "exclusiveMinimum": 0.0 },
+    "NearClip": { "type": "number", "exclusiveMinimum": 0.0 },
+    "FarClip": { "type": "number", "exclusiveMinimum": 0.0 },
+    "AspectRatio": { "type": "number", "exclusiveMinimum": 0.0 },
+    "EffectiveNearClip": { "type": "number", "exclusiveMinimum": 0.0 },
+    "EffectiveFarClip": { "type": "number", "exclusiveMinimum": 0.0 }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "MousePosition": { "$include": "Common/Vector2.json" },
+    "Hovered": { "type": "boolean" }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "MaxDimension": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional maximum width or height in pixels. Use this to reduce image size and token usage."
+    }
+  }
+}
