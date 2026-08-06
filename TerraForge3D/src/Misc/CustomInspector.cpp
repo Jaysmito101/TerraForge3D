@@ -337,35 +337,35 @@ namespace tf3d::misc
     std::string CustomInspectorWidget::CustomInspectorWidgetTypeToString(CustomInspectorWidgetType type)
     {
         switch (type) {
-            case CustomInspectorWidgetType_Slider:
+            case CustomInspectorWidgetType::Slider:
                 return "Slider";
-            case CustomInspectorWidgetType_Drag:
+            case CustomInspectorWidgetType::Drag:
                 return "Drag";
-            case CustomInspectorWidgetType_Color:
+            case CustomInspectorWidgetType::Color:
                 return "Color";
-            case CustomInspectorWidgetType_Texture:
+            case CustomInspectorWidgetType::Texture:
                 return "Texture";
-            case CustomInspectorWidgetType_Path:
+            case CustomInspectorWidgetType::Path:
                 return "Path";
-            case CustomInspectorWidgetType_Curve:
+            case CustomInspectorWidgetType::Curve:
                 return "Curve";
-            case CustomInspectorWidgetType_Button:
+            case CustomInspectorWidgetType::Button:
                 return "Button";
-            case CustomInspectorWidgetType_Checkbox:
+            case CustomInspectorWidgetType::Checkbox:
                 return "Checkbox";
-            case CustomInspectorWidgetType_Input:
+            case CustomInspectorWidgetType::Input:
                 return "Input";
-            case CustomInspectorWidgetType_Seed:
+            case CustomInspectorWidgetType::Seed:
                 return "Seed";
-            case CustomInspectorWidgetType_Dropdown:
+            case CustomInspectorWidgetType::Dropdown:
                 return "Dropdown";
-            case CustomInspectorWidgetType_Seperator:
-                return "Seperator";
-            case CustomInspectorWidgetType_NewLine:
+            case CustomInspectorWidgetType::Separator:
+                return "Separator";
+            case CustomInspectorWidgetType::NewLine:
                 return "NewLine";
-            case CustomInspectorWidgetType_Text:
+            case CustomInspectorWidgetType::Text:
                 return "Text";
-            case CustomInspectorWidgetType_Unknown:
+            case CustomInspectorWidgetType::Unknown:
             default:
                 return "Unknown";
         }
@@ -374,34 +374,34 @@ namespace tf3d::misc
     CustomInspectorWidgetType CustomInspectorWidget::CustomInspectorWidgetTypeFromString(const std::string &type)
     {
         if (type == "Slider")
-            return CustomInspectorWidgetType_Slider;
+            return CustomInspectorWidgetType::Slider;
         if (type == "Drag")
-            return CustomInspectorWidgetType_Drag;
+            return CustomInspectorWidgetType::Drag;
         if (type == "Color")
-            return CustomInspectorWidgetType_Color;
+            return CustomInspectorWidgetType::Color;
         if (type == "Texture")
-            return CustomInspectorWidgetType_Texture;
+            return CustomInspectorWidgetType::Texture;
         if (type == "Path")
-            return CustomInspectorWidgetType_Path;
+            return CustomInspectorWidgetType::Path;
         if (type == "Curve")
-            return CustomInspectorWidgetType_Curve;
+            return CustomInspectorWidgetType::Curve;
         if (type == "Button")
-            return CustomInspectorWidgetType_Button;
+            return CustomInspectorWidgetType::Button;
         if (type == "Checkbox")
-            return CustomInspectorWidgetType_Checkbox;
+            return CustomInspectorWidgetType::Checkbox;
         if (type == "Input")
-            return CustomInspectorWidgetType_Input;
+            return CustomInspectorWidgetType::Input;
         if (type == "Seed")
-            return CustomInspectorWidgetType_Seed;
+            return CustomInspectorWidgetType::Seed;
         if (type == "Dropdown")
-            return CustomInspectorWidgetType_Dropdown;
-        if (type == "Seperator")
-            return CustomInspectorWidgetType_Seperator;
+            return CustomInspectorWidgetType::Dropdown;
+        if (type == "Separator" || type == "Seperator")
+            return CustomInspectorWidgetType::Separator;
         if (type == "NewLine")
-            return CustomInspectorWidgetType_NewLine;
+            return CustomInspectorWidgetType::NewLine;
         if (type == "Text")
-            return CustomInspectorWidgetType_Text;
-        return CustomInspectorWidgetType_Unknown;
+            return CustomInspectorWidgetType::Text;
+        return CustomInspectorWidgetType::Unknown;
     }
 
     SerializerNode CustomInspectorWidget::Save() const
@@ -411,7 +411,7 @@ namespace tf3d::misc
         node->Set("TypeName", CustomInspectorWidgetTypeToString(m_Type));
         node->Set("TargetVariable", m_VariableName);
         node->Set("Label", m_Label);
-        if (m_Type == CustomInspectorWidgetType_Seed)
+        if (m_Type == CustomInspectorWidgetType::Seed)
             node->Set("SeedHistory", m_SeedHistory);
         node->Set("ISpeed", m_ISpeed);
         node->Set("FSeed", m_FSpeed);
@@ -444,7 +444,7 @@ namespace tf3d::misc
         m_VariableName = node->Get<std::string>("TargetVariable", m_VariableName);
         m_Label        = node->Get<std::string>("Label", m_Label);
         m_ID           = node->Get<std::string>("ID", m_ID);
-        if (m_Type == CustomInspectorWidgetType_Seed)
+        if (m_Type == CustomInspectorWidgetType::Seed)
             m_SeedHistory = node->Get<std::vector<int>>("SeedHistory", m_SeedHistory);
         m_ISpeed               = node->Get<int>("ISpeed", m_ISpeed);
         m_FSpeed               = node->Get<float>("FSeed", m_FSpeed);
@@ -471,8 +471,8 @@ namespace tf3d::misc
     CustomInspector::CustomInspector()
     {
         m_ID = GenerateId(16);
-        AddWidget("Seperator", CustomInspectorWidget(CustomInspectorWidgetType_Seperator));
-        AddWidget("NewLine", CustomInspectorWidget(CustomInspectorWidgetType_NewLine));
+        AddWidget("Separator", CustomInspectorWidget(CustomInspectorWidgetType::Separator));
+        AddWidget("NewLine", CustomInspectorWidget(CustomInspectorWidgetType::NewLine));
     }
 
     CustomInspector::~CustomInspector()
@@ -689,7 +689,7 @@ namespace tf3d::misc
 
     CustomInspectorWidget &CustomInspector::AddWidget(const std::string &name, const CustomInspectorWidget &widget)
     {
-        if (name == "Seperator" || name == "NewLine") {
+        if (name == "Separator" || name == "NewLine") {
             if (!HasWidget(name))
                 m_WidgetsOrder.push_back(name);
             m_Widgets[name] = widget;
@@ -708,7 +708,7 @@ namespace tf3d::misc
     {
         CustomInspectorWidget widget(type);
         widget.SetLabel(label);
-        if (type == CustomInspectorWidgetType_Button)
+        if (type == CustomInspectorWidgetType::Button)
             widget.SetActionName(variableName);
         else
             widget.SetVariableName(variableName);
@@ -719,13 +719,13 @@ namespace tf3d::misc
     {
         auto widgetType = CustomInspectorWidget::CustomInspectorWidgetTypeFromString(type);
         switch (widgetType) {
-            case CustomInspectorWidgetType_Seperator:
-                return AddWidget("Seperator", widgetType);
-            case CustomInspectorWidgetType_NewLine:
+            case CustomInspectorWidgetType::Separator:
+                return AddWidget("Separator", widgetType);
+            case CustomInspectorWidgetType::NewLine:
                 return AddWidget("NewLine", widgetType);
-            case CustomInspectorWidgetType_Unknown:
+            case CustomInspectorWidgetType::Unknown:
                 TF3D_LOG_WARN("Skipping unknown CustomInspector widget type '{}'", type);
-                return AddWidget(label, CustomInspectorWidgetType_Text);
+                return AddWidget(label, CustomInspectorWidgetType::Text);
             default:
                 return AddWidget(label, widgetType, variableName);
         }
@@ -824,8 +824,8 @@ namespace tf3d::misc
 
         for (const auto &[widgetName, widget] : m_Widgets) {
             if (widget.m_VariableName != name ||
-                (widget.m_Type != CustomInspectorWidgetType_Slider &&
-                 widget.m_Type != CustomInspectorWidgetType_Drag))
+                (widget.m_Type != CustomInspectorWidgetType::Slider &&
+                 widget.m_Type != CustomInspectorWidgetType::Drag))
                 continue;
 
             const float minimum = widget.m_Constratins[0];
@@ -983,13 +983,13 @@ namespace tf3d::misc
                     schema["title"] = widget->m_Label;
                 if (!widget->m_Tooltip.empty())
                     schema["description"] = widget->m_Tooltip;
-                if ((widget->m_Type == CustomInspectorWidgetType_Slider ||
-                     widget->m_Type == CustomInspectorWidgetType_Drag) &&
+                if ((widget->m_Type == CustomInspectorWidgetType::Slider ||
+                     widget->m_Type == CustomInspectorWidgetType::Drag) &&
                     (widget->m_Constratins[0] != 0.0f || widget->m_Constratins[1] != 0.0f)) {
                     schema["minimum"] = widget->m_Constratins[0];
                     schema["maximum"] = widget->m_Constratins[1];
                 }
-                if (widget->m_Type == CustomInspectorWidgetType_Dropdown &&
+                if (widget->m_Type == CustomInspectorWidgetType::Dropdown &&
                     !widget->m_DropdownOptions.empty()) {
                     schema["type"]        = "integer";
                     schema["enum"]        = nlohmann::json::array();
@@ -1243,7 +1243,7 @@ namespace tf3d::misc
                             continue;
                         const std::string action = button.value("Action", button.value("Name", "Action"));
                         const std::string label  = button.value("Label", action);
-                        auto &widget             = AddWidget(label, CustomInspectorWidgetType_Button, action);
+                        auto &widget             = AddWidget(label, CustomInspectorWidgetType::Button, action);
                         if (button.contains("Tooltip"))
                             widget.SetTooltip(button["Tooltip"].get<std::string>());
                         else if (button.contains("Description"))
@@ -1302,7 +1302,7 @@ namespace tf3d::misc
             return false;
         }
         if (!hasContent)
-            AddWidget("No parameters available", CustomInspectorWidgetType_Text);
+            AddWidget("No parameters available", CustomInspectorWidgetType::Text);
         return true;
     }
 
@@ -1330,37 +1330,37 @@ namespace tf3d::misc
         if (!widget.m_FontName.empty())
             ImGui::PushFont(GetUIFont(widget.m_FontName));
         bool widgetChanged = false;
-        if (widget.m_Type == CustomInspectorWidgetType_Slider)
+        if (widget.m_Type == CustomInspectorWidgetType::Slider)
             widgetChanged = RenderSlider(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Drag)
+        else if (widget.m_Type == CustomInspectorWidgetType::Drag)
             widgetChanged = RenderDrag(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Color)
+        else if (widget.m_Type == CustomInspectorWidgetType::Color)
             widgetChanged = RenderColor(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Texture)
+        else if (widget.m_Type == CustomInspectorWidgetType::Texture)
             widgetChanged = RenderTexture(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Path)
+        else if (widget.m_Type == CustomInspectorWidgetType::Path)
             widgetChanged = RenderPath(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Curve)
+        else if (widget.m_Type == CustomInspectorWidgetType::Curve)
             widgetChanged = RenderCurve(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Button)
+        else if (widget.m_Type == CustomInspectorWidgetType::Button)
             widgetChanged = RenderButton(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Checkbox)
+        else if (widget.m_Type == CustomInspectorWidgetType::Checkbox)
             widgetChanged = RenderCheckbox(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Input)
+        else if (widget.m_Type == CustomInspectorWidgetType::Input)
             widgetChanged = RenderInput(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Seed)
+        else if (widget.m_Type == CustomInspectorWidgetType::Seed)
             widgetChanged = RenderSeed(m_Widgets[widgetLabel]);
-        else if (widget.m_Type == CustomInspectorWidgetType_Dropdown)
+        else if (widget.m_Type == CustomInspectorWidgetType::Dropdown)
             widgetChanged = RenderDropdown(widget);
-        else if (widget.m_Type == CustomInspectorWidgetType_Seperator)
+        else if (widget.m_Type == CustomInspectorWidgetType::Separator)
             ImGui::Separator();
-        else if (widget.m_Type == CustomInspectorWidgetType_NewLine)
+        else if (widget.m_Type == CustomInspectorWidgetType::NewLine)
             ImGui::NewLine();
-        else if (widget.m_Type == CustomInspectorWidgetType_Text)
+        else if (widget.m_Type == CustomInspectorWidgetType::Text)
             ImGui::TextWrapped("%s", widget.m_Label.c_str());
 
         if (widgetChanged) {
-            if (widget.m_Type == CustomInspectorWidgetType_Button)
+            if (widget.m_Type == CustomInspectorWidgetType::Button)
                 m_LastAction = widget.m_VariableName;
             else if (!widget.m_VariableName.empty())
                 m_LastChangedVariable = widget.m_VariableName;
@@ -1368,8 +1368,8 @@ namespace tf3d::misc
         if (!widget.m_FontName.empty())
             ImGui::PopFont();
         RenderInspectorTooltip(widget.m_Label, widget.m_Tooltip);
-        if (widget.m_Type != CustomInspectorWidgetType_Seed &&
-            widget.m_Type != CustomInspectorWidgetType_Button &&
+        if (widget.m_Type != CustomInspectorWidgetType::Seed &&
+            widget.m_Type != CustomInspectorWidgetType::Button &&
             !widget.m_VariableName.empty()) {
             if (ImGui::BeginPopupContextItem(widget.m_ID.c_str())) {
                 static char s_ResetButtonName[1024];

@@ -452,28 +452,28 @@ namespace tf3d::misc
         int32_t m_CurvePointCount = 2, m_DefaultCurvePointCount = 2;
     };
 
-    enum CustomInspectorWidgetType {
-        CustomInspectorWidgetType_Unknown = 0,
-        CustomInspectorWidgetType_Slider,
-        CustomInspectorWidgetType_Drag,
-        CustomInspectorWidgetType_Color,
-        CustomInspectorWidgetType_Texture,
-        CustomInspectorWidgetType_Path,
-        CustomInspectorWidgetType_Curve,
-        CustomInspectorWidgetType_Button,
-        CustomInspectorWidgetType_Checkbox,
-        CustomInspectorWidgetType_Input,
-        CustomInspectorWidgetType_Seed,
-        CustomInspectorWidgetType_Dropdown,
-        CustomInspectorWidgetType_Seperator,
-        CustomInspectorWidgetType_NewLine,
-        CustomInspectorWidgetType_Text
+    enum class CustomInspectorWidgetType {
+        Unknown = 0,
+        Slider,
+        Drag,
+        Color,
+        Texture,
+        Path,
+        Curve,
+        Button,
+        Checkbox,
+        Input,
+        Seed,
+        Dropdown,
+        Separator,
+        NewLine,
+        Text
     };
 
     class CustomInspectorWidget
     {
     public:
-        CustomInspectorWidget(CustomInspectorWidgetType type = CustomInspectorWidgetType_Unknown);
+        CustomInspectorWidget(CustomInspectorWidgetType type = CustomInspectorWidgetType::Unknown);
         ~CustomInspectorWidget();
 
         inline CustomInspectorWidgetType GetType() const
@@ -563,7 +563,7 @@ namespace tf3d::misc
         std::string m_Label              = "";
         std::string m_VariableName       = "";
         std::string m_FontName           = "";
-        CustomInspectorWidgetType m_Type = CustomInspectorWidgetType_Unknown;
+        CustomInspectorWidgetType m_Type = CustomInspectorWidgetType::Unknown;
         float m_Constratins[4]           = {0.0f, 0.0f, 0.0f, 0.0f};
         float m_FSpeed                   = 1.0f;
         int32_t m_ISpeed                 = 1;

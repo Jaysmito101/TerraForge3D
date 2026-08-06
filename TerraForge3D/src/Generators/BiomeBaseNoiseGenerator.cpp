@@ -39,55 +39,55 @@ namespace tf3d::generators
         m_NoiseOctaveStrengths[0] = m_NoiseOctaveStrengths[1] = 0.0f;
         {
             m_Inspector->Add("Seed", 152);
-            auto &seedWidget = m_Inspector->AddWidget("Noise Seed", CustomInspectorWidgetType_Seed, "Seed");
+            auto &seedWidget = m_Inspector->AddWidget("Noise Seed", CustomInspectorWidgetType::Seed, "Seed");
             seedWidget.SetTooltip("Random seed used to generate the base noise pattern.");
 
             m_Inspector->Add("NoiseAlgorithm", m_NoiseAlgorithms.DefaultValue());
-            auto &algorithmWidget = m_Inspector->AddWidget("Noise Algorithm", CustomInspectorWidgetType_Dropdown, "NoiseAlgorithm");
+            auto &algorithmWidget = m_Inspector->AddWidget("Noise Algorithm", CustomInspectorWidgetType::Dropdown, "NoiseAlgorithm");
             algorithmWidget.SetDropdownOptions(m_NoiseAlgorithms.Labels());
             algorithmWidget.SetTooltip(m_NoiseAlgorithms.Tooltip());
 
             m_Inspector->Add("Influence", 0.5f);
-            auto &influenceWidget = m_Inspector->AddWidget("Influence", CustomInspectorWidgetType_Slider, "Influence");
+            auto &influenceWidget = m_Inspector->AddWidget("Influence", CustomInspectorWidgetType::Slider, "Influence");
             influenceWidget.SetConstraints(0.0f, 1.0f);
             influenceWidget.SetTooltip("Controls how strongly this generator contributes to the final biome output.");
 
             m_Inspector->Add("Strength", 1.0f);
-            auto &strengthWidget = m_Inspector->AddWidget("Strength", CustomInspectorWidgetType_Drag, "Strength");
+            auto &strengthWidget = m_Inspector->AddWidget("Strength", CustomInspectorWidgetType::Drag, "Strength");
             strengthWidget.SetConstraints(0.0f, 0.0f);
             strengthWidget.SetSpeed(0.01f);
             strengthWidget.SetTooltip("Scales the amplitude of the generated noise.");
 
             m_Inspector->Add("Frequency", 0.45f);
-            auto &frequencyWidget = m_Inspector->AddWidget("Noise Scale", CustomInspectorWidgetType_Drag, "Frequency");
+            auto &frequencyWidget = m_Inspector->AddWidget("Noise Scale", CustomInspectorWidgetType::Drag, "Frequency");
             frequencyWidget.SetConstraints(0.0f, 0.0f);
             frequencyWidget.SetSpeed(0.001f);
             frequencyWidget.SetTooltip("Controls the size of the shared noise features. Higher values create smaller features.");
 
             m_Inspector->Add("Lacunarity", 1.8f);
-            auto &lacunarityWidget = m_Inspector->AddWidget("Noise Lacunarity", CustomInspectorWidgetType_Drag, "Lacunarity");
+            auto &lacunarityWidget = m_Inspector->AddWidget("Noise Lacunarity", CustomInspectorWidgetType::Drag, "Lacunarity");
             lacunarityWidget.SetConstraints(1.0f, 4.0f);
             lacunarityWidget.SetSpeed(0.01f);
             lacunarityWidget.SetTooltip("Frequency multiplier between successive noise layers.");
 
             m_Inspector->Add("Persistence", 0.55f);
-            auto &persistenceWidget = m_Inspector->AddWidget("Noise Persistence", CustomInspectorWidgetType_Slider, "Persistence");
+            auto &persistenceWidget = m_Inspector->AddWidget("Noise Persistence", CustomInspectorWidgetType::Slider, "Persistence");
             persistenceWidget.SetConstraints(0.0f, 0.99f);
             persistenceWidget.SetTooltip("Amplitude retained by each successive noise layer.");
 
             m_Inspector->Add("NoiseOctaves", 10);
-            auto &octaveWidget = m_Inspector->AddWidget("Noise Octaves", CustomInspectorWidgetType_Slider, "NoiseOctaves");
+            auto &octaveWidget = m_Inspector->AddWidget("Noise Octaves", CustomInspectorWidgetType::Slider, "NoiseOctaves");
             octaveWidget.SetConstraints(1.0f, static_cast<float>(BIOME_BASE_NOISE_OCTAVE_COUNT));
             octaveWidget.SetTooltip("Number of noise layers enabled from the octave strength profile.");
 
             m_Inspector->Add("NoiseWarp", 0.0f);
-            auto &warpWidget = m_Inspector->AddWidget("Noise Warp", CustomInspectorWidgetType_Drag, "NoiseWarp");
+            auto &warpWidget = m_Inspector->AddWidget("Noise Warp", CustomInspectorWidgetType::Drag, "NoiseWarp");
             warpWidget.SetConstraints(0.0f, 4.0f);
             warpWidget.SetSpeed(0.01f);
             warpWidget.SetTooltip("Bends the sampling domain before evaluating the noise, adding organic distortion.");
 
             m_Inspector->Add("NoiseJitter", 0.75f);
-            auto &jitterWidget = m_Inspector->AddWidget("Noise Jitter", CustomInspectorWidgetType_Slider, "NoiseJitter");
+            auto &jitterWidget = m_Inspector->AddWidget("Noise Jitter", CustomInspectorWidgetType::Slider, "NoiseJitter");
             jitterWidget.SetConstraints(0.0f, 1.0f);
             jitterWidget.SetTooltip("Moves feature points inside Voronoi, Worley, and Gabor cells.");
             jitterWidget.SetRenderOnConditions("NoiseAlgorithm", {m_NoiseAlgorithms.Value("Gabor"),
@@ -95,45 +95,45 @@ namespace tf3d::generators
                                                                   m_NoiseAlgorithms.Value("Worley")});
 
             m_Inspector->Add("AutoUseSeedTexture", true);
-            auto &seedTextureWidget = m_Inspector->AddWidget("Auto Use Seed Texture", CustomInspectorWidgetType_Checkbox, "AutoUseSeedTexture");
+            auto &seedTextureWidget = m_Inspector->AddWidget("Auto Use Seed Texture", CustomInspectorWidgetType::Checkbox, "AutoUseSeedTexture");
             seedTextureWidget.SetTooltip("When enabled, the generated seed texture is ignored.");
 
             m_Inspector->Add<glm::vec3>("Offset");
-            auto &offsetWidget = m_Inspector->AddWidget("Offset", CustomInspectorWidgetType_Drag, "Offset");
+            auto &offsetWidget = m_Inspector->AddWidget("Offset", CustomInspectorWidgetType::Drag, "Offset");
             offsetWidget.SetConstraints(0.0f, 0.0f);
             offsetWidget.SetSpeed(0.01f);
             offsetWidget.SetTooltip("Offsets the noise sampling position in 3D space.");
 
             m_Inspector->Add("MixMethod", 0);
-            auto &mixMethodWidget = m_Inspector->AddWidget("Mix Method", CustomInspectorWidgetType_Dropdown, "MixMethod");
+            auto &mixMethodWidget = m_Inspector->AddWidget("Mix Method", CustomInspectorWidgetType::Dropdown, "MixMethod");
             mixMethodWidget.SetDropdownOptions({"Add", "Multiply", "Add & Multiply", "Set", "None"});
             mixMethodWidget.SetTooltip("Selects how this output is blended with the source buffer.");
 
             m_Inspector->Add("TransformFactor", 1);
-            auto &transformFactorWidget = m_Inspector->AddWidget("Transform Factor", CustomInspectorWidgetType_Dropdown, "TransformFactor");
+            auto &transformFactorWidget = m_Inspector->AddWidget("Transform Factor", CustomInspectorWidgetType::Dropdown, "TransformFactor");
             transformFactorWidget.SetDropdownOptions({"None", "Slope", "Height"});
             transformFactorWidget.SetTooltip("Chooses which terrain factor is used to remap the noise.");
 
             m_Inspector->Add("SlopeSmoothingRadius", 3);
-            auto &slopeSmoothingWidget = m_Inspector->AddWidget("Slope Smoothing Radius", CustomInspectorWidgetType_Slider, "SlopeSmoothingRadius");
+            auto &slopeSmoothingWidget = m_Inspector->AddWidget("Slope Smoothing Radius", CustomInspectorWidgetType::Slider, "SlopeSmoothingRadius");
             slopeSmoothingWidget.SetConstraints(0.0f, 20.0f);
             slopeSmoothingWidget.SetTooltip("Sets the radius used to smooth slope sampling.");
             slopeSmoothingWidget.SetRenderOnCondition("TransformFactor", 1);
 
             m_Inspector->Add("SlopeSamplingRadius", 3.0f);
-            auto &slopeSamplingWidget = m_Inspector->AddWidget("Slope Sampling Radius", CustomInspectorWidgetType_Slider, "SlopeSamplingRadius");
+            auto &slopeSamplingWidget = m_Inspector->AddWidget("Slope Sampling Radius", CustomInspectorWidgetType::Slider, "SlopeSamplingRadius");
             slopeSamplingWidget.SetConstraints(1.0f, 10.0f);
             slopeSamplingWidget.SetTooltip("Controls how far the generator samples around each point when measuring slope.");
             slopeSamplingWidget.SetRenderOnCondition("TransformFactor", 1);
 
             m_Inspector->Add("TransformRange", glm::vec2(0.0f, 1.0f));
-            auto &transformRangeWidget = m_Inspector->AddWidget("Transform Range", CustomInspectorWidgetType_Drag, "TransformRange");
+            auto &transformRangeWidget = m_Inspector->AddWidget("Transform Range", CustomInspectorWidgetType::Drag, "TransformRange");
             transformRangeWidget.SetConstraints(0.0f, 0.0f);
             transformRangeWidget.SetSpeed(0.001f);
             transformRangeWidget.SetTooltip("Remaps the chosen transform factor into this normalized range.");
 
             m_Inspector->Add("UseGaussianPreFilter", false);
-            auto &gaussianFilterWidget = m_Inspector->AddWidget("Use Gaussian Pre Filter", CustomInspectorWidgetType_Checkbox, "UseGaussianPreFilter");
+            auto &gaussianFilterWidget = m_Inspector->AddWidget("Use Gaussian Pre Filter", CustomInspectorWidgetType::Checkbox, "UseGaussianPreFilter");
             gaussianFilterWidget.SetTooltip("Applies a gaussian pre-filter before the noise is evaluated.");
         }
     }
