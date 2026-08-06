@@ -70,13 +70,13 @@ namespace tf3d::mcp_layer
 
             ViewportManager *viewport = FindActiveViewport(applicationState);
             if (viewport == nullptr || viewport->GetRendererViewport() == nullptr ||
-                viewport->GetRendererViewport()->m_FrameBuffer == nullptr) {
+                viewport->GetRendererViewport()->GetFrameBuffer() == nullptr) {
                 return McpResult::Failure(
                     McpErrorType::NoActiveViewport,
                     "TerraForge3D does not currently have an active viewport.");
             }
 
-            const auto &frameBuffer = viewport->GetRendererViewport()->m_FrameBuffer;
+            const auto &frameBuffer = viewport->GetRendererViewport()->GetFrameBuffer();
             const int width         = frameBuffer->GetWidth();
             const int height        = frameBuffer->GetHeight();
             std::vector<uint8_t> pixels;

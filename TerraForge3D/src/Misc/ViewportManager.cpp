@@ -30,7 +30,7 @@ namespace tf3d::misc
     {
         TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/update");
         if (m_AutoCalculateAspectRatio) {
-            m_RendererViewport->m_Camera.SetAspectRatio(m_Width / (m_Height + 0.000000001f));
+            m_RendererViewport->GetCamera().SetAspectRatio(m_Width / (m_Height + 0.000000001f));
         }
 
         if (m_IsVisible) {
@@ -64,59 +64,62 @@ namespace tf3d::misc
         // auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
         auto viewportOffset = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMin();
         ImGui::BeginChild("MainRender");
-        if ((m_RendererViewport->m_IsHovered = ImGui::IsWindowHovered())) {
+        m_RendererViewport->SetHovered(ImGui::IsWindowHovered());
+        if (m_RendererViewport->IsHovered()) {
             ImGuiIO io = ImGui::GetIO();
 
             if (m_IsControlEnabled) {
-                const bool usesCamera = m_RendererViewport->m_ViewportMode == renderer::RendererViewportMode_Object ||
-                                        m_RendererViewport->m_ViewportMode == renderer::RendererViewportMode_Wireframe;
+                const bool usesCamera = m_RendererViewport->GetMode() == renderer::RendererViewportMode_Object ||
+                                        m_RendererViewport->GetMode() == renderer::RendererViewportMode_Wireframe;
                 if (usesCamera && ImGui::IsKeyPressed(ImGuiKey_Space))
-                    m_RendererViewport->m_Camera.Reset();
+                    m_RendererViewport->GetCamera().Reset();
                 if (io.MouseDown[ImGuiMouseButton_Middle] && (ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift))) {
                     if (usesCamera) {
-                        m_RendererViewport->m_Camera.Pan(io.MouseDelta.x * m_MovementSpeed, io.MouseDelta.y * m_MovementSpeed, m_Height);
+                        m_RendererViewport->GetCamera().Pan(io.MouseDelta.x * m_MovementSpeed, io.MouseDelta.y * m_MovementSpeed, m_Height);
                     } else {
-                        m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
-                        m_RendererViewport->m_OffsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
+                        m_RendererViewport->GetOffsetX() -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
+                        m_RendererViewport->GetOffsetY() += io.MouseDelta.y * m_MovementSpeed * 0.001f;
                     }
                 }
                 if (io.MouseDown[ImGuiMouseButton_Middle] && !(ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift))) {
                     if (usesCamera) {
-                        m_RendererViewport->m_Camera.Orbit(io.MouseDelta.x * m_RotationSpeed, -io.MouseDelta.y * m_RotationSpeed);
+                        m_RendererViewport->GetCamera().Orbit(io.MouseDelta.x * m_RotationSpeed, -io.MouseDelta.y * m_RotationSpeed);
                     } else {
-                        m_RendererViewport->m_OffsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
-                        m_RendererViewport->m_OffsetY -= io.MouseDelta.y * m_MovementSpeed * 0.001f;
+                        m_RendererViewport->GetOffsetX() -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
+                        m_RendererViewport->GetOffsetY() -= io.MouseDelta.y * m_MovementSpeed * 0.001f;
                     }
                 }
                 if (fabs(io.MouseWheel) > 0.000001f) {
                     if (usesCamera) {
-                        m_RendererViewport->m_Camera.Zoom(io.MouseWheel * m_ZoomSpeed);
+                        m_RendererViewport->GetCamera().Zoom(io.MouseWheel * m_ZoomSpeed);
                     } else {
-                        m_RendererViewport->m_Scale += m_ZoomSpeed * 0.06f * io.MouseWheel;
-                        m_RendererViewport->m_Scale = glm::clamp(m_RendererViewport->m_Scale, 0.0000001f, 1000000.0f);
+                        m_RendererViewport->GetScale() += m_ZoomSpeed * 0.06f * io.MouseWheel;
+                        m_RendererViewport->GetScale() = glm::clamp(m_RendererViewport->GetScale(), 0.0000001f, 1000000.0f);
                     }
                 }
                 if (usesCamera && ImGui::IsKeyPressed(ImGuiKey_F))
-                    m_RendererViewport->m_Camera.Reset();
+                    m_RendererViewport->GetCamera().Reset();
 
                 if (ImGui::IsKeyDown(ImGuiKey_Space) && io.MouseDown[ImGuiMouseButton_Right])
                     ImGui::OpenPopup((std::string("Viewport Settings##") + std::to_string(this->m_ID)).c_str());
             }
 
-            m_RendererViewport->m_MousePosition[0] = m_MousePosX = (ImGui::GetIO().MousePos.x - viewportOffset.x) / m_Width;
-            m_RendererViewport->m_MousePosition[1] = m_MousePosY = (ImGui::GetIO().MousePos.y - viewportOffset.y) / m_Height;
-            m_RendererViewport->m_MousePosition[1]               = 1.0f - m_RendererViewport->m_MousePosition[1];
+            auto &mousePosition = m_RendererViewport->GetMousePosition();
+            mousePosition[0] = m_MousePosX = (ImGui::GetIO().MousePos.x - viewportOffset.x) / m_Width;
+            mousePosition[1] = m_MousePosY = (ImGui::GetIO().MousePos.y - viewportOffset.y) / m_Height;
+            mousePosition[1]               = 1.0f - mousePosition[1];
 
         } else {
-            m_RendererViewport->m_MousePosition[0] = m_MousePosX = -1.0f;
-            m_RendererViewport->m_MousePosition[1] = m_MousePosY = -1.0f;
+            auto &mousePosition = m_RendererViewport->GetMousePosition();
+            mousePosition[0] = m_MousePosX = -1.0f;
+            mousePosition[1] = m_MousePosY = -1.0f;
         }
 
-        ImVec2 imageSize                  = ImGui::GetWindowSize();
-        m_Width                           = imageSize.x;
-        m_Height                          = imageSize.y;
-        m_RendererViewport->m_AspectRatio = m_Width / (m_Height + 0.000000001f);
-        ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->m_FrameBuffer->GetColorTexture(), imageSize, ImVec2(0, 1), ImVec2(1, 0));
+        ImVec2 imageSize = ImGui::GetWindowSize();
+        m_Width          = imageSize.x;
+        m_Height         = imageSize.y;
+        m_RendererViewport->SetAspectRatio(m_Width / (m_Height + 0.000000001f));
+        ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->GetFrameBuffer()->GetColorTexture(), imageSize, ImVec2(0, 1), ImVec2(1, 0));
         m_IsActive = ImGui::IsItemHovered();
         ImGui::EndChild();
         this->ShowSettingPopUp();
@@ -135,38 +138,43 @@ namespace tf3d::misc
                     "Heightmap",
                     "TextureSlot"};
 
-            SHOW_COMBO_BOX("Viewport Mode", m_RendererViewport->m_ViewportMode, viewportModesText, IM_ARRAYSIZE(viewportModesText));
+            int viewportMode = static_cast<int>(m_RendererViewport->GetMode());
+            ShowComboBox("Viewport Mode", &viewportMode, viewportModesText, IM_ARRAYSIZE(viewportModesText));
+            m_RendererViewport->SetMode(static_cast<renderer::RendererViewportMode>(viewportMode));
             ImGui::NewLine();
 
-            if (m_RendererViewport->m_ViewportMode != renderer::RendererViewportMode_Heightmap && m_RendererViewport->m_ViewportMode != renderer::RendererViewportMode_TextureSlot) {
+            if (m_RendererViewport->GetMode() != renderer::RendererViewportMode_Heightmap && m_RendererViewport->GetMode() != renderer::RendererViewportMode_TextureSlot) {
                 ImGui::Text("Camera Settings");
                 ImGui::Separator();
-                m_RendererViewport->m_Camera.ShowSettings();
+                m_RendererViewport->GetCamera().ShowSettings();
                 ImGui::Checkbox("Auto Calculate Aspect Ratio", &m_AutoCalculateAspectRatio);
             } else {
-                ImGui::DragFloat("Offset X", &m_RendererViewport->m_OffsetX, 0.01f);
-                ImGui::DragFloat("Offset Y", &m_RendererViewport->m_OffsetY, 0.01f);
-                ImGui::DragFloat("Scale", &m_RendererViewport->m_Scale, 0.01f);
+                ImGui::DragFloat("Offset X", &m_RendererViewport->GetOffsetX(), 0.01f);
+                ImGui::DragFloat("Offset Y", &m_RendererViewport->GetOffsetY(), 0.01f);
+                ImGui::DragFloat("Scale", &m_RendererViewport->GetScale(), 0.01f);
             }
 
-            if (m_RendererViewport->m_ViewportMode == renderer::RendererViewportMode_TextureSlot) {
-                ImGui::Checkbox("Texture Slot Detailed Mode", &m_RendererViewport->m_TextureSlotDetailedMode);
-                if (m_RendererViewport->m_TextureSlotDetailedMode) {
+            if (m_RendererViewport->GetMode() == renderer::RendererViewportMode_TextureSlot) {
+                auto &textureSlotDetailedMode = m_RendererViewport->GetTextureSlotDetailedMode();
+                auto &textureSlot             = m_RendererViewport->GetTextureSlot();
+                auto &textureSlotDetailed     = m_RendererViewport->GetTextureSlotDetailed();
+                ImGui::Checkbox("Texture Slot Detailed Mode", &textureSlotDetailedMode);
+                if (textureSlotDetailedMode) {
                     static const char *s_TextureSlotChannels[] = {"R", "G", "B", "A"};
                     for (int i = 0; i < 4; i++) {
                         ImGui::PushID(i);
                         ImGui::Text("Viewport Channel %s :", s_TextureSlotChannels[i]);
-                        if (ImGui::DragInt("Texture Slot", &m_RendererViewport->m_TextureSlotDetailed[i].first, 0.1f, 0, 5))
-                            m_RendererViewport->m_TextureSlotDetailed[i].first = glm::clamp(m_RendererViewport->m_TextureSlotDetailed[i].first, 0, 5);
+                        if (ImGui::DragInt("Texture Slot", &textureSlotDetailed[i].first, 0.1f, 0, 5))
+                            textureSlotDetailed[i].first = glm::clamp(textureSlotDetailed[i].first, 0, 5);
                         ShowTextureSlotDetailsPopup();
-                        if (ImGui::DragInt("Texture Slot Channel", &m_RendererViewport->m_TextureSlotDetailed[i].second, 0.1f, 0, 3))
-                            m_RendererViewport->m_TextureSlotDetailed[i].first = glm::clamp(m_RendererViewport->m_TextureSlotDetailed[i].first, 0, 3);
+                        if (ImGui::DragInt("Texture Slot Channel", &textureSlotDetailed[i].second, 0.1f, 0, 3))
+                            textureSlotDetailed[i].first = glm::clamp(textureSlotDetailed[i].first, 0, 3);
                         ImGui::PopID();
                     }
 
                 } else {
-                    if (ImGui::DragInt("Texture Slot", &m_RendererViewport->m_TextureSlot, 0.1f, 0, 5))
-                        m_RendererViewport->m_TextureSlot = glm::clamp(m_RendererViewport->m_TextureSlot, 0, 5);
+                    if (ImGui::DragInt("Texture Slot", &textureSlot, 0.1f, 0, 5))
+                        textureSlot = glm::clamp(textureSlot, 0, 5);
                     ShowTextureSlotDetailsPopup();
                 }
             }

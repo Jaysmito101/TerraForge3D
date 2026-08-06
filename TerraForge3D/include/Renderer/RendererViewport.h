@@ -2,10 +2,12 @@
 
 #include "Base/Base.h"
 
+#include <array>
+#include <cstdint>
+#include <utility>
+
 namespace tf3d::renderer
 {
-
-    /* Different modes based on shaders/outputs */
     enum RendererViewportMode {
         RendererViewportMode_Object = 0,
         RendererViewportMode_Wireframe,
@@ -14,7 +16,6 @@ namespace tf3d::renderer
         RendererViewportMode_COUNT
     };
 
-    /* A viewport object for rendering a instance of scene with its own camera/context */
     class RendererViewport
     {
     public:
@@ -22,19 +23,70 @@ namespace tf3d::renderer
         ~RendererViewport();
         void ResizeTo(uint32_t width, uint32_t height);
 
-    public:
-        std::shared_ptr<FrameBuffer> m_FrameBuffer;                        // Framebuffer for this viewport
-        Camera m_Camera;                                                   // Camera for this viewport
-        RendererViewportMode m_ViewportMode = RendererViewportMode_Object; // Viewport mode
-        float m_PosOnTerrain[4]             = {0.0f, 0.0f, 0.0f};          // Position on terrain
-        bool m_TextureSlotDetailedMode      = false;                       // Detailed mode for texture slot renderer
-        int32_t m_TextureSlot               = 0;                           // Texture slot to render
-        std::pair<int32_t, int32_t> m_TextureSlotDetailed[4];
-        float m_OffsetX = 0.0f, m_OffsetY = 0.0f, m_Scale = 1.0;
-        float m_AspectRatio      = 1.0f;
-        float m_MousePosition[2] = {0.0f, 0.0f};
-        int32_t m_Width = 0, m_Height = 0;
-        bool m_IsHovered = false;
+        std::shared_ptr<FrameBuffer> &GetFrameBuffer();
+        const std::shared_ptr<FrameBuffer> &GetFrameBuffer() const;
+
+        Camera &GetCamera();
+        const Camera &GetCamera() const;
+
+        RendererViewportMode GetMode() const;
+        void SetMode(RendererViewportMode mode);
+
+        std::array<float, 4> &GetPositionOnTerrain();
+        const std::array<float, 4> &GetPositionOnTerrain() const;
+
+        float &GetOffsetX();
+        float &GetOffsetY();
+        float &GetScale();
+        float GetAspectRatio() const;
+        void SetAspectRatio(float aspectRatio);
+
+        std::array<float, 2> &GetMousePosition();
+        const std::array<float, 2> &GetMousePosition() const;
+
+        int32_t GetWidth() const;
+        int32_t GetHeight() const;
+
+        bool IsHovered() const;
+        void SetHovered(bool hovered);
+
+        bool &GetTextureSlotDetailedMode();
+        int32_t &GetTextureSlot();
+        std::array<std::pair<int32_t, int32_t>, 4> &GetTextureSlotDetailed();
+        const std::array<std::pair<int32_t, int32_t>, 4> &GetTextureSlotDetailed() const;
+
+    private:
+        struct SharedState {
+            std::shared_ptr<FrameBuffer> frameBuffer;
+            std::array<float, 2> mousePosition{0.0f, 0.0f};
+            int32_t width  = 0;
+            int32_t height = 0;
+            bool isHovered = false;
+        };
+
+        struct SceneModeState {
+            Camera camera;
+            std::array<float, 4> positionOnTerrain{0.0f, 0.0f, 0.0f, 0.0f};
+        };
+
+        struct ImageModeState {
+            float offsetX     = 0.0f;
+            float offsetY     = 0.0f;
+            float scale       = 1.0f;
+            float aspectRatio = 1.0f;
+        };
+
+        struct TextureSlotModeState {
+            bool detailedMode   = false;
+            int32_t textureSlot = 0;
+            std::array<std::pair<int32_t, int32_t>, 4> detailed{};
+        };
+
+        SharedState m_Shared;
+        SceneModeState m_SceneMode;
+        ImageModeState m_ImageMode;
+        TextureSlotModeState m_TextureSlotMode;
+        RendererViewportMode m_Mode = RendererViewportMode_Object;
     };
 
 } // namespace tf3d::renderer

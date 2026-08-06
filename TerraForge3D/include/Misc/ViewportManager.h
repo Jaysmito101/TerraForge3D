@@ -43,7 +43,8 @@ namespace tf3d::misc
         }
         inline const glm::vec2 GetPositionOnTerrain()
         {
-            return m_IsActive ? glm::vec2(m_RendererViewport->m_PosOnTerrain[0], m_RendererViewport->m_PosOnTerrain[1]) : glm::vec2(-1.0f);
+            const auto &position = m_RendererViewport->GetPositionOnTerrain();
+            return m_IsActive ? glm::vec2(position[0], position[1]) : glm::vec2(-1.0f);
         }
         inline bool IsControlEnabled()
         {

@@ -33,21 +33,21 @@ namespace tf3d::renderer
                                    float terrainHeightOffset, float seaWorldHeight,
                                    const glm::vec2 &surfaceMinimumXZ, const glm::vec2 &surfaceWorldSize)
     {
-        const glm::mat4 &projectionView       = viewport->m_Camera.GetProjectionViewMatrix();
-        const glm::mat4 inverseProjection     = glm::inverse(viewport->m_Camera.GetProjectionMatrix());
-        const glm::mat4 &view                 = viewport->m_Camera.GetViewMatrix();
+        const glm::mat4 &projectionView       = viewport->GetCamera().GetProjectionViewMatrix();
+        const glm::mat4 inverseProjection     = glm::inverse(viewport->GetCamera().GetProjectionMatrix());
+        const glm::mat4 &view                 = viewport->GetCamera().GetViewMatrix();
         const glm::mat4 inverseProjectionView = glm::inverse(projectionView);
-        const glm::vec3 &cameraPosition       = viewport->m_Camera.GetPosition();
+        const glm::vec3 &cameraPosition       = viewport->GetCamera().GetPosition();
         const glm::vec2 terrainMinimumXZ(-terrainWorldSize * 0.5f);
 
         m_Shader->SetUniformMat4("u_ProjectionView", projectionView);
         m_Shader->SetUniformMat4("u_InverseProjectionView", inverseProjectionView);
         m_Shader->SetUniformMat4("u_View", view);
         m_Shader->SetUniformMat4("u_InverseProjection", inverseProjection);
-        m_Shader->SetUniform1i("u_Perspective", viewport->m_Camera.IsPerspective() ? 1 : 0);
+        m_Shader->SetUniform1i("u_Perspective", viewport->GetCamera().IsPerspective() ? 1 : 0);
         m_Shader->SetUniform3f("u_CameraPosition", cameraPosition);
-        m_Shader->SetUniform2f("u_ViewportResolution", static_cast<float>(viewport->m_Width),
-                               static_cast<float>(viewport->m_Height));
+        m_Shader->SetUniform2f("u_ViewportResolution", static_cast<float>(viewport->GetWidth()),
+                               static_cast<float>(viewport->GetHeight()));
         m_Shader->SetUniform2f("u_TerrainMinimumXZ", terrainMinimumXZ);
         m_Shader->SetUniform2f("u_TerrainWorldSize", terrainWorldSize, terrainWorldSize);
         m_Shader->SetUniform2f("u_SurfaceMinimumXZ", surfaceMinimumXZ);
@@ -123,7 +123,7 @@ namespace tf3d::renderer
         const glm::vec2 surfaceMinimumXZ(-terrainWorldSize * 0.5f);
         m_ElapsedTime = static_cast<float>(glfwGetTime());
 
-        viewport->m_FrameBuffer->Begin();
+        viewport->GetFrameBuffer()->Begin();
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         glEnable(GL_BLEND);
@@ -138,9 +138,9 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, heightPyramid->GetRendererID());
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, viewport->m_FrameBuffer->GetColorTexture());
+        glBindTexture(GL_TEXTURE_2D, viewport->GetFrameBuffer()->GetColorTexture());
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, viewport->m_FrameBuffer->GetResolvedDepthTexture());
+        glBindTexture(GL_TEXTURE_2D, viewport->GetFrameBuffer()->GetResolvedDepthTexture());
 
         auto *skyRenderer   = m_AppState->rendererManager->GetSkyRenderer();
         const bool skyReady = skyRenderer != nullptr && skyRenderer->IsSkyReady();

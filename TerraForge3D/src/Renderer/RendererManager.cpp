@@ -136,12 +136,12 @@ namespace tf3d::renderer
         TF3D_PROFILE_SCOPE("renderer/viewport");
         {
             TF3D_PROFILE_SCOPE("renderer/setup");
-            glBindFramebuffer(GL_FRAMEBUFFER, viewport->m_FrameBuffer->GetRendererID());
-            glViewport(0, 0, viewport->m_FrameBuffer->GetWidth(), viewport->m_FrameBuffer->GetHeight());
+            glBindFramebuffer(GL_FRAMEBUFFER, viewport->GetFrameBuffer()->GetRendererID());
+            glViewport(0, 0, viewport->GetFrameBuffer()->GetWidth(), viewport->GetFrameBuffer()->GetHeight());
             glEnable(GL_MULTISAMPLE);
             glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            viewport->m_Camera.UpdateCamera();
+            viewport->GetCamera().UpdateCamera();
         }
 
         {
@@ -151,14 +151,15 @@ namespace tf3d::renderer
 
         {
             TF3D_PROFILE_SCOPE("renderer/scene");
-            viewport->m_PosOnTerrain[0] = viewport->m_PosOnTerrain[1] = viewport->m_PosOnTerrain[2] = -1.0f;
-            switch (viewport->m_ViewportMode) {
+            auto &positionOnTerrain = viewport->GetPositionOnTerrain();
+            positionOnTerrain[0] = positionOnTerrain[1] = positionOnTerrain[2] = -1.0f;
+            switch (viewport->GetMode()) {
                 case RendererViewportMode_Object: {
                     TF3D_PROFILE_SCOPE("renderer/scene/object");
                     m_ObjectRenderer->Render(viewport);
                     if (m_SeaRenderer != nullptr && m_SeaRenderer->IsEnabled()) {
-                        viewport->m_FrameBuffer->ResolveColor();
-                        viewport->m_FrameBuffer->ResolveDepth();
+                        viewport->GetFrameBuffer()->ResolveColor();
+                        viewport->GetFrameBuffer()->ResolveDepth();
                         m_SeaRenderer->Render(viewport);
                     }
                 } break;
@@ -181,7 +182,7 @@ namespace tf3d::renderer
 
         {
             TF3D_PROFILE_SCOPE("renderer/resolve");
-            viewport->m_FrameBuffer->Resolve();
+            viewport->GetFrameBuffer()->Resolve();
         }
     }
 

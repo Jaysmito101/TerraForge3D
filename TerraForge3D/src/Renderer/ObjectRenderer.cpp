@@ -76,10 +76,10 @@ namespace tf3d::renderer
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainGI"), hasHeightfieldGI ? 1 : 0);
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SlopeTexture"), 5);
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasSlopeTexture"), hasSlopeTexture ? 1 : 0);
-        // glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Projection"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.pers));
-        // glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_View"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.view));
-        glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.GetProjectionViewMatrix()));
-        glUniform3fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->m_Camera.GetPosition()));
+        // glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Projection"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().pers));
+        // glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_View"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().view));
+        glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().GetProjectionViewMatrix()));
+        glUniform3fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->GetCamera().GetPosition()));
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertNormals"), m_InvertNormals);
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewNormals"), m_ViewNormals ? 1 : 0);
@@ -100,13 +100,13 @@ namespace tf3d::renderer
         TF3D_PROFILE_END(objectSetupProfile);
         {
             TF3D_PROFILE_SCOPE("renderer/object/post-process");
-            if (isPlane && m_PostProcessShader != nullptr && viewport->m_Camera.GetPosition().y > 0.0f) {
+            if (isPlane && m_PostProcessShader != nullptr && viewport->GetCamera().GetPosition().y > 0.0f) {
                 m_PostProcessShader->Bind();
-                const glm::mat4 inverseProjectionView = glm::inverse(viewport->m_Camera.GetProjectionViewMatrix());
+                const glm::mat4 inverseProjectionView = glm::inverse(viewport->GetCamera().GetProjectionViewMatrix());
                 glUniformMatrix4fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_InverseProjectionView"), 1, GL_FALSE, glm::value_ptr(inverseProjectionView));
-                glUniformMatrix4fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->m_Camera.GetProjectionViewMatrix()));
-                glUniform3fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->m_Camera.GetPosition()));
-                glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ViewportResolution"), viewport->m_Width, viewport->m_Height);
+                glUniformMatrix4fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().GetProjectionViewMatrix()));
+                glUniform3fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->GetCamera().GetPosition()));
+                glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ViewportResolution"), viewport->GetWidth(), viewport->GetHeight());
                 glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_Color"),
                             67.0f / 255.0f, 88.0f / 255.0f, 114.0f / 255.0f);
                 auto *rendererLights      = m_AppState->rendererManager->GetRendererLights();
@@ -148,10 +148,11 @@ namespace tf3d::renderer
         }
 
         TF3D_PROFILE_BEGIN(objectMaterialStateProfile, "renderer/object/material-state");
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IsViewportActive"), (viewport->m_MousePosition[0] >= 0.0f && viewport->m_MousePosition[1] >= 0.0f) ? 1 : 0);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MousePos"), viewport->m_MousePosition[0], viewport->m_MousePosition[1]);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewportResolution"), viewport->m_Width, viewport->m_Height);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_DrawBrushSettings && m_DrawBrushSettings->m_ShowBrushCursor && viewport->m_IsHovered);
+        const auto &mousePosition = viewport->GetMousePosition();
+        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IsViewportActive"), (mousePosition[0] >= 0.0f && mousePosition[1] >= 0.0f) ? 1 : 0);
+        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MousePos"), mousePosition[0], mousePosition[1]);
+        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewportResolution"), viewport->GetWidth(), viewport->GetHeight());
+        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_DrawBrushSettings && m_DrawBrushSettings->m_ShowBrushCursor && viewport->IsHovered());
         glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_DrawMask"), m_DrawBrushSettings && m_DrawBrushSettings->m_ShowMask && m_DrawBrushSettings->m_MaskTexture != -1);
         if (m_DrawBrushSettings) {
             glUniform4f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrushSettings0"), m_DrawBrushSettings->m_BrushPositionX, m_DrawBrushSettings->m_BrushPositionY, m_DrawBrushSettings->m_BrushSize, m_DrawBrushSettings->m_BrushFalloff);
@@ -186,7 +187,7 @@ namespace tf3d::renderer
         {
             TF3D_PROFILE_SCOPE("renderer/object/terrain-draw");
             m_AppState->mainModel->Render();
-            m_SharedMemoryBuffer->GetData(viewport->m_PosOnTerrain, sizeof(float) * 4);
+            m_SharedMemoryBuffer->GetData(viewport->GetPositionOnTerrain().data(), sizeof(float) * 4);
         }
 
         // m_CustomBaseShapeDrawSettings = nullptr;

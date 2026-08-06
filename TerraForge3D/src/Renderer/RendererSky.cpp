@@ -63,7 +63,7 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyboxTextureID);
         glUniform1i(glGetUniformLocation(m_SkyboxShader->GetNativeShader(), "u_Skybox"), 0);
-        glm::mat4 mpv = viewport->m_Camera.GetProjectionMatrix() * glm::mat4(glm::mat3(viewport->m_Camera.GetViewMatrix()));
+        glm::mat4 mpv = viewport->GetCamera().GetProjectionMatrix() * glm::mat4(glm::mat3(viewport->GetCamera().GetViewMatrix()));
         glUniformMatrix4fv(glGetUniformLocation(m_SkyboxShader->GetNativeShader(), "u_MPV"), 1, GL_FALSE, glm::value_ptr(mpv));
         m_SkyboxModel->Render();
         glEnable(GL_DEPTH_TEST);
