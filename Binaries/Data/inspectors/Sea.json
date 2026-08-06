@@ -1,0 +1,255 @@
+{
+    "Description": "Procedural water surface settings.",
+    "ShowResetButton": false,
+    "Params": [
+        {
+            "Name": "Enabled",
+            "Type": "Bool",
+            "Default": true,
+            "Widget": "Checkbox",
+            "Label": "Enable Sea",
+            "Description": "Render the procedural sea surface over the generated terrain."
+        }
+    ],
+    "Sections": [
+        {
+            "Name": "WaterLevel",
+            "Label": "Water Level",
+            "Description": "Controls the sea elevation and how water transitions across the terrain shoreline.",
+            "Params": [
+                {
+                    "Name": "SeaLevel",
+                    "Type": "Float",
+                    "Default": 0.0,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 0.0],
+                    "Label": "Sea Level (field units)",
+                    "Description": "Vertical water level in terrain field units. The shader offsets this by the generated terrain height."
+                },
+                {
+                    "Name": "ShoreWidth",
+                    "Type": "Float",
+                    "Default": 0.055,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.002,
+                    "Constraints": [0.001, 10.0],
+                    "Label": "Shore Width",
+                    "Description": "Base width of the shoreline blending band used for shallow-water color, waves, foam, and alpha."
+                },
+                {
+                    "Name": "ShoreSoftness",
+                    "Type": "Float",
+                    "Default": 0.35,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 1.0],
+                    "Label": "Shore Softness",
+                    "Description": "Softens and widens shoreline coverage by sampling a larger terrain neighborhood. Higher values make the shore transition gentler."
+                },
+                {
+                    "Name": "DeepDepth",
+                    "Type": "Float",
+                    "Default": 0.48,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.001, 100.0],
+                    "Label": "Deep Water Depth",
+                    "Description": "Depth scale for transitioning from shallow to deep water and for attenuating shore effects."
+                }
+            ]
+        },
+        {
+            "Name": "Waves",
+            "Label": "Waves",
+            "Description": "Controls the layered procedural displacement used to shape the moving water surface.",
+            "Params": [
+                {
+                    "Name": "WaveAmplitude",
+                    "Type": "Float",
+                    "Default": 0.022,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.001,
+                    "Constraints": [0.0, 10.0],
+                    "Label": "Wave Amplitude",
+                    "Description": "Height of the procedural waves. Shore-depth attenuation reduces this near shallow water."
+                },
+                {
+                    "Name": "WaveLength",
+                    "Type": "Float",
+                    "Default": 0.18,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.01, 2.0],
+                    "Label": "Wave Length (terrain scale)",
+                    "Description": "Distance between the main wave cycles in terrain scale. Smaller values create shorter, denser waves."
+                },
+                {
+                    "Name": "WaveSpeed",
+                    "Type": "Float",
+                    "Default": 0.16,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [-10.0, 10.0],
+                    "Label": "Wave Speed",
+                    "Description": "Rate and direction of wave phase motion. Negative values reverse the motion."
+                },
+                {
+                    "Name": "WaveChoppiness",
+                    "Type": "Float",
+                    "Default": 0.36,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 2.0],
+                    "Label": "Wave Choppiness",
+                    "Description": "Adds sharper harmonics and stronger gradients to the wave profile, producing more broken or pointed waves."
+                }
+            ]
+        },
+        {
+            "Name": "SurfaceShading",
+            "Label": "Surface Shading",
+            "Description": "Controls procedural surface detail, underwater refraction, sky reflection, transparency, and water colors.",
+            "Params": [
+                {
+                    "Name": "NormalStrength",
+                    "Type": "Float",
+                    "Default": 0.2,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 2.0],
+                    "Label": "Normal Strength",
+                    "Description": "Strength of the procedural ripple normal perturbation used for lighting, reflection, and refraction."
+                },
+                {
+                    "Name": "NormalScale",
+                    "Type": "Float",
+                    "Default": 4.2,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.05,
+                    "Constraints": [0.05, 40.0],
+                    "Label": "Normal Scale (terrain UV)",
+                    "Description": "Frequency of procedural surface ripples in terrain UV space. Higher values make finer detail."
+                },
+                {
+                    "Name": "RefractionStrength",
+                    "Type": "Float",
+                    "Default": 0.006,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.001,
+                    "Constraints": [0.0, 0.25],
+                    "Label": "Refraction",
+                    "Description": "Screen-space offset used to distort the scene visible below the water surface."
+                },
+                {
+                    "Name": "ReflectionStrength",
+                    "Type": "Float",
+                    "Default": 0.52,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 2.0],
+                    "Label": "Reflection",
+                    "Description": "Strength of the sky/environment reflection. It is visible when sky lighting is available and is Fresnel-weighted."
+                },
+                {
+                    "Name": "Opacity",
+                    "Type": "Float",
+                    "Default": 0.96,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 1.0],
+                    "Label": "Opacity",
+                    "Description": "Base transparency of the water volume. Foam can remain more opaque than the water body."
+                },
+                {
+                    "Name": "ShallowColor",
+                    "Type": "Vector3",
+                    "Default": [0.012, 0.19, 0.23],
+                    "Widget": "Color",
+                    "Label": "Shallow Color",
+                    "Description": "Water color used near the surface and blended toward the deep color as depth increases."
+                },
+                {
+                    "Name": "DeepColor",
+                    "Type": "Vector3",
+                    "Default": [0.002, 0.018, 0.055],
+                    "Widget": "Color",
+                    "Label": "Deep Color",
+                    "Description": "Water color used at greater depth. Deep Water Depth controls how quickly this color is reached."
+                }
+            ]
+        },
+        {
+            "Name": "Foam",
+            "Label": "Foam",
+            "Description": "Controls nearshore breaking foam, offshore ripples, and the animated procedural foam pattern.",
+            "Params": [
+                {
+                    "Name": "FoamStrength",
+                    "Type": "Float",
+                    "Default": 0.36,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 2.0],
+                    "Label": "Nearshore Foam",
+                    "Description": "Strength of foam generated around shore contact and breaking wave fronts."
+                },
+                {
+                    "Name": "NearshoreFoamWidth",
+                    "Type": "Float",
+                    "Default": 0.18,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.02, 0.8],
+                    "Label": "Nearshore Crest Width",
+                    "Description": "Width of the nearshore foam crest. Higher values produce broader, less sharply peaked foam bands."
+                },
+                {
+                    "Name": "OffshoreFoamStrength",
+                    "Type": "Float",
+                    "Default": 0.08,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [0.0, 2.0],
+                    "Label": "Offshore Foam",
+                    "Description": "Strength of the subtle ripple foam that appears farther from the shoreline."
+                },
+                {
+                    "Name": "FoamScale",
+                    "Type": "Float",
+                    "Default": 5.5,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.1,
+                    "Constraints": [0.1, 80.0],
+                    "Label": "Foam Scale (terrain UV)",
+                    "Description": "Frequency of the procedural foam pattern. Higher values create smaller, more detailed foam patches."
+                },
+                {
+                    "Name": "FoamSpeed",
+                    "Type": "Float",
+                    "Default": 0.24,
+                    "Widget": "Drag",
+                    "Sensitivity": 0.01,
+                    "Constraints": [-10.0, 10.0],
+                    "Label": "Foam Speed",
+                    "Description": "Rate and direction of animated foam motion and pulsing. Negative values reverse the motion."
+                },
+                {
+                    "Name": "FoamColor",
+                    "Type": "Vector3",
+                    "Default": [0.56, 0.76, 0.76],
+                    "Widget": "Color",
+                    "Label": "Foam Color",
+                    "Description": "Color blended into the water wherever the procedural foam mask is present."
+                }
+            ],
+            "Buttons": [
+                {
+                    "Action": "ReloadSeaShaders",
+                    "Label": "Reload Sea Shaders",
+                    "Description": "Reload the sea vertex and fragment shaders after editing shader files."
+                }
+            ]
+        }
+    ]
+}
