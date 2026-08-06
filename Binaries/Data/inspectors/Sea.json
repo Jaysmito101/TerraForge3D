@@ -1,6 +1,6 @@
 {
     "Description": "Procedural water surface settings.",
-    "ShowResetButton": false,
+    "ShowResetButton": true,
     "Params": [
         {
             "Name": "Enabled",

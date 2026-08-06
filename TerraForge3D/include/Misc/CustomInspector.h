@@ -677,6 +677,7 @@ namespace tf3d::misc
             m_WidgetSections.clear();
             m_CurrentSection.clear();
             m_Description.clear();
+            m_SchemaMetadata = nlohmann::json::object();
             m_LastChangedVariable.clear();
             m_LastAction.clear();
         }
@@ -728,6 +729,7 @@ namespace tf3d::misc
         std::unordered_map<std::string, CustomInspectorSection> m_Sections;
         std::vector<std::string> m_SectionsOrder;
         std::unordered_map<std::string, std::string> m_WidgetSections;
+        nlohmann::json m_SchemaMetadata = nlohmann::json::object();
         std::string m_CurrentSection;
         std::string m_ID = "";
         std::string m_Description;
