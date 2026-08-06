@@ -27,6 +27,14 @@
 #define stricmp   strcasecmp
 #endif
 
+#include "resource.h"
+
+#ifdef TERR3D_WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32 // For Windows
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#endif
+
 namespace tf3d::utils
 {
 
@@ -570,8 +578,6 @@ namespace tf3d::utils
     }
 
 #endif
-
-#include "resource.h"
 
     void SetUpIcon()
     {
