@@ -187,8 +187,8 @@ namespace tf3d::generators
 
     void BiomeBaseNoiseGenerator::Load(SerializerNode data)
     {
-        m_Inspector->LoadData(data->GetChildNode("Inspector"));
-        auto noiseOctavesVector = data->GetFloatArray("OctaveStrengths");
+        m_Inspector->LoadData(data->Get<SerializerNode>("Inspector"));
+        auto noiseOctavesVector = data->Get<std::vector<float>>("OctaveStrengths");
         for (int i = 0; i < BIOME_BASE_NOISE_OCTAVE_COUNT; i++) {
             const std::string variableName = "NoiseOctaveStrength" + std::to_string(i);
             const float defaultValue       = i < 2 ? 0.0f : 1.0f;
@@ -205,9 +205,9 @@ namespace tf3d::generators
     SerializerNode BiomeBaseNoiseGenerator::Save()
     {
         auto node = CreateSerializerNode();
-        node->SetChildNode("Inspector", m_Inspector->SaveData());
+        node->Set("Inspector", m_Inspector->SaveData());
         const auto noiseOctavesVector = std::vector<float>(m_NoiseOctaveStrengths.begin(), m_NoiseOctaveStrengths.end());
-        node->SetFloatArray("OctaveStrengths", noiseOctavesVector);
+        node->Set("OctaveStrengths", noiseOctavesVector);
         return node;
     }
 

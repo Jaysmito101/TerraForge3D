@@ -340,24 +340,22 @@ namespace tf3d::generators
 
     void DEMBaseShapeGenerator::Load(SerializerNode data)
     {
-        m_ZoomOnMap          = data->GetFloat("ZoomOnMap", 1.0f);
-        m_ZoomResolution     = data->GetInteger("ZoomResolution", 0);
-        m_AutoZoomResolution = data->GetInteger("AutoZoomResolution", 1) != 0;
-        m_MapStrength        = data->GetFloat("MapStrength", 1.0f);
-        m_MapCenter.x        = data->GetFloat("MapCenter_X", 0.0f);
-        m_MapCenter.y        = data->GetFloat("MapCenter_Y", 0.0f);
+        m_ZoomOnMap          = data->Get<float>("ZoomOnMap", 1.0f);
+        m_ZoomResolution     = data->Get<int>("ZoomResolution", 0);
+        m_AutoZoomResolution = data->Get<bool>("AutoZoomResolution", true);
+        m_MapStrength        = data->Get<float>("MapStrength", 1.0f);
+        m_MapCenter          = data->Get<glm::vec2>("MapCenter", glm::vec2(0.0f));
         m_RequireUpdation    = true;
     }
 
     SerializerNode DEMBaseShapeGenerator::Save()
     {
         auto node = CreateSerializerNode();
-        node->SetFloat("ZoomOnMap", m_ZoomOnMap);
-        node->SetInteger("ZoomResolution", m_ZoomResolution);
-        node->SetInteger("AutoZoomResolution", m_AutoZoomResolution ? 1 : 0);
-        node->SetFloat("MapStrength", m_MapStrength);
-        node->SetFloat("MapCenter_X", m_MapCenter.x);
-        node->SetFloat("MapCenter_Y", m_MapCenter.y);
+        node->Set("ZoomOnMap", m_ZoomOnMap);
+        node->Set("ZoomResolution", m_ZoomResolution);
+        node->Set("AutoZoomResolution", m_AutoZoomResolution);
+        node->Set("MapStrength", m_MapStrength);
+        node->Set("MapCenter", m_MapCenter);
         return node;
     }
 

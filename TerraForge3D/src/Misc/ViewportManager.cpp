@@ -26,6 +26,43 @@ namespace tf3d::misc
         delete this->m_RendererViewport;
     }
 
+    SerializerNode ViewportManager::Save() const
+    {
+        SerializerNode state    = m_RendererViewport->Save();
+        SerializerNode viewport = CreateSerializerNode();
+        viewport->Set("id", static_cast<int>(m_ID));
+        viewport->Set("visible", m_IsVisible);
+        viewport->Set("active", m_IsActive);
+        viewport->Set("controlEnabled", m_IsControlEnabled);
+        viewport->Set("autoCalculateAspectRatio", m_AutoCalculateAspectRatio);
+
+        SerializerNode display = CreateSerializerNode();
+        display->Set("width", m_Width);
+        display->Set("height", m_Height);
+        viewport->Set("display", display);
+        state->Set("viewport", viewport);
+        return state;
+    }
+
+    void ViewportManager::Load(const SerializerNode &data)
+    {
+        if (!data)
+            return;
+
+        if (const SerializerNode viewport = data->Get<SerializerNode>("viewport")) {
+            m_IsVisible                = viewport->Get<bool>("visible", m_IsVisible);
+            m_IsActive                 = viewport->Get<bool>("active", m_IsActive);
+            m_IsControlEnabled         = viewport->Get<bool>("controlEnabled", m_IsControlEnabled);
+            m_AutoCalculateAspectRatio = viewport->Get<bool>(
+                "autoCalculateAspectRatio", m_AutoCalculateAspectRatio);
+            if (const SerializerNode display = viewport->Get<SerializerNode>("display")) {
+                m_Width  = display->Get<float>("width", m_Width);
+                m_Height = display->Get<float>("height", m_Height);
+            }
+        }
+        m_RendererViewport->Load(data);
+    }
+
     void ViewportManager::Update()
     {
         TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/update");
@@ -78,8 +115,8 @@ namespace tf3d::misc
                         m_RendererViewport->GetCamera().Pan(io.MouseDelta.x * m_MovementSpeed, io.MouseDelta.y * m_MovementSpeed, m_Height);
                     } else {
                         const bool textureSlotMode = m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot;
-                        float &offsetX = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetX() : m_RendererViewport->GetHeightmapOffsetX();
-                        float &offsetY = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetY() : m_RendererViewport->GetHeightmapOffsetY();
+                        float &offsetX             = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetX() : m_RendererViewport->GetHeightmapOffsetX();
+                        float &offsetY             = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetY() : m_RendererViewport->GetHeightmapOffsetY();
                         offsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
                         offsetY += io.MouseDelta.y * m_MovementSpeed * 0.001f;
                     }
@@ -89,8 +126,8 @@ namespace tf3d::misc
                         m_RendererViewport->GetCamera().Orbit(io.MouseDelta.x * m_RotationSpeed, -io.MouseDelta.y * m_RotationSpeed);
                     } else {
                         const bool textureSlotMode = m_RendererViewport->GetMode() == renderer::RendererViewportMode::TextureSlot;
-                        float &offsetX = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetX() : m_RendererViewport->GetHeightmapOffsetX();
-                        float &offsetY = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetY() : m_RendererViewport->GetHeightmapOffsetY();
+                        float &offsetX             = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetX() : m_RendererViewport->GetHeightmapOffsetX();
+                        float &offsetY             = textureSlotMode ? m_RendererViewport->GetTextureSlotOffsetY() : m_RendererViewport->GetHeightmapOffsetY();
                         offsetX -= io.MouseDelta.x * m_MovementSpeed * 0.001f;
                         offsetY -= io.MouseDelta.y * m_MovementSpeed * 0.001f;
                     }

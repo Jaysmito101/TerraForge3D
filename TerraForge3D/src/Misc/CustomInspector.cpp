@@ -94,73 +94,61 @@ namespace tf3d::misc
     SerializerNode CustomInspectorValue::Save() const
     {
         SerializerNode node = CreateSerializerNode();
-        node->SetString("Name", m_Name);
-        node->SetInteger("Type", static_cast<int32_t>(m_Type));
-        node->SetString("TypeName", CustomInspectorValueTypeToString(m_Type));
+        node->Set("Name", m_Name);
+        node->Set("Type", static_cast<int32_t>(m_Type));
+        node->Set("TypeName", CustomInspectorValueTypeToString(m_Type));
         switch (m_Type) {
             case CustomInspectorValueType_Int:
-                node->SetInteger("Value", m_IntValue);
-                node->SetInteger("DefaultValue", m_DefaultIntValue);
+                node->Set("Value", m_IntValue);
+                node->Set("DefaultValue", m_DefaultIntValue);
                 break;
             case CustomInspectorValueType_Float:
-                node->SetFloat("Value", m_FloatValue);
-                node->SetFloat("DefaultValue", m_DefaultFloatValue);
+                node->Set("Value", m_FloatValue);
+                node->Set("DefaultValue", m_DefaultFloatValue);
                 break;
             case CustomInspectorValueType_Bool:
-                node->SetString("Value", m_BoolValue ? "true" : "false");
-                node->SetString("DefaultValue", m_DefaultBoolValue ? "true" : "false");
+                node->Set("Value", m_BoolValue);
+                node->Set("DefaultValue", m_DefaultBoolValue);
                 break;
             case CustomInspectorValueType_String:
-                node->SetString("Value", m_StringValue);
-                node->SetString("DefaultValue", m_DefaultStringValue);
+                node->Set("Value", m_StringValue);
+                node->Set("DefaultValue", m_DefaultStringValue);
                 break;
             case CustomInspectorValueType_Vector2:
-                node->SetFloat("ValueX", m_VectorValue[0]);
-                node->SetFloat("ValueY", m_VectorValue[1]);
-                node->SetFloat("DefaultValueX", m_DefaultVectorValue[0]);
-                node->SetFloat("DefaultValueY", m_DefaultVectorValue[1]);
+                node->Set("Value", glm::vec2(m_VectorValue[0], m_VectorValue[1]));
+                node->Set("DefaultValue", glm::vec2(m_DefaultVectorValue[0], m_DefaultVectorValue[1]));
                 break;
             case CustomInspectorValueType_Vector3:
-                node->SetFloat("ValueX", m_VectorValue[0]);
-                node->SetFloat("ValueY", m_VectorValue[1]);
-                node->SetFloat("ValueZ", m_VectorValue[2]);
-                node->SetFloat("DefaultValueX", m_DefaultVectorValue[0]);
-                node->SetFloat("DefaultValueY", m_DefaultVectorValue[1]);
-                node->SetFloat("DefaultValueZ", m_DefaultVectorValue[2]);
+                node->Set("Value", glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]));
+                node->Set("DefaultValue", glm::vec3(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2]));
                 break;
             case CustomInspectorValueType_Vector4:
-                node->SetFloat("ValueX", m_VectorValue[0]);
-                node->SetFloat("ValueY", m_VectorValue[1]);
-                node->SetFloat("ValueZ", m_VectorValue[2]);
-                node->SetFloat("ValueW", m_VectorValue[3]);
-                node->SetFloat("DefaultValueX", m_DefaultVectorValue[0]);
-                node->SetFloat("DefaultValueY", m_DefaultVectorValue[1]);
-                node->SetFloat("DefaultValueZ", m_DefaultVectorValue[2]);
-                node->SetFloat("DefaultValueW", m_DefaultVectorValue[3]);
+                node->Set("Value", glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
+                node->Set("DefaultValue", glm::vec4(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2], m_DefaultVectorValue[3]));
                 break;
             case CustomInspectorValueType_Texture:
-                node->SetFile("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
-                node->SetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "null");
-                node->SetInteger("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8);
+                node->Set("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
+                node->Set("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "null");
+                node->Set("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8);
                 break;
             case CustomInspectorValueType_Path:
-                node->SetInteger("PathPointCount", m_PathPointCount);
-                node->SetInteger("DefaultPathPointCount", m_DefaultPathPointCount);
+                node->Set("PathPointCount", m_PathPointCount);
+                node->Set("DefaultPathPointCount", m_DefaultPathPointCount);
                 for (size_t index = 0; index < CustomInspectorMaxPathPoints; ++index) {
-                    node->SetFloat("PathValueX" + std::to_string(index), m_PathPoints[index].x);
-                    node->SetFloat("PathValueY" + std::to_string(index), m_PathPoints[index].y);
-                    node->SetFloat("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
-                    node->SetFloat("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+                    node->Set("PathValueX" + std::to_string(index), m_PathPoints[index].x);
+                    node->Set("PathValueY" + std::to_string(index), m_PathPoints[index].y);
+                    node->Set("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
+                    node->Set("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
                 }
                 break;
             case CustomInspectorValueType_Curve:
-                node->SetInteger("CurvePointCount", m_CurvePointCount);
-                node->SetInteger("DefaultCurvePointCount", m_DefaultCurvePointCount);
+                node->Set("CurvePointCount", m_CurvePointCount);
+                node->Set("DefaultCurvePointCount", m_DefaultCurvePointCount);
                 for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index) {
-                    node->SetFloat("CurveValueX" + std::to_string(index), m_CurvePoints[index].x);
-                    node->SetFloat("CurveValueY" + std::to_string(index), m_CurvePoints[index].y);
-                    node->SetFloat("DefaultCurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
-                    node->SetFloat("DefaultCurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
+                    node->Set("CurveValueX" + std::to_string(index), m_CurvePoints[index].x);
+                    node->Set("CurveValueY" + std::to_string(index), m_CurvePoints[index].y);
+                    node->Set("DefaultCurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
+                    node->Set("DefaultCurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
                 }
                 break;
             default:
@@ -171,54 +159,63 @@ namespace tf3d::misc
 
     void CustomInspectorValue::Load(const SerializerNode &node)
     {
-        m_Type = CustomInspectorValueTypeFromString(node->GetString("TypeName", CustomInspectorValueTypeToString(m_Type)));
-        m_Name = node->GetString("Name");
+        m_Type = CustomInspectorValueTypeFromString(node->Get<std::string>("TypeName", CustomInspectorValueTypeToString(m_Type)));
+        m_Name = node->Get<std::string>("Name");
         switch (m_Type) {
             case CustomInspectorValueType_Int:
-                m_DefaultIntValue = node->GetInteger("DefaultValue", m_DefaultIntValue);
-                m_IntValue        = node->GetInteger("Value", m_DefaultIntValue);
+                m_DefaultIntValue = node->Get<int>("DefaultValue", m_DefaultIntValue);
+                m_IntValue        = node->Get<int>("Value", m_DefaultIntValue);
                 break;
             case CustomInspectorValueType_Float:
-                m_DefaultFloatValue = node->GetFloat("DefaultValue", m_DefaultFloatValue);
-                m_FloatValue        = node->GetFloat("Value", m_DefaultFloatValue);
+                m_DefaultFloatValue = node->Get<float>("DefaultValue", m_DefaultFloatValue);
+                m_FloatValue        = node->Get<float>("Value", m_DefaultFloatValue);
                 break;
             case CustomInspectorValueType_Bool:
-                m_DefaultBoolValue = node->GetString("DefaultValue", m_DefaultBoolValue ? "true" : "false") == "true";
-                m_BoolValue        = node->GetString("Value", m_DefaultBoolValue ? "true" : "false") == "true";
+                m_DefaultBoolValue = node->Get<bool>("DefaultValue", m_DefaultBoolValue);
+                m_BoolValue        = node->Get<bool>("Value", m_DefaultBoolValue);
                 break;
             case CustomInspectorValueType_String:
-                m_DefaultStringValue = node->GetString("DefaultValue", m_DefaultStringValue);
-                m_StringValue        = node->GetString("Value", m_DefaultStringValue);
+                m_DefaultStringValue = node->Get<std::string>("DefaultValue", m_DefaultStringValue);
+                m_StringValue        = node->Get<std::string>("Value", m_DefaultStringValue);
                 break;
-            case CustomInspectorValueType_Vector2:
-                m_DefaultVectorValue[0] = node->GetFloat("DefaultValueX", m_DefaultVectorValue[0]);
-                m_DefaultVectorValue[1] = node->GetFloat("DefaultValueY", m_DefaultVectorValue[1]);
-                m_VectorValue[0]        = node->GetFloat("ValueX", m_DefaultVectorValue[0]);
-                m_VectorValue[1]        = node->GetFloat("ValueY", m_DefaultVectorValue[1]);
-                break;
-            case CustomInspectorValueType_Vector3:
-                m_DefaultVectorValue[0] = node->GetFloat("DefaultValueX", m_DefaultVectorValue[0]);
-                m_DefaultVectorValue[1] = node->GetFloat("DefaultValueY", m_DefaultVectorValue[1]);
-                m_DefaultVectorValue[2] = node->GetFloat("DefaultValueZ", m_DefaultVectorValue[2]);
-                m_VectorValue[0]        = node->GetFloat("ValueX", m_DefaultVectorValue[0]);
-                m_VectorValue[1]        = node->GetFloat("ValueY", m_DefaultVectorValue[1]);
-                m_VectorValue[2]        = node->GetFloat("ValueZ", m_DefaultVectorValue[2]);
-                break;
-            case CustomInspectorValueType_Vector4:
-                m_DefaultVectorValue[0] = node->GetFloat("DefaultValueX", m_DefaultVectorValue[0]);
-                m_DefaultVectorValue[1] = node->GetFloat("DefaultValueY", m_DefaultVectorValue[1]);
-                m_DefaultVectorValue[2] = node->GetFloat("DefaultValueZ", m_DefaultVectorValue[2]);
-                m_DefaultVectorValue[3] = node->GetFloat("DefaultValueW", m_DefaultVectorValue[3]);
-                m_VectorValue[0]        = node->GetFloat("ValueX", m_DefaultVectorValue[0]);
-                m_VectorValue[1]        = node->GetFloat("ValueY", m_DefaultVectorValue[1]);
-                m_VectorValue[2]        = node->GetFloat("ValueZ", m_DefaultVectorValue[2]);
-                m_VectorValue[3]        = node->GetFloat("ValueW", m_DefaultVectorValue[3]);
-                break;
+            case CustomInspectorValueType_Vector2: {
+                const glm::vec2 defaultValue = node->Get<glm::vec2>(
+                    "DefaultValue", glm::vec2(m_DefaultVectorValue[0], m_DefaultVectorValue[1]));
+                const glm::vec2 value   = node->Get<glm::vec2>("Value", defaultValue);
+                m_DefaultVectorValue[0] = defaultValue.x;
+                m_DefaultVectorValue[1] = defaultValue.y;
+                m_VectorValue[0]        = value.x;
+                m_VectorValue[1]        = value.y;
+            } break;
+            case CustomInspectorValueType_Vector3: {
+                const glm::vec3 defaultValue = node->Get<glm::vec3>(
+                    "DefaultValue", glm::vec3(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2]));
+                const glm::vec3 value   = node->Get<glm::vec3>("Value", defaultValue);
+                m_DefaultVectorValue[0] = defaultValue.x;
+                m_DefaultVectorValue[1] = defaultValue.y;
+                m_DefaultVectorValue[2] = defaultValue.z;
+                m_VectorValue[0]        = value.x;
+                m_VectorValue[1]        = value.y;
+                m_VectorValue[2]        = value.z;
+            } break;
+            case CustomInspectorValueType_Vector4: {
+                const glm::vec4 defaultValue = node->Get<glm::vec4>(
+                    "DefaultValue", glm::vec4(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2], m_DefaultVectorValue[3]));
+                const glm::vec4 value   = node->Get<glm::vec4>("Value", defaultValue);
+                m_DefaultVectorValue[0] = defaultValue.x;
+                m_DefaultVectorValue[1] = defaultValue.y;
+                m_DefaultVectorValue[2] = defaultValue.z;
+                m_DefaultVectorValue[3] = defaultValue.w;
+                m_VectorValue[0]        = value.x;
+                m_VectorValue[1]        = value.y;
+                m_VectorValue[2]        = value.z;
+                m_VectorValue[3]        = value.w;
+            } break;
             case CustomInspectorValueType_Texture: {
-                m_TextureLoadAs16Bit    = node->GetInteger("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8) >= 16;
-                const auto &defaultPath = node->GetFile("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
-                const auto &path        = node->GetFile("Value", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
-                auto loadTexture        = [this](const std::string &texturePath) -> std::shared_ptr<Texture2D> {
+                m_TextureLoadAs16Bit   = node->Get<int>("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8) >= 16;
+                const auto defaultPath = node->Get<std::string>("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
+                const auto path        = node->Get<std::string>("Value", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
+                auto loadTexture       = [this](const std::string &texturePath) -> std::shared_ptr<Texture2D> {
                     if (texturePath.empty() || texturePath == "null")
                         return nullptr;
                     return std::make_shared<Texture2D>(texturePath, false, false, m_TextureLoadAs16Bit);
@@ -228,23 +225,23 @@ namespace tf3d::misc
                 break;
             }
             case CustomInspectorValueType_Path:
-                m_DefaultPathPointCount = glm::clamp(node->GetInteger("DefaultPathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
-                m_PathPointCount        = glm::clamp(node->GetInteger("PathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
+                m_DefaultPathPointCount = glm::clamp(node->Get<int>("DefaultPathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
+                m_PathPointCount        = glm::clamp(node->Get<int>("PathPointCount", m_DefaultPathPointCount), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
                 for (size_t index = 0; index < CustomInspectorMaxPathPoints; ++index) {
-                    m_DefaultPathPoints[index].x = node->GetFloat("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
-                    m_DefaultPathPoints[index].y = node->GetFloat("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
-                    m_PathPoints[index].x        = node->GetFloat("PathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
-                    m_PathPoints[index].y        = node->GetFloat("PathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+                    m_DefaultPathPoints[index].x = node->Get<float>("DefaultPathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
+                    m_DefaultPathPoints[index].y = node->Get<float>("DefaultPathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
+                    m_PathPoints[index].x        = node->Get<float>("PathValueX" + std::to_string(index), m_DefaultPathPoints[index].x);
+                    m_PathPoints[index].y        = node->Get<float>("PathValueY" + std::to_string(index), m_DefaultPathPoints[index].y);
                 }
                 break;
             case CustomInspectorValueType_Curve:
-                m_DefaultCurvePointCount = glm::clamp(node->GetInteger("DefaultCurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
-                m_CurvePointCount        = glm::clamp(node->GetInteger("CurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
+                m_DefaultCurvePointCount = glm::clamp(node->Get<int>("DefaultCurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
+                m_CurvePointCount        = glm::clamp(node->Get<int>("CurvePointCount", m_DefaultCurvePointCount), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
                 for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index) {
-                    m_DefaultCurvePoints[index].x = node->GetFloat("DefaultCurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
-                    m_DefaultCurvePoints[index].y = node->GetFloat("DefaultCurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
-                    m_CurvePoints[index].x        = node->GetFloat("CurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
-                    m_CurvePoints[index].y        = node->GetFloat("CurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
+                    m_DefaultCurvePoints[index].x = node->Get<float>("DefaultCurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
+                    m_DefaultCurvePoints[index].y = node->Get<float>("DefaultCurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
+                    m_CurvePoints[index].x        = node->Get<float>("CurveValueX" + std::to_string(index), m_DefaultCurvePoints[index].x);
+                    m_CurvePoints[index].y        = node->Get<float>("CurveValueY" + std::to_string(index), m_DefaultCurvePoints[index].y);
                 }
                 break;
             default:
@@ -335,57 +332,57 @@ namespace tf3d::misc
     SerializerNode CustomInspectorWidget::Save() const
     {
         SerializerNode node = CreateSerializerNode();
-        node->SetInteger("Type", static_cast<int32_t>(m_Type));
-        node->SetString("TypeName", CustomInspectorWidgetTypeToString(m_Type));
-        node->SetString("TargetVariable", m_VariableName);
-        node->SetString("Label", m_Label);
+        node->Set("Type", static_cast<int32_t>(m_Type));
+        node->Set("TypeName", CustomInspectorWidgetTypeToString(m_Type));
+        node->Set("TargetVariable", m_VariableName);
+        node->Set("Label", m_Label);
         if (m_Type == CustomInspectorWidgetType_Seed)
-            node->SetIntegerArray("SeedHistory", m_SeedHistory);
-        node->SetInteger("ISpeed", m_ISpeed);
-        node->SetFloat("FSeed", m_FSpeed);
-        node->SetString("ID", m_ID);
-        node->SetFloat("Contraints_0", m_Constratins[0]);
-        node->SetFloat("Contraints_1", m_Constratins[1]);
-        node->SetFloat("Contraints_2", m_Constratins[2]);
-        node->SetFloat("Contraints_3", m_Constratins[3]);
+            node->Set("SeedHistory", m_SeedHistory);
+        node->Set("ISpeed", m_ISpeed);
+        node->Set("FSeed", m_FSpeed);
+        node->Set("ID", m_ID);
+        node->Set("Contraints_0", m_Constratins[0]);
+        node->Set("Contraints_1", m_Constratins[1]);
+        node->Set("Contraints_2", m_Constratins[2]);
+        node->Set("Contraints_3", m_Constratins[3]);
         if (m_UseRenderOnCondition) {
-            node->SetInteger("RenderOnConditionValue", m_RenderOnConditionValue);
-            node->SetString("RenderOnConditionName", m_RenderOnConditionName);
-            node->SetInteger("UseRenderOnCondition", m_UseRenderOnCondition ? 1 : 0);
+            node->Set("RenderOnConditionValue", m_RenderOnConditionValue);
+            node->Set("RenderOnConditionName", m_RenderOnConditionName);
+            node->Set("UseRenderOnCondition", m_UseRenderOnCondition);
             if (!m_RenderOnConditionValues.empty())
-                node->SetIntegerArray("RenderOnConditionValues", m_RenderOnConditionValues);
+                node->Set("RenderOnConditionValues", m_RenderOnConditionValues);
         }
         if (m_FontName.size() > 0)
-            node->SetString("FontName", m_FontName);
+            node->Set("FontName", m_FontName);
         if (m_Tooltip.size() > 0)
-            node->SetString("Tooltip", m_Tooltip);
+            node->Set("Tooltip", m_Tooltip);
         return node;
     }
 
     void CustomInspectorWidget::Load(SerializerNode node)
     {
-        m_Type         = CustomInspectorWidgetTypeFromString(node->GetString("TypeName", CustomInspectorWidgetTypeToString(m_Type)));
-        m_VariableName = node->GetString("TargetVariable", m_VariableName);
-        m_Label        = node->GetString("Label", m_Label);
-        m_ID           = node->GetString("ID", m_ID);
+        m_Type         = CustomInspectorWidgetTypeFromString(node->Get<std::string>("TypeName", CustomInspectorWidgetTypeToString(m_Type)));
+        m_VariableName = node->Get<std::string>("TargetVariable", m_VariableName);
+        m_Label        = node->Get<std::string>("Label", m_Label);
+        m_ID           = node->Get<std::string>("ID", m_ID);
         if (m_Type == CustomInspectorWidgetType_Seed)
-            m_SeedHistory = node->GetIntegerArray("SeedHistory", m_SeedHistory);
-        m_ISpeed               = node->GetInteger("ISpeed", m_ISpeed);
-        m_FSpeed               = node->GetFloat("FSeed", m_FSpeed);
-        m_Constratins[0]       = node->GetFloat("Contraints_0", m_Constratins[0]);
-        m_Constratins[1]       = node->GetFloat("Contraints_1", m_Constratins[1]);
-        m_Constratins[2]       = node->GetFloat("Contraints_2", m_Constratins[2]);
-        m_Constratins[3]       = node->GetFloat("Contraints_3", m_Constratins[3]);
-        m_UseRenderOnCondition = node->GetInteger("UseRenderOnCondition", 0) == 1;
+            m_SeedHistory = node->Get<std::vector<int>>("SeedHistory", m_SeedHistory);
+        m_ISpeed               = node->Get<int>("ISpeed", m_ISpeed);
+        m_FSpeed               = node->Get<float>("FSeed", m_FSpeed);
+        m_Constratins[0]       = node->Get<float>("Contraints_0", m_Constratins[0]);
+        m_Constratins[1]       = node->Get<float>("Contraints_1", m_Constratins[1]);
+        m_Constratins[2]       = node->Get<float>("Contraints_2", m_Constratins[2]);
+        m_Constratins[3]       = node->Get<float>("Contraints_3", m_Constratins[3]);
+        m_UseRenderOnCondition = node->Get<bool>("UseRenderOnCondition", false);
         if (m_UseRenderOnCondition) {
-            m_RenderOnConditionValue  = node->GetInteger("RenderOnConditionValue", m_RenderOnConditionValue);
-            m_RenderOnConditionName   = node->GetString("RenderOnConditionName", m_RenderOnConditionName);
-            m_RenderOnConditionValues = node->GetIntegerArray("RenderOnConditionValues", {});
+            m_RenderOnConditionValue  = node->Get<int>("RenderOnConditionValue", m_RenderOnConditionValue);
+            m_RenderOnConditionName   = node->Get<std::string>("RenderOnConditionName", m_RenderOnConditionName);
+            m_RenderOnConditionValues = node->Get<std::vector<int>>("RenderOnConditionValues", {});
             if (m_RenderOnConditionValues.empty())
                 m_RenderOnConditionValues.push_back(m_RenderOnConditionValue);
         }
-        m_Tooltip  = node->GetString("Tooltip", m_Tooltip);
-        m_FontName = node->GetString("FontName", m_FontName);
+        m_Tooltip  = node->Get<std::string>("Tooltip", m_Tooltip);
+        m_FontName = node->Get<std::string>("FontName", m_FontName);
     }
 
     CustomInspector::CustomInspector()
@@ -795,13 +792,15 @@ namespace tf3d::misc
     SerializerNode CustomInspector::SaveData() const
     {
         SerializerNode node = CreateSerializerNode();
-        node->SetInteger("ValueCount", static_cast<int32_t>(m_Values.size()));
-        node->CreateNodeArray("Values");
+        node->Set("ValueCount", static_cast<int32_t>(m_Values.size()));
+        std::vector<SerializerNode> values;
+        values.reserve(m_Values.size());
         for (const auto &it : m_Values) {
             auto subNode = it.second.Save();
-            subNode->SetString("GName", it.first);
-            node->PushToNodeArray("Values", subNode);
+            subNode->Set("GName", it.first);
+            values.push_back(subNode);
         }
+        node->Set("Values", values);
         return node;
     }
 
@@ -813,12 +812,12 @@ namespace tf3d::misc
                 textureBitDepths[name] = true;
         }
         m_Values.clear();
-        int32_t valueCount = node->GetInteger("ValueCount");
-        auto subNodes      = node->GetNodeArray("Values");
+        int32_t valueCount = node->Get<int>("ValueCount");
+        auto subNodes      = node->Get<std::vector<SerializerNode>>("Values");
         if (subNodes.size() != valueCount)
             TF3D_LOG_WARN("Inspector data is incomplete: expected {}, found {}", valueCount, subNodes.size());
         for (auto subNode : subNodes) {
-            std::string name = subNode->GetString("GName");
+            std::string name = subNode->Get<std::string>("GName");
             CustomInspectorValue value;
             if (textureBitDepths.contains(name))
                 value.m_TextureLoadAs16Bit = true;
@@ -830,42 +829,44 @@ namespace tf3d::misc
     SerializerNode CustomInspector::Save() const
     {
         SerializerNode node = CreateSerializerNode();
-        node->SetString("ID", m_ID);
+        node->Set("ID", m_ID);
         if (!m_Description.empty())
-            node->SetString("Description", m_Description);
-        node->SetChildNode("Data", SaveData());
-        node->SetStringArray("WidgetsOrder", m_WidgetsOrder);
-        node->SetInteger("WidgetsCount", static_cast<int32_t>(m_Widgets.size()));
-        node->CreateNodeArray("Widgets");
+            node->Set("Description", m_Description);
+        node->Set("Data", SaveData());
+        node->Set("WidgetsOrder", m_WidgetsOrder);
+        node->Set("WidgetsCount", static_cast<int32_t>(m_Widgets.size()));
+        std::vector<SerializerNode> widgets;
+        widgets.reserve(m_Widgets.size());
         for (const auto &it : m_Widgets) {
             auto subNode = it.second.Save();
-            subNode->SetString("GName", it.first);
-            node->PushToNodeArray("Widgets", subNode);
+            subNode->Set("GName", it.first);
+            widgets.push_back(subNode);
         }
+        node->Set("Widgets", widgets);
         return node;
     }
 
     void CustomInspector::Load(SerializerNode node)
     {
-        LoadData(node->GetChildNode("Data"));
+        LoadData(node->Get<SerializerNode>("Data"));
         m_Widgets.clear();
         m_WidgetsOrder.clear();
-        m_ID           = node->GetString("ID", m_ID);
-        m_Description  = node->GetString("Description", m_Description);
-        int valueCount = node->GetInteger("WidgetsCount");
-        m_WidgetsOrder = node->GetStringArray("WidgetsOrder");
-        auto subNodes  = node->GetNodeArray("Widgets");
+        m_ID           = node->Get<std::string>("ID", m_ID);
+        m_Description  = node->Get<std::string>("Description", m_Description);
+        int valueCount = node->Get<int>("WidgetsCount");
+        m_WidgetsOrder = node->Get<std::vector<std::string>>("WidgetsOrder");
+        auto subNodes  = node->Get<std::vector<SerializerNode>>("Widgets");
         if (subNodes.size() != valueCount)
             TF3D_LOG_WARN("Inspector data is incomplete: expected {}, found {}", valueCount, subNodes.size());
         for (auto subNode : subNodes) {
-            std::string name = subNode->GetString("GName");
+            std::string name = subNode->Get<std::string>("GName");
             CustomInspectorWidget widget;
             widget.Load(subNode);
             m_Widgets[name] = widget;
         }
         if (m_WidgetsOrder.empty()) {
             for (const auto &subNode : subNodes)
-                m_WidgetsOrder.push_back(subNode->GetString("GName"));
+                m_WidgetsOrder.push_back(subNode->Get<std::string>("GName"));
         }
     }
 

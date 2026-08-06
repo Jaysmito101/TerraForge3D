@@ -304,13 +304,13 @@ namespace tf3d::generators
     SerializerNode CalculatedMaskGenerator::Save() const
     {
         auto node = CreateSerializerNode();
-        node->SetInteger("MaskType", static_cast<int32_t>(m_Settings.type));
-        node->SetInteger("MaskMode", m_Settings.shaderMode);
+        node->Set("MaskType", static_cast<int32_t>(m_Settings.type));
+        node->Set("MaskMode", m_Settings.shaderMode);
         const int typeIndex = glm::clamp(static_cast<int>(m_Settings.type), 0, static_cast<int>(CalculatedMaskType::Count) - 1);
         if (m_Metadata.contains("Types") && typeIndex < static_cast<int>(m_Metadata["Types"].size()))
-            node->SetString("MaskTypeID", m_Metadata["Types"][typeIndex].value("ID", ""));
+            node->Set("MaskTypeID", m_Metadata["Types"][typeIndex].value("ID", ""));
         if (m_Inspector != nullptr)
-            node->SetChildNode("Inspector", m_Inspector->SaveData());
+            node->Set("Inspector", m_Inspector->SaveData());
         return node;
     }
 
@@ -318,9 +318,9 @@ namespace tf3d::generators
     {
         if (data == nullptr || m_Inspector == nullptr)
             return;
-        int typeIndex = FindTypeIndexByID(data->GetString("MaskTypeID", ""));
+        int typeIndex = FindTypeIndexByID(data->Get<std::string>("MaskTypeID", ""));
         if (typeIndex < 0 && data->HasKey("MaskMode")) {
-            const int shaderMode = data->GetInteger("MaskMode", m_Settings.shaderMode);
+            const int shaderMode = data->Get<int>("MaskMode", m_Settings.shaderMode);
             if (m_Metadata.contains("Types") && m_Metadata["Types"].is_array()) {
                 for (size_t candidateIndex = 0; candidateIndex < m_Metadata["Types"].size(); ++candidateIndex)
                     if (m_Metadata["Types"][candidateIndex].value("Mode", -1) == shaderMode)
@@ -328,11 +328,11 @@ namespace tf3d::generators
             }
         }
         if (typeIndex < 0)
-            typeIndex = glm::clamp(data->GetInteger("MaskType", static_cast<int32_t>(m_Settings.type)),
+            typeIndex = glm::clamp(data->Get<int>("MaskType", static_cast<int32_t>(m_Settings.type)),
                                    0, static_cast<int>(CalculatedMaskType::Count) - 1);
         if (!LoadInspectorForType(typeIndex))
             return;
-        const auto inspectorData = data->GetChildNode("Inspector");
+        const auto inspectorData = data->Get<SerializerNode>("Inspector");
         if (inspectorData != nullptr)
             m_Inspector->LoadData(inspectorData);
         if (!m_Inspector->HasVariable("NoiseAlgorithm"))

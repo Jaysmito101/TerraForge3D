@@ -103,39 +103,39 @@ namespace tf3d::generators
     {
         if (data == nullptr)
             return;
-        m_ID         = data->GetString("ID", m_ID);
-        m_Enabled    = data->GetInteger("Enabled", m_Enabled ? 1 : 0) != 0;
-        m_UseMask    = data->GetInteger("UseMask", m_UseMask ? 1 : 0) != 0;
-        m_InvertMask = data->GetInteger("InvertMask", m_InvertMask ? 1 : 0) != 0;
-        m_Strength   = data->GetFloat("Strength", m_Strength);
-        m_MergeMode  = static_cast<BiomeFilterMergeMode>(glm::clamp(data->GetInteger("MergeMode", static_cast<int>(m_MergeMode)), 0, 4));
+        m_ID         = data->Get<std::string>("ID", m_ID);
+        m_Enabled    = data->Get<bool>("Enabled", m_Enabled);
+        m_UseMask    = data->Get<bool>("UseMask", m_UseMask);
+        m_InvertMask = data->Get<bool>("InvertMask", m_InvertMask);
+        m_Strength   = data->Get<float>("Strength", m_Strength);
+        m_MergeMode  = static_cast<BiomeFilterMergeMode>(glm::clamp(data->Get<int>("MergeMode", static_cast<int>(m_MergeMode)), 0, 4));
         if (m_Inspector != nullptr) {
-            auto parameters = data->GetChildNode("Parameters");
+            auto parameters = data->Get<SerializerNode>("Parameters");
             if (parameters != nullptr)
                 m_Inspector->LoadData(parameters);
         }
         if (m_CalculatedMaskGenerator != nullptr)
-            m_CalculatedMaskGenerator->Load(data->GetChildNode("CalculatedMask"));
+            m_CalculatedMaskGenerator->Load(data->Get<SerializerNode>("CalculatedMask"));
         if (m_MaskTool != nullptr)
-            m_MaskTool->Load(data->GetChildNode("MaskTool"));
+            m_MaskTool->Load(data->Get<SerializerNode>("MaskTool"));
     }
 
     SerializerNode BiomeFilter::Save() const
     {
         auto node = CreateSerializerNode();
-        node->SetString("ID", m_ID);
-        node->SetString("DefinitionID", GetDefinitionID());
-        node->SetInteger("Enabled", m_Enabled ? 1 : 0);
-        node->SetInteger("UseMask", m_UseMask ? 1 : 0);
-        node->SetInteger("InvertMask", m_InvertMask ? 1 : 0);
-        node->SetFloat("Strength", m_Strength);
-        node->SetInteger("MergeMode", static_cast<int>(m_MergeMode));
+        node->Set("ID", m_ID);
+        node->Set("DefinitionID", GetDefinitionID());
+        node->Set("Enabled", m_Enabled);
+        node->Set("UseMask", m_UseMask);
+        node->Set("InvertMask", m_InvertMask);
+        node->Set("Strength", m_Strength);
+        node->Set("MergeMode", static_cast<int>(m_MergeMode));
         if (m_Inspector != nullptr)
-            node->SetChildNode("Parameters", m_Inspector->SaveData());
+            node->Set("Parameters", m_Inspector->SaveData());
         if (m_CalculatedMaskGenerator != nullptr)
-            node->SetChildNode("CalculatedMask", m_CalculatedMaskGenerator->Save());
+            node->Set("CalculatedMask", m_CalculatedMaskGenerator->Save());
         if (m_MaskTool != nullptr)
-            node->SetChildNode("MaskTool", m_MaskTool->Save());
+            node->Set("MaskTool", m_MaskTool->Save());
         return node;
     }
 

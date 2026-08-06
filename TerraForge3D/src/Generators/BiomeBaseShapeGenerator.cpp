@@ -87,12 +87,12 @@ namespace tf3d::generators
 
     void BiomeBaseShapeGenerator::Load(SerializerNode data)
     {
-        m_Name         = data->GetString("Name", "Default Name");
-        m_ID           = data->GetString("ID", GenerateId(8));
-        m_Description  = data->GetString("Description", m_Description);
-        m_Source       = data->GetString("Source");
-        m_ShaderPath   = data->GetString("ShaderPath", "");
-        auto inspector = data->GetChildNode("Inspector");
+        m_Name         = data->Get<std::string>("Name", "Default Name");
+        m_ID           = data->Get<std::string>("ID", GenerateId(8));
+        m_Description  = data->Get<std::string>("Description", m_Description);
+        m_Source       = data->Get<std::string>("Source");
+        m_ShaderPath   = data->Get<std::string>("ShaderPath", "");
+        auto inspector = data->Get<SerializerNode>("Inspector");
         if (inspector)
             m_Inspector->Load(inspector);
         else
@@ -105,12 +105,12 @@ namespace tf3d::generators
     SerializerNode BiomeBaseShapeGenerator::Save()
     {
         SerializerNode node = CreateSerializerNode();
-        node->SetString("Name", m_Name);
-        node->SetString("ID", m_ID);
-        node->SetString("Description", m_Description);
-        node->SetString("Source", m_Source);
-        node->SetString("ShaderPath", m_ShaderPath);
-        node->SetChildNode("Inspector", m_Inspector->Save());
+        node->Set("Name", m_Name);
+        node->Set("ID", m_ID);
+        node->Set("Description", m_Description);
+        node->Set("Source", m_Source);
+        node->Set("ShaderPath", m_ShaderPath);
+        node->Set("Inspector", m_Inspector->Save());
         return node;
     }
 

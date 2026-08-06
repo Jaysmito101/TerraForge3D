@@ -82,7 +82,7 @@ namespace tf3d::generators
     SerializerNode MaskTool::Save() const
     {
         auto node = CreateSerializerNode();
-        node->SetInteger("MaskSource", static_cast<int>(m_PreviewMode));
+        node->Set("MaskSource", static_cast<int>(m_PreviewMode));
         return node;
     }
 
@@ -90,8 +90,8 @@ namespace tf3d::generators
     {
         if (data == nullptr)
             return;
-        const int savedSource = data->GetInteger("MaskSource",
-                                                 data->GetInteger("PreviewMode", static_cast<int>(MaskPreviewMode::Painted)));
+        const int savedSource = data->Get<int>("MaskSource",
+                                               data->Get<int>("PreviewMode", static_cast<int>(MaskPreviewMode::Painted)));
         const auto source     = static_cast<MaskPreviewMode>(glm::clamp(savedSource, 0, 1));
         FinishActiveStroke();
         m_PreviewMode = source == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr

@@ -437,8 +437,8 @@ namespace tf3d::generators
         if (data == nullptr)
             return;
         m_Filters.clear();
-        for (const auto &filterNode : data->GetNodeArray("Filters")) {
-            auto definition = m_Catalog->FindByID(filterNode->GetString("DefinitionID"));
+        for (const auto &filterNode : data->Get<std::vector<SerializerNode>>("Filters")) {
+            auto definition = m_Catalog->FindByID(filterNode->Get<std::string>("DefinitionID"));
             const int index = AddFilter(definition);
             if (index >= 0)
                 m_Filters[index]->Load(filterNode);
@@ -449,9 +449,11 @@ namespace tf3d::generators
     SerializerNode BiomeFilterStack::Save() const
     {
         auto node = CreateSerializerNode();
-        node->CreateNodeArray("Filters");
+        std::vector<SerializerNode> filters;
+        filters.reserve(m_Filters.size());
         for (const auto &filter : m_Filters)
-            node->PushToNodeArray("Filters", filter->Save());
+            filters.push_back(filter->Save());
+        node->Set("Filters", filters);
         return node;
     }
 

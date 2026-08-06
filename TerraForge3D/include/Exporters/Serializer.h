@@ -1,15 +1,36 @@
 #pragma once
 
 #include "Base/Logging/Logger.h"
-
+#include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 
+#include <algorithm>
+#include <concepts>
+#include <cstdint>
 #include <memory>
-
-#include "Base/Base.h"
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace tf3d::exporters
 {
+
+    template <typename>
+    inline constexpr bool SerializerUnsupportedType = false;
+
+    template <typename T>
+    struct SerializerVectorTraits {
+        static constexpr bool IsVector = false;
+    };
+
+    template <typename T, typename Allocator>
+    struct SerializerVectorTraits<std::vector<T, Allocator>> {
+        static constexpr bool IsVector = true;
+        using ElementType              = T;
+    };
 
     class SerializerNodeInternal;
     static std::shared_ptr<SerializerNodeInternal> CreateSerializerNode();
@@ -17,214 +38,334 @@ namespace tf3d::exporters
     class SerializerNodeInternal
     {
     private:
+        inline static void WarnInvalidField(const std::string &key, std::string_view reason)
+        {
+            TF3D_LOG_WARN("Invalid serializer field '{}': {}", key, reason);
+        }
+
         template <typename T>
-        inline SerializerNodeInternal *SetSimple(const std::string &key, const T &value, const std::string &valueTypeName)
+        SerializerNodeInternal *SetTyped(const std::string &key, T &&value, std::string_view typeName)
         {
             nlohmann::json data;
-            data["Type"]  = valueTypeName;
-            data["Value"] = value;
-            m_Value[key]  = data;
+            data["Type"]  = std::string(typeName);
+            data["Value"] = std::forward<T>(value);
+
+            m_Value[key] = std::move(data);
+            m_Children.erase(key);
+            m_Arrays.erase(key);
             return this;
         }
 
         template <typename T>
-        inline T GetSimple(const std::string &key, const std::string &valueTypeName, const T &defaultValue)
+        T GetTyped(const std::string &key, std::string_view typeName, const T &defaultValue) const
         {
-            // if(!HasKey(key)) return defaultValue;
-            if (GetKeyType(key) != valueTypeName)
+            const auto it = m_Value.find(key);
+            if (it == m_Value.end()) {
+                if (m_Children.contains(key) || m_Arrays.contains(key))
+                    WarnInvalidField(key, "expected a scalar value");
                 return defaultValue;
-            try {
-                return m_Value[key]["Value"].get<T>();
-            } catch (...) {
-                // std::cout << "Error: Could not get value for key: " << key << std::endl;
             }
-            return defaultValue;
+            if (!it.value().is_object() || !it.value().contains("Type") ||
+                it.value()["Type"] != std::string(typeName) || !it.value().contains("Value")) {
+                WarnInvalidField(key, "unexpected value type");
+                return defaultValue;
+            }
+            try {
+                return it.value()["Value"].get<T>();
+            } catch (...) {
+                WarnInvalidField(key, "value could not be converted");
+                return defaultValue;
+            }
+        }
+        template <typename T>
+        std::vector<T> GetArray(const std::string &key,
+                                std::string_view typeName,
+                                const std::vector<T> &defaultValue) const
+        {
+            const auto it = m_Value.find(key);
+            if (it == m_Value.end()) {
+                if (m_Children.contains(key) || m_Arrays.contains(key))
+                    WarnInvalidField(key, "expected a value array");
+                return defaultValue;
+            }
+            if (!it.value().is_object() || !it.value().contains("Type") ||
+                it.value()["Type"] != std::string(typeName) || !it.value().contains("Value") ||
+                !it.value()["Value"].is_array()) {
+                WarnInvalidField(key, "unexpected array type");
+                return defaultValue;
+            }
+            try {
+                std::vector<T> result;
+                result.reserve(it.value()["Value"].size());
+                for (const auto &item : it.value()["Value"])
+                    result.push_back(item.get<T>());
+                return result;
+            } catch (...) {
+                WarnInvalidField(key, "array element could not be converted");
+                return defaultValue;
+            }
+        }
+        inline static nlohmann::json EncodeVector(const glm::vec2 &value)
+        {
+            return {{"x", value.x}, {"y", value.y}};
         }
 
-        inline SerializerNodeInternal *CreateArray(const std::string &key, const std::string &valueTypeName)
+        inline static nlohmann::json EncodeVector(const glm::vec3 &value)
         {
-            if (valueTypeName == "NodeArray") {
-                m_Arrays[key] = std::vector<std::shared_ptr<SerializerNodeInternal>>();
-                return this;
-            }
-            nlohmann::json data;
-            data["Type"]  = valueTypeName;
-            data["Value"] = nullptr;
-            m_Value[key]  = data;
-            return this;
+            return {{"x", value.x}, {"y", value.y}, {"z", value.z}};
+        }
+
+        inline static nlohmann::json EncodeVector(const glm::vec4 &value)
+        {
+            return {{"x", value.x}, {"y", value.y}, {"z", value.z}, {"w", value.w}};
         }
 
         template <typename T>
-        inline SerializerNodeInternal *PushToArray(const std::string &key, const T &value, const std::string &valueTypeName)
+        std::vector<T> GetVectorArray(const std::string &key,
+                                      std::string_view typeName,
+                                      const std::vector<T> &defaultValue) const
         {
-            // if (!HasKey(key)) CreateArray(key, valueTypeName);
-            if (GetKeyType(key) != valueTypeName)
-                CreateArray(key, valueTypeName);
-            m_Value[key]["Value"].push_back(value);
-            return this;
+            const auto it = m_Value.find(key);
+            if (it == m_Value.end()) {
+                if (m_Children.contains(key) || m_Arrays.contains(key))
+                    WarnInvalidField(key, "expected a vector array");
+                return defaultValue;
+            }
+            if (!it.value().is_object() || !it.value().contains("Type") ||
+                it.value()["Type"] != std::string(typeName) || !it.value().contains("Value") ||
+                !it.value()["Value"].is_array()) {
+                WarnInvalidField(key, "unexpected vector array type");
+                return defaultValue;
+            }
+            try {
+                std::vector<T> result;
+                result.reserve(it.value()["Value"].size());
+                for (const auto &item : it.value()["Value"]) {
+                    if constexpr (std::same_as<T, glm::vec2>)
+                        result.emplace_back(item.at("x").get<float>(), item.at("y").get<float>());
+                    else if constexpr (std::same_as<T, glm::vec3>)
+                        result.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
+                                            item.at("z").get<float>());
+                    else if constexpr (std::same_as<T, glm::vec4>)
+                        result.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
+                                            item.at("z").get<float>(), item.at("w").get<float>());
+                    else
+                        static_assert(SerializerUnsupportedType<T>, "Unsupported serializer vector element type");
+                }
+                return result;
+            } catch (...) {
+                WarnInvalidField(key, "vector array element is malformed");
+                return defaultValue;
+            }
+        }
+        inline std::string GetStoredType(const std::string &key) const
+        {
+            const auto it = m_Value.find(key);
+            if (it == m_Value.end() || !it.value().is_object() || !it.value().contains("Type"))
+                return {};
+            try {
+                return it.value()["Type"].get<std::string>();
+            } catch (...) {
+                WarnInvalidField(key, "stored type metadata is malformed");
+                return {};
+            }
         }
 
     public:
         SerializerNodeInternal()  = default;
         ~SerializerNodeInternal() = default;
 
-        inline SerializerNodeInternal *SetInteger(const std::string &key, int value)
+        template <typename T>
+        SerializerNodeInternal *Set(const std::string &key, const T &value)
         {
-            return SetSimple(key, value, "Integer");
-        }
-        inline SerializerNodeInternal *SetFloat(const std::string &key, float value)
-        {
-            return SetSimple(key, value, "Float");
-        }
-        inline SerializerNodeInternal *SetString(const std::string &key, const std::string &value)
-        {
-            return SetSimple(key, value, "String");
-        }
-        inline SerializerNodeInternal *SetChildNode(const std::string &key, std::shared_ptr<SerializerNodeInternal> value)
-        {
-            m_Children[key] = value;
-            return this;
-        }
-        inline SerializerNodeInternal *SetFile(const std::string &key, const std::string &path)
-        {
-            m_Files.push_back({path, false});
-            return SetSimple(key, path, "File");
+            using Value = std::remove_cvref_t<T>;
+
+            if constexpr (std::same_as<Value, bool>) {
+                return SetTyped(key, value, "Boolean");
+            } else if constexpr (std::integral<Value> && !std::same_as<Value, bool>) {
+                return SetTyped(key, value, "Integer");
+            } else if constexpr (std::is_enum_v<Value>) {
+                using Underlying = std::underlying_type_t<Value>;
+                return SetTyped(key, static_cast<Underlying>(value), "Integer");
+            } else if constexpr (std::floating_point<Value>) {
+                return SetTyped(key, value, "Float");
+            } else if constexpr (std::same_as<Value, std::string>) {
+                return SetTyped(key, value, "String");
+            } else if constexpr (std::convertible_to<Value, std::string_view>) {
+                return SetTyped(key, std::string_view(value), "String");
+            } else if constexpr (std::same_as<Value, std::shared_ptr<SerializerNodeInternal>>) {
+                m_Value.erase(key);
+                m_Arrays.erase(key);
+                m_Children[key] = value;
+                return this;
+            } else if constexpr (std::same_as<Value, glm::vec2>) {
+                return SetTyped(key, nlohmann::json{{"x", value.x}, {"y", value.y}}, "Vector2");
+            } else if constexpr (std::same_as<Value, glm::vec3>) {
+                return SetTyped(key,
+                                nlohmann::json{{"x", value.x}, {"y", value.y}, {"z", value.z}},
+                                "Vector3");
+            } else if constexpr (std::same_as<Value, glm::vec4>) {
+                return SetTyped(key,
+                                nlohmann::json{{"x", value.x}, {"y", value.y}, {"z", value.z}, {"w", value.w}},
+                                "Vector4");
+            } else if constexpr (SerializerVectorTraits<Value>::IsVector) {
+                using Element      = typename SerializerVectorTraits<Value>::ElementType;
+                using ElementValue = std::remove_cv_t<Element>;
+
+                if constexpr (std::same_as<ElementValue, std::shared_ptr<SerializerNodeInternal>>) {
+                    m_Value.erase(key);
+                    m_Children.erase(key);
+                    m_Arrays[key] = value;
+                    return this;
+                } else {
+
+                    nlohmann::json encoded = nlohmann::json::array();
+
+                    if constexpr (std::same_as<ElementValue, glm::vec2>) {
+                        for (const auto &item : value)
+                            encoded.push_back(EncodeVector(item));
+                        return SetTyped(key, std::move(encoded), "Vector2Array");
+                    } else if constexpr (std::same_as<ElementValue, glm::vec3>) {
+                        for (const auto &item : value)
+                            encoded.push_back(EncodeVector(item));
+                        return SetTyped(key, std::move(encoded), "Vector3Array");
+                    } else if constexpr (std::same_as<ElementValue, glm::vec4>) {
+                        for (const auto &item : value)
+                            encoded.push_back(EncodeVector(item));
+                        return SetTyped(key, std::move(encoded), "Vector4Array");
+                    } else if constexpr (std::same_as<ElementValue, bool>) {
+                        for (const auto &item : value)
+                            encoded.push_back(item);
+                        return SetTyped(key, std::move(encoded), "BooleanArray");
+                    } else if constexpr (std::integral<ElementValue> || std::is_enum_v<ElementValue>) {
+                        for (const auto &item : value)
+                            encoded.push_back(item);
+                        return SetTyped(key, std::move(encoded), "IntegerArray");
+                    } else if constexpr (std::floating_point<ElementValue>) {
+                        for (const auto &item : value)
+                            encoded.push_back(item);
+                        return SetTyped(key, std::move(encoded), "FloatArray");
+                    } else if constexpr (std::same_as<ElementValue, std::string> ||
+                                         std::convertible_to<ElementValue, std::string_view>) {
+                        for (const auto &item : value)
+                            encoded.push_back(std::string_view(item));
+                        return SetTyped(key, std::move(encoded), "StringArray");
+                    } else {
+                        static_assert(SerializerUnsupportedType<Value>, "Unsupported serializer vector element type");
+                    }
+                }
+            } else {
+                static_assert(SerializerUnsupportedType<Value>, "Unsupported serializer value type");
+            }
         }
 
-        inline SerializerNodeInternal *SetIntegerArray(const std::string &key, std::vector<int> value)
+        template <typename T>
+        T Get(const std::string &key, const T &defaultValue = T()) const
         {
-            return SetSimple(key, value, "IntegerArray");
-        }
-        inline SerializerNodeInternal *SetFloatArray(const std::string &key, std::vector<float> value)
-        {
-            return SetSimple(key, value, "FloatArray");
-        }
-        inline SerializerNodeInternal *SetStringArray(const std::string &key, const std::vector<std::string> &value)
-        {
-            return SetSimple(key, value, "StringArray");
-        }
-        inline SerializerNodeInternal *SetNodeArray(const std::string &key, std::vector<std::shared_ptr<SerializerNodeInternal>> value)
-        {
-            m_Arrays[key] = value;
-            return this;
-        }
+            using Value = std::remove_cvref_t<T>;
 
-        inline SerializerNodeInternal *CreateIntegerArray(const std::string &key)
-        {
-            return CreateArray(key, "IntegerArray");
-        }
-        inline SerializerNodeInternal *CreateFloatArray(const std::string &key)
-        {
-            return CreateArray(key, "FloatArray");
-        }
-        inline SerializerNodeInternal *CreateStringArray(const std::string &key)
-        {
-            return CreateArray(key, "StringArray");
-        }
-        inline SerializerNodeInternal *CreateNodeArray(const std::string &key)
-        {
-            return CreateArray(key, "NodeArray");
-        }
+            if constexpr (std::same_as<Value, bool>) {
+                return GetTyped<bool>(key, "Boolean", defaultValue);
+            } else if constexpr (std::integral<Value> && !std::same_as<Value, bool>) {
+                return GetTyped<Value>(key, "Integer", defaultValue);
+            } else if constexpr (std::is_enum_v<Value>) {
+                using Underlying = std::underlying_type_t<Value>;
+                return static_cast<Value>(GetTyped<Underlying>(key, "Integer", static_cast<Underlying>(defaultValue)));
+            } else if constexpr (std::floating_point<Value>) {
+                return GetTyped<Value>(key, "Float", defaultValue);
+            } else if constexpr (std::same_as<Value, std::string>) {
+                return GetTyped<std::string>(key, "String", defaultValue);
+            } else if constexpr (std::same_as<Value, std::shared_ptr<SerializerNodeInternal>>) {
+                const auto it = m_Children.find(key);
+                if (it != m_Children.end())
+                    return it->second;
+                if (HasKey(key))
+                    WarnInvalidField(key, "expected a child node");
+                return defaultValue;
+            } else if constexpr (std::same_as<Value, glm::vec2>) {
+                if (GetStoredType(key) != "Vector2") {
+                    if (HasKey(key))
+                        WarnInvalidField(key, "expected a Vector2 value");
+                    return defaultValue;
+                }
+                try {
+                    const auto &value = m_Value.at(key).at("Value");
+                    return glm::vec2(value.at("x").get<float>(), value.at("y").get<float>());
+                } catch (...) {
+                    WarnInvalidField(key, "Vector2 value is malformed");
+                    return defaultValue;
+                }
+            } else if constexpr (std::same_as<Value, glm::vec3>) {
+                if (GetStoredType(key) != "Vector3") {
+                    if (HasKey(key))
+                        WarnInvalidField(key, "expected a Vector3 value");
+                    return defaultValue;
+                }
+                try {
+                    const auto &value = m_Value.at(key).at("Value");
+                    return glm::vec3(value.at("x").get<float>(), value.at("y").get<float>(),
+                                     value.at("z").get<float>());
+                } catch (...) {
+                    WarnInvalidField(key, "Vector3 value is malformed");
+                    return defaultValue;
+                }
+            } else if constexpr (std::same_as<Value, glm::vec4>) {
+                if (GetStoredType(key) != "Vector4") {
+                    if (HasKey(key))
+                        WarnInvalidField(key, "expected a Vector4 value");
+                    return defaultValue;
+                }
+                try {
+                    const auto &value = m_Value.at(key).at("Value");
+                    return glm::vec4(value.at("x").get<float>(), value.at("y").get<float>(),
+                                     value.at("z").get<float>(), value.at("w").get<float>());
+                } catch (...) {
+                    WarnInvalidField(key, "Vector4 value is malformed");
+                    return defaultValue;
+                }
+            } else if constexpr (SerializerVectorTraits<Value>::IsVector) {
+                using Element      = typename SerializerVectorTraits<Value>::ElementType;
+                using ElementValue = std::remove_cv_t<Element>;
 
-        inline SerializerNodeInternal *PushToIntegerArray(const std::string &key, int value)
-        {
-            return PushToArray(key, value, "IntegerArray");
-        }
-        inline SerializerNodeInternal *PushToFloatArray(const std::string &key, float value)
-        {
-            return PushToArray(key, value, "FloatArray");
-        }
-        inline SerializerNodeInternal *PushToStringArray(const std::string &key, const std::string &value)
-        {
-            return PushToArray(key, value, "StringArray");
-        }
-        inline SerializerNodeInternal *PushToNodeArray(const std::string &key, std::shared_ptr<SerializerNodeInternal> value)
-        {
-            if (GetKeyType(key) != "NodeArray")
-                CreateArray(key, "NodeArray");
-            m_Arrays[key].push_back(value);
-            return this;
-        }
-
-        inline int GetInteger(const std::string &key, int defaultValue = 0)
-        {
-            return GetSimple<int>(key, "Integer", defaultValue);
-        }
-        inline float GetFloat(const std::string &key, float defaultValue = 0.0f)
-        {
-            return GetSimple<float>(key, "Float", defaultValue);
-        }
-        inline std::string GetString(const std::string &key, const std::string &defaultValue = "")
-        {
-            return GetSimple<std::string>(key, "String", defaultValue);
-        }
-        inline std::shared_ptr<SerializerNodeInternal> GetChildNode(const std::string &key, std::shared_ptr<SerializerNodeInternal> defaultValue = nullptr)
-        {
-            const auto &it = m_Children.find(key);
-            if (it != m_Children.end())
-                return it->second;
-            return defaultValue;
-        }
-        inline std::string GetFile(const std::string &key, const std::string &defaultValue = "")
-        {
-            return GetSimple<std::string>(key, "File", defaultValue);
-        }
-
-        inline std::vector<int> GetIntegerArray(const std::string &key, const std::vector<int> &defaultValue = std::vector<int>())
-        {
-            return GetSimple<std::vector<int>>(key, "IntegerArray", defaultValue);
-        }
-        inline std::vector<float> GetFloatArray(const std::string &key, const std::vector<float> &defaultValue = std::vector<float>())
-        {
-            return GetSimple<std::vector<float>>(key, "FloatArray", defaultValue);
-        }
-        inline std::vector<std::string> GetStringArray(const std::string &key, const std::vector<std::string> &defaultValue = std::vector<std::string>())
-        {
-            return GetSimple<std::vector<std::string>>(key, "StringArray", defaultValue);
-        }
-        inline std::vector<std::shared_ptr<SerializerNodeInternal>> GetNodeArray(const std::string &key, const std::vector<std::shared_ptr<SerializerNodeInternal>> &defaultValue = std::vector<std::shared_ptr<SerializerNodeInternal>>())
-        {
-            const auto &it = m_Arrays.find(key);
-            if (it != m_Arrays.end())
-                return it->second;
-            return defaultValue;
-        }
-
-        inline int GetArraySize(const std::string &key)
-        {
-            const auto &it0 = m_Value.find(key);
-            if (it0 != m_Value.end())
-                return (int)it0.value()["Value"].size();
-            const auto &it2 = m_Arrays.find(key);
-            if (it2 != m_Arrays.end())
-                return (int)it2->second.size();
-            return -1;
+                if constexpr (std::same_as<ElementValue, std::shared_ptr<SerializerNodeInternal>>) {
+                    const auto it = m_Arrays.find(key);
+                    if (it != m_Arrays.end())
+                        return it->second;
+                    if (HasKey(key))
+                        WarnInvalidField(key, "expected a node array");
+                    return defaultValue;
+                } else if constexpr (std::same_as<ElementValue, glm::vec2>)
+                    return GetVectorArray<ElementValue>(key, "Vector2Array", defaultValue);
+                else if constexpr (std::same_as<ElementValue, glm::vec3>)
+                    return GetVectorArray<ElementValue>(key, "Vector3Array", defaultValue);
+                else if constexpr (std::same_as<ElementValue, glm::vec4>)
+                    return GetVectorArray<ElementValue>(key, "Vector4Array", defaultValue);
+                else if constexpr (std::same_as<ElementValue, bool>)
+                    return GetArray<ElementValue>(key, "BooleanArray", defaultValue);
+                else if constexpr (std::integral<ElementValue> || std::is_enum_v<ElementValue>)
+                    return GetArray<ElementValue>(key, "IntegerArray", defaultValue);
+                else if constexpr (std::floating_point<ElementValue>)
+                    return GetArray<ElementValue>(key, "FloatArray", defaultValue);
+                else if constexpr (std::same_as<ElementValue, std::string>)
+                    return GetArray<ElementValue>(key, "StringArray", defaultValue);
+                else
+                    static_assert(SerializerUnsupportedType<Value>, "Unsupported serializer vector element type");
+            } else {
+                static_assert(SerializerUnsupportedType<Value>, "Unsupported serializer value type");
+            }
         }
 
         inline bool HasKey(const std::string &key) const
         {
-            return (m_Value.find(key) != m_Value.end()) || (m_Children.find(key) != m_Children.end());
-        }
-
-        inline std::string GetKeyType(const std::string &key) const
-        {
-            const auto &it0 = m_Value.find(key);
-            if (it0 != m_Value.end())
-                return it0.value()["Type"];
-            const auto &it2 = m_Children.find(key);
-            if (it2 != m_Children.end())
-                return "Node";
-            const auto &it3 = m_Arrays.find(key);
-            if (it3 != m_Arrays.end())
-                return "NodeArray";
-            return "Unknown";
+            return m_Value.contains(key) || m_Children.contains(key) || m_Arrays.contains(key);
         }
 
         inline std::vector<std::string> GetKeys() const
         {
             std::vector<std::string> keys;
-            for (const auto &it : m_Value)
-                keys.push_back(it.get<std::string>());
+            keys.reserve(m_Value.size() + m_Children.size() + m_Arrays.size());
+            for (const auto &it : m_Value.items())
+                keys.push_back(it.key());
             for (const auto &it : m_Children)
                 keys.push_back(it.first);
             for (const auto &it : m_Arrays)
@@ -236,74 +377,161 @@ namespace tf3d::exporters
         {
             auto node     = std::make_shared<SerializerNodeInternal>();
             node->m_Value = m_Value;
-            for (const auto &it : m_Children) {
+            for (const auto &it : m_Children)
                 node->m_Children[it.first] = it.second->Clone();
-            }
             for (const auto &it : m_Arrays) {
-                for (const auto &it2 : it.second) {
-                    node->m_Arrays[it.first].push_back(it2->Clone());
-                }
+                for (const auto &child : it.second)
+                    node->m_Arrays[it.first].push_back(child->Clone());
             }
             return node;
         }
 
-        /*
-        // TODO
-        inline bool ResolveFilesToHandler(const TF3DFile& file);
-        inline bool ResolveFilesFromHandler(const TF3DFile& file);
-        */
+        inline SerializerNodeInternal *Merge(const SerializerNodeInternal &other)
+        {
+            for (const auto &it : other.m_Value.items()) {
+                m_Value[it.key()] = it.value();
+                m_Children.erase(it.key());
+                m_Arrays.erase(it.key());
+            }
+            for (const auto &it : other.m_Children) {
+                m_Value.erase(it.first);
+                m_Arrays.erase(it.first);
+                const auto current = m_Children.find(it.first);
+                if (current == m_Children.end())
+                    m_Children[it.first] = it.second->Clone();
+                else
+                    current->second->Merge(*it.second);
+            }
+            for (const auto &it : other.m_Arrays) {
+                m_Value.erase(it.first);
+                m_Children.erase(it.first);
+                m_Arrays[it.first].clear();
+                for (const auto &node : it.second)
+                    m_Arrays[it.first].push_back(node->Clone());
+            }
+            return this;
+        }
 
         inline nlohmann::json ToJson() const
         {
-            nlohmann::json data;
-            data["Value"]    = m_Value;
-            data["Children"] = nlohmann::json::object();
-            data["Arrays"]   = nlohmann::json::object();
-            for (const auto &it : m_Children) {
-                data["Children"][it.first] = it.second->ToJson();
-            }
+            nlohmann::json data = nlohmann::json::object();
+            for (const auto &it : m_Value.items())
+                data[it.key()] = it.value()["Value"];
+            for (const auto &it : m_Children)
+                data[it.first] = it.second->ToJson();
             for (const auto &it : m_Arrays) {
-                for (const auto &it2 : it.second) {
-                    data["Arrays"][it.first].push_back(it2->ToJson());
-                }
+                data[it.first] = nlohmann::json::array();
+                for (const auto &node : it.second)
+                    data[it.first].push_back(node->ToJson());
             }
             return data;
         }
 
-        inline void LoadJson(nlohmann::json data)
+        inline void LoadJson(const nlohmann::json &data)
         {
             Clear();
-            try {
-                const auto &it0 = data.find("Value");
-                if (it0 != data.end())
-                    m_Value = it0.value();
-            } catch (...) {
-                TF3D_LOG_ERROR("Failed to load serializer value");
+            if (!data.is_object()) {
+                TF3D_LOG_WARN("Invalid serializer root: expected a JSON object");
+                return;
             }
-            try {
-                const auto &it1 = data.find("Children");
-                if (it1 != data.end()) {
-                    for (const auto &it2 : it1.value().items()) {
-                        m_Children[it2.key()] = std::make_shared<SerializerNodeInternal>();
-                        m_Children[it2.key()]->LoadJson(it2.value());
-                    }
-                }
-            } catch (...) {
-                TF3D_LOG_ERROR("Failed to load serializer children");
-            }
-            try {
-                const auto &it3 = data.find("Arrays");
-                if (it3 != data.end()) {
-                    for (const auto &it4 : it3.value().items()) {
-                        for (const auto &it5 : it4.value()) {
-                            auto node = std::make_shared<SerializerNodeInternal>();
-                            node->LoadJson(it5);
-                            m_Arrays[it4.key()].push_back(node);
+
+            for (const auto &[key, value] : data.items()) {
+                try {
+                    if (value.is_boolean()) {
+                        Set(key, value.get<bool>());
+                    } else if (value.is_number_integer()) {
+                        Set(key, value.get<std::int64_t>());
+                    } else if (value.is_number()) {
+                        Set(key, value.get<double>());
+                    } else if (value.is_string()) {
+                        Set(key, value.get<std::string>());
+                    } else if (value.is_array()) {
+                        if (value.empty()) {
+                            m_Arrays[key] = {};
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_boolean();
+                                   })) {
+                            Set(key, value.get<std::vector<bool>>());
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_number_integer();
+                                   })) {
+                            Set(key, value.get<std::vector<std::int64_t>>());
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_number();
+                                   })) {
+                            Set(key, value.get<std::vector<double>>());
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_string();
+                                   })) {
+                            Set(key, value.get<std::vector<std::string>>());
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_object() && item.size() == 4 && item.contains("x") && item.contains("y") &&
+                                              item.contains("z") && item.contains("w") && item.at("x").is_number() &&
+                                              item.at("y").is_number() && item.at("z").is_number() &&
+                                              item.at("w").is_number();
+                                   })) {
+                            std::vector<glm::vec4> vectors;
+                            vectors.reserve(value.size());
+                            for (const auto &item : value)
+                                vectors.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
+                                                     item.at("z").get<float>(), item.at("w").get<float>());
+                            Set(key, vectors);
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_object() && item.size() == 3 && item.contains("x") && item.contains("y") &&
+                                              item.contains("z") && item.at("x").is_number() &&
+                                              item.at("y").is_number() && item.at("z").is_number();
+                                   })) {
+                            std::vector<glm::vec3> vectors;
+                            vectors.reserve(value.size());
+                            for (const auto &item : value)
+                                vectors.emplace_back(item.at("x").get<float>(), item.at("y").get<float>(),
+                                                     item.at("z").get<float>());
+                            Set(key, vectors);
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_object() && item.size() == 2 && item.contains("x") && item.contains("y") &&
+                                              item.at("x").is_number() && item.at("y").is_number();
+                                   })) {
+                            std::vector<glm::vec2> vectors;
+                            vectors.reserve(value.size());
+                            for (const auto &item : value)
+                                vectors.emplace_back(item.at("x").get<float>(), item.at("y").get<float>());
+                            Set(key, vectors);
+                        } else if (std::all_of(value.begin(), value.end(), [](const nlohmann::json &item) {
+                                       return item.is_object();
+                                   })) {
+                            auto &nodes = m_Arrays[key];
+                            for (const auto &item : value) {
+                                auto node = CreateSerializerNode();
+                                node->LoadJson(item);
+                                nodes.push_back(std::move(node));
+                            }
+                        } else {
+                            WarnInvalidField(key, "unsupported array element types");
                         }
+                    } else if (value.is_object()) {
+                        const bool hasX = value.contains("x");
+                        const bool hasY = value.contains("y");
+                        const bool hasZ = value.contains("z");
+                        const bool hasW = value.contains("w");
+                        if (hasX && hasY && hasZ && hasW) {
+                            Set(key, glm::vec4(value.at("x").get<float>(), value.at("y").get<float>(),
+                                               value.at("z").get<float>(), value.at("w").get<float>()));
+                        } else if (hasX && hasY && hasZ) {
+                            Set(key, glm::vec3(value.at("x").get<float>(), value.at("y").get<float>(),
+                                               value.at("z").get<float>()));
+                        } else if (hasX && hasY) {
+                            Set(key, glm::vec2(value.at("x").get<float>(), value.at("y").get<float>()));
+                        } else {
+                            auto node = CreateSerializerNode();
+                            node->LoadJson(value);
+                            m_Children[key] = std::move(node);
+                        }
+                    } else {
+                        WarnInvalidField(key, "unsupported JSON value type");
                     }
+                } catch (...) {
+                    WarnInvalidField(key, "JSON value could not be decoded");
                 }
-            } catch (...) {
-                TF3D_LOG_ERROR("Failed to load serializer arrays");
             }
         }
 
@@ -318,7 +546,6 @@ namespace tf3d::exporters
         nlohmann::json m_Value;
         std::unordered_map<std::string, std::vector<std::shared_ptr<SerializerNodeInternal>>> m_Arrays;
         std::unordered_map<std::string, std::shared_ptr<SerializerNodeInternal>> m_Children;
-        std::vector<std::pair<std::string, bool>> m_Files;
     };
 
     using SerializerNode = std::shared_ptr<SerializerNodeInternal>;
@@ -328,7 +555,7 @@ namespace tf3d::exporters
         return std::make_shared<SerializerNodeInternal>();
     }
 
-    inline static SerializerNode CreateSerializerNodeFromJson(nlohmann::json data)
+    inline static SerializerNode CreateSerializerNodeFromJson(const nlohmann::json &data)
     {
         SerializerNode node = CreateSerializerNode();
         node->LoadJson(data);
@@ -336,6 +563,7 @@ namespace tf3d::exporters
     }
 
 } // namespace tf3d::exporters
+
 using tf3d::exporters::CreateSerializerNode;
 using tf3d::exporters::CreateSerializerNodeFromJson;
 using tf3d::exporters::SerializerNode;
