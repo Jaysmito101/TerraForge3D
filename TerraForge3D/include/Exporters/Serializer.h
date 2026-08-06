@@ -750,7 +750,7 @@ namespace tf3d::exporters
         }
 
     private:
-        nlohmann::json m_Value;
+        nlohmann::json m_Value = nlohmann::json::object();
         std::unordered_map<std::string, std::vector<std::shared_ptr<SerializerNodeInternal>>> m_Arrays;
         std::unordered_map<std::string, std::shared_ptr<SerializerNodeInternal>> m_Children;
     };
