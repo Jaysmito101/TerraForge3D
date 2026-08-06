@@ -23,7 +23,7 @@ namespace tf3d::renderer
 
         m_Shared.width          = static_cast<int32_t>(width);
         m_Shared.height         = static_cast<int32_t>(height);
-        m_ImageMode.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+        m_Shared.aspectRatio    = static_cast<float>(width) / static_cast<float>(height);
         m_Shared.frameBuffer    = std::make_shared<FrameBuffer>(width, height);
     }
 
@@ -67,29 +67,44 @@ namespace tf3d::renderer
         return m_SceneMode.positionOnTerrain;
     }
 
-    float &RendererViewport::GetOffsetX()
+    float &RendererViewport::GetHeightmapOffsetX()
     {
-        return m_ImageMode.offsetX;
+        return m_HeightmapMode.offsetX;
     }
 
-    float &RendererViewport::GetOffsetY()
+    float &RendererViewport::GetHeightmapOffsetY()
     {
-        return m_ImageMode.offsetY;
+        return m_HeightmapMode.offsetY;
     }
 
-    float &RendererViewport::GetScale()
+    float &RendererViewport::GetHeightmapScale()
     {
-        return m_ImageMode.scale;
+        return m_HeightmapMode.scale;
+    }
+
+    float &RendererViewport::GetTextureSlotOffsetX()
+    {
+        return m_TextureSlotMode.offsetX;
+    }
+
+    float &RendererViewport::GetTextureSlotOffsetY()
+    {
+        return m_TextureSlotMode.offsetY;
+    }
+
+    float &RendererViewport::GetTextureSlotScale()
+    {
+        return m_TextureSlotMode.scale;
     }
 
     float RendererViewport::GetAspectRatio() const
     {
-        return m_ImageMode.aspectRatio;
+        return m_Shared.aspectRatio;
     }
 
     void RendererViewport::SetAspectRatio(float aspectRatio)
     {
-        m_ImageMode.aspectRatio = aspectRatio;
+        m_Shared.aspectRatio = aspectRatio;
     }
 
     std::array<float, 2> &RendererViewport::GetMousePosition()

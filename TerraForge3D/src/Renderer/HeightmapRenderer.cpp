@@ -31,8 +31,8 @@ namespace tf3d::renderer
         glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMin"), fieldMinimum);
         glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMax"), fieldMaximum);
         glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_AspectRatio"), viewport->GetAspectRatio());
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Offset"), viewport->GetOffsetX(), viewport->GetOffsetY());
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Scale"), viewport->GetScale());
+        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Offset"), viewport->GetHeightmapOffsetX(), viewport->GetHeightmapOffsetY());
+        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Scale"), viewport->GetHeightmapScale());
         m_ScreenQuad->Render();
     }
 
