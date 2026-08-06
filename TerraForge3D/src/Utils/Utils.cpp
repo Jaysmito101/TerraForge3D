@@ -571,6 +571,22 @@ namespace tf3d::utils
 
 #endif
 
+    void SetUpIcon()
+    {
+#ifdef TERR3D_WIN32
+        HWND hwnd   = glfwGetWin32Window(mainApp->GetWindow()->GetNativeWindow());
+        HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
+        if (hIcon) {
+            // Change both icons to the same icon handle.
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+            // This will ensure that the application icon gets changed too.
+            SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+            SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        }
+#endif
+    }
+
     void AccocFileType()
     {
 #ifdef TERR3D_WIN32

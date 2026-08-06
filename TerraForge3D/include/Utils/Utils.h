@@ -64,6 +64,7 @@ namespace tf3d::utils
     std::wstring s2ws(const std::string &s);
 #endif
 
+    void SetUpIcon();
     std::string ColorConvertToHexString(float r, float g, float b, float a = 1.0f);
     std::string LowercaseFilterText(const std::string &value);
     bool FuzzyFilterMatch(const std::string &query, const std::string &candidate);
