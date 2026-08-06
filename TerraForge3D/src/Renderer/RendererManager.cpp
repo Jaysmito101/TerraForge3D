@@ -1,12 +1,15 @@
 #include "Renderer/RendererManager.h"
 #include "Data/ApplicationState.h"
+#include "Data/ResourceManager.h"
 #include "Profiler.h"
+#include "Utils/Utils.h"
 
 namespace tf3d::renderer
 {
     RendererManager::RendererManager(ApplicationState *appState)
     {
-        m_AppState            = appState;
+        m_AppState = appState;
+        BuildTerrainInspector();
         m_ObjectRenderer      = std::make_shared<ObjectRenderer>(appState);
         m_HeightmapRenderer   = std::make_shared<HeightmapRenderer>(appState);
         m_TextureSlotRenderer = std::make_shared<TextureSlotRenderer>(appState);
@@ -23,6 +26,31 @@ namespace tf3d::renderer
 
     RendererManager::~RendererManager()
     {
+    }
+
+    void RendererManager::BuildTerrainInspector()
+    {
+        if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
+            TF3D_LOG_ERROR("Cannot load Renderer Terrain inspector metadata without a resource manager");
+            return;
+        }
+
+        const std::string configPath = m_AppState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
+                                       PATH_SEPARATOR + "Terrain.json";
+        bool loaded              = false;
+        const std::string source = m_AppState->resourceManager->LoadText(configPath, false, &loaded);
+        if (!loaded) {
+            TF3D_LOG_ERROR("Could not load Renderer Terrain inspector metadata '{}'", configPath);
+            return;
+        }
+
+        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
+        if (config.is_discarded()) {
+            TF3D_LOG_ERROR("Could not parse Renderer Terrain inspector metadata '{}'", configPath);
+            return;
+        }
+        if (!m_TerrainInspector.LoadConfig(config))
+            TF3D_LOG_ERROR("Could not load Renderer Terrain inspector metadata '{}'", configPath);
     }
 
     bool RendererManager::IsWindowVisible() const
@@ -56,7 +84,7 @@ namespace tf3d::renderer
             m_AppState->generationManager->GetHeightmapData(),
             m_AppState->generationManager->GetHeightPyramid(),
             m_AppState->generationManager->GetTerrainRevision(),
-            m_RendererLights->m_Sun.direction,
+            m_RendererLights->GetSunDirection(),
             std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f));
     }
 
@@ -78,7 +106,7 @@ namespace tf3d::renderer
         m_PlanarShadowCache->Update(
             isPlane ? m_AppState->generationManager->GetHeightPyramid() : nullptr,
             m_AppState->generationManager->GetTerrainRevision(),
-            m_RendererLights->m_Sun.direction,
+            m_RendererLights->GetSunDirection(),
             glm::vec2(-terrainWorldSize * 0.5f),
             terrainWorldSize,
             terrainHeightOffset,
@@ -94,9 +122,11 @@ namespace tf3d::renderer
             return;
         }
 
-        m_HeightfieldAmbientCache->SetEnabled(m_EnableAmbientAo);
+        const bool enableAmbientAo        = m_TerrainInspector.Get<bool>("TerrainAOEnabled", true);
+        const float ambientAoRadiusFactor = m_TerrainInspector.Get<float>("TerrainAORadiusFactor", 0.12f);
+        m_HeightfieldAmbientCache->SetEnabled(enableAmbientAo);
         const float terrainWorldSize = std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f);
-        if (!m_EnableAmbientAo) {
+        if (!enableAmbientAo) {
             return;
         }
 
@@ -104,7 +134,7 @@ namespace tf3d::renderer
             m_AppState->generationManager->GetHeightPyramid(),
             m_AppState->generationManager->GetTerrainRevision(),
             terrainWorldSize,
-            terrainWorldSize * m_AmbientAoRadiusFactor);
+            terrainWorldSize * ambientAoRadiusFactor);
     }
 
     void RendererManager::UpdateHeightfieldGICache()
@@ -116,29 +146,33 @@ namespace tf3d::renderer
             return;
         }
 
-        m_HeightfieldGICache->SetEnabled(m_TerrainGISettings.enabled);
-        if (!m_TerrainGISettings.enabled) {
+        const bool enableTerrainGI                = m_TerrainInspector.Get<bool>("TerrainGIEnabled", false);
+        const int32_t terrainGIResolution         = m_TerrainInspector.Get<int32_t>("TerrainGIResolution", 128);
+        const int32_t terrainGITargetSamples      = m_TerrainInspector.Get<int32_t>("TerrainGITargetSamples", 32);
+        const int32_t terrainGISamplesPerDispatch = m_TerrainInspector.Get<int32_t>("TerrainGISamplesPerDispatch", 1);
+        m_HeightfieldGICache->SetEnabled(enableTerrainGI);
+        if (!enableTerrainGI) {
             return;
         }
 
-        const bool hasSkyLight          = m_RendererLights->m_UseSkyLight && m_RendererSky->IsSkyReady();
+        const bool hasSkyLight          = m_RendererLights->IsSkyLightEnabled() && m_RendererSky->IsSkyReady();
         const bool hasTerrainSelfShadow = m_TerrainSelfShadow != nullptr && m_TerrainSelfShadow->IsReady();
         m_HeightfieldGICache->Update(
             m_AppState->generationManager->GetHeightPyramid(),
             m_AppState->generationManager->GetTerrainRevision(),
             std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f),
-            m_RendererLights->m_Sun.direction,
-            m_RendererLights->m_Sun.color,
-            m_RendererLights->m_Sun.intensity,
+            m_RendererLights->GetSunDirection(),
+            m_RendererLights->GetSunColor(),
+            m_RendererLights->GetSunIntensity(),
             hasSkyLight,
-            m_RendererLights->m_SkyLightIntensity,
+            m_RendererLights->GetSkyLightIntensity(),
             hasSkyLight ? m_RendererSky->GetSkyboxMap() : -1,
             hasSkyLight ? m_RendererSky->GetIrradianceMap() : -1,
             hasTerrainSelfShadow,
             hasTerrainSelfShadow ? static_cast<int32_t>(m_TerrainSelfShadow->GetRendererID()) : -1,
-            m_TerrainGISettings.resolution,
-            m_TerrainGISettings.targetSamples,
-            m_TerrainGISettings.samplesPerDispatch);
+            terrainGIResolution,
+            terrainGITargetSamples,
+            terrainGISamplesPerDispatch);
     }
 
     void RendererManager::Render(RendererViewport *viewport)
@@ -237,14 +271,7 @@ namespace tf3d::renderer
                 if (ImGui::BeginTabBar("Items Settings")) {
                     if (ImGui::BeginTabItem("Terrain")) {
                         ImGui::PushID("Terrain");
-                        ImGui::Checkbox("Enable Terrain AO", &m_EnableAmbientAo);
-                        ImGui::SliderFloat("AO Radius (Terrain Scale)", &m_AmbientAoRadiusFactor, 0.01f, 0.5f, "%.3f");
-                        ImGui::SliderFloat("Base-Plane Shadow Softness", &m_PlanarShadowSoftness, 0.0f, 12.0f, "%.1f");
-                        ImGui::Separator();
-                        ImGui::Checkbox("Enable Terrain GI", &m_TerrainGISettings.enabled);
-                        ImGui::SliderInt("GI Resolution", &m_TerrainGISettings.resolution, 32, 256);
-                        ImGui::SliderInt("GI Target Samples", &m_TerrainGISettings.targetSamples, 1, 256);
-                        ImGui::SliderInt("GI Samples / Dispatch", &m_TerrainGISettings.samplesPerDispatch, 1, 8);
+                        m_TerrainInspector.Render();
                         if (m_HeightfieldGICache != nullptr) {
                             ImGui::Text("GI Progress: %.1f%% (%d / %d)",
                                         m_HeightfieldGICache->GetProgress() * 100.0f,
@@ -285,5 +312,45 @@ namespace tf3d::renderer
             ImGui::Separator();
             ImGui::End();
         }
+    }
+
+    exporters::SerializerNode RendererManager::SaveTerrainSettings() const
+    {
+        auto data      = m_TerrainInspector.SaveState();
+        auto terrainGI = data->Get<exporters::SerializerNode>("TerrainGI");
+        if (!terrainGI) {
+            terrainGI = exporters::CreateSerializerNode();
+            data->Set("TerrainGI", terrainGI);
+        }
+        if (m_HeightfieldGICache != nullptr) {
+            terrainGI->Set("Progress", m_HeightfieldGICache->GetProgress());
+            terrainGI->Set("AccumulatedSamples", m_HeightfieldGICache->GetAccumulatedSamples());
+            terrainGI->Set("Ready", m_HeightfieldGICache->IsReady());
+        }
+        data->Set("TerrainGI", terrainGI);
+        return data;
+    }
+
+    bool RendererManager::LoadTerrainSettings(exporters::SerializerNode data)
+    {
+        if (!data) {
+            TF3D_LOG_ERROR("Cannot load terrain renderer settings from an empty serializer node");
+            return false;
+        }
+
+        nlohmann::json stateJson = data->ToJson();
+        if (stateJson.contains("TerrainGI") && stateJson["TerrainGI"].is_object()) {
+            stateJson["TerrainGI"].erase("Progress");
+            stateJson["TerrainGI"].erase("AccumulatedSamples");
+            stateJson["TerrainGI"].erase("Ready");
+        }
+
+        const auto previousState = m_TerrainInspector.SaveState();
+        if (!m_TerrainInspector.LoadState(exporters::CreateSerializerNodeFromJson(stateJson))) {
+            m_TerrainInspector.LoadState(previousState);
+            return false;
+        }
+
+        return true;
     }
 } // namespace tf3d::renderer

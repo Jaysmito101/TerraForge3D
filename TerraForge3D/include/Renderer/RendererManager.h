@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Exporters/Serializer.h"
+#include "Misc/CustomInspector.h"
 #include "Renderer/HeightmapRenderer.h"
 #include "Renderer/ObjectRenderer.h"
 #include "Renderer/RendererViewport.h"
@@ -19,13 +21,6 @@ TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 namespace tf3d::renderer
 {
 
-    struct TerrainGISettings {
-        bool enabled               = false;
-        int32_t resolution         = 128;
-        int32_t targetSamples      = 32;
-        int32_t samplesPerDispatch = 1;
-    };
-
     class RendererManager
     {
     public:
@@ -35,6 +30,12 @@ namespace tf3d::renderer
         void Update();
         void Render(RendererViewport *viewport);
         void ShowSettings();
+        exporters::SerializerNode SaveTerrainSettings() const;
+        bool LoadTerrainSettings(exporters::SerializerNode data);
+        inline nlohmann::json GetTerrainSettingsSchema() const
+        {
+            return m_TerrainInspector.BuildSchema();
+        }
         bool IsWindowVisible() const;
         bool *IsWindowVisiblePtr();
 
@@ -56,7 +57,7 @@ namespace tf3d::renderer
         }
         inline float GetPlanarShadowSoftness() const
         {
-            return m_PlanarShadowSoftness;
+            return m_TerrainInspector.Get<float>("BasePlaneShadowSoftness", 4.0f);
         }
         inline HeightfieldAmbientCache *GetHeightfieldAmbientCache()
         {
@@ -93,6 +94,7 @@ namespace tf3d::renderer
         void UpdatePlanarShadowCache();
         void UpdateHeightfieldAmbientCache();
         void UpdateHeightfieldGICache();
+        void BuildTerrainInspector();
 
         ApplicationState *m_AppState = nullptr;
         // std::shared_ptr<ObjectRenderer> m_ObjectRenderer;
@@ -108,10 +110,7 @@ namespace tf3d::renderer
         std::shared_ptr<HeightfieldAmbientCache> m_HeightfieldAmbientCache;
         std::shared_ptr<HeightfieldGICache> m_HeightfieldGICache;
         std::shared_ptr<SeaRenderer> m_SeaRenderer;
-        bool m_EnableAmbientAo        = true;
-        float m_AmbientAoRadiusFactor = 0.12f;
-        float m_PlanarShadowSoftness  = 4.0f;
-        TerrainGISettings m_TerrainGISettings;
+        CustomInspector m_TerrainInspector;
     };
 
 } // namespace tf3d::renderer

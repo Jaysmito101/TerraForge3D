@@ -1,0 +1,123 @@
+{
+    "Description": "Controls terrain ambient occlusion, base-plane shadows, and terrain global illumination.",
+    "ShowResetButton": false,
+    "Schema": {
+        "properties": {
+            "TerrainGI": {
+                "properties": {
+                    "Progress": {
+                        "type": "number",
+                        "minimum": 0.0,
+                        "maximum": 1.0,
+                        "readOnly": true,
+                        "title": "GI Progress",
+                        "description": "Current terrain GI accumulation progress."
+                    },
+                    "AccumulatedSamples": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "title": "Accumulated GI Samples",
+                        "description": "Number of GI samples accumulated so far."
+                    },
+                    "Ready": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "title": "Terrain GI Ready",
+                        "description": "Whether the terrain GI cache has a complete published result."
+                    }
+                }
+            }
+        }
+    },
+    "Sections": [
+        {
+            "Name": "TerrainAO",
+            "Label": "Terrain Ambient Occlusion",
+            "Description": "Controls the terrain ambient-occlusion cache used to add local contact shading.",
+            "Params": [
+                {
+                    "Name": "TerrainAOEnabled",
+                    "SerializedName": "Enabled",
+                    "Type": "Bool",
+                    "Default": true,
+                    "Widget": "Checkbox",
+                    "Label": "Enable Terrain AO",
+                    "Description": "Enable ambient occlusion calculated from the terrain heightfield."
+                },
+                {
+                    "Name": "TerrainAORadiusFactor",
+                    "SerializedName": "RadiusFactor",
+                    "Type": "Float",
+                    "Default": 0.12,
+                    "Widget": "Slider",
+                    "Constraints": [0.01, 0.5],
+                    "Label": "AO Radius (Terrain Scale)",
+                    "Description": "Sampling radius for terrain ambient occlusion, expressed as a fraction of the terrain scale."
+                }
+            ]
+        },
+        {
+            "Name": "BasePlaneShadow",
+            "Label": "Base-Plane Shadow",
+            "Description": "Controls the softness of the shadow projected onto the solid base plane below generated terrain.",
+            "Params": [
+                {
+                    "Name": "BasePlaneShadowSoftness",
+                    "SerializedName": "Softness",
+                    "Type": "Float",
+                    "Default": 4.0,
+                    "Widget": "Slider",
+                    "Constraints": [0.0, 12.0],
+                    "Label": "Base-Plane Shadow Softness",
+                    "Description": "Softness radius of the terrain shadow on the base plane. Higher values produce a broader, softer shadow."
+                }
+            ]
+        },
+        {
+            "Name": "TerrainGI",
+            "Label": "Terrain Global Illumination",
+            "Description": "Controls the progressive terrain GI cache that combines terrain, sun, sky, and self-shadow lighting.",
+            "Params": [
+                {
+                    "Name": "TerrainGIEnabled",
+                    "SerializedName": "Enabled",
+                    "Type": "Bool",
+                    "Default": false,
+                    "Widget": "Checkbox",
+                    "Label": "Enable Terrain GI",
+                    "Description": "Enable progressive global illumination calculated over the terrain heightfield."
+                },
+                {
+                    "Name": "TerrainGIResolution",
+                    "SerializedName": "Resolution",
+                    "Type": "Int",
+                    "Default": 128,
+                    "Widget": "Slider",
+                    "Constraints": [32, 256],
+                    "Label": "GI Resolution",
+                    "Description": "Resolution of the terrain GI cache. Higher values improve spatial detail and increase memory and build cost."
+                },
+                {
+                    "Name": "TerrainGITargetSamples",
+                    "SerializedName": "TargetSamples",
+                    "Type": "Int",
+                    "Default": 32,
+                    "Widget": "Slider",
+                    "Constraints": [1, 256],
+                    "Label": "GI Target Samples",
+                    "Description": "Total samples accumulated for each terrain GI cache texel before the result is considered complete."
+                },
+                {
+                    "Name": "TerrainGISamplesPerDispatch",
+                    "SerializedName": "SamplesPerDispatch",
+                    "Type": "Int",
+                    "Default": 1,
+                    "Widget": "Slider",
+                    "Constraints": [1, 8],
+                    "Label": "GI Samples / Dispatch",
+                    "Description": "Number of GI samples built per compute dispatch. Higher values complete faster but use more GPU time per update."
+                }
+            ]
+        }
+    ]
+}
