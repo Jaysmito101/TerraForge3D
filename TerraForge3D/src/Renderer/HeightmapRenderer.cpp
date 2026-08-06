@@ -25,14 +25,16 @@ namespace tf3d::renderer
         const auto &fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
         const float fieldMinimum    = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
         const float fieldMaximum    = fieldStatistics.valid ? fieldStatistics.maximum : 1.0f;
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMin"), fieldMinimum);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightmapMax"), fieldMaximum);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_AspectRatio"), viewport->GetAspectRatio());
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Offset"), viewport->GetHeightmapOffsetX(), viewport->GetHeightmapOffsetY());
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Scale"), viewport->GetHeightmapScale());
+        m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
+        m_Shader->SetUniform1f("u_TileSize", m_AppState->mainMap.tileSize);
+        m_Shader->SetUniform2f("u_TileOffset", m_AppState->mainMap.tileOffsetX,
+                               m_AppState->mainMap.tileOffsetY);
+        m_Shader->SetUniform1f("u_HeightmapMin", fieldMinimum);
+        m_Shader->SetUniform1f("u_HeightmapMax", fieldMaximum);
+        m_Shader->SetUniform1f("u_AspectRatio", viewport->GetAspectRatio());
+        m_Shader->SetUniform2f("u_Offset", viewport->GetHeightmapOffsetX(),
+                               viewport->GetHeightmapOffsetY());
+        m_Shader->SetUniform1f("u_Scale", viewport->GetHeightmapScale());
         m_ScreenQuad->Render();
     }
 

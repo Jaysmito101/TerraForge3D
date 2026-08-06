@@ -52,8 +52,8 @@ namespace tf3d::renderer
             glActiveTexture(GL_TEXTURE6);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TerrainSelfShadow"), 6);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainSelfShadow"), hasTerrainSelfShadow ? 1 : 0);
+        m_Shader->SetUniform1i("u_TerrainSelfShadow", 6);
+        m_Shader->SetUniform1i("u_HasTerrainSelfShadow", hasTerrainSelfShadow ? 1 : 0);
         auto *heightfieldAmbient         = m_AppState->rendererManager->GetHeightfieldAmbientCache();
         const bool hasHeightfieldAmbient = heightfieldAmbient != nullptr && heightfieldAmbient->IsReady();
         if (hasHeightfieldAmbient) {
@@ -62,8 +62,8 @@ namespace tf3d::renderer
             glActiveTexture(GL_TEXTURE8);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TerrainAmbient"), 8);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainAmbient"), hasHeightfieldAmbient ? 1 : 0);
+        m_Shader->SetUniform1i("u_TerrainAmbient", 8);
+        m_Shader->SetUniform1i("u_HasTerrainAmbient", hasHeightfieldAmbient ? 1 : 0);
         auto *heightfieldGI         = m_AppState->rendererManager->GetHeightfieldGICache();
         const bool hasHeightfieldGI = heightfieldGI != nullptr && heightfieldGI->IsReady();
         if (hasHeightfieldGI) {
@@ -72,55 +72,54 @@ namespace tf3d::renderer
             glActiveTexture(GL_TEXTURE9);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TerrainGI"), 9);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasTerrainGI"), hasHeightfieldGI ? 1 : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SlopeTexture"), 5);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HasSlopeTexture"), hasSlopeTexture ? 1 : 0);
-        // glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Projection"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().pers));
-        // glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_View"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().view));
-        glUniformMatrix4fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().GetProjectionViewMatrix()));
-        glUniform3fv(glGetUniformLocation(m_Shader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->GetCamera().GetPosition()));
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertNormals"), m_InvertNormals);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewNormals"), m_ViewNormals ? 1 : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewSlope"), m_ViewSlope ? 1 : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewTerrainSelfShadow"), m_ViewTerrainSelfShadow ? 1 : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewTerrainAmbient"), m_ViewTerrainAmbient ? 1 : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewTerrainBentNormal"), m_ViewTerrainBentNormal ? 1 : 0);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
+        m_Shader->SetUniform1i("u_TerrainGI", 9);
+        m_Shader->SetUniform1i("u_HasTerrainGI", hasHeightfieldGI ? 1 : 0);
+        m_Shader->SetUniform1i("u_SlopeTexture", 5);
+        m_Shader->SetUniform1i("u_HasSlopeTexture", hasSlopeTexture ? 1 : 0);
+        m_Shader->SetUniformMat4("u_ProjectionView", viewport->GetCamera().GetProjectionViewMatrix());
+        m_Shader->SetUniform3f("u_CameraPosition", viewport->GetCamera().GetPosition());
+        m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
+        m_Shader->SetUniform1i("u_InvertNormals", m_InvertNormals);
+        m_Shader->SetUniform1i("u_ViewNormals", m_ViewNormals ? 1 : 0);
+        m_Shader->SetUniform1i("u_ViewSlope", m_ViewSlope ? 1 : 0);
+        m_Shader->SetUniform1i("u_ViewTerrainSelfShadow", m_ViewTerrainSelfShadow ? 1 : 0);
+        m_Shader->SetUniform1i("u_ViewTerrainAmbient", m_ViewTerrainAmbient ? 1 : 0);
+        m_Shader->SetUniform1i("u_ViewTerrainBentNormal", m_ViewTerrainBentNormal ? 1 : 0);
+        m_Shader->SetUniform1f("u_TileSize", m_AppState->mainMap.tileSize);
+        m_Shader->SetUniform2f("u_TileOffset", m_AppState->mainMap.tileOffsetX,
+                               m_AppState->mainMap.tileOffsetY);
         const bool isPlane          = m_AppState->mainModel != nullptr && m_AppState->mainModel->isGeneratedPlane;
         const auto &fieldStatistics = m_AppState->generationManager->GetFieldStatisticsResult();
         const float fieldMinimum    = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
         const float solidDepth      = isPlane ? std::max(m_AppState->mainModel->planeSolidDepth, 0.0001f) : 0.0f;
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_PlaneMode"), isPlane ? 1 : 0);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_FieldMinimum"), fieldMinimum);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_HeightOffset"), isPlane ? -fieldMinimum + solidDepth : 0.0f);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SolidDepth"), solidDepth);
+        m_Shader->SetUniform1i("u_PlaneMode", isPlane ? 1 : 0);
+        m_Shader->SetUniform1f("u_FieldMinimum", fieldMinimum);
+        m_Shader->SetUniform1f("u_HeightOffset", isPlane ? -fieldMinimum + solidDepth : 0.0f);
+        m_Shader->SetUniform1f("u_SolidDepth", solidDepth);
         TF3D_PROFILE_END(objectSetupProfile);
         {
             TF3D_PROFILE_SCOPE("renderer/object/post-process");
             if (isPlane && m_PostProcessShader != nullptr && viewport->GetCamera().GetPosition().y > 0.0f) {
                 m_PostProcessShader->Bind();
                 const glm::mat4 inverseProjectionView = glm::inverse(viewport->GetCamera().GetProjectionViewMatrix());
-                glUniformMatrix4fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_InverseProjectionView"), 1, GL_FALSE, glm::value_ptr(inverseProjectionView));
-                glUniformMatrix4fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ProjectionView"), 1, GL_FALSE, glm::value_ptr(viewport->GetCamera().GetProjectionViewMatrix()));
-                glUniform3fv(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_CameraPosition"), 1, glm::value_ptr(viewport->GetCamera().GetPosition()));
-                glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_ViewportResolution"), viewport->GetWidth(), viewport->GetHeight());
-                glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_Color"),
-                            67.0f / 255.0f, 88.0f / 255.0f, 114.0f / 255.0f);
+                m_PostProcessShader->SetUniformMat4("u_InverseProjectionView", inverseProjectionView);
+                m_PostProcessShader->SetUniformMat4("u_ProjectionView", viewport->GetCamera().GetProjectionViewMatrix());
+                m_PostProcessShader->SetUniform3f("u_CameraPosition", viewport->GetCamera().GetPosition());
+                m_PostProcessShader->SetUniform2f("u_ViewportResolution", viewport->GetWidth(), viewport->GetHeight());
+                m_PostProcessShader->SetUniform3f("u_Color", 67.0f / 255.0f,
+                                                  88.0f / 255.0f, 114.0f / 255.0f);
                 auto *rendererLights      = m_AppState->rendererManager->GetRendererLights();
                 auto *skyRenderer         = m_AppState->rendererManager->GetSkyRenderer();
                 const bool enableSkyLight = rendererLights->m_UseSkyLight && skyRenderer->IsSkyReady();
                 const auto &baseSun       = rendererLights->m_Sun;
-                glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_EnableSkyLight"), enableSkyLight ? 1 : 0);
-                glUniform1f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SkyLightIntensity"), rendererLights->m_SkyLightIntensity);
-                glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SunDirection"), baseSun.direction.x, baseSun.direction.y, baseSun.direction.z);
-                glUniform3f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SunColor"), baseSun.color.x, baseSun.color.y, baseSun.color.z);
-                glUniform1f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_SunIntensity"), baseSun.intensity);
+                m_PostProcessShader->SetUniform1i("u_EnableSkyLight", enableSkyLight ? 1 : 0);
+                m_PostProcessShader->SetUniform1f("u_SkyLightIntensity", rendererLights->m_SkyLightIntensity);
+                m_PostProcessShader->SetUniform3f("u_SunDirection", baseSun.direction);
+                m_PostProcessShader->SetUniform3f("u_SunColor", baseSun.color);
+                m_PostProcessShader->SetUniform1f("u_SunIntensity", baseSun.intensity);
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, enableSkyLight ? skyRenderer->GetIrradianceMap() : 0);
-                glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_IrradianceMap"), 1);
+                m_PostProcessShader->SetUniform1i("u_IrradianceMap", 1);
                 auto *planarShadowCache    = m_AppState->rendererManager->GetPlanarShadowCache();
                 const bool hasPlanarShadow = planarShadowCache != nullptr && planarShadowCache->IsReady();
                 if (hasPlanarShadow) {
@@ -129,15 +128,15 @@ namespace tf3d::renderer
                     glActiveTexture(GL_TEXTURE7);
                     glBindTexture(GL_TEXTURE_2D, 0);
                 }
-                glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_TerrainPlanarShadow"), 7);
-                glUniform1i(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_HasTerrainPlanarShadow"), hasPlanarShadow ? 1 : 0);
-                glUniform1f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_PlanarShadowSoftness"),
-                            m_AppState->rendererManager->GetPlanarShadowSoftness());
+                m_PostProcessShader->SetUniform1i("u_TerrainPlanarShadow", 7);
+                m_PostProcessShader->SetUniform1i("u_HasTerrainPlanarShadow", hasPlanarShadow ? 1 : 0);
+                m_PostProcessShader->SetUniform1f("u_PlanarShadowSoftness",
+                                                  m_AppState->rendererManager->GetPlanarShadowSoftness());
                 if (hasPlanarShadow) {
                     const auto atlasMinimum   = planarShadowCache->GetAtlasMinimumXZ();
                     const auto atlasWorldSize = planarShadowCache->GetAtlasWorldSize();
-                    glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_PlanarShadowMinimumXZ"), atlasMinimum.x, atlasMinimum.y);
-                    glUniform2f(glGetUniformLocation(m_PostProcessShader->GetNativeShader(), "u_PlanarShadowWorldSize"), atlasWorldSize.x, atlasWorldSize.y);
+                    m_PostProcessShader->SetUniform2f("u_PlanarShadowMinimumXZ", atlasMinimum);
+                    m_PostProcessShader->SetUniform2f("u_PlanarShadowWorldSize", atlasWorldSize);
                 }
                 glBindVertexArray(m_PostProcessVao);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -149,39 +148,47 @@ namespace tf3d::renderer
 
         TF3D_PROFILE_BEGIN(objectMaterialStateProfile, "renderer/object/material-state");
         const auto &mousePosition = viewport->GetMousePosition();
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IsViewportActive"), (mousePosition[0] >= 0.0f && mousePosition[1] >= 0.0f) ? 1 : 0);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MousePos"), mousePosition[0], mousePosition[1]);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_ViewportResolution"), viewport->GetWidth(), viewport->GetHeight());
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_RequiresDrawBrush"), m_DrawBrushSettings && m_DrawBrushSettings->m_ShowBrushCursor && viewport->IsHovered());
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_DrawMask"), m_DrawBrushSettings && m_DrawBrushSettings->m_ShowMask && m_DrawBrushSettings->m_MaskTexture != -1);
+        m_Shader->SetUniform1i("u_IsViewportActive", (mousePosition[0] >= 0.0f && mousePosition[1] >= 0.0f) ? 1 : 0);
+        m_Shader->SetUniform2f("u_MousePos", mousePosition[0], mousePosition[1]);
+        m_Shader->SetUniform2f("u_ViewportResolution", viewport->GetWidth(), viewport->GetHeight());
+        m_Shader->SetUniform1i("u_RequiresDrawBrush", m_DrawBrushSettings && m_DrawBrushSettings->m_ShowBrushCursor && viewport->IsHovered());
+        m_Shader->SetUniform1i("u_DrawMask", m_DrawBrushSettings && m_DrawBrushSettings->m_ShowMask && m_DrawBrushSettings->m_MaskTexture != -1);
         if (m_DrawBrushSettings) {
-            glUniform4f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrushSettings0"), m_DrawBrushSettings->m_BrushPositionX, m_DrawBrushSettings->m_BrushPositionY, m_DrawBrushSettings->m_BrushSize, m_DrawBrushSettings->m_BrushFalloff);
-            glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskColor"), m_DrawBrushSettings->m_MaskColor.x, m_DrawBrushSettings->m_MaskColor.y, m_DrawBrushSettings->m_MaskColor.z);
-            glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_InvertMask"), m_DrawBrushSettings->m_InvertMask ? 1 : 0);
+            m_Shader->SetUniform4f("u_BrushSettings0", m_DrawBrushSettings->m_BrushPositionX,
+                                   m_DrawBrushSettings->m_BrushPositionY,
+                                   m_DrawBrushSettings->m_BrushSize,
+                                   m_DrawBrushSettings->m_BrushFalloff);
+            m_Shader->SetUniform3f("u_MaskColor", m_DrawBrushSettings->m_MaskColor);
+            m_Shader->SetUniform1i("u_InvertMask", m_DrawBrushSettings->m_InvertMask ? 1 : 0);
 
             if (m_DrawBrushSettings->m_MaskTexture != -1) {
                 glActiveTexture(GL_TEXTURE4);
                 glBindTexture(GL_TEXTURE_2D, m_DrawBrushSettings->m_MaskTexture);
-                glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_MaskTexture"), 4);
+                m_Shader->SetUniform1i("u_MaskTexture", 4);
             }
         }
 
         const auto &sun = m_AppState->rendererManager->GetRendererLights()->m_Sun;
-        glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SunDirection"), sun.direction.x, sun.direction.y, sun.direction.z);
-        glUniform3f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SunColor"), sun.color.x, sun.color.y, sun.color.z);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SunIntensity"), sun.intensity);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_EnableSkyLight"), (m_AppState->rendererManager->GetRendererLights()->m_UseSkyLight && m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady()) ? GL_TRUE : GL_FALSE);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SkyLightIntensity"), m_AppState->rendererManager->GetRendererLights()->m_SkyLightIntensity);
+        m_Shader->SetUniform3f("u_SunDirection", sun.direction);
+        m_Shader->SetUniform3f("u_SunColor", sun.color);
+        m_Shader->SetUniform1f("u_SunIntensity", sun.intensity);
+        m_Shader->SetUniform1i("u_EnableSkyLight",
+                               (m_AppState->rendererManager->GetRendererLights()->m_UseSkyLight &&
+                                m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady())
+                                   ? 1
+                                   : 0);
+        m_Shader->SetUniform1f("u_SkyLightIntensity",
+                               m_AppState->rendererManager->GetRendererLights()->m_SkyLightIntensity);
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetIrradianceMap() : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_IrradianceMap"), 1);
+        m_Shader->SetUniform1i("u_IrradianceMap", 1);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetSpecularMap() : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_SpecularMap"), 2);
+        m_Shader->SetUniform1i("u_SpecularMap", 2);
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady() ? m_AppState->rendererManager->GetSkyRenderer()->GetBrdfLut() : 0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_BrdfLut"), 3);
+        m_Shader->SetUniform1i("u_BrdfLut", 3);
         TF3D_PROFILE_END(objectMaterialStateProfile);
 
         {

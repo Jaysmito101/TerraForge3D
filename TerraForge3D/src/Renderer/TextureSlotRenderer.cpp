@@ -23,17 +23,21 @@ namespace tf3d::renderer
     {
         m_Shader->Bind();
         m_AppState->generationManager->GetHeightmapData()->Bind(0);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Resolution"), m_AppState->mainMap.tileResolution);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileSize"), m_AppState->mainMap.tileSize);
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TileOffset"), m_AppState->mainMap.tileOffsetX, m_AppState->mainMap.tileOffsetY);
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_AspectRatio"), viewport->GetAspectRatio());
-        glUniform2f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Offset"), viewport->GetTextureSlotOffsetX(), viewport->GetTextureSlotOffsetY());
-        glUniform1f(glGetUniformLocation(m_Shader->GetNativeShader(), "u_Scale"), viewport->GetTextureSlotScale());
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TextureSlotDetailedMode"), viewport->GetTextureSlotDetailedMode() ? GL_TRUE : GL_FALSE);
-        glUniform1i(glGetUniformLocation(m_Shader->GetNativeShader(), "u_TextureSlot"), viewport->GetTextureSlot());
+        m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
+        m_Shader->SetUniform1f("u_TileSize", m_AppState->mainMap.tileSize);
+        m_Shader->SetUniform2f("u_TileOffset", m_AppState->mainMap.tileOffsetX,
+                               m_AppState->mainMap.tileOffsetY);
+        m_Shader->SetUniform1f("u_AspectRatio", viewport->GetAspectRatio());
+        m_Shader->SetUniform2f("u_Offset", viewport->GetTextureSlotOffsetX(),
+                               viewport->GetTextureSlotOffsetY());
+        m_Shader->SetUniform1f("u_Scale", viewport->GetTextureSlotScale());
+        m_Shader->SetUniform1i("u_TextureSlotDetailedMode",
+                               viewport->GetTextureSlotDetailedMode() ? 1 : 0);
+        m_Shader->SetUniform1i("u_TextureSlot", viewport->GetTextureSlot());
         const auto &textureSlotDetailed = viewport->GetTextureSlotDetailed();
         for (int i = 0; i < 4; i++)
-            glUniform2i(glGetUniformLocation(m_Shader->GetNativeShader(), ("u_TextureSlotDetailed[" + std::to_string(i) + "]").c_str()), textureSlotDetailed[i].first, textureSlotDetailed[i].second);
+            m_Shader->SetUniform2i("u_TextureSlotDetailed[" + std::to_string(i) + "]",
+                                   textureSlotDetailed[i].first, textureSlotDetailed[i].second);
         m_ScreenQuad->Render();
     }
 
