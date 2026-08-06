@@ -17,6 +17,9 @@ namespace tf3d::misc
         ViewportManager(ApplicationState *appState);
         ~ViewportManager();
 
+        SerializerNode Save() const;
+        void Load(const SerializerNode &data);
+
         void Update();
         void Show();
 

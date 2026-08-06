@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Exporters/Serializer.h"
 
 #include <array>
 #include <cstdint>
@@ -31,7 +32,7 @@ namespace tf3d::renderer
     }
 
     inline constexpr bool TryParseRendererViewportMode(std::string_view value,
-                                                        RendererViewportMode &mode)
+                                                       RendererViewportMode &mode)
     {
         if (value == "Object")
             mode = RendererViewportMode::Object;
@@ -51,6 +52,8 @@ namespace tf3d::renderer
     public:
         RendererViewport();
         ~RendererViewport();
+        SerializerNode Save() const;
+        void Load(const SerializerNode &data);
         void ResizeTo(uint32_t width, uint32_t height);
 
         std::shared_ptr<FrameBuffer> &GetFrameBuffer();
@@ -68,7 +71,7 @@ namespace tf3d::renderer
         float &GetHeightmapOffsetX();
         float &GetHeightmapOffsetY();
         float &GetHeightmapScale();
-        
+
         float &GetTextureSlotOffsetX();
         float &GetTextureSlotOffsetY();
         float &GetTextureSlotScale();
@@ -93,10 +96,10 @@ namespace tf3d::renderer
         struct SharedState {
             std::shared_ptr<FrameBuffer> frameBuffer;
             std::array<float, 2> mousePosition{0.0f, 0.0f};
-            int32_t width  = 0;
-            int32_t height = 0;
+            int32_t width     = 0;
+            int32_t height    = 0;
             float aspectRatio = 1.0f;
-            bool isHovered = false;
+            bool isHovered    = false;
         };
 
         struct SceneModeState {
@@ -111,9 +114,9 @@ namespace tf3d::renderer
         };
 
         struct TextureSlotModeState {
-            float offsetX        = 0.0f;
-            float offsetY        = 0.0f;
-            float scale          = 1.0f;
+            float offsetX       = 0.0f;
+            float offsetY       = 0.0f;
+            float scale         = 1.0f;
             bool detailedMode   = false;
             int32_t textureSlot = 0;
             std::array<std::pair<int32_t, int32_t>, 4> detailed{};
