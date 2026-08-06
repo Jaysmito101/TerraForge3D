@@ -26,9 +26,6 @@
 #include "UI/McpControlPanel.h"
 #endif
 
-static tf3d::data::ApplicationState *appState;
-static tf3d::base::Application *mainApp;
-
 namespace tf3d
 {
 
@@ -199,7 +196,7 @@ namespace tf3d
             srand((uint32_t)time(NULL));
             utils::SetUpIcon();
             appState                          = new ApplicationState();
-            appState->mainApp                 = mainApp;
+            appState->mainApp                 = this;
             appState->constants.executableDir = GetExecutableDir();
             appState->constants.dataDir       = appState->constants.executableDir + PATH_SEPARATOR "Data";
             appState->constants.cacheDir      = appState->constants.dataDir + PATH_SEPARATOR "cache";
@@ -338,6 +335,9 @@ namespace tf3d
             // delete appState->serailizer;
             delete appState;
         }
+
+    private:
+        data::ApplicationState *appState;
     };
 
 } // namespace tf3d
