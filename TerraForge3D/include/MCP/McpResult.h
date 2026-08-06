@@ -2,13 +2,48 @@
 
 #include <nlohmann/json.hpp>
 
+#include <cstdint>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace tf3d::mcp_layer
 {
 
     inline constexpr const char *MCP_RESULT_REVISION = "tf3d.mcp/v1";
+
+    enum class McpErrorType : uint8_t {
+        InvalidTask = 0,
+        Shutdown,
+        TaskException,
+        Timeout,
+        Cancelled,
+        NoActiveViewport,
+        ViewportReadFailed,
+        JpegEncodeFailed
+    };
+
+    inline constexpr std::string_view McpErrorTypeToCode(McpErrorType type)
+    {
+        if (type == McpErrorType::InvalidTask)
+            return "invalid_task";
+        else if (type == McpErrorType::Shutdown)
+            return "shutdown";
+        else if (type == McpErrorType::TaskException)
+            return "task_exception";
+        else if (type == McpErrorType::Timeout)
+            return "timeout";
+        else if (type == McpErrorType::Cancelled)
+            return "cancelled";
+        else if (type == McpErrorType::NoActiveViewport)
+            return "no_active_viewport";
+        else if (type == McpErrorType::ViewportReadFailed)
+            return "viewport_read_failed";
+        else if (type == McpErrorType::JpegEncodeFailed)
+            return "jpeg_encode_failed";
+
+        return "unknown";
+    }
 
     struct McpResult {
         bool ok                    = true;
@@ -38,13 +73,13 @@ namespace tf3d::mcp_layer
         }
 
         static McpResult Failure(
-            std::string code,
+            McpErrorType type,
             std::string message,
             nlohmann::json details = nlohmann::json::object())
         {
             McpResult response;
             response.ok = false;
-            response.diagnostics.push_back({{"code", std::move(code)},
+            response.diagnostics.push_back({{"code", std::string(McpErrorTypeToCode(type))},
                                             {"message", std::move(message)},
                                             {"details", std::move(details)}});
             return response;

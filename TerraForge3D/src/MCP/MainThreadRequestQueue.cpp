@@ -18,20 +18,23 @@ namespace tf3d::mcp_layer
     McpResult MainThreadRequestQueue::Execute(Task task, std::chrono::milliseconds timeout)
     {
         if (!task)
-            return McpResult::Failure("invalid_task", "MCP request did not contain executable work");
+            return McpResult::Failure(McpErrorType::InvalidTask,
+                                      "MCP request did not contain executable work");
         {
             std::lock_guard<std::mutex> lock(mutex);
             if (stopped)
-                return McpResult::Failure("shutdown", "TerraForge3D is shutting down");
+                return McpResult::Failure(McpErrorType::Shutdown,
+                                          "TerraForge3D is shutting down");
         }
 
         if (std::this_thread::get_id() == ownerThread) {
             try {
                 return task();
             } catch (const std::exception &exception) {
-                return McpResult::Failure("task_exception", exception.what());
+                return McpResult::Failure(McpErrorType::TaskException, exception.what());
             } catch (...) {
-                return McpResult::Failure("task_exception", "MCP main-thread task failed");
+                return McpResult::Failure(McpErrorType::TaskException,
+                                          "MCP main-thread task failed");
             }
         }
 
@@ -42,14 +45,17 @@ namespace tf3d::mcp_layer
         {
             std::lock_guard<std::mutex> lock(mutex);
             if (stopped) {
-                return McpResult::Failure("shutdown", "TerraForge3D is shutting down");
+                return McpResult::Failure(McpErrorType::Shutdown,
+                                          "TerraForge3D is shutting down");
             }
             requests.push(pending);
         }
 
         if (result.wait_for(timeout) != std::future_status::ready) {
             pending->cancelled.store(true, std::memory_order_release);
-            return McpResult::Failure("timeout", "TerraForge3D did not complete the MCP request before its deadline");
+            return McpResult::Failure(
+                McpErrorType::Timeout,
+                "TerraForge3D did not complete the MCP request before its deadline");
         }
 
         return result.get();
@@ -75,12 +81,17 @@ namespace tf3d::mcp_layer
                 try {
                     pending->promise.set_value(pending->task());
                 } catch (const std::exception &exception) {
-                    pending->promise.set_value(McpResult::Failure("task_exception", exception.what()));
+                    pending->promise.set_value(
+                        McpResult::Failure(McpErrorType::TaskException, exception.what()));
                 } catch (...) {
-                    pending->promise.set_value(McpResult::Failure("task_exception", "MCP main-thread task failed"));
+                    pending->promise.set_value(
+                        McpResult::Failure(McpErrorType::TaskException,
+                                           "MCP main-thread task failed"));
                 }
             } else {
-                pending->promise.set_value(McpResult::Failure("cancelled", "MCP request expired before execution"));
+                pending->promise.set_value(
+                    McpResult::Failure(McpErrorType::Cancelled,
+                                       "MCP request expired before execution"));
             }
 
             ++processed;
@@ -103,7 +114,8 @@ namespace tf3d::mcp_layer
         while (!pendingRequests.empty()) {
             pendingRequests.front()->cancelled.store(true, std::memory_order_release);
             pendingRequests.front()->promise.set_value(
-                McpResult::Failure("shutdown", "TerraForge3D is shutting down"));
+                McpResult::Failure(McpErrorType::Shutdown,
+                                   "TerraForge3D is shutting down"));
             pendingRequests.pop();
         }
     }

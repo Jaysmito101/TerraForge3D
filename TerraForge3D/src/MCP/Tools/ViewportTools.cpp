@@ -48,7 +48,7 @@ namespace tf3d::mcp_layer
             if (viewport == nullptr || viewport->GetRendererViewport() == nullptr ||
                 viewport->GetRendererViewport()->m_FrameBuffer == nullptr) {
                 return McpResult::Failure(
-                    "no_active_viewport",
+                    McpErrorType::NoActiveViewport,
                     "TerraForge3D does not currently have an active viewport.");
             }
 
@@ -58,7 +58,7 @@ namespace tf3d::mcp_layer
             std::vector<uint8_t> pixels;
             if (!frameBuffer->DownloadColorToU8(pixels)) {
                 return McpResult::Failure(
-                    "viewport_read_failed",
+                    McpErrorType::ViewportReadFailed,
                     "TerraForge3D could not read the active viewport framebuffer.");
             }
 
@@ -73,7 +73,7 @@ namespace tf3d::mcp_layer
                     JpegQuality) == 0 ||
                 jpeg.empty()) {
                 return McpResult::Failure(
-                    "jpeg_encode_failed",
+                    McpErrorType::JpegEncodeFailed,
                     "TerraForge3D could not encode the active viewport as JPEG.");
             }
 
