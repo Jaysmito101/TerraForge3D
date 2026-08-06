@@ -105,7 +105,7 @@ namespace tf3d::data
         ApplicationStateGlobals globals;
         ApplicationStateConstants constants;
 
-        MainMenu *mainMenu                         = nullptr;
+        ui::MainMenu *mainMenu                         = nullptr;
         texture_store::TextureStore *textureStore  = nullptr;
         SupportersTribute *supportersTribute       = nullptr;
         OSLiscences *osLiscences                   = nullptr;

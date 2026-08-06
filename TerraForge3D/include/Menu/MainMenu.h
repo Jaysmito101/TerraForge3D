@@ -6,6 +6,8 @@ namespace tf3d::data
 }
 using tf3d::data::ApplicationState;
 
+namespace tf3d::ui
+{
 class MainMenu
 {
 public:
@@ -22,3 +24,4 @@ public:
 private:
     ApplicationState *appState;
 };
+}

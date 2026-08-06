@@ -250,7 +250,7 @@ namespace tf3d
             appState->generationManager = new GenerationManager(appState);
             appState->supportersTribute = new SupportersTribute();
             appState->rendererManager   = new renderer::RendererManager(appState);
-            appState->mainMenu          = new MainMenu(appState);
+            appState->mainMenu          = new ui::MainMenu(appState);
             // appState->projectManager = new ProjectManager(appState);
             // appState->serailizer = new Serializer(appState);
             appState->osLiscences   = new OSLiscences(appState);
