@@ -173,9 +173,9 @@ namespace tf3d::renderer
         m_Shader->SetUniform1f("u_SunIntensity", rendererLights->GetSunIntensity());
         m_Shader->SetUniform1i("u_EnableSkyLight",
                                (rendererLights->IsSkyLightEnabled() &&
-                                 m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady())
-                                    ? 1
-                                    : 0);
+                                m_AppState->rendererManager->GetSkyRenderer()->IsSkyReady())
+                                   ? 1
+                                   : 0);
         m_Shader->SetUniform1f("u_SkyLightIntensity",
                                rendererLights->GetSkyLightIntensity());
 

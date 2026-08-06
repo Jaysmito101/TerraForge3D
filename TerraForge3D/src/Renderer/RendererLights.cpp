@@ -7,7 +7,8 @@
 namespace tf3d::renderer
 {
 
-    RendererLights::RendererLights(ApplicationState *appState) : m_AppState(appState)
+    RendererLights::RendererLights(ApplicationState *appState)
+        : m_AppState(appState)
     {
         BuildInspector();
     }
