@@ -62,9 +62,6 @@ namespace tf3d::renderer
         }
 
     private:
-        void BuildInspector();
-
-        ApplicationState *m_AppState = nullptr;
         CustomInspector m_Inspector;
     };
 

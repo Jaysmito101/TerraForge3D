@@ -1,15 +1,13 @@
 #include "Renderer/RendererManager.h"
 #include "Data/ApplicationState.h"
-#include "Data/ResourceManager.h"
 #include "Profiler.h"
-#include "Utils/Utils.h"
 
 namespace tf3d::renderer
 {
     RendererManager::RendererManager(ApplicationState *appState)
     {
         m_AppState = appState;
-        BuildTerrainInspector();
+        m_TerrainInspector.LoadConfig(appState, "Terrain");
         m_ObjectRenderer      = std::make_shared<ObjectRenderer>(appState);
         m_HeightmapRenderer   = std::make_shared<HeightmapRenderer>(appState);
         m_TextureSlotRenderer = std::make_shared<TextureSlotRenderer>(appState);
@@ -26,31 +24,6 @@ namespace tf3d::renderer
 
     RendererManager::~RendererManager()
     {
-    }
-
-    void RendererManager::BuildTerrainInspector()
-    {
-        if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
-            TF3D_LOG_ERROR("Cannot load Renderer Terrain inspector metadata without a resource manager");
-            return;
-        }
-
-        const std::string configPath = m_AppState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
-                                       PATH_SEPARATOR + "Terrain.json";
-        bool loaded              = false;
-        const std::string source = m_AppState->resourceManager->LoadText(configPath, false, &loaded);
-        if (!loaded) {
-            TF3D_LOG_ERROR("Could not load Renderer Terrain inspector metadata '{}'", configPath);
-            return;
-        }
-
-        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
-        if (config.is_discarded()) {
-            TF3D_LOG_ERROR("Could not parse Renderer Terrain inspector metadata '{}'", configPath);
-            return;
-        }
-        if (!m_TerrainInspector.LoadConfig(config))
-            TF3D_LOG_ERROR("Could not load Renderer Terrain inspector metadata '{}'", configPath);
     }
 
     bool RendererManager::IsWindowVisible() const

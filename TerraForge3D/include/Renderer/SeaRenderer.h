@@ -50,8 +50,6 @@ namespace tf3d::renderer
         void ReloadShaders() override;
 
     private:
-        void BuildInspector();
-
         void BindUniforms(RendererViewport *viewport, float terrainWorldSize,
                           float terrainHeightOffset, float seaWorldHeight,
                           const glm::vec2 &surfaceMinimumXZ, const glm::vec2 &surfaceWorldSize);

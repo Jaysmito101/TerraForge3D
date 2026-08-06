@@ -57,7 +57,6 @@ namespace tf3d::renderer
         }
 
     private:
-        void BuildInspector();
         bool LoadSkyboxTexture(const std::string &path);
 
     private:

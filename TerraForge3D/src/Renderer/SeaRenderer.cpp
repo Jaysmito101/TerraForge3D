@@ -19,7 +19,7 @@ namespace tf3d::renderer
     SeaRenderer::SeaRenderer(ApplicationState *appState)
     {
         m_AppState = appState;
-        BuildInspector();
+        m_Inspector.LoadConfig(appState, "Sea");
         glGenVertexArrays(1, &m_Vao);
         ReloadShaders();
     }
@@ -28,31 +28,6 @@ namespace tf3d::renderer
     {
         if (m_Vao != 0)
             glDeleteVertexArrays(1, &m_Vao);
-    }
-
-    void SeaRenderer::BuildInspector()
-    {
-        if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
-            TF3D_LOG_ERROR("Cannot load Sea inspector metadata without a resource manager");
-            return;
-        }
-
-        const std::string configPath = m_AppState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
-                                       PATH_SEPARATOR + "Sea.json";
-        bool loaded              = false;
-        const std::string source = m_AppState->resourceManager->LoadText(configPath, false, &loaded);
-        if (!loaded) {
-            TF3D_LOG_ERROR("Could not load Sea inspector metadata '{}'", configPath);
-            return;
-        }
-
-        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
-        if (config.is_discarded()) {
-            TF3D_LOG_ERROR("Could not parse Sea inspector metadata '{}'", configPath);
-            return;
-        }
-        if (!m_Inspector.LoadConfig(config))
-            TF3D_LOG_ERROR("Could not load Sea inspector metadata '{}'", configPath);
     }
 
     void SeaRenderer::BindUniforms(RendererViewport *viewport, float terrainWorldSize,

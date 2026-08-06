@@ -1,5 +1,7 @@
 #include "Misc/CustomInspector.h"
 #include "Base/Base.h"
+#include "Data/ApplicationState.h"
+#include "Data/ResourceManager.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/PathEditor.h"
 #include "Utils/Utils.h"
@@ -1169,6 +1171,38 @@ namespace tf3d::misc
             if (!widget.empty() && !section.empty())
                 m_WidgetSections[widget] = section;
         }
+    }
+
+    bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
+    {
+        if (appState == nullptr || appState->resourceManager == nullptr) {
+            TF3D_LOG_ERROR("Cannot load inspector metadata '{}' without a resource manager", inspectorName);
+            return false;
+        }
+        if (inspectorName.empty()) {
+            TF3D_LOG_ERROR("Cannot load inspector metadata with an empty name");
+            return false;
+        }
+
+        const std::string configPath = appState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
+                                       PATH_SEPARATOR + std::string(inspectorName) + ".json";
+        bool loaded              = false;
+        const std::string source = appState->resourceManager->LoadText(configPath, false, &loaded);
+        if (!loaded) {
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath);
+            return false;
+        }
+
+        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
+        if (config.is_discarded()) {
+            TF3D_LOG_ERROR("Could not parse inspector metadata '{}'", configPath);
+            return false;
+        }
+        if (!LoadConfig(config)) {
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath);
+            return false;
+        }
+        return true;
     }
 
     bool CustomInspector::LoadConfig(const nlohmann::json &config)

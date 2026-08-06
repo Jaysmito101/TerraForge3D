@@ -22,7 +22,7 @@ namespace tf3d::renderer
     RendererSky::RendererSky(ApplicationState *appState)
     {
         m_AppState = appState;
-        BuildInspector();
+        m_Inspector.LoadConfig(appState, "Sky");
         m_SkyboxModel = new Model("Skybox");
         m_SkyboxModel->mesh->GenerateCube();
         m_SkyboxModel->mesh->RecalculateNormals();
@@ -44,31 +44,6 @@ namespace tf3d::renderer
         if (m_BrdfLutTextureID > -1)
             glDeleteTextures(1, &m_BrdfLutTextureID);
         delete m_SkyboxModel;
-    }
-
-    void RendererSky::BuildInspector()
-    {
-        if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
-            TF3D_LOG_ERROR("Cannot load Renderer Sky inspector metadata without a resource manager");
-            return;
-        }
-
-        const std::string configPath = m_AppState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
-                                       PATH_SEPARATOR + "Sky.json";
-        bool loaded              = false;
-        const std::string source = m_AppState->resourceManager->LoadText(configPath, false, &loaded);
-        if (!loaded) {
-            TF3D_LOG_ERROR("Could not load Renderer Sky inspector metadata '{}'", configPath);
-            return;
-        }
-
-        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
-        if (config.is_discarded()) {
-            TF3D_LOG_ERROR("Could not parse Renderer Sky inspector metadata '{}'", configPath);
-            return;
-        }
-        if (!m_Inspector.LoadConfig(config))
-            TF3D_LOG_ERROR("Could not load Renderer Sky inspector metadata '{}'", configPath);
     }
 
     void RendererSky::ShowSettings()

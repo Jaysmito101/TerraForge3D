@@ -5,10 +5,13 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::misc
 {
@@ -658,6 +661,7 @@ namespace tf3d::misc
         void Load(SerializerNode node);
         SerializerNode SaveState() const;
         bool LoadState(SerializerNode node);
+        bool LoadConfig(ApplicationState *appState, std::string_view inspectorName);
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
 
