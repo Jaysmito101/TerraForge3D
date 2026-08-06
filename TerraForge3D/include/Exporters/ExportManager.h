@@ -65,18 +65,9 @@ namespace tf3d::exporters
         {
             this->m_StatusMessage = msg;
         }
-        inline bool IsWindowOpen()
-        {
-            return this->m_IsWindowOpen;
-        }
-        inline bool *IsWindowOpenPtr()
-        {
-            return &this->m_IsWindowOpen;
-        }
-        inline void SetVisible(bool visible)
-        {
-            this->m_IsWindowOpen = visible;
-        }
+        bool IsWindowOpen() const;
+        bool *IsWindowOpenPtr();
+        void SetVisible(bool visible);
 
     public:
         float m_ExportProgress = 0.0f;
@@ -88,7 +79,6 @@ namespace tf3d::exporters
         int m_ExportTextureFormat    = 0;
         int m_ExportTextureBitDepth  = 0;
         bool m_HideExportControls    = false;
-        bool m_IsWindowOpen          = false;
 
         std::shared_ptr<GeneratorTexture> m_VisualzeTexture;
         std::shared_ptr<ComputeShader> m_VisualzeShader;

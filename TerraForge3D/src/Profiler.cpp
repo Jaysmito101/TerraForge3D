@@ -357,13 +357,13 @@ void PerformanceMonitor::ClearCapture()
     m_IsCapturing = false;
 }
 
-void PerformanceMonitor::RenderUI()
+void PerformanceMonitor::RenderUI(bool *windowOpen)
 {
-    if (!m_WindowOpen)
+    if (windowOpen == nullptr || !*windowOpen)
         return;
 
     Snapshot snapshot = CaptureSnapshot();
-    if (!ImGui::Begin("Performance Monitor", &m_WindowOpen)) {
+    if (!ImGui::Begin("Performance Monitor", windowOpen)) {
         ImGui::End();
         return;
     }

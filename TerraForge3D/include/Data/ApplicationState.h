@@ -21,6 +21,7 @@
 #include "Generators/GenerationManager.h"
 #include "Generators/GeneratorData.h"
 
+#include <array>
 #include <nlohmann/json.hpp>
 
 #ifdef TF3D_ENABLE_MCP
@@ -45,10 +46,26 @@ namespace tf3d::data
 {
 
     struct ApplicationStateWindows {
+        bool dashboard           = true;
+        bool generationManager   = true;
+        bool rendererSettings    = true;
+        bool exportManager       = false;
+        bool jobManager          = false;
+        bool performanceMonitor  = false;
+        bool mcpControlPanel     = true;
+
         bool styleEditor       = false;
         bool textureStore      = false;
         bool osLisc            = false;
         bool supportersTribute = false;
+
+        std::array<bool, MAX_VIEWPORT_COUNT> viewportVisible = [] {
+            std::array<bool, MAX_VIEWPORT_COUNT> result{};
+            if constexpr (MAX_VIEWPORT_COUNT > 0) {
+                result[0] = true;
+            }
+            return result;
+        }();
 
         nlohmann::json Save();
         void Load(nlohmann::json data);

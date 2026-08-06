@@ -164,7 +164,7 @@ namespace tf3d
             appState->exportManager->ShowSettings();
             appState->jobManager->ShowSettings();
             appState->rendererManager->ShowSettings();
-            PerformanceMonitor::Get().RenderUI();
+            PerformanceMonitor::Get().RenderUI(&appState->windows.performanceMonitor);
 #ifdef TF3D_ENABLE_MCP
             if (appState->mcpControlPanel)
                 appState->mcpControlPanel->ShowSettings();
@@ -257,8 +257,9 @@ namespace tf3d
             appState->textureStore  = new texture_store::TextureStore(appState);
             appState->exportManager = new ExportManager(appState);
             appState->styleManager  = new Style();
-            for (int i = 0; i < MAX_VIEWPORT_COUNT; i++)
+            for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) {
                 appState->viewportManagers[i] = new misc::ViewportManager(appState);
+            }
 
             appState->styleManager->LoadFromFile(appState->constants.stylesDir + PATH_SEPARATOR "Default.json");
             appState->styleManager->Apply();

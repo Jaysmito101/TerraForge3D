@@ -112,13 +112,18 @@ namespace tf3d::ui
     {
     }
 
+    bool *McpControlPanel::IsWindowVisiblePtr()
+    {
+        return m_AppState != nullptr ? &m_AppState->windows.mcpControlPanel : nullptr;
+    }
+
     void McpControlPanel::ShowSettings()
     {
-        if (!m_IsWindowVisible)
+        if (m_AppState == nullptr || !m_AppState->windows.mcpControlPanel)
             return;
         m_CopyMessage.clear();
 
-        ImGui::Begin("MCP Server", &m_IsWindowVisible);
+        ImGui::Begin("MCP Server", &m_AppState->windows.mcpControlPanel);
 
         mcp_layer::McpServerStats stats;
         if (m_AppState && m_AppState->mcpServer)

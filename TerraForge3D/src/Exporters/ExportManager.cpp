@@ -19,11 +19,27 @@ namespace tf3d::exporters
     {
     }
 
+    bool ExportManager::IsWindowOpen() const
+    {
+        return m_AppState != nullptr && m_AppState->windows.exportManager;
+    }
+
+    bool *ExportManager::IsWindowOpenPtr()
+    {
+        return m_AppState != nullptr ? &m_AppState->windows.exportManager : nullptr;
+    }
+
+    void ExportManager::SetVisible(bool visible)
+    {
+        if (m_AppState != nullptr)
+            m_AppState->windows.exportManager = visible;
+    }
+
     void ExportManager::ShowSettings()
     {
-        if (!m_IsWindowOpen)
+        if (m_AppState == nullptr || !m_AppState->windows.exportManager)
             return;
-        ImGui::Begin("Export Manager##RootWindow", &m_IsWindowOpen);
+        ImGui::Begin("Export Manager##RootWindow", &m_AppState->windows.exportManager);
 
         if (m_ExportProgress > 0.0f || m_HideExportControls) {
             if (m_StatusMessage.size() > 0)

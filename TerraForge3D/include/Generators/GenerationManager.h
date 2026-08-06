@@ -67,7 +67,6 @@ namespace tf3d::generators
     };
 
     struct UiState {
-        bool windowVisible               = true;
         bool updationPaused              = false;
         std::atomic_bool requireUpdation = true;
         bool useSeedFromActiveMesh       = false;
@@ -106,18 +105,9 @@ namespace tf3d::generators
         {
             m_Ui.updationPaused = paused;
         }
-        inline const bool IsWindowVisible() const
-        {
-            return m_Ui.windowVisible;
-        }
-        inline void SetWindowVisible(bool visible)
-        {
-            m_Ui.windowVisible = visible;
-        }
-        inline bool *IsWindowVisiblePtr()
-        {
-            return &m_Ui.windowVisible;
-        }
+        bool IsWindowVisible() const;
+        void SetWindowVisible(bool visible);
+        bool *IsWindowVisiblePtr();
         inline GeneratorData *GetHeightmapData() const
         {
             return m_Field.heightmapData.get();

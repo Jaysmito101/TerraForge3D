@@ -35,14 +35,8 @@ namespace tf3d::renderer
         void Update();
         void Render(RendererViewport *viewport);
         void ShowSettings();
-        inline bool IsWindowVisible()
-        {
-            return m_IsWindowVisible;
-        }
-        inline bool *IsWindowVisiblePtr()
-        {
-            return &m_IsWindowVisible;
-        }
+        bool IsWindowVisible() const;
+        bool *IsWindowVisiblePtr();
 
         inline RendererLights *GetRendererLights()
         {
@@ -101,7 +95,6 @@ namespace tf3d::renderer
         void UpdateHeightfieldGICache();
 
         ApplicationState *m_AppState = nullptr;
-        bool m_IsWindowVisible       = true;
         // std::shared_ptr<ObjectRenderer> m_ObjectRenderer;
         // std::shared_ptr<HeightmapRenderer> m_HeightmapRenderer;
         // std::shared_ptr<TextureSlotRenderer> m_TextureSlotRenderer;

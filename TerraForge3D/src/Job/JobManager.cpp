@@ -23,11 +23,21 @@ namespace tf3d::job
     {
     }
 
+    bool *JobManager::IsWindowOpenPtr()
+    {
+        return m_AppState != nullptr ? &m_AppState->windows.jobManager : nullptr;
+    }
+
+    bool JobManager::IsWindowOpen() const
+    {
+        return m_AppState != nullptr && m_AppState->windows.jobManager;
+    }
+
     void JobManager::ShowSettings()
     {
-        if (!m_IsVisible)
+        if (m_AppState == nullptr || !m_AppState->windows.jobManager)
             return;
-        ImGui::Begin("Job Manager", &m_IsVisible);
+        ImGui::Begin("Job Manager", &m_AppState->windows.jobManager);
 
         ImGui::BeginTabBar("##JOB_MANAGER_TAB_BAR");
 

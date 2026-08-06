@@ -21,18 +21,11 @@ namespace tf3d::job
 
         virtual void ShowSettings();
 
-        inline bool *IsWindowOpenPtr()
-        {
-            return &m_IsVisible;
-        }
-        inline bool IsWindowOpen() const
-        {
-            return m_IsVisible;
-        }
+        bool *IsWindowOpenPtr();
+        bool IsWindowOpen() const;
 
     private:
         ApplicationState *m_AppState = nullptr;
-        bool m_IsVisible             = false;
     };
 
 } // namespace tf3d::job

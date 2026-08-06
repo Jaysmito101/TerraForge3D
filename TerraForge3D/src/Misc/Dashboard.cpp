@@ -15,6 +15,22 @@ namespace tf3d::misc
     {
     }
 
+    bool Dashboard::IsWindowVisible() const
+    {
+        return m_AppState != nullptr && m_AppState->windows.dashboard;
+    }
+
+    bool *Dashboard::IsWindowVisiblePtr()
+    {
+        return m_AppState != nullptr ? &m_AppState->windows.dashboard : nullptr;
+    }
+
+    void Dashboard::SetWindowVisible(bool visible)
+    {
+        if (m_AppState != nullptr)
+            m_AppState->windows.dashboard = visible;
+    }
+
     void Dashboard::Update()
     {
         if (m_ForceUpdate) {
@@ -23,7 +39,9 @@ namespace tf3d::misc
 
     void Dashboard::ShowSettings()
     {
-        ImGui::Begin("Dashboard", &m_IsWindowVisible);
+        if (m_AppState == nullptr || !m_AppState->windows.dashboard)
+            return;
+        ImGui::Begin("Dashboard", &m_AppState->windows.dashboard);
         ShowChooseBaseModelPopup();
         if (ImGui::Button("Change Base Model"))
             ImGui::OpenPopup("Choose Base Model##Main");

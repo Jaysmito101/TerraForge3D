@@ -149,11 +149,10 @@ void MainMenu::ShowOptionsMenu()
 void MainMenu::ShowWindowsMenu()
 {
     if (ImGui::BeginMenu("Viewports")) {
-        static bool s_IsViewportOpen = false;
         for (auto &vp : appState->viewportManagers) {
-            s_IsViewportOpen = vp->IsVisible();
-            ShowWindowMenuItem(("Viewport " + std::to_string(vp->GetID())).data(), &s_IsViewportOpen);
-            vp->SetVisible(s_IsViewportOpen);
+            ShowWindowMenuItem(
+                ("Viewport " + std::to_string(vp->GetID())).data(),
+                vp->IsVisiblePtr());
         }
         ImGui::EndMenu();
     }
@@ -162,7 +161,7 @@ void MainMenu::ShowWindowsMenu()
     ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
     ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
     ShowWindowMenuItem("Job Manager", appState->jobManager->IsWindowOpenPtr());
-    ShowWindowMenuItem("Performance Monitor", PerformanceMonitor::Get().IsWindowOpenPtr());
+    ShowWindowMenuItem("Performance Monitor", &appState->windows.performanceMonitor);
     ShowWindowMenuItem("Theme Editor", &appState->windows.styleEditor);
     ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
     ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);

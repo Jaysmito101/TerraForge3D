@@ -35,6 +35,22 @@ namespace tf3d::generators
 
     GenerationManager::~GenerationManager() = default;
 
+    bool GenerationManager::IsWindowVisible() const
+    {
+        return m_AppState != nullptr && m_AppState->windows.generationManager;
+    }
+
+    void GenerationManager::SetWindowVisible(bool visible)
+    {
+        if (m_AppState != nullptr)
+            m_AppState->windows.generationManager = visible;
+    }
+
+    bool *GenerationManager::IsWindowVisiblePtr()
+    {
+        return m_AppState != nullptr ? &m_AppState->windows.generationManager : nullptr;
+    }
+
     void GenerationManager::Update()
     {
         TF3D_PROFILE_SCOPE("generation/update");
@@ -123,7 +139,7 @@ namespace tf3d::generators
     void GenerationManager::ShowSettingsInspector()
     {
         static bool s_TempBoolean = false;
-        ImGui::Begin("Generator Inspector", &m_Ui.windowVisible);
+        ImGui::Begin("Generator Inspector", &m_AppState->windows.generationManager);
 
         if (ImGui::Selectable("Options", m_Ui.selectedNode.m_ID == "GlobalOptions")) {
             m_Ui.selectedNode.m_ID         = "GlobalOptions";
@@ -284,7 +300,7 @@ namespace tf3d::generators
 
     void GenerationManager::ShowSettingsDetailed()
     {
-        ImGui::Begin("Generation Settings", &m_Ui.windowVisible);
+        ImGui::Begin("Generation Settings", &m_AppState->windows.generationManager);
 
         if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_GlobalOptions)
             ShowSettingsGlobalOptions();

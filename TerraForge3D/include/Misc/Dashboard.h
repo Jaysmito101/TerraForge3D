@@ -18,18 +18,9 @@ namespace tf3d::misc
         void Update();
         void ShowSettings();
 
-        inline bool IsWindowVisible() const
-        {
-            return m_IsWindowVisible;
-        }
-        inline bool *IsWindowVisiblePtr()
-        {
-            return &m_IsWindowVisible;
-        } // For ImGui::Checkbox
-        inline void SetWindowVisible(bool visible)
-        {
-            m_IsWindowVisible = visible;
-        }
+        bool IsWindowVisible() const;
+        bool *IsWindowVisiblePtr();
+        void SetWindowVisible(bool visible);
 
     private:
         void CalculateTileSizeAndOffset();
@@ -37,7 +28,6 @@ namespace tf3d::misc
 
     private:
         ApplicationState *m_AppState = nullptr;
-        bool m_IsWindowVisible       = true;
         bool m_ForceUpdate           = false;
     };
 

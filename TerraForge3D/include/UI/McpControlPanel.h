@@ -20,14 +20,10 @@ namespace tf3d::ui
         ~McpControlPanel() = default;
 
         void ShowSettings();
-        bool *IsWindowVisiblePtr()
-        {
-            return &m_IsWindowVisible;
-        }
+        bool *IsWindowVisiblePtr();
 
     private:
         ApplicationState *m_AppState = nullptr;
-        bool m_IsWindowVisible       = true;
         bool m_RuntimeEnabled        = false;
         bool m_RestartRequired       = false;
         std::string m_LastError;

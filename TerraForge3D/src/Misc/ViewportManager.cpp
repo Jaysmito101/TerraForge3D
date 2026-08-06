@@ -14,9 +14,6 @@ namespace tf3d::misc
     {
         static uint32_t s_ViewportID = 1;
         this->m_ID                   = s_ViewportID++;
-        this->m_IsVisible            = false;
-        if (this->m_ID == 1)
-            this->m_IsVisible = true; // Show the first viewport by default
         this->m_AppState         = appState;
         this->m_RendererViewport = new renderer::RendererViewport();
     }
@@ -26,12 +23,37 @@ namespace tf3d::misc
         delete this->m_RendererViewport;
     }
 
+    bool *ViewportManager::GetVisibilityState()
+    {
+        if (m_AppState == nullptr || m_ID == 0 || m_ID > MAX_VIEWPORT_COUNT)
+            return nullptr;
+        return &m_AppState->windows.viewportVisible[m_ID - 1];
+    }
+
+    bool ViewportManager::IsVisible() const
+    {
+        if (m_AppState == nullptr || m_ID == 0 || m_ID > MAX_VIEWPORT_COUNT)
+            return false;
+        return m_AppState->windows.viewportVisible[m_ID - 1];
+    }
+
+    bool *ViewportManager::IsVisiblePtr()
+    {
+        return GetVisibilityState();
+    }
+
+    void ViewportManager::SetVisible(bool visible)
+    {
+        if (bool *visibility = GetVisibilityState())
+            *visibility = visible;
+    }
+
     SerializerNode ViewportManager::Save() const
     {
         SerializerNode state    = m_RendererViewport->Save();
         SerializerNode viewport = CreateSerializerNode();
         viewport->Set("ID", static_cast<int>(m_ID));
-        viewport->Set("Visible", m_IsVisible);
+        viewport->Set("Visible", IsVisible());
         viewport->Set("Active", m_IsActive);
         viewport->Set("ControlEnabled", m_IsControlEnabled);
         viewport->Set("AutoCalculateAspectRatio", m_AutoCalculateAspectRatio);
@@ -50,7 +72,7 @@ namespace tf3d::misc
             return;
 
         if (const SerializerNode viewport = data->Get<SerializerNode>("Viewport")) {
-            m_IsVisible                = viewport->Get<bool>("Visible", m_IsVisible);
+            SetVisible(viewport->Get<bool>("Visible", IsVisible()));
             m_IsActive                 = viewport->Get<bool>("Active", m_IsActive);
             m_IsControlEnabled         = viewport->Get<bool>("ControlEnabled", m_IsControlEnabled);
             m_AutoCalculateAspectRatio = viewport->Get<bool>(
@@ -70,7 +92,7 @@ namespace tf3d::misc
             m_RendererViewport->GetCamera().SetAspectRatio(m_Width / (m_Height + 0.000000001f));
         }
 
-        if (m_IsVisible) {
+        if (IsVisible()) {
             const ImVec2 framebufferScale = ImGui::GetIO().DisplayFramebufferScale;
             const float scaleX            = std::max(framebufferScale.x, 1.0f);
             const float scaleY            = std::max(framebufferScale.y, 1.0f);
@@ -85,17 +107,18 @@ namespace tf3d::misc
         } else {
             TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/hidden");
         }
-        m_IsActive &= m_IsVisible;
+        m_IsActive &= IsVisible();
     }
 
     void ViewportManager::Show()
     {
         static char s_TempBuffer[1024];
         std::sprintf(s_TempBuffer, "Viewport %d", this->m_ID);
-        if (!this->m_IsVisible)
+        bool *visibility = GetVisibilityState();
+        if (visibility == nullptr || !*visibility)
             return;
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::Begin(s_TempBuffer, &m_IsVisible);
+        ImGui::Begin(s_TempBuffer, visibility);
         ImGui::PopStyleVar();
         // auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
         // auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();

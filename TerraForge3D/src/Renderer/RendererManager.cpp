@@ -25,6 +25,16 @@ namespace tf3d::renderer
     {
     }
 
+    bool RendererManager::IsWindowVisible() const
+    {
+        return m_AppState != nullptr && m_AppState->windows.rendererSettings;
+    }
+
+    bool *RendererManager::IsWindowVisiblePtr()
+    {
+        return m_AppState != nullptr ? &m_AppState->windows.rendererSettings : nullptr;
+    }
+
     void RendererManager::Update()
     {
         TF3D_PROFILE_SCOPE("renderer/lighting-caches");
@@ -188,8 +198,8 @@ namespace tf3d::renderer
 
     void RendererManager::ShowSettings()
     {
-        if (this->m_IsWindowVisible) {
-            ImGui::Begin("Renderer Settings", &this->m_IsWindowVisible);
+        if (m_AppState != nullptr && m_AppState->windows.rendererSettings) {
+            ImGui::Begin("Renderer Settings", &m_AppState->windows.rendererSettings);
             ImGui::PushID("Renderer Settings");
             if (ImGui::CollapsingHeader("Core Settings")) {
                 if (ImGui::BeginTabBar("Core Settings Type")) {

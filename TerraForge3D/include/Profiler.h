@@ -104,15 +104,7 @@ public:
     void StopCapture();
     void ClearCapture();
 
-    void RenderUI();
-    bool *IsWindowOpenPtr()
-    {
-        return &m_WindowOpen;
-    }
-    bool IsWindowOpen() const
-    {
-        return m_WindowOpen;
-    }
+    void RenderUI(bool *windowOpen);
 
 private:
     using Clock = std::chrono::steady_clock;
@@ -150,7 +142,6 @@ private:
     bool m_FrameOpen       = false;
     bool m_IsCapturing     = false;
 
-    bool m_WindowOpen            = false;
     bool m_GroupCallTreeByThread = false;
 };
 
