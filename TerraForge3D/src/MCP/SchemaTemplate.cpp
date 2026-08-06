@@ -200,7 +200,7 @@ namespace tf3d::mcp_layer
                 return std::nullopt;
             }
 
-            const std::string name = node.at(RuntimeDirective).get<std::string>();
+            const std::string name                    = node.at(RuntimeDirective).get<std::string>();
             const std::optional<nlohmann::json> value = runtime(name);
             if (!value) {
                 TF3D_LOG_ERROR("MCP schema '{}' runtime value '{}' is unavailable",
@@ -239,8 +239,8 @@ namespace tf3d::mcp_layer
             return std::nullopt;
         }
 
-        const auto candidate = (path.is_absolute() ? path : root / path).lexically_normal();
-        const auto relative  = candidate.lexically_relative(root);
+        const auto candidate           = (path.is_absolute() ? path : root / path).lexically_normal();
+        const auto relative            = candidate.lexically_relative(root);
         const std::string relativeText = relative.generic_string();
         if (relative.empty() || relativeText == ".." || relativeText.starts_with("../")) {
             TF3D_LOG_ERROR("MCP schema path '{}' escapes Data/Mcp/Schemas", PathText(path));
