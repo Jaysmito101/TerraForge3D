@@ -571,13 +571,12 @@ namespace tf3d::utils
 
 #endif
 
-
 #include "resource.h"
 
     void SetUpIcon()
     {
 #ifdef TERR3D_WIN32
-        HWND hwnd   = glfwGetWin32Window(mainApp->GetWindow()->GetNativeWindow());
+        HWND hwnd   = glfwGetWin32Window(base::Application::Get()->GetWindow()->GetNativeWindow());
         HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
         if (hIcon) {
             // Change both icons to the same icon handle.
