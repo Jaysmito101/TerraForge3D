@@ -46,6 +46,80 @@ namespace tf3d::mcp_layer
         {
             TF3D_LOG_ERROR("MCP schema '{}' failed: {}", PathText(path), message);
         }
+
+        std::string ChildPath(std::string_view path, std::string_view child)
+        {
+            if (path.empty())
+                return std::string(child);
+            return std::string(path) + "." + std::string(child);
+        }
+
+        bool ValidateWritableNode(const nlohmann::json &value,
+                                  const nlohmann::json &schema,
+                                  std::string_view path,
+                                  std::string &error)
+        {
+            if (!schema.is_object()) {
+                TF3D_LOG_ERROR("MCP writable validation schema must contain JSON objects");
+                error = "The writable validation schema is invalid.";
+                return false;
+            }
+
+            const auto readOnly = schema.find("readOnly");
+            if (readOnly != schema.end()) {
+                if (!readOnly->is_boolean()) {
+                    TF3D_LOG_ERROR("MCP writable validation schema field 'readOnly' must be a boolean");
+                    error = "The writable validation schema is invalid.";
+                    return false;
+                }
+
+                if (readOnly->get<bool>()) {
+                    const std::string field = path.empty() ? "value" : std::string(path);
+                    TF3D_LOG_WARN("MCP update rejected read-only field '{}'", field);
+                    error = "Field '" + field + "' is read-only.";
+                    return false;
+                }
+            }
+
+            const auto properties = schema.find("properties");
+            if (properties != schema.end()) {
+                if (!properties->is_object()) {
+                    TF3D_LOG_ERROR("MCP writable validation schema field 'properties' must be an object");
+                    error = "The writable validation schema is invalid.";
+                    return false;
+                }
+
+                if (value.is_object()) {
+                    for (const auto &[key, childValue] : value.items()) {
+                        const auto childSchema = properties->find(key);
+                        if (childSchema == properties->end())
+                            continue;
+
+                        if (!ValidateWritableNode(
+                                childValue, *childSchema, ChildPath(path, key), error))
+                            return false;
+                    }
+                }
+            }
+
+            const auto items = schema.find("items");
+            if (items != schema.end()) {
+                if (!items->is_object()) {
+                    TF3D_LOG_ERROR("MCP writable validation schema field 'items' must be an object");
+                    error = "The writable validation schema is invalid.";
+                    return false;
+                }
+
+                if (value.is_array()) {
+                    for (const auto &item : value) {
+                        if (!ValidateWritableNode(item, *items, path, error))
+                            return false;
+                    }
+                }
+            }
+
+            return true;
+        }
     } // namespace
 
     McpSchemaTemplate::McpSchemaTemplate(std::filesystem::path schemaRoot)
@@ -105,6 +179,15 @@ namespace tf3d::mcp_layer
             else
                 target[key] = value;
         }
+    }
+
+    bool McpSchemaTemplate::ValidateWritable(
+        const nlohmann::json &value,
+        const nlohmann::json &schema,
+        std::string &error)
+    {
+        error.clear();
+        return ValidateWritableNode(value, schema, {}, error);
     }
 
     std::optional<nlohmann::json> McpSchemaTemplate::ComposeFile(

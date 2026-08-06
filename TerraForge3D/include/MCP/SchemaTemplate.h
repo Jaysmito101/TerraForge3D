@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <functional>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -29,6 +30,11 @@ namespace tf3d::mcp_layer
 
         static std::filesystem::path DefaultRoot();
         static void Merge(nlohmann::json &target, const nlohmann::json &source);
+
+        static bool ValidateWritable(
+            const nlohmann::json &value,
+            const nlohmann::json &schema,
+            std::string &error);
 
     private:
         std::optional<nlohmann::json> ComposeFile(
