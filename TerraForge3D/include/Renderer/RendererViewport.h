@@ -4,17 +4,47 @@
 
 #include <array>
 #include <cstdint>
+#include <string_view>
 #include <utility>
 
 namespace tf3d::renderer
 {
-    enum RendererViewportMode {
-        RendererViewportMode_Object = 0,
-        RendererViewportMode_Wireframe,
-        RendererViewportMode_Heightmap,
-        RendererViewportMode_TextureSlot,
-        RendererViewportMode_COUNT
+    enum class RendererViewportMode {
+        Object = 0,
+        Wireframe,
+        Heightmap,
+        TextureSlot,
+        Count
     };
+
+    inline constexpr std::string_view RendererViewportModeToString(RendererViewportMode mode)
+    {
+        if (mode == RendererViewportMode::Object)
+            return "Object";
+        else if (mode == RendererViewportMode::Wireframe)
+            return "Wireframe";
+        else if (mode == RendererViewportMode::Heightmap)
+            return "Heightmap";
+        else if (mode == RendererViewportMode::TextureSlot)
+            return "TextureSlot";
+        return "unknown";
+    }
+
+    inline constexpr bool TryParseRendererViewportMode(std::string_view value,
+                                                        RendererViewportMode &mode)
+    {
+        if (value == "Object")
+            mode = RendererViewportMode::Object;
+        else if (value == "Wireframe")
+            mode = RendererViewportMode::Wireframe;
+        else if (value == "Heightmap")
+            mode = RendererViewportMode::Heightmap;
+        else if (value == "TextureSlot")
+            mode = RendererViewportMode::TextureSlot;
+        else
+            return false;
+        return true;
+    }
 
     class RendererViewport
     {
@@ -93,7 +123,7 @@ namespace tf3d::renderer
         SceneModeState m_SceneMode;
         HeightmapModeState m_HeightmapMode;
         TextureSlotModeState m_TextureSlotMode;
-        RendererViewportMode m_Mode = RendererViewportMode_Object;
+        RendererViewportMode m_Mode = RendererViewportMode::Object;
     };
 
 } // namespace tf3d::renderer
