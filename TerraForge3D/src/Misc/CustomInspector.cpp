@@ -1071,7 +1071,17 @@ namespace tf3d::misc
     bool CustomInspector::LoadConfig(const nlohmann::json &config)
     {
         Clear();
-        m_Description   = config.value("Description", "");
+        m_Description     = config.contains("Description") && config["Description"].is_string()
+                                ? config["Description"].get<std::string>()
+                                : "";
+        m_ShowResetButton = true;
+        if (config.contains("ShowResetButton")) {
+            if (!config["ShowResetButton"].is_boolean()) {
+                TF3D_LOG_ERROR("Inspector metadata field 'ShowResetButton' must be a boolean");
+                return false;
+            }
+            m_ShowResetButton = config["ShowResetButton"].get<bool>();
+        }
         bool hasContent = false;
         try {
             const auto loadGroup = [&](const nlohmann::json &group) {
