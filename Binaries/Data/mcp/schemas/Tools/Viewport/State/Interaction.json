@@ -1,5 +1,6 @@
 {
   "$include": "Common/Object.json",
+  "readOnly": true,
   "properties": {
     "MousePosition": { "$include": "Common/Vector2.json", "readOnly": true },
     "Hovered": { "type": "boolean", "readOnly": true }

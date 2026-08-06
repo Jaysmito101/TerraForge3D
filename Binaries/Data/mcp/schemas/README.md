@@ -23,3 +23,10 @@ JSON Schema specification.
 Tool metadata is also template-driven. Action templates under `Tools/**/Actions`
 define `Name`, `Title`, `Description`, `InputSchema`, `Annotations`, and
 `Flags`; C++ only supplies the invocation handler.
+
+Update handlers can pass a composed schema to `McpSchemaTemplate::ValidateWritable`.
+The validator walks nested objects and arrays and rejects any supplied field whose
+schema has `readOnly: true`, so read-only update rules remain in the JSON schema
+tree instead of being duplicated in tool code. Viewport update policies compose
+the canonical state templates, so writable camera controls and read-only camera
+projection fields stay defined in one place.

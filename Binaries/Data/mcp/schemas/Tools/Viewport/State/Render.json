@@ -1,5 +1,6 @@
 {
   "$include": "Common/Object.json",
+  "readOnly": true,
   "properties": {
     "Width": { "type": "integer", "minimum": 1, "readOnly": true },
     "Height": { "type": "integer", "minimum": 1, "readOnly": true },

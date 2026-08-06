@@ -1,5 +1,6 @@
 {
   "$include": "Common/Object.json",
+  "readOnly": true,
   "properties": {
     "ID": { "type": "integer", "readOnly": true },
     "Visible": { "type": "boolean", "readOnly": true },

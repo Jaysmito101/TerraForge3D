@@ -6,7 +6,7 @@
       "enum": { "$runtime": "Viewport.Modes" }
     },
     "Camera": { "$include": "Tools/Viewport/State/Camera.json" },
-    "PositionOnTerrain": { "$include": "Common/Vector4.json" },
+    "PositionOnTerrain": { "$include": "Common/Vector4.json", "readOnly": true },
     "Heightmap": { "$include": "Tools/Viewport/State/Heightmap.json" },
     "TextureSlot": { "$include": "Tools/Viewport/State/TextureSlot.json" },
     "Render": { "$include": "Tools/Viewport/State/Render.json" },
