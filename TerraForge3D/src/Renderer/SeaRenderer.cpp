@@ -40,28 +40,6 @@ namespace tf3d::renderer
         const glm::mat4 inverseProjectionView = glm::inverse(projectionView);
         const glm::vec3 &cameraPosition       = viewport->GetCamera().GetPosition();
         const glm::vec2 terrainMinimumXZ(-terrainWorldSize * 0.5f);
-        const float seaLevel             = m_Inspector.Get<float>("SeaLevel");
-        const float waveAmplitude        = m_Inspector.Get<float>("WaveAmplitude");
-        const float waveLength           = m_Inspector.Get<float>("WaveLength");
-        const float waveSpeed            = m_Inspector.Get<float>("WaveSpeed");
-        const float waveChoppiness       = m_Inspector.Get<float>("WaveChoppiness");
-        const float shoreWidth           = m_Inspector.Get<float>("ShoreWidth");
-        const float shoreSoftness        = m_Inspector.Get<float>("ShoreSoftness");
-        const float deepDepth            = m_Inspector.Get<float>("DeepDepth");
-        const float normalStrength       = m_Inspector.Get<float>("NormalStrength");
-        const float normalScale          = m_Inspector.Get<float>("NormalScale");
-        const float refractionStrength   = m_Inspector.Get<float>("RefractionStrength");
-        const float reflectionStrength   = m_Inspector.Get<float>("ReflectionStrength");
-        const float opacity              = m_Inspector.Get<float>("Opacity");
-        const float foamStrength         = m_Inspector.Get<float>("FoamStrength");
-        const float nearshoreFoamWidth   = m_Inspector.Get<float>("NearshoreFoamWidth");
-        const float offshoreFoamStrength = m_Inspector.Get<float>("OffshoreFoamStrength");
-        const float foamScale            = m_Inspector.Get<float>("FoamScale");
-        const float foamSpeed            = m_Inspector.Get<float>("FoamSpeed");
-        const glm::vec3 shallowColor     = m_Inspector.Get<glm::vec3>("ShallowColor");
-        const glm::vec3 deepColor        = m_Inspector.Get<glm::vec3>("DeepColor");
-        const glm::vec3 foamColor        = m_Inspector.Get<glm::vec3>("FoamColor");
-
         m_Shader->SetUniformMat4("u_ProjectionView", projectionView);
         m_Shader->SetUniformMat4("u_InverseProjectionView", inverseProjectionView);
         m_Shader->SetUniformMat4("u_View", view);
@@ -74,34 +52,13 @@ namespace tf3d::renderer
         m_Shader->SetUniform2f("u_TerrainWorldSize", terrainWorldSize, terrainWorldSize);
         m_Shader->SetUniform2f("u_SurfaceMinimumXZ", surfaceMinimumXZ);
         m_Shader->SetUniform2f("u_SurfaceWorldSize", surfaceWorldSize);
-        m_Shader->SetUniform1f("u_SeaLevel", seaLevel);
         m_Shader->SetUniform1f("u_SeaWorldHeight", seaWorldHeight);
         m_Shader->SetUniform1f("u_TerrainHeightOffset", terrainHeightOffset);
         m_Shader->SetUniform1f("u_BottomWorldHeight", 0.0f);
         m_Shader->SetUniform1f("u_SideEdgeOffset", std::max(terrainWorldSize * 0.00025f, 0.00005f));
         m_Shader->SetUniform1f("u_Time", m_ElapsedTime);
 
-        m_Shader->SetUniform1f("u_WaveAmplitude", waveAmplitude);
-        m_Shader->SetUniform1f("u_WaveLength", std::max(waveLength, 0.001f));
-        m_Shader->SetUniform1f("u_WaveSpeed", waveSpeed);
-        m_Shader->SetUniform1f("u_WaveChoppiness", waveChoppiness);
-        m_Shader->SetUniform1f("u_ShoreWidth", std::max(shoreWidth, 0.001f));
-        m_Shader->SetUniform1f("u_ShoreSoftness", std::clamp(shoreSoftness, 0.0f, 1.0f));
-        m_Shader->SetUniform1f("u_DeepDepth", std::max(deepDepth, 0.001f));
-        m_Shader->SetUniform1f("u_NormalStrength", normalStrength);
-        m_Shader->SetUniform1f("u_NormalScale", std::max(normalScale, 0.01f));
-        m_Shader->SetUniform1f("u_RefractionStrength", refractionStrength);
-        m_Shader->SetUniform1f("u_ReflectionStrength", reflectionStrength);
-        m_Shader->SetUniform1f("u_Opacity", opacity);
-        m_Shader->SetUniform1f("u_FoamStrength", foamStrength);
-        m_Shader->SetUniform1f("u_NearshoreFoamWidth",
-                               std::clamp(nearshoreFoamWidth, 0.02f, 0.8f));
-        m_Shader->SetUniform1f("u_OffshoreFoamStrength", std::max(offshoreFoamStrength, 0.0f));
-        m_Shader->SetUniform1f("u_FoamScale", std::max(foamScale, 0.01f));
-        m_Shader->SetUniform1f("u_FoamSpeed", foamSpeed);
-        m_Shader->SetUniform3f("u_ShallowColor", shallowColor);
-        m_Shader->SetUniform3f("u_DeepColor", deepColor);
-        m_Shader->SetUniform3f("u_FoamColor", foamColor);
+        m_Inspector.ApplyToShader(*m_Shader);
 
         const auto *heightPyramid = m_AppState->generationManager->GetHeightPyramid();
         m_Shader->SetUniform1i("u_HeightPyramid", 5);
@@ -184,8 +141,8 @@ namespace tf3d::renderer
     void SeaRenderer::ShowSettings()
     {
         m_Inspector.Render();
-        if (m_Inspector.GetLastAction() == "ReloadSeaShaders")
-            ReloadShaders();
+        // if (m_Inspector.GetLastAction() == "ReloadSeaShaders")
+        ReloadShaders();
     }
 
     void SeaRenderer::ReloadShaders()
