@@ -979,6 +979,20 @@ namespace tf3d::misc
         }
         for (const auto &[name, value] : m_Values)
             addVariable(schema, name, nullptr);
+
+        const auto mergeSchema = [](nlohmann::json &target, const nlohmann::json &source, const auto &merge) -> void {
+            if (!target.is_object() || !source.is_object()) {
+                target = source;
+                return;
+            }
+            for (const auto &[key, value] : source.items()) {
+                if (target.contains(key))
+                    merge(target[key], value, merge);
+                else
+                    target[key] = value;
+            }
+        };
+        mergeSchema(schema, m_SchemaMetadata, mergeSchema);
         return schema;
     }
 
@@ -1082,9 +1096,16 @@ namespace tf3d::misc
     bool CustomInspector::LoadConfig(const nlohmann::json &config)
     {
         Clear();
-        m_Description     = config.contains("Description") && config["Description"].is_string()
-                                ? config["Description"].get<std::string>()
-                                : "";
+        m_Description = config.contains("Description") && config["Description"].is_string()
+                            ? config["Description"].get<std::string>()
+                            : "";
+        if (config.contains("Schema")) {
+            if (!config["Schema"].is_object()) {
+                TF3D_LOG_ERROR("Inspector metadata field 'Schema' must be an object");
+                return false;
+            }
+            m_SchemaMetadata = config["Schema"];
+        }
         m_ShowResetButton = true;
         if (config.contains("ShowResetButton")) {
             if (!config["ShowResetButton"].is_boolean()) {
