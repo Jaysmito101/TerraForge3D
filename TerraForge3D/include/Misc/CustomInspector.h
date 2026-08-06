@@ -52,6 +52,10 @@ namespace tf3d::misc
         {
             return m_Name;
         }
+        inline std::string GetSerializedName() const
+        {
+            return m_SerializedName.empty() ? m_Name : m_SerializedName;
+        }
 
     private:
         inline int32_t GetInt() const
@@ -431,6 +435,7 @@ namespace tf3d::misc
 
     private:
         std::string m_Name              = "";
+        std::string m_SerializedName    = "";
         CustomInspectorValueType m_Type = CustomInspectorValueType::Unknown;
         int32_t m_IntValue = 0, m_DefaultIntValue = 0;
         float m_FloatValue = 0.0f, m_DefaultFloatValue = 0.0f;

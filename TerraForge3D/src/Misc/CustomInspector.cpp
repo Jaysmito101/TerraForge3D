@@ -96,6 +96,8 @@ namespace tf3d::misc
     {
         SerializerNode node = CreateSerializerNode();
         node->Set("Name", m_Name);
+        if (!m_SerializedName.empty() && m_SerializedName != m_Name)
+            node->Set("SerializedName", m_SerializedName);
         node->Set("Type", static_cast<int32_t>(m_Type));
         node->Set("TypeName", CustomInspectorValueTypeToString(m_Type));
         switch (m_Type) {
@@ -160,8 +162,9 @@ namespace tf3d::misc
 
     void CustomInspectorValue::Load(const SerializerNode &node)
     {
-        m_Type = CustomInspectorValueTypeFromString(node->Get<std::string>("TypeName", CustomInspectorValueTypeToString(m_Type)));
-        m_Name = node->Get<std::string>("Name");
+        m_Type           = CustomInspectorValueTypeFromString(node->Get<std::string>("TypeName", CustomInspectorValueTypeToString(m_Type)));
+        m_Name           = node->Get<std::string>("Name");
+        m_SerializedName = node->Get<std::string>("SerializedName", m_Name);
         switch (m_Type) {
             case CustomInspectorValueType::Int:
                 m_DefaultIntValue = node->Get<int>("DefaultValue", m_DefaultIntValue);
@@ -537,6 +540,8 @@ namespace tf3d::misc
     CustomInspectorValue &CustomInspector::AddVariable(const std::string &name, const CustomInspectorValue &value)
     {
         m_Values[name] = value;
+        if (m_Values[name].m_SerializedName.empty())
+            m_Values[name].m_SerializedName = name;
         return (m_Values[name]);
     }
 
@@ -573,47 +578,46 @@ namespace tf3d::misc
 
     CustomInspectorValue &CustomInspector::AddVairableFromConfig(const nlohmann::json &config)
     {
-        std::string name          = config.contains("Name") ? config["Name"].get<std::string>() : "Unnamed";
-        std::string valueTypeName = "Float";
+        std::string name                 = config.contains("Name") ? config["Name"].get<std::string>() : "Unnamed";
+        const std::string serializedName = config.value("SerializedName", name);
+        std::string valueTypeName        = "Float";
         if (config.contains("Type"))
             valueTypeName = config["Type"];
-        auto valueType       = CustomInspectorValue::CustomInspectorValueTypeFromString(valueTypeName);
-        bool hasDefaultValue = config.contains("Default");
+        auto valueType            = CustomInspectorValue::CustomInspectorValueTypeFromString(valueTypeName);
+        bool hasDefaultValue      = config.contains("Default");
+        const auto configureValue = [&](CustomInspectorValue &value) -> CustomInspectorValue & {
+            value.m_Name           = name;
+            value.m_SerializedName = serializedName;
+            return value;
+        };
         switch (valueType) {
             case CustomInspectorValueType::Int: {
-                auto &var  = Add<int32_t>(name, hasDefaultValue ? config["Default"].get<int32_t>() : 0);
-                var.m_Name = name;
-                return var;
+                auto &var = Add<int32_t>(name, hasDefaultValue ? config["Default"].get<int32_t>() : 0);
+                return configureValue(var);
             }
             case CustomInspectorValueType::Float: {
-                auto &var  = Add<float>(name, hasDefaultValue ? config["Default"].get<float>() : 0.0f);
-                var.m_Name = name;
-                return var;
+                auto &var = Add<float>(name, hasDefaultValue ? config["Default"].get<float>() : 0.0f);
+                return configureValue(var);
             }
             case CustomInspectorValueType::Bool: {
-                auto &var  = Add<bool>(name, hasDefaultValue ? config["Default"].get<bool>() : false);
-                var.m_Name = name;
-                return var;
+                auto &var = Add<bool>(name, hasDefaultValue ? config["Default"].get<bool>() : false);
+                return configureValue(var);
             }
             case CustomInspectorValueType::String: {
-                auto &var  = Add<std::string>(name, hasDefaultValue ? config["Default"].get<std::string>() : "");
-                var.m_Name = name;
-                return var;
+                auto &var = Add<std::string>(name, hasDefaultValue ? config["Default"].get<std::string>() : "");
+                return configureValue(var);
             }
             case CustomInspectorValueType::Vector2: {
-                auto &var  = Add<glm::vec2>(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f));
-                var.m_Name = name;
-                return var;
+                auto &var = Add<glm::vec2>(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f));
+                return configureValue(var);
             }
             case CustomInspectorValueType::Vector3: {
-                auto &var  = Add<glm::vec3>(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f));
-                var.m_Name = name;
-                return var;
+                auto &var = Add<glm::vec3>(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f));
+                return configureValue(var);
             }
             case CustomInspectorValueType::Vector4: {
-                auto &var  = Add<glm::vec4>(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f));
-                var.m_Name = name;
-                return var;
+                auto &var = Add<glm::vec4>(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f));
+                return configureValue(var);
             }
             case CustomInspectorValueType::Texture: {
                 const bool loadAs16Bit                    = config.value("BitDepth", 8) >= 16;
@@ -625,8 +629,7 @@ namespace tf3d::misc
                 }
                 auto &var                = Add<std::shared_ptr<Texture2D>>(name, defaultTexture);
                 var.m_TextureLoadAs16Bit = loadAs16Bit;
-                var.m_Name               = name;
-                return var;
+                return configureValue(var);
             }
             case CustomInspectorValueType::Path: {
                 std::array<glm::vec2, CustomInspectorMaxPathPoints> points{};
@@ -640,9 +643,8 @@ namespace tf3d::misc
                         points[index] = glm::vec2(point[0].get<float>(), point[1].get<float>());
                     }
                 }
-                auto &var  = AddPathVariable(name, points, pointCount);
-                var.m_Name = name;
-                return var;
+                auto &var = AddPathVariable(name, points, pointCount);
+                return configureValue(var);
             }
             case CustomInspectorValueType::Curve: {
                 std::array<glm::vec2, CustomInspectorMaxCurvePoints> points;
@@ -660,9 +662,8 @@ namespace tf3d::misc
                     points[0] = glm::vec2(0.0f, 0.0f);
                     points[1] = glm::vec2(1.0f, 1.0f);
                 }
-                auto &var  = AddCurveVariable(name, points, pointCount);
-                var.m_Name = name;
-                return var;
+                auto &var = AddCurveVariable(name, points, pointCount);
+                return configureValue(var);
             }
             default:
                 throw std::runtime_error("Unknown value type");
@@ -774,7 +775,7 @@ namespace tf3d::misc
         auto saveValue = [&](SerializerNode target,
                              const std::string &name,
                              const CustomInspectorValue &value) {
-            if (!value.WriteStateValue(target, name))
+            if (!value.WriteStateValue(target, value.GetSerializedName()))
                 TF3D_LOG_WARN("Skipping unsupported CustomInspector state field '{}'", name);
         };
 
@@ -813,9 +814,42 @@ namespace tf3d::misc
             return false;
         }
 
-        bool valid     = true;
-        auto loadValue = [&](const std::string &name, SerializerNode source) {
-            const auto existing = m_Values.find(name);
+        bool valid               = true;
+        const auto findValueName = [&](const std::string &serializedName,
+                                       const std::string &sectionName) -> std::string {
+            if (sectionName.empty()) {
+                const auto direct = m_Values.find(serializedName);
+                if (direct != m_Values.end() && direct->second.GetSerializedName() == serializedName)
+                    return direct->first;
+            }
+
+            for (const auto &widgetLabel : m_WidgetsOrder) {
+                const auto widgetSection = m_WidgetSections.find(widgetLabel);
+                if (!sectionName.empty() &&
+                    (widgetSection == m_WidgetSections.end() || widgetSection->second != sectionName))
+                    continue;
+                const auto widget = m_Widgets.find(widgetLabel);
+                if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+                    continue;
+                const auto value = m_Values.find(widget->second.m_VariableName);
+                if (value != m_Values.end() && value->second.GetSerializedName() == serializedName)
+                    return value->first;
+            }
+
+            if (sectionName.empty()) {
+                for (const auto &[name, value] : m_Values) {
+                    if (value.GetSerializedName() == serializedName)
+                        return name;
+                }
+            }
+            return {};
+        };
+
+        auto loadValue = [&](const std::string &name,
+                             const std::string &sectionName,
+                             SerializerNode source) {
+            const std::string valueName = findValueName(name, sectionName);
+            const auto existing         = m_Values.find(valueName);
             if (existing == m_Values.end()) {
                 TF3D_LOG_WARN("Invalid CustomInspector state field '{}'", name);
                 valid = false;
@@ -838,10 +872,10 @@ namespace tf3d::misc
                     continue;
                 }
                 for (const auto &field : sectionState->GetKeys())
-                    loadValue(field, sectionState);
+                    loadValue(field, key, sectionState);
                 continue;
             }
-            loadValue(key, node);
+            loadValue(key, {}, node);
         }
         return valid;
     }
@@ -940,7 +974,7 @@ namespace tf3d::misc
             const auto value = m_Values.find(name);
             if (value == m_Values.end() || !emitted.insert(name).second)
                 return;
-            target["properties"][name] = buildValueSchema(value->second, widget);
+            target["properties"][value->second.GetSerializedName()] = buildValueSchema(value->second, widget);
         };
 
         for (const auto &sectionName : m_SectionsOrder) {
