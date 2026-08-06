@@ -2,8 +2,12 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
+#include <algorithm>
+#include <memory>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace tf3d::misc
@@ -49,6 +53,7 @@ namespace tf3d::misc
             return m_Name;
         }
 
+    private:
         inline int32_t GetInt() const
         {
             switch (m_Type) {
@@ -247,17 +252,152 @@ namespace tf3d::misc
         {
             return m_CurvePointCount;
         }
-        inline void SetInt(int value)
+
+    public:
+        template <typename T>
+        static constexpr CustomInspectorValueType TypeFor()
         {
-            if (m_Type == CustomInspectorValueType_Int)
-                m_IntValue = value;
+            using ValueType = std::decay_t<T>;
+            if constexpr (std::is_same_v<ValueType, bool>)
+                return CustomInspectorValueType_Bool;
+            else if constexpr (std::is_integral_v<ValueType>)
+                return CustomInspectorValueType_Int;
+            else if constexpr (std::is_floating_point_v<ValueType>)
+                return CustomInspectorValueType_Float;
+            else if constexpr (std::is_same_v<ValueType, std::string>)
+                return CustomInspectorValueType_String;
+            else if constexpr (std::is_same_v<ValueType, glm::vec2>)
+                return CustomInspectorValueType_Vector2;
+            else if constexpr (std::is_same_v<ValueType, glm::vec3>)
+                return CustomInspectorValueType_Vector3;
+            else if constexpr (std::is_same_v<ValueType, glm::vec4>)
+                return CustomInspectorValueType_Vector4;
+            else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>)
+                return CustomInspectorValueType_Texture;
+            else
+                return CustomInspectorValueType_Unknown;
         }
-        inline void SetVector2(glm::vec2 value)
+
+        template <typename T>
+        T Get(T fallback = {}) const
         {
-            if (m_Type != CustomInspectorValueType_Vector2)
-                return;
-            m_VectorValue[0] = value.x;
-            m_VectorValue[1] = value.y;
+            using ValueType = std::decay_t<T>;
+            if constexpr (std::is_same_v<ValueType, bool>) {
+                return m_Type == CustomInspectorValueType_Bool ? GetBool() : fallback;
+            } else if constexpr (std::is_integral_v<ValueType>) {
+                return m_Type == CustomInspectorValueType_Int ? static_cast<T>(GetInt()) : fallback;
+            } else if constexpr (std::is_floating_point_v<ValueType>) {
+                return m_Type == CustomInspectorValueType_Float ? static_cast<T>(GetFloat()) : fallback;
+            } else if constexpr (std::is_same_v<ValueType, std::string>) {
+                return m_Type == CustomInspectorValueType_String ? GetString() : fallback;
+            } else if constexpr (std::is_same_v<ValueType, glm::vec2>) {
+                return m_Type == CustomInspectorValueType_Vector2 ? GetVector2() : fallback;
+            } else if constexpr (std::is_same_v<ValueType, glm::vec3>) {
+                return m_Type == CustomInspectorValueType_Vector3 ? GetVector3() : fallback;
+            } else if constexpr (std::is_same_v<ValueType, glm::vec4>) {
+                return m_Type == CustomInspectorValueType_Vector4 ? GetVector4() : fallback;
+            } else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>) {
+                return m_Type == CustomInspectorValueType_Texture ? GetTexture() : fallback;
+            } else if constexpr (std::is_same_v<ValueType, std::vector<glm::vec2>>) {
+                std::vector<glm::vec2> points;
+                if (m_Type == CustomInspectorValueType_Path) {
+                    points.reserve(static_cast<size_t>(m_PathPointCount));
+                    for (int index = 0; index < m_PathPointCount; ++index)
+                        points.push_back(m_PathPoints[index]);
+                } else if (m_Type == CustomInspectorValueType_Curve) {
+                    points.reserve(static_cast<size_t>(m_CurvePointCount));
+                    for (int index = 0; index < m_CurvePointCount; ++index)
+                        points.push_back(m_CurvePoints[index]);
+                } else {
+                    return fallback;
+                }
+                return points;
+            } else {
+                return fallback;
+            }
+        }
+
+        template <typename T>
+        bool Set(T value)
+        {
+            using ValueType = std::decay_t<T>;
+            if constexpr (std::is_same_v<ValueType, bool>) {
+                if (m_Type != CustomInspectorValueType_Bool)
+                    return false;
+                m_BoolValue = value;
+            } else if constexpr (std::is_integral_v<ValueType>) {
+                if (m_Type != CustomInspectorValueType_Int)
+                    return false;
+                m_IntValue = static_cast<int32_t>(value);
+            } else if constexpr (std::is_floating_point_v<ValueType>) {
+                if (m_Type != CustomInspectorValueType_Float)
+                    return false;
+                m_FloatValue = static_cast<float>(value);
+            } else if constexpr (std::is_same_v<ValueType, std::string>) {
+                if (m_Type != CustomInspectorValueType_String)
+                    return false;
+                m_StringValue = std::move(value);
+            } else if constexpr (std::is_same_v<ValueType, glm::vec2>) {
+                if (m_Type != CustomInspectorValueType_Vector2)
+                    return false;
+                m_VectorValue[0] = value.x;
+                m_VectorValue[1] = value.y;
+            } else if constexpr (std::is_same_v<ValueType, glm::vec3>) {
+                if (m_Type != CustomInspectorValueType_Vector3)
+                    return false;
+                m_VectorValue[0] = value.x;
+                m_VectorValue[1] = value.y;
+                m_VectorValue[2] = value.z;
+            } else if constexpr (std::is_same_v<ValueType, glm::vec4>) {
+                if (m_Type != CustomInspectorValueType_Vector4)
+                    return false;
+                m_VectorValue[0] = value.x;
+                m_VectorValue[1] = value.y;
+                m_VectorValue[2] = value.z;
+                m_VectorValue[3] = value.w;
+            } else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>) {
+                if (m_Type != CustomInspectorValueType_Texture)
+                    return false;
+                m_TextureValue = std::move(value);
+            } else if constexpr (std::is_same_v<ValueType, std::vector<glm::vec2>>) {
+                if (value.empty())
+                    return false;
+                if (m_Type == CustomInspectorValueType_Path) {
+                    m_PathPointCount = std::clamp(static_cast<int32_t>(value.size()), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
+                    for (int index = 0; index < m_PathPointCount; ++index)
+                        m_PathPoints[index] = value[static_cast<size_t>(index)];
+                } else if (m_Type == CustomInspectorValueType_Curve) {
+                    m_CurvePointCount = std::clamp(static_cast<int32_t>(value.size()), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
+                    for (int index = 0; index < m_CurvePointCount; ++index)
+                        m_CurvePoints[index] = value[static_cast<size_t>(index)];
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+            return true;
+        }
+
+        template <typename T>
+        bool SetDefault(T value)
+        {
+            if (!Set(std::move(value)))
+                return false;
+            m_DefaultIntValue        = m_IntValue;
+            m_DefaultFloatValue      = m_FloatValue;
+            m_DefaultBoolValue       = m_BoolValue;
+            m_DefaultStringValue     = m_StringValue;
+            m_DefaultTextureValue    = m_TextureValue;
+            m_DefaultVectorValue[0]  = m_VectorValue[0];
+            m_DefaultVectorValue[1]  = m_VectorValue[1];
+            m_DefaultVectorValue[2]  = m_VectorValue[2];
+            m_DefaultVectorValue[3]  = m_VectorValue[3];
+            m_DefaultPathPoints      = m_PathPoints;
+            m_DefaultPathPointCount  = m_PathPointCount;
+            m_DefaultCurvePoints     = m_CurvePoints;
+            m_DefaultCurvePointCount = m_CurvePointCount;
+            return true;
         }
 
         inline void ResetValue()
@@ -282,6 +422,10 @@ namespace tf3d::misc
 
         static std::string CustomInspectorValueTypeToString(CustomInspectorValueType type);
         static CustomInspectorValueType CustomInspectorValueTypeFromString(const std::string &type);
+
+    private:
+        bool WriteStateValue(SerializerNode target, const std::string &name) const;
+        bool ReadStateValue(SerializerNode source, const std::string &name);
 
         friend class CustomInspector;
 
@@ -438,49 +582,49 @@ namespace tf3d::misc
         CustomInspector();
         ~CustomInspector();
 
-        CustomInspectorValue &GetVariable(const std::string &name);
-        bool HasVariable(const std::string &name);
-        void RemoveVariable(const std::string &name);
-        CustomInspectorValue &AddVariable(const std::string &name, const CustomInspectorValue &value);
-        CustomInspectorValue &AddStringVariable(const std::string &name, const std::string &defaultValue);
-        CustomInspectorValue &AddIntegerVariable(const std::string &name, int defaultValue = 0);
-        CustomInspectorValue &AddFloatVariable(const std::string &name, float defaultValue = 0.0f);
-        CustomInspectorValue &AddBoolVariable(const std::string &name, bool defaultValue = false);
-        CustomInspectorValue &AddVector2Variable(const std::string &name, glm::vec2 defaultValue = glm::vec2(0.0f));
-        CustomInspectorValue &AddVector3Variable(const std::string &name, glm::vec3 defaultValue = glm::vec3(0.0f));
-        CustomInspectorValue &AddVector4Variable(const std::string &name, glm::vec4 defaultValue = glm::vec4(0.0f));
-        CustomInspectorValue &AddTextureVariable(const std::string &name, std::shared_ptr<Texture2D> defaultValue = nullptr);
-        CustomInspectorValue &AddPathVariable(const std::string &name,
-                                              const std::array<glm::vec2, CustomInspectorMaxPathPoints> &defaultPoints = {}, int defaultPointCount = 2);
-        CustomInspectorValue &AddCurveVariable(const std::string &name,
-                                               const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints = {}, int defaultPointCount = 2);
-        CustomInspectorValue &AddVairableFromConfig(const nlohmann::json &config);
+        bool Contains(const std::string &name) const;
+        void Remove(const std::string &name);
+        template <typename T>
+        CustomInspectorValue &Add(const std::string &name, T defaultValue = {})
+        {
+            using ValueType = std::decay_t<T>;
+            CustomInspectorValue value(CustomInspectorValue::TypeFor<ValueType>());
+            value.m_Name = name;
+            value.SetDefault(std::move(defaultValue));
+            return AddVariable(name, value);
+        }
+
+        template <typename T>
+        T Get(const std::string &name, T fallback = {}) const
+        {
+            const auto value = m_Values.find(name);
+            return value == m_Values.end() ? fallback : value->second.Get(fallback);
+        }
+
+        template <typename T>
+        bool Set(const std::string &name, T value)
+        {
+            const auto existing = m_Values.find(name);
+            return existing != m_Values.end() && existing->second.Set(std::move(value));
+        }
+
+        template <typename Function>
+        void ForEachValue(Function &&function) const
+        {
+            for (const auto &[name, value] : m_Values)
+                function(name, value);
+        }
+
+        const CustomInspectorValue *FindValue(const std::string &name) const;
 
         bool HasWidget(const std::string &name);
         CustomInspectorWidget &GetWidget(const std::string &name);
         void RemoveWidget(const std::string &name);
         CustomInspectorWidget &AddWidget(const std::string &name, const CustomInspectorWidget &widget);
-        CustomInspectorWidget &AddSliderWidget(const std::string &label, const std::string &variableName, float min = 0.0f, float max = 0.0f);
-        CustomInspectorWidget &AddDragWidget(const std::string &label, const std::string &variableName, float min = 0.0f, float max = 0.0f, float speed = 1.0f);
-        CustomInspectorWidget &AddColorWidget(const std::string &label, const std::string &variableName);
-        CustomInspectorWidget &AddTextureWidget(const std::string &label, const std::string &variableName, float width = 100.0f, float height = 100.0f);
-        CustomInspectorWidget &AddPathWidget(const std::string &label, const std::string &variableName);
-        CustomInspectorWidget &AddCurveWidget(const std::string &label, const std::string &variableName);
-        CustomInspectorWidget &AddButtonWidget(const std::string &label, const std::string &actionName);
-        CustomInspectorWidget &AddCheckboxWidget(const std::string &label, const std::string &variableName);
-        CustomInspectorWidget &AddInputWidget(const std::string &label, const std::string &variableName);
-        CustomInspectorWidget &AddSeedWidget(const std::string &label, const std::string &variableName);
-        CustomInspectorWidget &AddDropdownWidget(const std::string &label, const std::string &variableName, const std::vector<std::string> &options);
-        CustomInspectorWidget &AddTextWidget(const std::string &label, const std::string &font = "");
-        CustomInspectorWidget &AddSeperatorWidget();
-        CustomInspectorWidget &AddNewLineWidget();
+        CustomInspectorWidget &AddWidget(const std::string &label,
+                                         CustomInspectorWidgetType type,
+                                         const std::string &variableName = "");
         CustomInspectorWidget &AddWidgetFromString(const std::string &label, const std::string &type, const std::string &variableName);
-
-        CustomInspectorWidget &SetWidgetDropdownOptions(const std::string &label, const std::vector<std::string> &options);
-        CustomInspectorWidget &SetWidgetConstraints(const std::string &label, float a = 0.0f, float b = 0.0f, float c = 0.0f, float d = 0.0f);
-        CustomInspectorWidget &SetWidgetSpeed(const std::string &label, float speed = 1.0f);
-        CustomInspectorWidget &SetWidgetTooltip(const std::string &label, const std::string &value = "Default Tooltip");
-        CustomInspectorWidget &SetWidgetFont(const std::string &label, const std::string &value = "");
 
         CustomInspectorSection &AddSection(const std::string &name,
                                            const std::string &label = "",
@@ -531,10 +675,6 @@ namespace tf3d::misc
             m_LastChangedVariable.clear();
             m_LastAction.clear();
         }
-        inline const std::unordered_map<std::string, CustomInspectorValue> &GetValues() const
-        {
-            return m_Values;
-        }
         inline const std::unordered_map<std::string, CustomInspectorWidget> &GetWidgets() const
         {
             return m_Widgets;
@@ -557,6 +697,12 @@ namespace tf3d::misc
         }
 
     private:
+        CustomInspectorValue &AddVariable(const std::string &name, const CustomInspectorValue &value);
+        CustomInspectorValue &AddPathVariable(const std::string &name,
+                                              const std::array<glm::vec2, CustomInspectorMaxPathPoints> &defaultPoints = {}, int defaultPointCount = 2);
+        CustomInspectorValue &AddCurveVariable(const std::string &name,
+                                               const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints = {}, int defaultPointCount = 2);
+        CustomInspectorValue &AddVairableFromConfig(const nlohmann::json &config);
         bool RenderWidget(const std::string &widgetLabel);
         bool RenderSlider(const CustomInspectorWidget &widget);
         bool RenderDrag(const CustomInspectorWidget &widget);

@@ -79,25 +79,25 @@ namespace tf3d::generators
         {
             switch (value.GetType()) {
                 case CustomInspectorValueType_Int:
-                    shader->SetUniform1i(uniformName, value.GetInt());
+                    shader->SetUniform1i(uniformName, value.Get<int32_t>());
                     break;
                 case CustomInspectorValueType_Float:
-                    shader->SetUniform1f(uniformName, value.GetFloat());
+                    shader->SetUniform1f(uniformName, value.Get<float>());
                     break;
                 case CustomInspectorValueType_Bool:
-                    shader->SetUniform1i(uniformName, value.GetBool() ? 1 : 0);
+                    shader->SetUniform1i(uniformName, value.Get<bool>() ? 1 : 0);
                     break;
                 case CustomInspectorValueType_Vector2:
-                    shader->SetUniform2f(uniformName, value.GetVector2());
+                    shader->SetUniform2f(uniformName, value.Get<glm::vec2>());
                     break;
                 case CustomInspectorValueType_Vector3:
-                    shader->SetUniform3f(uniformName, value.GetVector3());
+                    shader->SetUniform3f(uniformName, value.Get<glm::vec3>());
                     break;
                 case CustomInspectorValueType_Vector4:
-                    shader->SetUniform4f(uniformName, value.GetVector4());
+                    shader->SetUniform4f(uniformName, value.Get<glm::vec4>());
                     break;
                 case CustomInspectorValueType_Texture: {
-                    const auto texture    = value.GetTexture();
+                    const auto texture    = value.Get<std::shared_ptr<Texture2D>>();
                     const bool hasTexture = texture != nullptr && texture->IsLoaded();
                     if (hasTexture)
                         shader->SetUniform1i(uniformName, texture->Bind(textureSlot++));
@@ -109,12 +109,14 @@ namespace tf3d::generators
                     break;
                 }
                 case CustomInspectorValueType_Curve: {
+                    const auto points                   = value.Get<std::vector<glm::vec2>>();
                     const std::string pointCountUniform = binding != nullptr && binding->is_object()
                                                               ? binding->value("PointCountUniform", uniformName + "PointCount")
                                                               : uniformName + "PointCount";
-                    shader->SetUniform1i(pointCountUniform, glm::clamp(value.GetCurvePointCount(), 2, static_cast<int>(CustomInspectorMaxCurvePoints)));
+                    shader->SetUniform1i(pointCountUniform, glm::clamp(static_cast<int>(points.size()), 2, static_cast<int>(CustomInspectorMaxCurvePoints)));
                     for (size_t pointIndex = 0; pointIndex < CustomInspectorMaxCurvePoints; ++pointIndex) {
-                        shader->SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", value.GetCurvePoints()[pointIndex]);
+                        const glm::vec2 point = pointIndex < points.size() ? points[pointIndex] : glm::vec2(0.0f);
+                        shader->SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", point);
                     }
                     break;
                 }
@@ -166,9 +168,9 @@ namespace tf3d::generators
         for (const auto &[uniformName, binding] : bindings.items()) {
             if (binding.is_object() && binding.contains("Parameter")) {
                 const std::string parameterName = binding["Parameter"].get<std::string>();
-                const auto parameter            = filter->GetParameters().find(parameterName);
-                if (parameter != filter->GetParameters().end())
-                    SetUniformFromParameter(shader, uniformName, parameter->second, textureSlot, &binding);
+                const auto *parameter           = filter->FindParameter(parameterName);
+                if (parameter != nullptr)
+                    SetUniformFromParameter(shader, uniformName, *parameter, textureSlot, &binding);
                 continue;
             }
             SetUniformFromJson(shader, uniformName, binding, textureSlot);
@@ -396,7 +398,7 @@ namespace tf3d::generators
             float requestedPercentile = -1.0f;
             if (filter->NeedsHistogram()) {
                 const std::string percentileParameter = filter->GetRequestedPercentileParameter();
-                if (!percentileParameter.empty() && filter->GetParameters().find(percentileParameter) != filter->GetParameters().end())
+                if (!percentileParameter.empty() && filter->FindParameter(percentileParameter) != nullptr)
                     requestedPercentile = filter->GetFloatParameter(percentileParameter, -1.0f);
             }
             m_Statistics->Compute(input, m_Resolution, m_StatisticsSampleStride, filter->NeedsHistogram(), requestedPercentile);

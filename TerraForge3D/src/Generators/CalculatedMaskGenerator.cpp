@@ -86,9 +86,9 @@ namespace tf3d::generators
 
     int CalculatedMaskGenerator::GetSelectedTypeIndex() const
     {
-        if (m_Inspector == nullptr || !m_Inspector->HasVariable("MaskType"))
+        if (m_Inspector == nullptr || !m_Inspector->Contains("MaskType"))
             return static_cast<int>(m_Settings.type);
-        return glm::clamp(m_Inspector->GetVariable("MaskType").GetInt(), 0, static_cast<int>(CalculatedMaskType::Count) - 1);
+        return glm::clamp(m_Inspector->Get("MaskType", static_cast<int32_t>(m_Settings.type)), 0, static_cast<int>(CalculatedMaskType::Count) - 1);
     }
 
     bool CalculatedMaskGenerator::LoadInspectorForType(int typeIndex)
@@ -185,96 +185,76 @@ namespace tf3d::generators
     {
         if (m_Inspector == nullptr)
             return;
-        if (m_Inspector->HasVariable("Range")) {
-            const auto &range = m_Inspector->GetVariable("Range");
-            if (range.GetType() == CustomInspectorValueType_Vector2) {
-                const glm::vec2 value = range.GetVector2();
+        if (const auto *range = m_Inspector->FindValue("Range")) {
+            if (range->GetType() == CustomInspectorValueType_Vector2) {
+                const glm::vec2 value = range->Get<glm::vec2>();
                 m_Settings.minimum    = std::min(value.x, value.y);
                 m_Settings.maximum    = std::max(value.x, value.y);
                 if (value.x > value.y)
-                    m_Inspector->GetVariable("Range").SetVector2(glm::vec2(m_Settings.minimum, m_Settings.maximum));
+                    m_Inspector->Set("Range", glm::vec2(m_Settings.minimum, m_Settings.maximum));
             } else {
-                m_Settings.minimum = range.GetFloat();
+                m_Settings.minimum = range->Get<float>(m_Settings.minimum);
                 m_Settings.maximum = 1.0f;
             }
         }
-        if (m_Inspector->HasVariable("EdgeFeather"))
-            m_Settings.softness = m_Inspector->GetVariable("EdgeFeather").GetFloat();
-        if (m_Inspector->HasVariable("EdgeSoftness"))
-            m_Settings.softness = m_Inspector->GetVariable("EdgeSoftness").GetFloat();
-        if (m_Inspector->HasVariable("Direction"))
-            m_Settings.angle = m_Inspector->GetVariable("Direction").GetFloat();
-        if (m_Inspector->HasVariable("DirectionWidth"))
-            m_Settings.angleWidth = m_Inspector->GetVariable("DirectionWidth").GetFloat();
-        if (m_Inspector->HasVariable("Scale"))
-            m_Settings.scale = m_Inspector->GetVariable("Scale").GetFloat();
-        if (m_Inspector->HasVariable("Seed"))
-            m_Settings.seed = m_Inspector->GetVariable("Seed").GetFloat();
-        if (m_Inspector->HasVariable("NoiseAlgorithm"))
-            m_Settings.noiseAlgorithm = m_Inspector->GetVariable("NoiseAlgorithm").GetInt();
-        if (m_Inspector->HasVariable("NoiseOctaves"))
-            m_Settings.noiseOctaves = m_Inspector->GetVariable("NoiseOctaves").GetInt();
-        if (m_Inspector->HasVariable("NoiseLacunarity"))
-            m_Settings.noiseLacunarity = m_Inspector->GetVariable("NoiseLacunarity").GetFloat();
-        if (m_Inspector->HasVariable("NoisePersistence"))
-            m_Settings.noisePersistence = m_Inspector->GetVariable("NoisePersistence").GetFloat();
-        if (m_Inspector->HasVariable("NoiseWarp"))
-            m_Settings.noiseWarp = m_Inspector->GetVariable("NoiseWarp").GetFloat();
-        if (m_Inspector->HasVariable("NoiseJitter"))
-            m_Settings.noiseJitter = m_Inspector->GetVariable("NoiseJitter").GetFloat();
-        if (m_Inspector->HasVariable("SampleRadius"))
-            m_Settings.sampleRadius = m_Inspector->GetVariable("SampleRadius").GetFloat();
-        if (m_Inspector->HasVariable("CurvatureSensitivity"))
-            m_Settings.curvatureScale = m_Inspector->GetVariable("CurvatureSensitivity").GetFloat();
-        if (m_Inspector->HasVariable("CavitySensitivity"))
-            m_Settings.cavityScale = m_Inspector->GetVariable("CavitySensitivity").GetFloat();
-        if (m_Inspector->HasVariable("SeaLevel"))
-            m_Settings.seaLevel = m_Inspector->GetVariable("SeaLevel").GetFloat();
-        if (m_Inspector->HasVariable("SpiralArms"))
-            m_Settings.spiralArms = m_Inspector->GetVariable("SpiralArms").GetFloat();
-        if (m_Inspector->HasVariable("SpiralTurns"))
-            m_Settings.spiralTurns = m_Inspector->GetVariable("SpiralTurns").GetFloat();
-        if (m_Inspector->HasVariable("SpiralThickness"))
-            m_Settings.spiralThickness = m_Inspector->GetVariable("SpiralThickness").GetFloat();
-        if (m_Inspector->HasVariable("SpiralSoftness"))
-            m_Settings.spiralSoftness = m_Inspector->GetVariable("SpiralSoftness").GetFloat();
-        if (m_Inspector->HasVariable("SpiralRotation"))
-            m_Settings.spiralRotation = m_Inspector->GetVariable("SpiralRotation").GetFloat();
-        if (m_Inspector->HasVariable("SpiralInvert"))
-            m_Settings.spiralInvert = m_Inspector->GetVariable("SpiralInvert").GetBool();
-        if (m_Inspector->HasVariable("GridCells"))
-            m_Settings.gridCells = m_Inspector->GetVariable("GridCells").GetFloat();
-        if (m_Inspector->HasVariable("GridThickness"))
-            m_Settings.gridThickness = m_Inspector->GetVariable("GridThickness").GetFloat();
-        if (m_Inspector->HasVariable("GridSoftness"))
-            m_Settings.gridSoftness = m_Inspector->GetVariable("GridSoftness").GetFloat();
-        if (m_Inspector->HasVariable("GridRotation"))
-            m_Settings.gridRotation = m_Inspector->GetVariable("GridRotation").GetFloat();
-        if (m_Inspector->HasVariable("GridInvert"))
-            m_Settings.gridInvert = m_Inspector->GetVariable("GridInvert").GetBool();
-        if (m_Inspector->HasVariable("DotCells"))
-            m_Settings.dotCells = m_Inspector->GetVariable("DotCells").GetFloat();
-        if (m_Inspector->HasVariable("DotRadius"))
-            m_Settings.dotRadius = m_Inspector->GetVariable("DotRadius").GetFloat();
-        if (m_Inspector->HasVariable("DotSoftness"))
-            m_Settings.dotSoftness = m_Inspector->GetVariable("DotSoftness").GetFloat();
-        if (m_Inspector->HasVariable("DotRotation"))
-            m_Settings.dotRotation = m_Inspector->GetVariable("DotRotation").GetFloat();
-        if (m_Inspector->HasVariable("DotInvert"))
-            m_Settings.dotInvert = m_Inspector->GetVariable("DotInvert").GetBool();
-        if (m_Inspector->HasVariable("Center"))
-            m_Settings.center = m_Inspector->GetVariable("Center").GetVector2();
-        if (m_Inspector->HasVariable("UsePath"))
-            m_Settings.usePath = m_Inspector->GetVariable("UsePath").GetBool();
-        if (m_Inspector->HasVariable("Feature"))
-            m_Settings.selectValleys = m_Inspector->GetVariable("Feature").GetInt() == 1;
-        if (m_Inspector->HasVariable("Path")) {
-            const auto &path          = m_Inspector->GetVariable("Path");
-            m_Settings.pathPoints     = path.GetPathPoints();
-            m_Settings.pathPointCount = glm::clamp(path.GetPathPointCount(), 2, CalculatedMaskSettings::MaxPathPoints);
-            m_Settings.pathEnd        = m_Settings.pathPoints[m_Settings.pathPointCount - 1];
+        const auto readFloat = [this](const char *name, float &target) {
+            if (const auto *value = m_Inspector->FindValue(name))
+                target = value->Get<float>(target);
+        };
+        const auto readInt = [this](const char *name, int &target) {
+            if (const auto *value = m_Inspector->FindValue(name))
+                target = value->Get<int32_t>(target);
+        };
+        const auto readBool = [this](const char *name, bool &target) {
+            if (const auto *value = m_Inspector->FindValue(name))
+                target = value->Get<bool>(target);
+        };
+
+        readFloat("EdgeFeather", m_Settings.softness);
+        readFloat("EdgeSoftness", m_Settings.softness);
+        readFloat("Direction", m_Settings.angle);
+        readFloat("DirectionWidth", m_Settings.angleWidth);
+        readFloat("Scale", m_Settings.scale);
+        readFloat("Seed", m_Settings.seed);
+        readInt("NoiseAlgorithm", m_Settings.noiseAlgorithm);
+        readInt("NoiseOctaves", m_Settings.noiseOctaves);
+        readFloat("NoiseLacunarity", m_Settings.noiseLacunarity);
+        readFloat("NoisePersistence", m_Settings.noisePersistence);
+        readFloat("NoiseWarp", m_Settings.noiseWarp);
+        readFloat("NoiseJitter", m_Settings.noiseJitter);
+        readFloat("SampleRadius", m_Settings.sampleRadius);
+        readFloat("CurvatureSensitivity", m_Settings.curvatureScale);
+        readFloat("CavitySensitivity", m_Settings.cavityScale);
+        readFloat("SeaLevel", m_Settings.seaLevel);
+        readFloat("SpiralArms", m_Settings.spiralArms);
+        readFloat("SpiralTurns", m_Settings.spiralTurns);
+        readFloat("SpiralThickness", m_Settings.spiralThickness);
+        readFloat("SpiralSoftness", m_Settings.spiralSoftness);
+        readFloat("SpiralRotation", m_Settings.spiralRotation);
+        readBool("SpiralInvert", m_Settings.spiralInvert);
+        readFloat("GridCells", m_Settings.gridCells);
+        readFloat("GridThickness", m_Settings.gridThickness);
+        readFloat("GridSoftness", m_Settings.gridSoftness);
+        readFloat("GridRotation", m_Settings.gridRotation);
+        readBool("GridInvert", m_Settings.gridInvert);
+        readFloat("DotCells", m_Settings.dotCells);
+        readFloat("DotRadius", m_Settings.dotRadius);
+        readFloat("DotSoftness", m_Settings.dotSoftness);
+        readFloat("DotRotation", m_Settings.dotRotation);
+        readBool("DotInvert", m_Settings.dotInvert);
+        if (const auto *value = m_Inspector->FindValue("Center"))
+            m_Settings.center = value->Get<glm::vec2>(m_Settings.center);
+        readBool("UsePath", m_Settings.usePath);
+        if (const auto *value = m_Inspector->FindValue("Feature"))
+            m_Settings.selectValleys = value->Get<int32_t>(m_Settings.selectValleys ? 1 : 0) == 1;
+        if (const auto *value = m_Inspector->FindValue("Path")) {
+            const auto points         = value->Get<std::vector<glm::vec2>>();
+            m_Settings.pathPointCount = glm::clamp(static_cast<int>(points.size()), 2, CalculatedMaskSettings::MaxPathPoints);
+            for (int index = 0; index < m_Settings.pathPointCount; ++index)
+                m_Settings.pathPoints[index] = points[static_cast<size_t>(index)];
+            m_Settings.pathEnd = m_Settings.pathPoints[m_Settings.pathPointCount - 1];
         }
-        if (m_Inspector->HasVariable("MaskType")) {
+        if (m_Inspector->Contains("MaskType")) {
             const int typeIndex = GetSelectedTypeIndex();
             m_Settings.type     = static_cast<CalculatedMaskType>(typeIndex);
             if (m_Metadata.contains("Types") && typeIndex < static_cast<int>(m_Metadata["Types"].size()))
@@ -335,20 +315,20 @@ namespace tf3d::generators
         const auto inspectorData = data->Get<SerializerNode>("Inspector");
         if (inspectorData != nullptr)
             m_Inspector->LoadData(inspectorData);
-        if (!m_Inspector->HasVariable("NoiseAlgorithm"))
-            m_Inspector->AddIntegerVariable("NoiseAlgorithm", m_NoiseAlgorithms.DefaultValue());
-        if (!m_Inspector->HasVariable("NoiseOctaves"))
-            m_Inspector->AddIntegerVariable("NoiseOctaves", 5);
-        if (!m_Inspector->HasVariable("NoiseLacunarity"))
-            m_Inspector->AddFloatVariable("NoiseLacunarity", 2.0f);
-        if (!m_Inspector->HasVariable("NoisePersistence"))
-            m_Inspector->AddFloatVariable("NoisePersistence", 0.5f);
-        if (!m_Inspector->HasVariable("NoiseWarp"))
-            m_Inspector->AddFloatVariable("NoiseWarp", 0.0f);
-        if (!m_Inspector->HasVariable("NoiseJitter"))
-            m_Inspector->AddFloatVariable("NoiseJitter", 0.75f);
-        if (m_Inspector->HasVariable("MaskType"))
-            m_Inspector->GetVariable("MaskType").SetInt(typeIndex);
+        if (!m_Inspector->Contains("NoiseAlgorithm"))
+            m_Inspector->Add("NoiseAlgorithm", m_NoiseAlgorithms.DefaultValue());
+        if (!m_Inspector->Contains("NoiseOctaves"))
+            m_Inspector->Add("NoiseOctaves", 5);
+        if (!m_Inspector->Contains("NoiseLacunarity"))
+            m_Inspector->Add("NoiseLacunarity", 2.0f);
+        if (!m_Inspector->Contains("NoisePersistence"))
+            m_Inspector->Add("NoisePersistence", 0.5f);
+        if (!m_Inspector->Contains("NoiseWarp"))
+            m_Inspector->Add("NoiseWarp", 0.0f);
+        if (!m_Inspector->Contains("NoiseJitter"))
+            m_Inspector->Add("NoiseJitter", 0.75f);
+        if (m_Inspector->Contains("MaskType"))
+            m_Inspector->Set("MaskType", typeIndex);
         SyncSettingsFromInspector();
         Invalidate();
     }

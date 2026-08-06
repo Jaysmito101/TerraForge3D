@@ -87,16 +87,16 @@ namespace tf3d::generators
 
     int BiomeFilter::GetIntegerParameter(const std::string &name, int defaultValue) const
     {
-        if (m_Inspector == nullptr || !m_Inspector->HasVariable(name))
+        if (m_Inspector == nullptr)
             return defaultValue;
-        return m_Inspector->GetVariable(name).GetInt();
+        return m_Inspector->Get(name, defaultValue);
     }
 
     float BiomeFilter::GetFloatParameter(const std::string &name, float defaultValue) const
     {
-        if (m_Inspector == nullptr || !m_Inspector->HasVariable(name))
+        if (m_Inspector == nullptr)
             return defaultValue;
-        return m_Inspector->GetVariable(name).GetFloat();
+        return m_Inspector->Get(name, defaultValue);
     }
 
     void BiomeFilter::Load(SerializerNode data)

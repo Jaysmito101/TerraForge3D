@@ -250,6 +250,76 @@ namespace tf3d::misc
         }
     }
 
+    bool CustomInspectorValue::WriteStateValue(SerializerNode target, const std::string &name) const
+    {
+        switch (m_Type) {
+            case CustomInspectorValueType_Int:
+                target->Set(name, m_IntValue);
+                return true;
+            case CustomInspectorValueType_Float:
+                target->Set(name, m_FloatValue);
+                return true;
+            case CustomInspectorValueType_Bool:
+                target->Set(name, m_BoolValue);
+                return true;
+            case CustomInspectorValueType_String:
+                target->Set(name, m_StringValue);
+                return true;
+            case CustomInspectorValueType_Vector2:
+                target->Set(name, glm::vec2(m_VectorValue[0], m_VectorValue[1]));
+                return true;
+            case CustomInspectorValueType_Vector3:
+                target->Set(name, glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]));
+                return true;
+            case CustomInspectorValueType_Vector4:
+                target->Set(name, glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
+                return true;
+            case CustomInspectorValueType_Texture:
+                target->Set(name, m_TextureValue ? m_TextureValue->GetPath() : "");
+                return true;
+            case CustomInspectorValueType_Path:
+                target->Set(name, Get<std::vector<glm::vec2>>());
+                return true;
+            case CustomInspectorValueType_Curve:
+                target->Set(name, Get<std::vector<glm::vec2>>());
+                return true;
+            case CustomInspectorValueType_Unknown:
+            default:
+                return false;
+        }
+    }
+
+    bool CustomInspectorValue::ReadStateValue(SerializerNode source, const std::string &name)
+    {
+        switch (m_Type) {
+            case CustomInspectorValueType_Int:
+                return Set(source->Get(name, m_IntValue));
+            case CustomInspectorValueType_Float:
+                return Set(source->Get(name, m_FloatValue));
+            case CustomInspectorValueType_Bool:
+                return Set(source->Get(name, m_BoolValue));
+            case CustomInspectorValueType_String:
+                return Set(source->Get(name, m_StringValue));
+            case CustomInspectorValueType_Vector2:
+                return Set(source->Get(name, GetVector2()));
+            case CustomInspectorValueType_Vector3:
+                return Set(source->Get(name, GetVector3()));
+            case CustomInspectorValueType_Vector4:
+                return Set(source->Get(name, GetVector4()));
+            case CustomInspectorValueType_Texture: {
+                const std::string path = source->Get(name, m_TextureValue ? m_TextureValue->GetPath() : "");
+                m_TextureValue         = path.empty() ? nullptr : std::make_shared<Texture2D>(path, false, false, m_TextureLoadAs16Bit);
+                return true;
+            }
+            case CustomInspectorValueType_Path:
+            case CustomInspectorValueType_Curve:
+                return Set(source->Get(name, Get<std::vector<glm::vec2>>()));
+            case CustomInspectorValueType_Unknown:
+            default:
+                return false;
+        }
+    }
+
     CustomInspectorWidget::CustomInspectorWidget(CustomInspectorWidgetType type)
     {
         m_Type = type;
@@ -437,17 +507,18 @@ namespace tf3d::misc
         return m_Sections.at(name);
     }
 
-    CustomInspectorValue &CustomInspector::GetVariable(const std::string &name)
+    const CustomInspectorValue *CustomInspector::FindValue(const std::string &name) const
     {
-        return m_Values[name];
+        const auto value = m_Values.find(name);
+        return value == m_Values.end() ? nullptr : &value->second;
     }
 
-    bool CustomInspector::HasVariable(const std::string &name)
+    bool CustomInspector::Contains(const std::string &name) const
     {
         return m_Values.find(name) != m_Values.end();
     }
 
-    void CustomInspector::RemoveVariable(const std::string &name)
+    void CustomInspector::Remove(const std::string &name)
     {
         // Ideally this should not be called
         m_Values.erase(name);
@@ -459,68 +530,6 @@ namespace tf3d::misc
     {
         m_Values[name] = value;
         return (m_Values[name]);
-    }
-
-    CustomInspectorValue &CustomInspector::AddStringVariable(const std::string &name, const std::string &defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_String);
-        value.m_StringValue = value.m_DefaultStringValue = defaultValue;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddIntegerVariable(const std::string &name, int defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Int);
-        value.m_IntValue = value.m_DefaultIntValue = defaultValue;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddFloatVariable(const std::string &name, float defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Float);
-        value.m_FloatValue = value.m_DefaultFloatValue = defaultValue;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddBoolVariable(const std::string &name, bool defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Bool);
-        value.m_BoolValue = value.m_DefaultBoolValue = defaultValue;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddVector2Variable(const std::string &name, glm::vec2 defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Vector2);
-        value.m_DefaultVectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
-        value.m_DefaultVectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddVector3Variable(const std::string &name, glm::vec3 defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Vector3);
-        value.m_DefaultVectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
-        value.m_DefaultVectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
-        value.m_DefaultVectorValue[2] = value.m_VectorValue[2] = defaultValue.z;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddVector4Variable(const std::string &name, glm::vec4 defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Vector4);
-        value.m_DefaultVectorValue[0] = value.m_VectorValue[0] = defaultValue.x;
-        value.m_DefaultVectorValue[1] = value.m_VectorValue[1] = defaultValue.y;
-        value.m_DefaultVectorValue[2] = value.m_VectorValue[2] = defaultValue.z;
-        value.m_DefaultVectorValue[3] = value.m_VectorValue[3] = defaultValue.w;
-        return AddVariable(name, value);
-    }
-
-    CustomInspectorValue &CustomInspector::AddTextureVariable(const std::string &name, std::shared_ptr<Texture2D> defaultValue)
-    {
-        CustomInspectorValue value(CustomInspectorValueType_Texture);
-        value.m_TextureValue = value.m_DefaultTextureValue = defaultValue;
-        return AddVariable(name, value);
     }
 
     CustomInspectorValue &CustomInspector::AddPathVariable(const std::string &name,
@@ -564,37 +573,37 @@ namespace tf3d::misc
         bool hasDefaultValue = config.contains("Default");
         switch (valueType) {
             case CustomInspectorValueType_Int: {
-                auto &var  = AddIntegerVariable(name, hasDefaultValue ? config["Default"].get<int32_t>() : 0);
+                auto &var  = Add<int32_t>(name, hasDefaultValue ? config["Default"].get<int32_t>() : 0);
                 var.m_Name = name;
                 return var;
             }
             case CustomInspectorValueType_Float: {
-                auto &var  = AddFloatVariable(name, hasDefaultValue ? config["Default"].get<float>() : 0.0f);
+                auto &var  = Add<float>(name, hasDefaultValue ? config["Default"].get<float>() : 0.0f);
                 var.m_Name = name;
                 return var;
             }
             case CustomInspectorValueType_Bool: {
-                auto &var  = AddBoolVariable(name, hasDefaultValue ? config["Default"].get<bool>() : false);
+                auto &var  = Add<bool>(name, hasDefaultValue ? config["Default"].get<bool>() : false);
                 var.m_Name = name;
                 return var;
             }
             case CustomInspectorValueType_String: {
-                auto &var  = AddStringVariable(name, hasDefaultValue ? config["Default"].get<std::string>() : "");
+                auto &var  = Add<std::string>(name, hasDefaultValue ? config["Default"].get<std::string>() : "");
                 var.m_Name = name;
                 return var;
             }
             case CustomInspectorValueType_Vector2: {
-                auto &var  = AddVector2Variable(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f));
+                auto &var  = Add<glm::vec2>(name, hasDefaultValue ? glm::vec2(config["Default"][0].get<float>(), config["Default"][1].get<float>()) : glm::vec2(0.0f));
                 var.m_Name = name;
                 return var;
             }
             case CustomInspectorValueType_Vector3: {
-                auto &var  = AddVector3Variable(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f));
+                auto &var  = Add<glm::vec3>(name, hasDefaultValue ? glm::vec3(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>()) : glm::vec3(0.0f));
                 var.m_Name = name;
                 return var;
             }
             case CustomInspectorValueType_Vector4: {
-                auto &var  = AddVector4Variable(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f));
+                auto &var  = Add<glm::vec4>(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f));
                 var.m_Name = name;
                 return var;
             }
@@ -606,7 +615,7 @@ namespace tf3d::misc
                     if (!path.empty() && path != "null")
                         defaultTexture = std::make_shared<Texture2D>(path, true, false, loadAs16Bit);
                 }
-                auto &var                = AddTextureVariable(name, defaultTexture);
+                auto &var                = Add<std::shared_ptr<Texture2D>>(name, defaultTexture);
                 var.m_TextureLoadAs16Bit = loadAs16Bit;
                 var.m_Name               = name;
                 return var;
@@ -670,8 +679,12 @@ namespace tf3d::misc
 
     CustomInspectorWidget &CustomInspector::AddWidget(const std::string &name, const CustomInspectorWidget &widget)
     {
-        if (name == "Seperator" || name == "NewLine")
-            return GetWidget(name);
+        if (name == "Seperator" || name == "NewLine") {
+            if (!HasWidget(name))
+                m_WidgetsOrder.push_back(name);
+            m_Widgets[name] = widget;
+            return m_Widgets[name];
+        }
         m_Widgets[name] = widget;
         m_WidgetsOrder.push_back(name);
         if (!m_CurrentSection.empty())
@@ -679,118 +692,16 @@ namespace tf3d::misc
         return m_Widgets[name];
     }
 
-    CustomInspectorWidget &CustomInspector::AddSliderWidget(const std::string &label, const std::string &variableName, float min, float max)
+    CustomInspectorWidget &CustomInspector::AddWidget(const std::string &label,
+                                                      CustomInspectorWidgetType type,
+                                                      const std::string &variableName)
     {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Slider);
+        CustomInspectorWidget widget(type);
         widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        widget.m_Constratins[0] = min;
-        widget.m_Constratins[1] = max;
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddDragWidget(const std::string &label, const std::string &variableName, float min, float max, float speed)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Drag);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        widget.m_Constratins[0] = min;
-        widget.m_Constratins[1] = max;
-        widget.m_FSpeed         = speed;
-        widget.m_ISpeed         = static_cast<int32_t>(speed);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddColorWidget(const std::string &label, const std::string &variableName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Color);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddTextureWidget(const std::string &label, const std::string &variableName, float widht, float height)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Texture);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        widget.m_Constratins[0] = widht;
-        widget.m_Constratins[1] = height;
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddButtonWidget(const std::string &label, const std::string &actionName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Button);
-        widget.SetLabel(label);
-        widget.SetActionName(actionName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddCheckboxWidget(const std::string &label, const std::string &variableName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Checkbox);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddInputWidget(const std::string &label, const std::string &variableName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Input);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddSeedWidget(const std::string &label, const std::string &variableName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Seed);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddDropdownWidget(const std::string &label, const std::string &variableName, const std::vector<std::string> &options)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Dropdown);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        widget.m_DropdownOptions = options;
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddPathWidget(const std::string &label, const std::string &variableName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Path);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddCurveWidget(const std::string &label, const std::string &variableName)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Curve);
-        widget.SetLabel(label);
-        widget.SetVariableName(variableName);
-        return AddWidget(label, widget);
-    }
-
-    CustomInspectorWidget &CustomInspector::AddSeperatorWidget()
-    {
-        return AddWidget("Seperator", CustomInspectorWidget(CustomInspectorWidgetType_Seperator));
-    }
-
-    CustomInspectorWidget &CustomInspector::AddNewLineWidget()
-    {
-        return AddWidget("NewLine", CustomInspectorWidget(CustomInspectorWidgetType_NewLine));
-    }
-
-    CustomInspectorWidget &CustomInspector::AddTextWidget(const std::string &label, const std::string &font)
-    {
-        CustomInspectorWidget widget(CustomInspectorWidgetType_Text);
-        widget.SetLabel(label);
-        widget.m_FontName = font;
+        if (type == CustomInspectorWidgetType_Button)
+            widget.SetActionName(variableName);
+        else
+            widget.SetVariableName(variableName);
         return AddWidget(label, widget);
     }
 
@@ -798,37 +709,15 @@ namespace tf3d::misc
     {
         auto widgetType = CustomInspectorWidget::CustomInspectorWidgetTypeFromString(type);
         switch (widgetType) {
-            case CustomInspectorWidgetType_Slider:
-                return AddSliderWidget(label, variableName);
-            case CustomInspectorWidgetType_Drag:
-                return AddDragWidget(label, variableName);
-            case CustomInspectorWidgetType_Color:
-                return AddColorWidget(label, variableName);
-            case CustomInspectorWidgetType_Texture:
-                return AddTextureWidget(label, variableName);
-            case CustomInspectorWidgetType_Path:
-                return AddPathWidget(label, variableName);
-            case CustomInspectorWidgetType_Curve:
-                return AddCurveWidget(label, variableName);
-            case CustomInspectorWidgetType_Button:
-                return AddButtonWidget(label, variableName);
-            case CustomInspectorWidgetType_Checkbox:
-                return AddCheckboxWidget(label, variableName);
-            case CustomInspectorWidgetType_Input:
-                return AddInputWidget(label, variableName);
-            case CustomInspectorWidgetType_Seed:
-                return AddSeedWidget(label, variableName);
-            case CustomInspectorWidgetType_Dropdown:
-                return AddDropdownWidget(label, variableName, {});
             case CustomInspectorWidgetType_Seperator:
-                return AddSeperatorWidget();
+                return AddWidget("Seperator", widgetType);
             case CustomInspectorWidgetType_NewLine:
-                return AddNewLineWidget();
-            case CustomInspectorWidgetType_Text:
-                return AddTextWidget(label, variableName);
+                return AddWidget("NewLine", widgetType);
             case CustomInspectorWidgetType_Unknown:
+                TF3D_LOG_WARN("Skipping unknown CustomInspector widget type '{}'", type);
+                return AddWidget(label, CustomInspectorWidgetType_Text);
             default:
-                throw std::runtime_error(std::string("Invalid data type for Drag"));
+                return AddWidget(label, widgetType, variableName);
         }
     }
 
@@ -877,52 +766,8 @@ namespace tf3d::misc
         auto saveValue = [&](SerializerNode target,
                              const std::string &name,
                              const CustomInspectorValue &value) {
-            switch (value.GetType()) {
-                case CustomInspectorValueType_Int:
-                    target->Set(name, value.m_IntValue);
-                    break;
-                case CustomInspectorValueType_Float:
-                    target->Set(name, value.m_FloatValue);
-                    break;
-                case CustomInspectorValueType_Bool:
-                    target->Set(name, value.m_BoolValue);
-                    break;
-                case CustomInspectorValueType_String:
-                    target->Set(name, value.m_StringValue);
-                    break;
-                case CustomInspectorValueType_Vector2:
-                    target->Set(name, glm::vec2(value.m_VectorValue[0], value.m_VectorValue[1]));
-                    break;
-                case CustomInspectorValueType_Vector3:
-                    target->Set(name, glm::vec3(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2]));
-                    break;
-                case CustomInspectorValueType_Vector4:
-                    target->Set(name, glm::vec4(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]));
-                    break;
-                case CustomInspectorValueType_Texture:
-                    target->Set(name, value.m_TextureValue ? value.m_TextureValue->GetPath() : "");
-                    break;
-                case CustomInspectorValueType_Path: {
-                    std::vector<glm::vec2> points;
-                    points.reserve(static_cast<size_t>(value.m_PathPointCount));
-                    for (int32_t index = 0; index < value.m_PathPointCount; ++index)
-                        points.push_back(value.m_PathPoints[index]);
-                    target->Set(name, points);
-                    break;
-                }
-                case CustomInspectorValueType_Curve: {
-                    std::vector<glm::vec2> points;
-                    points.reserve(static_cast<size_t>(value.m_CurvePointCount));
-                    for (int32_t index = 0; index < value.m_CurvePointCount; ++index)
-                        points.push_back(value.m_CurvePoints[index]);
-                    target->Set(name, points);
-                    break;
-                }
-                case CustomInspectorValueType_Unknown:
-                default:
-                    TF3D_LOG_WARN("Skipping unsupported CustomInspector state field '{}'", name);
-                    break;
-            }
+            if (!value.WriteStateValue(target, name))
+                TF3D_LOG_WARN("Skipping unsupported CustomInspector state field '{}'", name);
         };
 
         for (const auto &sectionName : m_SectionsOrder) {
@@ -969,65 +814,9 @@ namespace tf3d::misc
                 return;
             }
 
-            auto &value = existing->second;
-            switch (value.GetType()) {
-                case CustomInspectorValueType_Int:
-                    value.m_IntValue = source->Get(name, value.m_IntValue);
-                    break;
-                case CustomInspectorValueType_Float:
-                    value.m_FloatValue = source->Get(name, value.m_FloatValue);
-                    break;
-                case CustomInspectorValueType_Bool:
-                    value.m_BoolValue = source->Get(name, value.m_BoolValue);
-                    break;
-                case CustomInspectorValueType_String:
-                    value.m_StringValue = source->Get(name, value.m_StringValue);
-                    break;
-                case CustomInspectorValueType_Vector2: {
-                    const glm::vec2 result = source->Get(name, glm::vec2(value.m_VectorValue[0], value.m_VectorValue[1]));
-                    value.m_VectorValue[0] = result.x;
-                    value.m_VectorValue[1] = result.y;
-                    break;
-                }
-                case CustomInspectorValueType_Vector3: {
-                    const glm::vec3 result = source->Get(name, glm::vec3(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2]));
-                    value.m_VectorValue[0] = result.x;
-                    value.m_VectorValue[1] = result.y;
-                    value.m_VectorValue[2] = result.z;
-                    break;
-                }
-                case CustomInspectorValueType_Vector4: {
-                    const glm::vec4 result = source->Get(name, glm::vec4(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]));
-                    value.m_VectorValue[0] = result.x;
-                    value.m_VectorValue[1] = result.y;
-                    value.m_VectorValue[2] = result.z;
-                    value.m_VectorValue[3] = result.w;
-                    break;
-                }
-                case CustomInspectorValueType_Texture: {
-                    const std::string path = source->Get(name, value.m_TextureValue ? value.m_TextureValue->GetPath() : "");
-                    value.m_TextureValue   = path.empty() ? nullptr : std::make_shared<Texture2D>(path, false, false, value.m_TextureLoadAs16Bit);
-                    break;
-                }
-                case CustomInspectorValueType_Path: {
-                    const auto points      = source->Get<std::vector<glm::vec2>>(name, {});
-                    value.m_PathPointCount = std::clamp(static_cast<int32_t>(points.size()), 1, static_cast<int32_t>(CustomInspectorMaxPathPoints));
-                    for (int32_t index = 0; index < value.m_PathPointCount; ++index)
-                        value.m_PathPoints[index] = points[static_cast<size_t>(index)];
-                    break;
-                }
-                case CustomInspectorValueType_Curve: {
-                    const auto points       = source->Get<std::vector<glm::vec2>>(name, {});
-                    value.m_CurvePointCount = std::clamp(static_cast<int32_t>(points.size()), 2, static_cast<int32_t>(CustomInspectorMaxCurvePoints));
-                    for (int32_t index = 0; index < value.m_CurvePointCount; ++index)
-                        value.m_CurvePoints[index] = points[static_cast<size_t>(index)];
-                    break;
-                }
-                case CustomInspectorValueType_Unknown:
-                default:
-                    TF3D_LOG_WARN("Invalid CustomInspector state type for '{}'", name);
-                    valid = false;
-                    break;
+            if (!existing->second.ReadStateValue(source, name)) {
+                TF3D_LOG_WARN("Invalid CustomInspector state type for '{}'", name);
+                valid = false;
             }
         };
 
@@ -1327,7 +1116,7 @@ namespace tf3d::misc
                             continue;
                         const std::string action = button.value("Action", button.value("Name", "Action"));
                         const std::string label  = button.value("Label", action);
-                        auto &widget             = AddButtonWidget(label, action);
+                        auto &widget             = AddWidget(label, CustomInspectorWidgetType_Button, action);
                         if (button.contains("Tooltip"))
                             widget.SetTooltip(button["Tooltip"].get<std::string>());
                         else if (button.contains("Description"))
@@ -1360,47 +1149,8 @@ namespace tf3d::misc
             return false;
         }
         if (!hasContent)
-            AddTextWidget("No parameters available");
+            AddWidget("No parameters available", CustomInspectorWidgetType_Text);
         return true;
-    }
-
-    CustomInspectorWidget &CustomInspector::SetWidgetDropdownOptions(const std::string &label, const std::vector<std::string> &options)
-    {
-        auto &widget             = m_Widgets[label];
-        widget.m_DropdownOptions = options;
-        return widget;
-    }
-
-    CustomInspectorWidget &CustomInspector::SetWidgetConstraints(const std::string &label, float a, float b, float c, float d)
-    {
-        auto &widget            = m_Widgets[label];
-        widget.m_Constratins[0] = a;
-        widget.m_Constratins[1] = b;
-        widget.m_Constratins[2] = c;
-        widget.m_Constratins[3] = d;
-        return widget;
-    }
-
-    CustomInspectorWidget &CustomInspector::SetWidgetTooltip(const std::string &label, const std::string &value)
-    {
-        auto &widget     = m_Widgets[label];
-        widget.m_Tooltip = value;
-        return widget;
-    }
-
-    CustomInspectorWidget &CustomInspector::SetWidgetFont(const std::string &label, const std::string &value)
-    {
-        auto &widget      = m_Widgets[label];
-        widget.m_FontName = value;
-        return widget;
-    }
-
-    CustomInspectorWidget &CustomInspector::SetWidgetSpeed(const std::string &label, float speed)
-    {
-        auto &widget    = m_Widgets[label];
-        widget.m_FSpeed = speed;
-        widget.m_ISpeed = static_cast<int32_t>(speed);
-        return widget;
     }
 
     bool CustomInspector::RenderWidget(const std::string &widgetLabel)
@@ -1411,14 +1161,14 @@ namespace tf3d::misc
 
         const auto &widget = widgetIterator->second;
         if (widget.m_UseRenderOnCondition) {
-            if (!HasVariable(widget.m_RenderOnConditionName))
+            if (!Contains(widget.m_RenderOnConditionName))
                 return false;
             const auto &condition     = m_Values.at(widget.m_RenderOnConditionName);
             const auto &allowedValues = widget.m_RenderOnConditionValues;
             if (!allowedValues.empty()) {
-                if (std::find(allowedValues.begin(), allowedValues.end(), condition.GetInt()) == allowedValues.end())
+                if (std::find(allowedValues.begin(), allowedValues.end(), condition.Get<int32_t>()) == allowedValues.end())
                     return false;
-            } else if (condition.GetInt() != widget.m_RenderOnConditionValue) {
+            } else if (condition.Get<int32_t>() != widget.m_RenderOnConditionValue) {
                 return false;
             }
         }

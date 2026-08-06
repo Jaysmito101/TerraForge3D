@@ -42,39 +42,38 @@ namespace tf3d::generators
         TF3D_PROFILE_SCOPE(std::string("generation/base-shape/") + m_Name);
         buffer->Bind(0);
         m_Shader->Bind();
-        const auto &values = m_Inspector->GetValues();
-        int textureSlot    = 4;
-        for (const auto &[valueName, uniformValue] : values) {
+        int textureSlot = 4;
+        m_Inspector->ForEachValue([&](const auto &valueName, const auto &uniformValue) {
             std::string uniformName = std::string("u_") + valueName;
             switch (uniformValue.GetType()) {
                 case CustomInspectorValueType_Int:
-                    m_Shader->SetUniform1i(uniformName, uniformValue.GetInt());
+                    m_Shader->SetUniform1i(uniformName, uniformValue.template Get<int32_t>());
                     break;
                 case CustomInspectorValueType_Float:
-                    m_Shader->SetUniform1f(uniformName, uniformValue.GetFloat());
+                    m_Shader->SetUniform1f(uniformName, uniformValue.template Get<float>());
                     break;
                 case CustomInspectorValueType_Bool:
-                    m_Shader->SetUniform1i(uniformName, uniformValue.GetInt());
+                    m_Shader->SetUniform1i(uniformName, uniformValue.template Get<bool>() ? 1 : 0);
                     break;
                 case CustomInspectorValueType_Vector2:
-                    m_Shader->SetUniform2f(uniformName, uniformValue.GetVector2());
+                    m_Shader->SetUniform2f(uniformName, uniformValue.template Get<glm::vec2>());
                     break;
                 case CustomInspectorValueType_Vector3:
-                    m_Shader->SetUniform3f(uniformName, uniformValue.GetVector3());
+                    m_Shader->SetUniform3f(uniformName, uniformValue.template Get<glm::vec3>());
                     break;
                 case CustomInspectorValueType_Vector4:
-                    m_Shader->SetUniform4f(uniformName, uniformValue.GetVector4());
+                    m_Shader->SetUniform4f(uniformName, uniformValue.template Get<glm::vec4>());
                     break;
                 case CustomInspectorValueType_Texture:
-                    if (uniformValue.GetTexture())
-                        m_Shader->SetUniform1i(uniformName, uniformValue.GetTexture()->Bind(textureSlot++));
+                    if (const auto texture = uniformValue.template Get<std::shared_ptr<Texture2D>>())
+                        m_Shader->SetUniform1i(uniformName, texture->Bind(textureSlot++));
                     break;
                 case CustomInspectorValueType_String: // for future
                 case CustomInspectorValueType_Unknown:
                 default:
                     break;
             }
-        }
+        });
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
         m_Shader->SetUniform1i("u_UseSeedTexture", seedTexture != nullptr ? 1 : 0);
         if (seedTexture)
@@ -160,8 +159,7 @@ namespace tf3d::generators
         source += "uniform bool u_UseSeedTexture;\n";
         source += "uniform sampler2D u_SeedTexture;\n";
         source += "// custom uniforms\n";
-        const auto &values = m_Inspector->GetValues();
-        for (const auto &[valueName, uniformValue] : values) {
+        m_Inspector->ForEachValue([&](const auto &valueName, const auto &uniformValue) {
             switch (uniformValue.GetType()) {
                 case CustomInspectorValueType_Int:
                     source += "uniform int u_" + valueName + " = 0;\n";
@@ -193,7 +191,7 @@ namespace tf3d::generators
                 default:
                     break;
             }
-        }
+        });
         source += "\n\n";
         source += "// utility function to convert pixel coord to\n";
         source += "// offset inside the output buffer\n";
