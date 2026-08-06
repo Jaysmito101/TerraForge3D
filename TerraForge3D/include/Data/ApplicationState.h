@@ -107,7 +107,7 @@ namespace tf3d::data
 
         ui::MainMenu *mainMenu                         = nullptr;
         texture_store::TextureStore *textureStore  = nullptr;
-        SupportersTribute *supportersTribute       = nullptr;
+        misc::SupportersTribute *supportersTribute       = nullptr;
         OSLiscences *osLiscences                   = nullptr;
         ProjectManager *projectManager             = nullptr;
         ExportManager *exportManager               = nullptr;

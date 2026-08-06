@@ -248,7 +248,7 @@ namespace tf3d
             appState->resourceManager   = ResourceManager::GetInstance(appState);
             appState->dashboard         = new Dashboard(appState);
             appState->generationManager = new GenerationManager(appState);
-            appState->supportersTribute = new SupportersTribute();
+            appState->supportersTribute = new misc::SupportersTribute();
             appState->rendererManager   = new renderer::RendererManager(appState);
             appState->mainMenu          = new ui::MainMenu(appState);
             // appState->projectManager = new ProjectManager(appState);
