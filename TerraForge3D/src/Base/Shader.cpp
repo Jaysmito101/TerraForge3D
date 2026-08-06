@@ -142,6 +142,11 @@ namespace tf3d::base
         glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
     }
 
+    void Shader::SetUniform3f(const std::string &name, float value0, float value1, float value2)
+    {
+        glUniform3f(GetUniformLocation(name), value0, value1, value2);
+    }
+
     void Shader::SetUniform2f(const std::string &name, float value0, float value1)
     {
         glUniform2f(GetUniformLocation(name), value0, value1);
@@ -150,6 +155,17 @@ namespace tf3d::base
     void Shader::SetUniform2f(const std::string &name, const glm::vec2 &value)
     {
         SetUniform2f(name, value.x, value.y);
+    }
+
+    void Shader::SetUniform2i(const std::string &name, int value0, int value1)
+    {
+        glUniform2i(GetUniformLocation(name), value0, value1);
+    }
+
+    void Shader::SetUniform4f(const std::string &name, float value0, float value1,
+                              float value2, float value3)
+    {
+        glUniform4f(GetUniformLocation(name), value0, value1, value2, value3);
     }
 
     void Shader::SetUniformi(const std::string &name, int value)
