@@ -4,5 +4,5 @@
     "ViewportId": { "$include": "Common/ViewportId.json" },
     "State": { "$include": "Tools/Viewport/UpdateState.json" }
   },
-  "required": ["State"]
+  "required": ["ViewportId", "State"]
 }

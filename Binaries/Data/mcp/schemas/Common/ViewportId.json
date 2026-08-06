@@ -1,5 +1,5 @@
 {
   "type": "integer",
   "minimum": 1,
-  "description": "Optional viewport ID. Omit it to use the active viewport."
+  "description": "Viewport ID to target. Use List viewports to discover visible IDs."
 }
