@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sea.reset",
+  "Title": "Reset sea renderer settings",
+  "Description": "Reset procedural sea renderer settings to the defaults defined by its inspector metadata.",
+  "InputSchema": { "$include": "Common/Object.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

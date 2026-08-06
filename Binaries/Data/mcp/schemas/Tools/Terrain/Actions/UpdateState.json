@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.terrain.update_state",
+  "Title": "Update terrain renderer settings",
+  "Description": "Update writable terrain renderer settings using a partial hierarchical State object. Read-only GI progress fields are rejected.",
+  "InputSchema": { "$include": "Tools/Terrain/UpdateState.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

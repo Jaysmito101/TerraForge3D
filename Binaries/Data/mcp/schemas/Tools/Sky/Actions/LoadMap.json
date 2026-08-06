@@ -1,0 +1,15 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sky.load_map",
+  "Title": "Load sky map",
+  "Description": "Load an HDR or LDR equirectangular sky map from a filesystem path and rebuild the generated environment lighting maps.",
+  "InputSchema": {
+    "$include": "Common/Object.json",
+    "properties": {
+      "Path": { "type": "string", "minLength": 1 }
+    },
+    "required": ["Path"]
+  },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

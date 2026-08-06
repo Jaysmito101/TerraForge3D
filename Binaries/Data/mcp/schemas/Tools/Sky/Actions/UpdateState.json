@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sky.update_state",
+  "Title": "Update sky renderer settings",
+  "Description": "Update writable sky renderer settings using a partial hierarchical State object. Sky map loading is exposed separately through load_map.",
+  "InputSchema": { "$include": "Tools/Sky/UpdateState.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

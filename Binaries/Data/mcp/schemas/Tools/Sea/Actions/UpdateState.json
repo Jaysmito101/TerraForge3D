@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sea.update_state",
+  "Title": "Update sea renderer settings",
+  "Description": "Update procedural sea renderer settings using a partial hierarchical State object.",
+  "InputSchema": { "$include": "Tools/Sea/UpdateState.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

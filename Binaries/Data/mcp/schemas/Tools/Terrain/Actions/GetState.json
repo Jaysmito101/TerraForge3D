@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.terrain.get_state",
+  "Title": "Get terrain renderer settings",
+  "Description": "Return the settings shown by the Renderer Settings Terrain tab, including terrain ambient occlusion, base-plane shadows, terrain global illumination, and read-only GI progress.",
+  "InputSchema": { "$include": "Tools/Terrain/GetState.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

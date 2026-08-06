@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sea.get_state",
+  "Title": "Get sea renderer settings",
+  "Description": "Return the current procedural sea renderer settings.",
+  "InputSchema": { "$include": "Tools/Sea/GetState.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

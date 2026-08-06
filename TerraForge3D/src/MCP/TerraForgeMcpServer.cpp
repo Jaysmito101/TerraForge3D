@@ -3,6 +3,7 @@
 #include "MCP/Resources/CoreResources.h"
 #include "MCP/TerraForgeMcpServer.h"
 #include "MCP/Tools/CoreTools.h"
+#include "MCP/Tools/SceneTools.h"
 #include "MCP/Tools/ViewportTools.h"
 #include "MCP/McpTransport.h"
 
@@ -91,6 +92,7 @@ namespace tf3d::mcp_layer
         endpoint = "http://" + host + ":" + std::to_string(port) + "/mcp";
         RegisterMcpCoreTools(actions, applicationState);
         RegisterMcpViewportTools(actions, applicationState);
+        RegisterMcpSceneTools(actions, applicationState);
         RegisterMcpCoreResources(resources, applicationState);
     }
 

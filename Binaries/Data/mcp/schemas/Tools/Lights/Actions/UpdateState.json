@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.lights.update_state",
+  "Title": "Update renderer light settings",
+  "Description": "Update renderer lighting settings using a partial hierarchical State object.",
+  "InputSchema": { "$include": "Tools/Lights/UpdateState.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

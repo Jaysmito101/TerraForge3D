@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.lights.get_state",
+  "Title": "Get renderer light settings",
+  "Description": "Return the current renderer lighting settings, including sky-light and primary sun controls.",
+  "InputSchema": { "$include": "Tools/Lights/GetState.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

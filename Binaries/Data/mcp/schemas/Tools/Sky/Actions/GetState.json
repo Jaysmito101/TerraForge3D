@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sky.get_state",
+  "Title": "Get sky renderer settings",
+  "Description": "Return the current sky renderer settings, including sky display, environment-map resolutions, loaded map path, and read-only readiness state.",
+  "InputSchema": { "$include": "Tools/Sky/GetState.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

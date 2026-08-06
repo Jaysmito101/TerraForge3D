@@ -1,0 +1,9 @@
+{
+  "$include": "Common/Action.json",
+  "Name": "tf3d.renderer.sky.reload_shaders",
+  "Title": "Reload sky shaders",
+  "Description": "Reload the skybox and environment-map compute shaders.",
+  "InputSchema": { "$include": "Common/Object.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}
