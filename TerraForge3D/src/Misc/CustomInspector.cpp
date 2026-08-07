@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <unordered_set>
 
 #ifdef min
@@ -21,6 +22,64 @@
 
 namespace tf3d::misc
 {
+
+    namespace
+    {
+        bool ReadPresetFloat(const nlohmann::json &source, float &destination)
+        {
+            if (!source.is_number())
+                return false;
+            const double parsed = source.get<double>();
+            if (!std::isfinite(parsed) ||
+                parsed < -static_cast<double>(std::numeric_limits<float>::max()) ||
+                parsed > static_cast<double>(std::numeric_limits<float>::max()))
+                return false;
+            destination = static_cast<float>(parsed);
+            return std::isfinite(destination);
+        }
+
+        bool ReadPresetInteger(const nlohmann::json &source, int32_t &destination)
+        {
+            int64_t parsed = 0;
+            if (source.is_number_integer()) {
+                parsed = source.get<int64_t>();
+            } else if (source.is_number_unsigned()) {
+                const uint64_t unsignedValue = source.get<uint64_t>();
+                if (unsignedValue > static_cast<uint64_t>(std::numeric_limits<int32_t>::max()))
+                    return false;
+                parsed = static_cast<int64_t>(unsignedValue);
+            } else {
+                return false;
+            }
+            if (parsed < static_cast<int64_t>(std::numeric_limits<int32_t>::min()) ||
+                parsed > static_cast<int64_t>(std::numeric_limits<int32_t>::max()))
+                return false;
+            destination = static_cast<int32_t>(parsed);
+            return true;
+        }
+
+        bool ReadPresetVector(const nlohmann::json &source, int dimensions, float *destination)
+        {
+            static constexpr const char *componentNames[] = {"X", "Y", "Z", "W"};
+            if (source.is_array()) {
+                if (source.size() != static_cast<size_t>(dimensions))
+                    return false;
+                for (int index = 0; index < dimensions; ++index) {
+                    if (!ReadPresetFloat(source[index], destination[index]))
+                        return false;
+                }
+                return true;
+            }
+            if (!source.is_object() || source.size() != static_cast<size_t>(dimensions))
+                return false;
+            for (int index = 0; index < dimensions; ++index) {
+                if (!source.contains(componentNames[index]) ||
+                    !ReadPresetFloat(source[componentNames[index]], destination[index]))
+                    return false;
+            }
+            return true;
+        }
+    } // namespace
 
     void RenderInspectorTooltip(const std::string &label, const std::string &description)
     {
@@ -680,6 +739,180 @@ namespace tf3d::misc
         throw std::runtime_error("Unknown value type");
     }
 
+    bool CustomInspector::SetPresetValue(std::unordered_map<std::string, CustomInspectorValue> &values,
+                                         const std::string &name,
+                                         const nlohmann::json &value,
+                                         std::string_view presetName) const
+    {
+        const auto invalid = [&](std::string_view reason) {
+            TF3D_LOG_WARN("Invalid CustomInspector preset '{}' field '{}': {}",
+                          std::string(presetName), name, std::string(reason));
+            return false;
+        };
+
+        auto target = values.find(name);
+        if (target == values.end()) {
+            for (auto iterator = values.begin(); iterator != values.end(); ++iterator) {
+                if (iterator->second.GetSerializedName() == name) {
+                    target = iterator;
+                    break;
+                }
+            }
+        }
+        if (target == values.end())
+            return invalid("unknown inspector value");
+
+        CustomInspectorValue candidate = target->second;
+        bool converted                 = false;
+        switch (candidate.GetType()) {
+            case CustomInspectorValueType::Int: {
+                int32_t parsed = 0;
+                converted      = ReadPresetInteger(value, parsed) && candidate.Set(parsed);
+                break;
+            }
+            case CustomInspectorValueType::Float: {
+                float parsed = 0.0f;
+                converted    = ReadPresetFloat(value, parsed) && candidate.Set(parsed);
+                break;
+            }
+            case CustomInspectorValueType::Bool:
+                converted = value.is_boolean() && candidate.Set(value.get<bool>());
+                break;
+            case CustomInspectorValueType::String:
+                converted = value.is_string() && candidate.Set(value.get<std::string>());
+                break;
+            case CustomInspectorValueType::Vector2: {
+                float components[4] = {};
+                converted           = ReadPresetVector(value, 2, components) &&
+                            candidate.Set(glm::vec2(components[0], components[1]));
+                break;
+            }
+            case CustomInspectorValueType::Vector3: {
+                float components[4] = {};
+                converted           = ReadPresetVector(value, 3, components) &&
+                            candidate.Set(glm::vec3(components[0], components[1], components[2]));
+                break;
+            }
+            case CustomInspectorValueType::Vector4: {
+                float components[4] = {};
+                converted           = ReadPresetVector(value, 4, components) &&
+                            candidate.Set(glm::vec4(components[0], components[1], components[2], components[3]));
+                break;
+            }
+            case CustomInspectorValueType::Texture: {
+                if (!value.is_string())
+                    break;
+                const std::string path = value.get<std::string>();
+                if (path.empty() || path == "null") {
+                    converted = candidate.Set(std::shared_ptr<Texture2D>{});
+                    break;
+                }
+                auto texture = std::make_shared<Texture2D>(path, true, false, candidate.m_TextureLoadAs16Bit);
+                if (!texture->IsLoaded())
+                    return invalid("texture could not be loaded");
+                converted = candidate.Set(std::move(texture));
+                break;
+            }
+            case CustomInspectorValueType::Path:
+            case CustomInspectorValueType::Curve: {
+                if (!value.is_array())
+                    break;
+                const size_t minimumPoints = candidate.GetType() == CustomInspectorValueType::Curve ? 2u : 1u;
+                if (value.size() < minimumPoints || value.size() > CustomInspectorMaxPathPoints)
+                    break;
+                std::vector<glm::vec2> points;
+                points.reserve(value.size());
+                for (const auto &point : value) {
+                    float components[4] = {};
+                    if (!ReadPresetVector(point, 2, components)) {
+                        points.clear();
+                        break;
+                    }
+                    points.emplace_back(components[0], components[1]);
+                }
+                converted = !points.empty() && candidate.Set(std::move(points));
+                break;
+            }
+            case CustomInspectorValueType::Unknown:
+            case CustomInspectorValueType::Count:
+            default:
+                break;
+        }
+
+        if (!converted)
+            return invalid("value does not match its inspector type");
+        if (!ValidateValue(target->first, candidate))
+            return false;
+        target->second = std::move(candidate);
+        return true;
+    }
+
+    bool CustomInspector::ApplyPresetValues(const nlohmann::json &values,
+                                            std::string_view presetName,
+                                            bool commit)
+    {
+        if (!values.is_object()) {
+            TF3D_LOG_WARN("Invalid CustomInspector preset '{}': Values must be an object",
+                          std::string(presetName));
+            return false;
+        }
+
+        auto candidates = m_Values;
+        bool valid      = true;
+        for (const auto &[name, value] : values.items()) {
+            if (!SetPresetValue(candidates, name, value, presetName))
+                valid = false;
+        }
+        if (valid && commit)
+            m_Values = std::move(candidates);
+        return valid;
+    }
+
+    bool CustomInspector::RenderPresetSelector()
+    {
+        if (m_Presets.empty())
+            return false;
+
+        std::string preview     = "Custom";
+        std::string description = "Choose a preset or reset all inspector values to their defaults.";
+        if (m_SelectedPreset == 0) {
+            preview = "Default";
+        } else if (m_SelectedPreset > 0 && static_cast<size_t>(m_SelectedPreset - 1) < m_Presets.size()) {
+            const auto &preset = m_Presets[static_cast<size_t>(m_SelectedPreset - 1)];
+            preview            = preset.label;
+            description        = preset.description;
+        }
+
+        bool changed = false;
+        if (ImGui::BeginCombo("Preset", preview.c_str())) {
+            if (ImGui::Selectable("Default", m_SelectedPreset == 0)) {
+                Reset();
+                changed = true;
+            }
+            if (m_SelectedPreset == 0)
+                ImGui::SetItemDefaultFocus();
+
+            for (size_t index = 0; index < m_Presets.size(); ++index) {
+                const auto &preset   = m_Presets[index];
+                const int32_t choice = static_cast<int32_t>(index + 1);
+                const bool selected  = m_SelectedPreset == choice;
+                if (ImGui::Selectable(preset.label.c_str(), selected)) {
+                    if (ApplyPresetValues(preset.values, preset.name, true)) {
+                        m_SelectedPreset      = choice;
+                        m_LastChangedVariable = "Preset";
+                        m_LastAction.clear();
+                        changed = true;
+                    }
+                }
+                if (selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+        RenderInspectorTooltip("Preset", description);
+        return changed;
+    }
+
     bool CustomInspector::HasWidget(const std::string &name)
     {
         return m_Widgets.find(name) != m_Widgets.end();
@@ -774,6 +1007,7 @@ namespace tf3d::misc
             value.Load(subNode);
             m_Values[name] = value;
         }
+        m_SelectedPreset = -1;
     }
 
     SerializerNode CustomInspector::SaveState() const
@@ -929,6 +1163,7 @@ namespace tf3d::misc
             }
             loadValue(key, {}, node);
         }
+        m_SelectedPreset = -1;
         return valid;
     }
 
@@ -1066,6 +1301,22 @@ namespace tf3d::misc
         for (const auto &[name, value] : m_Values)
             addVariable(schema, name, nullptr);
 
+        if (!m_Presets.empty()) {
+            schema["Presets"] = nlohmann::json::array();
+            schema["Presets"].push_back({{"Name", "Default"},
+                                         {"Label", "Default"},
+                                         {"Description", "Reset all inspector values to their schema defaults."},
+                                         {"Values", nlohmann::json::object()}});
+            for (const auto &preset : m_Presets) {
+                nlohmann::json presetSchema = {
+                    {"Name", preset.name},
+                    {"Label", preset.label},
+                    {"Description", preset.description},
+                    {"Values", preset.values}};
+                schema["Presets"].push_back(std::move(presetSchema));
+            }
+        }
+
         const auto mergeSchema = [](nlohmann::json &target, const nlohmann::json &source, const auto &merge) -> void {
             if (!target.is_object() || !source.is_object()) {
                 target = source;
@@ -1177,6 +1428,7 @@ namespace tf3d::misc
             if (!widget.empty() && !section.empty())
                 m_WidgetSections[widget] = section;
         }
+        m_SelectedPreset = -1;
     }
 
     bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
@@ -1343,6 +1595,65 @@ namespace tf3d::misc
                 }
                 m_WidgetsOrder = std::move(orderedWidgets);
             }
+
+            if (config.contains("Presets")) {
+                const auto &presets = config["Presets"];
+                if (!presets.is_array()) {
+                    TF3D_LOG_ERROR("Inspector metadata field 'Presets' must be an array");
+                    return false;
+                }
+
+                for (const auto &presetConfig : presets) {
+                    if (!presetConfig.is_object()) {
+                        TF3D_LOG_WARN("Skipping CustomInspector preset: expected an object");
+                        continue;
+                    }
+                    if (!presetConfig.contains("Name") || !presetConfig["Name"].is_string()) {
+                        TF3D_LOG_WARN("Skipping CustomInspector preset without a string Name");
+                        continue;
+                    }
+                    const std::string name = presetConfig["Name"].get<std::string>();
+                    if (name.empty() || name == "Default") {
+                        TF3D_LOG_WARN("Skipping CustomInspector preset with reserved or empty Name '{}'", name);
+                        continue;
+                    }
+                    if (std::any_of(m_Presets.begin(), m_Presets.end(), [&](const Preset &preset) {
+                            return preset.name == name;
+                        })) {
+                        TF3D_LOG_WARN("Skipping duplicate CustomInspector preset '{}'", name);
+                        continue;
+                    }
+                    if (!presetConfig.contains("Values") || !presetConfig["Values"].is_object()) {
+                        TF3D_LOG_WARN("Skipping CustomInspector preset '{}': Values must be an object", name);
+                        continue;
+                    }
+
+                    Preset preset;
+                    preset.name        = name;
+                    preset.label       = name;
+                    preset.description = "Apply the " + name + " inspector preset.";
+                    if (presetConfig.contains("Label")) {
+                        if (!presetConfig["Label"].is_string()) {
+                            TF3D_LOG_WARN("Skipping CustomInspector preset '{}': Label must be a string", name);
+                            continue;
+                        }
+                        preset.label = presetConfig["Label"].get<std::string>();
+                    }
+                    if (presetConfig.contains("Description")) {
+                        if (!presetConfig["Description"].is_string()) {
+                            TF3D_LOG_WARN("Skipping CustomInspector preset '{}': Description must be a string", name);
+                            continue;
+                        }
+                        preset.description = presetConfig["Description"].get<std::string>();
+                    }
+                    if (preset.label.empty())
+                        preset.label = name;
+                    preset.values = presetConfig["Values"];
+                    if (!ApplyPresetValues(preset.values, preset.name, false))
+                        continue;
+                    m_Presets.push_back(std::move(preset));
+                }
+            }
         } catch (const std::exception &exception) {
             TF3D_LOG_ERROR("Failed to load inspector metadata: {}", exception.what());
             return false;
@@ -1496,8 +1807,16 @@ namespace tf3d::misc
             ImGui::Separator();
         }
 
+        if (!m_Presets.empty()) {
+            hasChanged = RenderPresetSelector() || hasChanged;
+            ImGui::Separator();
+        }
+
         const auto renderWidget = [&](const std::string &widgetLabel) {
-            hasChanged = RenderWidget(widgetLabel) || hasChanged;
+            const bool widgetChanged = RenderWidget(widgetLabel);
+            if (widgetChanged && m_LastChangedVariable != "Preset")
+                m_SelectedPreset = -1;
+            hasChanged = widgetChanged || hasChanged;
         };
 
         if (m_SectionsOrder.empty()) {

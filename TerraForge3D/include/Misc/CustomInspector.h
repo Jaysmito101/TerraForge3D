@@ -2,7 +2,9 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
+#include <array>
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -694,6 +696,9 @@ namespace tf3d::misc
         {
             for (auto &[name, value] : m_Values)
                 value.ResetValue();
+            m_SelectedPreset      = 0;
+            m_LastChangedVariable = "Preset";
+            m_LastAction.clear();
         }
 
         inline bool IsResetEnabled() const
@@ -727,11 +732,13 @@ namespace tf3d::misc
             m_Sections.clear();
             m_SectionsOrder.clear();
             m_WidgetSections.clear();
+            m_Presets.clear();
             m_CurrentSection.clear();
             m_Description.clear();
             m_SchemaMetadata = nlohmann::json::object();
             m_LastChangedVariable.clear();
             m_LastAction.clear();
+            m_SelectedPreset = 0;
         }
         inline const std::unordered_map<std::string, CustomInspectorWidget> &GetWidgets() const
         {
@@ -761,6 +768,12 @@ namespace tf3d::misc
         CustomInspectorValue &AddCurveVariable(const std::string &name,
                                                const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints = {}, int defaultPointCount = 2);
         CustomInspectorValue &AddVairableFromConfig(const nlohmann::json &config);
+        bool ApplyPresetValues(const nlohmann::json &values, std::string_view presetName, bool commit);
+        bool SetPresetValue(std::unordered_map<std::string, CustomInspectorValue> &values,
+                            const std::string &name,
+                            const nlohmann::json &value,
+                            std::string_view presetName) const;
+        bool RenderPresetSelector();
         bool ValidateValue(const std::string &name, const CustomInspectorValue &value) const;
         bool RenderWidget(const std::string &widgetLabel);
         bool RenderSlider(const CustomInspectorWidget &widget);
@@ -776,6 +789,13 @@ namespace tf3d::misc
         bool RenderCurve(const CustomInspectorWidget &widget);
 
     private:
+        struct Preset {
+            std::string name;
+            std::string label;
+            std::string description;
+            nlohmann::json values = nlohmann::json::object();
+        };
+
         std::unordered_map<std::string, CustomInspectorValue> m_Values;
         std::unordered_map<std::string, CustomInspectorWidget> m_Widgets;
         std::vector<std::string> m_WidgetsOrder;
@@ -789,6 +809,8 @@ namespace tf3d::misc
         std::string m_LastChangedVariable;
         std::string m_LastAction;
         bool m_ShowResetButton = true;
+        std::vector<Preset> m_Presets;
+        int32_t m_SelectedPreset = 0;
     };
 
 } // namespace tf3d::misc
