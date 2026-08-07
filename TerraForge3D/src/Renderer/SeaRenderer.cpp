@@ -148,6 +148,6 @@ namespace tf3d::renderer
     void SeaRenderer::ReloadShaders()
     {
         if (m_AppState != nullptr && m_AppState->resourceManager != nullptr)
-            m_Shader = m_AppState->resourceManager->LoadShader("sea", true);
+            m_Shader = m_AppState->resourceManager->LoadGraphicsShader("sea", true);
     }
 } // namespace tf3d::renderer

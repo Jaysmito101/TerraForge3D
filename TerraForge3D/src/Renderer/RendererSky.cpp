@@ -91,7 +91,7 @@ namespace tf3d::renderer
         m_SpecularMap    = m_AppState->resourceManager->LoadComputeShader("sky_specular_map/compute", true);
         m_IrradianceMap  = m_AppState->resourceManager->LoadComputeShader("sky_irradiance_map/compute", true);
         m_BrdfLut        = m_AppState->resourceManager->LoadComputeShader("sky_brdf_lut/compute", true);
-        m_SkyboxShader   = m_AppState->resourceManager->LoadShader("skybox", true);
+        m_SkyboxShader   = m_AppState->resourceManager->LoadGraphicsShader("skybox", true);
     }
 
     // From : https://github.com/Nadrin/PBR/blob/master/src/opengl.cpp

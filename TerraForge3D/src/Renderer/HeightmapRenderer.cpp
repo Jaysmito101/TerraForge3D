@@ -53,11 +53,11 @@ namespace tf3d::renderer
     {
         // if (m_Shader) delete m_Shader;
         // bool success = false;
-        // m_Shader = new Shader(
+        // m_Shader = new GraphicsShader(
         //	ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "heightmap_mode" PATH_SEPARATOR "vert.glsl", &success),
         //	ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "heightmap_mode" PATH_SEPARATOR "frag.glsl", &success)
         //);
 
-        m_Shader = m_AppState->resourceManager->LoadShader("heightmap_mode", true);
+        m_Shader = m_AppState->resourceManager->LoadGraphicsShader("heightmap_mode", true);
     }
 } // namespace tf3d::renderer

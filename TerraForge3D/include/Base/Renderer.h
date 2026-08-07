@@ -14,9 +14,9 @@ namespace tf3d::base
     namespace Renderer
     {
 
-        void RenderModel(Model *model, Camera *camera, FrameBuffer *framebuffer, Shader *shader, Texture2D *diffuse, glm::vec3 lightPosition, float *lightColor, float time);
+        void RenderModel(Model *model, Camera *camera, FrameBuffer *framebuffer, GraphicsShader *shader, Texture2D *diffuse, glm::vec3 lightPosition, float *lightColor, float time);
 
-        void RenderModels(std::vector<Model *> models, Camera *camera, FrameBuffer *framebuffer, Shader *shader, std::vector<Texture2D *> diffuse, glm::vec3 lightPosition, float *lightColor, float time);
+        void RenderModels(std::vector<Model *> models, Camera *camera, FrameBuffer *framebuffer, GraphicsShader *shader, std::vector<Texture2D *> diffuse, glm::vec3 lightPosition, float *lightColor, float time);
 
     } // namespace Renderer
 

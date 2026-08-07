@@ -68,7 +68,6 @@
 
 #include "Application.h"
 #include "Camera.h"
-#include "ComputeShader.h"
 #include "DataTexture.h"
 #include "EventManager.h"
 #include "ExportTexture.h"

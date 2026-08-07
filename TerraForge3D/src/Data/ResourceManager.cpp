@@ -190,26 +190,26 @@ namespace tf3d::data
         return shader;
     }
 
-    std::shared_ptr<Shader> ResourceManager::GetShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
+    std::shared_ptr<GraphicsShader> ResourceManager::GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
     {
         const auto formattedVertexSource   = InjectFieldFormatDefine(vertexSource);
         const auto formattedFragmentSource = InjectFieldFormatDefine(fragmentSource);
         auto hash                          = std::hash<std::string>{}(formattedVertexSource + formattedFragmentSource);
 
-        if (m_Shaders.find(name) != m_Shaders.end()) {
-            if (hash == m_Shaders[name].second) {
-                return m_Shaders[name].first;
+        if (m_GraphicsShaders.find(name) != m_GraphicsShaders.end()) {
+            if (hash == m_GraphicsShaders[name].second) {
+                return m_GraphicsShaders[name].first;
             }
         }
 
         TF3D_LOG_DEBUG("Compiling shader '{}'", name);
-        auto shader     = std::make_shared<Shader>(formattedVertexSource, formattedFragmentSource);
-        m_Shaders[name] = std::make_pair(shader, hash);
+        auto shader             = std::make_shared<GraphicsShader>(formattedVertexSource, formattedFragmentSource);
+        m_GraphicsShaders[name] = std::make_pair(shader, hash);
 
         return shader;
     }
 
-    std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string shader, bool forceReload, bool *successOut)
+    std::shared_ptr<GraphicsShader> ResourceManager::LoadGraphicsShader(const std::string shader, bool forceReload, bool *successOut)
     {
         bool success = false;
         if (!successOut)
@@ -223,7 +223,17 @@ namespace tf3d::data
         if (!*successOut)
             return nullptr;
 
-        return GetShader(shader, vertexSource, fragmentSource);
+        return GetGraphicsShader(shader, vertexSource, fragmentSource);
+    }
+
+    std::shared_ptr<GraphicsShader> ResourceManager::GetShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
+    {
+        return GetGraphicsShader(name, vertexSource, fragmentSource);
+    }
+
+    std::shared_ptr<GraphicsShader> ResourceManager::LoadShader(const std::string shader, bool forceReload, bool *successOut)
+    {
+        return LoadGraphicsShader(shader, forceReload, successOut);
     }
 
     std::shared_ptr<ComputeShader> ResourceManager::LoadComputeShader(const std::string shader, bool forceReload, bool *successOut)

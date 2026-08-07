@@ -20,10 +20,14 @@ namespace tf3d::data
         std::string LoadText(const std::string path, bool forceReload = false, bool *success = nullptr);
 
         std::shared_ptr<ComputeShader> GetComputeShader(const std::string name, const std::string source);
-        std::shared_ptr<Shader> GetShader(const std::string name, const std::string vertexSource, const std::string fragmentSource);
+        std::shared_ptr<GraphicsShader> GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource);
 
         std::shared_ptr<ComputeShader> LoadComputeShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
-        std::shared_ptr<Shader> LoadShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
+        std::shared_ptr<GraphicsShader> LoadGraphicsShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
+
+        // Compatibility names for callers that still use the old generic spelling.
+        std::shared_ptr<GraphicsShader> GetShader(const std::string name, const std::string vertexSource, const std::string fragmentSource);
+        std::shared_ptr<GraphicsShader> LoadShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
 
         static inline ResourceManager *GetInstance(ApplicationState *appState = nullptr)
         {
@@ -41,7 +45,7 @@ namespace tf3d::data
         ApplicationState *m_AppState = nullptr;
         std::unordered_map<std::string, std::string> m_TextResources;
         std::unordered_map<std::string, std::pair<std::shared_ptr<ComputeShader>, size_t>> m_ComputeShaders;
-        std::unordered_map<std::string, std::pair<std::shared_ptr<Shader>, size_t>> m_Shaders;
+        std::unordered_map<std::string, std::pair<std::shared_ptr<GraphicsShader>, size_t>> m_GraphicsShaders;
 
         static ResourceManager *m_Instance;
     };

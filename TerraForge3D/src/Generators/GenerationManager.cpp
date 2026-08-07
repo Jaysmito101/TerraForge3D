@@ -1,5 +1,5 @@
 #include "Generators/GenerationManager.h"
-#include "Base/ComputeShader.h"
+#include "Base/Shader.h"
 #include "Data/ApplicationState.h"
 #include "Data/ConfigManager.h"
 #include "Profiler.h"

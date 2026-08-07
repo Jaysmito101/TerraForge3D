@@ -215,7 +215,7 @@ namespace tf3d::renderer
 
     void ObjectRenderer::ReloadShaders()
     {
-        m_Shader            = m_AppState->resourceManager->LoadShader("object_mode", true);
-        m_PostProcessShader = m_AppState->resourceManager->LoadShader("post_process/base_surface", true);
+        m_Shader            = m_AppState->resourceManager->LoadGraphicsShader("object_mode", true);
+        m_PostProcessShader = m_AppState->resourceManager->LoadGraphicsShader("post_process/base_surface", true);
     }
 } // namespace tf3d::renderer

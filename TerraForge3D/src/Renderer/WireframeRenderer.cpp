@@ -45,7 +45,7 @@ namespace tf3d::renderer
 
     void WireframeRenderer::ReloadShaders()
     {
-        m_Shader = m_AppState->resourceManager->LoadShader("wireframe_mode", true);
+        m_Shader = m_AppState->resourceManager->LoadGraphicsShader("wireframe_mode", true);
     }
 
 } // namespace tf3d::renderer

@@ -7,15 +7,15 @@ namespace tf3d::base
     namespace Renderer
     {
 
-        void RenderModel(Model *model, Camera *camera, FrameBuffer *framebuffer, Shader *shader, Texture2D *diffuse, glm::vec3 lightPosition, float *lightColor, float time)
+        void RenderModel(Model *model, Camera *camera, FrameBuffer *framebuffer, GraphicsShader *shader, Texture2D *diffuse, glm::vec3 lightPosition, float *lightColor, float time)
         {
             framebuffer->Begin();
             shader->Bind();
-            shader->SetTime(&time);
-            shader->SetMPV(camera->GetProjectionViewMatrix());
+            shader->SetUniform1f("_Time", time);
+            shader->SetUniformMat4("_PV", camera->GetProjectionViewMatrix());
             shader->SetUniformMat4("_Model", model->modelMatrix);
-            shader->SetLightCol(lightColor);
-            shader->SetLightPos(lightPosition);
+            shader->SetUniform3f("_LightColor", lightColor);
+            shader->SetUniform3f("_LightPosition", lightPosition);
             float tmp[3];
             shader->SetUniform3f("_MousePos", tmp);
             tmp[0] = 800;
@@ -23,12 +23,12 @@ namespace tf3d::base
             tmp[2] = 1;
             shader->SetUniform3f("_Resolution", tmp);
             diffuse->Bind(5);
-            shader->SetUniformi("_Diffuse", 5);
+            shader->SetUniform1i("_Diffuse", 5);
             model->Render();
             framebuffer->End();
         }
 
-        void RenderModels(std::vector<Model *> models, Camera *camera, FrameBuffer *framebuffer, Shader *shader, std::vector<Texture2D *> diffuse, glm::vec3 lightPosition, float *lightColor, float time)
+        void RenderModels(std::vector<Model *> models, Camera *camera, FrameBuffer *framebuffer, GraphicsShader *shader, std::vector<Texture2D *> diffuse, glm::vec3 lightPosition, float *lightColor, float time)
         {
             if (models.size() != diffuse.size()) {
                 return;
@@ -38,11 +38,11 @@ namespace tf3d::base
 
             for (int i = 0; i < models.size(); i++) {
                 shader->Bind();
-                shader->SetTime(&time);
-                shader->SetMPV(camera->GetProjectionViewMatrix());
+                shader->SetUniform1f("_Time", time);
+                shader->SetUniformMat4("_PV", camera->GetProjectionViewMatrix());
                 shader->SetUniformMat4("_Model", models[i]->modelMatrix);
-                shader->SetLightCol(lightColor);
-                shader->SetLightPos(lightPosition);
+                shader->SetUniform3f("_LightColor", lightColor);
+                shader->SetUniform3f("_LightPosition", lightPosition);
                 float tmp[3];
                 shader->SetUniform3f("_MousePos", tmp);
                 tmp[0] = 800;
@@ -50,7 +50,7 @@ namespace tf3d::base
                 tmp[2] = 1;
                 shader->SetUniform3f("_Resolution", tmp);
                 diffuse[i]->Bind(5);
-                shader->SetUniformi("_Diffuse", 5);
+                shader->SetUniform1i("_Diffuse", 5);
                 models[i]->Render();
             }
 

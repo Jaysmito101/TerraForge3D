@@ -1,53 +1,147 @@
 #pragma once
 
+#include <glad/gl.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <unordered_map>
 
 namespace tf3d::base
 {
 
-    class Shader
+    class ShaderCore
     {
     public:
-        Shader(std::string vertexStc, std::string fragmentSrc, std::string geometrySource);
-        Shader(std::string vertexStc, std::string fragmentSrc);
+        virtual ~ShaderCore() = default;
 
-        ~Shader();
+        inline void Bind()
+        {
+            glUseProgram(m_Shader);
+        }
 
-        void Bind();
+        inline void Unbind()
+        {
+            glUseProgram(0);
+        }
 
-        void SetLightPos(glm::vec3 &);
-        void SetLightCol(float *);
-        void SetTime(float *);
-        void SetMPV(const glm::mat4 &);
-
-        void SetUniformf(const std::string &name, float value);
-        void SetUniform1f(const std::string &name, float value);
-        void SetUniform3f(const std::string &name, const float *value);
-        void SetUniform3f(const std::string &name, const glm::vec3 &value);
-        void SetUniform3f(const std::string &name, float value0, float value1, float value2);
-        void SetUniform2f(const std::string &name, float value0, float value1);
-        void SetUniform2f(const std::string &name, const glm::vec2 &value);
-        void SetUniform2i(const std::string &name, int value0, int value1);
-        void SetUniform4f(const std::string &name, float value0, float value1, float value2, float value3);
-        void SetUniformi(const std::string &name, int value);
-        void SetUniform1i(const std::string &name, int value);
-        void SetUniformMat4(const std::string &name, const glm::mat4 &value);
-
-        void Unbind();
-
-        inline int GetNativeShader()
+        inline int GetNativeShader() const
         {
             return m_Shader;
         }
 
-        int m_Shader = 0, m_UniformId = 0, m_LightPosUniformID = 0, m_LightColUniformID = 0, m_TimeUniformID = 0;
-        std::unordered_map<std::string, int> uniformLocations;
+        inline void SetUniform1f(const std::string &name, float value)
+        {
+            glUniform1f(GetUniformLocation(name), value);
+        }
 
-    private:
-        int GetUniformLocation(const std::string &name);
+        inline void SetUniform1fv(const std::string &name, const float *values, int count)
+        {
+            glUniform1fv(GetUniformLocation(name), count, values);
+        }
+
+        inline void SetUniform3f(const std::string &name, const float *value)
+        {
+            glUniform3f(GetUniformLocation(name), value[0], value[1], value[2]);
+        }
+
+        inline void SetUniform3f(const std::string &name, const glm::vec3 &value)
+        {
+            glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
+        }
+
+        inline void SetUniform3f(const std::string &name, float value0, float value1, float value2)
+        {
+            glUniform3f(GetUniformLocation(name), value0, value1, value2);
+        }
+
+        inline void SetUniform2f(const std::string &name, float value0, float value1)
+        {
+            glUniform2f(GetUniformLocation(name), value0, value1);
+        }
+
+        inline void SetUniform2f(const std::string &name, const glm::vec2 &value)
+        {
+            SetUniform2f(name, value.x, value.y);
+        }
+
+        inline void SetUniform2i(const std::string &name, int value0, int value1)
+        {
+            glUniform2i(GetUniformLocation(name), value0, value1);
+        }
+
+        inline void SetUniform4f(const std::string &name, const glm::vec4 &value)
+        {
+            glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+        }
+
+        inline void SetUniform4f(const std::string &name, float value0, float value1, float value2, float value3)
+        {
+            glUniform4f(GetUniformLocation(name), value0, value1, value2, value3);
+        }
+
+        inline void SetUniform1i(const std::string &name, int value)
+        {
+            glUniform1i(GetUniformLocation(name), value);
+        }
+
+        inline void SetUniformMat4(const std::string &name, const glm::mat4 &value)
+        {
+            glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+        }
+
+        inline int GetUniformLocation(const std::string &name)
+        {
+            const auto iterator = uniformLocations.find(name);
+            if (iterator != uniformLocations.end())
+                return iterator->second;
+
+            const int location = glGetUniformLocation(m_Shader, name.c_str());
+            uniformLocations.emplace(name, location);
+            return location;
+        }
+
+    protected:
+        ShaderCore() = default;
+
+        int m_Shader = 0;
+        std::unordered_map<std::string, int> uniformLocations;
     };
 
+    class GraphicsShader : public ShaderCore
+    {
+    public:
+        GraphicsShader(std::string vertexSource, std::string fragmentSource, std::string geometrySource);
+        GraphicsShader(std::string vertexSource, std::string fragmentSource);
+
+        ~GraphicsShader() override;
+    };
+
+    class ComputeShader : public ShaderCore
+    {
+    public:
+        ComputeShader(std::string source);
+        ~ComputeShader() override;
+
+        inline void Dispatch(int x, int y, int z)
+        {
+            glDispatchCompute(x, y, z);
+        }
+
+        inline void SetMemoryBarrier()
+        {
+            glMemoryBarrier(GL_ALL_BARRIER_BITS);
+        }
+
+    private:
+        int maxWorkGroupCount[3], maxWorkGroupSize[3], maxWorkGroupInvocations;
+    };
+
+    // Backward-compatible name for the normal graphics shader.
+    using Shader = GraphicsShader;
+
 } // namespace tf3d::base
+
+using tf3d::base::ComputeShader;
+using tf3d::base::GraphicsShader;
 using tf3d::base::Shader;
+using tf3d::base::ShaderCore;

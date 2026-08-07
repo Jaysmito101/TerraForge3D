@@ -49,7 +49,7 @@ namespace tf3d::renderer
 
     void TextureSlotRenderer::ReloadShaders()
     {
-        m_Shader = m_AppState->resourceManager->LoadShader("texture_slot_mode", true);
+        m_Shader = m_AppState->resourceManager->LoadGraphicsShader("texture_slot_mode", true);
     }
 
 } // namespace tf3d::renderer
