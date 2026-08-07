@@ -1,107 +1,125 @@
 {
-    "ID": "clip",
-    "Name": "Clip",
-    "Category": "Shaping",
-    "Implementation": "PhaseChain",
-    "Description": "Clips terrain values from the bottom or top with an IQ-style smooth minimum or maximum around the threshold.",
-    "Statistics": {
-        "NeedsMinMax": true,
-        "NeedsHistogram": true,
-        "RequestedPercentileParameter": "Threshold"
-    },
-    "Phases": {
-        "Clip": "clip",
-        "Merge": "../../common/merge"
-    },
-    "Resources": {
-        "Temps": [
-            {
-                "Name": "Clipped",
-                "Type": "Field"
-            }
-        ]
-    },
-    "Execution": {
-        "Passes": [
-            {
-                "Phase": "Clip",
-                "Input": "Current",
-                "Output": "Clipped",
-                "Uniforms": {
-                    "u_Threshold": {
-                        "Parameter": "Threshold"
-                    },
-                    "u_Side": {
-                        "Parameter": "Side"
-                    },
-                    "u_Softness": {
-                        "Parameter": "Softness"
-                    },
-                    "u_ThresholdMode": {
-                        "Parameter": "ThresholdMode"
-                    }
-                }
-            }
-        ],
-        "Merge": {
-            "Phase": "Merge",
-            "Input": "Current",
-            "Operation": "Clipped",
-            "Output": "Next"
-        }
-    },
-    "Params": [
-        {
-            "Name": "Side",
-            "Type": "Int",
-            "Default": 0,
-            "Widget": "Dropdown",
-            "Options": [
-                "Bottom",
-                "Top"
-            ],
-            "Label": "Clip side",
-            "Description": "Selects whether values below or above the threshold are clipped."
-        },
-        {
-            "Name": "ThresholdMode",
-            "Type": "Int",
-            "Default": 0,
-            "Widget": "Dropdown",
-            "Options": [
-                "Absolute",
-                "Normalized range",
-                "Percentile"
-            ],
-            "Label": "Threshold mode",
-            "Description": "Chooses whether Threshold is an absolute height, a normalized position in the field range, or a histogram percentile."
-        },
-        {
-            "Name": "Threshold",
-            "Type": "Float",
-            "Default": 0.5,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                -100,
-                100
-            ],
-            "Label": "Threshold",
-            "Description": "The height at which clipping begins.",
-            "Tooltip": "Bottom clipping raises values below the threshold; top clipping lowers values above it."
-        },
-        {
-            "Name": "Softness",
-            "Type": "Float",
-            "Default": 0.05,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1
-            ],
-            "Label": "Softness",
-            "Description": "Blend width used by the smooth minimum or maximum around the threshold.",
-            "Tooltip": "Zero creates a hard min/max clip. Larger values make the transition smoother."
-        }
+  "ID": "clip",
+  "Name": "Clip",
+  "Category": "Shaping",
+  "Implementation": "PhaseChain",
+  "Description": "Clips terrain values from the bottom or top with an IQ-style smooth minimum or maximum around the threshold.",
+  "Statistics": {
+    "NeedsMinMax": true,
+    "NeedsHistogram": true,
+    "RequestedPercentileParameter": "Threshold"
+  },
+  "Phases": {
+    "Clip": "clip",
+    "Merge": "../../common/merge"
+  },
+  "Resources": {
+    "Temps": [
+      {
+        "Name": "Clipped",
+        "Type": "Field"
+      }
     ]
+  },
+  "Execution": {
+    "Passes": [
+      {
+        "Phase": "Clip",
+        "Input": "Current",
+        "Output": "Clipped",
+        "Uniforms": {
+          "u_Threshold": {
+            "Parameter": "Threshold"
+          },
+          "u_Side": {
+            "Parameter": "Side"
+          },
+          "u_Softness": {
+            "Parameter": "Softness"
+          },
+          "u_ThresholdMode": {
+            "Parameter": "ThresholdMode"
+          }
+        }
+      }
+    ],
+    "Merge": {
+      "Phase": "Merge",
+      "Input": "Current",
+      "Operation": "Clipped",
+      "Output": "Next"
+    }
+  },
+  "Sections": [
+    {
+      "Name": "Direction",
+      "Label": "Direction",
+      "Description": "Direction and side selection.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Side",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Dropdown",
+          "Options": [
+            "Bottom",
+            "Top"
+          ],
+          "Label": "Clip side",
+          "Description": "Selects whether values below or above the threshold are clipped."
+        }
+      ]
+    },
+    {
+      "Name": "Threshold",
+      "Label": "Threshold",
+      "Description": "Threshold and transition controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "ThresholdMode",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Dropdown",
+          "Options": [
+            "Absolute",
+            "Normalized range",
+            "Percentile"
+          ],
+          "Label": "Threshold mode",
+          "Description": "Chooses whether Threshold is an absolute height, a normalized position in the field range, or a histogram percentile."
+        },
+        {
+          "Name": "Threshold",
+          "Type": "Float",
+          "Default": 0.5,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -100,
+            100
+          ],
+          "Label": "Threshold",
+          "Description": "The height at which clipping begins.",
+          "Tooltip": "Bottom clipping raises values below the threshold; top clipping lowers values above it."
+        },
+        {
+          "Name": "Softness",
+          "Type": "Float",
+          "Default": 0.05,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Softness",
+          "Description": "Blend width used by the smooth minimum or maximum around the threshold.",
+          "Tooltip": "Zero creates a hard min/max clip. Larger values make the transition smoother."
+        }
+      ]
+    }
+  ]
 }

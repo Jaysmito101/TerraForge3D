@@ -1,70 +1,79 @@
 {
-    "ID": "smoothen",
-    "Name": "Smoothen",
-    "Category": "Shaping",
-    "Implementation": "PhaseChain",
-    "Description": "Applies a power curve followed by smoothstep, with an optional absolute-value step and no upward value overshoot.",
-    "Statistics": {
-        "NeedsMinMax": true,
-        "NeedsHistogram": false
-    },
-    "Phases": {
-        "Smoothen": "smoothen",
-        "Merge": "../../common/merge"
-    },
-    "Resources": {
-        "Temps": [
-            {
-                "Name": "Smoothened",
-                "Type": "Field"
-            }
-        ]
-    },
-    "Execution": {
-        "Passes": [
-            {
-                "Phase": "Smoothen",
-                "Input": "Current",
-                "Output": "Smoothened",
-                "Uniforms": {
-                    "u_Exponent": {
-                        "Parameter": "Smoothing"
-                    },
-                    "u_Abs": {
-                        "Parameter": "Abs"
-                    }
-                }
-            }
-        ],
-        "Merge": {
-            "Phase": "Merge",
-            "Input": "Current",
-            "Operation": "Smoothened",
-            "Output": "Next"
+  "ID": "smoothen",
+  "Name": "Smoothen",
+  "Category": "Shaping",
+  "Implementation": "PhaseChain",
+  "Description": "Applies a power curve followed by smoothstep, with an optional absolute-value step and no upward value overshoot.",
+  "Statistics": {
+    "NeedsMinMax": true,
+    "NeedsHistogram": false
+  },
+  "Phases": {
+    "Smoothen": "smoothen",
+    "Merge": "../../common/merge"
+  },
+  "Resources": {
+    "Temps": [
+      {
+        "Name": "Smoothened",
+        "Type": "Field"
+      }
+    ]
+  },
+  "Execution": {
+    "Passes": [
+      {
+        "Phase": "Smoothen",
+        "Input": "Current",
+        "Output": "Smoothened",
+        "Uniforms": {
+          "u_Exponent": {
+            "Parameter": "Smoothing"
+          },
+          "u_Abs": {
+            "Parameter": "Abs"
+          }
         }
-    },
-    "Params": [
+      }
+    ],
+    "Merge": {
+      "Phase": "Merge",
+      "Input": "Current",
+      "Operation": "Smoothened",
+      "Output": "Next"
+    }
+  },
+  "Sections": [
+    {
+      "Name": "Smoothing",
+      "Label": "Smoothing",
+      "Description": "Filter strength and iteration controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
         {
-            "Name": "Smoothing",
-            "Type": "Float",
-            "Default": 2,
-            "Widget": "Slider",
-            "Constraints": [
-                1.0,
-                4.0
-            ],
-            "Label": "Exponent",
-            "Description": "Power applied to each input value before smoothstep.",
-            "Tooltip": "Values above 1 push values in the 0-1 range toward zero. The final result never exceeds the processed input."
+          "Name": "Smoothing",
+          "Type": "Float",
+          "Default": 2,
+          "Widget": "Slider",
+          "Constraints": [
+            1.0,
+            4.0
+          ],
+          "Label": "Exponent",
+          "Description": "Power applied to each input value before smoothstep.",
+          "Tooltip": "Values above 1 push values in the 0-1 range toward zero. The final result never exceeds the processed input."
         },
         {
-            "Name": "Abs",
-            "Type": "Bool",
-            "Default": false,
-            "Widget": "Checkbox",
-            "Label": "Absolute input",
-            "Description": "Applies absolute value before raising the input to the exponent.",
-            "Tooltip": "Useful when the sign should not affect the power operation."
+          "Name": "Abs",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Absolute input",
+          "Description": "Applies absolute value before raising the input to the exponent.",
+          "Tooltip": "Useful when the sign should not affect the power operation."
         }
-    ]
+      ]
+    }
+  ]
 }

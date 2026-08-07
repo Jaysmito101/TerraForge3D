@@ -1,73 +1,100 @@
 {
-    "ID": "curve",
-    "Name": "Curve Remap",
-    "Category": "Shaping",
-    "Implementation": "PhaseChain",
-    "DefaultMergeMode": "Override",
-    "Description": "Remaps the current noise values through a normalized 2D curve while preserving the field's min/max range.",
-    "Statistics": {
-        "NeedsMinMax": true,
-        "NeedsHistogram": false
-    },
-    "Phases": {
-        "Curve": "curve",
-        "Merge": "../../common/merge"
-    },
-    "Resources": {
-        "Temps": [
-            {
-                "Name": "Curved",
-                "Type": "Field"
-            }
-        ]
-    },
-    "Execution": {
-        "Passes": [
-            {
-                "Phase": "Curve",
-                "Input": "Current",
-                "Output": "Curved",
-                "Uniforms": {
-                    "u_Curve": {
-                        "Parameter": "Curve",
-                        "PointCountUniform": "u_CurvePointCount"
-                    },
-                    "u_Softness": {
-                        "Parameter": "Softness"
-                    }
-                }
-            }
-        ],
-        "Merge": {
-            "Phase": "Merge",
-            "Input": "Current",
-            "Operation": "Curved",
-            "Output": "Next"
-        }
-    },
-    "Params": [
-        {
-            "Name": "Curve",
-            "Type": "Curve",
-            "PointCount": 2,
-            "Default": [
-                [0.0, 0.0],
-                [1.0, 1.0]
-            ],
-            "Widget": "Curve",
-            "Label": "Noise curve",
-            "Description": "Maps normalized input noise on the horizontal axis to normalized output noise on the vertical axis.",
-            "Tooltip": "Drag points to reshape the field. The default diagonal leaves the input unchanged; the result is mapped back to the current field min/max range."
-        },
-        {
-            "Name": "Softness",
-            "Type": "Float",
-            "Default": 0.0,
-            "Widget": "Slider",
-            "Constraints": [0.0, 1.0],
-            "Label": "Softness",
-            "Description": "Blends each straight segment toward a stronger smootherstep transition between its control points.",
-            "Tooltip": "Zero keeps the control points piecewise-linear. Higher values create a more pronounced eased transition while still passing through every control point."
-        }
+  "ID": "curve",
+  "Name": "Curve Remap",
+  "Category": "Shaping",
+  "Implementation": "PhaseChain",
+  "DefaultMergeMode": "Override",
+  "Description": "Remaps the current noise values through a normalized 2D curve while preserving the field's min/max range.",
+  "Statistics": {
+    "NeedsMinMax": true,
+    "NeedsHistogram": false
+  },
+  "Phases": {
+    "Curve": "curve",
+    "Merge": "../../common/merge"
+  },
+  "Resources": {
+    "Temps": [
+      {
+        "Name": "Curved",
+        "Type": "Field"
+      }
     ]
+  },
+  "Execution": {
+    "Passes": [
+      {
+        "Phase": "Curve",
+        "Input": "Current",
+        "Output": "Curved",
+        "Uniforms": {
+          "u_Curve": {
+            "Parameter": "Curve",
+            "PointCountUniform": "u_CurvePointCount"
+          },
+          "u_Softness": {
+            "Parameter": "Softness"
+          }
+        }
+      }
+    ],
+    "Merge": {
+      "Phase": "Merge",
+      "Input": "Current",
+      "Operation": "Curved",
+      "Output": "Next"
+    }
+  },
+  "Sections": [
+    {
+      "Name": "Curve",
+      "Label": "Curve",
+      "Description": "Curve remapping controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Curve",
+          "Type": "Curve",
+          "PointCount": 2,
+          "Default": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ],
+          "Widget": "Curve",
+          "Label": "Noise curve",
+          "Description": "Maps normalized input noise on the horizontal axis to normalized output noise on the vertical axis.",
+          "Tooltip": "Drag points to reshape the field. The default diagonal leaves the input unchanged; the result is mapped back to the current field min/max range."
+        }
+      ]
+    },
+    {
+      "Name": "Falloff",
+      "Label": "Falloff",
+      "Description": "Falloff and edge transition controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Softness",
+          "Type": "Float",
+          "Default": 0.0,
+          "Widget": "Slider",
+          "Constraints": [
+            0.0,
+            1.0
+          ],
+          "Label": "Softness",
+          "Description": "Blends each straight segment toward a stronger smootherstep transition between its control points.",
+          "Tooltip": "Zero keeps the control points piecewise-linear. Higher values create a more pronounced eased transition while still passing through every control point."
+        }
+      ]
+    }
+  ]
 }

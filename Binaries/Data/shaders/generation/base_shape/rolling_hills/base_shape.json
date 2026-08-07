@@ -1,199 +1,235 @@
 {
-    "Name": "Rolling Hills",
-    "Params": [
+  "Name": "Rolling Hills",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
         {
-            "Name": "NoiseAlgorithm",
-            "Type": "Int",
-            "Default": "Simplex",
-            "Widget": "Dropdown",
-            "Label": "Noise Algorithm",
-            "Description": "Chooses the noise that shapes the rolling hill crests, valleys, and broad terrain flow."
+          "Name": "NoiseAlgorithm",
+          "Type": "Int",
+          "Default": "Simplex",
+          "Widget": "Dropdown",
+          "Label": "Noise Algorithm",
+          "Description": "Chooses the noise that shapes the rolling hill crests, valleys, and broad terrain flow."
         },
         {
-            "Name": "NoiseScale",
-            "Type": "Float",
-            "Default": 1.0,
-            "Widget": "Drag",
-            "Sensitivity": 0.00025,
-            "Constraints": [
-                0.001,
-                64
-            ],
-            "Label": "Noise Scale",
-            "Description": "Sets the spacing of the broad hills and the size of their surface variation.",
-            "Tooltip": "Higher values create more closely spaced hill features."
+          "Name": "NoiseScale",
+          "Type": "Float",
+          "Default": 1.0,
+          "Widget": "Drag",
+          "Sensitivity": 0.00025,
+          "Constraints": [
+            0.001,
+            64
+          ],
+          "Label": "Noise Scale",
+          "Description": "Sets the spacing of the broad hills and the size of their surface variation.",
+          "Tooltip": "Higher values create more closely spaced hill features."
         },
         {
-            "Name": "NoiseSeed",
-            "Type": "Int",
-            "Default": 0,
-            "Widget": "Input",
-            "Label": "Noise Seed",
-            "Description": "Rearranges the hill crests and valleys without changing the terrain scale.",
-            "Tooltip": "Use a new seed for a different rolling landscape."
+          "Name": "NoiseSeed",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Input",
+          "Label": "Noise Seed",
+          "Description": "Rearranges the hill crests and valleys without changing the terrain scale.",
+          "Tooltip": "Use a new seed for a different rolling landscape."
         },
         {
-            "Name": "NoiseWarp",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4
-            ],
-            "Label": "Noise Warp",
-            "Description": "Bends hill crests and valleys so the terrain flows less evenly.",
-            "Tooltip": "Increase it for more organic rolling contours."
+          "Name": "NoiseWarp",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4
+          ],
+          "Label": "Noise Warp",
+          "Description": "Bends hill crests and valleys so the terrain flows less evenly.",
+          "Tooltip": "Increase it for more organic rolling contours."
         },
         {
-            "Name": "NoiseJitter",
-            "Type": "Float",
-            "Default": 0.75,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1
-            ],
-            "Label": "Noise Jitter",
-            "Description": "Offsets cellular feature points in rolling-hill surface detail.",
-            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local hill variation placement.",
-            "Conditional": "NoiseAlgorithm",
-            "ConditionalValues": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-            ]
-        },
-        {
-            "Name": "Strength",
-            "Type": "Float",
-            "Default": 0.8,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Scales the overall height amplitude of the generated shape.",
-            "Tooltip": "Adjust the overall strength of this base shape."
-        },
-        {
-            "Name": "Scale",
-            "Type": "Float",
-            "Default": 1.2,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0.001,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls the scale of the coordinate space used by the shape.",
-            "Tooltip": "Higher values generally create smaller, more frequent features."
-        },
-        {
-            "Name": "Octaves",
-            "Type": "Int",
-            "Default": 5,
-            "Widget": "Slider",
-            "Constraints": [
-                1,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls how many noise octaves contribute to the shape.",
-            "Tooltip": "More octaves add finer detail and increase generation cost."
-        },
-        {
-            "Name": "Persistence",
-            "Type": "Float",
-            "Default": 0.5,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                0.95,
-                0,
-                0
-            ],
-            "Description": "Controls how strongly successive noise octaves retain their amplitude.",
-            "Tooltip": "Higher values preserve more high-frequency detail."
-        },
-        {
-            "Name": "Lacunarity",
-            "Type": "Float",
-            "Default": 2,
-            "Widget": "Slider",
-            "Constraints": [
-                1,
-                4,
-                0,
-                0
-            ],
-            "Description": "Controls how quickly the frequency changes between noise octaves.",
-            "Tooltip": "Higher values spread the octave frequencies farther apart."
-        },
-        {
-            "Name": "RidgeAmount",
-            "Label": "Ridge Amount",
-            "Type": "Float",
-            "Default": 0.15,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1,
-                0,
-                0
-            ],
-            "Tooltip": "Increase this value for more pronounced ridge structure.",
-            "Description": "Controls how strongly the terrain is biased toward ridges."
-        },
-        {
-            "Name": "Seed",
-            "Type": "Int",
-            "Default": 42,
-            "Widget": "Seed",
-            "Description": "Selects the deterministic random pattern used by the generator.",
-            "Tooltip": "Change the seed to create a different reproducible layout."
-        },
-        {
-            "Name": "Offset",
-            "Type": "Vector2",
-            "Default": [
-                0,
-                0
-            ],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                -8,
-                8,
-                0,
-                0
-            ],
-            "Description": "Translates the sampling coordinates without changing the shape's scale.",
-            "Tooltip": "Use the offset to move through the procedural field."
-        },
-        {
-            "Name": "Rotation",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Slider",
-            "Constraints": [
-                -180,
-                180,
-                0,
-                0
-            ],
-            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-            "Tooltip": "Use rotation to change the direction of directional features."
+          "Name": "NoiseJitter",
+          "Type": "Float",
+          "Default": 0.75,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Noise Jitter",
+          "Description": "Offsets cellular feature points in rolling-hill surface detail.",
+          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local hill variation placement.",
+          "Conditional": "NoiseAlgorithm",
+          "ConditionalValues": [
+            "Gabor",
+            "Voronoi",
+            "Worley"
+          ]
         }
-    ],
-    "ID": "rolling_hills",
-    "Description": "Generates a rolling hills-style procedural base shape with controls for its main form and variation.",
-    "Shader": "shape.glsl"
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 0.8,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Scales the overall height amplitude of the generated shape.",
+          "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 1.2,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the scale of the coordinate space used by the shape.",
+          "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+          "Name": "Persistence",
+          "Type": "Float",
+          "Default": 0.5,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            0.95,
+            0,
+            0
+          ],
+          "Description": "Controls how strongly successive noise octaves retain their amplitude.",
+          "Tooltip": "Higher values preserve more high-frequency detail."
+        },
+        {
+          "Name": "Lacunarity",
+          "Type": "Float",
+          "Default": 2,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            4,
+            0,
+            0
+          ],
+          "Description": "Controls how quickly the frequency changes between noise octaves.",
+          "Tooltip": "Higher values spread the octave frequencies farther apart."
+        },
+        {
+          "Name": "RidgeAmount",
+          "Label": "Ridge Amount",
+          "Type": "Float",
+          "Default": 0.15,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "Tooltip": "Increase this value for more pronounced ridge structure.",
+          "Description": "Controls how strongly the terrain is biased toward ridges."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Octaves",
+          "Type": "Int",
+          "Default": 5,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls how many noise octaves contribute to the shape.",
+          "Tooltip": "More octaves add finer detail and increase generation cost."
+        },
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 42,
+          "Widget": "Seed",
+          "Description": "Selects the deterministic random pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible layout."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector2",
+          "Default": [
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -8,
+            8,
+            0,
+            0
+          ],
+          "Description": "Translates the sampling coordinates without changing the shape's scale.",
+          "Tooltip": "Use the offset to move through the procedural field."
+        },
+        {
+          "Name": "Rotation",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Slider",
+          "Constraints": [
+            -180,
+            180,
+            0,
+            0
+          ],
+          "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+          "Tooltip": "Use rotation to change the direction of directional features."
+        }
+      ]
+    }
+  ],
+  "ID": "rolling_hills",
+  "Description": "Generates a rolling hills-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
 }

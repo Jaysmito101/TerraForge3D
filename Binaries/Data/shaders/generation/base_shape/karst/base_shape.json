@@ -1,186 +1,222 @@
 {
-    "Name": "Karst",
-    "Params": [
+  "Name": "Karst",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
         {
-            "Name": "NoiseAlgorithm",
-            "Type": "Int",
-            "Default": "Simplex",
-            "Widget": "Dropdown",
-            "Label": "Noise Algorithm",
-            "Description": "Chooses the noise that breaks up karst ridges, hollows, and the low areas between them."
+          "Name": "NoiseAlgorithm",
+          "Type": "Int",
+          "Default": "Simplex",
+          "Widget": "Dropdown",
+          "Label": "Noise Algorithm",
+          "Description": "Chooses the noise that breaks up karst ridges, hollows, and the low areas between them."
         },
         {
-            "Name": "NoiseScale",
-            "Type": "Float",
-            "Default": 0.15,
-            "Widget": "Drag",
-            "Sensitivity": 0.00025,
-            "Constraints": [
-                0.001,
-                64
-            ],
-            "Label": "Noise Scale",
-            "Description": "Sets the size of karst surface breakup and the spacing of its hollows.",
-            "Tooltip": "Higher values create more closely spaced karst features."
+          "Name": "NoiseScale",
+          "Type": "Float",
+          "Default": 0.15,
+          "Widget": "Drag",
+          "Sensitivity": 0.00025,
+          "Constraints": [
+            0.001,
+            64
+          ],
+          "Label": "Noise Scale",
+          "Description": "Sets the size of karst surface breakup and the spacing of its hollows.",
+          "Tooltip": "Higher values create more closely spaced karst features."
         },
         {
-            "Name": "NoiseSeed",
-            "Type": "Int",
-            "Default": 0,
-            "Widget": "Input",
-            "Label": "Noise Seed",
-            "Description": "Rearranges karst ridges and hollows without changing their overall scale.",
-            "Tooltip": "Use a new seed for a different karst pattern."
+          "Name": "NoiseSeed",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Input",
+          "Label": "Noise Seed",
+          "Description": "Rearranges karst ridges and hollows without changing their overall scale.",
+          "Tooltip": "Use a new seed for a different karst pattern."
         },
         {
-            "Name": "NoiseWarp",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4
-            ],
-            "Label": "Noise Warp",
-            "Description": "Bends the karst field so ridges and hollows flow in less regular paths.",
-            "Tooltip": "Increase it for more natural, weathered karst shapes."
+          "Name": "NoiseWarp",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4
+          ],
+          "Label": "Noise Warp",
+          "Description": "Bends the karst field so ridges and hollows flow in less regular paths.",
+          "Tooltip": "Increase it for more natural, weathered karst shapes."
         },
         {
-            "Name": "NoiseJitter",
-            "Type": "Float",
-            "Default": 0.75,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1
-            ],
-            "Label": "Noise Jitter",
-            "Description": "Offsets cellular feature points in karst hollows and ridge breakup.",
-            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local karst feature placement.",
-            "Conditional": "NoiseAlgorithm",
-            "ConditionalValues": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-            ]
-        },
-        {
-            "Name": "Strength",
-            "Type": "Float",
-            "Default": 1,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Scales the overall height amplitude of the generated shape.",
-            "Tooltip": "Adjust the overall strength of this base shape."
-        },
-        {
-            "Name": "Scale",
-            "Type": "Float",
-            "Default": 2,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0.1,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls the scale of the coordinate space used by the shape.",
-            "Tooltip": "Higher values generally create smaller, more frequent features."
-        },
-        {
-            "Name": "CavitySize",
-            "Label": "Cavity Size",
-            "Type": "Float",
-            "Default": 0.4,
-            "Widget": "Slider",
-            "Constraints": [
-                0.08,
-                0.85,
-                0,
-                0
-            ],
-            "Description": "Controls the size of the generated cavities.",
-            "Tooltip": "Increase cavity size for broader depressions."
-        },
-        {
-            "Name": "CavityDepth",
-            "Label": "Cavity Depth",
-            "Type": "Float",
-            "Default": 0.65,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1,
-                0,
-                0
-            ],
-            "Description": "Controls the depth of the generated cavities.",
-            "Tooltip": "Increase cavity depth for stronger karst relief."
-        },
-        {
-            "Name": "Softness",
-            "Type": "Float",
-            "Default": 0.8,
-            "Widget": "Slider",
-            "Constraints": [
-                0.5,
-                2.0,
-                0,
-                0
-            ],
-            "Description": "Controls the softness of cavity and region transitions.",
-            "Tooltip": "Higher values create smoother boundaries."
-        },
-        {
-            "Name": "Seed",
-            "Type": "Int",
-            "Default": 42,
-            "Widget": "Seed",
-            "Description": "Selects the deterministic random pattern used by the generator.",
-            "Tooltip": "Change the seed to create a different reproducible layout."
-        },
-        {
-            "Name": "Offset",
-            "Type": "Vector2",
-            "Default": [
-                0,
-                0
-            ],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                -8,
-                8,
-                0,
-                0
-            ],
-            "Description": "Translates the sampling coordinates without changing the shape's scale.",
-            "Tooltip": "Use the offset to move through the procedural field."
-        },
-        {
-            "Name": "Rotation",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Slider",
-            "Constraints": [
-                -180,
-                180,
-                0,
-                0
-            ],
-            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-            "Tooltip": "Use rotation to change the direction of directional features."
+          "Name": "NoiseJitter",
+          "Type": "Float",
+          "Default": 0.75,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Noise Jitter",
+          "Description": "Offsets cellular feature points in karst hollows and ridge breakup.",
+          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local karst feature placement.",
+          "Conditional": "NoiseAlgorithm",
+          "ConditionalValues": [
+            "Gabor",
+            "Voronoi",
+            "Worley"
+          ]
         }
-    ],
-    "ID": "karst",
-    "Description": "Generates a karst-style procedural base shape with controls for its main form and variation.",
-    "Shader": "shape.glsl"
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Scales the overall height amplitude of the generated shape.",
+          "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 2,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.1,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the scale of the coordinate space used by the shape.",
+          "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+          "Name": "CavitySize",
+          "Label": "Cavity Size",
+          "Type": "Float",
+          "Default": 0.4,
+          "Widget": "Slider",
+          "Constraints": [
+            0.08,
+            0.85,
+            0,
+            0
+          ],
+          "Description": "Controls the size of the generated cavities.",
+          "Tooltip": "Increase cavity size for broader depressions."
+        },
+        {
+          "Name": "CavityDepth",
+          "Label": "Cavity Depth",
+          "Type": "Float",
+          "Default": 0.65,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "Description": "Controls the depth of the generated cavities.",
+          "Tooltip": "Increase cavity depth for stronger karst relief."
+        },
+        {
+          "Name": "Softness",
+          "Type": "Float",
+          "Default": 0.8,
+          "Widget": "Slider",
+          "Constraints": [
+            0.5,
+            2.0,
+            0,
+            0
+          ],
+          "Description": "Controls the softness of cavity and region transitions.",
+          "Tooltip": "Higher values create smoother boundaries."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 42,
+          "Widget": "Seed",
+          "Description": "Selects the deterministic random pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible layout."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector2",
+          "Default": [
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -8,
+            8,
+            0,
+            0
+          ],
+          "Description": "Translates the sampling coordinates without changing the shape's scale.",
+          "Tooltip": "Use the offset to move through the procedural field."
+        },
+        {
+          "Name": "Rotation",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Slider",
+          "Constraints": [
+            -180,
+            180,
+            0,
+            0
+          ],
+          "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+          "Tooltip": "Use rotation to change the direction of directional features."
+        }
+      ]
+    }
+  ],
+  "ID": "karst",
+  "Description": "Generates a karst-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
 }

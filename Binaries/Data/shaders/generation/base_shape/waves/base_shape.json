@@ -1,200 +1,236 @@
 {
-    "Name": "Waves",
-    "Params": [
+  "Name": "Waves",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
         {
-            "Name": "NoiseAlgorithm",
-            "Type": "Int",
-            "Default": "Simplex",
-            "Widget": "Dropdown",
-            "Label": "Noise Algorithm",
-            "Description": "Chooses the noise that modulates wave height, direction, and phase variation."
+          "Name": "NoiseAlgorithm",
+          "Type": "Int",
+          "Default": "Simplex",
+          "Widget": "Dropdown",
+          "Label": "Noise Algorithm",
+          "Description": "Chooses the noise that modulates wave height, direction, and phase variation."
         },
         {
-            "Name": "NoiseScale",
-            "Type": "Float",
-            "Default": 0.15,
-            "Widget": "Drag",
-            "Sensitivity": 0.00025,
-            "Constraints": [
-                0.001,
-                64
-            ],
-            "Label": "Noise Scale",
-            "Description": "Sets the size of wave distortion and the noise that shifts wave phase.",
-            "Tooltip": "Higher values create more closely spaced wave variation."
+          "Name": "NoiseScale",
+          "Type": "Float",
+          "Default": 0.15,
+          "Widget": "Drag",
+          "Sensitivity": 0.00025,
+          "Constraints": [
+            0.001,
+            64
+          ],
+          "Label": "Noise Scale",
+          "Description": "Sets the size of wave distortion and the noise that shifts wave phase.",
+          "Tooltip": "Higher values create more closely spaced wave variation."
         },
         {
-            "Name": "NoiseSeed",
-            "Type": "Int",
-            "Default": 0,
-            "Widget": "Input",
-            "Label": "Noise Seed",
-            "Description": "Rearranges wave distortion and phase variation without changing the main wave scale.",
-            "Tooltip": "Use a new seed for a different wave surface."
+          "Name": "NoiseSeed",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Input",
+          "Label": "Noise Seed",
+          "Description": "Rearranges wave distortion and phase variation without changing the main wave scale.",
+          "Tooltip": "Use a new seed for a different wave surface."
         },
         {
-            "Name": "NoiseWarp",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4
-            ],
-            "Label": "Noise Warp",
-            "Description": "Bends wave bands and phase sampling so the waves do not remain perfectly uniform.",
-            "Tooltip": "Increase it for more natural, disturbed wave patterns."
+          "Name": "NoiseWarp",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4
+          ],
+          "Label": "Noise Warp",
+          "Description": "Bends wave bands and phase sampling so the waves do not remain perfectly uniform.",
+          "Tooltip": "Increase it for more natural, disturbed wave patterns."
         },
         {
-            "Name": "NoiseJitter",
-            "Type": "Float",
-            "Default": 0.75,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1
-            ],
-            "Label": "Noise Jitter",
-            "Description": "Offsets cellular feature points in wave distortion and phase detail.",
-            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local wave variation placement.",
-            "Conditional": "NoiseAlgorithm",
-            "ConditionalValues": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-            ]
-        },
-        {
-            "Name": "Strength",
-            "Type": "Float",
-            "Default": 0.7,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Scales the overall height amplitude of the generated shape.",
-            "Tooltip": "Adjust the overall strength of this base shape."
-        },
-        {
-            "Name": "Scale",
-            "Type": "Float",
-            "Default": 1,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0.001,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls the scale of the coordinate space used by the shape.",
-            "Tooltip": "Higher values generally create smaller, more frequent features."
-        },
-        {
-            "Name": "Wavelength",
-            "Type": "Float",
-            "Default": 3.5,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0.2,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls the distance between repeating wave crests.",
-            "Tooltip": "Increase wavelength for broader, more widely spaced waves."
-        },
-        {
-            "Name": "WaveAmount",
-            "Label": "Wave Amount",
-            "Type": "Float",
-            "Default": 0.7,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1,
-                0,
-                0
-            ],
-            "Description": "Controls how strongly the wave pattern affects the terrain.",
-            "Tooltip": "Increase this value for more pronounced waves."
-        },
-        {
-            "Name": "Distortion",
-            "Type": "Float",
-            "Default": 0.3,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1,
-                0,
-                0
-            ],
-            "Description": "Controls the amount of procedural warping applied to the shape.",
-            "Tooltip": "Increase distortion for a less regular silhouette."
-        },
-        {
-            "Name": "Octaves",
-            "Type": "Int",
-            "Default": 4,
-            "Widget": "Slider",
-            "Constraints": [
-                1,
-                12,
-                0,
-                0
-            ],
-            "Description": "Controls how many noise octaves contribute to the shape.",
-            "Tooltip": "More octaves add finer detail and increase generation cost."
-        },
-        {
-            "Name": "Seed",
-            "Type": "Int",
-            "Default": 42,
-            "Widget": "Seed",
-            "Description": "Selects the deterministic random pattern used by the generator.",
-            "Tooltip": "Change the seed to create a different reproducible layout."
-        },
-        {
-            "Name": "Offset",
-            "Type": "Vector2",
-            "Default": [
-                0,
-                0
-            ],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                -8,
-                8,
-                0,
-                0
-            ],
-            "Description": "Translates the sampling coordinates without changing the shape's scale.",
-            "Tooltip": "Use the offset to move through the procedural field."
-        },
-        {
-            "Name": "Rotation",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Slider",
-            "Constraints": [
-                -180,
-                180,
-                0,
-                0
-            ],
-            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-            "Tooltip": "Use rotation to change the direction of directional features."
+          "Name": "NoiseJitter",
+          "Type": "Float",
+          "Default": 0.75,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Noise Jitter",
+          "Description": "Offsets cellular feature points in wave distortion and phase detail.",
+          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local wave variation placement.",
+          "Conditional": "NoiseAlgorithm",
+          "ConditionalValues": [
+            "Gabor",
+            "Voronoi",
+            "Worley"
+          ]
         }
-    ],
-    "ID": "waves",
-    "Description": "Generates a waves-style procedural base shape with controls for its main form and variation.",
-    "Shader": "shape.glsl"
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 0.7,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Scales the overall height amplitude of the generated shape.",
+          "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the scale of the coordinate space used by the shape.",
+          "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+          "Name": "Wavelength",
+          "Type": "Float",
+          "Default": 3.5,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.2,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the distance between repeating wave crests.",
+          "Tooltip": "Increase wavelength for broader, more widely spaced waves."
+        },
+        {
+          "Name": "WaveAmount",
+          "Label": "Wave Amount",
+          "Type": "Float",
+          "Default": 0.7,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "Description": "Controls how strongly the wave pattern affects the terrain.",
+          "Tooltip": "Increase this value for more pronounced waves."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Distortion",
+          "Type": "Float",
+          "Default": 0.3,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "Description": "Controls the amount of procedural warping applied to the shape.",
+          "Tooltip": "Increase distortion for a less regular silhouette."
+        },
+        {
+          "Name": "Octaves",
+          "Type": "Int",
+          "Default": 4,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            12,
+            0,
+            0
+          ],
+          "Description": "Controls how many noise octaves contribute to the shape.",
+          "Tooltip": "More octaves add finer detail and increase generation cost."
+        },
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 42,
+          "Widget": "Seed",
+          "Description": "Selects the deterministic random pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible layout."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector2",
+          "Default": [
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -8,
+            8,
+            0,
+            0
+          ],
+          "Description": "Translates the sampling coordinates without changing the shape's scale.",
+          "Tooltip": "Use the offset to move through the procedural field."
+        },
+        {
+          "Name": "Rotation",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Slider",
+          "Constraints": [
+            -180,
+            180,
+            0,
+            0
+          ],
+          "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+          "Tooltip": "Use rotation to change the direction of directional features."
+        }
+      ]
+    }
+  ],
+  "ID": "waves",
+  "Description": "Generates a waves-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
 }

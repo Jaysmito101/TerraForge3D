@@ -1,199 +1,235 @@
 {
-    "Name": "Canyons",
-    "Params": [
+  "Name": "Canyons",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
         {
-            "Name": "NoiseAlgorithm",
-            "Type": "Int",
-            "Default": "Simplex",
-            "Widget": "Dropdown",
-            "Label": "Noise Algorithm",
-            "Description": "Chooses the pattern used to break up canyon walls, floors, and transitions."
+          "Name": "NoiseAlgorithm",
+          "Type": "Int",
+          "Default": "Simplex",
+          "Widget": "Dropdown",
+          "Label": "Noise Algorithm",
+          "Description": "Chooses the pattern used to break up canyon walls, floors, and transitions."
         },
         {
-            "Name": "NoiseScale",
-            "Type": "Float",
-            "Default": 0.54,
-            "Widget": "Drag",
-            "Sensitivity": 0.00025,
-            "Constraints": [
-                0.001,
-                64
-            ],
-            "Label": "Noise Scale",
-            "Description": "Sets the size of the breakup carried across the canyon walls and floor.",
-            "Tooltip": "Higher values pack more variation into the canyon."
+          "Name": "NoiseScale",
+          "Type": "Float",
+          "Default": 0.54,
+          "Widget": "Drag",
+          "Sensitivity": 0.00025,
+          "Constraints": [
+            0.001,
+            64
+          ],
+          "Label": "Noise Scale",
+          "Description": "Sets the size of the breakup carried across the canyon walls and floor.",
+          "Tooltip": "Higher values pack more variation into the canyon."
         },
         {
-            "Name": "NoiseSeed",
-            "Type": "Int",
-            "Default": 24,
-            "Widget": "Input",
-            "Label": "Noise Seed",
-            "Description": "Rearranges canyon wall and floor variation while preserving the canyon form.",
-            "Tooltip": "Use this to try a different canyon layout without changing its scale."
+          "Name": "NoiseSeed",
+          "Type": "Int",
+          "Default": 24,
+          "Widget": "Input",
+          "Label": "Noise Seed",
+          "Description": "Rearranges canyon wall and floor variation while preserving the canyon form.",
+          "Tooltip": "Use this to try a different canyon layout without changing its scale."
         },
         {
-            "Name": "NoiseWarp",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4
-            ],
-            "Label": "Noise Warp",
-            "Description": "Bends the canyon sampling path to make walls and floors less uniform.",
-            "Tooltip": "Increase it for more winding, irregular canyon variation."
+          "Name": "NoiseWarp",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4
+          ],
+          "Label": "Noise Warp",
+          "Description": "Bends the canyon sampling path to make walls and floors less uniform.",
+          "Tooltip": "Increase it for more winding, irregular canyon variation."
         },
         {
-            "Name": "NoiseJitter",
-            "Type": "Float",
-            "Default": 0.75,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1
-            ],
-            "Label": "Noise Jitter",
-            "Description": "Offsets cellular feature points that shape canyon breakup.",
-            "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes cell placement in the canyon detail.",
-            "Conditional": "NoiseAlgorithm",
-            "ConditionalValues": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-            ]
-        },
-        {
-            "Name": "Strength",
-            "Type": "Float",
-            "Default": 1,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Scales the overall height amplitude of the generated shape.",
-            "Tooltip": "Adjust the overall strength of this base shape."
-        },
-        {
-            "Name": "Scale",
-            "Type": "Float",
-            "Default": 1,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0.001,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls the scale of the coordinate space used by the shape.",
-            "Tooltip": "Higher values generally create smaller, more frequent features."
-        },
-        {
-            "Name": "Width",
-            "Label": "Canyon Width",
-            "Type": "Float",
-            "Default": 0.386,
-            "Widget": "Slider",
-            "Constraints": [
-                0.01,
-                0.9,
-                0,
-                0
-            ],
-            "Description": "Controls the width of the main canyon bands.",
-            "Tooltip": "Increase width for broader canyon regions."
-        },
-        {
-            "Name": "Depth",
-            "Type": "Float",
-            "Default": 0.858,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1,
-                0,
-                0
-            ],
-            "Description": "Controls how deeply the generated feature cuts into the terrain.",
-            "Tooltip": "Increase depth for a stronger depression or relief."
-        },
-        {
-            "Name": "Waviness",
-            "Type": "Float",
-            "Default": 1.0,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1,
-                0,
-                0
-            ],
-            "Description": "Controls how much the main feature meanders or bends.",
-            "Tooltip": "Increase waviness for more winding feature paths."
-        },
-        {
-            "Name": "Octaves",
-            "Type": "Int",
-            "Default": 5,
-            "Widget": "Slider",
-            "Constraints": [
-                1,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls how many noise octaves contribute to the shape.",
-            "Tooltip": "More octaves add finer detail and increase generation cost."
-        },
-        {
-            "Name": "Seed",
-            "Type": "Int",
-            "Default": 42,
-            "Widget": "Seed",
-            "Description": "Selects the deterministic random pattern used by the generator.",
-            "Tooltip": "Change the seed to create a different reproducible layout."
-        },
-        {
-            "Name": "Offset",
-            "Type": "Vector2",
-            "Default": [
-                0,
-                0
-            ],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                -8,
-                8,
-                0,
-                0
-            ],
-            "Description": "Translates the sampling coordinates without changing the shape's scale.",
-            "Tooltip": "Use the offset to move through the procedural field."
-        },
-        {
-            "Name": "Rotation",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Slider",
-            "Constraints": [
-                -180,
-                180,
-                0,
-                0
-            ],
-            "Description": "Rotates the shape's sampling coordinates around the terrain center.",
-            "Tooltip": "Use rotation to change the direction of directional features."
+          "Name": "NoiseJitter",
+          "Type": "Float",
+          "Default": 0.75,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Noise Jitter",
+          "Description": "Offsets cellular feature points that shape canyon breakup.",
+          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes cell placement in the canyon detail.",
+          "Conditional": "NoiseAlgorithm",
+          "ConditionalValues": [
+            "Gabor",
+            "Voronoi",
+            "Worley"
+          ]
         }
-    ],
-    "ID": "canyons",
-    "Description": "Generates a canyons-style procedural base shape with controls for its main form and variation.",
-    "Shader": "shape.glsl"
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Scales the overall height amplitude of the generated shape.",
+          "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the scale of the coordinate space used by the shape.",
+          "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+          "Name": "Width",
+          "Label": "Canyon Width",
+          "Type": "Float",
+          "Default": 0.386,
+          "Widget": "Slider",
+          "Constraints": [
+            0.01,
+            0.9,
+            0,
+            0
+          ],
+          "Description": "Controls the width of the main canyon bands.",
+          "Tooltip": "Increase width for broader canyon regions."
+        },
+        {
+          "Name": "Depth",
+          "Type": "Float",
+          "Default": 0.858,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "Description": "Controls how deeply the generated feature cuts into the terrain.",
+          "Tooltip": "Increase depth for a stronger depression or relief."
+        },
+        {
+          "Name": "Waviness",
+          "Type": "Float",
+          "Default": 1.0,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "Description": "Controls how much the main feature meanders or bends.",
+          "Tooltip": "Increase waviness for more winding feature paths."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Octaves",
+          "Type": "Int",
+          "Default": 5,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls how many noise octaves contribute to the shape.",
+          "Tooltip": "More octaves add finer detail and increase generation cost."
+        },
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 42,
+          "Widget": "Seed",
+          "Description": "Selects the deterministic random pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible layout."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector2",
+          "Default": [
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -8,
+            8,
+            0,
+            0
+          ],
+          "Description": "Translates the sampling coordinates without changing the shape's scale.",
+          "Tooltip": "Use the offset to move through the procedural field."
+        },
+        {
+          "Name": "Rotation",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Slider",
+          "Constraints": [
+            -180,
+            180,
+            0,
+            0
+          ],
+          "Description": "Rotates the shape's sampling coordinates around the terrain center.",
+          "Tooltip": "Use rotation to change the direction of directional features."
+        }
+      ]
+    }
+  ],
+  "ID": "canyons",
+  "Description": "Generates a canyons-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
 }

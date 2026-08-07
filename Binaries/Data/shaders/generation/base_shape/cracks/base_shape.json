@@ -1,233 +1,269 @@
 {
-    "Name": "Cracks",
-    "Params": [
+  "Name": "Cracks",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
         {
-            "Name": "NoiseAlgorithm",
-            "Type": "Int",
-            "Default": "Simplex",
-            "Widget": "Dropdown",
-            "Label": "Noise Algorithm",
-            "Description": "Chooses the secondary noise that roughens the surface inside the crack pattern."
+          "Name": "NoiseAlgorithm",
+          "Type": "Int",
+          "Default": "Simplex",
+          "Widget": "Dropdown",
+          "Label": "Noise Algorithm",
+          "Description": "Chooses the secondary noise that roughens the surface inside the crack pattern."
         },
         {
-            "Name": "NoiseSeed",
-            "Type": "Int",
-            "Default": 0,
-            "Widget": "Input",
-            "Label": "Noise Seed",
-            "Description": "Changes the small-scale variation inside the cracks without moving the crack network.",
-            "Tooltip": "Use this to vary crack surface texture independently."
+          "Name": "NoiseSeed",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Input",
+          "Label": "Noise Seed",
+          "Description": "Changes the small-scale variation inside the cracks without moving the crack network.",
+          "Tooltip": "Use this to vary crack surface texture independently."
         },
         {
-            "Name": "NoiseWarp",
-            "Type": "Float",
-            "Default": 0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4
-            ],
-            "Label": "Noise Warp",
-            "Description": "Distorts the crack-surface detail field without changing the main crack geometry.",
-            "Tooltip": "Increase it to break up repeated interior patterns."
+          "Name": "NoiseWarp",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4
+          ],
+          "Label": "Noise Warp",
+          "Description": "Distorts the crack-surface detail field without changing the main crack geometry.",
+          "Tooltip": "Increase it to break up repeated interior patterns."
         },
         {
-            "Name": "NoiseJitter",
-            "Type": "Float",
-            "Default": 0.75,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                1
-            ],
-            "Label": "Noise Jitter",
-            "Description": "Offsets cellular feature points in the crack interior detail.",
-            "Tooltip": "Only affects Gabor, Voronoi, and Worley; the main crack Voronoi layout is separate.",
-            "Conditional": "NoiseAlgorithm",
-            "ConditionalValues": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-            ]
+          "Name": "NoiseJitter",
+          "Type": "Float",
+          "Default": 0.75,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Noise Jitter",
+          "Description": "Offsets cellular feature points in the crack interior detail.",
+          "Tooltip": "Only affects Gabor, Voronoi, and Worley; the main crack Voronoi layout is separate.",
+          "Conditional": "NoiseAlgorithm",
+          "ConditionalValues": [
+            "Gabor",
+            "Voronoi",
+            "Worley"
+          ]
         },
         {
-            "Name": "Strength",
-            "Type": "Float",
-            "Default": 0.58,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Scales the overall height amplitude of the generated shape.",
-            "Tooltip": "Adjust the overall strength of this base shape."
+          "Name": "NoiseStrength",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.001,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Controls the amplitude of the added noise detail.",
+          "Tooltip": "Increase this value for stronger noise variation."
         },
         {
-            "Name": "Scale",
-            "Type": "Float",
-            "Default": 1.4,
-            "Widget": "Drag",
-            "Sensitivity": 0.001,
-            "Constraints": [
-                0.001,
-                16,
-                0,
-                0
-            ],
-            "Description": "Controls the scale of the coordinate space used by the shape.",
-            "Tooltip": "Higher values generally create smaller, more frequent features."
-        },
-        {
-            "Name": "CrackShapeDistortion",
-            "Type": "Float",
-            "Default": 0.38,
-            "Widget": "Slider",
-            "Constraints": [
-                0,
-                0.45,
-                0,
-                0
-            ],
-            "Description": "Controls the crack shape distortion value used by the Cracks base shape.",
-            "Tooltip": "Adjust crack shape distortion to change the generated terrain."
-        },
-        {
-            "Name": "Smoothness",
-            "Type": "Float",
-            "Default": 0.12,
-            "Widget": "Slider",
-            "Constraints": [
-                0.005,
-                1,
-                0,
-                0
-            ],
-            "Description": "Controls how softly the shape transitions between regions.",
-            "Tooltip": "Higher values produce softer, less abrupt transitions."
-        },
-        {
-            "Name": "CrackWidth",
-            "Label": "Crack Width",
-            "Type": "Float",
-            "Default": 0.12,
-            "Widget": "Slider",
-            "Constraints": [
-                0.005,
-                0.5,
-                0,
-                0
-            ],
-            "Tooltip": "Adjust crack width to change the generated terrain.",
-            "Description": "Controls the crack width value used by the Cracks base shape."
-        },
-        {
-            "Name": "RandomHeights",
-            "Type": "Float",
-            "Default": 2.8,
-            "Widget": "Drag",
-            "Sensitivity": 0.001,
-            "Constraints": [
-                0,
-                8,
-                0,
-                0
-            ],
-            "Description": "Controls the random heights value used by the Cracks base shape.",
-            "Tooltip": "Adjust random heights to change the generated terrain."
-        },
-        {
-            "Name": "NoiseStrength",
-            "Type": "Float",
-            "Default": 1,
-            "Widget": "Drag",
-            "Sensitivity": 0.001,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Controls the amplitude of the added noise detail.",
-            "Tooltip": "Increase this value for stronger noise variation."
-        },
-        {
-            "Name": "NoiseScale",
-            "Type": "Float",
-            "Default": 0.15,
-            "Widget": "Drag",
-            "Sensitivity": 0.00025,
-            "Constraints": [
-                0.001,
-                16,
-                0,
-                0
-            ],
-            "Description": "Sets the size of the secondary noise added inside the crack pattern.",
-            "Tooltip": "Higher values pack more crack-surface detail into the same pattern."
-        },
-        {
-            "Name": "Seed",
-            "Type": "Int",
-            "Default": 42,
-            "Widget": "Seed",
-            "Description": "Selects the deterministic random pattern used by the generator.",
-            "Tooltip": "Change the seed to create a different reproducible layout."
-        },
-        {
-            "Name": "Offset",
-            "Type": "Vector3",
-            "Default": [
-                0,
-                0,
-                0
-            ],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Description": "Translates the sampling coordinates without changing the shape's scale.",
-            "Tooltip": "Use the offset to move through the procedural field."
-        },
-        {
-            "Name": "SquareValue",
-            "Type": "Bool",
-            "Default": false,
-            "Widget": "Checkbox",
-            "Label": "Square Value",
-            "Description": "Squares the sampled value to change the shape's value profile.",
-            "Tooltip": "Enable to bias values toward zero and sharpen the response."
-        },
-        {
-            "Name": "AbsoluteValue",
-            "Type": "Bool",
-            "Default": false,
-            "Widget": "Checkbox",
-            "Label": "Absolute Value",
-            "Description": "Reflects negative values into the positive range.",
-            "Tooltip": "Enable to remove negative valleys from the generated result."
-        },
-        {
-            "Name": "MinMaxHeight",
-            "Type": "Vector2",
-            "Default": [
-                0.1,
-                0.16
-            ],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [
-                0,
-                4,
-                0,
-                0
-            ],
-            "Description": "Controls the lower and upper height range used by the shape.",
-            "Tooltip": "Adjust the two components to set the shape's height interval."
+          "Name": "NoiseScale",
+          "Type": "Float",
+          "Default": 0.15,
+          "Widget": "Drag",
+          "Sensitivity": 0.00025,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Description": "Sets the size of the secondary noise added inside the crack pattern.",
+          "Tooltip": "Higher values pack more crack-surface detail into the same pattern."
         }
-    ],
-    "ID": "cracks",
-    "Description": "Generates a cracks-style procedural base shape with controls for its main form and variation.",
-    "Shader": "shape.glsl"
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 0.58,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Scales the overall height amplitude of the generated shape.",
+          "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 1.4,
+          "Widget": "Drag",
+          "Sensitivity": 0.001,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the scale of the coordinate space used by the shape.",
+          "Tooltip": "Higher values generally create smaller, more frequent features."
+        },
+        {
+          "Name": "CrackWidth",
+          "Label": "Crack Width",
+          "Type": "Float",
+          "Default": 0.12,
+          "Widget": "Slider",
+          "Constraints": [
+            0.005,
+            0.5,
+            0,
+            0
+          ],
+          "Tooltip": "Adjust crack width to change the generated terrain.",
+          "Description": "Controls the crack width value used by the Cracks base shape."
+        },
+        {
+          "Name": "RandomHeights",
+          "Type": "Float",
+          "Default": 2.8,
+          "Widget": "Drag",
+          "Sensitivity": 0.001,
+          "Constraints": [
+            0,
+            8,
+            0,
+            0
+          ],
+          "Description": "Controls the random heights value used by the Cracks base shape.",
+          "Tooltip": "Adjust random heights to change the generated terrain."
+        },
+        {
+          "Name": "SquareValue",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Square Value",
+          "Description": "Squares the sampled value to change the shape's value profile.",
+          "Tooltip": "Enable to bias values toward zero and sharpen the response."
+        },
+        {
+          "Name": "AbsoluteValue",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Absolute Value",
+          "Description": "Reflects negative values into the positive range.",
+          "Tooltip": "Enable to remove negative valleys from the generated result."
+        },
+        {
+          "Name": "MinMaxHeight",
+          "Type": "Vector2",
+          "Default": [
+            0.1,
+            0.16
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Controls the lower and upper height range used by the shape.",
+          "Tooltip": "Adjust the two components to set the shape's height interval."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "CrackShapeDistortion",
+          "Type": "Float",
+          "Default": 0.38,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            0.45,
+            0,
+            0
+          ],
+          "Description": "Controls the crack shape distortion value used by the Cracks base shape.",
+          "Tooltip": "Adjust crack shape distortion to change the generated terrain."
+        },
+        {
+          "Name": "Smoothness",
+          "Type": "Float",
+          "Default": 0.12,
+          "Widget": "Slider",
+          "Constraints": [
+            0.005,
+            1,
+            0,
+            0
+          ],
+          "Description": "Controls how softly the shape transitions between regions.",
+          "Tooltip": "Higher values produce softer, less abrupt transitions."
+        },
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 42,
+          "Widget": "Seed",
+          "Description": "Selects the deterministic random pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible layout."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector3",
+          "Default": [
+            0,
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Description": "Translates the sampling coordinates without changing the shape's scale.",
+          "Tooltip": "Use the offset to move through the procedural field."
+        }
+      ]
+    }
+  ],
+  "ID": "cracks",
+  "Description": "Generates a cracks-style procedural base shape with controls for its main form and variation.",
+  "Shader": "shape.glsl"
 }

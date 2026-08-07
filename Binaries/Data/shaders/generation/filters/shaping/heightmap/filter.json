@@ -1,167 +1,209 @@
 {
-    "ID": "heightmap",
-    "Name": "Heightmap",
-    "Category": "Shaping",
-    "Implementation": "PhaseChain",
-    "DefaultMergeMode": "Override",
-    "Description": "Loads an image as a terrain field. The red channel is sampled across the full terrain area and can be scaled, offset, or inverted before merging.",
-    "Statistics": {
-        "NeedsMinMax": true,
-        "NeedsHistogram": false
-    },
-    "Phases": {
-        "Heightmap": "heightmap",
-        "Merge": "../../common/merge"
-    },
-    "Resources": {
-        "Temps": [
-            {
-                "Name": "Heightmap",
-                "Type": "Field"
-            }
-        ]
-    },
-    "Execution": {
-        "Passes": [
-            {
-                "Phase": "Heightmap",
-                "Input": "Current",
-                "Output": "Heightmap",
-                "Uniforms": {
-                    "u_Heightmap": {
-                        "Parameter": "Heightmap",
-                        "PresenceUniform": "u_HasHeightmap"
-                    },
-                    "u_HeightScale": {
-                        "Parameter": "HeightScale"
-                    },
-                    "u_HeightOffset": {
-                        "Parameter": "HeightOffset"
-                    },
-                    "u_FitToFieldRange": {
-                        "Parameter": "FitToFieldRange"
-                    },
-                    "u_MapScale": {
-                        "Parameter": "MapScale"
-                    },
-                    "u_MapPosition": {
-                        "Parameter": "MapPosition"
-                    },
-                    "u_MapRotation": {
-                        "Parameter": "MapRotation"
-                    },
-                    "u_EdgeFeather": {
-                        "Parameter": "EdgeFeather"
-                    },
-                    "u_Invert": {
-                        "Parameter": "Invert"
-                    }
-                }
-            }
-        ],
-        "Merge": {
-            "Phase": "Merge",
-            "Input": "Current",
-            "Operation": "Heightmap",
-            "Output": "Next",
-            "Uniforms": {
-                "u_InvalidOperationThreshold": {
-                    "Value": 1000000000.0,
-                    "Type": "Float"
-                }
-            }
-        }
-    },
-    "Params": [
-        {
-            "Name": "Heightmap",
-            "Type": "Texture",
-            "BitDepth": 16,
-            "Widget": "Texture",
-            "Constraints": [96, 96],
-            "Label": "Heightmap",
-            "Description": "Image used as the terrain height field. The red channel is sampled as the height value.",
-            "Tooltip": "Click the preview to choose a heightmap image. The filter remains inactive until a valid image is selected."
-        },
-        {
-            "Name": "MapScale",
-            "Type": "Float",
-            "Default": 1.0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [0.01, 4.0],
-            "Label": "Map scale",
-            "Description": "Scales the imported heightmap in terrain space.",
-            "Tooltip": "Uniformly scales the heightmap on both axes. Values below 1 make a smaller placed patch."
-        },
-        {
-            "Name": "MapPosition",
-            "Type": "Vector2",
-            "Default": [0.0, 0.0],
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [-1.0, 1.0],
-            "Label": "Map position",
-            "Description": "Moves the heightmap center relative to the terrain center.",
-            "Tooltip": "Uses normalized terrain coordinates: 0,0 is centered and +/-1 moves by one terrain width or height."
-        },
-        {
-            "Name": "MapRotation",
-            "Type": "Float",
-            "Default": 0.0,
-            "Widget": "Drag",
-            "Sensitivity": 0.5,
-            "Constraints": [-180.0, 180.0],
-            "Label": "Map rotation",
-            "Description": "Rotates the imported heightmap around its center in degrees."
-        },
-        {
-            "Name": "EdgeFeather",
-            "Type": "Float",
-            "Default": 0.02,
-            "Widget": "Slider",
-            "Constraints": [0.0, 0.5],
-            "Label": "Edge feather",
-            "Description": "Softens the transition between the imported patch and the existing terrain.",
-            "Tooltip": "Increase this when placing a smaller map to avoid a visible rectangular edge."
-        },
-        {
-            "Name": "HeightScale",
-            "Type": "Float",
-            "Default": 1.0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [-4.0, 4.0],
-            "Label": "Height scale",
-            "Description": "Multiplies the sampled height values before merging them.",
-            "Tooltip": "Use this to increase, reduce, or reverse the heightmap amplitude."
-        },
-        {
-            "Name": "HeightOffset",
-            "Type": "Float",
-            "Default": 0.0,
-            "Widget": "Drag",
-            "Sensitivity": 0.01,
-            "Constraints": [-2.0, 2.0],
-            "Label": "Height offset",
-            "Description": "Adds a constant offset to the sampled height values.",
-            "Tooltip": "Shifts the imported heightmap up or down before the merge stage."
-        },
-        {
-            "Name": "FitToFieldRange",
-            "Type": "Bool",
-            "Default": false,
-            "Widget": "Checkbox",
-            "Label": "Fit to field range",
-            "Description": "Maps the imported normalized height into the current terrain min/max range before merging."
-        },
-        {
-            "Name": "Invert",
-            "Type": "Bool",
-            "Default": false,
-            "Widget": "Checkbox",
-            "Label": "Invert heightmap",
-            "Description": "Reverses the sampled height values before scaling and offsetting."
-        }
+  "ID": "heightmap",
+  "Name": "Heightmap",
+  "Category": "Shaping",
+  "Implementation": "PhaseChain",
+  "DefaultMergeMode": "Override",
+  "Description": "Loads an image as a terrain field. The red channel is sampled across the full terrain area and can be scaled, offset, or inverted before merging.",
+  "Statistics": {
+    "NeedsMinMax": true,
+    "NeedsHistogram": false
+  },
+  "Phases": {
+    "Heightmap": "heightmap",
+    "Merge": "../../common/merge"
+  },
+  "Resources": {
+    "Temps": [
+      {
+        "Name": "Heightmap",
+        "Type": "Field"
+      }
     ]
+  },
+  "Execution": {
+    "Passes": [
+      {
+        "Phase": "Heightmap",
+        "Input": "Current",
+        "Output": "Heightmap",
+        "Uniforms": {
+          "u_Heightmap": {
+            "Parameter": "Heightmap",
+            "PresenceUniform": "u_HasHeightmap"
+          },
+          "u_HeightScale": {
+            "Parameter": "HeightScale"
+          },
+          "u_HeightOffset": {
+            "Parameter": "HeightOffset"
+          },
+          "u_FitToFieldRange": {
+            "Parameter": "FitToFieldRange"
+          },
+          "u_MapScale": {
+            "Parameter": "MapScale"
+          },
+          "u_MapPosition": {
+            "Parameter": "MapPosition"
+          },
+          "u_MapRotation": {
+            "Parameter": "MapRotation"
+          },
+          "u_EdgeFeather": {
+            "Parameter": "EdgeFeather"
+          },
+          "u_Invert": {
+            "Parameter": "Invert"
+          }
+        }
+      }
+    ],
+    "Merge": {
+      "Phase": "Merge",
+      "Input": "Current",
+      "Operation": "Heightmap",
+      "Output": "Next",
+      "Uniforms": {
+        "u_InvalidOperationThreshold": {
+          "Value": 1000000000.0,
+          "Type": "Float"
+        }
+      }
+    }
+  },
+  "Sections": [
+    {
+      "Name": "Source",
+      "Label": "Source",
+      "Description": "Input map and coordinate controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Heightmap",
+          "Type": "Texture",
+          "BitDepth": 16,
+          "Widget": "Texture",
+          "Constraints": [
+            96,
+            96
+          ],
+          "Label": "Heightmap",
+          "Description": "Image used as the terrain height field. The red channel is sampled as the height value.",
+          "Tooltip": "Click the preview to choose a heightmap image. The filter remains inactive until a valid image is selected."
+        },
+        {
+          "Name": "MapScale",
+          "Type": "Float",
+          "Default": 1.0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.01,
+            4.0
+          ],
+          "Label": "Map scale",
+          "Description": "Scales the imported heightmap in terrain space.",
+          "Tooltip": "Uniformly scales the heightmap on both axes. Values below 1 make a smaller placed patch."
+        },
+        {
+          "Name": "MapPosition",
+          "Type": "Vector2",
+          "Default": [
+            0.0,
+            0.0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -1.0,
+            1.0
+          ],
+          "Label": "Map position",
+          "Description": "Moves the heightmap center relative to the terrain center.",
+          "Tooltip": "Uses normalized terrain coordinates: 0,0 is centered and +/-1 moves by one terrain width or height."
+        },
+        {
+          "Name": "MapRotation",
+          "Type": "Float",
+          "Default": 0.0,
+          "Widget": "Drag",
+          "Sensitivity": 0.5,
+          "Constraints": [
+            -180.0,
+            180.0
+          ],
+          "Label": "Map rotation",
+          "Description": "Rotates the imported heightmap around its center in degrees."
+        }
+      ]
+    },
+    {
+      "Name": "Blend",
+      "Label": "Blend",
+      "Description": "Blend, scale, and offset controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "EdgeFeather",
+          "Type": "Float",
+          "Default": 0.02,
+          "Widget": "Slider",
+          "Constraints": [
+            0.0,
+            0.5
+          ],
+          "Label": "Edge feather",
+          "Description": "Softens the transition between the imported patch and the existing terrain.",
+          "Tooltip": "Increase this when placing a smaller map to avoid a visible rectangular edge."
+        },
+        {
+          "Name": "HeightScale",
+          "Type": "Float",
+          "Default": 1.0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -4.0,
+            4.0
+          ],
+          "Label": "Height scale",
+          "Description": "Multiplies the sampled height values before merging them.",
+          "Tooltip": "Use this to increase, reduce, or reverse the heightmap amplitude."
+        },
+        {
+          "Name": "HeightOffset",
+          "Type": "Float",
+          "Default": 0.0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -2.0,
+            2.0
+          ],
+          "Label": "Height offset",
+          "Description": "Adds a constant offset to the sampled height values.",
+          "Tooltip": "Shifts the imported heightmap up or down before the merge stage."
+        },
+        {
+          "Name": "FitToFieldRange",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Fit to field range",
+          "Description": "Maps the imported normalized height into the current terrain min/max range before merging."
+        },
+        {
+          "Name": "Invert",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Invert heightmap",
+          "Description": "Reverses the sampled height values before scaling and offsetting."
+        }
+      ]
+    }
+  ]
 }
