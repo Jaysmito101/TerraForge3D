@@ -44,7 +44,7 @@ namespace tf3d::generators
         if (!HasContext()) {
             return false;
         }
-        
+
         {
             std::lock_guard lock(m_Mutex);
             m_RequestPending = true;

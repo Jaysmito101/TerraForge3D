@@ -127,8 +127,8 @@ namespace tf3d::generators
         }
         m_InvertPreview = data->Get<bool>("InvertPreview", m_InvertPreview);
         m_PreviewMode   = source == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
-                            ? MaskPreviewMode::Generated
-                            : MaskPreviewMode::Painted;
+                              ? MaskPreviewMode::Generated
+                              : MaskPreviewMode::Painted;
         m_IsEditing     = false;
         if (s_CurrentlyEditingMaskTool == this)
             s_CurrentlyEditingMaskTool = nullptr;

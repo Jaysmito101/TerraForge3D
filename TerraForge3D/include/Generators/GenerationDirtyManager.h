@@ -8,11 +8,11 @@ namespace tf3d::generators
 {
 
     enum class GenerationDirtyScope : uint32_t {
-        None = 0,
-        Biomes = 1u << 0,
-        Mixer = 1u << 1,
+        None      = 0,
+        Biomes    = 1u << 0,
+        Mixer     = 1u << 1,
         Structure = 1u << 2,
-        Force = 1u << 3,
+        Force     = 1u << 3,
         AllBiomes = 1u << 4
     };
 

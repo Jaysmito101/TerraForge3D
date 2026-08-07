@@ -98,11 +98,11 @@ namespace tf3d::generators
     void GenerationManager::ExecuteGeneration()
     {
         TF3D_PROFILE_SCOPE("generation/execute");
-        auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
-        const auto dirtyState    = m_AppState->generationDirtyManager.Consume();
-        const bool forceUpdate   = dirtyState.RequiresForce();
+        auto generationStateLock   = m_AppState->generationDirtyManager.AcquireStateLock();
+        const auto dirtyState      = m_AppState->generationDirtyManager.Consume();
+        const bool forceUpdate     = dirtyState.RequiresForce();
         const bool updateAllBiomes = dirtyState.Has(GenerationDirtyScope::AllBiomes);
-        auto hasAnythingUpdated = false;
+        auto hasAnythingUpdated    = false;
         for (auto biome : m_Field.biomeManagers) {
             if (biome->IsUpdationRequired() || updateAllBiomes || forceUpdate) {
                 biome->Update(m_Field.swapBuffer.get(), m_Field.seedTexture.get());
@@ -285,7 +285,7 @@ namespace tf3d::generators
                                         }
                                         m_AppState->generationDirtyManager.MarkBiomes();
                                         m_AppState->generationDirtyManager.MarkStructure();
-                                        filterWasRemoved     = true;
+                                        filterWasRemoved = true;
                                     }
                                 }
                                 ImGui::PopID();
@@ -360,10 +360,10 @@ namespace tf3d::generators
         ImGui::Checkbox("Auto Updation Paused", &m_Ui.updationPaused);
 
         if (m_Ui.useSeedFromActiveMesh && m_Field.seedTexture == nullptr) {
-            m_Field.seedTexture  = std::make_shared<GeneratorTexture>(m_Ui.seedTextureResolution, m_Ui.seedTextureResolution);
+            m_Field.seedTexture = std::make_shared<GeneratorTexture>(m_Ui.seedTextureResolution, m_Ui.seedTextureResolution);
             m_AppState->generationDirtyManager.MarkAllBiomes();
         } else if (!m_Ui.useSeedFromActiveMesh && m_Field.seedTexture != nullptr) {
-            m_Field.seedTexture  = nullptr;
+            m_Field.seedTexture = nullptr;
             m_AppState->generationDirtyManager.MarkAllBiomes();
         }
 
@@ -446,7 +446,7 @@ namespace tf3d::generators
         WaitForGenerationWorker();
         m_Worker->ConsumeCompleted();
         auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
-        auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
+        auto size                = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_Field.heightmapData->Resize(size);
         m_Field.workingHeightmapData->Resize(size);
         m_Field.swapBuffer->Resize(size);
