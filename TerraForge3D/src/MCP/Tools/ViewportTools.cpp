@@ -2,6 +2,7 @@
 
 #include "MCP/ActionRegistry.h"
 #include "MCP/SchemaTemplate.h"
+#include "MCP/ToolHelpers.h"
 
 #include "Base/FrameBuffer.h"
 #include "Exporters/Serializer.h"
@@ -119,19 +120,11 @@ namespace tf3d::mcp_layer
                                           "'Camera' state must be an object.");
             }
 
-            std::string readOnlyError;
-            if (!McpSchemaTemplate::ValidateWritable(
-                    state, readOnlySchema, readOnlyError)) {
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
-                    readOnlyError.empty() ? "State contains a read-only field." : readOnlyError);
-            }
-
-            const SerializerNode current = manager.Save();
-            const SerializerNode updates = CreateSerializerNodeFromJson(state);
-            current->Merge(*updates);
-            manager.Load(current);
-            return McpResult::Success(manager.Save()->ToJson());
+            return tool_helpers::ApplySerializedState(
+                state,
+                &readOnlySchema,
+                [&manager] { return manager.Save(); },
+                [&manager](const auto &data) { manager.Load(data); });
         }
 
         McpResult CaptureViewport(ApplicationState *applicationState,
@@ -306,16 +299,16 @@ namespace tf3d::mcp_layer
         const auto updateReadOnlySchema =
             McpSchemaTemplate::ComposeDefault("Tools/Viewport/UpdateStateReadOnly.json");
 
-        RegisterActionFromJson(
+        TF3D_MCP_REGISTER_ACTION(
             actions,
-            McpSchemaTemplate::ComposeDefault("Tools/Viewport/Actions/List.json"),
+            "Tools/Viewport/Actions/List.json",
             [applicationState](const nlohmann::json &) {
                 return ListVisibleViewports(applicationState);
             });
 
-        RegisterActionFromJson(
+        TF3D_MCP_REGISTER_ACTION(
             actions,
-            McpSchemaTemplate::ComposeDefault("Tools/Viewport/Actions/GetState.json"),
+            "Tools/Viewport/Actions/GetState.json",
             [applicationState](const nlohmann::json &arguments) {
                 ViewportManager *viewport = nullptr;
                 McpResult failure;
@@ -325,15 +318,15 @@ namespace tf3d::mcp_layer
                     return McpResult::Failure(
                         McpErrorType::ViewportNotFound,
                         "The requested viewport has no renderer state.");
-                return McpResult::Success(
-                    viewport->Save()->ToJson());
+                return tool_helpers::GetSerializedState(
+                    [viewport] { return viewport->Save(); });
             });
 
         if (updateReadOnlySchema) {
-            RegisterActionFromJson(
+            TF3D_MCP_REGISTER_ACTION_WITH_RUNTIME(
                 actions,
-                McpSchemaTemplate::ComposeDefault(
-                    "Tools/Viewport/Actions/UpdateState.json", runtime),
+                "Tools/Viewport/Actions/UpdateState.json",
+                runtime,
                 [applicationState, readOnlySchema = *updateReadOnlySchema](
                     const nlohmann::json &arguments) {
                     if (!arguments.contains("State"))
@@ -348,9 +341,9 @@ namespace tf3d::mcp_layer
                 });
         }
 
-        RegisterActionFromJson(
+        TF3D_MCP_REGISTER_ACTION(
             actions,
-            McpSchemaTemplate::ComposeDefault("Tools/Viewport/Actions/Capture.json"),
+            "Tools/Viewport/Actions/Capture.json",
             [applicationState](const nlohmann::json &arguments) {
                 return CaptureViewport(applicationState, arguments);
             });
