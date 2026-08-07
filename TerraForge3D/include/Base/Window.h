@@ -52,7 +52,7 @@ public:
     }
 
 private:
-    bool isActive, vSyncState, isFullscreen = false;
+    bool isActive = false, vSyncState = false, isFullscreen = false;
     GLFWwindow *m_Window;
     EventFn m_CloseEventCallback, m_ResizeEventCallback, m_MouseEventCallback;
     ClearColor m_ClearColor;
