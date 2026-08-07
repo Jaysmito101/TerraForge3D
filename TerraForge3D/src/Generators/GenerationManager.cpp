@@ -14,9 +14,9 @@ namespace tf3d::generators
     {
         // if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
         m_AppState = appState;
-        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
-                                              std::to_string(m_AppState->mainMap.tileResolution));
-        PerformanceMonitor::Get().SetMetadata("terrain/revision", "0");
+        TF3D_PROFILE_SET_METADATA("terrain/tile-resolution",
+                                  std::to_string(m_AppState->mainMap.tileResolution));
+        TF3D_PROFILE_SET_METADATA("terrain/revision", "0");
         std::string configuredStorage;
         if (m_AppState->configManager != nullptr && m_AppState->configManager->GetString("generation", "field_storage", configuredStorage)) {
             GeneratorData::SetDefaultStorage(configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
@@ -33,8 +33,8 @@ namespace tf3d::generators
         m_Field.biomeMixer           = std::make_shared<BiomeMixer>(m_AppState);
         m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
         m_Field.biomeManagers.back()->SetName("Default Global");
-        PerformanceMonitor::Get().SetMetadata("terrain/biome-count",
-                                              std::to_string(m_Field.biomeManagers.size()));
+        TF3D_PROFILE_SET_METADATA("terrain/biome-count",
+                                  std::to_string(m_Field.biomeManagers.size()));
         m_Worker = std::make_unique<GenerationWorker>("Generation Worker", [this](bool) { ExecuteGeneration(); });
         m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::Force);
     }
@@ -97,18 +97,18 @@ namespace tf3d::generators
         TF3D_PROFILE_SCOPE_DOMAIN("generation/request", PerformanceMonitor::Domain::Generation);
         GenerationRequestSnapshot snapshot = CaptureGenerationSnapshot();
         StoreGenerationSnapshot(snapshot);
-        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
-                                              std::to_string(snapshot.tileResolution));
-        PerformanceMonitor::Get().SetMetadata("terrain/revision",
-                                              std::to_string(snapshot.terrainRevision));
-        PerformanceMonitor::Get().SetMetadata("terrain/biome-count",
-                                              std::to_string(snapshot.biomeCount));
-        PerformanceMonitor::Get().SetMetadata("terrain/filter-count",
-                                              std::to_string(snapshot.filterCount));
+        TF3D_PROFILE_SET_METADATA("terrain/tile-resolution",
+                                  std::to_string(snapshot.tileResolution));
+        TF3D_PROFILE_SET_METADATA("terrain/revision",
+                                  std::to_string(snapshot.terrainRevision));
+        TF3D_PROFILE_SET_METADATA("terrain/biome-count",
+                                  std::to_string(snapshot.biomeCount));
+        TF3D_PROFILE_SET_METADATA("terrain/filter-count",
+                                  std::to_string(snapshot.filterCount));
 
         uint64_t requestId = 0;
         if (!m_Worker->Request(false, &requestId)) {
-            requestId          = PerformanceMonitor::Get().NewFlowId();
+            requestId          = TF3D_PROFILE_NEW_FLOW_ID();
             snapshot.requestId = requestId;
             snapshot.force     = snapshot.dirtyState.RequiresForce();
             StoreGenerationSnapshot(snapshot);
@@ -137,7 +137,7 @@ namespace tf3d::generators
     {
         GenerationRequestSnapshot snapshot;
         auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
-        snapshot.submittedFrame  = PerformanceMonitor::Get().CurrentFrameId();
+        snapshot.submittedFrame  = TF3D_PROFILE_CURRENT_FRAME_ID();
         snapshot.terrainRevision = m_TerrainRevision.load(std::memory_order_acquire);
         snapshot.tileResolution  = m_AppState->mainMap.tileResolution;
         snapshot.dirtyState      = m_AppState->generationDirtyManager.Snapshot();
@@ -168,7 +168,7 @@ namespace tf3d::generators
         }
         if (!snapshot.dirtyState.IsDirty()) {
             auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
-            snapshot.submittedFrame  = PerformanceMonitor::Get().CurrentFrameId();
+            snapshot.submittedFrame  = TF3D_PROFILE_CURRENT_FRAME_ID();
             snapshot.terrainRevision = m_TerrainRevision.load(std::memory_order_acquire);
             snapshot.tileResolution  = m_AppState->mainMap.tileResolution;
             snapshot.dirtyState      = m_AppState->generationDirtyManager.Consume();
@@ -525,9 +525,9 @@ namespace tf3d::generators
         TF3D_PROFILE_SCOPE_DOMAIN("generation/commit", PerformanceMonitor::Domain::Generation);
         m_Field.heightmapData.swap(m_Field.workingHeightmapData);
         const uint64_t terrainRevision = m_TerrainRevision.fetch_add(1, std::memory_order_release) + 1;
-        PerformanceMonitor::Get().SetMetadata("terrain/revision", std::to_string(terrainRevision));
-        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
-                                              std::to_string(m_AppState->mainMap.tileResolution));
+        TF3D_PROFILE_SET_METADATA("terrain/revision", std::to_string(terrainRevision));
+        TF3D_PROFILE_SET_METADATA("terrain/tile-resolution",
+                                  std::to_string(m_AppState->mainMap.tileResolution));
         GenerateHeightmapMipmaps();
         if (m_Field.heightPyramid != nullptr) {
             m_Field.heightPyramid->Rebuild(m_Field.heightmapData.get());
@@ -580,8 +580,8 @@ namespace tf3d::generators
         m_Worker->ConsumeCompleted();
         TF3D_PROFILE_VALUE_DOMAIN("generation/resolution", m_AppState->mainMap.tileResolution, 0, 0,
                                   PerformanceMonitor::Domain::Generation);
-        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
-                                              std::to_string(m_AppState->mainMap.tileResolution));
+        TF3D_PROFILE_SET_METADATA("terrain/tile-resolution",
+                                  std::to_string(m_AppState->mainMap.tileResolution));
         auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
         auto size                = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_Field.heightmapData->Resize(size);

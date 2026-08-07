@@ -164,7 +164,7 @@ namespace tf3d
             appState->exportManager->ShowSettings();
             appState->jobManager->ShowSettings();
             appState->rendererManager->ShowSettings();
-            PerformanceMonitor::Get().RenderUI(&appState->windows.performanceMonitor);
+            TF3D_PROFILE_RENDER_UI(&appState->windows.performanceMonitor);
 #ifdef TF3D_ENABLE_MCP
             if (appState->mcpControlPanel)
                 appState->mcpControlPanel->ShowSettings();

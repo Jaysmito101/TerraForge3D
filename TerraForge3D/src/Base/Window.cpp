@@ -63,7 +63,7 @@ void Window::SetVSync(bool enabled)
         glfwSwapInterval(0);
         vSyncState = enabled;
     }
-    PerformanceMonitor::Get().SetMetadata("window/vsync", vSyncState ? "on" : "off");
+    TF3D_PROFILE_SET_METADATA("window/vsync", vSyncState ? "on" : "off");
 }
 
 void Window::Clear()

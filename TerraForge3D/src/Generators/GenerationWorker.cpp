@@ -51,7 +51,7 @@ namespace tf3d::generators
         {
             std::lock_guard lock(m_Mutex);
             if (!m_RequestPending.load(std::memory_order_acquire)) {
-                m_LastRequestId = PerformanceMonitor::Get().NewFlowId();
+                m_LastRequestId = TF3D_PROFILE_NEW_FLOW_ID();
                 newRequest      = true;
             }
             requestId        = m_LastRequestId.load(std::memory_order_acquire);

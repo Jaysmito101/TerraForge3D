@@ -408,8 +408,18 @@ private:
     ::PerformanceMonitor::Get().IsCapturing()
 #define TF3D_PROFILE_CAPTURE_MODE() \
     ::PerformanceMonitor::Get().GetCaptureMode()
+#define TF3D_PROFILE_CURRENT_FRAME_ID() \
+    ::PerformanceMonitor::Get().CurrentFrameId()
 #define TF3D_PROFILE_NEW_FLOW_ID() \
     ::PerformanceMonitor::Get().NewFlowId()
+#define TF3D_PROFILE_SET_METADATA(key, value) \
+    ::PerformanceMonitor::Get().SetMetadata(key, value)
+#define TF3D_PROFILE_FRAME_BEGIN() \
+    ::PerformanceMonitor::Get().BeginFrame()
+#define TF3D_PROFILE_FRAME_END() \
+    ::PerformanceMonitor::Get().EndFrame()
+#define TF3D_PROFILE_RENDER_UI(windowOpen) \
+    ::PerformanceMonitor::Get().RenderUI(windowOpen)
 
 #else
 
@@ -532,7 +542,23 @@ private:
     } while (false)
 #define TF3D_PROFILE_CAPTURE_ACTIVE() false
 #define TF3D_PROFILE_CAPTURE_MODE()   ::PerformanceMonitor::CaptureMode::Off
+#define TF3D_PROFILE_CURRENT_FRAME_ID() uint64_t(0)
 #define TF3D_PROFILE_NEW_FLOW_ID()    uint64_t(0)
+#define TF3D_PROFILE_SET_METADATA(key, value) \
+    do {                                      \
+        (void)sizeof(key);                    \
+        (void)sizeof(value);                  \
+    } while (false)
+#define TF3D_PROFILE_FRAME_BEGIN() \
+    do {                                  \
+    } while (false)
+#define TF3D_PROFILE_FRAME_END() \
+    do {                                \
+    } while (false)
+#define TF3D_PROFILE_RENDER_UI(windowOpen) \
+    do {                                      \
+        (void)sizeof(windowOpen);              \
+    } while (false)
 
 #endif
 

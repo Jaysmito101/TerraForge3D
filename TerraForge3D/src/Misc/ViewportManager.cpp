@@ -16,9 +16,9 @@ namespace tf3d::misc
         this->m_ID                   = s_ViewportID++;
         this->m_AppState             = appState;
         this->m_RendererViewport     = new renderer::RendererViewport();
-        PerformanceMonitor::Get().SetMetadata("viewport/" + std::to_string(m_ID) + "/render-size",
-                                              std::to_string(m_RendererViewport->GetWidth()) + "x" +
-                                                  std::to_string(m_RendererViewport->GetHeight()));
+        TF3D_PROFILE_SET_METADATA("viewport/" + std::to_string(m_ID) + "/render-size",
+                                  std::to_string(m_RendererViewport->GetWidth()) + "x" +
+                                      std::to_string(m_RendererViewport->GetHeight()));
     }
 
     ViewportManager::~ViewportManager()
@@ -106,8 +106,8 @@ namespace tf3d::misc
             if (renderWidth != static_cast<uint32_t>(m_RendererViewport->GetWidth()) ||
                 renderHeight != static_cast<uint32_t>(m_RendererViewport->GetHeight())) {
                 const std::string metadataKey = "viewport/" + std::to_string(m_ID) + "/render-size";
-                PerformanceMonitor::Get().SetMetadata(metadataKey,
-                                                      std::to_string(renderWidth) + "x" + std::to_string(renderHeight));
+                TF3D_PROFILE_SET_METADATA(metadataKey,
+                                          std::to_string(renderWidth) + "x" + std::to_string(renderHeight));
             }
             {
                 TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("viewport/") + std::to_string(m_ID) + "/resize", PerformanceMonitor::Domain::Renderer);

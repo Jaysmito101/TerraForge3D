@@ -93,23 +93,23 @@ namespace tf3d::base
         auto setGlMetadata = [](const char *key, GLenum name) {
             const GLubyte *value = glGetString(name);
             if (value != nullptr)
-                PerformanceMonitor::Get().SetMetadata(key, reinterpret_cast<const char *>(value));
+                TF3D_PROFILE_SET_METADATA(key, reinterpret_cast<const char *>(value));
         };
         setGlMetadata("gl/vendor", GL_VENDOR);
         setGlMetadata("gl/renderer", GL_RENDERER);
         setGlMetadata("gl/version", GL_VERSION);
-        PerformanceMonitor::Get().SetMetadata("process/name", "TerraForge3D");
-        PerformanceMonitor::Get().SetMetadata("build/version", TERR3D_VERSION_STRING);
-        PerformanceMonitor::Get().SetMetadata("trace/format", "chrome-trace-event");
-        PerformanceMonitor::Get().SetMetadata("window/vsync", m_Window->IsVSyncEnabled() ? "on" : "off");
+        TF3D_PROFILE_SET_METADATA("process/name", "TerraForge3D");
+        TF3D_PROFILE_SET_METADATA("build/version", TERR3D_VERSION_STRING);
+        TF3D_PROFILE_SET_METADATA("trace/format", "chrome-trace-event");
+        TF3D_PROFILE_SET_METADATA("window/vsync", m_Window->IsVSyncEnabled() ? "on" : "off");
 #if defined(TF3D_PROFILER_ENABLED) && TF3D_PROFILER_ENABLED
 #if defined(TF3D_PROFILER_GPU) && TF3D_PROFILER_GPU
-        PerformanceMonitor::Get().SetMetadata("profiler/compile-mode", "FULL");
+        TF3D_PROFILE_SET_METADATA("profiler/compile-mode", "FULL");
 #else
-        PerformanceMonitor::Get().SetMetadata("profiler/compile-mode", "CPU");
+        TF3D_PROFILE_SET_METADATA("profiler/compile-mode", "CPU");
 #endif
 #else
-        PerformanceMonitor::Get().SetMetadata("profiler/compile-mode", "OFF");
+        TF3D_PROFILE_SET_METADATA("profiler/compile-mode", "OFF");
 #endif
         InitImGui(windowConfigPath);
     }
@@ -166,7 +166,7 @@ namespace tf3d::base
         float oneSecCounter = 0;
 
         while (isActive) {
-            PerformanceMonitor::Get().BeginFrame();
+            TF3D_PROFILE_FRAME_BEGIN();
             TF3D_PROFILE_BEGIN(frameProfile, "app/frame");
             float currentTime = (float)glfwGetTime();
             float deltaTime   = currentTime - previousTime;
@@ -189,7 +189,7 @@ namespace tf3d::base
                 m_Window->Update();
             }
             frameProfile.End();
-            PerformanceMonitor::Get().EndFrame();
+            TF3D_PROFILE_FRAME_END();
         }
 
         OnEnd();
