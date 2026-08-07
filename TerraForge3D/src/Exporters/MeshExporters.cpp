@@ -1,6 +1,7 @@
 #include "Base/Base.h"
 #include "Data/ApplicationState.h"
 #include "Exporters/ExportManager.h"
+#include "Profiler.h"
 
 #include <fstream>
 #include <sstream>
@@ -80,10 +81,16 @@ namespace tf3d::exporters
         if (exporting)
             *exporting = true;
         m_AppState->eventManager->RaiseEvent("ForceUpdate"); // force regenerate the mesh before exporting once
-        auto heightMapData = m_AppState->generationManager->GetHeightmapData()->GetCPUCopy();
-        auto meshClone     = m_AppState->mainModel->mesh->Clone();
-        auto worker        = ([path, format, exporting, meshClone, heightMapData, this]() -> void {
+        float *heightMapData = nullptr;
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("export/mesh/readback", PerformanceMonitor::Domain::Wait);
+            heightMapData = m_AppState->generationManager->GetHeightmapData()->GetCPUCopy();
+        }
+        auto meshClone = m_AppState->mainModel->mesh->Clone();
+        auto worker    = ([path, format, exporting, meshClone, heightMapData, this]() -> void {
             using namespace std::chrono_literals;
+            TF3D_PROFILE_THREAD_NAME("Export Worker");
+            TF3D_PROFILE_SCOPE_DOMAIN("export/mesh/write", PerformanceMonitor::Domain::Io);
             SetStatusMessage("Exporting : " + path);
             m_ExportProgress = 0.01f;
             if (!ExportMesh(path, ApplyMeshTransform(meshClone, heightMapData), format))

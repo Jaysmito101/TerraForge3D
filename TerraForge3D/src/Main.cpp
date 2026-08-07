@@ -34,7 +34,7 @@ namespace tf3d
     public:
         virtual void OnPreload() override
         {
-            PerformanceMonitor::Get().SetCurrentThreadName("Main Thread");
+            TF3D_PROFILE_THREAD_NAME("Main Thread");
             SetTitle("TerraForge3D - Jaysmito Mukherjee");
             MkDir(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs");
             SetWindowConfigPath(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "configs" PATH_SEPARATOR "windowconfigs.terr3d");
@@ -44,49 +44,49 @@ namespace tf3d
 
         virtual void OnUpdate(float deltatime) override
         {
-            TF3D_PROFILE_SCOPE("app/update");
+            TF3D_PROFILE_SCOPE_DOMAIN("app/update", PerformanceMonitor::Domain::Cpu);
 #ifdef TF3D_ENABLE_MCP
             if (appState->mcpServer) {
-                TF3D_PROFILE_SCOPE("app/update/mcp");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/mcp", PerformanceMonitor::Domain::Io);
                 appState->mcpServer->Update();
             }
 #endif
             if (!appState->states.ruinning)
                 return;
             {
-                TF3D_PROFILE_SCOPE("app/update/jobs");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/jobs", PerformanceMonitor::Domain::Job);
                 {
-                    TF3D_PROFILE_SCOPE("app/update/jobsystem");
+                    TF3D_PROFILE_SCOPE_DOMAIN("app/update/jobsystem", PerformanceMonitor::Domain::Job);
                     appState->jobSystem->Update();
                 }
                 {
-                    TF3D_PROFILE_SCOPE("app/update/dashboard");
+                    TF3D_PROFILE_SCOPE_DOMAIN("app/update/dashboard", PerformanceMonitor::Domain::Ui);
                     appState->dashboard->Update();
                 }
                 {
-                    TF3D_PROFILE_SCOPE("app/update/export");
+                    TF3D_PROFILE_SCOPE_DOMAIN("app/update/export", PerformanceMonitor::Domain::Io);
                     appState->exportManager->Update();
                 }
                 {
-                    TF3D_PROFILE_SCOPE("app/update/generation");
+                    TF3D_PROFILE_SCOPE_DOMAIN("app/update/generation", PerformanceMonitor::Domain::Generation);
                     appState->generationManager->Update();
                 }
             }
 
             {
-                TF3D_PROFILE_SCOPE("app/update/renderer");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/renderer", PerformanceMonitor::Domain::Renderer);
                 appState->rendererManager->Update();
             }
 
             {
-                TF3D_PROFILE_SCOPE("app/update/viewports");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/viewports", PerformanceMonitor::Domain::Renderer);
                 for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) {
                     appState->viewportManagers[i]->Update();
                 }
             }
 
             {
-                TF3D_PROFILE_SCOPE("app/update/misc");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/misc", PerformanceMonitor::Domain::Cpu);
                 // NOTE: This is a temporary hack to fix the brush not working on all viewports
                 appState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(nullptr);
 
@@ -135,7 +135,7 @@ namespace tf3d
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
             }
             {
-                TF3D_PROFILE_SCOPE("app/ui");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/ui", PerformanceMonitor::Domain::Ui);
                 RenderImGui();
             }
         }

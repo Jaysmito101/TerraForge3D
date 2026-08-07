@@ -1,4 +1,5 @@
 #include "Generators/GeneratorTexture.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -88,8 +89,14 @@ namespace tf3d::generators
 
     float *GeneratorTexture::MakeCPUCopy()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("readback/generator-texture", PerformanceMonitor::Domain::Wait);
         const int channels = GetChannelCount();
         m_Data             = new float[m_Width * m_Height * channels];
+        TF3D_PROFILE_VALUE_DOMAIN("readback/generator-texture-bytes",
+                                  static_cast<uint64_t>(m_Width) * static_cast<uint64_t>(m_Height) *
+                                      static_cast<uint64_t>(channels) * sizeof(float),
+                                  static_cast<uint64_t>(m_Width), static_cast<uint64_t>(m_Height),
+                                  PerformanceMonitor::Domain::Wait);
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
         glGetTexImage(GL_TEXTURE_2D, 0, m_Format, GL_FLOAT, m_Data);
         glBindTexture(GL_TEXTURE_2D, 0);

@@ -1,5 +1,6 @@
 #include "Generators/GeneratorData.h"
 #include "Base/Base.h"
+#include "Profiler.h"
 
 #include <algorithm>
 #include <cmath>
@@ -101,6 +102,9 @@ namespace tf3d::generators
 
     void GeneratorData::GetData(void *data, size_t offset, size_t size)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("readback/generator-data", PerformanceMonitor::Domain::Wait);
+        TF3D_PROFILE_VALUE_DOMAIN("readback/generator-data-bytes", static_cast<uint64_t>(size), 0, 0,
+                                  PerformanceMonitor::Domain::Wait);
         if (offset != 0 || size != m_Size)
             return;
         glBindTexture(GL_TEXTURE_2D, m_RendererID);

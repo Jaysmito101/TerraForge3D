@@ -1,6 +1,7 @@
 #include <Base.h>
 #include <Base/Logging/Logger.h>
 #include <Shader.h>
+#include "Profiler.h"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace tf3d::base
@@ -10,6 +11,7 @@ namespace tf3d::base
     {
         GLuint CompileShader(const std::string &shaderSrc, GLenum shaderType, const std::string &name)
         {
+            TF3D_PROFILE_SCOPE_DOMAIN("resource/shader-compile", PerformanceMonitor::Domain::Resource);
             GLuint shader        = glCreateShader(shaderType);
             const GLchar *source = shaderSrc.c_str();
             glShaderSource(shader, 1, &source, 0);
@@ -42,6 +44,7 @@ namespace tf3d::base
 
     GraphicsShader::GraphicsShader(std::string vertexSrc, std::string fragmentSrc, std::string geometrySource)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/program-link/graphics-geometry", PerformanceMonitor::Domain::Resource);
         GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER, "Vertex");
         GLuint geomShader = CompileShader(geometrySource, GL_GEOMETRY_SHADER, "Geometry");
         GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER, "Fragment");
@@ -90,6 +93,7 @@ namespace tf3d::base
 
     GraphicsShader::GraphicsShader(std::string vertexSrc, std::string fragmentSrc)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/program-link/graphics", PerformanceMonitor::Domain::Resource);
         GLuint vertShader = CompileShader(vertexSrc, GL_VERTEX_SHADER, "Vertex");
         GLuint fragShader = CompileShader(fragmentSrc, GL_FRAGMENT_SHADER, "Fragment");
 
@@ -131,6 +135,7 @@ namespace tf3d::base
 
     ComputeShader::ComputeShader(std::string source)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/program-link/compute", PerformanceMonitor::Domain::Resource);
         GLuint shader = CompileShader(source, GL_COMPUTE_SHADER, "Compute Shader");
 
         if (shader == 0)

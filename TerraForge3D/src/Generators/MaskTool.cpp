@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Renderer/ObjectRenderer.h"
+#include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
@@ -138,6 +139,7 @@ namespace tf3d::generators
 
     bool MaskTool::CopyGeneratedMaskToPainted()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/mask/copy", PerformanceMonitor::Domain::Generation);
         if (m_ExternalGeneratedTexture == nullptr)
             return false;
 
@@ -151,7 +153,10 @@ namespace tf3d::generators
         const auto dispatchSize  = (m_Size + workgroupSize - 1) / workgroupSize;
         m_CopyShader->Dispatch(dispatchSize, dispatchSize, 1);
         m_CopyShader->SetMemoryBarrier();
-        glFinish();
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("generation/mask/copy-finish", PerformanceMonitor::Domain::Wait);
+            glFinish();
+        }
         m_Strokes.clear();
         m_ActiveStroke    = MaskStroke{};
         m_HasActiveStroke = false;

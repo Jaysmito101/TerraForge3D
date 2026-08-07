@@ -27,7 +27,7 @@ namespace tf3d::renderer
 
     void ObjectRenderer::Render(RendererViewport *viewport)
     {
-        TF3D_PROFILE_SCOPE("renderer/object");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/object", PerformanceMonitor::Domain::Renderer);
         TF3D_PROFILE_BEGIN(objectSetupProfile, "renderer/object/setup");
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
@@ -98,7 +98,7 @@ namespace tf3d::renderer
         m_Shader->SetUniform1f("u_SolidDepth", solidDepth);
         TF3D_PROFILE_END(objectSetupProfile);
         {
-            TF3D_PROFILE_SCOPE("renderer/object/post-process");
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/object/post-process", PerformanceMonitor::Domain::Renderer);
             if (isPlane && m_PostProcessShader && viewport->GetCamera().GetPosition().y > 0.0f) {
                 m_PostProcessShader->Bind();
                 const glm::mat4 inverseProjectionView = glm::inverse(viewport->GetCamera().GetProjectionViewMatrix());
@@ -138,8 +138,12 @@ namespace tf3d::renderer
                     m_PostProcessShader->SetUniform2f("u_PlanarShadowMinimumXZ", atlasMinimum);
                     m_PostProcessShader->SetUniform2f("u_PlanarShadowWorldSize", atlasWorldSize);
                 }
-                glBindVertexArray(m_PostProcessVao);
-                glDrawArrays(GL_TRIANGLES, 0, 3);
+                {
+                    TF3D_PROFILE_GPU_SCOPE("renderer/object/post-process/gpu");
+                    glBindVertexArray(m_PostProcessVao);
+                    glDrawArrays(GL_TRIANGLES, 0, 3);
+                    TF3D_PROFILE_COUNTER_DOMAIN("gpu/draw-calls", 1.0, PerformanceMonitor::Domain::Gpu);
+                }
                 glBindVertexArray(0);
 
                 m_Shader->Bind();
@@ -192,8 +196,15 @@ namespace tf3d::renderer
         TF3D_PROFILE_END(objectMaterialStateProfile);
 
         {
-            TF3D_PROFILE_SCOPE("renderer/object/terrain-draw");
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/object/terrain-draw", PerformanceMonitor::Domain::Renderer);
+            TF3D_PROFILE_GPU_SCOPE("renderer/object/terrain-draw/gpu");
             m_AppState->mainModel->Render();
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/draw-calls", 1.0, PerformanceMonitor::Domain::Gpu);
+        }
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/picking/readback", PerformanceMonitor::Domain::Wait);
+            TF3D_PROFILE_VALUE_DOMAIN("renderer/picking/readback-bytes", sizeof(float) * 4, 0, 0,
+                                      PerformanceMonitor::Domain::Wait);
             m_SharedMemoryBuffer->GetData(viewport->GetPositionOnTerrain().data(), sizeof(float) * 4);
         }
 

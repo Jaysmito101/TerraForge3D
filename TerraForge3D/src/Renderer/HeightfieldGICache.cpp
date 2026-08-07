@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/HeightfieldPyramid.h"
+#include "Profiler.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
@@ -128,6 +129,7 @@ namespace tf3d::renderer
                                     bool hasTerrainSelfShadow, int32_t terrainSelfShadowRendererID,
                                     int32_t resolution, int32_t targetSamples, int32_t samplesPerDispatch)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/check", PerformanceMonitor::Domain::Renderer);
         PollWorkerCompletion();
         if (!m_Enabled)
             return false;
@@ -187,6 +189,9 @@ namespace tf3d::renderer
             m_PendingWork = work;
             m_WorkPending = true;
         }
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/cache/heightfield-gi/request", resolution,
+                                  static_cast<uint64_t>(work.sampleStart), static_cast<uint64_t>(work.samplesThisDispatch),
+                                  PerformanceMonitor::Domain::Renderer);
         if (!m_Worker->Request(false)) {
             std::lock_guard lock(m_WorkMutex);
             m_WorkPending = false;
@@ -207,13 +212,14 @@ namespace tf3d::renderer
         }
 
         if (m_Worker == nullptr) {
-            m_Worker = std::make_unique<GenerationWorker>("Heightfield GI Worker", [this](bool) { RunWorkerBuild(); });
+            m_Worker = std::make_unique<GenerationWorker>("Heightfield GI Worker", [this](bool) { RunWorkerBuild(); }, "renderer/cache/heightfield-gi");
         }
         m_IsReady = m_HasPublishedOutput;
     }
 
     void HeightfieldGICache::RunWorkerBuild()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/worker", PerformanceMonitor::Domain::Worker);
         WorkParameters work;
         {
             std::lock_guard lock(m_WorkMutex);
@@ -258,11 +264,15 @@ namespace tf3d::renderer
         m_Shader->SetUniform1f("u_HeightBias", std::max(0.001f,
                                                         work.terrainWorldSize / static_cast<float>(std::max(work.heightPyramid->GetResolution(), 1)) * 1.5f));
 
-        glBindImageTexture(0, m_AccumulationRendererID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-        glBindImageTexture(1, m_RawRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-        glDispatchCompute((work.outputResolution + WorkgroupSize - 1) / WorkgroupSize,
-                          (work.outputResolution + WorkgroupSize - 1) / WorkgroupSize, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/heightfield-gi/sample-gpu");
+            glBindImageTexture(0, m_AccumulationRendererID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+            glBindImageTexture(1, m_RawRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            glDispatchCompute((work.outputResolution + WorkgroupSize - 1) / WorkgroupSize,
+                              (work.outputResolution + WorkgroupSize - 1) / WorkgroupSize, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
         m_Shader->Unbind();
         glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
         glBindImageTexture(1, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
@@ -280,10 +290,14 @@ namespace tf3d::renderer
                                                           work.terrainWorldSize / static_cast<float>(std::max(work.outputResolution, 1)) * 6.0f,
                                                           0.0001f));
         m_FilterShader->SetUniform1f("u_NormalPower", 4.0f);
-        glBindImageTexture(0, work.outputRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-        glDispatchCompute((work.outputResolution + WorkgroupSize - 1) / WorkgroupSize,
-                          (work.outputResolution + WorkgroupSize - 1) / WorkgroupSize, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/heightfield-gi/filter-gpu");
+            glBindImageTexture(0, work.outputRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            glDispatchCompute((work.outputResolution + WorkgroupSize - 1) / WorkgroupSize,
+                              (work.outputResolution + WorkgroupSize - 1) / WorkgroupSize, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
         m_FilterShader->Unbind();
         glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
         for (int32_t textureSlot = 3; textureSlot >= 0; --textureSlot) {
@@ -293,7 +307,10 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE0);
-        glFinish();
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/finish", PerformanceMonitor::Domain::Wait);
+            glFinish();
+        }
 
         {
             std::lock_guard lock(m_WorkMutex);
@@ -305,6 +322,7 @@ namespace tf3d::renderer
 
     void HeightfieldGICache::PollWorkerCompletion()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/poll", PerformanceMonitor::Domain::Renderer);
         if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
             return;
 
@@ -316,9 +334,16 @@ namespace tf3d::renderer
             completed      = m_CompletedWork;
             m_WorkComplete = false;
         }
+        const uint64_t requestId = m_Worker->GetCompletedRequestId();
         m_Worker->ConsumeCompleted();
 
         if (!m_Enabled || !InputsMatch(completed)) {
+            TF3D_PROFILE_COUNTER_DOMAIN_FLOW("renderer/cache/heightfield-gi/stale-result", 1.0,
+                                             PerformanceMonitor::Domain::Renderer, requestId);
+            TF3D_PROFILE_FLOW_STEP_DOMAIN("renderer/cache/heightfield-gi/request", requestId, "stale",
+                                          PerformanceMonitor::Domain::Renderer);
+            TF3D_PROFILE_FLOW_END_DOMAIN("renderer/cache/heightfield-gi/request", requestId,
+                                         PerformanceMonitor::Domain::Generation);
             m_IsReady            = false;
             m_HasPublishedOutput = false;
             m_AccumulatedSamples = 0;
@@ -332,6 +357,13 @@ namespace tf3d::renderer
         m_ResetPending       = false;
         m_HasPublishedOutput = true;
         m_IsReady            = true;
+        TF3D_PROFILE_SCOPE_FLOW("renderer/cache/heightfield-gi/publish", PerformanceMonitor::Domain::Renderer, requestId);
+        TF3D_PROFILE_FLOW_STEP_DOMAIN("renderer/cache/heightfield-gi/request", requestId, "published",
+                                      PerformanceMonitor::Domain::Renderer);
+        TF3D_PROFILE_FLOW_END_DOMAIN("renderer/cache/heightfield-gi/request", requestId,
+                                     PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/cache/heightfield-gi/publish", m_AccumulatedSamples,
+                                  m_TargetSamples, 1, PerformanceMonitor::Domain::Renderer);
     }
 
     void HeightfieldGICache::Bind(uint32_t textureSlot) const

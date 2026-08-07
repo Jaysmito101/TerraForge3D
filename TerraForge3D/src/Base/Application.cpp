@@ -1,5 +1,6 @@
 #include "Base/Application.h"
 #include "Base/Logging/Logger.h"
+#include "Data/VersionInfo.h"
 #include "Profiler.h"
 
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -89,6 +90,27 @@ namespace tf3d::base
         isActive = true;
         s_App    = this;
         InitGlad();
+        auto setGlMetadata = [](const char *key, GLenum name) {
+            const GLubyte *value = glGetString(name);
+            if (value != nullptr)
+                PerformanceMonitor::Get().SetMetadata(key, reinterpret_cast<const char *>(value));
+        };
+        setGlMetadata("gl/vendor", GL_VENDOR);
+        setGlMetadata("gl/renderer", GL_RENDERER);
+        setGlMetadata("gl/version", GL_VERSION);
+        PerformanceMonitor::Get().SetMetadata("process/name", "TerraForge3D");
+        PerformanceMonitor::Get().SetMetadata("build/version", TERR3D_VERSION_STRING);
+        PerformanceMonitor::Get().SetMetadata("trace/format", "chrome-trace-event");
+        PerformanceMonitor::Get().SetMetadata("window/vsync", m_Window->IsVSyncEnabled() ? "on" : "off");
+#if defined(TF3D_PROFILER_ENABLED) && TF3D_PROFILER_ENABLED
+#if defined(TF3D_PROFILER_GPU) && TF3D_PROFILER_GPU
+        PerformanceMonitor::Get().SetMetadata("profiler/compile-mode", "FULL");
+#else
+        PerformanceMonitor::Get().SetMetadata("profiler/compile-mode", "CPU");
+#endif
+#else
+        PerformanceMonitor::Get().SetMetadata("profiler/compile-mode", "OFF");
+#endif
         InitImGui(windowConfigPath);
     }
 
@@ -105,12 +127,14 @@ namespace tf3d::base
 
     void Application::ImGuiRenderEnd()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("imgui/draw", PerformanceMonitor::Domain::Ui);
         ImGui::EndFrame();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         ImGuiIO &io = ImGui::GetIO();
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            TF3D_PROFILE_SCOPE_DOMAIN("imgui/platform-windows", PerformanceMonitor::Domain::Ui);
             GLFWwindow *backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
@@ -126,8 +150,11 @@ namespace tf3d::base
     void Application::RenderImGui()
     {
         glEnable(GL_BLEND);
-        ImGuiRenderBegin();
-        OnImGuiRender();
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("imgui/build", PerformanceMonitor::Domain::Ui);
+            ImGuiRenderBegin();
+            OnImGuiRender();
+        }
         ImGuiRenderEnd();
         glDisable(GL_BLEND);
     }
@@ -135,6 +162,7 @@ namespace tf3d::base
     void Application::Run(std::string loadFile)
     {
         m_Window->SetVisible(true);
+        TF3D_PROFILE_THREAD_NAME("Main Thread");
         float oneSecCounter = 0;
 
         while (isActive) {
@@ -147,17 +175,17 @@ namespace tf3d::base
             OnUpdate(deltaTime);
 
             if (oneSecCounter >= 1) {
-                TF3D_PROFILE_SCOPE("app/one-second-tick");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/one-second-tick", PerformanceMonitor::Domain::Cpu);
                 OnOneSecondTick();
                 oneSecCounter = 0;
             }
 
             {
-                TF3D_PROFILE_SCOPE("app/render");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/render", PerformanceMonitor::Domain::Renderer);
                 Render();
             }
             {
-                TF3D_PROFILE_SCOPE("app/present");
+                TF3D_PROFILE_SCOPE_DOMAIN("app/present", PerformanceMonitor::Domain::Present);
                 m_Window->Update();
             }
             frameProfile.End();

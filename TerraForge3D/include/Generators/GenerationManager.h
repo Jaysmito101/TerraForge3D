@@ -14,6 +14,8 @@
 #include <atomic>
 #include <cstdint>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -74,6 +76,17 @@ namespace tf3d::generators
         int fieldStorageUiMode          = 0;
         bool fieldStorageRestartPending = false;
         SelectedUINode selectedNode;
+    };
+
+    struct GenerationRequestSnapshot {
+        uint64_t requestId       = 0;
+        uint64_t submittedFrame  = 0;
+        uint64_t terrainRevision = 0;
+        int32_t tileResolution   = 0;
+        uint32_t biomeCount      = 0;
+        uint32_t filterCount     = 0;
+        bool force               = false;
+        GenerationDirtyState dirtyState;
     };
 
 #define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + std::string(#objectname))
@@ -150,6 +163,9 @@ namespace tf3d::generators
         void GenerateHeightmapMipmaps();
         void CommitHeightfield();
         void RequestGeneration();
+        GenerationRequestSnapshot CaptureGenerationSnapshot();
+        GenerationRequestSnapshot TakeGenerationSnapshot();
+        void StoreGenerationSnapshot(const GenerationRequestSnapshot &snapshot);
         void ExecuteGeneration();
 
     private:
@@ -159,10 +175,13 @@ namespace tf3d::generators
 
         std::unique_ptr<GenerationWorker> m_Worker;
         std::atomic<uint64_t> m_TerrainRevision = 0;
+        mutable std::mutex m_RequestSnapshotMutex;
+        std::optional<GenerationRequestSnapshot> m_PendingGenerationSnapshot;
     };
 
 } // namespace tf3d::generators
 using tf3d::generators::FieldState;
 using tf3d::generators::GenerationManager;
+using tf3d::generators::GenerationRequestSnapshot;
 using tf3d::generators::SelectedUINode;
 using tf3d::generators::UiState;

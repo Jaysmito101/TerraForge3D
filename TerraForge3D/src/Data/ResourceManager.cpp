@@ -1,4 +1,5 @@
 #include "Data/ResourceManager.h"
+#include "Profiler.h"
 #include "Data/ApplicationState.h"
 #include "Generators/GeneratorData.h"
 #include "Utils/Utils.h"
@@ -58,6 +59,7 @@ namespace tf3d::data
 
     std::string ResourceManager::LoadShaderSource(const std::string shader, bool forceReload, bool *success)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/shader-source", PerformanceMonitor::Domain::Resource);
         TF3D_LOG_INFO("Loading shader: '{}'", shader);
         auto shaderPath = FixPathSeperator(shader);
         shaderPath      = m_AppState->constants.shadersDir + PATH_SEPARATOR + shaderPath + ".glsl";
@@ -74,6 +76,7 @@ namespace tf3d::data
 
     std::string ResourceManager::PreprocessShaderSource(const std::string &source, const std::string &sourcePath, bool *successOut)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/shader-preprocess", PerformanceMonitor::Domain::Resource);
         bool success = true;
         if (!successOut)
             successOut = &success;
@@ -150,6 +153,7 @@ namespace tf3d::data
 
     std::string ResourceManager::LoadText(const std::string path, bool forceReload, bool *successOut)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/text-load", PerformanceMonitor::Domain::Io);
         bool success = false;
         if (!successOut)
             successOut = &success;
@@ -175,6 +179,7 @@ namespace tf3d::data
 
     std::optional<base::ComputeShader> ResourceManager::GetComputeShader(const std::string name, const std::string source)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/compute-compile", PerformanceMonitor::Domain::Resource);
         const auto formattedSource = InjectFieldFormatDefine(source);
 
         TF3D_LOG_DEBUG("Compiling compute shader '{}'", name);
@@ -187,6 +192,7 @@ namespace tf3d::data
 
     std::optional<base::GraphicsShader> ResourceManager::GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("resource/graphics-compile", PerformanceMonitor::Domain::Resource);
         const auto formattedVertexSource   = InjectFieldFormatDefine(vertexSource);
         const auto formattedFragmentSource = InjectFieldFormatDefine(fragmentSource);
 

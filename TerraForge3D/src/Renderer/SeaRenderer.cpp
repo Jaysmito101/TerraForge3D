@@ -6,6 +6,7 @@
 #include "Generators/HeightfieldPyramid.h"
 #include "Renderer/RendererLights.h"
 #include "Renderer/RendererSky.h"
+#include "Profiler.h"
 
 #include <algorithm>
 #include <cmath>
@@ -85,6 +86,7 @@ namespace tf3d::renderer
 
     void SeaRenderer::Render(RendererViewport *viewport)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/sea/draw", PerformanceMonitor::Domain::Renderer);
         if (!IsEnabled() || viewport == nullptr || !m_Shader ||
             m_AppState == nullptr || m_AppState->generationManager == nullptr ||
             m_AppState->mainModel == nullptr || !m_AppState->mainModel->isGeneratedPlane ||
@@ -127,8 +129,12 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyReady ? skyRenderer->GetSpecularMap() : 0);
 
-        glBindVertexArray(m_Vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/sea/draw/gpu");
+            glBindVertexArray(m_Vao);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/draw-calls", 1.0, PerformanceMonitor::Domain::Gpu);
+        }
         glBindVertexArray(0);
 
         m_Shader->Unbind();

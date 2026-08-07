@@ -1,8 +1,12 @@
 #pragma once
 
+#include "Profiler.h"
+
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -173,11 +177,16 @@ namespace tf3d::base
 
         inline void Dispatch(int x, int y, int z)
         {
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            TF3D_PROFILE_VALUE_DOMAIN("gpu/dispatch/workgroups", static_cast<uint64_t>(std::max(x, 0)),
+                                      static_cast<uint64_t>(std::max(y, 0)), static_cast<uint64_t>(std::max(z, 0)),
+                                      PerformanceMonitor::Domain::Gpu);
             glDispatchCompute(x, y, z);
         }
 
         inline void SetMemoryBarrier()
         {
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/barriers", 1.0, PerformanceMonitor::Domain::Gpu);
             glMemoryBarrier(GL_ALL_BARRIER_BITS);
         }
 

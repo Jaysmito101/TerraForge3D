@@ -1,4 +1,5 @@
 #include "Base/Logging/Logger.h"
+#include "Profiler.h"
 #include <Window.h>
 
 #include <GLFW/glfw3.h>
@@ -62,6 +63,7 @@ void Window::SetVSync(bool enabled)
         glfwSwapInterval(0);
         vSyncState = enabled;
     }
+    PerformanceMonitor::Get().SetMetadata("window/vsync", vSyncState ? "on" : "off");
 }
 
 void Window::Clear()
@@ -121,8 +123,14 @@ void Window::Update()
         isActive = false;
     }
 
-    glfwSwapBuffers(m_Window);
-    glfwPollEvents();
+    {
+        TF3D_PROFILE_SCOPE_DOMAIN("present/swap-wait", PerformanceMonitor::Domain::Present);
+        glfwSwapBuffers(m_Window);
+    }
+    {
+        TF3D_PROFILE_SCOPE_DOMAIN("present/event-poll", PerformanceMonitor::Domain::Present);
+        glfwPollEvents();
+    }
 }
 
 void Window::SetMouseCallback(EventFn callback)

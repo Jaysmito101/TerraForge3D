@@ -68,7 +68,7 @@ namespace tf3d::generators
 
     void BiomeCustomBaseShape::Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer)
     {
-        TF3D_PROFILE_SCOPE("generation/custom-base-shape");
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/custom-base-shape", PerformanceMonitor::Domain::Generation);
 
         if (m_RequireBaseShapeUpdate) {
             if (sourceBuffer) {
@@ -86,7 +86,11 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Mode", 0); // for transfer
         m_Shader->SetUniform1f("u_MixFactor", 1.0f);
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+        const auto dispatchSize  = m_AppState->mainMap.tileResolution / workgroupSize;
+        TF3D_PROFILE_GPU_SCOPE("generation/custom-base-shape/gpu");
+        TF3D_PROFILE_VALUE_DOMAIN("generation/custom-base-shape/dispatch", dispatchSize, dispatchSize, 1,
+                                  PerformanceMonitor::Domain::Generation);
+        m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
 
         // m_WorkingDataBuffer->CopyTo(sourceBuffer);

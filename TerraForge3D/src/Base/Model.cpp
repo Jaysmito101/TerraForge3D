@@ -1,4 +1,5 @@
 #include "Base/Logging/Logger.h"
+#include "Profiler.h"
 #include <Model.h>
 #include <iostream>
 
@@ -81,8 +82,12 @@ namespace tf3d::base
             return;
         }
 
+        TF3D_PROFILE_GPU_SCOPE("renderer/model/draw");
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, 0);
+        TF3D_PROFILE_COUNTER_DOMAIN("gpu/draw-calls", 1.0, PerformanceMonitor::Domain::Gpu);
+        TF3D_PROFILE_VALUE_DOMAIN("gpu/triangles", static_cast<uint64_t>(mesh->GetIndexCount() / 3), 0, 0,
+                                  PerformanceMonitor::Domain::Gpu);
         glBindVertexArray(0);
     }
 

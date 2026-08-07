@@ -16,8 +16,19 @@ namespace tf3d::generators
         AllBiomes = 1u << 4
     };
 
+    enum class GenerationDirtyCause : uint32_t {
+        Unknown  = 0,
+        UiEdit   = 1u << 0,
+        FileLoad = 1u << 1,
+        Resize   = 1u << 2,
+        External = 1u << 3,
+        Force    = 1u << 4,
+    };
+
     struct GenerationDirtyState {
-        uint32_t mask = 0;
+        uint32_t mask      = 0;
+        uint32_t causeMask = 0;
+        uint64_t revision  = 0;
 
         inline bool IsDirty() const
         {
@@ -40,34 +51,37 @@ namespace tf3d::generators
     public:
         using StateLock = std::unique_lock<std::mutex>;
 
-        inline void Mark(GenerationDirtyScope scope)
+        inline void Mark(GenerationDirtyScope scope, GenerationDirtyCause cause = GenerationDirtyCause::Unknown)
         {
+            std::lock_guard lock(m_DirtyMutex);
             m_PendingMask.fetch_or(static_cast<uint32_t>(scope), std::memory_order_release);
+            m_CauseMask.fetch_or(static_cast<uint32_t>(cause), std::memory_order_release);
+            m_Revision.fetch_add(1, std::memory_order_acq_rel);
         }
 
-        inline void MarkBiomes()
+        inline void MarkBiomes(GenerationDirtyCause cause = GenerationDirtyCause::UiEdit)
         {
-            Mark(GenerationDirtyScope::Biomes);
+            Mark(GenerationDirtyScope::Biomes, cause);
         }
 
-        inline void MarkAllBiomes()
+        inline void MarkAllBiomes(GenerationDirtyCause cause = GenerationDirtyCause::UiEdit)
         {
-            Mark(GenerationDirtyScope::AllBiomes);
+            Mark(GenerationDirtyScope::AllBiomes, cause);
         }
 
-        inline void MarkMixer()
+        inline void MarkMixer(GenerationDirtyCause cause = GenerationDirtyCause::UiEdit)
         {
-            Mark(GenerationDirtyScope::Mixer);
+            Mark(GenerationDirtyScope::Mixer, cause);
         }
 
-        inline void MarkStructure()
+        inline void MarkStructure(GenerationDirtyCause cause = GenerationDirtyCause::UiEdit)
         {
-            Mark(GenerationDirtyScope::Structure);
+            Mark(GenerationDirtyScope::Structure, cause);
         }
 
-        inline void MarkForce()
+        inline void MarkForce(GenerationDirtyCause cause = GenerationDirtyCause::Force)
         {
-            Mark(GenerationDirtyScope::Force);
+            Mark(GenerationDirtyScope::Force, cause);
         }
 
         inline bool IsDirty() const
@@ -75,9 +89,20 @@ namespace tf3d::generators
             return m_PendingMask.load(std::memory_order_acquire) != 0;
         }
 
+        inline GenerationDirtyState Snapshot() const
+        {
+            std::lock_guard lock(m_DirtyMutex);
+            return {m_PendingMask.load(std::memory_order_acquire),
+                    m_CauseMask.load(std::memory_order_acquire),
+                    m_Revision.load(std::memory_order_acquire)};
+        }
+
         inline GenerationDirtyState Consume()
         {
-            return {m_PendingMask.exchange(0, std::memory_order_acq_rel)};
+            std::lock_guard lock(m_DirtyMutex);
+            return {m_PendingMask.exchange(0, std::memory_order_acq_rel),
+                    m_CauseMask.exchange(0, std::memory_order_acq_rel),
+                    m_Revision.load(std::memory_order_acquire)};
         }
 
         inline StateLock AcquireStateLock()
@@ -87,6 +112,9 @@ namespace tf3d::generators
 
     private:
         std::atomic<uint32_t> m_PendingMask = 0;
+        std::atomic<uint32_t> m_CauseMask   = 0;
+        std::atomic<uint64_t> m_Revision    = 0;
+        mutable std::mutex m_DirtyMutex;
         std::mutex m_StateMutex;
     };
 

@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -65,6 +66,7 @@ namespace tf3d::generators
 
     bool HeightfieldPyramid::Rebuild(GeneratorData *heightmap)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/heightfield-pyramid", PerformanceMonitor::Domain::Generation);
         if (heightmap == nullptr || heightmap->GetResolution() <= 0 || !m_Shader)
             return false;
 
@@ -81,6 +83,7 @@ namespace tf3d::generators
 
         int32_t sourceWidth  = resolution;
         int32_t sourceHeight = resolution;
+        TF3D_PROFILE_GPU_SCOPE("generation/heightfield-pyramid/gpu");
         for (int32_t level = 0; level < m_MipLevels; ++level) {
             const bool sourceIsHeightmap = level == 0;
             const int32_t outputWidth    = sourceIsHeightmap ? resolution : std::max(sourceWidth / 2, 1);
@@ -93,6 +96,7 @@ namespace tf3d::generators
             glBindImageTexture(0, m_RendererID, level, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
             glDispatchCompute((outputWidth + WorkgroupSize - 1) / WorkgroupSize,
                               (outputHeight + WorkgroupSize - 1) / WorkgroupSize, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
             sourceWidth  = outputWidth;

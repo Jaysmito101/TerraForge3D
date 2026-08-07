@@ -4,6 +4,7 @@
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/HeightfieldPyramid.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -67,6 +68,7 @@ namespace tf3d::renderer
     bool TerrainSelfShadow::Update(GeneratorData *heightmap, HeightfieldPyramid *heightPyramid,
                                    uint64_t terrainRevision, const glm::vec3 &sunDirection, float terrainWorldSize)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/terrain-self-shadow/update", PerformanceMonitor::Domain::Renderer);
         if (heightmap == nullptr || heightPyramid == nullptr || !heightPyramid->IsReady() ||
             heightmap->GetResolution() <= 0 || !m_Shader) {
             return false;
@@ -100,14 +102,22 @@ namespace tf3d::renderer
         m_Shader->SetUniform2f("u_TerrainWorldSize", terrainWorldSize, terrainWorldSize);
         m_Shader->SetUniform1f("u_HeightBias", std::max(0.001f, terrainWorldSize / static_cast<float>(m_Resolution) * 1.5f));
 
-        glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8);
-        glDispatchCompute((m_Resolution + WorkgroupSize - 1) / WorkgroupSize,
-                          (m_Resolution + WorkgroupSize - 1) / WorkgroupSize, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/terrain-self-shadow/dispatch");
+            glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8);
+            glDispatchCompute((m_Resolution + WorkgroupSize - 1) / WorkgroupSize,
+                              (m_Resolution + WorkgroupSize - 1) / WorkgroupSize, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
+        }
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/terrain-self-shadow/mipmap");
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_RendererID);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/mipmap-generations", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
 
         m_Shader->Unbind();
         glActiveTexture(GL_TEXTURE1);

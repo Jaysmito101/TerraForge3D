@@ -1,4 +1,5 @@
 #include "FrameBuffer.h"
+#include "Profiler.h"
 
 #include <glad/gl.h>
 
@@ -10,11 +11,15 @@ namespace tf3d::base
 
     FrameBuffer::FrameBuffer(int w, int h)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/framebuffer/allocate", PerformanceMonitor::Domain::Resource);
         width            = w;
         height           = h;
         GLint maxSamples = 1;
         glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
         const GLsizei samples = std::max<GLsizei>(1, std::min(8, static_cast<GLsizei>(maxSamples)));
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/framebuffer/size", static_cast<uint64_t>(std::max(w, 0)),
+                                  static_cast<uint64_t>(std::max(h, 0)), static_cast<uint64_t>(samples),
+                                  PerformanceMonitor::Domain::Resource);
 
         glGenFramebuffers(1, &fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -71,6 +76,9 @@ namespace tf3d::base
 
     void FrameBuffer::ResolveColor()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/resolve/color", PerformanceMonitor::Domain::Renderer);
+        TF3D_PROFILE_GPU_SCOPE("renderer/resolve/color/gpu");
+        TF3D_PROFILE_COUNTER_DOMAIN("gpu/framebuffer-resolves", 1.0, PerformanceMonitor::Domain::Gpu);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFbo);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -80,6 +88,9 @@ namespace tf3d::base
 
     void FrameBuffer::ResolveDepth()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/resolve/depth", PerformanceMonitor::Domain::Renderer);
+        TF3D_PROFILE_GPU_SCOPE("renderer/resolve/depth/gpu");
+        TF3D_PROFILE_COUNTER_DOMAIN("gpu/framebuffer-resolves", 1.0, PerformanceMonitor::Domain::Gpu);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFbo);
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
@@ -100,6 +111,7 @@ namespace tf3d::base
 
     bool FrameBuffer::DownloadColorToU8(std::vector<uint8_t> &pixels, bool flipVertically)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/readback/viewport-color", PerformanceMonitor::Domain::Wait);
         pixels.clear();
         if (resolveFbo == 0 || width <= 0 || height <= 0)
             return false;
@@ -119,6 +131,10 @@ namespace tf3d::base
         glBindFramebuffer(GL_READ_FRAMEBUFFER, resolveFbo);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        TF3D_PROFILE_GPU_SCOPE("renderer/readback/viewport-color/gpu");
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/readback/viewport-color-bytes",
+                                  static_cast<uint64_t>(rawPixels.size()), 0, 0,
+                                  PerformanceMonitor::Domain::Wait);
         glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, rawPixels.data());
 
         glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);

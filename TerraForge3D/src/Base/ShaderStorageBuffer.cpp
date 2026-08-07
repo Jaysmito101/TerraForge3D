@@ -1,6 +1,8 @@
 #include "ShaderStorageBuffer.h"
+#include "Profiler.h"
 
 #include <glad/gl.h>
+#include <algorithm>
 
 namespace tf3d::base
 {
@@ -50,6 +52,9 @@ namespace tf3d::base
 
     void ShaderStorageBuffer::GetData(void *data, int size)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("readback/shader-storage-buffer", PerformanceMonitor::Domain::Wait);
+        TF3D_PROFILE_VALUE_DOMAIN("readback/shader-storage-buffer-bytes", static_cast<uint64_t>(std::max(size, 0)), 0, 0,
+                                  PerformanceMonitor::Domain::Wait);
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);
     }
 

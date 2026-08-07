@@ -143,7 +143,9 @@ namespace tf3d::generators
     {
         if (!m_IsEnabled)
             return;
-        TF3D_PROFILE_SCOPE(std::string("generation/biome/") + m_BiomeName);
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/biome/") + m_BiomeName, PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_VALUE_DOMAIN("generation/biome/enabled", m_IsEnabled ? 1 : 0, 0, 0,
+                                  PerformanceMonitor::Domain::Generation);
         // m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
 
         if (!m_CustomBaseShape->IsEnabled() || m_CustomBaseShape->RequiresBaseShapeUpdate()) {
@@ -228,10 +230,20 @@ namespace tf3d::generators
 
         if (ImGui::CollapsingHeader("Statistics")) {
             if (m_StatisticsDirty && m_Statistics != nullptr && m_Data != nullptr) {
-                m_Statistics->Compute(m_Data.get(), m_AppState->mainMap.tileResolution, m_StatisticsSampleStride);
-                glFinish();
-                m_StatisticsResult = m_Statistics->Read();
-                m_StatisticsDirty  = false;
+                TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics", PerformanceMonitor::Domain::Generation);
+                {
+                    TF3D_PROFILE_GPU_SCOPE("generation/biome/statistics/gpu");
+                    m_Statistics->Compute(m_Data.get(), m_AppState->mainMap.tileResolution, m_StatisticsSampleStride);
+                }
+                {
+                    TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics/finish", PerformanceMonitor::Domain::Wait);
+                    glFinish();
+                }
+                {
+                    TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics/readback", PerformanceMonitor::Domain::Wait);
+                    m_StatisticsResult = m_Statistics->Read();
+                }
+                m_StatisticsDirty = false;
             }
 
             if (!m_StatisticsResult.valid) {

@@ -39,7 +39,7 @@ namespace tf3d::generators
 
     void BiomeBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture)
     {
-        TF3D_PROFILE_SCOPE(std::string("generation/base-shape/") + m_Name);
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/base-shape/") + m_Name, PerformanceMonitor::Domain::Generation);
         buffer->Bind(0);
         m_Shader->Bind();
         int textureSlot = 4;
@@ -79,7 +79,11 @@ namespace tf3d::generators
         if (seedTexture)
             m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+        const auto dispatchSize  = m_AppState->mainMap.tileResolution / workgroupSize;
+        TF3D_PROFILE_GPU_SCOPE("generation/base-shape/gpu");
+        TF3D_PROFILE_VALUE_DOMAIN("generation/base-shape/dispatch", dispatchSize, dispatchSize, 1,
+                                  PerformanceMonitor::Domain::Generation);
+        m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
         m_RequireUpdation = false;
     }

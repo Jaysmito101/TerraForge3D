@@ -38,7 +38,7 @@ namespace tf3d::renderer
 
     void RendererManager::Update()
     {
-        TF3D_PROFILE_SCOPE("renderer/lighting-caches");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/lighting-caches", PerformanceMonitor::Domain::Renderer);
         UpdateTerrainSelfShadowCache();
         UpdatePlanarShadowCache();
         UpdateHeightfieldAmbientCache();
@@ -47,7 +47,7 @@ namespace tf3d::renderer
 
     void RendererManager::UpdateTerrainSelfShadowCache()
     {
-        TF3D_PROFILE_SCOPE("renderer/cache/terrain-self-shadow");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/terrain-self-shadow", PerformanceMonitor::Domain::Renderer);
         if (m_TerrainSelfShadow == nullptr || m_AppState == nullptr ||
             m_AppState->generationManager == nullptr || m_RendererLights == nullptr) {
             return;
@@ -63,7 +63,7 @@ namespace tf3d::renderer
 
     void RendererManager::UpdatePlanarShadowCache()
     {
-        TF3D_PROFILE_SCOPE("renderer/cache/planar-shadow");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/planar-shadow", PerformanceMonitor::Domain::Renderer);
         if (m_PlanarShadowCache == nullptr || m_AppState == nullptr ||
             m_AppState->generationManager == nullptr || m_RendererLights == nullptr) {
             return;
@@ -89,7 +89,7 @@ namespace tf3d::renderer
 
     void RendererManager::UpdateHeightfieldAmbientCache()
     {
-        TF3D_PROFILE_SCOPE("renderer/cache/heightfield-ambient");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient", PerformanceMonitor::Domain::Renderer);
         if (m_HeightfieldAmbientCache == nullptr || m_AppState == nullptr ||
             m_AppState->generationManager == nullptr) {
             return;
@@ -112,7 +112,7 @@ namespace tf3d::renderer
 
     void RendererManager::UpdateHeightfieldGICache()
     {
-        TF3D_PROFILE_SCOPE("renderer/cache/heightfield-gi");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi", PerformanceMonitor::Domain::Renderer);
         if (m_HeightfieldGICache == nullptr || m_AppState == nullptr ||
             m_AppState->generationManager == nullptr || m_RendererLights == nullptr ||
             m_RendererSky == nullptr) {
@@ -150,7 +150,10 @@ namespace tf3d::renderer
 
     void RendererManager::Render(RendererViewport *viewport)
     {
-        TF3D_PROFILE_SCOPE("renderer/viewport");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/viewport", PerformanceMonitor::Domain::Renderer);
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/viewport/size", viewport->GetFrameBuffer()->GetWidth(),
+                                  viewport->GetFrameBuffer()->GetHeight(), static_cast<uint64_t>(viewport->GetMode()),
+                                  PerformanceMonitor::Domain::Renderer);
         {
             TF3D_PROFILE_SCOPE("renderer/setup");
             glBindFramebuffer(GL_FRAMEBUFFER, viewport->GetFrameBuffer()->GetRendererID());
@@ -162,7 +165,8 @@ namespace tf3d::renderer
         }
 
         {
-            TF3D_PROFILE_SCOPE("renderer/sky");
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/sky", PerformanceMonitor::Domain::Renderer);
+            TF3D_PROFILE_GPU_SCOPE("renderer/sky/gpu");
             m_RendererSky->Render(viewport);
         }
 
@@ -172,7 +176,8 @@ namespace tf3d::renderer
             positionOnTerrain[0] = positionOnTerrain[1] = positionOnTerrain[2] = -1.0f;
             switch (viewport->GetMode()) {
                 case RendererViewportMode::Object: {
-                    TF3D_PROFILE_SCOPE("renderer/scene/object");
+                    TF3D_PROFILE_SCOPE_DOMAIN("renderer/scene/object", PerformanceMonitor::Domain::Renderer);
+                    TF3D_PROFILE_GPU_SCOPE("renderer/scene/object/gpu");
                     m_ObjectRenderer->Render(viewport);
                     if (m_SeaRenderer != nullptr && m_SeaRenderer->IsEnabled()) {
                         viewport->GetFrameBuffer()->ResolveColor();
@@ -181,15 +186,18 @@ namespace tf3d::renderer
                     }
                 } break;
                 case RendererViewportMode::Wireframe: {
-                    TF3D_PROFILE_SCOPE("renderer/scene/wireframe");
+                    TF3D_PROFILE_SCOPE_DOMAIN("renderer/scene/wireframe", PerformanceMonitor::Domain::Renderer);
+                    TF3D_PROFILE_GPU_SCOPE("renderer/scene/wireframe/gpu");
                     m_WireframeRenderer->Render(viewport);
                 } break;
                 case RendererViewportMode::Heightmap: {
-                    TF3D_PROFILE_SCOPE("renderer/scene/heightmap");
+                    TF3D_PROFILE_SCOPE_DOMAIN("renderer/scene/heightmap", PerformanceMonitor::Domain::Renderer);
+                    TF3D_PROFILE_GPU_SCOPE("renderer/scene/heightmap/gpu");
                     m_HeightmapRenderer->Render(viewport);
                 } break;
                 case RendererViewportMode::TextureSlot: {
-                    TF3D_PROFILE_SCOPE("renderer/scene/texture-slot");
+                    TF3D_PROFILE_SCOPE_DOMAIN("renderer/scene/texture-slot", PerformanceMonitor::Domain::Renderer);
+                    TF3D_PROFILE_GPU_SCOPE("renderer/scene/texture-slot/gpu");
                     m_TextureSlotRenderer->Render(viewport);
                 } break;
                 default:
@@ -198,7 +206,9 @@ namespace tf3d::renderer
         }
 
         {
-            TF3D_PROFILE_SCOPE("renderer/resolve");
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/resolve", PerformanceMonitor::Domain::Renderer);
+            TF3D_PROFILE_GPU_SCOPE("renderer/resolve/gpu");
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/framebuffer-resolves", 1.0, PerformanceMonitor::Domain::Gpu);
             viewport->GetFrameBuffer()->Resolve();
         }
     }

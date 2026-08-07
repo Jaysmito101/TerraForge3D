@@ -4,6 +4,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
+#include "Profiler.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
@@ -69,6 +70,7 @@ namespace tf3d::generators
 
     GeneratorDataStatistics::Result GeneratorDataStatistics::Read() const
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/statistics/readback", PerformanceMonitor::Domain::Wait);
         Result statistics;
         if (m_ResultBuffer == nullptr)
             return statistics;

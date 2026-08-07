@@ -1,4 +1,5 @@
 #include "Renderer/RendererViewport.h"
+#include "Profiler.h"
 
 namespace tf3d::renderer
 {
@@ -120,6 +121,9 @@ namespace tf3d::renderer
             m_Shared.height == static_cast<int32_t>(height))
             return;
 
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/viewport/resize", PerformanceMonitor::Domain::Resource);
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/viewport/size", width, height, 0,
+                                  PerformanceMonitor::Domain::Resource);
         m_Shared.width       = static_cast<int32_t>(width);
         m_Shared.height      = static_cast<int32_t>(height);
         m_Shared.aspectRatio = static_cast<float>(width) / static_cast<float>(height);

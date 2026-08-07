@@ -71,7 +71,7 @@ namespace tf3d::renderer
 
     void RendererSky::Render(RendererViewport *viewport)
     {
-        TF3D_PROFILE_SCOPE("renderer/sky/draw");
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/sky/draw", PerformanceMonitor::Domain::Renderer);
         if (!m_IsSkyReady || !m_Inspector.Get<bool>("RenderSky", true))
             return;
         glDisable(GL_DEPTH_TEST);
@@ -81,7 +81,11 @@ namespace tf3d::renderer
         glUniform1i(glGetUniformLocation(m_SkyboxShader->GetNativeShader(), "u_Skybox"), 0);
         glm::mat4 mpv = viewport->GetCamera().GetProjectionMatrix() * glm::mat4(glm::mat3(viewport->GetCamera().GetViewMatrix()));
         glUniformMatrix4fv(glGetUniformLocation(m_SkyboxShader->GetNativeShader(), "u_MPV"), 1, GL_FALSE, glm::value_ptr(mpv));
-        m_SkyboxModel->Render();
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/sky/draw/gpu");
+            m_SkyboxModel->Render();
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/draw-calls", 1.0, PerformanceMonitor::Domain::Gpu);
+        }
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -97,6 +101,7 @@ namespace tf3d::renderer
     // From : https://github.com/Nadrin/PBR/blob/master/src/opengl.cpp
     bool RendererSky::LoadSkyboxTexture(const std::string &path)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/sky/load", PerformanceMonitor::Domain::Resource);
         if (path.size() < 3)
             return false;
         const int32_t skyboxSize        = m_Inspector.Get<int32_t>("SkyboxSize", 512);
@@ -166,17 +171,22 @@ namespace tf3d::renderer
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        glBindImageTexture(0, skyboxTextureUnfiltered, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA32F);
-        m_EquirectToCube->Bind();
-        glActiveTexture(GL_TEXTURE0 + 1);
-        glBindTexture(GL_TEXTURE_2D, skyboxTextureEquirect);
-        glUniform1i(glGetUniformLocation(m_EquirectToCube->GetNativeShader(), "u_InputTexture"), 1);
-        glDispatchCompute(skyboxSize / 16, skyboxSize / 16, 6);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
-                        GL_TEXTURE_UPDATE_BARRIER_BIT |
-                        GL_TEXTURE_FETCH_BARRIER_BIT);
-        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-        glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/sky/equirect-to-cube");
+            glBindImageTexture(0, skyboxTextureUnfiltered, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA32F);
+            m_EquirectToCube->Bind();
+            glActiveTexture(GL_TEXTURE0 + 1);
+            glBindTexture(GL_TEXTURE_2D, skyboxTextureEquirect);
+            glUniform1i(glGetUniformLocation(m_EquirectToCube->GetNativeShader(), "u_InputTexture"), 1);
+            glDispatchCompute(skyboxSize / 16, skyboxSize / 16, 6);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+                            GL_TEXTURE_UPDATE_BARRIER_BIT |
+                            GL_TEXTURE_FETCH_BARRIER_BIT);
+            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/mipmap-generations", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
 
         glDeleteTextures(1, &skyboxTextureEquirect);
 
@@ -196,19 +206,23 @@ namespace tf3d::renderer
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        m_SpecularMap->Bind();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
-        glUniform1i(glGetUniformLocation(m_SpecularMap->GetNativeShader(), "inputTexture"), 0);
-        const GLint roughnessLocation = glGetUniformLocation(m_SpecularMap->GetNativeShader(), "roughness");
-        for (int32_t mip = 0; mip < specularMipLevels; ++mip) {
-            const int32_t mipSize = specularMapSize >> mip;
-            glBindImageTexture(1, m_SpecularMapTextureID, mip, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-            const float roughness = specularMipLevels > 1 ? static_cast<float>(mip) / static_cast<float>(specularMipLevels - 1) : 0.0f;
-            glUniform1f(roughnessLocation, roughness);
-            glDispatchCompute((mipSize + 15) / 16, (mipSize + 15) / 16, 6);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/sky/specular");
+            m_SpecularMap->Bind();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
+            glUniform1i(glGetUniformLocation(m_SpecularMap->GetNativeShader(), "inputTexture"), 0);
+            const GLint roughnessLocation = glGetUniformLocation(m_SpecularMap->GetNativeShader(), "roughness");
+            for (int32_t mip = 0; mip < specularMipLevels; ++mip) {
+                const int32_t mipSize = specularMapSize >> mip;
+                glBindImageTexture(1, m_SpecularMapTextureID, mip, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+                const float roughness = specularMipLevels > 1 ? static_cast<float>(mip) / static_cast<float>(specularMipLevels - 1) : 0.0f;
+                glUniform1f(roughnessLocation, roughness);
+                glDispatchCompute((mipSize + 15) / 16, (mipSize + 15) / 16, 6);
+                TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            }
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         }
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
         constexpr int32_t brdfLutSize = 256;
         glGenTextures(1, &m_BrdfLutTextureID);
@@ -219,10 +233,14 @@ namespace tf3d::renderer
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        m_BrdfLut->Bind();
-        glBindImageTexture(0, m_BrdfLutTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16F);
-        glDispatchCompute((brdfLutSize + 15) / 16, (brdfLutSize + 15) / 16, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/sky/brdf");
+            m_BrdfLut->Bind();
+            glBindImageTexture(0, m_BrdfLutTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16F);
+            glDispatchCompute((brdfLutSize + 15) / 16, (brdfLutSize + 15) / 16, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
 
         glGenTextures(1, &m_IrradianceMapTextureID);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_IrradianceMapTextureID);
@@ -237,14 +255,21 @@ namespace tf3d::renderer
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        glBindImageTexture(0, m_IrradianceMapTextureID, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA32F);
-        m_IrradianceMap->Bind();
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
-        glUniform1i(glGetUniformLocation(m_IrradianceMap->GetNativeShader(), "u_InputTexture"), 1);
-        glDispatchCompute((irradianceMapSize + 15) / 16, (irradianceMapSize + 15) / 16, 6);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/sky/irradiance");
+            glBindImageTexture(0, m_IrradianceMapTextureID, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA32F);
+            m_IrradianceMap->Bind();
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureUnfiltered);
+            glUniform1i(glGetUniformLocation(m_IrradianceMap->GetNativeShader(), "u_InputTexture"), 1);
+            glDispatchCompute((irradianceMapSize + 15) / 16, (irradianceMapSize + 15) / 16, 6);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+        }
 
-        glFinish();
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/sky/finish", PerformanceMonitor::Domain::Wait);
+            glFinish();
+        }
 
         m_Inspector.Set("SkyMapPath", path);
         m_IsSkyReady = true;

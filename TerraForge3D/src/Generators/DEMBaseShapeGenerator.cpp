@@ -238,7 +238,10 @@ namespace tf3d::generators
 
     void DEMBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture)
     {
-        TF3D_PROFILE_SCOPE("generation/dem-base-shape");
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/dem-base-shape", PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_VALUE_DOMAIN("generation/dem/visible-tiles", static_cast<uint64_t>(m_VisibleTileCount),
+                                  static_cast<uint64_t>(m_TilesFallbackCount), static_cast<uint64_t>(m_TilesUsingCount),
+                                  PerformanceMonitor::Domain::Generation);
         auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto now     = std::chrono::steady_clock::now();
         if (m_ViewInteractionPending && now - m_LastViewInteractionTime >= std::chrono::milliseconds(kTileRequestDebounceMilliseconds)) {
@@ -263,7 +266,11 @@ namespace tf3d::generators
         // clear the buffer
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
         m_Shader->SetUniform1i("u_Mode", 0);
-        m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
+        const auto dispatchSize = m_AppState->mainMap.tileResolution / workgroupSize;
+        {
+            TF3D_PROFILE_GPU_SCOPE("generation/dem/clear-gpu");
+            m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
+        }
         m_Shader->SetMemoryBarrier();
 
         // generate the map data
@@ -320,12 +327,15 @@ namespace tf3d::generators
             m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
         };
 
-        for (const auto &tile : fallbackTiles) {
-            renderPreviewTile(tile);
-        }
-        for (const auto &tile : highResolutionTiles) {
-            renderPreviewTile(tile);
-            ++m_TilesUsingCount;
+        {
+            TF3D_PROFILE_GPU_SCOPE("generation/dem/tiles-gpu");
+            for (const auto &tile : fallbackTiles) {
+                renderPreviewTile(tile);
+            }
+            for (const auto &tile : highResolutionTiles) {
+                renderPreviewTile(tile);
+                ++m_TilesUsingCount;
+            }
         }
 
         // update the visualizer map
@@ -333,7 +343,10 @@ namespace tf3d::generators
         m_Shader->SetMemoryBarrier();
         m_Shader->SetUniform1i("u_Mode", 2);
         m_MapVisualzeTexture->BindForCompute(1);
-        m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
+        {
+            TF3D_PROFILE_GPU_SCOPE("generation/dem/visualizer-gpu");
+            m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
+        }
         m_Shader->SetMemoryBarrier();
         m_RequireUpdation = false;
     }

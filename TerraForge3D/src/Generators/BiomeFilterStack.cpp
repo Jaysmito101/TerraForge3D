@@ -189,7 +189,8 @@ namespace tf3d::generators
                                     GeneratorData *input, GeneratorData *output, GeneratorData *reference)
     {
         const std::string phase = pass.value("Phase", "");
-        TF3D_PROFILE_SCOPE(std::string("generation/filter-phase/") + filter->GetName() + "/" + phase);
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/filter-phase/") + filter->GetName() + "/" + phase,
+                                       PerformanceMonitor::Domain::Generation);
         auto *shader = filter->GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
@@ -203,6 +204,7 @@ namespace tf3d::generators
         SetPassUniforms(filter, shader, pass.value("Uniforms", nlohmann::json::object()));
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_Resolution + workgroupSize - 1) / workgroupSize;
+        TF3D_PROFILE_GPU_SCOPE("generation/filter-phase/gpu");
         shader->Dispatch(dispatchSize, dispatchSize, 1);
         shader->SetMemoryBarrier();
     }
@@ -210,7 +212,8 @@ namespace tf3d::generators
     void BiomeFilterStack::RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge, GeneratorData *input, GeneratorData *operation, GeneratorData *output)
     {
         const std::string phase = merge.value("Phase", "");
-        TF3D_PROFILE_SCOPE(std::string("generation/filter-merge/") + filter->GetName() + "/" + phase);
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/filter-merge/") + filter->GetName() + "/" + phase,
+                                       PerformanceMonitor::Domain::Generation);
         auto *shader = filter->GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
@@ -231,6 +234,7 @@ namespace tf3d::generators
         }
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_Resolution + workgroupSize - 1) / workgroupSize;
+        TF3D_PROFILE_GPU_SCOPE("generation/filter-merge/gpu");
         shader->Dispatch(dispatchSize, dispatchSize, 1);
         shader->SetMemoryBarrier();
     }
@@ -540,7 +544,9 @@ namespace tf3d::generators
             const auto &filter = m_Filters[filterIndex];
             if (!filter->IsEnabled())
                 continue;
-            TF3D_PROFILE_SCOPE(std::string("generation/filter/") + std::to_string(filterIndex) + "/" + filter->GetName());
+            TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/filter/") + filter->GetName(), PerformanceMonitor::Domain::Generation);
+            TF3D_PROFILE_VALUE_DOMAIN("generation/filter/index", static_cast<uint64_t>(filterIndex), 0, 0,
+                                      PerformanceMonitor::Domain::Generation);
             filter->UpdateGeneratedMask(current);
             RunFilter(filter, current, next);
             current = next;
@@ -549,6 +555,8 @@ namespace tf3d::generators
         }
 
         if (applied && current != baseResult) {
+            TF3D_PROFILE_SCOPE_DOMAIN("generation/filter/merge-copy", PerformanceMonitor::Domain::Generation);
+            TF3D_PROFILE_GPU_SCOPE("generation/filter/merge-copy/gpu");
             glMemoryBarrier(GL_ALL_BARRIER_BITS);
             current->CopyTo(baseResult);
         }

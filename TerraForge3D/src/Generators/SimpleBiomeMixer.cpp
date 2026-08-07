@@ -1,5 +1,6 @@
 #include "Generators/SimpleBiomeMixer.h"
 #include "Data/ApplicationState.h"
+#include "Profiler.h"
 
 namespace tf3d::generators
 {
@@ -19,9 +20,13 @@ namespace tf3d::generators
 
     void SimpleBiomeMixer::Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/mixer/simple", PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_GPU_SCOPE("generation/mixer/simple/gpu");
         const auto &biomeManagers = m_AppState->generationManager->GetBiomeManagers();
         auto workgroupSize        = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize   = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
+        TF3D_PROFILE_VALUE_DOMAIN("generation/mixer/dispatch", dispatchSize, dispatchSize,
+                                  static_cast<uint64_t>(biomeManagers.size()), PerformanceMonitor::Domain::Generation);
 
         m_Shader->Bind();
         m_SwapBuffer->Bind(1);

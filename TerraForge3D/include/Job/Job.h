@@ -2,6 +2,8 @@
 
 #include "Base/Base.h"
 
+#include <cstdint>
+
 namespace tf3d::job
 {
 
@@ -35,6 +37,7 @@ namespace tf3d::job
         JobStatus status                = JobStatus_None;
         void *userData                  = nullptr;
         uint32_t id;
+        uint64_t profileFlowId = 0;
         // std::vector<uint32_t> dependsOn; For future
 
         // Job Functions

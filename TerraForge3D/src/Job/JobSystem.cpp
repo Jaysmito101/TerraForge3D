@@ -1,5 +1,6 @@
 #include "Job/JobSystem.h"
 #include "Job/Job.h"
+#include "Profiler.h"
 
 namespace tf3d::job
 {
@@ -23,6 +24,7 @@ namespace tf3d::job
 
     void JobSystem::Update()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("job/update", PerformanceMonitor::Domain::Job);
         // Assign Jobs for AsyncOnMainThread
         UpdateAsyncOnMainThreadJobs();
 
@@ -46,7 +48,13 @@ namespace tf3d::job
         // if (job->onSetup)
         //  	job->onSetup(job);
 
-        jobs[job->id] = job;
+        jobs[job->id]      = job;
+        job->profileFlowId = TF3D_PROFILE_NEW_FLOW_ID();
+        TF3D_PROFILE_FLOW_BEGIN_DOMAIN("job/request", job->profileFlowId, PerformanceMonitor::Domain::Job);
+        TF3D_PROFILE_FLOW_STEP_DOMAIN("job/request", job->profileFlowId, "queued", PerformanceMonitor::Domain::Job);
+        TF3D_PROFILE_VALUE_DOMAIN_FLOW("job/request/id", job->id,
+                                       static_cast<uint64_t>(job->excutionModel), 0,
+                                       PerformanceMonitor::Domain::Job, job->profileFlowId);
 
         if (job->excutionModel == JobExecutionModel_Async)
             asyncJobsQueue.push(job->id);
@@ -67,6 +75,7 @@ namespace tf3d::job
 
     void JobSystem::WaitAll()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("job/wait-all", PerformanceMonitor::Domain::Wait);
         for (int i = 0; i < threadPoolSize; i++) {
             threadPool[i].FinishPendingJob(true);
         }
@@ -90,6 +99,8 @@ namespace tf3d::job
                 asyncOnMTJobsQueue.pop();
                 job->status = JobStatus_OnGoing;
 
+                TF3D_PROFILE_SCOPE_FLOW("job/main-execute", PerformanceMonitor::Domain::Job, job->profileFlowId);
+
                 if (job->onRun) {
                     if (job->onRun(job.get()))
                         job->status = JobStatus_Success;
@@ -98,6 +109,8 @@ namespace tf3d::job
                 }
                 if (job->onComplete)
                     job->onComplete(job.get());
+                TF3D_PROFILE_FLOW_STEP_DOMAIN("job/request", job->profileFlowId, "completed", PerformanceMonitor::Domain::Job);
+                TF3D_PROFILE_FLOW_END_DOMAIN("job/request", job->profileFlowId, PerformanceMonitor::Domain::Job);
                 completedJobs.push(job->id);
                 auto mtJobEndTime = std::chrono::high_resolution_clock::now();
                 timeTaken         = std::chrono::duration<double>(mtJobEndTime - mtJobsBeginTime).count();
@@ -113,8 +126,12 @@ namespace tf3d::job
         for (int i = 0; i < threadPoolSize; i++) {
             if (threadPool[i].hasCompletedJob) {
                 Job *job = threadPool[i].FinishPendingJob();
+                if (job == nullptr)
+                    continue;
                 if (job->onComplete)
                     job->onComplete(job);
+                TF3D_PROFILE_FLOW_STEP_DOMAIN("job/request", job->profileFlowId, "completed", PerformanceMonitor::Domain::Job);
+                TF3D_PROFILE_FLOW_END_DOMAIN("job/request", job->profileFlowId, PerformanceMonitor::Domain::Job);
                 completedJobs.push(job->id);
             }
         }

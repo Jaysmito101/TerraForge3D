@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/HeightfieldPyramid.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -72,6 +73,7 @@ namespace tf3d::renderer
     bool HeightfieldAmbientCache::Update(HeightfieldPyramid *heightPyramid, uint64_t terrainRevision,
                                          float terrainWorldSize, float aoRadius)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/check", PerformanceMonitor::Domain::Renderer);
         PollWorkerCompletion();
         if (!m_Enabled)
             return false;
@@ -98,6 +100,9 @@ namespace tf3d::renderer
         if (!requiresRebuild)
             return false;
 
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/cache/heightfield-ambient/request", requestedResolution,
+                                  terrainRevision, static_cast<uint64_t>(m_IsReady ? 1 : 0),
+                                  PerformanceMonitor::Domain::Renderer);
         EnsureTextures(requestedResolution);
 
         WorkParameters work;
@@ -127,12 +132,13 @@ namespace tf3d::renderer
         if (!enabled)
             m_IsReady = false;
         else if (m_Worker == nullptr) {
-            m_Worker = std::make_unique<GenerationWorker>("Heightfield Ambient Worker", [this](bool) { RunWorkerBuild(); });
+            m_Worker = std::make_unique<GenerationWorker>("Heightfield Ambient Worker", [this](bool) { RunWorkerBuild(); }, "renderer/cache/heightfield-ambient");
         }
     }
 
     void HeightfieldAmbientCache::RunWorkerBuild()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/worker", PerformanceMonitor::Domain::Worker);
         WorkParameters work;
         {
             std::lock_guard lock(m_WorkMutex);
@@ -152,14 +158,21 @@ namespace tf3d::renderer
         m_GenerateShader->SetUniform1f("u_AoRadius", work.aoRadius);
         m_GenerateShader->SetUniform1f("u_HeightBias", std::max(0.001f,
                                                                 work.terrainWorldSize / static_cast<float>(work.outputResolution) * 1.5f));
-        glBindImageTexture(0, work.outputRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-        glDispatchCompute((work.outputResolution + WorkgroupSize - 1) / WorkgroupSize,
-                          (work.outputResolution + WorkgroupSize - 1) / WorkgroupSize, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/heightfield-ambient/gpu");
+            glBindImageTexture(0, work.outputRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            glDispatchCompute((work.outputResolution + WorkgroupSize - 1) / WorkgroupSize,
+                              (work.outputResolution + WorkgroupSize - 1) / WorkgroupSize, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
         m_GenerateShader->Unbind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        glFinish();
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/finish", PerformanceMonitor::Domain::Wait);
+            glFinish();
+        }
 
         {
             std::lock_guard lock(m_WorkMutex);
@@ -171,6 +184,7 @@ namespace tf3d::renderer
 
     void HeightfieldAmbientCache::PollWorkerCompletion()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/poll", PerformanceMonitor::Domain::Renderer);
         if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
             return;
 
@@ -182,12 +196,19 @@ namespace tf3d::renderer
             completed      = m_CompletedWork;
             m_WorkComplete = false;
         }
+        const uint64_t requestId = m_Worker->GetCompletedRequestId();
         m_Worker->ConsumeCompleted();
         std::swap(m_RendererID, m_WorkingRendererID);
         m_TerrainRevision  = completed.terrainRevision;
         m_TerrainWorldSize = completed.terrainWorldSize;
         m_AoRadius         = completed.aoRadius;
         m_IsReady          = m_Enabled;
+        TF3D_PROFILE_SCOPE_FLOW("renderer/cache/heightfield-ambient/publish", PerformanceMonitor::Domain::Renderer, requestId);
+        TF3D_PROFILE_FLOW_STEP_DOMAIN("renderer/cache/heightfield-ambient/request", requestId, "published",
+                                      PerformanceMonitor::Domain::Renderer);
+        TF3D_PROFILE_FLOW_END_DOMAIN("renderer/cache/heightfield-ambient/request", requestId,
+                                     PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_INSTANT_DOMAIN("renderer/cache/heightfield-ambient/publish", PerformanceMonitor::Domain::Renderer);
     }
 
     void HeightfieldAmbientCache::Bind(uint32_t textureSlot) const

@@ -16,6 +16,9 @@ namespace tf3d::misc
         this->m_ID                   = s_ViewportID++;
         this->m_AppState             = appState;
         this->m_RendererViewport     = new renderer::RendererViewport();
+        PerformanceMonitor::Get().SetMetadata("viewport/" + std::to_string(m_ID) + "/render-size",
+                                              std::to_string(m_RendererViewport->GetWidth()) + "x" +
+                                                  std::to_string(m_RendererViewport->GetHeight()));
     }
 
     ViewportManager::~ViewportManager()
@@ -87,7 +90,8 @@ namespace tf3d::misc
 
     void ViewportManager::Update()
     {
-        TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/update");
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("viewport/") + std::to_string(m_ID) + "/update", PerformanceMonitor::Domain::Renderer);
+        TF3D_PROFILE_VALUE_DOMAIN("renderer/viewports/active", 1, 0, 0, PerformanceMonitor::Domain::Renderer);
         if (m_AutoCalculateAspectRatio) {
             m_RendererViewport->GetCamera().SetAspectRatio(m_Width / (m_Height + 0.000000001f));
         }
@@ -99,13 +103,19 @@ namespace tf3d::misc
             constexpr float renderScale   = 1.5f;
             const uint32_t renderWidth    = static_cast<uint32_t>(std::max(m_Width * scaleX * renderScale, 1.0f));
             const uint32_t renderHeight   = static_cast<uint32_t>(std::max(m_Height * scaleY * renderScale, 1.0f));
+            if (renderWidth != static_cast<uint32_t>(m_RendererViewport->GetWidth()) ||
+                renderHeight != static_cast<uint32_t>(m_RendererViewport->GetHeight())) {
+                const std::string metadataKey = "viewport/" + std::to_string(m_ID) + "/render-size";
+                PerformanceMonitor::Get().SetMetadata(metadataKey,
+                                                      std::to_string(renderWidth) + "x" + std::to_string(renderHeight));
+            }
             {
-                TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/resize");
+                TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("viewport/") + std::to_string(m_ID) + "/resize", PerformanceMonitor::Domain::Renderer);
                 m_RendererViewport->ResizeTo(renderWidth, renderHeight);
             }
             this->m_AppState->rendererManager->Render(this->m_RendererViewport);
         } else {
-            TF3D_PROFILE_SCOPE(std::string("viewport/") + std::to_string(m_ID) + "/hidden");
+            TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("viewport/") + std::to_string(m_ID) + "/hidden", PerformanceMonitor::Domain::Renderer);
         }
         m_IsActive &= IsVisible();
     }
@@ -117,6 +127,7 @@ namespace tf3d::misc
         bool *visibility = GetVisibilityState();
         if (visibility == nullptr || !*visibility)
             return;
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("viewport/") + std::to_string(m_ID) + "/ui", PerformanceMonitor::Domain::Ui);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin(s_TempBuffer, visibility);
         ImGui::PopStyleVar();

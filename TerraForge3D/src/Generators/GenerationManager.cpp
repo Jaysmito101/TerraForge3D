@@ -14,6 +14,9 @@ namespace tf3d::generators
     {
         // if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
         m_AppState = appState;
+        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
+                                              std::to_string(m_AppState->mainMap.tileResolution));
+        PerformanceMonitor::Get().SetMetadata("terrain/revision", "0");
         std::string configuredStorage;
         if (m_AppState->configManager != nullptr && m_AppState->configManager->GetString("generation", "field_storage", configuredStorage)) {
             GeneratorData::SetDefaultStorage(configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
@@ -30,8 +33,10 @@ namespace tf3d::generators
         m_Field.biomeMixer           = std::make_shared<BiomeMixer>(m_AppState);
         m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
         m_Field.biomeManagers.back()->SetName("Default Global");
+        PerformanceMonitor::Get().SetMetadata("terrain/biome-count",
+                                              std::to_string(m_Field.biomeManagers.size()));
         m_Worker = std::make_unique<GenerationWorker>("Generation Worker", [this](bool) { ExecuteGeneration(); });
-        m_AppState->generationDirtyManager.MarkForce();
+        m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::Force);
     }
 
     GenerationManager::~GenerationManager() = default;
@@ -54,21 +59,25 @@ namespace tf3d::generators
 
     void GenerationManager::Update()
     {
-        TF3D_PROFILE_SCOPE("generation/update");
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/update", PerformanceMonitor::Domain::Generation);
         if (m_Ui.updationPaused)
             return;
         if (!m_Worker->HasContext()) {
             // TF3D_LOG_DEBUG("GenerationManager::Update() - Running generation on render thread as no shared OpenGL context is available");
             if (m_AppState->generationDirtyManager.IsDirty()) {
-                ExecuteGeneration();
-                CommitHeightfield();
+                RequestGeneration();
             }
             return;
         }
 
         if (m_Worker->IsCompleted() && !m_Worker->IsRunning()) {
             if (m_Worker->ConsumeCompleted()) {
+                const uint64_t requestId = m_Worker->GetCompletedRequestId();
+                TF3D_PROFILE_SCOPE_FLOW("generation/publish", PerformanceMonitor::Domain::Generation, requestId);
                 CommitHeightfield();
+                TF3D_PROFILE_FLOW_STEP_DOMAIN("generation/request", requestId, "published",
+                                              PerformanceMonitor::Domain::Generation);
+                TF3D_PROFILE_FLOW_END_DOMAIN("generation/request", requestId, PerformanceMonitor::Domain::Generation);
             }
         }
 
@@ -79,39 +88,144 @@ namespace tf3d::generators
 
     bool GenerationManager::UpdateInternal(const std::string &, void *)
     {
-        m_AppState->generationDirtyManager.MarkForce();
+        m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::External);
         return false;
     }
 
     void GenerationManager::RequestGeneration()
     {
-        if (!m_Worker->Request(false)) {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/request", PerformanceMonitor::Domain::Generation);
+        GenerationRequestSnapshot snapshot = CaptureGenerationSnapshot();
+        StoreGenerationSnapshot(snapshot);
+        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
+                                              std::to_string(snapshot.tileResolution));
+        PerformanceMonitor::Get().SetMetadata("terrain/revision",
+                                              std::to_string(snapshot.terrainRevision));
+        PerformanceMonitor::Get().SetMetadata("terrain/biome-count",
+                                              std::to_string(snapshot.biomeCount));
+        PerformanceMonitor::Get().SetMetadata("terrain/filter-count",
+                                              std::to_string(snapshot.filterCount));
+
+        uint64_t requestId = 0;
+        if (!m_Worker->Request(false, &requestId)) {
+            requestId          = PerformanceMonitor::Get().NewFlowId();
+            snapshot.requestId = requestId;
+            snapshot.force     = snapshot.dirtyState.RequiresForce();
+            StoreGenerationSnapshot(snapshot);
+            TF3D_PROFILE_FLOW_BEGIN_DOMAIN("generation/request", requestId, PerformanceMonitor::Domain::Generation);
+            TF3D_PROFILE_VALUE_DOMAIN_FLOW("generation/request/force", snapshot.force ? 1 : 0, 0, 0,
+                                           PerformanceMonitor::Domain::Generation, requestId);
+            TF3D_PROFILE_FLOW_STEP_DOMAIN("generation/request", requestId, "started",
+                                          PerformanceMonitor::Domain::Generation);
+            TF3D_PROFILE_INSTANT_DOMAIN_FLOW("generation/request/fallback", PerformanceMonitor::Domain::Generation, requestId);
             ExecuteGeneration();
+            {
+                TF3D_PROFILE_SCOPE_FLOW("generation/publish", PerformanceMonitor::Domain::Generation, requestId);
+                CommitHeightfield();
+                TF3D_PROFILE_FLOW_STEP_DOMAIN("generation/request", requestId, "published",
+                                              PerformanceMonitor::Domain::Generation);
+                TF3D_PROFILE_FLOW_END_DOMAIN("generation/request", requestId, PerformanceMonitor::Domain::Generation);
+            }
+        } else {
+            std::lock_guard lock(m_RequestSnapshotMutex);
+            if (m_PendingGenerationSnapshot.has_value())
+                m_PendingGenerationSnapshot->requestId = requestId;
         }
+    }
+
+    GenerationRequestSnapshot GenerationManager::CaptureGenerationSnapshot()
+    {
+        GenerationRequestSnapshot snapshot;
+        auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
+        snapshot.submittedFrame  = PerformanceMonitor::Get().CurrentFrameId();
+        snapshot.terrainRevision = m_TerrainRevision.load(std::memory_order_acquire);
+        snapshot.tileResolution  = m_AppState->mainMap.tileResolution;
+        snapshot.dirtyState      = m_AppState->generationDirtyManager.Snapshot();
+        snapshot.biomeCount      = static_cast<uint32_t>(m_Field.biomeManagers.size());
+        for (const auto &biome : m_Field.biomeManagers) {
+            if (biome != nullptr)
+                snapshot.filterCount += static_cast<uint32_t>(std::max(0, biome->GetFiltersCount()));
+        }
+        snapshot.force = snapshot.dirtyState.RequiresForce();
+        return snapshot;
+    }
+
+    void GenerationManager::StoreGenerationSnapshot(const GenerationRequestSnapshot &snapshot)
+    {
+        std::lock_guard lock(m_RequestSnapshotMutex);
+        m_PendingGenerationSnapshot = snapshot;
+    }
+
+    GenerationRequestSnapshot GenerationManager::TakeGenerationSnapshot()
+    {
+        GenerationRequestSnapshot snapshot;
+        {
+            std::lock_guard lock(m_RequestSnapshotMutex);
+            if (m_PendingGenerationSnapshot.has_value()) {
+                snapshot = *m_PendingGenerationSnapshot;
+                m_PendingGenerationSnapshot.reset();
+            }
+        }
+        if (!snapshot.dirtyState.IsDirty()) {
+            auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
+            snapshot.submittedFrame  = PerformanceMonitor::Get().CurrentFrameId();
+            snapshot.terrainRevision = m_TerrainRevision.load(std::memory_order_acquire);
+            snapshot.tileResolution  = m_AppState->mainMap.tileResolution;
+            snapshot.dirtyState      = m_AppState->generationDirtyManager.Consume();
+            snapshot.biomeCount      = static_cast<uint32_t>(m_Field.biomeManagers.size());
+            for (const auto &biome : m_Field.biomeManagers) {
+                if (biome != nullptr)
+                    snapshot.filterCount += static_cast<uint32_t>(std::max(0, biome->GetFiltersCount()));
+            }
+            snapshot.force = snapshot.dirtyState.RequiresForce();
+        }
+        if (snapshot.requestId == 0 && m_Worker != nullptr)
+            snapshot.requestId = m_Worker->GetActiveRequestId();
+        return snapshot;
     }
 
     void GenerationManager::WaitForGenerationWorker()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/wait-for-worker", PerformanceMonitor::Domain::Wait);
         m_Worker->WaitForIdle();
     }
 
     void GenerationManager::ExecuteGeneration()
     {
-        TF3D_PROFILE_SCOPE("generation/execute");
-        auto generationStateLock   = m_AppState->generationDirtyManager.AcquireStateLock();
-        const auto dirtyState      = m_AppState->generationDirtyManager.Consume();
+        const GenerationRequestSnapshot snapshot = TakeGenerationSnapshot();
+        const auto &dirtyState                   = snapshot.dirtyState;
+        TF3D_PROFILE_SCOPE_FLOW("generation/execute", PerformanceMonitor::Domain::Generation, snapshot.requestId);
+        TF3D_PROFILE_VALUE_DOMAIN_FLOW("generation/request-snapshot", dirtyState.mask, dirtyState.causeMask,
+                                       dirtyState.revision, PerformanceMonitor::Domain::Generation, snapshot.requestId);
+        TF3D_PROFILE_VALUE_DOMAIN_FLOW("generation/request-context", snapshot.submittedFrame,
+                                       snapshot.terrainRevision, snapshot.requestId,
+                                       PerformanceMonitor::Domain::Generation, snapshot.requestId);
+        TF3D_PROFILE_VALUE_DOMAIN_FLOW("generation/request-shape", static_cast<uint64_t>(snapshot.tileResolution),
+                                       snapshot.biomeCount, snapshot.filterCount,
+                                       PerformanceMonitor::Domain::Generation, snapshot.requestId);
+        TF3D_PROFILE_VALUE_DOMAIN_FLOW("generation/dirty-state", dirtyState.mask, dirtyState.causeMask,
+                                       dirtyState.revision, PerformanceMonitor::Domain::Generation, snapshot.requestId);
         const bool forceUpdate     = dirtyState.RequiresForce();
         const bool updateAllBiomes = dirtyState.Has(GenerationDirtyScope::AllBiomes);
         auto hasAnythingUpdated    = false;
         for (auto biome : m_Field.biomeManagers) {
             if (biome->IsUpdationRequired() || updateAllBiomes || forceUpdate) {
+                TF3D_PROFILE_SCOPE_DOMAIN("generation/biome", PerformanceMonitor::Domain::Generation);
                 biome->Update(m_Field.swapBuffer.get(), m_Field.seedTexture.get());
                 hasAnythingUpdated = true;
             }
         }
         if (hasAnythingUpdated || m_Field.biomeMixer->IsUpdationRequired() || dirtyState.Has(GenerationDirtyScope::Mixer) || forceUpdate) {
-            m_Field.biomeMixer->Update(m_Field.workingHeightmapData.get(), m_Field.swapBuffer.get());
-            m_Field.slopeGenerator->Compute(m_Field.workingHeightmapData.get(), m_Field.workingHeightmapData->GetResolution());
+            {
+                TF3D_PROFILE_SCOPE_DOMAIN("generation/mixer", PerformanceMonitor::Domain::Generation);
+                TF3D_PROFILE_GPU_SCOPE("generation/mixer/gpu");
+                m_Field.biomeMixer->Update(m_Field.workingHeightmapData.get(), m_Field.swapBuffer.get());
+            }
+            {
+                TF3D_PROFILE_SCOPE_DOMAIN("generation/slope", PerformanceMonitor::Domain::Generation);
+                TF3D_PROFILE_GPU_SCOPE("generation/slope/gpu");
+                m_Field.slopeGenerator->Compute(m_Field.workingHeightmapData.get(), m_Field.workingHeightmapData->GetResolution());
+            }
         }
     }
 
@@ -132,10 +246,12 @@ namespace tf3d::generators
 
     void GenerationManager::ShowSettings()
     {
-        // NOTE: this is bad, remove it asap
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/ui", PerformanceMonitor::Domain::Ui);
+        TF3D_PROFILE_BEGIN(stateLockScope, "generation/ui-state-lock");
         auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
         ShowSettingsInspector();
         ShowSettingsDetailed();
+        stateLockScope.End();
     }
 
     void GenerationManager::ShowSettingsInspector()
@@ -390,15 +506,30 @@ namespace tf3d::generators
     {
         if (m_Field.statistics == nullptr || m_Field.heightmapData == nullptr)
             return;
-        m_Field.statistics->Compute(m_Field.heightmapData.get(), m_AppState->mainMap.tileResolution, m_Field.statisticsSampleStride);
-        glFinish();
-        m_Field.statisticsResult = m_Field.statistics->Read();
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/statistics", PerformanceMonitor::Domain::Generation);
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("generation/statistics/dispatch", PerformanceMonitor::Domain::Generation);
+            TF3D_PROFILE_GPU_SCOPE("generation/statistics/gpu");
+            m_Field.statistics->Compute(m_Field.heightmapData.get(), m_AppState->mainMap.tileResolution, m_Field.statisticsSampleStride);
+        }
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("generation/statistics/finish", PerformanceMonitor::Domain::Wait);
+            glFinish();
+        }
+        {
+            TF3D_PROFILE_SCOPE_DOMAIN("generation/statistics/readback", PerformanceMonitor::Domain::Wait);
+            m_Field.statisticsResult = m_Field.statistics->Read();
+        }
     }
 
     void GenerationManager::CommitHeightfield()
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/commit", PerformanceMonitor::Domain::Generation);
         m_Field.heightmapData.swap(m_Field.workingHeightmapData);
-        m_TerrainRevision.fetch_add(1, std::memory_order_release);
+        const uint64_t terrainRevision = m_TerrainRevision.fetch_add(1, std::memory_order_release) + 1;
+        PerformanceMonitor::Get().SetMetadata("terrain/revision", std::to_string(terrainRevision));
+        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
+                                              std::to_string(m_AppState->mainMap.tileResolution));
         GenerateHeightmapMipmaps();
         if (m_Field.heightPyramid != nullptr) {
             m_Field.heightPyramid->Rebuild(m_Field.heightmapData.get());
@@ -411,6 +542,9 @@ namespace tf3d::generators
         if (m_Field.heightmapData == nullptr || m_Field.heightmapData->GetResolution() <= 0)
             return;
 
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/heightfield-mipmap", PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_GPU_SCOPE("generation/heightfield-mipmap/gpu");
+        TF3D_PROFILE_COUNTER_DOMAIN("gpu/mipmap-generations", 1.0, PerformanceMonitor::Domain::Gpu);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         m_Field.heightmapData->BindAsTexture(0);
         int32_t mipLevels = 1;
@@ -443,15 +577,20 @@ namespace tf3d::generators
 
     bool GenerationManager::OnTileResolutionChange(const std::string, void *)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/resize", PerformanceMonitor::Domain::Generation);
         WaitForGenerationWorker();
         m_Worker->ConsumeCompleted();
+        TF3D_PROFILE_VALUE_DOMAIN("generation/resolution", m_AppState->mainMap.tileResolution, 0, 0,
+                                  PerformanceMonitor::Domain::Generation);
+        PerformanceMonitor::Get().SetMetadata("terrain/tile-resolution",
+                                              std::to_string(m_AppState->mainMap.tileResolution));
         auto generationStateLock = m_AppState->generationDirtyManager.AcquireStateLock();
         auto size                = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_Field.heightmapData->Resize(size);
         m_Field.workingHeightmapData->Resize(size);
         m_Field.swapBuffer->Resize(size);
         m_Field.slopeGenerator->Resize(m_AppState->mainMap.tileResolution);
-        m_AppState->generationDirtyManager.MarkForce();
+        m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::Resize);
         for (auto biome : m_Field.biomeManagers) {
             biome->Resize();
         }

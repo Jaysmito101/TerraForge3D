@@ -4,6 +4,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -29,6 +30,7 @@ namespace tf3d::generators
 
     bool SlopeGenerator::Compute(GeneratorData *heightmap, int32_t resolution)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/slope/compute", PerformanceMonitor::Domain::Generation);
         if (heightmap == nullptr || !m_Shader || m_Texture == nullptr || resolution <= 0)
             return false;
         Resize(resolution);
@@ -41,6 +43,7 @@ namespace tf3d::generators
 
         const int workgroupSize = std::max(m_AppState->constants.gpuWorkgroupSize, 1);
         const int dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
+        TF3D_PROFILE_GPU_SCOPE("generation/slope/compute/gpu");
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
         m_Texture->GenerateMipmaps();

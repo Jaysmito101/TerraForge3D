@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/HeightfieldPyramid.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -67,6 +68,7 @@ namespace tf3d::renderer
                                    float terrainWorldSize, float terrainHeightOffset, float terrainMaximumHeight,
                                    float receiverHeight)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/planar-shadow/update", PerformanceMonitor::Domain::Renderer);
         if (heightPyramid == nullptr || !heightPyramid->IsReady() || !m_Shader ||
             terrainWorldSize <= 0.000001f) {
             return false;
@@ -124,14 +126,22 @@ namespace tf3d::renderer
         const glm::vec2 lightDirectionXZ(lightDirection.x, lightDirection.z);
         m_Shader->SetUniform1f("u_MaxDistance", glm::length(atlasWorldSize) * 2.0f / std::max(glm::length(lightDirectionXZ), 0.000001f));
 
-        glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8);
-        glDispatchCompute((m_Resolution + WorkgroupSize - 1) / WorkgroupSize,
-                          (m_Resolution + WorkgroupSize - 1) / WorkgroupSize, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/planar-shadow/dispatch");
+            glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8);
+            glDispatchCompute((m_Resolution + WorkgroupSize - 1) / WorkgroupSize,
+                              (m_Resolution + WorkgroupSize - 1) / WorkgroupSize, 1);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
+        }
+        {
+            TF3D_PROFILE_GPU_SCOPE("renderer/cache/planar-shadow/mipmap");
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_RendererID);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            TF3D_PROFILE_COUNTER_DOMAIN("gpu/mipmap-generations", 1.0, PerformanceMonitor::Domain::Gpu);
+            glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
 
         m_Shader->Unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
