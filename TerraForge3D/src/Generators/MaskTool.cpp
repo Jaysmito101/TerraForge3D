@@ -83,6 +83,24 @@ namespace tf3d::generators
     {
         auto node = CreateSerializerNode();
         node->Set("MaskSource", static_cast<int>(m_PreviewMode));
+        node->Set("InvertPreview", m_InvertPreview);
+
+        std::vector<SerializerNode> strokes;
+        strokes.reserve(m_Strokes.size() + (m_HasActiveStroke ? 1 : 0));
+        const auto appendStroke = [&strokes](const MaskStroke &stroke) {
+            auto strokeNode = CreateSerializerNode();
+            strokeNode->Set("Points", stroke.points);
+            strokeNode->Set("Strength", stroke.strength);
+            strokeNode->Set("Size", stroke.size);
+            strokeNode->Set("Falloff", stroke.falloff);
+            strokeNode->Set("Mode", stroke.mode);
+            strokes.push_back(std::move(strokeNode));
+        };
+        for (const auto &stroke : m_Strokes)
+            appendStroke(stroke);
+        if (m_HasActiveStroke)
+            appendStroke(m_ActiveStroke);
+        node->Set("Strokes", strokes);
         return node;
     }
 
@@ -94,12 +112,27 @@ namespace tf3d::generators
                                                data->Get<int>("PreviewMode", static_cast<int>(MaskPreviewMode::Painted)));
         const auto source     = static_cast<MaskPreviewMode>(glm::clamp(savedSource, 0, 1));
         FinishActiveStroke();
-        m_PreviewMode = source == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
+        m_Strokes.clear();
+        for (const auto &strokeNode : data->Get<std::vector<SerializerNode>>("Strokes")) {
+            if (strokeNode == nullptr)
+                continue;
+            MaskStroke stroke;
+            stroke.points   = strokeNode->Get<std::vector<glm::vec2>>("Points");
+            stroke.strength = strokeNode->Get<float>("Strength", 0.0f);
+            stroke.size     = strokeNode->Get<float>("Size", 0.0f);
+            stroke.falloff  = strokeNode->Get<float>("Falloff", 0.0f);
+            stroke.mode     = strokeNode->Get<int>("Mode", 0);
+            if (!stroke.points.empty())
+                m_Strokes.push_back(std::move(stroke));
+        }
+        m_InvertPreview = data->Get<bool>("InvertPreview", m_InvertPreview);
+        m_PreviewMode   = source == MaskPreviewMode::Generated && m_ExternalGeneratedTexture != nullptr
                             ? MaskPreviewMode::Generated
                             : MaskPreviewMode::Painted;
-        m_IsEditing   = false;
+        m_IsEditing     = false;
         if (s_CurrentlyEditingMaskTool == this)
             s_CurrentlyEditingMaskTool = nullptr;
+        RasterizeStrokes();
         m_RequireUpdation = true;
     }
 

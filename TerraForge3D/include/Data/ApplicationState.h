@@ -127,20 +127,20 @@ namespace tf3d::data
         texture_store::TextureStore *textureStore  = nullptr;
         misc::SupportersTribute *supportersTribute = nullptr;
         misc::OSLiscences *osLiscences             = nullptr;
-        data::ProjectManager *projectManager             = nullptr;
-        exporters::ExportManager *exportManager               = nullptr;
-        base::Model *mainModel                           = nullptr;
+        data::ProjectManager *projectManager       = nullptr;
+        exporters::ExportManager *exportManager    = nullptr;
+        base::Model *mainModel                     = nullptr;
         renderer::RendererManager *rendererManager = nullptr;
         Dashboard *dashboard                       = nullptr;
         misc::ViewportManager *viewportManagers[MAX_VIEWPORT_COUNT];
-        misc::Style *styleManager                  = nullptr;
+        misc::Style *styleManager                        = nullptr;
         generators::GenerationManager *generationManager = nullptr;
         generators::GenerationDirtyManager generationDirtyManager;
-        job::JobSystem *jobSystem      = nullptr;
-        job::JobManager *jobManager    = nullptr;
-        base::EventManager *eventManager           = nullptr;
-        data::ResourceManager *resourceManager     = nullptr;
-        data::ConfigManager *configManager         = nullptr;
+        job::JobSystem *jobSystem              = nullptr;
+        job::JobManager *jobManager            = nullptr;
+        base::EventManager *eventManager       = nullptr;
+        data::ResourceManager *resourceManager = nullptr;
+        data::ConfigManager *configManager     = nullptr;
 
 #ifdef TF3D_ENABLE_MCP
         bool mcpEnabled                           = true;
