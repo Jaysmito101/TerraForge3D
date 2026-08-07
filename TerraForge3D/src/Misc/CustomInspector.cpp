@@ -81,6 +81,71 @@ namespace tf3d::misc
         }
     } // namespace
 
+    namespace
+    {
+        template <typename ShaderType>
+        void ApplyInspectorValues(const CustomInspector &inspector, ShaderType &shader, std::string_view uniformPrefix)
+        {
+            const auto &widgets     = inspector.GetWidgets();
+            const auto &widgetOrder = inspector.GetWidgetsOrder();
+            inspector.ForEachValue([&](const auto &valueName, const auto &uniformValue) {
+                const CustomInspectorWidget *widget = nullptr;
+                for (const auto &widgetLabel : widgetOrder) {
+                    const auto widgetIterator = widgets.find(widgetLabel);
+                    if (widgetIterator == widgets.end() || widgetIterator->second.GetVariableName() != valueName)
+                        continue;
+                    if (widget == nullptr || widgetIterator->second.IsShaderUniformConfigured())
+                        widget = &widgetIterator->second;
+                    if (widget->IsShaderUniformConfigured())
+                        break;
+                }
+
+                const std::string uniformName = widget != nullptr && widget->IsShaderUniformConfigured()
+                                                    ? widget->GetShaderUniformName()
+                                                    : std::string(uniformPrefix) + valueName;
+                if (uniformName.empty())
+                    return;
+
+                switch (uniformValue.GetType()) {
+                    case CustomInspectorValueType::Int:
+                        shader.SetUniform1i(uniformName, uniformValue.template Get<int32_t>());
+                        break;
+                    case CustomInspectorValueType::Float:
+                        shader.SetUniform1f(uniformName, uniformValue.template Get<float>());
+                        break;
+                    case CustomInspectorValueType::Bool:
+                        shader.SetUniform1i(uniformName, uniformValue.template Get<bool>() ? 1 : 0);
+                        break;
+                    case CustomInspectorValueType::Vector2:
+                        shader.SetUniform2f(uniformName, uniformValue.template Get<glm::vec2>());
+                        break;
+                    case CustomInspectorValueType::Vector3:
+                        shader.SetUniform3f(uniformName, uniformValue.template Get<glm::vec3>());
+                        break;
+                    case CustomInspectorValueType::Vector4: {
+                        const glm::vec4 vector = uniformValue.template Get<glm::vec4>();
+                        shader.SetUniform4f(uniformName, vector.x, vector.y, vector.z, vector.w);
+                        break;
+                    }
+                    case CustomInspectorValueType::FloatArray: {
+                        const auto values = uniformValue.template Get<std::vector<float>>();
+                        if (!values.empty())
+                            shader.SetUniform1fv(uniformName, values.data(), static_cast<int>(values.size()));
+                        break;
+                    }
+                    case CustomInspectorValueType::String:
+                    case CustomInspectorValueType::Texture:
+                    case CustomInspectorValueType::Path:
+                    case CustomInspectorValueType::Curve:
+                    case CustomInspectorValueType::Unknown:
+                    case CustomInspectorValueType::Count:
+                    default:
+                        break;
+                }
+            });
+        }
+    } // namespace
+
     void RenderInspectorTooltip(const std::string &label, const std::string &description)
     {
         if (description.empty() || ImGui::IsItemActive() || !ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_NoSharedDelay))
@@ -119,6 +184,8 @@ namespace tf3d::misc
                 return "Vector3";
             case CustomInspectorValueType::Vector4:
                 return "Vector4";
+            case CustomInspectorValueType::FloatArray:
+                return "FloatArray";
             case CustomInspectorValueType::Texture:
                 return "Texture";
             case CustomInspectorValueType::Path:
@@ -146,6 +213,8 @@ namespace tf3d::misc
             return CustomInspectorValueType::Vector3;
         if (type == "Vector4")
             return CustomInspectorValueType::Vector4;
+        if (type == "FloatArray")
+            return CustomInspectorValueType::FloatArray;
         if (type == "Texture")
             return CustomInspectorValueType::Texture;
         if (type == "Path")
@@ -191,6 +260,10 @@ namespace tf3d::misc
             case CustomInspectorValueType::Vector4:
                 node->Set("Value", glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
                 node->Set("DefaultValue", glm::vec4(m_DefaultVectorValue[0], m_DefaultVectorValue[1], m_DefaultVectorValue[2], m_DefaultVectorValue[3]));
+                break;
+            case CustomInspectorValueType::FloatArray:
+                node->Set("Value", m_FloatArrayValue);
+                node->Set("DefaultValue", m_DefaultFloatArrayValue);
                 break;
             case CustomInspectorValueType::Texture:
                 node->Set("Value", m_TextureValue ? m_TextureValue->GetPath() : "null");
@@ -278,6 +351,10 @@ namespace tf3d::misc
                 m_VectorValue[2]        = value.z;
                 m_VectorValue[3]        = value.w;
             } break;
+            case CustomInspectorValueType::FloatArray:
+                m_DefaultFloatArrayValue = node->Get<std::vector<float>>("DefaultValue", m_DefaultFloatArrayValue);
+                m_FloatArrayValue        = node->Get<std::vector<float>>("Value", m_DefaultFloatArrayValue);
+                break;
             case CustomInspectorValueType::Texture: {
                 m_TextureLoadAs16Bit   = node->Get<int>("TextureBitDepth", m_TextureLoadAs16Bit ? 16 : 8) >= 16;
                 const auto defaultPath = node->Get<std::string>("DefaultValue", m_DefaultTextureValue ? m_DefaultTextureValue->GetPath() : "");
@@ -340,6 +417,9 @@ namespace tf3d::misc
             case CustomInspectorValueType::Vector4:
                 target->Set(name, glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
                 return true;
+            case CustomInspectorValueType::FloatArray:
+                target->Set(name, m_FloatArrayValue);
+                return true;
             case CustomInspectorValueType::Texture:
                 target->Set(name, m_TextureValue ? m_TextureValue->GetPath() : "");
                 return true;
@@ -372,6 +452,8 @@ namespace tf3d::misc
                 return Set(source->Get(name, GetVector3()));
             case CustomInspectorValueType::Vector4:
                 return Set(source->Get(name, GetVector4()));
+            case CustomInspectorValueType::FloatArray:
+                return Set(source->Get(name, m_FloatArrayValue));
             case CustomInspectorValueType::Texture: {
                 const std::string path = source->Get(name, m_TextureValue ? m_TextureValue->GetPath() : "");
                 m_TextureValue         = path.empty() ? nullptr : std::make_shared<Texture2D>(path, false, false, m_TextureLoadAs16Bit);
@@ -411,6 +493,8 @@ namespace tf3d::misc
                 return "Path";
             case CustomInspectorWidgetType::Curve:
                 return "Curve";
+            case CustomInspectorWidgetType::Octaves:
+                return "Octaves";
             case CustomInspectorWidgetType::Button:
                 return "Button";
             case CustomInspectorWidgetType::Checkbox:
@@ -447,6 +531,8 @@ namespace tf3d::misc
             return CustomInspectorWidgetType::Path;
         if (type == "Curve")
             return CustomInspectorWidgetType::Curve;
+        if (type == "Octaves")
+            return CustomInspectorWidgetType::Octaves;
         if (type == "Button")
             return CustomInspectorWidgetType::Button;
         if (type == "Checkbox")
@@ -687,6 +773,15 @@ namespace tf3d::misc
                 auto &var = Add<glm::vec4>(name, hasDefaultValue ? glm::vec4(config["Default"][0].get<float>(), config["Default"][1].get<float>(), config["Default"][2].get<float>(), config["Default"][3].get<float>()) : glm::vec4(0.0f));
                 return configureValue(var);
             }
+            case CustomInspectorValueType::FloatArray: {
+                std::vector<float> values;
+                if (hasDefaultValue && config["Default"].is_array())
+                    values = config["Default"].get<std::vector<float>>();
+                if (values.empty())
+                    values.resize(std::max(config.value("Count", 1), 1), 0.0f);
+                auto &var = Add<std::vector<float>>(name, std::move(values));
+                return configureValue(var);
+            }
             case CustomInspectorValueType::Texture: {
                 const bool loadAs16Bit                    = config.value("BitDepth", 8) >= 16;
                 std::shared_ptr<Texture2D> defaultTexture = nullptr;
@@ -797,6 +892,22 @@ namespace tf3d::misc
                 float components[4] = {};
                 converted           = ReadPresetVector(value, 4, components) &&
                             candidate.Set(glm::vec4(components[0], components[1], components[2], components[3]));
+                break;
+            }
+            case CustomInspectorValueType::FloatArray: {
+                if (!value.is_array() || value.empty())
+                    break;
+                std::vector<float> values;
+                values.reserve(value.size());
+                for (const auto &item : value) {
+                    float parsed = 0.0f;
+                    if (!ReadPresetFloat(item, parsed)) {
+                        values.clear();
+                        break;
+                    }
+                    values.push_back(parsed);
+                }
+                converted = !values.empty() && candidate.Set(std::move(values));
                 break;
             }
             case CustomInspectorValueType::Texture: {
@@ -926,6 +1037,8 @@ namespace tf3d::misc
     void CustomInspector::RemoveWidget(const std::string &name)
     {
         m_Widgets.erase(name);
+        m_WidgetsOrder.erase(std::remove(m_WidgetsOrder.begin(), m_WidgetsOrder.end(), name), m_WidgetsOrder.end());
+        m_WidgetSections.erase(name);
     }
 
     CustomInspectorWidget &CustomInspector::AddWidget(const std::string &name, const CustomInspectorWidget &widget)
@@ -1053,34 +1166,70 @@ namespace tf3d::misc
     bool CustomInspector::ValidateValue(const std::string &name, const CustomInspectorValue &value) const
     {
         if (value.GetType() != CustomInspectorValueType::Int &&
-            value.GetType() != CustomInspectorValueType::Float)
+            value.GetType() != CustomInspectorValueType::Float &&
+            value.GetType() != CustomInspectorValueType::FloatArray)
             return true;
 
-        const float numericValue = value.GetType() == CustomInspectorValueType::Int
-                                       ? static_cast<float>(value.Get<int32_t>())
-                                       : value.Get<float>();
-        if (!std::isfinite(numericValue)) {
-            TF3D_LOG_WARN("Invalid CustomInspector value '{}' must be finite", name);
-            return false;
+        const auto validateRange = [&](float numericValue, float minimum, float maximum) {
+            if (!std::isfinite(numericValue)) {
+                TF3D_LOG_WARN("Invalid CustomInspector value '{}' must be finite", name);
+                return false;
+            }
+            if (minimum != 0.0f || maximum != 0.0f) {
+                if (numericValue < minimum || numericValue > maximum) {
+                    TF3D_LOG_WARN(
+                        "Invalid CustomInspector value '{}' must be between {} and {}",
+                        name,
+                        minimum,
+                        maximum);
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        if (value.GetType() == CustomInspectorValueType::FloatArray) {
+            const auto values = value.Get<std::vector<float>>();
+            if (!value.m_DefaultFloatArrayValue.empty() && values.size() != value.m_DefaultFloatArrayValue.size()) {
+                TF3D_LOG_WARN("Invalid CustomInspector value '{}' must contain {} elements", name, value.m_DefaultFloatArrayValue.size());
+                return false;
+            }
+            for (const auto numericValue : values) {
+                if (!std::isfinite(numericValue)) {
+                    TF3D_LOG_WARN("Invalid CustomInspector value '{}' must be finite", name);
+                    return false;
+                }
+            }
+        } else {
+            const float numericValue = value.GetType() == CustomInspectorValueType::Int
+                                           ? static_cast<float>(value.Get<int32_t>())
+                                           : value.Get<float>();
+            if (!std::isfinite(numericValue)) {
+                TF3D_LOG_WARN("Invalid CustomInspector value '{}' must be finite", name);
+                return false;
+            }
         }
 
         for (const auto &[widgetName, widget] : m_Widgets) {
             if (widget.m_VariableName != name ||
                 (widget.m_Type != CustomInspectorWidgetType::Slider &&
-                 widget.m_Type != CustomInspectorWidgetType::Drag))
+                 widget.m_Type != CustomInspectorWidgetType::Drag &&
+                 widget.m_Type != CustomInspectorWidgetType::Octaves))
                 continue;
 
             const float minimum = widget.m_Constratins[0];
             const float maximum = widget.m_Constratins[1];
-            if (minimum == 0.0f && maximum == 0.0f)
-                continue;
-            if (numericValue < minimum || numericValue > maximum) {
-                TF3D_LOG_WARN(
-                    "Invalid CustomInspector value '{}' must be between {} and {}",
-                    name,
-                    minimum,
-                    maximum);
-                return false;
+            if (value.GetType() == CustomInspectorValueType::FloatArray) {
+                for (const auto numericValue : value.Get<std::vector<float>>()) {
+                    if (!validateRange(numericValue, minimum, maximum))
+                        return false;
+                }
+            } else {
+                const float numericValue = value.GetType() == CustomInspectorValueType::Int
+                                               ? static_cast<float>(value.Get<int32_t>())
+                                               : value.Get<float>();
+                if (!validateRange(numericValue, minimum, maximum))
+                    return false;
             }
         }
         return true;
@@ -1209,6 +1358,11 @@ namespace tf3d::misc
                 case CustomInspectorValueType::Vector4:
                     schema = vectorSchema(4);
                     break;
+                case CustomInspectorValueType::FloatArray:
+                    schema = {
+                        {"type", "array"},
+                        {"items", {{"type", "number"}}}};
+                    break;
                 case CustomInspectorValueType::Path:
                 case CustomInspectorValueType::Curve:
                     schema = {
@@ -1231,6 +1385,12 @@ namespace tf3d::misc
                     (widget->m_Constratins[0] != 0.0f || widget->m_Constratins[1] != 0.0f)) {
                     schema["minimum"] = widget->m_Constratins[0];
                     schema["maximum"] = widget->m_Constratins[1];
+                }
+                if (widget->m_Type == CustomInspectorWidgetType::Octaves &&
+                    value.GetType() == CustomInspectorValueType::FloatArray &&
+                    (widget->m_Constratins[0] != 0.0f || widget->m_Constratins[1] != 0.0f)) {
+                    schema["items"]["minimum"] = widget->m_Constratins[0];
+                    schema["items"]["maximum"] = widget->m_Constratins[1];
                 }
                 if (widget->m_Type == CustomInspectorWidgetType::Dropdown &&
                     !widget->m_DropdownOptions.empty()) {
@@ -1665,55 +1825,12 @@ namespace tf3d::misc
 
     void CustomInspector::ApplyToShader(tf3d::base::Shader &shader, std::string_view uniformPrefix) const
     {
-        for (const auto &[name, value] : m_Values) {
-            const CustomInspectorWidget *widget = nullptr;
-            for (const auto &widgetLabel : m_WidgetsOrder) {
-                const auto widgetIterator = m_Widgets.find(widgetLabel);
-                if (widgetIterator == m_Widgets.end() || widgetIterator->second.m_VariableName != name)
-                    continue;
-                if (widget == nullptr || widgetIterator->second.m_ShaderUniformConfigured)
-                    widget = &widgetIterator->second;
-                if (widget->m_ShaderUniformConfigured)
-                    break;
-            }
+        ApplyInspectorValues(*this, shader, uniformPrefix);
+    }
 
-            const std::string uniformName = widget != nullptr && widget->m_ShaderUniformConfigured
-                                                ? widget->m_ShaderUniformName
-                                                : std::string(uniformPrefix) + name;
-            if (uniformName.empty())
-                continue;
-
-            switch (value.GetType()) {
-                case CustomInspectorValueType::Int:
-                    shader.SetUniform1i(uniformName, value.Get<int32_t>());
-                    break;
-                case CustomInspectorValueType::Float:
-                    shader.SetUniform1f(uniformName, value.Get<float>());
-                    break;
-                case CustomInspectorValueType::Bool:
-                    shader.SetUniform1i(uniformName, value.Get<bool>() ? 1 : 0);
-                    break;
-                case CustomInspectorValueType::Vector2:
-                    shader.SetUniform2f(uniformName, value.Get<glm::vec2>());
-                    break;
-                case CustomInspectorValueType::Vector3:
-                    shader.SetUniform3f(uniformName, value.Get<glm::vec3>());
-                    break;
-                case CustomInspectorValueType::Vector4: {
-                    const glm::vec4 vector = value.Get<glm::vec4>();
-                    shader.SetUniform4f(uniformName, vector.x, vector.y, vector.z, vector.w);
-                    break;
-                }
-                case CustomInspectorValueType::String:
-                case CustomInspectorValueType::Texture:
-                case CustomInspectorValueType::Path:
-                case CustomInspectorValueType::Curve:
-                case CustomInspectorValueType::Unknown:
-                case CustomInspectorValueType::Count:
-                default:
-                    break;
-            }
-        }
+    void CustomInspector::ApplyToShader(tf3d::base::ComputeShader &shader, std::string_view uniformPrefix) const
+    {
+        ApplyInspectorValues(*this, shader, uniformPrefix);
     }
 
     bool CustomInspector::RenderWidget(const std::string &widgetLabel)
@@ -1752,6 +1869,8 @@ namespace tf3d::misc
             widgetChanged = RenderPath(widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Curve)
             widgetChanged = RenderCurve(widget);
+        else if (widget.m_Type == CustomInspectorWidgetType::Octaves)
+            widgetChanged = RenderOctaves(widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Button)
             widgetChanged = RenderButton(widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Checkbox)
@@ -2089,6 +2208,37 @@ namespace tf3d::misc
         for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
             value.m_CurvePoints[index] = glm::vec2(points[index].x, points[index].y);
         value.m_CurvePointCount = pointCount;
+        return changed;
+    }
+
+    bool CustomInspector::RenderOctaves(const CustomInspectorWidget &widget)
+    {
+        auto &value = m_Values[widget.m_VariableName];
+        if (value.GetType() != CustomInspectorValueType::FloatArray)
+            throw std::runtime_error("Invalid data type for Octaves");
+
+        auto &octaves = value.m_FloatArrayValue;
+        if (octaves.empty())
+            return false;
+
+        ImGui::TextUnformatted(widget.m_Label.c_str());
+        bool changed = false;
+        ImGui::PushID((widget.m_VariableName + "Values").c_str());
+        for (size_t index = 0; index < octaves.size(); ++index) {
+            ImGui::PushID(static_cast<int>(index));
+            const std::string label = "Octave " + std::to_string(index + 1);
+            if (ImGui::VSliderFloat("##Value",
+                                    ImVec2(20.0f, 200.0f),
+                                    &octaves[index],
+                                    widget.m_Constratins[0],
+                                    widget.m_Constratins[1]))
+                changed = true;
+            RenderInspectorTooltip(label, std::to_string(octaves[index]));
+            ImGui::SameLine();
+            ImGui::PopID();
+        }
+        ImGui::NewLine();
+        ImGui::PopID();
         return changed;
     }
 

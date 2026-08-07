@@ -32,6 +32,7 @@ namespace tf3d::misc
         Vector2,
         Vector3,
         Vector4,
+        FloatArray,
         Texture,
         Path,
         Curve,
@@ -286,6 +287,8 @@ namespace tf3d::misc
                 return CustomInspectorValueType::Vector3;
             else if constexpr (std::is_same_v<ValueType, glm::vec4>)
                 return CustomInspectorValueType::Vector4;
+            else if constexpr (std::is_same_v<ValueType, std::vector<float>>)
+                return CustomInspectorValueType::FloatArray;
             else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>)
                 return CustomInspectorValueType::Texture;
             else
@@ -310,6 +313,8 @@ namespace tf3d::misc
                 return m_Type == CustomInspectorValueType::Vector3 ? GetVector3() : fallback;
             } else if constexpr (std::is_same_v<ValueType, glm::vec4>) {
                 return m_Type == CustomInspectorValueType::Vector4 ? GetVector4() : fallback;
+            } else if constexpr (std::is_same_v<ValueType, std::vector<float>>) {
+                return m_Type == CustomInspectorValueType::FloatArray ? m_FloatArrayValue : fallback;
             } else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>) {
                 return m_Type == CustomInspectorValueType::Texture ? GetTexture() : fallback;
             } else if constexpr (std::is_same_v<ValueType, std::vector<glm::vec2>>) {
@@ -369,6 +374,10 @@ namespace tf3d::misc
                 m_VectorValue[1] = value.y;
                 m_VectorValue[2] = value.z;
                 m_VectorValue[3] = value.w;
+            } else if constexpr (std::is_same_v<ValueType, std::vector<float>>) {
+                if (m_Type != CustomInspectorValueType::FloatArray || value.empty())
+                    return false;
+                m_FloatArrayValue = std::move(value);
             } else if constexpr (std::is_same_v<ValueType, std::shared_ptr<Texture2D>>) {
                 if (m_Type != CustomInspectorValueType::Texture)
                     return false;
@@ -407,6 +416,7 @@ namespace tf3d::misc
             m_DefaultVectorValue[1]  = m_VectorValue[1];
             m_DefaultVectorValue[2]  = m_VectorValue[2];
             m_DefaultVectorValue[3]  = m_VectorValue[3];
+            m_DefaultFloatArrayValue = m_FloatArrayValue;
             m_DefaultPathPoints      = m_PathPoints;
             m_DefaultPathPointCount  = m_PathPointCount;
             m_DefaultCurvePoints     = m_CurvePoints;
@@ -425,6 +435,7 @@ namespace tf3d::misc
             m_VectorValue[1]  = m_DefaultVectorValue[1];
             m_VectorValue[2]  = m_DefaultVectorValue[2];
             m_VectorValue[3]  = m_DefaultVectorValue[3];
+            m_FloatArrayValue = m_DefaultFloatArrayValue;
             m_PathPoints      = m_DefaultPathPoints;
             m_PathPointCount  = m_DefaultPathPointCount;
             m_CurvePoints     = m_DefaultCurvePoints;
@@ -454,6 +465,7 @@ namespace tf3d::misc
         std::shared_ptr<Texture2D> m_TextureValue = nullptr, m_DefaultTextureValue = nullptr;
         bool m_TextureLoadAs16Bit = false;
         float m_VectorValue[4] = {0.0f, 0.0f, 0.0f, 0.0f}, m_DefaultVectorValue[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        std::vector<float> m_FloatArrayValue, m_DefaultFloatArrayValue;
         std::array<glm::vec2, CustomInspectorMaxPathPoints> m_PathPoints{};
         std::array<glm::vec2, CustomInspectorMaxPathPoints> m_DefaultPathPoints{};
         int32_t m_PathPointCount = 2, m_DefaultPathPointCount = 2;
@@ -470,6 +482,7 @@ namespace tf3d::misc
         Texture,
         Path,
         Curve,
+        Octaves,
         Button,
         Checkbox,
         Input,
@@ -691,6 +704,7 @@ namespace tf3d::misc
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
         void ApplyToShader(tf3d::base::Shader &shader, std::string_view uniformPrefix = "u_") const;
+        void ApplyToShader(tf3d::base::ComputeShader &shader, std::string_view uniformPrefix = "u_") const;
 
         inline void Reset()
         {
@@ -787,6 +801,7 @@ namespace tf3d::misc
         bool RenderDropdown(const CustomInspectorWidget &widget);
         bool RenderPath(const CustomInspectorWidget &widget);
         bool RenderCurve(const CustomInspectorWidget &widget);
+        bool RenderOctaves(const CustomInspectorWidget &widget);
 
     private:
         struct Preset {
