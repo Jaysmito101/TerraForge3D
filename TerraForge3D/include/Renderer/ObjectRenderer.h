@@ -31,7 +31,7 @@ namespace tf3d::renderer
         bool m_ViewTerrainAmbient    = false;
         bool m_ViewTerrainBentNormal = false;
         std::shared_ptr<ShaderStorageBuffer> m_SharedMemoryBuffer;
-        std::shared_ptr<Shader> m_PostProcessShader;
+        std::shared_ptr<base::GraphicsShader> m_PostProcessShader;
         uint32_t m_PostProcessVao              = 0;
         DrawBrushSettings *m_DrawBrushSettings = nullptr;
     };

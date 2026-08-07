@@ -7,10 +7,9 @@
 #include "Generators/NoiseAlgorithmCatalog.h"
 #include "Misc/CustomInspector.h"
 #include "Utils/Utils.h"
-#include <array>
 #include <nlohmann/json.hpp>
 
-#define BASE_SHAPE_UI_PROPERTY(x)     m_RequireUpdation = x || m_RequireUpdation
+#define BASE_NOISE_UI_PROPERTY(x)     m_RequireUpdation = x || m_RequireUpdation
 
 #define BIOME_BASE_NOISE_OCTAVE_COUNT 10
 
@@ -29,6 +28,7 @@ namespace tf3d::generators
         BiomeBaseNoiseGenerator(ApplicationState *appState);
         ~BiomeBaseNoiseGenerator();
 
+        bool LoadConfig(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
         bool ShowSettings();
         void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorTexture *seedTexture);
 
@@ -41,12 +41,16 @@ namespace tf3d::generators
         }
 
     private:
-        ApplicationState *m_AppState = nullptr;
-        bool m_RequireUpdation       = true;
-        std::shared_ptr<ComputeShader> m_Shader;
-        std::shared_ptr<CustomInspector> m_Inspector;
+        data::ApplicationState *m_AppState = nullptr;
+        bool m_RequireUpdation             = false;
+        std::shared_ptr<base::ComputeShader> m_Shader;
+        std::shared_ptr<misc::CustomInspector> m_Inspector;
         NoiseAlgorithmCatalog m_NoiseAlgorithms;
-        std::array<float, BIOME_BASE_NOISE_OCTAVE_COUNT> m_NoiseOctaveStrengths{};
+        std::string m_Name        = "Base Noise";
+        std::string m_ID          = "base_noise";
+        std::string m_Description = "";
+        std::string m_Source      = "";
+        std::string m_ShaderPath  = "";
     };
 
 } // namespace tf3d::generators

@@ -44,8 +44,8 @@ namespace tf3d::generators
         void EnsureTexture(int32_t resolution);
         void ReleaseTexture();
 
-        ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_Shader;
+        data::ApplicationState *m_AppState = nullptr;
+        std::shared_ptr<base::ComputeShader> m_Shader;
         uint32_t m_RendererID = 0;
         int32_t m_Resolution  = 0;
         int32_t m_MipLevels   = 0;

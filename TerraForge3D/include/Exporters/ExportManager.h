@@ -73,15 +73,15 @@ namespace tf3d::exporters
         float m_ExportProgress = 0.0f;
 
     private:
-        ApplicationState *m_AppState = nullptr;
-        std::string m_StatusMessage  = "";
-        int m_ExportMeshFormat       = 0;
-        int m_ExportTextureFormat    = 0;
-        int m_ExportTextureBitDepth  = 0;
-        bool m_HideExportControls    = false;
+        data::ApplicationState *m_AppState = nullptr;
+        std::string m_StatusMessage        = "";
+        int m_ExportMeshFormat             = 0;
+        int m_ExportTextureFormat          = 0;
+        int m_ExportTextureBitDepth        = 0;
+        bool m_HideExportControls          = false;
 
-        std::shared_ptr<GeneratorTexture> m_VisualzeTexture;
-        std::shared_ptr<ComputeShader> m_VisualzeShader;
+        std::shared_ptr<generators::GeneratorTexture> m_VisualzeTexture;
+        std::shared_ptr<base::ComputeShader> m_VisualzeShader;
 
         OBJExporter m_ObjExporter;
         STLExporter m_StlExporter;

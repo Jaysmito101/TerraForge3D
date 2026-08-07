@@ -101,12 +101,12 @@ namespace tf3d::generators
 
         bool m_RequireUpdation = true;
         std::shared_ptr<GeneratorTexture> m_MapVisualzeTexture;
-        std::shared_ptr<Texture2D> m_LoadingTexture;
-        std::shared_ptr<Texture2D> m_NullTexture;
+        std::shared_ptr<base::Texture2D> m_LoadingTexture;
+        std::shared_ptr<base::Texture2D> m_NullTexture;
         std::vector<TextureCacheKey> m_TextureDownloadQueue;
-        std::shared_ptr<ComputeShader> m_Shader;
+        std::shared_ptr<base::ComputeShader> m_Shader;
 
-        std::unordered_map<TextureCacheKey, std::shared_ptr<Texture2D>> m_TextureCache;
+        std::unordered_map<TextureCacheKey, std::shared_ptr<base::Texture2D>> m_TextureCache;
         std::unordered_map<TextureCacheKey, std::chrono::steady_clock::time_point> m_TileRetryAfter;
         std::string m_APIKey = "";
         char m_APIKeyInput[1024];

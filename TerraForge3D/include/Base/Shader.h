@@ -92,8 +92,9 @@ namespace tf3d::base
         inline int GetUniformLocation(const std::string &name)
         {
             const auto iterator = uniformLocations.find(name);
-            if (iterator != uniformLocations.end())
+            if (iterator != uniformLocations.end()) {
                 return iterator->second;
+            }
 
             const int location = glGetUniformLocation(m_Shader, name.c_str());
             uniformLocations.emplace(name, location);
@@ -136,12 +137,4 @@ namespace tf3d::base
         int maxWorkGroupCount[3], maxWorkGroupSize[3], maxWorkGroupInvocations;
     };
 
-    // Backward-compatible name for the normal graphics shader.
-    using Shader = GraphicsShader;
-
 } // namespace tf3d::base
-
-using tf3d::base::ComputeShader;
-using tf3d::base::GraphicsShader;
-using tf3d::base::Shader;
-using tf3d::base::ShaderCore;

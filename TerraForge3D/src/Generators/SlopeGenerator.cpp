@@ -1,6 +1,6 @@
 #include "Generators/SlopeGenerator.h"
 
-#include "Base/ComputeShader.h"
+#include "Base/Shader.h"
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
