@@ -140,8 +140,9 @@ namespace tf3d::generators
         m_Inspector->ApplyToShader(*m_Shader);
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
         m_Shader->SetUniform1i("u_UseSeedTexture", (seedTexture != nullptr && m_Inspector->Get("AutoUseSeedTexture", false)) ? 1 : 0);
-        if (seedTexture)
+        if (seedTexture) {
             m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
+        }
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
