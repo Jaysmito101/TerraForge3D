@@ -41,7 +41,9 @@ namespace tf3d::generators
                 ImGui::TextWrapped("%s", m_Definition->GetDescription().c_str());
         }
         changed |= ImGui::Checkbox("Enabled", &m_Enabled);
-        if (m_Inspector != nullptr && m_Definition->GetMetadata().contains("Params"))
+        if (m_Inspector != nullptr &&
+            (m_Definition->GetMetadata().contains("Params") ||
+             m_Definition->GetMetadata().contains("Sections")))
             changed |= m_Inspector->Render();
         changed |= ImGui::SliderFloat("Strength", &m_Strength, 0.0f, 1.0f);
 
