@@ -141,8 +141,8 @@ namespace tf3d::renderer
     void SeaRenderer::ShowSettings()
     {
         m_Inspector.Render();
-        // if (m_Inspector.GetLastAction() == "ReloadSeaShaders")
-        ReloadShaders();
+        if (m_Inspector.GetLastAction() == "ReloadSeaShaders")
+            ReloadShaders();
     }
 
     void SeaRenderer::ReloadShaders()
