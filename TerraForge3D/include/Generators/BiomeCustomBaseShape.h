@@ -7,6 +7,7 @@
 #include "Inspector/CustomInspector.h"
 #include "Renderer/ObjectRenderer.h"
 #include "Utils/Utils.h"
+#include <string_view>
 
 namespace tf3d::data
 {
@@ -29,7 +30,8 @@ namespace tf3d::generators
         ~BiomeCustomBaseShape();
 
         bool ShowShettings();
-        void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer);
+        void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer,
+                    std::string_view profilePrefix = {});
 
         SerializerNode Save();
         void Load(SerializerNode node);

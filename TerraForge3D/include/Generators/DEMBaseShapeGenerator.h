@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include <chrono>
+#include <string_view>
 
 #define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
@@ -49,7 +50,7 @@ namespace tf3d::generators
         ~DEMBaseShapeGenerator();
 
         bool ShowSettings();
-        void Update(GeneratorData *buffer, GeneratorTexture *seedTexture);
+        void Update(GeneratorData *buffer, GeneratorTexture *seedTexture, std::string_view profilePrefix = {});
 
         void Load(SerializerNode data);
         SerializerNode Save();

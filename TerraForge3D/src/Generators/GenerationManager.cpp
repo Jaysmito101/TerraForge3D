@@ -218,12 +218,10 @@ namespace tf3d::generators
         if (hasAnythingUpdated || m_Field.biomeMixer->IsUpdationRequired() || dirtyState.Has(GenerationDirtyScope::Mixer) || forceUpdate) {
             {
                 TF3D_PROFILE_SCOPE_DOMAIN("generation/mixer", PerformanceMonitor::Domain::Generation);
-                TF3D_PROFILE_GPU_SCOPE("generation/mixer/gpu");
                 m_Field.biomeMixer->Update(m_Field.workingHeightmapData.get(), m_Field.swapBuffer.get());
             }
             {
                 TF3D_PROFILE_SCOPE_DOMAIN("generation/slope", PerformanceMonitor::Domain::Generation);
-                TF3D_PROFILE_GPU_SCOPE("generation/slope/gpu");
                 m_Field.slopeGenerator->Compute(m_Field.workingHeightmapData.get(), m_Field.workingHeightmapData->GetResolution());
             }
         }

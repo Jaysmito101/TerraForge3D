@@ -37,9 +37,12 @@ namespace tf3d::generators
         return m_RequireUpdation;
     }
 
-    void BiomeBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture)
+    void BiomeBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture,
+                                         std::string_view profilePrefix)
     {
-        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/base-shape/") + m_Name, PerformanceMonitor::Domain::Generation);
+        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
+        const std::string scopeKey    = scopePrefix + "/base-shape/" + m_Name;
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
         buffer->Bind(0);
         m_Shader->Bind();
         int textureSlot = 4;
@@ -80,7 +83,8 @@ namespace tf3d::generators
             m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = m_AppState->mainMap.tileResolution / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE("generation/base-shape/gpu");
+        const std::string gpuKey = scopeKey + "/gpu";
+        TF3D_PROFILE_GPU_SCOPE(gpuKey);
         TF3D_PROFILE_VALUE_DOMAIN("generation/base-shape/dispatch", dispatchSize, dispatchSize, 1,
                                   PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);

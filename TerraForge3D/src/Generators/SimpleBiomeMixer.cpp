@@ -21,7 +21,6 @@ namespace tf3d::generators
     void SimpleBiomeMixer::Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/mixer/simple", PerformanceMonitor::Domain::Generation);
-        TF3D_PROFILE_GPU_SCOPE("generation/mixer/simple/gpu");
         const auto &biomeManagers = m_AppState->generationManager->GetBiomeManagers();
         auto workgroupSize        = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize   = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
@@ -35,8 +34,12 @@ namespace tf3d::generators
         // clear the buffer
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
         m_Shader->SetUniform1i("u_Mode", 0);
-        m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
-        m_Shader->SetMemoryBarrier();
+        {
+            const std::string gpuKey = "generation/mixer/simple/clear/gpu";
+            TF3D_PROFILE_GPU_SCOPE(gpuKey);
+            m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
+            m_Shader->SetMemoryBarrier();
+        }
 
         std::unordered_map<std::string, SimpleBiomeMixerSettings> biomeSettingsMap;
 
@@ -59,8 +62,13 @@ namespace tf3d::generators
                 biomeManager->GetMaskTexture()->Bind(3);
                 m_Shader->SetUniform1i("u_BiomeMask", 3);
             }
-            m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
-            m_Shader->SetMemoryBarrier();
+            {
+                const std::string gpuKey = std::string("generation/mixer/simple/biome/") +
+                                           biomeManager->GetBiomeName() + "/gpu";
+                TF3D_PROFILE_GPU_SCOPE(gpuKey);
+                m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
+                m_Shader->SetMemoryBarrier();
+            }
         }
 
         // This is a horrible way to update the map, but it works for now

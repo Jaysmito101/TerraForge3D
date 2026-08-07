@@ -236,9 +236,12 @@ namespace tf3d::generators
         return requestedZoom;
     }
 
-    void DEMBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture)
+    void DEMBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture,
+                                       std::string_view profilePrefix)
     {
-        TF3D_PROFILE_SCOPE_DOMAIN("generation/dem-base-shape", PerformanceMonitor::Domain::Generation);
+        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
+        const std::string scopeKey    = scopePrefix + "/dem-base-shape";
+        TF3D_PROFILE_SCOPE_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
         TF3D_PROFILE_VALUE_DOMAIN("generation/dem/visible-tiles", static_cast<uint64_t>(m_VisibleTileCount),
                                   static_cast<uint64_t>(m_TilesFallbackCount), static_cast<uint64_t>(m_TilesUsingCount),
                                   PerformanceMonitor::Domain::Generation);
@@ -268,7 +271,8 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Mode", 0);
         const auto dispatchSize = m_AppState->mainMap.tileResolution / workgroupSize;
         {
-            TF3D_PROFILE_GPU_SCOPE("generation/dem/clear-gpu");
+            const std::string gpuKey = scopeKey + "/clear/gpu";
+            TF3D_PROFILE_GPU_SCOPE(gpuKey);
             m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         }
         m_Shader->SetMemoryBarrier();
@@ -328,7 +332,8 @@ namespace tf3d::generators
         };
 
         {
-            TF3D_PROFILE_GPU_SCOPE("generation/dem/tiles-gpu");
+            const std::string gpuKey = scopeKey + "/tiles/gpu";
+            TF3D_PROFILE_GPU_SCOPE(gpuKey);
             for (const auto &tile : fallbackTiles) {
                 renderPreviewTile(tile);
             }
@@ -344,7 +349,8 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Mode", 2);
         m_MapVisualzeTexture->BindForCompute(1);
         {
-            TF3D_PROFILE_GPU_SCOPE("generation/dem/visualizer-gpu");
+            const std::string gpuKey = scopeKey + "/visualizer/gpu";
+            TF3D_PROFILE_GPU_SCOPE(gpuKey);
             m_Shader->Dispatch(m_MapVisualzeTexture->GetWidth() / workgroupSize, m_MapVisualzeTexture->GetHeight() / workgroupSize, 1);
         }
         m_Shader->SetMemoryBarrier();

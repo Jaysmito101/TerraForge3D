@@ -368,14 +368,21 @@ private:
 #else
 #define TF3D_PROFILE_GPU_SCOPE(key) \
     do {                            \
+        (void)sizeof(key);          \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE_DOMAIN(key, domain) \
     do {                                           \
+        (void)sizeof(key);                         \
+        (void)sizeof(domain);                      \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE_FLOW(key, domain, flowId) \
     do {                                                 \
+        (void)sizeof(key);                               \
+        (void)sizeof(domain);                            \
+        (void)sizeof(flowId);                            \
     } while (false)
-#define TF3D_PROFILE_BEGIN_GPU_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) ::PerformanceMonitor::GpuScope variable
+#define TF3D_PROFILE_BEGIN_GPU_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) \
+    [[maybe_unused]] ::PerformanceMonitor::GpuScope variable = ((void)sizeof(keyExpression), (void)sizeof(domain), (void)sizeof(flowId), ::PerformanceMonitor::GpuScope{})
 #endif
 #define TF3D_PROFILE_COUNTER(key, value) \
     ::PerformanceMonitor::Get().RecordCounter(key, value)
@@ -408,68 +415,120 @@ private:
 
 #define TF3D_PROFILE_SCOPE(key) \
     do {                        \
+        (void)sizeof(key);      \
     } while (false)
-#define TF3D_PROFILE_BEGIN(variable, key) ::PerformanceMonitor::Scope variable
+#define TF3D_PROFILE_BEGIN(variable, key) \
+    [[maybe_unused]] ::PerformanceMonitor::Scope variable = ((void)sizeof(key), ::PerformanceMonitor::Scope{})
 #define TF3D_PROFILE_SCOPE_DOMAIN(key, domain) \
     do {                                       \
+        (void)sizeof(key);                     \
+        (void)sizeof(domain);                  \
     } while (false)
 #define TF3D_PROFILE_SCOPE_FLOW(key, domain, flowId) \
     do {                                             \
+        (void)sizeof(key);                           \
+        (void)sizeof(domain);                        \
+        (void)sizeof(flowId);                        \
     } while (false)
 #define TF3D_PROFILE_SCOPE_LAZY(keyExpression) \
     do {                                       \
+        (void)sizeof(keyExpression);           \
     } while (false)
 #define TF3D_PROFILE_SCOPE_LAZY_DOMAIN(keyExpression, domain) \
     do {                                                      \
+        (void)sizeof(keyExpression);                          \
+        (void)sizeof(domain);                                 \
     } while (false)
-#define TF3D_PROFILE_BEGIN_LAZY_DOMAIN(variable, keyExpression, domain)              ::PerformanceMonitor::Scope variable
-#define TF3D_PROFILE_BEGIN_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) ::PerformanceMonitor::Scope variable
+#define TF3D_PROFILE_BEGIN_LAZY_DOMAIN(variable, keyExpression, domain) \
+    [[maybe_unused]] ::PerformanceMonitor::Scope variable = ((void)sizeof(keyExpression), (void)sizeof(domain), ::PerformanceMonitor::Scope{})
+#define TF3D_PROFILE_BEGIN_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) \
+    [[maybe_unused]] ::PerformanceMonitor::Scope variable = ((void)sizeof(keyExpression), (void)sizeof(domain), (void)sizeof(flowId), ::PerformanceMonitor::Scope{})
 #define TF3D_PROFILE_END(variable) \
     do {                           \
+        (void)sizeof(variable);    \
     } while (false)
-#define TF3D_PROFILE_EVENT_BEGIN(key) uint64_t(0)
+#define TF3D_PROFILE_EVENT_BEGIN(key) ((void)sizeof(key), uint64_t(0))
 #define TF3D_PROFILE_EVENT_END(eventId) \
     do {                                \
+        (void)sizeof(eventId);          \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE(key) \
     do {                            \
+        (void)sizeof(key);          \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE_DOMAIN(key, domain) \
     do {                                           \
+        (void)sizeof(key);                         \
+        (void)sizeof(domain);                      \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE_FLOW(key, domain, flowId) \
     do {                                                 \
+        (void)sizeof(key);                               \
+        (void)sizeof(domain);                            \
+        (void)sizeof(flowId);                            \
     } while (false)
-#define TF3D_PROFILE_BEGIN_GPU_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) ::PerformanceMonitor::GpuScope variable
+#define TF3D_PROFILE_BEGIN_GPU_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) \
+    [[maybe_unused]] ::PerformanceMonitor::GpuScope variable = ((void)sizeof(keyExpression), (void)sizeof(domain), (void)sizeof(flowId), ::PerformanceMonitor::GpuScope{})
 #define TF3D_PROFILE_COUNTER(key, value) \
     do {                                 \
+        (void)sizeof(key);               \
+        (void)sizeof(value);             \
     } while (false)
 #define TF3D_PROFILE_COUNTER_DOMAIN(key, value, domain) \
     do {                                                \
+        (void)sizeof(key);                              \
+        (void)sizeof(value);                            \
+        (void)sizeof(domain);                           \
     } while (false)
 #define TF3D_PROFILE_COUNTER_DOMAIN_FLOW(key, value, domain, flowId) \
     do {                                                             \
+        (void)sizeof(key);                                           \
+        (void)sizeof(value);                                         \
+        (void)sizeof(domain);                                        \
+        (void)sizeof(flowId);                                        \
     } while (false)
 #define TF3D_PROFILE_VALUE(key, value0, value1, value2) \
     do {                                                \
+        (void)sizeof(key);                              \
+        (void)sizeof(value0);                           \
+        (void)sizeof(value1);                           \
+        (void)sizeof(value2);                           \
     } while (false)
 #define TF3D_PROFILE_VALUE_DOMAIN(key, value0, value1, value2, domain) \
     do {                                                               \
+        (void)sizeof(key);                                             \
+        (void)sizeof(value0);                                          \
+        (void)sizeof(value1);                                          \
+        (void)sizeof(value2);                                          \
+        (void)sizeof(domain);                                          \
     } while (false)
 #define TF3D_PROFILE_VALUE_DOMAIN_FLOW(key, value0, value1, value2, domain, flowId) \
     do {                                                                            \
+        (void)sizeof(key);                                                          \
+        (void)sizeof(value0);                                                       \
+        (void)sizeof(value1);                                                       \
+        (void)sizeof(value2);                                                       \
+        (void)sizeof(domain);                                                       \
+        (void)sizeof(flowId);                                                       \
     } while (false)
 #define TF3D_PROFILE_INSTANT(key) \
     do {                          \
+        (void)sizeof(key);        \
     } while (false)
 #define TF3D_PROFILE_INSTANT_DOMAIN(key, domain) \
     do {                                         \
+        (void)sizeof(key);                       \
+        (void)sizeof(domain);                    \
     } while (false)
 #define TF3D_PROFILE_INSTANT_DOMAIN_FLOW(key, domain, flowId) \
     do {                                                      \
+        (void)sizeof(key);                                    \
+        (void)sizeof(domain);                                 \
+        (void)sizeof(flowId);                                 \
     } while (false)
 #define TF3D_PROFILE_THREAD_NAME(name) \
     do {                               \
+        (void)sizeof(name);            \
     } while (false)
 #define TF3D_PROFILE_CAPTURE_ACTIVE() false
 #define TF3D_PROFILE_CAPTURE_MODE()   ::PerformanceMonitor::CaptureMode::Off

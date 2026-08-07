@@ -66,9 +66,12 @@ namespace tf3d::generators
         return (m_RequireUpdation && m_Enabled) || enabledSwitch;
     }
 
-    void BiomeCustomBaseShape::Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer)
+    void BiomeCustomBaseShape::Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer,
+                                      GeneratorData *swapBuffer, std::string_view profilePrefix)
     {
-        TF3D_PROFILE_SCOPE_DOMAIN("generation/custom-base-shape", PerformanceMonitor::Domain::Generation);
+        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
+        const std::string scopeKey    = scopePrefix + "/custom-base-shape";
+        TF3D_PROFILE_SCOPE_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
 
         if (m_RequireBaseShapeUpdate) {
             if (sourceBuffer) {
@@ -87,7 +90,8 @@ namespace tf3d::generators
         m_Shader->SetUniform1f("u_MixFactor", 1.0f);
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = m_AppState->mainMap.tileResolution / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE("generation/custom-base-shape/gpu");
+        const std::string gpuKey = scopeKey + "/gpu";
+        TF3D_PROFILE_GPU_SCOPE(gpuKey);
         TF3D_PROFILE_VALUE_DOMAIN("generation/custom-base-shape/dispatch", dispatchSize, dispatchSize, 1,
                                   PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);

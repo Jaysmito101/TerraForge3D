@@ -143,28 +143,29 @@ namespace tf3d::generators
     {
         if (!m_IsEnabled)
             return;
-        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(std::string("generation/biome/") + m_BiomeName, PerformanceMonitor::Domain::Generation);
+        const std::string profilePrefix = std::string("generation/biome/") + m_BiomeName;
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(profilePrefix, PerformanceMonitor::Domain::Generation);
         TF3D_PROFILE_VALUE_DOMAIN("generation/biome/enabled", m_IsEnabled ? 1 : 0, 0, 0,
                                   PerformanceMonitor::Domain::Generation);
         // m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
 
         if (!m_CustomBaseShape->IsEnabled() || m_CustomBaseShape->RequiresBaseShapeUpdate()) {
             if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) {
-                m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture);
+                m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture, profilePrefix);
             } else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation) {
-                m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture);
+                m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture, profilePrefix);
             }
         }
 
         if (m_CustomBaseShape->IsEnabled()) {
-            m_CustomBaseShape->Update(m_Data.get(), m_Data.get(), swapBuffer);
+            m_CustomBaseShape->Update(m_Data.get(), m_Data.get(), swapBuffer, profilePrefix);
         }
 
         m_Data->CopyTo(swapBuffer); // temporary will later be
         // optimized when filters are implemented
 
-        m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture);
-        m_FilterStack->Update(m_Data.get());
+        m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture, profilePrefix);
+        m_FilterStack->Update(m_Data.get(), profilePrefix);
         m_CalculatedMaskGenerator->Invalidate();
         m_CalculatedMaskGenerator->Update(m_Data.get());
 

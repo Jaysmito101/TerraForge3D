@@ -4,6 +4,7 @@
 #include "Generators/BiomeFilterCatalog.h"
 #include "Generators/GeneratorDataStatistics.h"
 
+#include <string_view>
 #include <vector>
 
 namespace tf3d::data
@@ -22,7 +23,7 @@ namespace tf3d::generators
         ~BiomeFilterStack() = default;
 
         void Resize(size_t dataSize, int resolution);
-        void Update(GeneratorData *baseResult);
+        void Update(GeneratorData *baseResult, std::string_view profilePrefix = {});
         bool ShowSettings(int filterIndex);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
@@ -43,10 +44,14 @@ namespace tf3d::generators
         }
 
     private:
-        void RunFilter(const std::shared_ptr<BiomeFilter> &filter, GeneratorData *input, GeneratorData *output);
+        void RunFilter(const std::shared_ptr<BiomeFilter> &filter, GeneratorData *input, GeneratorData *output,
+                       std::string_view profilePrefix);
         void RunPhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &pass,
-                      GeneratorData *input, GeneratorData *output, GeneratorData *reference = nullptr);
-        void RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge, GeneratorData *input, GeneratorData *operation, GeneratorData *output);
+                      GeneratorData *input, GeneratorData *output, GeneratorData *reference,
+                      std::string_view profilePrefix);
+        void RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge,
+                           GeneratorData *input, GeneratorData *operation, GeneratorData *output,
+                           std::string_view profilePrefix);
         void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader, const nlohmann::json &bindings);
         void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader);
         void EnsureTempBufferCount(size_t count);

@@ -130,8 +130,6 @@ namespace tf3d::generators
             {
                 TF3D_PROFILE_BEGIN_LAZY_DOMAIN_FLOW(executeScope, m_ProfilePrefix + "/worker/execute",
                                                     PerformanceMonitor::Domain::Worker, requestId);
-                TF3D_PROFILE_BEGIN_GPU_LAZY_DOMAIN_FLOW(gpuScope, m_ProfilePrefix + "/worker/gpu",
-                                                        PerformanceMonitor::Domain::Gpu, requestId);
                 if (captureActive) {
                     const std::string requestKey = m_ProfilePrefix + "/worker/request";
                     TF3D_PROFILE_VALUE_DOMAIN_FLOW(requestKey, requestId, force ? 1 : 0, 0,
