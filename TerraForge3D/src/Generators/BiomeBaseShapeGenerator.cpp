@@ -93,7 +93,7 @@ namespace tf3d::generators
         m_ShaderPath   = data->Get<std::string>("ShaderPath", "");
         auto inspector = data->Get<SerializerNode>("Inspector");
         if (inspector)
-            m_Inspector->Load(inspector);
+            m_Inspector->LoadState(inspector);
         else
             TF3D_LOG_ERROR("Failed to load inspector data for generator '{}'", m_Name);
         // m_Shader = std::make_shared<ComputeShader>(BuildShaderSource());
@@ -109,7 +109,7 @@ namespace tf3d::generators
         node->Set("Description", m_Description);
         node->Set("Source", m_Source);
         node->Set("ShaderPath", m_ShaderPath);
-        node->Set("Inspector", m_Inspector->Save());
+        node->Set("Inspector", m_Inspector->SaveState());
         return node;
     }
 

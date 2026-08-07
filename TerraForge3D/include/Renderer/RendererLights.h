@@ -2,7 +2,7 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 

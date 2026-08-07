@@ -114,7 +114,7 @@ namespace tf3d::generators
         if (m_Inspector != nullptr) {
             auto parameters = data->Get<SerializerNode>("Parameters");
             if (parameters != nullptr)
-                m_Inspector->LoadData(parameters);
+                m_Inspector->LoadState(parameters);
         }
         if (m_CalculatedMaskGenerator != nullptr)
             m_CalculatedMaskGenerator->Load(data->Get<SerializerNode>("CalculatedMask"));
@@ -133,7 +133,7 @@ namespace tf3d::generators
         node->Set("Strength", m_Strength);
         node->Set("MergeMode", static_cast<int>(m_MergeMode));
         if (m_Inspector != nullptr)
-            node->Set("Parameters", m_Inspector->SaveData());
+            node->Set("Parameters", m_Inspector->SaveState());
         if (m_CalculatedMaskGenerator != nullptr)
             node->Set("CalculatedMask", m_CalculatedMaskGenerator->Save());
         if (m_MaskTool != nullptr)

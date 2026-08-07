@@ -37,12 +37,12 @@ namespace tf3d::mcp_layer
             jpeg.insert(jpeg.end(), bytes, bytes + size);
         }
 
-        ViewportManager *FindFirstViewportWithRenderer(ApplicationState *applicationState)
+        misc::ViewportManager *FindFirstViewportWithRenderer(ApplicationState *applicationState)
         {
             if (applicationState == nullptr)
                 return nullptr;
 
-            for (ViewportManager *viewport : applicationState->viewportManagers) {
+            for (misc::ViewportManager *viewport : applicationState->viewportManagers) {
                 if (viewport != nullptr && viewport->GetRendererViewport() != nullptr)
                     return viewport;
             }
@@ -51,7 +51,7 @@ namespace tf3d::mcp_layer
 
         bool ResolveViewport(ApplicationState *applicationState,
                              const nlohmann::json &arguments,
-                             ViewportManager *&viewport,
+                             misc::ViewportManager *&viewport,
                              McpResult &failure)
         {
             viewport = nullptr;
@@ -79,7 +79,7 @@ namespace tf3d::mcp_layer
             }
 
             const int requestedId = id.get<int>();
-            for (ViewportManager *candidate : applicationState->viewportManagers) {
+            for (misc::ViewportManager *candidate : applicationState->viewportManagers) {
                 if (candidate != nullptr && static_cast<int>(candidate->GetID()) == requestedId) {
                     viewport = candidate;
                     return true;
@@ -92,7 +92,7 @@ namespace tf3d::mcp_layer
             return false;
         }
 
-        McpResult UpdateViewportState(ViewportManager &manager,
+        McpResult UpdateViewportState(misc::ViewportManager &manager,
                                       const nlohmann::json &state,
                                       const nlohmann::json &readOnlySchema)
         {
@@ -149,7 +149,7 @@ namespace tf3d::mcp_layer
                 requestedMaxDimension = static_cast<int>(requestedValue);
             }
 
-            ViewportManager *viewport = nullptr;
+            misc::ViewportManager *viewport = nullptr;
             McpResult failure;
             if (!ResolveViewport(applicationState, arguments, viewport, failure))
                 return failure;
@@ -225,7 +225,7 @@ namespace tf3d::mcp_layer
                     "TerraForge3D viewport state is unavailable.");
 
             nlohmann::json viewports = nlohmann::json::array();
-            for (ViewportManager *viewport : applicationState->viewportManagers) {
+            for (misc::ViewportManager *viewport : applicationState->viewportManagers) {
                 if (viewport == nullptr || !viewport->IsVisible())
                     continue;
 
@@ -267,20 +267,20 @@ namespace tf3d::mcp_layer
                 }
 
                 if (name == "Viewport.TextureChannelIndices") {
-                    nlohmann::json channels   = nlohmann::json::array();
-                    ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
-                    const int channelCount    = viewport == nullptr
-                                                    ? 4
-                                                    : static_cast<int>(viewport->GetRendererViewport()
-                                                                           ->GetTextureSlotDetailed()
-                                                                           .size());
+                    nlohmann::json channels         = nlohmann::json::array();
+                    misc::ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
+                    const int channelCount          = viewport == nullptr
+                                                          ? 4
+                                                          : static_cast<int>(viewport->GetRendererViewport()
+                                                                                 ->GetTextureSlotDetailed()
+                                                                                 .size());
                     for (int value = 0; value < channelCount; ++value)
                         channels.push_back(value);
                     return channels;
                 }
 
                 if (name == "Viewport.TextureChannelCount") {
-                    ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
+                    misc::ViewportManager *viewport = FindFirstViewportWithRenderer(applicationState);
                     return viewport == nullptr
                                ? 4
                                : static_cast<int>(viewport->GetRendererViewport()
@@ -310,7 +310,7 @@ namespace tf3d::mcp_layer
             actions,
             "Tools/Viewport/Actions/GetState.json",
             [applicationState](const nlohmann::json &arguments) {
-                ViewportManager *viewport = nullptr;
+                misc::ViewportManager *viewport = nullptr;
                 McpResult failure;
                 if (!ResolveViewport(applicationState, arguments, viewport, failure))
                     return failure;
@@ -333,7 +333,7 @@ namespace tf3d::mcp_layer
                         return McpResult::Failure(
                             McpErrorType::InvalidArguments,
                             "'State' is required.");
-                    ViewportManager *viewport = nullptr;
+                    misc::ViewportManager *viewport = nullptr;
                     McpResult failure;
                     if (!ResolveViewport(applicationState, arguments, viewport, failure))
                         return failure;

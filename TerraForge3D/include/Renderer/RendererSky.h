@@ -2,7 +2,7 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 #include "Renderer/RendererViewport.h"
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
@@ -61,7 +61,7 @@ namespace tf3d::renderer
 
     private:
         data::ApplicationState *m_AppState = nullptr;
-        misc::CustomInspector m_Inspector;
+        inspector::CustomInspector m_Inspector;
         std::optional<base::ComputeShader> m_EquirectToCube;
         std::optional<base::ComputeShader> m_SpecularMap;
         std::optional<base::ComputeShader> m_IrradianceMap;

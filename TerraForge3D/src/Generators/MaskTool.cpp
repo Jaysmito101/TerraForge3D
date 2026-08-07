@@ -378,7 +378,7 @@ namespace tf3d::generators
             }
         }
 
-        ViewportManager *activeViewport = nullptr;
+        misc::ViewportManager *activeViewport = nullptr;
         for (auto viewport : m_AppState->viewportManagers) {
             if (viewport->IsActive()) {
                 activeViewport = viewport;

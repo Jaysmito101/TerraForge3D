@@ -5,7 +5,7 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Generators/NoiseAlgorithmCatalog.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 #include "Utils/Utils.h"
 #include <nlohmann/json.hpp>
 
@@ -63,7 +63,7 @@ namespace tf3d::generators
     protected:
         ApplicationState *m_AppState = nullptr;
         std::optional<base::ComputeShader> m_Shader;
-        std::shared_ptr<misc::CustomInspector> m_Inspector;
+        std::shared_ptr<inspector::CustomInspector> m_Inspector;
         std::string m_Name        = "";
         std::string m_ID          = "";
         std::string m_Description = "";

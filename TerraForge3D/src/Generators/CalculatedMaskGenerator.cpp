@@ -290,7 +290,7 @@ namespace tf3d::generators
         if (m_Metadata.contains("Types") && typeIndex < static_cast<int>(m_Metadata["Types"].size()))
             node->Set("MaskTypeID", m_Metadata["Types"][typeIndex].value("ID", ""));
         if (m_Inspector != nullptr)
-            node->Set("Inspector", m_Inspector->SaveData());
+            node->Set("Inspector", m_Inspector->SaveState());
         return node;
     }
 
@@ -314,7 +314,7 @@ namespace tf3d::generators
             return;
         const auto inspectorData = data->Get<SerializerNode>("Inspector");
         if (inspectorData != nullptr)
-            m_Inspector->LoadData(inspectorData);
+            m_Inspector->LoadState(inspectorData);
         if (!m_Inspector->Contains("NoiseAlgorithm"))
             m_Inspector->Add("NoiseAlgorithm", m_NoiseAlgorithms.DefaultValue());
         if (!m_Inspector->Contains("NoiseOctaves"))

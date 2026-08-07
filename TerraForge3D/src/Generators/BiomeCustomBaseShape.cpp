@@ -142,7 +142,7 @@ namespace tf3d::generators
         if (!m_Enabled)
             return false;
 
-        ViewportManager *activeViewport = nullptr;
+        misc::ViewportManager *activeViewport = nullptr;
         for (auto editor : m_AppState->viewportManagers) {
             if (editor->IsActive()) {
                 activeViewport = editor;

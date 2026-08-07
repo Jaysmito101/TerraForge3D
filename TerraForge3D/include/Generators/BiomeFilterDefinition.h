@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base/Base.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 
 #include <filesystem>
 #include <nlohmann/json.hpp>

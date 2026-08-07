@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Exporters/Serializer.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 #include "Renderer/HeightmapRenderer.h"
 #include "Renderer/ObjectRenderer.h"
 #include "Renderer/RendererViewport.h"

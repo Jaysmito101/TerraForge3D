@@ -4,7 +4,7 @@
 #include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 #include "Renderer/ObjectRenderer.h"
 #include "Utils/Utils.h"
 

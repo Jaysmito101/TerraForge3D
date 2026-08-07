@@ -4,7 +4,7 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 #include "Generators/NoiseAlgorithmCatalog.h"
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 
 namespace tf3d::base
 {

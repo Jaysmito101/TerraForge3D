@@ -162,12 +162,8 @@ namespace tf3d::generators
         m_ShaderPath  = data->Get<std::string>("ShaderPath", m_ShaderPath);
 
         auto inspector = data->Get<SerializerNode>("Inspector");
-        if (inspector != nullptr) {
-            if (inspector->HasKey("Data"))
-                m_Inspector->Load(inspector);
-            else
-                m_Inspector->LoadData(inspector);
-        }
+        if (inspector != nullptr)
+            m_Inspector->LoadState(inspector);
 
         auto octaveStrengths            = m_Inspector->Get<std::vector<float>>("OctaveStrengths", DefaultNoiseOctaveStrengths());
         const auto savedOctaveStrengths = data->Get<std::vector<float>>("OctaveStrengths");
@@ -219,7 +215,7 @@ namespace tf3d::generators
         node->Set("Description", m_Description);
         node->Set("Source", m_Source);
         node->Set("ShaderPath", m_ShaderPath);
-        node->Set("Inspector", m_Inspector->Save());
+        node->Set("Inspector", m_Inspector->SaveState());
         node->Set("OctaveStrengths", octaveStrengths);
         return node;
     }

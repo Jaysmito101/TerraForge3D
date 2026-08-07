@@ -19,7 +19,7 @@
 #include <nlohmann/json.hpp>
 #include <sys/stat.h>
 
-#include "Misc/CustomInspector.h"
+#include "Inspector/CustomInspector.h"
 
 #ifdef TF3D_ENABLE_MCP
 #include "MCP/TerraForgeMcpServer.h"
