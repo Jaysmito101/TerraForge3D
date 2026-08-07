@@ -769,7 +769,6 @@ namespace tf3d::utils
         return {};
     }
 
-
     void OnBeforeImGuiRender()
     {
         static bool dockspaceOpen                 = true;
