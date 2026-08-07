@@ -120,7 +120,7 @@ namespace tf3d::generators
         int FindTypeIndexByID(const std::string &id) const;
 
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_Shader;
+        std::optional<ComputeShader> m_Shader;
         std::shared_ptr<GeneratorTexture> m_Texture;
         std::shared_ptr<CustomInspector> m_Inspector;
         NoiseAlgorithmCatalog m_NoiseAlgorithms;

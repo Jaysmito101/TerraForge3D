@@ -83,8 +83,8 @@ namespace tf3d::generators
         void AppendActiveStrokePoint(const glm::vec2 &position);
 
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_RasterizeShader;
-        std::shared_ptr<ComputeShader> m_CopyShader;
+        std::optional<ComputeShader> m_RasterizeShader;
+        std::optional<ComputeShader> m_CopyShader;
         std::shared_ptr<ShaderStorageBuffer> m_StrokeSettingsBuffer;
         std::shared_ptr<ShaderStorageBuffer> m_StrokeRangesBuffer;
         std::shared_ptr<ShaderStorageBuffer> m_StrokePointsBuffer;

@@ -58,7 +58,7 @@ namespace tf3d::generators
         bool m_RequireUpdation             = true;
         bool m_Enabled                     = false;
         bool m_RequireBaseShapeUpdate      = false;
-        std::shared_ptr<base::ComputeShader> m_Shader;
+        std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
         std::shared_ptr<GeneratorTexture> m_PreviewTexture;
         renderer::DrawBrushSettings m_DrawSettings;

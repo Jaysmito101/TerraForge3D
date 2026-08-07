@@ -29,7 +29,7 @@ namespace tf3d::generators
 
     bool SlopeGenerator::Compute(GeneratorData *heightmap, int32_t resolution)
     {
-        if (heightmap == nullptr || m_Shader == nullptr || m_Texture == nullptr || resolution <= 0)
+        if (heightmap == nullptr || !m_Shader || m_Texture == nullptr || resolution <= 0)
             return false;
         Resize(resolution);
 

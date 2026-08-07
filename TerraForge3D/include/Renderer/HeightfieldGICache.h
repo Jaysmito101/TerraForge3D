@@ -90,8 +90,8 @@ namespace tf3d::renderer
         bool InputsMatch(const WorkParameters &parameters) const;
 
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_Shader;
-        std::shared_ptr<ComputeShader> m_FilterShader;
+        std::optional<ComputeShader> m_Shader;
+        std::optional<ComputeShader> m_FilterShader;
         std::unique_ptr<GenerationWorker> m_Worker;
         uint32_t m_AccumulationRendererID = 0;
         uint32_t m_RawRendererID          = 0;

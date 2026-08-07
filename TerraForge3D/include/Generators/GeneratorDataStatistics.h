@@ -1,8 +1,11 @@
 #pragma once
 
+#include "Base/Shader.h"
+
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 namespace tf3d::base
 {
@@ -58,7 +61,7 @@ namespace tf3d::generators
 
     private:
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_Shader;
+        std::optional<ComputeShader> m_Shader;
         std::shared_ptr<ShaderStorageBuffer> m_ResultBuffer;
     };
 

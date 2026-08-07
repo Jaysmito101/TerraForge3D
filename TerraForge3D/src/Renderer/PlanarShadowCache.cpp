@@ -67,7 +67,7 @@ namespace tf3d::renderer
                                    float terrainWorldSize, float terrainHeightOffset, float terrainMaximumHeight,
                                    float receiverHeight)
     {
-        if (heightPyramid == nullptr || !heightPyramid->IsReady() || m_Shader == nullptr ||
+        if (heightPyramid == nullptr || !heightPyramid->IsReady() || !m_Shader ||
             terrainWorldSize <= 0.000001f) {
             return false;
         }

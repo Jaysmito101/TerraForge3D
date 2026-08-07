@@ -132,7 +132,7 @@ namespace tf3d::renderer
         if (!m_Enabled)
             return false;
         if (heightPyramid == nullptr || !heightPyramid->IsReady() ||
-            m_Shader == nullptr || m_FilterShader == nullptr || terrainWorldSize <= 0.000001f) {
+            !m_Shader || !m_FilterShader || terrainWorldSize <= 0.000001f) {
             return false;
         }
 

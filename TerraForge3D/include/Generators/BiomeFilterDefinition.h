@@ -7,11 +7,8 @@
 #include <nlohmann/json.hpp>
 #include <unordered_map>
 
-namespace tf3d::base
-{
-    class ComputeShader;
-}
 using tf3d::base::ComputeShader;
+
 namespace tf3d::data
 {
     class ApplicationState;
@@ -29,7 +26,7 @@ namespace tf3d::generators
             const std::filesystem::path &shaderRoot);
 
         bool BuildInspector(CustomInspector &inspector) const;
-        std::shared_ptr<ComputeShader> GetPhaseShader(ApplicationState *appState, const std::string &phase) const;
+        ComputeShader *GetPhaseShader(ApplicationState *appState, const std::string &phase) const;
         bool NeedsFieldStatistics() const;
         bool NeedsHistogram() const;
         std::string GetRequestedPercentileParameter() const;
@@ -74,7 +71,7 @@ namespace tf3d::generators
         std::string m_SearchText;
         std::string m_FolderShaderPath;
         std::unordered_map<std::string, std::string> m_PhaseShaderPaths;
-        mutable std::unordered_map<std::string, std::shared_ptr<ComputeShader>> m_PhaseShaders;
+        mutable std::unordered_map<std::string, ComputeShader> m_PhaseShaders;
         nlohmann::json m_Metadata;
     };
 

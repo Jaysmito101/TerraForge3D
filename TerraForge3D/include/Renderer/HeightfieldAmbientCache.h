@@ -56,7 +56,7 @@ namespace tf3d::renderer
         void PollWorkerCompletion();
 
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_GenerateShader;
+        std::optional<ComputeShader> m_GenerateShader;
         std::unique_ptr<GenerationWorker> m_Worker;
         uint32_t m_RendererID        = 0;
         uint32_t m_WorkingRendererID = 0;

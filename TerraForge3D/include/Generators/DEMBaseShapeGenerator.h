@@ -104,7 +104,7 @@ namespace tf3d::generators
         std::shared_ptr<base::Texture2D> m_LoadingTexture;
         std::shared_ptr<base::Texture2D> m_NullTexture;
         std::vector<TextureCacheKey> m_TextureDownloadQueue;
-        std::shared_ptr<base::ComputeShader> m_Shader;
+        std::optional<base::ComputeShader> m_Shader;
 
         std::unordered_map<TextureCacheKey, std::shared_ptr<base::Texture2D>> m_TextureCache;
         std::unordered_map<TextureCacheKey, std::chrono::steady_clock::time_point> m_TileRetryAfter;

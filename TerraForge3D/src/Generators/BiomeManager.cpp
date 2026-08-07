@@ -69,7 +69,31 @@ namespace tf3d::generators
             if (!AddBaseShapeGenerator(config))
                 TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", shaderPath.string());
         }
-        m_BaseNoiseGenerator      = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
+
+        m_BaseNoiseGenerator           = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
+        const auto baseNoiseMetadata   = std::filesystem::path(m_AppState->constants.dataDir) / "inspectors" / "BaseNoise.json";
+        const auto baseNoiseShaderPath = std::filesystem::path(m_AppState->constants.shadersDir) / "generation" / "base_noise" / "noise_gen.glsl";
+        bool baseNoiseMetadataLoaded   = false;
+        const auto baseNoiseConfigText = ReadShaderSourceFile(baseNoiseMetadata.string(), &baseNoiseMetadataLoaded);
+        if (!baseNoiseMetadataLoaded) {
+            TF3D_LOG_ERROR("Failed to load base-noise metadata '{}'.", baseNoiseMetadata.string());
+        } else {
+            try {
+                const auto config          = nlohmann::json::parse(baseNoiseConfigText);
+                bool baseNoiseShaderLoaded = false;
+                const auto shaderSource    = m_AppState->resourceManager->LoadShaderSource("generation/base_noise/noise_gen", false, &baseNoiseShaderLoaded);
+                if (!baseNoiseShaderLoaded) {
+                    TF3D_LOG_ERROR("Failed to load base-noise shader '{}'.", baseNoiseShaderPath.string());
+                } else {
+                    const auto relativeShaderPath = std::filesystem::relative(baseNoiseShaderPath, m_AppState->constants.shadersDir).generic_string();
+                    if (!m_BaseNoiseGenerator->LoadConfig(config, shaderSource, relativeShaderPath))
+                        TF3D_LOG_ERROR("Failed to load base-noise generator '{}'.", baseNoiseMetadata.string());
+                }
+            } catch (const nlohmann::json::exception &exception) {
+                TF3D_LOG_ERROR("Failed to parse base-noise metadata '{}': {}", baseNoiseMetadata.string(), exception.what());
+            }
+        }
+
         m_DEMBaseShapeGenerator   = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
         m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
         m_CustomBaseShape         = std::make_shared<BiomeCustomBaseShape>(m_AppState);

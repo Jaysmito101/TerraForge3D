@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace tf3d::base
 {
@@ -12,7 +13,29 @@ namespace tf3d::base
     class ShaderCore
     {
     public:
-        virtual ~ShaderCore() = default;
+        ShaderCore(const ShaderCore &)            = delete;
+        ShaderCore &operator=(const ShaderCore &) = delete;
+
+        ShaderCore(ShaderCore &&other) noexcept
+            : m_Shader(std::exchange(other.m_Shader, 0)), uniformLocations(std::move(other.uniformLocations))
+        {
+        }
+
+        ShaderCore &operator=(ShaderCore &&other) noexcept
+        {
+            if (this == &other)
+                return *this;
+
+            Release();
+            m_Shader         = std::exchange(other.m_Shader, 0);
+            uniformLocations = std::move(other.uniformLocations);
+            return *this;
+        }
+
+        virtual ~ShaderCore()
+        {
+            Release();
+        }
 
         inline void Bind()
         {
@@ -27,6 +50,11 @@ namespace tf3d::base
         inline int GetNativeShader() const
         {
             return m_Shader;
+        }
+
+        inline bool IsValid() const
+        {
+            return m_Shader != 0;
         }
 
         inline void SetUniform1f(const std::string &name, float value)
@@ -104,6 +132,15 @@ namespace tf3d::base
     protected:
         ShaderCore() = default;
 
+        void Release() noexcept
+        {
+            if (m_Shader != 0) {
+                glDeleteProgram(m_Shader);
+                m_Shader = 0;
+            }
+            uniformLocations.clear();
+        }
+
         int m_Shader = 0;
         std::unordered_map<std::string, int> uniformLocations;
     };
@@ -111,17 +148,28 @@ namespace tf3d::base
     class GraphicsShader : public ShaderCore
     {
     public:
+        GraphicsShader() = default;
         GraphicsShader(std::string vertexSource, std::string fragmentSource, std::string geometrySource);
         GraphicsShader(std::string vertexSource, std::string fragmentSource);
 
-        ~GraphicsShader() override;
+        GraphicsShader(const GraphicsShader &)                = delete;
+        GraphicsShader &operator=(const GraphicsShader &)     = delete;
+        GraphicsShader(GraphicsShader &&) noexcept            = default;
+        GraphicsShader &operator=(GraphicsShader &&) noexcept = default;
+        ~GraphicsShader() override                            = default;
     };
 
     class ComputeShader : public ShaderCore
     {
     public:
+        ComputeShader() = default;
         ComputeShader(std::string source);
-        ~ComputeShader() override;
+
+        ComputeShader(const ComputeShader &)                = delete;
+        ComputeShader &operator=(const ComputeShader &)     = delete;
+        ComputeShader(ComputeShader &&) noexcept            = default;
+        ComputeShader &operator=(ComputeShader &&) noexcept = default;
+        ~ComputeShader() override                           = default;
 
         inline void Dispatch(int x, int y, int z)
         {
@@ -134,7 +182,9 @@ namespace tf3d::base
         }
 
     private:
-        int maxWorkGroupCount[3], maxWorkGroupSize[3], maxWorkGroupInvocations;
+        int maxWorkGroupCount[3]{};
+        int maxWorkGroupSize[3]{};
+        int maxWorkGroupInvocations = 0;
     };
 
 } // namespace tf3d::base

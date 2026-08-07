@@ -106,7 +106,7 @@ namespace tf3d::generators
         {
             return m_MaskTool->GetPreviewTexture();
         }
-        inline std::shared_ptr<ComputeShader> GetPhaseShader(ApplicationState *appState, const std::string &phase) const
+        inline ComputeShader *GetPhaseShader(ApplicationState *appState, const std::string &phase) const
         {
             return m_Definition->GetPhaseShader(appState, phase);
         }

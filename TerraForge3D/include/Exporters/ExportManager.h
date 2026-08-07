@@ -81,7 +81,7 @@ namespace tf3d::exporters
         bool m_HideExportControls          = false;
 
         std::shared_ptr<generators::GeneratorTexture> m_VisualzeTexture;
-        std::shared_ptr<base::ComputeShader> m_VisualzeShader;
+        std::optional<base::ComputeShader> m_VisualzeShader;
 
         OBJExporter m_ObjExporter;
         STLExporter m_StlExporter;

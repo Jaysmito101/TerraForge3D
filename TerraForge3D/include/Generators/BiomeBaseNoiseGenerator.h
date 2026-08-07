@@ -43,7 +43,7 @@ namespace tf3d::generators
     private:
         data::ApplicationState *m_AppState = nullptr;
         bool m_RequireUpdation             = false;
-        std::shared_ptr<base::ComputeShader> m_Shader;
+        std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<misc::CustomInspector> m_Inspector;
         NoiseAlgorithmCatalog m_NoiseAlgorithms;
         std::string m_Name        = "Base Noise";

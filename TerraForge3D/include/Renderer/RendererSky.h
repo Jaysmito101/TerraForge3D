@@ -62,17 +62,17 @@ namespace tf3d::renderer
     private:
         data::ApplicationState *m_AppState = nullptr;
         misc::CustomInspector m_Inspector;
-        std::shared_ptr<base::ComputeShader> m_EquirectToCube = nullptr;
-        std::shared_ptr<base::ComputeShader> m_SpecularMap    = nullptr;
-        std::shared_ptr<base::ComputeShader> m_IrradianceMap  = nullptr;
-        std::shared_ptr<base::ComputeShader> m_BrdfLut        = nullptr;
-        std::shared_ptr<base::GraphicsShader> m_SkyboxShader  = nullptr;
-        base::Model *m_SkyboxModel                            = nullptr;
-        bool m_IsSkyReady                                     = false;
-        uint32_t m_SkyboxTextureID                            = -1;
-        uint32_t m_IrradianceMapTextureID                     = -1;
-        uint32_t m_SpecularMapTextureID                       = -1;
-        uint32_t m_BrdfLutTextureID                           = -1;
+        std::optional<base::ComputeShader> m_EquirectToCube;
+        std::optional<base::ComputeShader> m_SpecularMap;
+        std::optional<base::ComputeShader> m_IrradianceMap;
+        std::optional<base::ComputeShader> m_BrdfLut;
+        std::optional<base::GraphicsShader> m_SkyboxShader;
+        base::Model *m_SkyboxModel        = nullptr;
+        bool m_IsSkyReady                 = false;
+        uint32_t m_SkyboxTextureID        = -1;
+        uint32_t m_IrradianceMapTextureID = -1;
+        uint32_t m_SpecularMapTextureID   = -1;
+        uint32_t m_BrdfLutTextureID       = -1;
     };
 
 } // namespace tf3d::renderer

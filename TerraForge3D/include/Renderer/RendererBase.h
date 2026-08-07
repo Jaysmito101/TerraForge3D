@@ -20,7 +20,7 @@ namespace tf3d::renderer
         virtual void ReloadShaders() = 0;
 
     protected:
-        ApplicationState *m_AppState                   = nullptr;
-        std::shared_ptr<base::GraphicsShader> m_Shader = nullptr;
+        ApplicationState *m_AppState = nullptr;
+        std::optional<base::GraphicsShader> m_Shader;
     };
 } // namespace tf3d::renderer

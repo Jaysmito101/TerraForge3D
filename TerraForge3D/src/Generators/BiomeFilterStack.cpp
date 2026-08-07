@@ -74,7 +74,7 @@ namespace tf3d::generators
 
     namespace
     {
-        void SetUniformFromParameter(const std::shared_ptr<ComputeShader> &shader, const std::string &uniformName,
+        void SetUniformFromParameter(ComputeShader *shader, const std::string &uniformName,
                                      const CustomInspectorValue &value, int &textureSlot, const nlohmann::json *binding = nullptr)
         {
             switch (value.GetType()) {
@@ -127,7 +127,7 @@ namespace tf3d::generators
             }
         }
 
-        void SetUniformFromJson(const std::shared_ptr<ComputeShader> &shader, const std::string &uniformName,
+        void SetUniformFromJson(ComputeShader *shader, const std::string &uniformName,
                                 const nlohmann::json &binding, int &textureSlot)
         {
             const nlohmann::json *value = &binding;
@@ -160,7 +160,7 @@ namespace tf3d::generators
         }
     } // namespace
 
-    void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, const std::shared_ptr<ComputeShader> &shader, const nlohmann::json &bindings)
+    void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader, const nlohmann::json &bindings)
     {
         if (!bindings.is_object())
             return;
@@ -177,7 +177,7 @@ namespace tf3d::generators
         }
     }
 
-    void BiomeFilterStack::BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, const std::shared_ptr<ComputeShader> &shader)
+    void BiomeFilterStack::BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader)
     {
         if (filter == nullptr || shader == nullptr || m_Statistics == nullptr || !filter->NeedsFieldStatistics())
             return;
@@ -190,7 +190,7 @@ namespace tf3d::generators
     {
         const std::string phase = pass.value("Phase", "");
         TF3D_PROFILE_SCOPE(std::string("generation/filter-phase/") + filter->GetName() + "/" + phase);
-        const auto shader = filter->GetPhaseShader(m_AppState, phase);
+        auto *shader = filter->GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
         input->Bind(0);
@@ -211,7 +211,7 @@ namespace tf3d::generators
     {
         const std::string phase = merge.value("Phase", "");
         TF3D_PROFILE_SCOPE(std::string("generation/filter-merge/") + filter->GetName() + "/" + phase);
-        const auto shader = filter->GetPhaseShader(m_AppState, phase);
+        auto *shader = filter->GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
         input->Bind(0);

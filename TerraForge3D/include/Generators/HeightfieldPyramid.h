@@ -45,7 +45,7 @@ namespace tf3d::generators
         void ReleaseTexture();
 
         data::ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<base::ComputeShader> m_Shader;
+        std::optional<base::ComputeShader> m_Shader;
         uint32_t m_RendererID = 0;
         int32_t m_Resolution  = 0;
         int32_t m_MipLevels   = 0;

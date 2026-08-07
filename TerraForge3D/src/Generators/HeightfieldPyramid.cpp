@@ -65,7 +65,7 @@ namespace tf3d::generators
 
     bool HeightfieldPyramid::Rebuild(GeneratorData *heightmap)
     {
-        if (heightmap == nullptr || heightmap->GetResolution() <= 0 || m_Shader == nullptr)
+        if (heightmap == nullptr || heightmap->GetResolution() <= 0 || !m_Shader)
             return false;
 
         const int32_t resolution = heightmap->GetResolution();

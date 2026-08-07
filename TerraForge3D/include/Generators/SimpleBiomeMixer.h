@@ -31,7 +31,7 @@ namespace tf3d::generators
 
     private:
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_Shader;
+        std::optional<ComputeShader> m_Shader;
         std::unordered_map<std::string, SimpleBiomeMixerSettings> m_BiomeSettings;
         bool m_RequireUpdation = true;
     };

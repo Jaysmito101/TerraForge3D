@@ -48,7 +48,7 @@ namespace tf3d::generators
 
     private:
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<ComputeShader> m_Shader;
+        std::optional<ComputeShader> m_Shader;
         std::shared_ptr<GeneratorTexture> m_Texture;
         std::atomic_bool m_HasData = false;
         float m_SampleRadius       = 1.0f;

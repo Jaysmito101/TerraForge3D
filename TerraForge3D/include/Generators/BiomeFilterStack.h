@@ -47,8 +47,8 @@ namespace tf3d::generators
         void RunPhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &pass,
                       GeneratorData *input, GeneratorData *output, GeneratorData *reference = nullptr);
         void RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge, GeneratorData *input, GeneratorData *operation, GeneratorData *output);
-        void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, const std::shared_ptr<ComputeShader> &shader, const nlohmann::json &bindings);
-        void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, const std::shared_ptr<ComputeShader> &shader);
+        void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader, const nlohmann::json &bindings);
+        void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader);
         void EnsureTempBufferCount(size_t count);
 
         static constexpr int FieldStatisticsBinding = 4;

@@ -85,7 +85,7 @@ namespace tf3d::renderer
 
     void SeaRenderer::Render(RendererViewport *viewport)
     {
-        if (!IsEnabled() || viewport == nullptr || m_Shader == nullptr ||
+        if (!IsEnabled() || viewport == nullptr || !m_Shader ||
             m_AppState == nullptr || m_AppState->generationManager == nullptr ||
             m_AppState->mainModel == nullptr || !m_AppState->mainModel->isGeneratedPlane ||
             m_AppState->generationManager->GetHeightPyramid() == nullptr ||

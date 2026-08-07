@@ -99,7 +99,7 @@ namespace tf3d::renderer
         TF3D_PROFILE_END(objectSetupProfile);
         {
             TF3D_PROFILE_SCOPE("renderer/object/post-process");
-            if (isPlane && m_PostProcessShader != nullptr && viewport->GetCamera().GetPosition().y > 0.0f) {
+            if (isPlane && m_PostProcessShader && viewport->GetCamera().GetPosition().y > 0.0f) {
                 m_PostProcessShader->Bind();
                 const glm::mat4 inverseProjectionView = glm::inverse(viewport->GetCamera().GetProjectionViewMatrix());
                 m_PostProcessShader->SetUniformMat4("u_InverseProjectionView", inverseProjectionView);
@@ -116,6 +116,7 @@ namespace tf3d::renderer
                 m_PostProcessShader->SetUniform3f("u_SunDirection", rendererLights->GetSunDirection());
                 m_PostProcessShader->SetUniform3f("u_SunColor", rendererLights->GetSunColor());
                 m_PostProcessShader->SetUniform1f("u_SunIntensity", rendererLights->GetSunIntensity());
+
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, enableSkyLight ? skyRenderer->GetIrradianceMap() : 0);
                 m_PostProcessShader->SetUniform1i("u_IrradianceMap", 1);

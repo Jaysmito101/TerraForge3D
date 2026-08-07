@@ -243,7 +243,7 @@ namespace tf3d::generators
             return false;
         m_Shader          = m_AppState->resourceManager->GetComputeShader("BaseShapeGen_" + m_ID, BuildShaderSource());
         m_RequireUpdation = true;
-        return m_Shader != nullptr;
+        return m_Shader.has_value();
     }
 
 } // namespace tf3d::generators

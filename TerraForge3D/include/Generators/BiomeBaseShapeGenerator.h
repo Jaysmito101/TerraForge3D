@@ -62,7 +62,7 @@ namespace tf3d::generators
 
     protected:
         ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<base::ComputeShader> m_Shader;
+        std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<misc::CustomInspector> m_Inspector;
         std::string m_Name        = "";
         std::string m_ID          = "";

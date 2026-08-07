@@ -68,7 +68,7 @@ namespace tf3d::renderer
                                    uint64_t terrainRevision, const glm::vec3 &sunDirection, float terrainWorldSize)
     {
         if (heightmap == nullptr || heightPyramid == nullptr || !heightPyramid->IsReady() ||
-            heightmap->GetResolution() <= 0 || m_Shader == nullptr) {
+            heightmap->GetResolution() <= 0 || !m_Shader) {
             return false;
         }
 

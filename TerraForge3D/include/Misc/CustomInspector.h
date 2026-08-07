@@ -15,11 +15,6 @@
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
-namespace tf3d::base
-{
-    class Shader;
-}
-
 namespace tf3d::misc
 {
 
@@ -703,8 +698,7 @@ namespace tf3d::misc
         bool LoadConfig(ApplicationState *appState, std::string_view inspectorName);
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
-        void ApplyToShader(tf3d::base::Shader &shader, std::string_view uniformPrefix = "u_") const;
-        void ApplyToShader(tf3d::base::ComputeShader &shader, std::string_view uniformPrefix = "u_") const;
+        void ApplyToShader(tf3d::base::ShaderCore &shader, std::string_view uniformPrefix = "u_") const;
 
         inline void Reset()
         {

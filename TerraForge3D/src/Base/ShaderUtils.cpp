@@ -26,6 +26,8 @@ namespace tf3d::base
             TF3D_LOG_DEBUG("Shader source:\n{}", shaderSrc);
             TF3D_LOG_ERROR("Shader compiler output: {}", errorLog);
             glDeleteShader(shader);
+            free(errorLog);
+            return 0;
         }
 
         return shader;

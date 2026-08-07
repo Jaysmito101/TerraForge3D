@@ -89,7 +89,7 @@ namespace tf3d::generators
         return statistics.is_object() ? statistics.value("RequestedPercentileParameter", "") : "";
     }
 
-    std::shared_ptr<ComputeShader> BiomeFilterDefinition::GetPhaseShader(ApplicationState *appState, const std::string &phase) const
+    ComputeShader *BiomeFilterDefinition::GetPhaseShader(ApplicationState *appState, const std::string &phase) const
     {
         const auto path = m_PhaseShaderPaths.find(phase);
         if (path == m_PhaseShaderPaths.end())
@@ -97,16 +97,17 @@ namespace tf3d::generators
 
         const auto cached = m_PhaseShaders.find(phase);
         if (cached != m_PhaseShaders.end())
-            return cached->second;
+            return &cached->second;
 
         bool loaded = false;
         auto shader = appState->resourceManager->LoadComputeShader(path->second, false, &loaded);
-        if (!loaded || shader == nullptr) {
+        if (!loaded || !shader) {
             TF3D_LOG_ERROR("Failed to load filter phase '{}' for '{}'.", phase, m_ID);
             return nullptr;
         }
-        m_PhaseShaders[phase] = shader;
-        return shader;
+
+        auto [iterator, inserted] = m_PhaseShaders.emplace(phase, std::move(*shader));
+        return &iterator->second;
     }
 
 } // namespace tf3d::generators

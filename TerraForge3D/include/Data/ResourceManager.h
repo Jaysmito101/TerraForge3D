@@ -19,11 +19,11 @@ namespace tf3d::data
         std::string PreprocessShaderSource(const std::string &source, const std::string &sourcePath, bool *success = nullptr);
         std::string LoadText(const std::string path, bool forceReload = false, bool *success = nullptr);
 
-        std::shared_ptr<base::ComputeShader> GetComputeShader(const std::string name, const std::string source);
-        std::shared_ptr<base::GraphicsShader> GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource);
+        std::optional<base::ComputeShader> GetComputeShader(const std::string name, const std::string source);
+        std::optional<base::GraphicsShader> GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource);
 
-        std::shared_ptr<base::ComputeShader> LoadComputeShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
-        std::shared_ptr<base::GraphicsShader> LoadGraphicsShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
+        std::optional<base::ComputeShader> LoadComputeShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
+        std::optional<base::GraphicsShader> LoadGraphicsShader(const std::string shader, bool forceReload = false, bool *success = nullptr);
 
         static inline ResourceManager *GetInstance(ApplicationState *appState = nullptr)
         {
@@ -40,8 +40,6 @@ namespace tf3d::data
     private:
         ApplicationState *m_AppState = nullptr;
         std::unordered_map<std::string, std::string> m_TextResources;
-        std::unordered_map<std::string, std::pair<std::shared_ptr<base::ComputeShader>, size_t>> m_ComputeShaders;
-        std::unordered_map<std::string, std::pair<std::shared_ptr<base::GraphicsShader>, size_t>> m_GraphicsShaders;
 
         static ResourceManager *m_Instance;
     };

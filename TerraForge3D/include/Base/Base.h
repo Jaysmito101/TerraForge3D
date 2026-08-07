@@ -1,6 +1,9 @@
 #pragma once
 
 #ifdef TERR3D_WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <Windows.h>
 #endif
 
@@ -21,6 +24,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <stack>
 #include <string>

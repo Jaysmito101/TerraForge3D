@@ -25,7 +25,7 @@ namespace tf3d::generators
     void GeneratorDataStatistics::Compute(GeneratorData *data, int resolution, int sampleStride,
                                           bool includeHistogram, float requestedPercentile)
     {
-        if (data == nullptr || m_Shader == nullptr || m_ResultBuffer == nullptr || resolution <= 0)
+        if (data == nullptr || !m_Shader || m_ResultBuffer == nullptr || resolution <= 0)
             return;
 
         sampleStride = std::max(sampleStride, 1);

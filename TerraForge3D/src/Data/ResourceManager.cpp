@@ -173,43 +173,32 @@ namespace tf3d::data
         return data;
     }
 
-    std::shared_ptr<base::ComputeShader> ResourceManager::GetComputeShader(const std::string name, const std::string source)
+    std::optional<base::ComputeShader> ResourceManager::GetComputeShader(const std::string name, const std::string source)
     {
         const auto formattedSource = InjectFieldFormatDefine(source);
-        auto hash                  = std::hash<std::string>{}(formattedSource);
-        if (m_ComputeShaders.find(name) != m_ComputeShaders.end()) {
-            if (hash == m_ComputeShaders[name].second) {
-                return m_ComputeShaders[name].first;
-            }
-        }
 
         TF3D_LOG_DEBUG("Compiling compute shader '{}'", name);
-        auto shader            = std::make_shared<base::ComputeShader>(formattedSource);
-        m_ComputeShaders[name] = std::make_pair(shader, hash);
+        base::ComputeShader shader(formattedSource);
+        if (!shader.IsValid())
+            return std::nullopt;
 
-        return shader;
+        return std::optional<base::ComputeShader>(std::move(shader));
     }
 
-    std::shared_ptr<base::GraphicsShader> ResourceManager::GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
+    std::optional<base::GraphicsShader> ResourceManager::GetGraphicsShader(const std::string name, const std::string vertexSource, const std::string fragmentSource)
     {
         const auto formattedVertexSource   = InjectFieldFormatDefine(vertexSource);
         const auto formattedFragmentSource = InjectFieldFormatDefine(fragmentSource);
-        auto hash                          = std::hash<std::string>{}(formattedVertexSource + formattedFragmentSource);
-
-        if (m_GraphicsShaders.find(name) != m_GraphicsShaders.end()) {
-            if (hash == m_GraphicsShaders[name].second) {
-                return m_GraphicsShaders[name].first;
-            }
-        }
 
         TF3D_LOG_DEBUG("Compiling shader '{}'", name);
-        auto shader             = std::make_shared<base::GraphicsShader>(formattedVertexSource, formattedFragmentSource);
-        m_GraphicsShaders[name] = std::make_pair(shader, hash);
+        base::GraphicsShader shader(formattedVertexSource, formattedFragmentSource);
+        if (!shader.IsValid())
+            return std::nullopt;
 
-        return shader;
+        return std::optional<base::GraphicsShader>(std::move(shader));
     }
 
-    std::shared_ptr<base::GraphicsShader> ResourceManager::LoadGraphicsShader(const std::string shader, bool forceReload, bool *successOut)
+    std::optional<base::GraphicsShader> ResourceManager::LoadGraphicsShader(const std::string shader, bool forceReload, bool *successOut)
     {
         bool success = false;
         if (!successOut)
@@ -217,16 +206,16 @@ namespace tf3d::data
 
         auto vertexSource = LoadShaderSource(shader + "/vert", forceReload, successOut);
         if (!*successOut)
-            return nullptr;
+            return std::nullopt;
 
         auto fragmentSource = LoadShaderSource(shader + "/frag", forceReload, successOut);
         if (!*successOut)
-            return nullptr;
+            return std::nullopt;
 
         return GetGraphicsShader(shader, vertexSource, fragmentSource);
     }
 
-    std::shared_ptr<ComputeShader> ResourceManager::LoadComputeShader(const std::string shader, bool forceReload, bool *successOut)
+    std::optional<base::ComputeShader> ResourceManager::LoadComputeShader(const std::string shader, bool forceReload, bool *successOut)
     {
         bool success = false;
         if (!successOut)
@@ -234,7 +223,7 @@ namespace tf3d::data
 
         auto source = LoadShaderSource(shader, forceReload, successOut);
         if (!*successOut)
-            return nullptr;
+            return std::nullopt;
 
         return GetComputeShader(shader, source);
     }
