@@ -1,12 +1,15 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "Utils/Utils.h"
+#include <array>
 #include <cctype>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <httplib/httplib.h>
 #include <iostream>
+#include <initializer_list>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <sys/stat.h>
@@ -92,6 +95,7 @@ namespace tf3d::utils
 #else
 #include <Commdlg.h>
 #include <atlstr.h>
+#include <shellapi.h>
 #include <windows.h>
 #endif
 #ifdef __APPLE__
@@ -709,6 +713,62 @@ namespace tf3d::utils
         system(op.c_str());
 #endif //  TERR3D_WIN32
     }
+
+    namespace
+    {
+        std::string EnvironmentValue(const char *name)
+        {
+            const char *value = std::getenv(name);
+            return value != nullptr ? std::string(value) : std::string();
+        }
+
+        bool IsRegularFile(const std::filesystem::path &path)
+        {
+            std::error_code error;
+            return std::filesystem::is_regular_file(path, error);
+        }
+
+    } // namespace
+
+    std::string FindExecutableOnPath(std::initializer_list<const char *> names)
+    {
+#ifdef TERR3D_WIN32
+        std::array<char, 32768> resolvedPath{};
+        for (const char *name : names) {
+            const DWORD length = SearchPathA(nullptr,
+                                             name,
+                                             nullptr,
+                                             static_cast<DWORD>(resolvedPath.size()),
+                                             resolvedPath.data(),
+                                             nullptr);
+            if (length > 0 && length < resolvedPath.size())
+                return std::string(resolvedPath.data(), length);
+        }
+#else
+        const std::string pathValue = EnvironmentValue("PATH");
+        std::size_t pathStart       = 0;
+        while (pathStart <= pathValue.size()) {
+            const std::size_t pathEnd   = pathValue.find(':', pathStart);
+            const std::string directory = pathValue.substr(
+                pathStart,
+                pathEnd == std::string::npos ? std::string::npos : pathEnd - pathStart);
+
+            if (!directory.empty()) {
+                for (const char *name : names) {
+                    const std::filesystem::path candidate = std::filesystem::path(directory) / name;
+                    if (IsRegularFile(candidate))
+                        return candidate.string();
+                }
+            }
+
+            if (pathEnd == std::string::npos)
+                break;
+            pathStart = pathEnd + 1;
+        }
+#endif
+        return {};
+    }
+
 
     void OnBeforeImGuiRender()
     {

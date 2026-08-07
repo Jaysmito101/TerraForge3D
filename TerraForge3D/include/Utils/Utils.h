@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <initializer_list>
 #include <string>
 
 TF3D_FWD_DEC_CLASS(ProjectManager, tf3d::data)
@@ -69,6 +70,7 @@ namespace tf3d::utils
     std::string LowercaseFilterText(const std::string &value);
     bool FuzzyFilterMatch(const std::string &query, const std::string &candidate);
     void OpenURL(std::string url);
+    std::string FindExecutableOnPath(std::initializer_list<const char *> names);
     std::string ShowSaveFileDialog(std::string ext = ".terr3d");
     std::string openfilename();
     std::string ShowOpenFileDialog(std::string ext = "*.glsl");
