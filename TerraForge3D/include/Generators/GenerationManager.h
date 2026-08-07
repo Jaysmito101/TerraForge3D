@@ -6,6 +6,7 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/GenerationDirtyManager.h"
 #include "Generators/HeightfieldPyramid.h"
 #include "Generators/SlopeGenerator.h"
 
@@ -67,12 +68,11 @@ namespace tf3d::generators
     };
 
     struct UiState {
-        bool updationPaused              = false;
-        std::atomic_bool requireUpdation = true;
-        bool useSeedFromActiveMesh       = false;
-        int32_t seedTextureResolution    = 256;
-        int fieldStorageUiMode           = 0;
-        bool fieldStorageRestartPending  = false;
+        bool updationPaused             = false;
+        bool useSeedFromActiveMesh      = false;
+        int32_t seedTextureResolution   = 256;
+        int fieldStorageUiMode          = 0;
+        bool fieldStorageRestartPending = false;
         SelectedUINode selectedNode;
     };
 
@@ -149,8 +149,8 @@ namespace tf3d::generators
         void UpdateFieldStatistics();
         void GenerateHeightmapMipmaps();
         void CommitHeightfield();
-        void RequestGeneration(bool force);
-        void ExecuteGeneration(bool force);
+        void RequestGeneration();
+        void ExecuteGeneration();
 
     private:
         ApplicationState *m_AppState = nullptr;

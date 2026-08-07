@@ -5,6 +5,7 @@
 #include "Data/ConfigManager.h"
 #include "Data/ResourceManager.h"
 #include "Exporters/ExportManager.h"
+#include "Generators/GenerationDirtyManager.h"
 #include "Job/Job.h"
 #include "Job/JobManager.h"
 #include "Job/JobSystem.h"
@@ -126,19 +127,20 @@ namespace tf3d::data
         texture_store::TextureStore *textureStore  = nullptr;
         misc::SupportersTribute *supportersTribute = nullptr;
         misc::OSLiscences *osLiscences             = nullptr;
-        ProjectManager *projectManager             = nullptr;
-        ExportManager *exportManager               = nullptr;
-        Model *mainModel                           = nullptr;
+        data::ProjectManager *projectManager             = nullptr;
+        exporters::ExportManager *exportManager               = nullptr;
+        base::Model *mainModel                           = nullptr;
         renderer::RendererManager *rendererManager = nullptr;
         Dashboard *dashboard                       = nullptr;
         misc::ViewportManager *viewportManagers[MAX_VIEWPORT_COUNT];
-        Style *styleManager                  = nullptr;
-        GenerationManager *generationManager = nullptr;
-        JobSystem::JobSystem *jobSystem      = nullptr;
-        JobSystem::JobManager *jobManager    = nullptr;
-        EventManager *eventManager           = nullptr;
-        ResourceManager *resourceManager     = nullptr;
-        ConfigManager *configManager         = nullptr;
+        misc::Style *styleManager                  = nullptr;
+        generators::GenerationManager *generationManager = nullptr;
+        generators::GenerationDirtyManager generationDirtyManager;
+        job::JobSystem *jobSystem      = nullptr;
+        job::JobManager *jobManager    = nullptr;
+        base::EventManager *eventManager           = nullptr;
+        data::ResourceManager *resourceManager     = nullptr;
+        data::ConfigManager *configManager         = nullptr;
 
 #ifdef TF3D_ENABLE_MCP
         bool mcpEnabled                           = true;

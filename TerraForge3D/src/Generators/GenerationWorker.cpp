@@ -41,8 +41,10 @@ namespace tf3d::generators
 
     bool GenerationWorker::Request(bool force)
     {
-        if (!HasContext())
+        if (!HasContext()) {
             return false;
+        }
+        
         {
             std::lock_guard lock(m_Mutex);
             m_RequestPending = true;
