@@ -1,0 +1,305 @@
+{
+  "Description": "Adds configurable procedural noise to the current biome field before filters are evaluated.",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source, scale, and layered detail controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 152,
+          "Widget": "Seed",
+          "Label": "Noise Seed",
+          "Description": "Selects the deterministic pattern used by the base-noise generator.",
+          "Tooltip": "Change the seed to create a different reproducible noise layout."
+        },
+        {
+          "Name": "NoiseAlgorithm",
+          "Type": "Int",
+          "Default": "Simplex",
+          "Widget": "Dropdown",
+          "Label": "Noise Algorithm",
+          "Description": "Selects the noise family used for every base-noise octave."
+        },
+        {
+          "Name": "Frequency",
+          "Type": "Float",
+          "Default": 0.45,
+          "Widget": "Drag",
+          "Sensitivity": 0.001,
+          "Label": "Noise Scale",
+          "Description": "Controls the size of the shared noise features.",
+          "Tooltip": "Higher values create smaller, more closely spaced features."
+        },
+        {
+          "Name": "Lacunarity",
+          "Type": "Float",
+          "Default": 1.8,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            1,
+            4
+          ],
+          "Label": "Noise Lacunarity",
+          "Description": "Sets the frequency multiplier between successive noise layers.",
+          "Tooltip": "Higher values make each octave add finer detail more quickly."
+        },
+        {
+          "Name": "Persistence",
+          "Type": "Float",
+          "Default": 0.55,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            0.99
+          ],
+          "Label": "Noise Persistence",
+          "Description": "Sets how much amplitude each successive noise layer retains.",
+          "Tooltip": "Higher values keep more high-frequency detail."
+        },
+        {
+          "Name": "NoiseOctaves",
+          "Type": "Int",
+          "Default": 10,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            10
+          ],
+          "Label": "Noise Octaves",
+          "Description": "Controls how many layers are evaluated from the octave-strength profile.",
+          "Tooltip": "More layers add detail and increase generation cost."
+        },
+        {
+          "Name": "NoiseWarp",
+          "Type": "Float",
+          "Default": 0,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4
+          ],
+          "Label": "Noise Warp",
+          "Description": "Bends the sampling domain before evaluating the noise.",
+          "Tooltip": "Increase it to break up smooth, predictable terrain contours."
+        },
+        {
+          "Name": "NoiseJitter",
+          "Type": "Float",
+          "Default": 0.75,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Noise Jitter",
+          "Description": "Moves feature points inside cellular noise cells.",
+          "Tooltip": "Only affects Gabor, Voronoi, and Worley noise.",
+          "Conditional": "NoiseAlgorithm",
+          "ConditionalValues": [
+            "Gabor",
+            "Voronoi",
+            "Worley"
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Octaves",
+      "Label": "Octave Strengths",
+      "Description": "Controls the contribution of each individual noise layer.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "OctaveStrengths",
+          "Type": "FloatArray",
+          "Default": [
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "Widget": "Octaves",
+          "Constraints": [
+            0,
+            1
+          ],
+          "ShaderUniform": "u_NoiseOctaveStrengths",
+          "Label": "Octave Strengths",
+          "Description": "Controls the contribution of each individual noise layer."
+        },
+        {
+          "Name": "NoiseOctaveStrengthsCount",
+          "Type": "Int",
+          "Default": 10,
+          "Visible": false
+        }
+      ]
+    },
+    {
+      "Name": "Blend",
+      "Label": "Blend",
+      "Description": "Controls how the generated noise is combined with the current biome field.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Label": "Strength",
+          "Description": "Scales the amplitude of the generated noise.",
+          "Tooltip": "Negative values invert the noise contribution."
+        },
+        {
+          "Name": "Influence",
+          "Type": "Float",
+          "Default": 0.5,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            1
+          ],
+          "Label": "Influence",
+          "Description": "Controls how strongly this generator contributes to the final biome output.",
+          "Tooltip": "Set to zero to temporarily disable the contribution without changing its settings."
+        },
+        {
+          "Name": "MixMethod",
+          "Type": "Int",
+          "Default": 0,
+          "Widget": "Dropdown",
+          "Options": [
+            "Add",
+            "Multiply",
+            "Add & Multiply",
+            "Set",
+            "None"
+          ],
+          "Label": "Mix Method",
+          "Description": "Selects how the generated noise is blended with the source field."
+        },
+        {
+          "Name": "AutoUseSeedTexture",
+          "Type": "Bool",
+          "Default": true,
+          "Widget": "Checkbox",
+          "ShaderUniform": "",
+          "Label": "Use Seed Texture",
+          "Description": "Uses the generated seed texture when one is available.",
+          "Tooltip": "Disable to use the inspector seed and coordinate field alone."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Controls the sampling offset and optional terrain-dependent remapping.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector3",
+          "Default": [
+            0,
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Label": "Offset",
+          "Description": "Offsets the noise sampling position in 3D space.",
+          "Tooltip": "Move through the noise field without changing its scale."
+        },
+        {
+          "Name": "TransformFactor",
+          "Type": "Int",
+          "Default": 1,
+          "Widget": "Dropdown",
+          "Options": [
+            "None",
+            "Slope",
+            "Height"
+          ],
+          "Label": "Transform Factor",
+          "Description": "Chooses the terrain factor used to remap the noise."
+        },
+        {
+          "Name": "SlopeSmoothingRadius",
+          "Type": "Int",
+          "Default": 3,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            20
+          ],
+          "Label": "Slope Smoothing Radius",
+          "Description": "Sets the radius used to smooth slope sampling.",
+          "Conditional": "TransformFactor",
+          "ConditionalValue": 1
+        },
+        {
+          "Name": "SlopeSamplingRadius",
+          "Type": "Float",
+          "Default": 3,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            10
+          ],
+          "Label": "Slope Sampling Radius",
+          "Description": "Controls how far the generator samples when measuring slope.",
+          "Conditional": "TransformFactor",
+          "ConditionalValue": 1
+        },
+        {
+          "Name": "TransformRange",
+          "Type": "Vector2",
+          "Default": [
+            0,
+            1
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.001,
+          "Label": "Transform Range",
+          "Description": "Remaps the chosen transform factor into this normalized range.",
+          "Tooltip": "The range is sorted before the smooth remap is applied."
+        }
+      ]
+    },
+    {
+      "Name": "Filtering",
+      "Label": "Filtering",
+      "Description": "Optional preprocessing for terrain-derived slope measurements.",
+      "Collapsible": true,
+      "DefaultOpen": false,
+      "Params": [
+        {
+          "Name": "UseGaussianPreFilter",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Use Gaussian Pre-filter",
+          "Description": "Applies a Gaussian pre-filter before slope samples are evaluated.",
+          "Tooltip": "Use this to reduce fine height-field noise in slope-driven noise."
+        }
+      ]
+    }
+  ]
+}
