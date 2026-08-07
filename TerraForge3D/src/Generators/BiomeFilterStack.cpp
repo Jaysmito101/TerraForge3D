@@ -248,6 +248,13 @@ namespace tf3d::generators
                     passes.push_back(pass);
             }
         }
+        std::vector<nlohmann::json> postPasses;
+        if (execution.contains("PostPasses") && execution["PostPasses"].is_array()) {
+            for (const auto &pass : execution["PostPasses"]) {
+                if (pass.is_object())
+                    postPasses.push_back(pass);
+            }
+        }
         nlohmann::json merge = execution.value("Merge", nlohmann::json::object());
         if (passes.empty() || !merge.is_object() || merge.value("Phase", "").empty()) {
             TF3D_LOG_ERROR("Filter '{}' has an incomplete phase execution description.", filter->GetName());
@@ -334,22 +341,42 @@ namespace tf3d::generators
             input->CopyTo(output);
             return;
         }
-        for (const auto &pass : passes) {
+        const auto validatePass = [&](const nlohmann::json &pass, const char *passGroup) {
+            if (!pass.is_object()) {
+                TF3D_LOG_ERROR("Filter '{}' has a non-object {} pass.", filter->GetName(), passGroup);
+                return false;
+            }
             const std::string phase = pass.value("Phase", "");
             if (phase.empty()) {
-                TF3D_LOG_ERROR("Filter '{}' has a pass without a phase.", filter->GetName());
-                input->CopyTo(output);
-                return;
+                TF3D_LOG_ERROR("Filter '{}' has a {} pass without a phase.", filter->GetName(), passGroup);
+                return false;
             }
             if (filter->GetPhaseShader(m_AppState, phase) == nullptr) {
-                TF3D_LOG_ERROR("Filter '{}' is missing phase '{}'.", filter->GetName(), phase);
-                input->CopyTo(output);
-                return;
+                TF3D_LOG_ERROR("Filter '{}' is missing {} phase '{}'.", filter->GetName(), passGroup, phase);
+                return false;
             }
             const std::string inputName  = pass.value("Input", "");
             const std::string outputName = pass.value("Output", "");
             if (inputName.empty() || outputName.empty() || resources.find(inputName) == resources.end() || resources.find(outputName) == resources.end()) {
-                TF3D_LOG_ERROR("Filter '{}' has a pass with an unknown or missing Input/Output resource.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' has a {} pass with an unknown or missing Input/Output resource.", filter->GetName(), passGroup);
+                return false;
+            }
+            const std::string referenceName = pass.value("Reference", "");
+            if (!referenceName.empty() && resources.find(referenceName) == resources.end()) {
+                TF3D_LOG_ERROR("Filter '{}' has a {} pass with an unknown Reference resource '{}'.", filter->GetName(), passGroup, referenceName);
+                return false;
+            }
+            return true;
+        };
+
+        for (const auto &pass : passes) {
+            if (!validatePass(pass, "operation")) {
+                input->CopyTo(output);
+                return;
+            }
+        }
+        for (const auto &pass : postPasses) {
+            if (!validatePass(pass, "post-operation")) {
                 input->CopyTo(output);
                 return;
             }
@@ -367,9 +394,7 @@ namespace tf3d::generators
                 input->CopyTo(output);
                 return;
             }
-            const std::string setupInputName  = setup.value("Input", "");
-            const std::string setupOutputName = setup.value("Output", "");
-            if (setupInputName.empty() || setupOutputName.empty() || resources.find(setupInputName) == resources.end() || resources.find(setupOutputName) == resources.end()) {
+            if (!validatePass(setup, "setup")) {
                 TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup resource declaration.", filter->GetName());
                 input->CopyTo(output);
                 return;
@@ -388,11 +413,33 @@ namespace tf3d::generators
         const std::string mergeInputName     = merge.value("Input", "");
         const std::string mergeOperationName = merge.value("Operation", "");
         const std::string mergeOutputName    = merge.value("Output", "");
-        if (mergeInputName.empty() || mergeOperationName.empty() || mergeOutputName.empty() || (pingPongIterations && mergeOperationName != "IterationResult") || resources.find(mergeInputName) == resources.end() || resources.find(mergeOperationName) == resources.end() || resources.find(mergeOutputName) == resources.end() || resources.at(mergeOutputName) != output || resources.at(mergeOperationName) == output || (!pingPongIterations && resources.at(mergeOperationName) == nullptr)) {
+        if (mergeInputName.empty() || mergeOperationName.empty() || mergeOutputName.empty() || resources.find(mergeInputName) == resources.end() || resources.find(mergeOperationName) == resources.end() || resources.find(mergeOutputName) == resources.end() || resources.at(mergeOutputName) != output || resources.at(mergeOperationName) == output || (!pingPongIterations && resources.at(mergeOperationName) == nullptr)) {
             TF3D_LOG_ERROR("Filter '{}' has a merge with an unknown or missing Input/Operation/Output resource.", filter->GetName());
             input->CopyTo(output);
             return;
         }
+
+        const auto runDeclaredPass = [&](const nlohmann::json &pass, GeneratorData *fallbackReference) {
+            const auto inputResource  = resources.find(pass.value("Input", ""));
+            const auto outputResource = resources.find(pass.value("Output", ""));
+            if (inputResource == resources.end() || outputResource == resources.end() || inputResource->second == nullptr || outputResource->second == nullptr) {
+                TF3D_LOG_ERROR("Filter '{}' references an uninitialized pass resource.", filter->GetName());
+                return false;
+            }
+
+            GeneratorData *reference        = fallbackReference;
+            const std::string referenceName = pass.value("Reference", "");
+            if (!referenceName.empty()) {
+                const auto referenceResource = resources.find(referenceName);
+                if (referenceResource == resources.end() || referenceResource->second == nullptr) {
+                    TF3D_LOG_ERROR("Filter '{}' references an uninitialized Reference resource '{}'.", filter->GetName(), referenceName);
+                    return false;
+                }
+                reference = referenceResource->second;
+            }
+            RunPhase(filter, pass, inputResource->second, outputResource->second, reference);
+            return true;
+        };
 
         if (filter->NeedsFieldStatistics() && m_Statistics != nullptr) {
             float requestedPercentile = -1.0f;
@@ -408,16 +455,22 @@ namespace tf3d::generators
             GeneratorData *iterationInput  = input;
             GeneratorData *iterationOutput = iterationBuffers[0];
             if (!setup.empty()) {
-                const std::string setupInputName  = setup.value("Input", "");
+                if (!runDeclaredPass(setup, nullptr)) {
+                    input->CopyTo(output);
+                    return;
+                }
                 const std::string setupOutputName = setup.value("Output", "");
-                RunPhase(filter, setup, resources.at(setupInputName), resources.at(setupOutputName));
-                iterationInput  = resources.at(setupOutputName);
-                iterationOutput = iterationInput == iterationBuffers[0] ? iterationBuffers[1] : iterationBuffers[0];
+                iterationInput                    = resources.at(setupOutputName);
+                iterationOutput                   = iterationInput == iterationBuffers[0] ? iterationBuffers[1] : iterationBuffers[0];
             }
 
             const bool useOriginalInput = execution.value("UseOriginalInput", false);
             for (int iteration = 0; iteration < iterations; iteration++) {
-                RunPhase(filter, passes.front(), iterationInput, iterationOutput, useOriginalInput ? input : nullptr);
+                const auto &pass = passes.front();
+                if (!runDeclaredPass(pass, useOriginalInput ? input : nullptr)) {
+                    input->CopyTo(output);
+                    return;
+                }
                 iterationInput  = iterationOutput;
                 iterationOutput = iterationOutput == iterationBuffers[0] ? iterationBuffers[1] : iterationBuffers[0];
             }
@@ -425,11 +478,25 @@ namespace tf3d::generators
         } else {
             for (int iteration = 0; iteration < iterations; iteration++) {
                 for (const auto &pass : passes) {
-                    const std::string inputName  = pass.value("Input", "");
-                    const std::string outputName = pass.value("Output", "");
-                    RunPhase(filter, pass, resources.at(inputName), resources.at(outputName));
+                    if (!runDeclaredPass(pass, nullptr)) {
+                        input->CopyTo(output);
+                        return;
+                    }
                 }
             }
+        }
+
+        for (const auto &pass : postPasses) {
+            if (!runDeclaredPass(pass, nullptr)) {
+                input->CopyTo(output);
+                return;
+            }
+        }
+
+        if (resources.at(mergeOperationName) == nullptr) {
+            TF3D_LOG_ERROR("Filter '{}' produced no merge operation resource '{}'.", filter->GetName(), mergeOperationName);
+            input->CopyTo(output);
+            return;
         }
         RunMergePhase(filter, merge, resources.at(mergeInputName), resources.at(mergeOperationName), resources.at(mergeOutputName));
     }
