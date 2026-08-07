@@ -83,8 +83,7 @@ namespace tf3d::misc
 
     namespace
     {
-        template <typename ShaderType>
-        void ApplyInspectorValues(const CustomInspector &inspector, ShaderType &shader, std::string_view uniformPrefix)
+        void ApplyInspectorValues(const CustomInspector &inspector, tf3d::base::ShaderCore &shader, std::string_view uniformPrefix)
         {
             const auto &widgets     = inspector.GetWidgets();
             const auto &widgetOrder = inspector.GetWidgetsOrder();
@@ -1823,12 +1822,7 @@ namespace tf3d::misc
         return true;
     }
 
-    void CustomInspector::ApplyToShader(tf3d::base::Shader &shader, std::string_view uniformPrefix) const
-    {
-        ApplyInspectorValues(*this, shader, uniformPrefix);
-    }
-
-    void CustomInspector::ApplyToShader(tf3d::base::ComputeShader &shader, std::string_view uniformPrefix) const
+    void CustomInspector::ApplyToShader(tf3d::base::ShaderCore &shader, std::string_view uniformPrefix) const
     {
         ApplyInspectorValues(*this, shader, uniformPrefix);
     }
