@@ -41,6 +41,15 @@
 namespace tf3d::utils
 {
 
+    uint64_t NextUniqueId()
+    {
+        static std::atomic<uint64_t> nextId{1};
+        uint64_t id = nextId.fetch_add(1, std::memory_order_relaxed);
+        while (id == 0)
+            id = nextId.fetch_add(1, std::memory_order_relaxed);
+        return id;
+    }
+
     void HashCombine64(uint64_t &hash, uint64_t value)
     {
         hash ^= value;

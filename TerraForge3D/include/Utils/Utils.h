@@ -52,6 +52,7 @@ namespace tf3d::utils
     };
 
     void HashCombine64(uint64_t &hash, uint64_t value);
+    uint64_t NextUniqueId();
     uint64_t QuantizeFloatForHash(float value,
                                   float precision = 0.00001f);
     float OrderedUintToFloat(uint32_t value);
