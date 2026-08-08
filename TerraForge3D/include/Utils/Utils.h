@@ -15,6 +15,7 @@ namespace tf3d::utils
 {
 
     std::string UChar2Hex(unsigned char c);
+    bool IsValidShaderSymbol(const std::string &symbol);
 
     struct Hash {
 

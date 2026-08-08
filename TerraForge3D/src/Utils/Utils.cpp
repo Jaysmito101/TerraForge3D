@@ -41,6 +41,20 @@
 namespace tf3d::utils
 {
 
+    bool IsValidShaderSymbol(const std::string &symbol)
+    {
+        if (symbol.empty())
+            return false;
+        for (size_t index = 0; index < symbol.size(); ++index) {
+            const char character = symbol[index];
+            const bool isLetter  = (character >= 'A' && character <= 'Z') || (character >= 'a' && character <= 'z');
+            const bool isDigit   = character >= '0' && character <= '9';
+            if (!(isLetter || isDigit || character == '_') || (index == 0 && isDigit))
+                return false;
+        }
+        return true;
+    }
+
     uint64_t NextUniqueId()
     {
         static std::atomic<uint64_t> nextId{1};
