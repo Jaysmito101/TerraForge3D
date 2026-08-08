@@ -64,11 +64,11 @@ namespace tf3d::generators
         data::ApplicationState *m_AppState = nullptr;
         std::optional<base::ComputeShader> m_Shader;
         std::optional<base::ComputeShader> m_RayQueryShader;
-        uint32_t m_RendererID = 0;
+        uint32_t m_RendererID               = 0;
         uint32_t m_RayQueryResultRendererID = 0;
-        int32_t m_Resolution  = 0;
-        int32_t m_MipLevels   = 0;
-        bool m_IsReady        = false;
+        int32_t m_Resolution                = 0;
+        int32_t m_MipLevels                 = 0;
+        bool m_IsReady                      = false;
     };
 
 } // namespace tf3d::generators
