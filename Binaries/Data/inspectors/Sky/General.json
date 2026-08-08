@@ -1,0 +1,65 @@
+[
+  {
+    "Name": "RenderSky",
+    "Type": "Bool",
+    "Default": true,
+    "Widget": "Checkbox",
+    "Label": "Render Sky",
+    "Description": "Render the loaded skybox in the viewport background."
+  },
+  {
+    "Name": "SkyMapPath",
+    "Type": "String",
+    "Default": "",
+    "Visible": false,
+    "Description": "Path of the equirectangular HDR or LDR sky map used to generate the environment maps."
+  },
+  {
+    "Name": "SkyboxSize",
+    "Type": "Int",
+    "Default": 512,
+    "Widget": "Dropdown",
+    "Options": [
+      "64",
+      "128",
+      "256",
+      "512",
+      "1024",
+      "2048",
+      "4096"
+    ],
+    "OptionValues": [
+      64,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "Label": "Environment Map Size",
+    "Description": "Resolution of the generated environment cube. Use a power-of-two value; larger values increase sky-map generation cost and memory use."
+  },
+  {
+    "Name": "IrradianceMapSize",
+    "Type": "Int",
+    "Default": 32,
+    "Widget": "Dropdown",
+    "Options": [
+      "16",
+      "32",
+      "64",
+      "128",
+      "256"
+    ],
+    "OptionValues": [
+      16,
+      32,
+      64,
+      128,
+      256
+    ],
+    "Label": "Irradiance Map Size",
+    "Description": "Resolution of the generated diffuse irradiance cube. Use a power-of-two value."
+  }
+]

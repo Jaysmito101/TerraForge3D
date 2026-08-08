@@ -1,0 +1,41 @@
+{
+  "Description": "Controls the sky display and the generated environment lighting maps.",
+  "ShowResetButton": false,
+  "WidgetOrder": [
+    "RenderSky",
+    "LoadSkyMap",
+    "ReloadShaders",
+    "SkyboxSize",
+    "IrradianceMapSize"
+  ],
+  "Schema": {
+    "properties": {
+      "SkyMapPath": {
+        "minLength": 1
+      },
+      "SkyReady": {
+        "type": "boolean",
+        "readOnly": true,
+        "title": "Sky Ready",
+        "description": "Whether the sky map and generated lighting maps are currently ready."
+      }
+    }
+  },
+  "Params": [
+    {
+      "$include": "./General.json"
+    }
+  ],
+  "Buttons": [
+    {
+      "Action": "LoadSkyMap",
+      "Label": "Load Sky Texture",
+      "Description": "Choose an HDR or LDR equirectangular sky map and rebuild the generated environment maps."
+    },
+    {
+      "Action": "ReloadShaders",
+      "Label": "Reload Shaders",
+      "Description": "Reload the skybox and environment-map compute shaders."
+    }
+  ]
+}
