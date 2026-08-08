@@ -51,11 +51,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points in the cliff breakup.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes where cliff variations appear.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         },
         {

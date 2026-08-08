@@ -51,11 +51,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points in the crack interior detail.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; the main crack Voronoi layout is separate.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         },
         {

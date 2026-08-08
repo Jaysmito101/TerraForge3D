@@ -105,11 +105,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points in the island terrain bands.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local terrain placement.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]

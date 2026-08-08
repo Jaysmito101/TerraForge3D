@@ -33,17 +33,21 @@
             "X + Y",
             "X * Y"
           ],
-          "Conditional": "SubStyle",
-          "ConditionalValue": 3,
           "Description": "Selects the coordinate combination used by the sine-wave sub-style.",
-          "Tooltip": "Choose the direction or combination of wave axes."
+          "Tooltip": "Choose the direction or combination of wave axes.",
+          "Conditions": [
+            {
+              "Name": "SubStyle",
+              "Values": [
+                3
+              ]
+            }
+          ]
         },
         {
           "Name": "Frequency",
           "Type": "Float",
           "Default": 1,
-          "Conditional": "SubStyle",
-          "ConditionalValue": 3,
           "Widget": "Drag",
           "Sensitivity": 0.01,
           "Constraints": [
@@ -53,7 +57,15 @@
             0
           ],
           "Description": "Controls the frequency of the selected wave pattern.",
-          "Tooltip": "Increase frequency for more bands across the terrain."
+          "Tooltip": "Increase frequency for more bands across the terrain.",
+          "Conditions": [
+            {
+              "Name": "SubStyle",
+              "Values": [
+                3
+              ]
+            }
+          ]
         },
         {
           "Name": "Height",
@@ -74,8 +86,6 @@
           "Name": "Radius",
           "Type": "Float",
           "Default": 0.5,
-          "Conditional": "SubStyle",
-          "ConditionalValue": 1,
           "Widget": "Drag",
           "Sensitivity": 0.01,
           "Constraints": [
@@ -85,7 +95,15 @@
             0
           ],
           "Description": "Controls the size of the primary radial feature.",
-          "Tooltip": "Increase radius to affect a larger area."
+          "Tooltip": "Increase radius to affect a larger area.",
+          "Conditions": [
+            {
+              "Name": "SubStyle",
+              "Values": [
+                1
+              ]
+            }
+          ]
         }
       ]
     },

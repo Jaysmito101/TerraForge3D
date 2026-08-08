@@ -17,7 +17,7 @@ namespace tf3d::inspector
             inspectorName.find_first_of("/\\") != std::string_view::npos)
             return {};
 
-        return dataDirectory / "inspectors" / std::string(inspectorName) / "Inspector.json";
+        return std::filesystem::absolute(dataDirectory) / "inspectors" / std::string(inspectorName) / "Inspector.json";
     }
 
     bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
@@ -39,8 +39,8 @@ namespace tf3d::inspector
         }
 
         utils::JsonIncludeResolverOptions resolverOptions;
-        resolverOptions.rootDirectory = dataDirectory / "inspectors";
-        resolverOptions.pathMode      = utils::JsonIncludePathMode::RelativeToIncludingFile;
+        resolverOptions.rootDirectory  = dataDirectory / "inspectors";
+        resolverOptions.pathMode       = utils::JsonIncludePathMode::RelativeToIncludingFile;
         resolverOptions.restrictToRoot = true;
         const utils::JsonIncludeResolver resolver(resolverOptions);
         std::string resolveError;

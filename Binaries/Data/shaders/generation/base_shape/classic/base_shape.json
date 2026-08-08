@@ -68,11 +68,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points used by the Classic noise field.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes feature placement.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]

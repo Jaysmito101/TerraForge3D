@@ -65,11 +65,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points in crater surface breakup.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; crater placement is unchanged.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]

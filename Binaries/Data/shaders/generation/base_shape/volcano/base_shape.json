@@ -65,11 +65,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points in volcanic slope and outside-terrain detail.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local volcano variation placement.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]

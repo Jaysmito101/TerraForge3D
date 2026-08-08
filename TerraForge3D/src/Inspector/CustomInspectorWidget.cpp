@@ -80,7 +80,7 @@ namespace tf3d::inspector
             return CustomInspectorWidgetType::Seed;
         if (type == "Dropdown")
             return CustomInspectorWidgetType::Dropdown;
-        if (type == "Separator" || type == "Seperator")
+        if (type == "Separator")
             return CustomInspectorWidgetType::Separator;
         if (type == "NewLine")
             return CustomInspectorWidgetType::NewLine;

@@ -65,11 +65,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points that shape canyon breakup.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes cell placement in the canyon detail.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]

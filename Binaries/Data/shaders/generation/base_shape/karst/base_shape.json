@@ -65,11 +65,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points in karst hollows and ridge breakup.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local karst feature placement.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]

@@ -65,11 +65,15 @@
           "Label": "Noise Jitter",
           "Description": "Offsets cellular feature points used to break up dune bands.",
           "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local dune feature placement.",
-          "Conditional": "NoiseAlgorithm",
-          "ConditionalValues": [
-            "Gabor",
-            "Voronoi",
-            "Worley"
+          "Conditions": [
+            {
+              "Name": "NoiseAlgorithm",
+              "Values": [
+                "Gabor",
+                "Voronoi",
+                "Worley"
+              ]
+            }
           ]
         }
       ]
