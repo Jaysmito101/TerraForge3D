@@ -23,12 +23,16 @@ namespace tf3d::generators
         float distance      = 0.0f;
     };
 
-
     class HeightfieldRayQuery
     {
     public:
         explicit HeightfieldRayQuery(data::ResourceManager *resourceManager);
         ~HeightfieldRayQuery();
+
+        HeightfieldRayQuery(const HeightfieldRayQuery &)            = delete;
+        HeightfieldRayQuery &operator=(const HeightfieldRayQuery &) = delete;
+        HeightfieldRayQuery(HeightfieldRayQuery &&)                 = delete;
+        HeightfieldRayQuery &operator=(HeightfieldRayQuery &&)      = delete;
 
         bool Intersect(uint32_t heightPyramidRendererID, int32_t pyramidLevels,
                        const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection,
