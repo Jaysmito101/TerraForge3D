@@ -140,12 +140,12 @@ namespace tf3d::renderer
         return m_Shared.frameBuffer;
     }
 
-    Camera &RendererViewport::GetCamera()
+    base::Camera &RendererViewport::GetCamera()
     {
         return m_SceneMode.camera;
     }
 
-    const Camera &RendererViewport::GetCamera() const
+    const base::Camera &RendererViewport::GetCamera() const
     {
         return m_SceneMode.camera;
     }

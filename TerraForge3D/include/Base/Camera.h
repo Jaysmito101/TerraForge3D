@@ -99,5 +99,3 @@ namespace tf3d::base
     };
 
 } // namespace tf3d::base
-using tf3d::base::CameraRay;
-using tf3d::base::Camera;

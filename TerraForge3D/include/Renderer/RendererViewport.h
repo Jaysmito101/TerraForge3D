@@ -59,8 +59,8 @@ namespace tf3d::renderer
         std::shared_ptr<FrameBuffer> &GetFrameBuffer();
         const std::shared_ptr<FrameBuffer> &GetFrameBuffer() const;
 
-        Camera &GetCamera();
-        const Camera &GetCamera() const;
+        base::Camera &GetCamera();
+        const base::Camera &GetCamera() const;
 
         RendererViewportMode GetMode() const;
         void SetMode(RendererViewportMode mode);
@@ -103,7 +103,7 @@ namespace tf3d::renderer
         };
 
         struct SceneModeState {
-            Camera camera;
+            base::Camera camera;
             std::array<float, 4> positionOnTerrain{0.0f, 0.0f, 0.0f, 0.0f};
         };
 
