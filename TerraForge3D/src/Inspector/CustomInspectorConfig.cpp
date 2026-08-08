@@ -1,7 +1,7 @@
 #include "Base/Base.h"
 #include "Data/ApplicationState.h"
-#include "Data/ResourceManager.h"
 #include "Inspector/CustomInspector.h"
+#include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
 #include <unordered_set>
@@ -11,8 +11,8 @@ namespace tf3d::inspector
 
     bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
     {
-        if (appState == nullptr || appState->resourceManager == nullptr) {
-            TF3D_LOG_ERROR("Cannot load inspector metadata '{}' without a resource manager", inspectorName);
+        if (appState == nullptr) {
+            TF3D_LOG_ERROR("Cannot load inspector metadata '{}' without application state", inspectorName);
             return false;
         }
         if (inspectorName.empty()) {
@@ -22,19 +22,14 @@ namespace tf3d::inspector
 
         const std::string configPath = appState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
                                        PATH_SEPARATOR + std::string(inspectorName) + ".json";
-        bool loaded              = false;
-        const std::string source = appState->resourceManager->LoadText(configPath, false, &loaded);
-        if (!loaded) {
-            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath);
+        const utils::JsonIncludeResolver resolver;
+        std::string resolveError;
+        const auto config = resolver.ResolveFile(configPath, &resolveError);
+        if (!config) {
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}': {}", configPath, resolveError);
             return false;
         }
-
-        const nlohmann::json config = nlohmann::json::parse(source, nullptr, false);
-        if (config.is_discarded()) {
-            TF3D_LOG_ERROR("Could not parse inspector metadata '{}'", configPath);
-            return false;
-        }
-        if (!LoadConfig(config)) {
+        if (!LoadConfig(*config)) {
             TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath);
             return false;
         }
