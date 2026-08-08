@@ -196,6 +196,7 @@ namespace
         PerformanceMonitor::Domain domain = PerformanceMonitor::Domain::Gpu;
         bool active                       = false;
         bool ended                        = false;
+        bool invalid                      = false;
     };
 } // namespace
 
@@ -387,7 +388,14 @@ PerformanceMonitor::CaptureMode PerformanceMonitor::GetCaptureMode() const
 
 bool PerformanceMonitor::IsCaptureGenerationActive(uint64_t generation) const
 {
-    return generation == m_CaptureGeneration.load(std::memory_order_acquire) && IsCapturing();
+    if (generation != m_CaptureGeneration.load(std::memory_order_acquire))
+        return false;
+
+    const CaptureMode mode = GetCaptureMode();
+    if (mode == CaptureMode::Full)
+        return true;
+
+    return mode == CaptureMode::Off && m_LastCaptureMode.load(std::memory_order_acquire) == CaptureMode::Full;
 }
 
 PerformanceMonitor::Scope PerformanceMonitor::BeginScope(std::string_view key, Domain domain, uint64_t flowId)
@@ -778,6 +786,7 @@ PerformanceMonitor::GpuScope PerformanceMonitor::BeginGpuScope(std::string_view 
     slot->flags               = EventComplete;
     slot->active              = true;
     slot->ended               = false;
+    slot->invalid             = false;
     glQueryCounter(slot->beginQuery, GL_TIMESTAMP);
     m_PendingGpuQueryCount.fetch_add(1, std::memory_order_relaxed);
     return GpuScope(this, context, static_cast<uint32_t>(slotIndex), generation);
@@ -808,28 +817,57 @@ void PerformanceMonitor::EndGpuScope(void *statePointer, uint32_t slotIndex, uin
     GpuQuerySlot &slot  = context.slots[slotIndex];
     if (!slot.active || slot.generation != generation || slot.ended)
         return;
-    glQueryCounter(slot.endQuery, GL_TIMESTAMP);
+
+    if (CurrentOpenGLContextId() == context.contextId) {
+        glQueryCounter(slot.endQuery, GL_TIMESTAMP);
+    } else {
+        slot.invalid = true;
+        slot.flags |= EventGpuUnavailable | EventMismatch;
+    }
     slot.cpuEndTicks = NowTicks();
     slot.ended       = true;
+    m_PendingGpuResultCount.fetch_add(1, std::memory_order_relaxed);
 #endif
 }
 
-void PerformanceMonitor::PollGpuQueries()
+void PerformanceMonitor::PollGpuQueries(bool waitForResults)
 {
 #if defined(TF3D_PROFILER_GPU) && !TF3D_PROFILER_GPU
+    (void)waitForResults;
     return;
 #else
     if (glfwGetCurrentContext() == nullptr)
         return;
-    Recorder &recorder = GetThreadRecorder();
+    Recorder &recorder            = GetThreadRecorder();
+    const uint64_t currentContext = CurrentOpenGLContextId();
     for (GpuContext &context : recorder.gpuContexts) {
+        if (context.contextId != currentContext)
+            continue;
         for (GpuQuerySlot &slot : context.slots) {
             if (!slot.active || !slot.ended)
                 continue;
-            GLint available = GL_FALSE;
-            glGetQueryObjectiv(slot.endQuery, GL_QUERY_RESULT_AVAILABLE, &available);
-            if (available == GL_FALSE)
+
+            const auto retireSlot = [&](bool dropped) {
+                slot.active  = false;
+                slot.ended   = false;
+                slot.invalid = false;
+                m_PendingGpuResultCount.fetch_sub(1, std::memory_order_relaxed);
+                m_PendingGpuQueryCount.fetch_sub(1, std::memory_order_relaxed);
+                if (dropped)
+                    m_DroppedGpuQueryCount.fetch_add(1, std::memory_order_relaxed);
+            };
+
+            if (slot.invalid || glIsQuery(slot.beginQuery) == GL_FALSE || glIsQuery(slot.endQuery) == GL_FALSE) {
+                retireSlot(true);
                 continue;
+            }
+
+            if (!waitForResults) {
+                GLint available = GL_FALSE;
+                glGetQueryObjectiv(slot.endQuery, GL_QUERY_RESULT_AVAILABLE, &available);
+                if (available == GL_FALSE)
+                    continue;
+            }
 
             GLuint64 gpuStart = 0;
             GLuint64 gpuEnd   = 0;
@@ -837,7 +875,7 @@ void PerformanceMonitor::PollGpuQueries()
             glGetQueryObjectui64v(slot.endQuery, GL_QUERY_RESULT, &gpuEnd);
             const bool valid                 = gpuEnd >= gpuStart;
             const uint64_t currentGeneration = m_CaptureGeneration.load(std::memory_order_acquire);
-            if (valid && slot.generation == currentGeneration && GetCaptureMode() == CaptureMode::Full) {
+            if (valid && slot.generation == currentGeneration && IsCaptureGenerationActive(slot.generation)) {
                 RawEvent event;
                 event.eventId                 = slot.eventId;
                 event.frameId                 = slot.frameId;
@@ -859,9 +897,7 @@ void PerformanceMonitor::PollGpuQueries()
                 event.kind   = EventKind::Span;
                 recorder.Append(event);
             }
-            slot.active = false;
-            slot.ended  = false;
-            m_PendingGpuQueryCount.fetch_sub(1, std::memory_order_relaxed);
+            retireSlot(!valid);
         }
     }
 #endif
@@ -888,7 +924,14 @@ void PerformanceMonitor::EndFrame()
         const double durationMs = now >= startTicks ? static_cast<double>(now - startTicks) / 1000000.0 : 0.0;
         EnsureFrame(frameId, startTicks, true, durationMs);
     }
-    PollGpuQueries();
+
+    const bool drainGpu = m_GpuDrainRequested.exchange(false, std::memory_order_acq_rel);
+    if (drainGpu &&
+        glfwGetCurrentContext() != nullptr &&
+        m_PendingGpuQueryCount.load(std::memory_order_acquire) != 0) {
+        glFinish();
+    }
+    PollGpuQueries(drainGpu);
     CollectCompletedEvents();
 }
 
@@ -1011,6 +1054,10 @@ PerformanceMonitor::Snapshot PerformanceMonitor::CaptureSnapshot() const
     snapshot.droppedEventCount       = m_DroppedEventCount.load(std::memory_order_relaxed);
     snapshot.incompleteEventCount    = m_IncompleteEventCount.load(std::memory_order_relaxed);
     snapshot.pendingGpuQueryCount    = m_PendingGpuQueryCount.load(std::memory_order_relaxed);
+    snapshot.pendingGpuResultCount   = m_PendingGpuResultCount.load(std::memory_order_relaxed);
+    snapshot.openGpuScopeCount       = snapshot.pendingGpuQueryCount > snapshot.pendingGpuResultCount
+                                           ? snapshot.pendingGpuQueryCount - snapshot.pendingGpuResultCount
+                                           : 0;
     snapshot.droppedGpuQueryCount    = m_DroppedGpuQueryCount.load(std::memory_order_relaxed);
     snapshot.profilerOverheadNs      = m_ProfilerOverheadNs.load(std::memory_order_relaxed);
     snapshot.profilerOverheadSamples = m_ProfilerOverheadSamples.load(std::memory_order_relaxed);
@@ -1031,6 +1078,7 @@ void PerformanceMonitor::StartCapture(CaptureMode mode)
     if (mode == CaptureMode::Off)
         mode = CaptureMode::Cpu;
     m_CaptureGeneration.fetch_add(1, std::memory_order_acq_rel);
+    m_GpuDrainRequested.store(false, std::memory_order_release);
     {
         std::lock_guard lock(m_Storage->dataMutex);
         m_Storage->frames.clear();
@@ -1054,15 +1102,18 @@ void PerformanceMonitor::StopCapture()
     if (!IsCapturing())
         return;
     CollectCompletedEvents();
+    const bool hadGpuCapture = GetCaptureMode() == CaptureMode::Full;
     m_CaptureMode.store(CaptureMode::Off, std::memory_order_release);
+    if (hadGpuCapture)
+        m_GpuDrainRequested.store(true, std::memory_order_release);
     CollectCompletedEvents();
-    m_CaptureGeneration.fetch_add(1, std::memory_order_acq_rel);
 }
 
 void PerformanceMonitor::ClearCapture()
 {
     m_CaptureMode.store(CaptureMode::Off, std::memory_order_release);
     m_CaptureGeneration.fetch_add(1, std::memory_order_acq_rel);
+    m_GpuDrainRequested.store(false, std::memory_order_release);
     {
         std::lock_guard lock(m_Storage->dataMutex);
         m_Storage->frames.clear();
@@ -1280,6 +1331,8 @@ bool PerformanceMonitor::ExportChromeTrace(const std::string &path) const
     writeMetadataIntegerValue("droppedEvents", snapshot.droppedEventCount);
     writeMetadataIntegerValue("incompleteEvents", snapshot.incompleteEventCount);
     writeMetadataIntegerValue("pendingGpuQueries", snapshot.pendingGpuQueryCount);
+    writeMetadataIntegerValue("openGpuScopes", snapshot.openGpuScopeCount);
+    writeMetadataIntegerValue("pendingGpuResults", snapshot.pendingGpuResultCount);
     writeMetadataIntegerValue("droppedGpuQueries", snapshot.droppedGpuQueryCount);
     writeMetadataIntegerValue("profilerOverheadNs", snapshot.profilerOverheadNs);
     writeMetadataIntegerValue("profilerOverheadSamples", snapshot.profilerOverheadSamples);
@@ -1369,6 +1422,10 @@ void PerformanceMonitor::RenderUI(bool *windowOpen)
                 static_cast<unsigned long long>(snapshot.incompleteEventCount),
                 static_cast<unsigned long long>(snapshot.pendingGpuQueryCount),
                 static_cast<unsigned long long>(snapshot.droppedGpuQueryCount));
+    if (snapshot.pendingGpuQueryCount > 0)
+        ImGui::TextDisabled("GPU pending detail: %llu open scopes | %llu awaiting results",
+                            static_cast<unsigned long long>(snapshot.openGpuScopeCount),
+                            static_cast<unsigned long long>(snapshot.pendingGpuResultCount));
     if (snapshot.profilerOverheadSamples > 0)
         ImGui::TextDisabled("Profiler overhead: %.3f ms across %llu samples",
                             static_cast<double>(snapshot.profilerOverheadNs) / 1000000.0,

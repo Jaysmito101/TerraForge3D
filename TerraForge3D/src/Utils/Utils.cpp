@@ -714,22 +714,6 @@ namespace tf3d::utils
 #endif //  TERR3D_WIN32
     }
 
-    namespace
-    {
-        std::string EnvironmentValue(const char *name)
-        {
-            const char *value = std::getenv(name);
-            return value != nullptr ? std::string(value) : std::string();
-        }
-
-        bool IsRegularFile(const std::filesystem::path &path)
-        {
-            std::error_code error;
-            return std::filesystem::is_regular_file(path, error);
-        }
-
-    } // namespace
-
     std::string FindExecutableOnPath(std::initializer_list<const char *> names)
     {
 #ifdef TERR3D_WIN32

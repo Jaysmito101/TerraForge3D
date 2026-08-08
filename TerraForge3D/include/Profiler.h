@@ -104,6 +104,8 @@ public:
         uint64_t droppedEventCount       = 0;
         uint64_t incompleteEventCount    = 0;
         uint64_t pendingGpuQueryCount    = 0;
+        uint64_t openGpuScopeCount       = 0;
+        uint64_t pendingGpuResultCount   = 0;
         uint64_t droppedGpuQueryCount    = 0;
         uint64_t profilerOverheadNs      = 0;
         uint64_t profilerOverheadSamples = 0;
@@ -255,7 +257,7 @@ public:
         return BeginGpuScope(std::forward<KeyFactory>(factory)(), domain, flowId);
     }
 
-    void PollGpuQueries();
+    void PollGpuQueries(bool waitForResults = false);
 
     void SetCurrentThreadName(std::string_view name);
     uint64_t CurrentFrameId() const;
@@ -316,7 +318,9 @@ private:
     std::atomic<uint64_t> m_DroppedEventCount{0};
     std::atomic<uint64_t> m_IncompleteEventCount{0};
     std::atomic<uint64_t> m_PendingGpuQueryCount{0};
+    std::atomic<uint64_t> m_PendingGpuResultCount{0};
     std::atomic<uint64_t> m_DroppedGpuQueryCount{0};
+    std::atomic_bool m_GpuDrainRequested{false};
     std::atomic<uint64_t> m_ProfilerOverheadNs{0};
     std::atomic<uint64_t> m_ProfilerOverheadSamples{0};
 
@@ -540,34 +544,38 @@ private:
     do {                               \
         (void)sizeof(name);            \
     } while (false)
-#define TF3D_PROFILE_CAPTURE_ACTIVE() false
-#define TF3D_PROFILE_CAPTURE_MODE()   ::PerformanceMonitor::CaptureMode::Off
+#define TF3D_PROFILE_CAPTURE_ACTIVE()   false
+#define TF3D_PROFILE_CAPTURE_MODE()     ::PerformanceMonitor::CaptureMode::Off
 #define TF3D_PROFILE_CURRENT_FRAME_ID() uint64_t(0)
-#define TF3D_PROFILE_NEW_FLOW_ID()    uint64_t(0)
+#define TF3D_PROFILE_NEW_FLOW_ID()      uint64_t(0)
 #define TF3D_PROFILE_SET_METADATA(key, value) \
     do {                                      \
         (void)sizeof(key);                    \
         (void)sizeof(value);                  \
     } while (false)
 #define TF3D_PROFILE_FRAME_BEGIN() \
-    do {                                  \
+    do {                           \
     } while (false)
 #define TF3D_PROFILE_FRAME_END() \
-    do {                                \
+    do {                         \
     } while (false)
 #define TF3D_PROFILE_RENDER_UI(windowOpen) \
-    do {                                      \
-        (void)sizeof(windowOpen);              \
+    do {                                   \
+        (void)sizeof(windowOpen);          \
     } while (false)
 
 #endif
 
 #if (!defined(TF3D_PROFILER_ENABLED) || TF3D_PROFILER_ENABLED) && \
     (!defined(TF3D_PROFILER_GPU) || TF3D_PROFILER_GPU)
-#define TF3D_PROFILE_POLL_GPU() ::PerformanceMonitor::Get().PollGpuQueries()
+#define TF3D_PROFILE_POLL_GPU()  ::PerformanceMonitor::Get().PollGpuQueries()
+#define TF3D_PROFILE_DRAIN_GPU() ::PerformanceMonitor::Get().PollGpuQueries(true)
 #else
 #define TF3D_PROFILE_POLL_GPU() \
     do {                        \
+    } while (false)
+#define TF3D_PROFILE_DRAIN_GPU() \
+    do {                         \
     } while (false)
 #endif
 

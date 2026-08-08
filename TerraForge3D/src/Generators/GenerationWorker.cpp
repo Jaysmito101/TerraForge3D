@@ -157,7 +157,7 @@ namespace tf3d::generators
                 }
                 glFinish();
             }
-            TF3D_PROFILE_POLL_GPU();
+            TF3D_PROFILE_DRAIN_GPU();
             if (captureActive) {
                 const std::string workerKey = m_ProfilePrefix + "/worker";
                 TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "gpu-complete", PerformanceMonitor::Domain::Worker);
