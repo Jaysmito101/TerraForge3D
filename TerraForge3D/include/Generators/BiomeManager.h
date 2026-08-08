@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base/Base.h"
-#include "Generators/BiomeBaseNoiseGenerator.h"
+#include "Generators/BaseNoiseGenerator.h"
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/BiomeCustomBaseShape.h"
 #include "Generators/BiomeFilterStack.h"
@@ -124,7 +124,7 @@ namespace tf3d::generators
         std::shared_ptr<MaskTool> m_MaskTool;
 
         std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
-        std::shared_ptr<BiomeBaseNoiseGenerator> m_BaseNoiseGenerator;
+        std::shared_ptr<BaseNoiseGenerator> m_BaseNoiseGenerator;
         std::shared_ptr<BiomeCustomBaseShape> m_CustomBaseShape;
         std::shared_ptr<GeneratorDataStatistics> m_Statistics;
         GeneratorDataStatisticsResult m_StatisticsResult;
@@ -133,4 +133,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::BiomeManager;

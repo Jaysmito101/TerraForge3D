@@ -70,7 +70,7 @@ namespace tf3d::generators
                 TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", shaderPath.string());
         }
 
-        m_BaseNoiseGenerator           = std::make_shared<BiomeBaseNoiseGenerator>(m_AppState);
+        m_BaseNoiseGenerator           = std::make_shared<BaseNoiseGenerator>(m_AppState);
         const auto baseNoiseMetadata   = std::filesystem::path(m_AppState->constants.dataDir) / "inspectors" / "BaseNoise.json";
         const auto baseNoiseShaderPath = std::filesystem::path(m_AppState->constants.shadersDir) / "generation" / "base_noise" / "noise_gen.glsl";
         bool baseNoiseMetadataLoaded   = false;
@@ -132,6 +132,7 @@ namespace tf3d::generators
         auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_Data->Resize(size);
         m_CustomBaseShape->Resize();
+        m_BaseNoiseGenerator->Resize(m_AppState->mainMap.tileResolution);
         m_CalculatedMaskGenerator->Resize(m_AppState->mainMap.tileResolution);
         m_MaskTool->Resize(m_AppState->mainMap.tileResolution);
         m_FilterStack->Resize(size, m_AppState->mainMap.tileResolution);

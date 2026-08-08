@@ -2,17 +2,15 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
+#include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/MaskTool.h"
 #include "Generators/NoiseAlgorithmCatalog.h"
 #include "Inspector/CustomInspector.h"
-#include "Utils/Utils.h"
+
 #include <nlohmann/json.hpp>
 #include <string_view>
-
-#define BASE_NOISE_UI_PROPERTY(x)     m_RequireUpdation = x || m_RequireUpdation
-
-#define BIOME_BASE_NOISE_OCTAVE_COUNT 10
 
 namespace tf3d::data
 {
@@ -23,14 +21,15 @@ using tf3d::data::ApplicationState;
 namespace tf3d::generators
 {
 
-    class BiomeBaseNoiseGenerator
+    class BaseNoiseGenerator
     {
     public:
-        BiomeBaseNoiseGenerator(ApplicationState *appState);
-        ~BiomeBaseNoiseGenerator();
+        explicit BaseNoiseGenerator(ApplicationState *appState);
+        ~BaseNoiseGenerator();
 
         bool LoadConfig(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
         bool ShowSettings();
+        void Resize(int size);
         void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorTexture *seedTexture,
                     std::string_view profilePrefix = {});
 
@@ -45,8 +44,12 @@ namespace tf3d::generators
     private:
         data::ApplicationState *m_AppState = nullptr;
         bool m_RequireUpdation             = false;
+        bool m_UseMask                     = false;
+        bool m_InvertMask                  = false;
         std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<inspector::CustomInspector> m_Inspector;
+        std::shared_ptr<CalculatedMaskGenerator> m_CalculatedMaskGenerator;
+        std::shared_ptr<MaskTool> m_MaskTool;
         NoiseAlgorithmCatalog m_NoiseAlgorithms;
         std::string m_Name        = "Base Noise";
         std::string m_ID          = "base_noise";
@@ -56,4 +59,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::BiomeBaseNoiseGenerator;

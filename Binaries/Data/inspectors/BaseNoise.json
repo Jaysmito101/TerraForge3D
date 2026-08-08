@@ -107,6 +107,20 @@
             "Voronoi",
             "Worley"
           ]
+        },
+        {
+          "Name": "Offset",
+          "Type": "Vector3",
+          "Default": [
+            0,
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Label": "Sampling Offset",
+          "Description": "Offsets the noise sampling position in 3D space.",
+          "Tooltip": "Move through the noise field without changing its scale."
         }
       ]
     },
@@ -203,101 +217,6 @@
           "Label": "Use Seed Texture",
           "Description": "Uses the generated seed texture when one is available.",
           "Tooltip": "Disable to use the inspector seed and coordinate field alone."
-        }
-      ]
-    },
-    {
-      "Name": "Transform",
-      "Label": "Transform",
-      "Description": "Controls the sampling offset and optional terrain-dependent remapping.",
-      "Collapsible": true,
-      "DefaultOpen": true,
-      "Params": [
-        {
-          "Name": "Offset",
-          "Type": "Vector3",
-          "Default": [
-            0,
-            0,
-            0
-          ],
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Label": "Offset",
-          "Description": "Offsets the noise sampling position in 3D space.",
-          "Tooltip": "Move through the noise field without changing its scale."
-        },
-        {
-          "Name": "TransformFactor",
-          "Type": "Int",
-          "Default": 1,
-          "Widget": "Dropdown",
-          "Options": [
-            "None",
-            "Slope",
-            "Height"
-          ],
-          "Label": "Transform Factor",
-          "Description": "Chooses the terrain factor used to remap the noise."
-        },
-        {
-          "Name": "SlopeSmoothingRadius",
-          "Type": "Int",
-          "Default": 3,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            20
-          ],
-          "Label": "Slope Smoothing Radius",
-          "Description": "Sets the radius used to smooth slope sampling.",
-          "Conditional": "TransformFactor",
-          "ConditionalValue": 1
-        },
-        {
-          "Name": "SlopeSamplingRadius",
-          "Type": "Float",
-          "Default": 3,
-          "Widget": "Slider",
-          "Constraints": [
-            1,
-            10
-          ],
-          "Label": "Slope Sampling Radius",
-          "Description": "Controls how far the generator samples when measuring slope.",
-          "Conditional": "TransformFactor",
-          "ConditionalValue": 1
-        },
-        {
-          "Name": "TransformRange",
-          "Type": "Vector2",
-          "Default": [
-            0,
-            1
-          ],
-          "Widget": "Drag",
-          "Sensitivity": 0.001,
-          "Label": "Transform Range",
-          "Description": "Remaps the chosen transform factor into this normalized range.",
-          "Tooltip": "The range is sorted before the smooth remap is applied."
-        }
-      ]
-    },
-    {
-      "Name": "Filtering",
-      "Label": "Filtering",
-      "Description": "Optional preprocessing for terrain-derived slope measurements.",
-      "Collapsible": true,
-      "DefaultOpen": false,
-      "Params": [
-        {
-          "Name": "UseGaussianPreFilter",
-          "Type": "Bool",
-          "Default": false,
-          "Widget": "Checkbox",
-          "Label": "Use Gaussian Pre-filter",
-          "Description": "Applies a Gaussian pre-filter before slope samples are evaluated.",
-          "Tooltip": "Use this to reduce fine height-field noise in slope-driven noise."
         }
       ]
     }
