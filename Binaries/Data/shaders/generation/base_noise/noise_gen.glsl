@@ -13,6 +13,7 @@ uniform int u_Seed;
 uniform bool u_UseSeedTexture;
 uniform sampler2D u_SeedTexture;
 uniform int u_NoiseAlgorithm;
+// Required by the shared noise helper's compatibility entry points.
 uniform float u_NoiseScale;
 uniform float u_NoiseSeed;
 uniform int u_NoiseOctaves;
@@ -24,121 +25,19 @@ uniform float u_Frequency;
 uniform float u_Lacunarity;
 uniform float u_Persistence;
 uniform int u_MixMethod;
-uniform int u_TransformFactor;
 uniform vec3 u_Offset;
 uniform float u_NoiseOctaveStrengths[16];
 uniform int u_NoiseOctaveStrengthsCount;
-uniform int u_SlopeSmoothingRadius;
-uniform vec2 u_TransformRange;
-uniform float u_SlopeSamplingRadius;
-uniform bool u_UseGaussianPreFilter;
+uniform bool u_UseMask;
+uniform bool u_InvertMask;
+layout(binding = 3) uniform sampler2D u_MaskTexture;
 
 #include "common/noise_2d.glsl"
-#include "common/noise_3d.glsl"
-#include "common/base_shape_helpers.glsl"
-
-uint PixelCoordToDataOffset(uint x, uint y)
-{
-	return y * u_Resolution + x;
-}
-
-float gaussianSample(ivec2 offset)
-{
-	const float filterMask[5][5] = {
-		{ 0.000229, 0.005977, 0.060598, 0.005977, 0.000229 },
-		{ 0.005977, 0.156150, 1.579180, 0.156150, 0.005977 },
-		{ 0.060598, 1.579180, 15.961800, 1.579180, 0.060598 },
-		{ 0.005977, 0.156150, 1.579180, 0.156150, 0.005977 },
-		{ 0.000229, 0.005977, 0.060598, 0.005977, 0.000229 }
-	};
-
-	float sum = 0.0;
-	float weightSum = 0.0;
-	
-	for (int i = -2; i <= 2; i++)
-	{
-		for (int j = -2; j <= 2; j++)
-		{
-			ivec2 offsetiv2 = offset + ivec2(i, j);
-			if (offsetiv2.x < 0 || offsetiv2.x >= u_Resolution || offsetiv2.y < 0 || offsetiv2.y >= u_Resolution) continue;
-			float weight = filterMask[i + 2][j + 2];
-			sum += imageLoad(DataSourceTexture, offsetiv2).r * weight;
-			weightSum += weight;
-		}
-	}
-
-	return sum / max(weightSum, 0.000001f);
-}
-
-float slopeHeightAt(ivec2 coord)
-{
-	coord = clamp(coord, ivec2(0), ivec2(u_Resolution - 1));
-	if (u_UseGaussianPreFilter) return gaussianSample(coord);
-	return imageLoad(DataSourceTexture, coord).r;
-}
-
-float calculateSlopeFactorAtCoord(ivec2 offsetb, ivec2 offsetc, float radius)
-{
-	if (u_Resolution < 2) return 0.0f;
-
-	ivec2 center = clamp(offsetb + offsetc, ivec2(0), ivec2(u_Resolution - 1));
-	int stepPixels = max(int(round(abs(radius))), 1);
-	float step = float(stepPixels);
-
-	float dX =
-		(3.0f * slopeHeightAt(center + ivec2( stepPixels, -stepPixels)) +
-		 10.0f * slopeHeightAt(center + ivec2( stepPixels,  0)) +
-		 3.0f * slopeHeightAt(center + ivec2( stepPixels,  stepPixels)) -
-		 3.0f * slopeHeightAt(center + ivec2(-stepPixels, -stepPixels)) -
-		10.0f * slopeHeightAt(center + ivec2(-stepPixels,  0)) -
-		 3.0f * slopeHeightAt(center + ivec2(-stepPixels,  stepPixels))) / (32.0f * step);
-	float dY =
-		(3.0f * slopeHeightAt(center + ivec2(-stepPixels,  stepPixels)) +
-		10.0f * slopeHeightAt(center + ivec2( 0,  stepPixels)) +
-		 3.0f * slopeHeightAt(center + ivec2( stepPixels,  stepPixels)) -
-		 3.0f * slopeHeightAt(center + ivec2(-stepPixels, -stepPixels)) -
-		10.0f * slopeHeightAt(center + ivec2( 0, -stepPixels)) -
-		 3.0f * slopeHeightAt(center + ivec2( stepPixels, -stepPixels))) / (32.0f * step);
-
-	float slopeGradient = length(vec2(dX, dY)) * float(u_Resolution);
-	return clamp(atan(slopeGradient) / 1.57079632679f, 0.0f, 1.0f);
-}
-
-float calculateSlopeFactor()
-{
-	ivec2 offsetv2 = ivec2(gl_GlobalInvocationID.xy);
-	int smoothingRadius = clamp(u_SlopeSmoothingRadius, 0, 20);
-	int samplingRadius = max(int(round(abs(u_SlopeSamplingRadius))), 1);
-
-	float factor = 0.0f;
-	float weightSum = 0.0f;
-	float sigma = max(float(smoothingRadius) * 0.5f, 1.0f);
-
-	for (int i = -smoothingRadius; i <= smoothingRadius; i++)
-	{
-		for (int j = -smoothingRadius; j <= smoothingRadius; j++)
-		{
-			ivec2 sampleOffset = ivec2(i, j) * samplingRadius;
-			float weight = exp(-0.5f * (float(i * i + j * j) / (sigma * sigma)));
-			factor += calculateSlopeFactorAtCoord(offsetv2, sampleOffset, float(samplingRadius)) * weight;
-			weightSum += weight;
-		}
-	}
-
-	factor /= max(weightSum, 0.000001f);
-
-	vec2 transformRange = vec2(min(u_TransformRange.x, u_TransformRange.y), max(u_TransformRange.x, u_TransformRange.y));
-	factor = tf3d_shape_smoothstep(transformRange.x, transformRange.y, factor);
-
-	return factor;
-}
-
 
 void main(void)
 {
 	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
 	if (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;
-	uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
 	vec2 uv = offsetv2 / float(u_Resolution);
 	vec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);
 	if (u_UseSeedTexture)
@@ -181,22 +80,22 @@ void main(void)
 	}
 	n /= max(amplitudeSum, 0.0001f);
 
-
-	if ( u_TransformFactor == 1) n = n * calculateSlopeFactor();
-	else if ( u_TransformFactor == 2)
-	{
-		vec2 transformRange = vec2(min(u_TransformRange.x, u_TransformRange.y), max(u_TransformRange.x, u_TransformRange.y));
-		 n = n * tf3d_shape_smoothstep(transformRange.x, transformRange.y, imageLoad(DataSourceTexture, ivec2(offsetv2)).r);
-	}
-
-	n = n * clamp(u_Strength, -4.0f, 4.0f) * clamp(u_Influence, 0.0f, 1.0f);
-
 	float sourceValue = imageLoad(DataSourceTexture, ivec2(offsetv2)).r;
-	float result = sourceValue;
-	if ( u_MixMethod == 0 ) result = sourceValue + n;
-	else if ( u_MixMethod == 1 ) result = sourceValue * n;
-	else if ( u_MixMethod == 2 ) result = sourceValue * n + sourceValue;
-	else if ( u_MixMethod == 3 ) result = n;
+	float noiseValue = n * clamp(u_Strength, -4.0f, 4.0f);
+	float targetValue = sourceValue;
+	if (u_MixMethod == 0) targetValue = sourceValue + noiseValue;
+	else if (u_MixMethod == 1) targetValue = sourceValue * noiseValue;
+	else if (u_MixMethod == 2) targetValue = sourceValue * noiseValue + sourceValue;
+	else if (u_MixMethod == 3) targetValue = noiseValue;
+
+	float maskValue = 1.0f;
+	if (u_UseMask)
+	{
+		maskValue = texelFetch(u_MaskTexture, ivec2(offsetv2), 0).r;
+		if (u_InvertMask) maskValue = 1.0f - maskValue;
+	}
+	float influence = clamp(u_Influence * maskValue, 0.0f, 1.0f);
+	float result = mix(sourceValue, targetValue, influence);
 	imageStore(DataTargetTexture, ivec2(offsetv2), vec4(result, 0.0, 0.0, 0.0));
 
 }
