@@ -178,6 +178,8 @@ namespace tf3d::generators
                     snapshot.filterCount += static_cast<uint32_t>(std::max(0, biome->GetFiltersCount()));
             }
             snapshot.force = snapshot.dirtyState.RequiresForce();
+        } else {
+            m_AppState->generationDirtyManager.ConsumeIfRevision(snapshot.dirtyState.revision);
         }
         if (snapshot.requestId == 0 && m_Worker != nullptr)
             snapshot.requestId = m_Worker->GetActiveRequestId();

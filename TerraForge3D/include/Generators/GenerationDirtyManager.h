@@ -105,6 +105,18 @@ namespace tf3d::generators
                     m_Revision.load(std::memory_order_acquire)};
         }
 
+        inline bool ConsumeIfRevision(uint64_t expectedRevision)
+        {
+            std::lock_guard lock(m_DirtyMutex);
+            if (m_Revision.load(std::memory_order_acquire) != expectedRevision) {
+                return false;
+            }
+
+            m_PendingMask.store(0, std::memory_order_release);
+            m_CauseMask.store(0, std::memory_order_release);
+            return true;
+        }
+
         inline StateLock AcquireStateLock()
         {
             return StateLock(m_StateMutex);
