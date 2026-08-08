@@ -8,12 +8,30 @@
 #include <string>
 
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 constexpr float MinElevation = glm::radians(2.0f);
 constexpr float MaxElevation = glm::radians(89.0f);
 constexpr float MinDistance  = 0.01f;
 constexpr float MaxDistance  = 1000000.0f;
+
+namespace
+{
+    constexpr float HomogeneousEpsilon = 0.000001f;
+
+    bool UnprojectNdc(const glm::mat4 &inverseProjectionView,
+                      const glm::vec3 &ndcPosition,
+                      glm::vec3 &worldPosition)
+    {
+        const glm::vec4 homogeneous = inverseProjectionView * glm::vec4(ndcPosition, 1.0f);
+        if (std::abs(homogeneous.w) <= HomogeneousEpsilon)
+            return false;
+
+        worldPosition = glm::vec3(homogeneous) / homogeneous.w;
+        return true;
+    }
+}
 
 Camera::Camera(bool perspective)
     : m_Perspective(perspective)
@@ -103,6 +121,64 @@ void Camera::UpdateCamera()
     m_View     = glm::lookAt(m_Position, m_Target, m_WorldUp);
     RebuildProjection();
     m_ProjectionView = m_Projection * m_View;
+}
+
+std::optional<CameraRay> Camera::ScreenToWorldRay(const glm::vec2 &screenPosition,
+                                                  const glm::vec2 &viewportSize) const
+{
+    if (viewportSize.x <= 0.0f || viewportSize.y <= 0.0f)
+        return std::nullopt;
+
+    const glm::vec2 normalizedScreen = screenPosition / viewportSize;
+    const glm::vec2 ndcXY            = normalizedScreen * 2.0f - 1.0f;
+    const glm::mat4 inverseProjectionView = glm::inverse(m_ProjectionView);
+
+    glm::vec3 nearWorld;
+    glm::vec3 farWorld;
+    if (!UnprojectNdc(inverseProjectionView, glm::vec3(ndcXY, -1.0f), nearWorld) ||
+        !UnprojectNdc(inverseProjectionView, glm::vec3(ndcXY, 1.0f), farWorld)) {
+        return std::nullopt;
+    }
+
+    const glm::vec3 origin = m_Perspective ? m_Position : nearWorld;
+    const glm::vec3 offset = farWorld - origin;
+    const float directionLength = glm::length(offset);
+    if (directionLength <= HomogeneousEpsilon)
+        return std::nullopt;
+
+    return CameraRay{origin, offset / directionLength};
+}
+
+std::optional<glm::vec2> Camera::WorldPosToScreenPos(const glm::vec3 &worldPosition,
+                                                     const glm::vec2 &viewportSize) const
+{
+    if (viewportSize.x <= 0.0f || viewportSize.y <= 0.0f)
+        return std::nullopt;
+
+    const glm::vec4 clipPosition = m_ProjectionView * glm::vec4(worldPosition, 1.0f);
+    if (clipPosition.w <= HomogeneousEpsilon)
+        return std::nullopt;
+
+    const glm::vec2 normalizedScreen = (glm::vec2(clipPosition) / clipPosition.w) * 0.5f + 0.5f;
+    return normalizedScreen * viewportSize;
+}
+
+std::optional<glm::vec3> Camera::ScreenToWorldPos(const glm::vec2 &screenPosition,
+                                                  float depth,
+                                                  const glm::vec2 &viewportSize) const
+{
+    if (viewportSize.x <= 0.0f || viewportSize.y <= 0.0f || depth < 0.0f || depth > 1.0f)
+        return std::nullopt;
+
+    const glm::vec2 normalizedScreen = screenPosition / viewportSize;
+    const glm::vec2 ndcXY            = normalizedScreen * 2.0f - 1.0f;
+    glm::vec3 worldPosition;
+    if (!UnprojectNdc(glm::inverse(m_ProjectionView),
+                      glm::vec3(ndcXY, depth * 2.0f - 1.0f),
+                      worldPosition)) {
+        return std::nullopt;
+    }
+    return worldPosition;
 }
 
 std::shared_ptr<SerializerNodeInternal> Camera::Save() const

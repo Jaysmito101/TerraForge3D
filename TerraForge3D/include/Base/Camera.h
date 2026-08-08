@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <optional>
 
 namespace tf3d::exporters
 {
@@ -15,6 +16,11 @@ namespace tf3d::base
 {
 
     using tf3d::exporters::SerializerNodeInternal;
+
+    struct CameraRay {
+        glm::vec3 origin{0.0f};
+        glm::vec3 direction{0.0f, 0.0f, -1.0f};
+    };
 
     class Camera
     {
@@ -51,6 +57,17 @@ namespace tf3d::base
         {
             return m_Position;
         }
+
+        std::optional<CameraRay> ScreenToWorldRay(const glm::vec2 &screenPosition,
+                                                  const glm::vec2 &viewportSize) const;
+
+        std::optional<glm::vec2> WorldPosToScreenPos(const glm::vec3 &worldPosition,
+                                                     const glm::vec2 &viewportSize) const;
+
+        std::optional<glm::vec3> ScreenToWorldPos(const glm::vec2 &screenPosition,
+                                                  float depth,
+                                                  const glm::vec2 &viewportSize) const;
+
         float GetEffectiveNearClip() const;
         float GetEffectiveFarClip() const;
         bool IsPerspective() const
@@ -82,4 +99,5 @@ namespace tf3d::base
     };
 
 } // namespace tf3d::base
+using tf3d::base::CameraRay;
 using tf3d::base::Camera;
