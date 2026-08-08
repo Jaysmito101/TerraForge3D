@@ -7,7 +7,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <vector>
 
 namespace tf3d::mcp_layer
 {
@@ -37,16 +36,10 @@ namespace tf3d::mcp_layer
             std::string &error);
 
     private:
-        std::optional<nlohmann::json> ComposeFile(
-            const std::filesystem::path &path,
-            const McpSchemaRuntimeProvider &runtime,
-            std::vector<std::filesystem::path> &includeStack) const;
-
         std::optional<nlohmann::json> ResolveNode(
             const nlohmann::json &node,
             const std::filesystem::path &currentFile,
-            const McpSchemaRuntimeProvider &runtime,
-            std::vector<std::filesystem::path> &includeStack) const;
+            const McpSchemaRuntimeProvider &runtime) const;
 
         std::optional<std::filesystem::path> ResolvePath(const std::filesystem::path &path) const;
 

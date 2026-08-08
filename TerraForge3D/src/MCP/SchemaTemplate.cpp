@@ -1,45 +1,22 @@
 #include "MCP/SchemaTemplate.h"
 
 #include "Base/Logging/Logger.h"
+#include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
-#include <algorithm>
-#include <fstream>
-#include <sstream>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace tf3d::mcp_layer
 {
 
     namespace
     {
-        constexpr std::string_view IncludeDirective = "$include";
         constexpr std::string_view RuntimeDirective = "$runtime";
 
         std::string PathText(const std::filesystem::path &path)
         {
             return path.generic_string();
-        }
-
-        bool ReadIncludePaths(const nlohmann::json &value, std::vector<std::string> &paths)
-        {
-            paths.clear();
-            if (value.is_string()) {
-                paths.push_back(value.get<std::string>());
-                return true;
-            }
-
-            if (!value.is_array())
-                return false;
-
-            for (const auto &item : value) {
-                if (!item.is_string())
-                    return false;
-                paths.push_back(item.get<std::string>());
-            }
-            return true;
         }
 
         void LogSchemaError(const std::filesystem::path &path, std::string_view message)
@@ -154,8 +131,20 @@ namespace tf3d::mcp_layer
         if (!resolvedPath)
             return std::nullopt;
 
-        std::vector<std::filesystem::path> includeStack;
-        return ComposeFile(*resolvedPath, runtime, includeStack);
+        utils::JsonIncludeResolverOptions includeOptions;
+        includeOptions.rootDirectory  = root;
+        includeOptions.pathMode       = utils::JsonIncludePathMode::RootRelativeBarePaths;
+        includeOptions.restrictToRoot = true;
+        const utils::JsonIncludeResolver includeResolver(includeOptions);
+
+        std::string includeError;
+        const auto included = includeResolver.ResolveFile(*resolvedPath, &includeError);
+        if (!included) {
+            LogSchemaError(*resolvedPath, includeError);
+            return std::nullopt;
+        }
+
+        return ResolveNode(*included, *resolvedPath, runtime);
     }
 
     std::optional<nlohmann::json> McpSchemaTemplate::ComposeDefault(
@@ -190,59 +179,18 @@ namespace tf3d::mcp_layer
         return ValidateWritableNode(value, schema, {}, error);
     }
 
-    std::optional<nlohmann::json> McpSchemaTemplate::ComposeFile(
-        const std::filesystem::path &path,
-        const McpSchemaRuntimeProvider &runtime,
-        std::vector<std::filesystem::path> &includeStack) const
-    {
-        const auto resolvedPath = ResolvePath(path);
-        if (!resolvedPath)
-            return std::nullopt;
-
-        if (std::find(includeStack.begin(), includeStack.end(), *resolvedPath) != includeStack.end()) {
-            LogSchemaError(*resolvedPath, "circular include");
-            return std::nullopt;
-        }
-
-        std::ifstream file(*resolvedPath);
-        if (!file.is_open()) {
-            LogSchemaError(*resolvedPath, "could not open template file");
-            return std::nullopt;
-        }
-
-        std::stringstream contents;
-        contents << file.rdbuf();
-
-        const nlohmann::json source = nlohmann::json::parse(contents.str(), nullptr, false);
-        if (source.is_discarded()) {
-            LogSchemaError(*resolvedPath, "invalid JSON");
-            return std::nullopt;
-        }
-
-        includeStack.push_back(*resolvedPath);
-        const auto result = ResolveNode(source, *resolvedPath, runtime, includeStack);
-        includeStack.pop_back();
-        return result;
-    }
-
     std::optional<nlohmann::json> McpSchemaTemplate::ResolveNode(
         const nlohmann::json &node,
         const std::filesystem::path &currentFile,
-        const McpSchemaRuntimeProvider &runtime,
-        std::vector<std::filesystem::path> &includeStack) const
+        const McpSchemaRuntimeProvider &runtime) const
     {
         if (node.is_array()) {
             nlohmann::json result = nlohmann::json::array();
             for (const auto &item : node) {
-                const auto resolved = ResolveNode(item, currentFile, runtime, includeStack);
+                const auto resolved = ResolveNode(item, currentFile, runtime);
                 if (!resolved)
                     return std::nullopt;
-                if (item.is_object() && item.contains(IncludeDirective) && resolved->is_array()) {
-                    for (const auto &includedItem : *resolved)
-                        result.push_back(includedItem);
-                } else {
-                    result.push_back(*resolved);
-                }
+                result.push_back(*resolved);
             }
             return result;
         }
@@ -251,35 +199,6 @@ namespace tf3d::mcp_layer
             return node;
 
         nlohmann::json result = nlohmann::json::object();
-        bool hasIncludedValue = false;
-        if (node.contains(IncludeDirective)) {
-            std::vector<std::string> includePaths;
-            if (!ReadIncludePaths(node.at(IncludeDirective), includePaths)) {
-                LogSchemaError(currentFile, "'$include' must be a string or an array of strings");
-                return std::nullopt;
-            }
-
-            for (const std::string &includePath : includePaths) {
-                const std::filesystem::path includeFile =
-                    includePath.starts_with("./") || includePath.starts_with("../")
-                        ? currentFile.parent_path() / includePath
-                        : std::filesystem::path(includePath);
-                const auto included = ComposeFile(includeFile, runtime, includeStack);
-                if (!included)
-                    return std::nullopt;
-
-                if (!hasIncludedValue) {
-                    result           = *included;
-                    hasIncludedValue = true;
-                } else if (result.is_object() && included->is_object()) {
-                    Merge(result, *included);
-                } else {
-                    LogSchemaError(currentFile, "includes must compose JSON objects");
-                    return std::nullopt;
-                }
-            }
-        }
-
         if (node.contains(RuntimeDirective)) {
             if (!node.at(RuntimeDirective).is_string()) {
                 LogSchemaError(currentFile, "'$runtime' must contain a string provider name");
@@ -302,10 +221,10 @@ namespace tf3d::mcp_layer
 
         nlohmann::json local = nlohmann::json::object();
         for (const auto &[key, value] : node.items()) {
-            if (key == IncludeDirective || key == RuntimeDirective)
+            if (key == RuntimeDirective)
                 continue;
 
-            const auto resolved = ResolveNode(value, currentFile, runtime, includeStack);
+            const auto resolved = ResolveNode(value, currentFile, runtime);
             if (!resolved)
                 return std::nullopt;
             local[key] = *resolved;
