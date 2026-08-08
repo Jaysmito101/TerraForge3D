@@ -1,0 +1,39 @@
+{
+  "Name": "Octaves",
+  "Label": "Octave Strengths",
+  "Description": "Controls the contribution of each individual noise layer.",
+  "Collapsible": true,
+  "DefaultOpen": true,
+  "Params": [
+    {
+      "Name": "OctaveStrengths",
+      "Type": "FloatArray",
+      "Default": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "Widget": "Octaves",
+      "Constraints": [
+        0,
+        1
+      ],
+      "ShaderUniform": "u_NoiseOctaveStrengths",
+      "Label": "Octave Strengths",
+      "Description": "Controls the contribution of each individual noise layer."
+    },
+    {
+      "Name": "NoiseOctaveStrengthsCount",
+      "Type": "Int",
+      "Default": 10,
+      "Visible": false
+    }
+  ]
+}

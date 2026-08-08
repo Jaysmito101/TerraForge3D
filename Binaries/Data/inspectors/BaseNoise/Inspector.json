@@ -1,0 +1,14 @@
+{
+  "Description": "Adds configurable procedural noise to the current biome field before filters are evaluated.",
+  "Sections": [
+    {
+      "$include": "./Noise.json"
+    },
+    {
+      "$include": "./Octaves.json"
+    },
+    {
+      "$include": "./Blend.json"
+    }
+  ]
+}

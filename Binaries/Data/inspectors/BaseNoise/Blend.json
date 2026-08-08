@@ -1,0 +1,57 @@
+{
+  "Name": "Blend",
+  "Label": "Blend",
+  "Description": "Controls how the generated noise is combined with the current biome field.",
+  "Collapsible": true,
+  "DefaultOpen": true,
+  "Params": [
+    {
+      "Name": "Strength",
+      "Type": "Float",
+      "Default": 1,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Label": "Strength",
+      "Description": "Scales the amplitude of the generated noise.",
+      "Tooltip": "Negative values invert the noise contribution."
+    },
+    {
+      "Name": "Influence",
+      "Type": "Float",
+      "Default": 0.5,
+      "Widget": "Slider",
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Influence",
+      "Description": "Controls how strongly this generator contributes to the final biome output.",
+      "Tooltip": "Set to zero to temporarily disable the contribution without changing its settings."
+    },
+    {
+      "Name": "MixMethod",
+      "Type": "Int",
+      "Default": 0,
+      "Widget": "Dropdown",
+      "Options": [
+        "Add",
+        "Multiply",
+        "Add & Multiply",
+        "Set",
+        "None"
+      ],
+      "Label": "Mix Method",
+      "Description": "Selects how the generated noise is blended with the source field."
+    },
+    {
+      "Name": "AutoUseSeedTexture",
+      "Type": "Bool",
+      "Default": true,
+      "Widget": "Checkbox",
+      "ShaderUniform": "",
+      "Label": "Use Seed Texture",
+      "Description": "Uses the generated seed texture when one is available.",
+      "Tooltip": "Disable to use the inspector seed and coordinate field alone."
+    }
+  ]
+}
