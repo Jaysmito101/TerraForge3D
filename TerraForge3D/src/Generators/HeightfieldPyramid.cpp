@@ -3,6 +3,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/GeneratorData.h"
+#include "Generators/HeightfieldRayQuery.h"
 #include "Profiler.h"
 
 #include <algorithm>
@@ -13,18 +14,17 @@ namespace tf3d::generators
     constexpr int32_t WorkgroupSize = 16;
 
     HeightfieldPyramid::HeightfieldPyramid(ApplicationState *appState)
-        : m_AppState(appState)
+        : m_AppState(appState),
+          m_RayQuery(appState != nullptr ? appState->resourceManager : nullptr)
     {
         if (m_AppState != nullptr && m_AppState->resourceManager != nullptr) {
-            m_Shader         = m_AppState->resourceManager->LoadComputeShader("heightfield/minmax_pyramid/compute", true);
-            m_RayQueryShader = m_AppState->resourceManager->LoadComputeShader("heightfield/pyramid_ray_query/compute", true);
+            m_Shader = m_AppState->resourceManager->LoadComputeShader("heightfield/minmax_pyramid/compute", true);
         }
     }
 
     HeightfieldPyramid::~HeightfieldPyramid()
     {
         ReleaseTexture();
-        ReleaseRayQueryResultTexture();
     }
 
     void HeightfieldPyramid::ReleaseTexture()
@@ -64,29 +64,6 @@ namespace tf3d::generators
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glBindTexture(GL_TEXTURE_2D, 0);
         m_IsReady = false;
-    }
-
-    void HeightfieldPyramid::ReleaseRayQueryResultTexture()
-    {
-        if (m_RayQueryResultRendererID != 0) {
-            glDeleteTextures(1, &m_RayQueryResultRendererID);
-            m_RayQueryResultRendererID = 0;
-        }
-    }
-
-    void HeightfieldPyramid::EnsureRayQueryResultTexture()
-    {
-        if (m_RayQueryResultRendererID != 0)
-            return;
-
-        glGenTextures(1, &m_RayQueryResultRendererID);
-        glBindTexture(GL_TEXTURE_2D, m_RayQueryResultRendererID);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, 1, 1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     bool HeightfieldPyramid::Rebuild(GeneratorData *heightmap)
@@ -134,6 +111,7 @@ namespace tf3d::generators
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
         m_IsReady = true;
+        m_RayQuery.Invalidate();
         return true;
     }
 
@@ -144,80 +122,11 @@ namespace tf3d::generators
                                                float terrainHeightOffset,
                                                HeightfieldRayHit &hit,
                                                float heightBias)
-    {
-        hit = {};
-        if (!m_IsReady || m_RendererID == 0 || m_MipLevels <= 0 ||
-            !m_RayQueryShader.has_value() || !m_RayQueryShader->IsValid() ||
-            terrainWorldSize.x <= 0.000001f || terrainWorldSize.y <= 0.000001f) {
-            return false;
-        }
-
-        const float directionLength = glm::length(rayDirection);
-        if (!std::isfinite(directionLength) || directionLength <= 0.000001f)
-            return false;
-
-        if (!std::isfinite(rayOrigin.x) || !std::isfinite(rayOrigin.y) || !std::isfinite(rayOrigin.z) ||
-            !std::isfinite(terrainMinimumXZ.x) || !std::isfinite(terrainMinimumXZ.y) ||
-            !std::isfinite(terrainWorldSize.x) || !std::isfinite(terrainWorldSize.y) ||
-            !std::isfinite(terrainHeightOffset)) {
-            return false;
-        }
-
-        const glm::vec3 normalizedDirection = rayDirection / directionLength;
-        EnsureRayQueryResultTexture();
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_RendererID);
-
-        m_RayQueryShader->Bind();
-        m_RayQueryShader->SetUniform1i("u_HeightPyramid", 0);
-        m_RayQueryShader->SetUniform1i("u_PyramidLevels", m_MipLevels);
-        m_RayQueryShader->SetUniform3f("u_RayOrigin", rayOrigin);
-        m_RayQueryShader->SetUniform3f("u_RayDirection", normalizedDirection);
-        m_RayQueryShader->SetUniform2f("u_TerrainMinimumXZ", terrainMinimumXZ);
-        m_RayQueryShader->SetUniform2f("u_TerrainWorldSize", terrainWorldSize);
-        m_RayQueryShader->SetUniform1f("u_TerrainHeightOffset", terrainHeightOffset);
-        m_RayQueryShader->SetUniform1f("u_HeightBias", std::max(heightBias, 0.0f));
-
-        glBindImageTexture(0, m_RayQueryResultRendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-        {
-            TF3D_PROFILE_GPU_SCOPE("renderer/picking/heightfield-pyramid-ray-query");
-            glDispatchCompute(1, 1, 1);
-            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
-        }
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT |
-                        GL_TEXTURE_FETCH_BARRIER_BIT);
-        m_RayQueryShader->Unbind();
-
-        float result[4]{};
-        {
-            TF3D_PROFILE_SCOPE_DOMAIN("renderer/picking/heightfield-pyramid-ray-query/readback",
-                                      PerformanceMonitor::Domain::Wait);
-            TF3D_PROFILE_VALUE_DOMAIN("renderer/picking/heightfield-pyramid-ray-query/readback-bytes",
-                                      sizeof(result), 0, 0, PerformanceMonitor::Domain::Wait);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_RayQueryResultRendererID);
-            glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, result);
-        }
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        if (result[3] < 0.5f || !std::isfinite(result[0]) || !std::isfinite(result[1]) ||
-            !std::isfinite(result[2])) {
-            return false;
-        }
-
-        hit.worldPosition                = glm::vec3(result[0], result[1], result[2]);
-        const glm::vec2 terrainMaximumXZ = terrainMinimumXZ + terrainWorldSize;
-        hit.terrainUv                    = glm::vec2(
-            (hit.worldPosition.x - terrainMinimumXZ.x) / terrainWorldSize.x,
-            (terrainMaximumXZ.y - hit.worldPosition.z) / terrainWorldSize.y);
-        hit.terrainHeight = hit.worldPosition.y - terrainHeightOffset;
-        hit.distance      = glm::dot(hit.worldPosition - rayOrigin, normalizedDirection);
-        return std::isfinite(hit.distance) && hit.distance >= 0.0f;
-    }
+{
+    if (!m_IsReady)
+        return false;
+    return m_RayQuery.Intersect(m_RendererID, m_MipLevels, rayOrigin, rayDirection,
+                                terrainMinimumXZ, terrainWorldSize, terrainHeightOffset, hit, heightBias);
+}
 
 } // namespace tf3d::generators
