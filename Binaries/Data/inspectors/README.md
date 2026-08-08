@@ -1,9 +1,37 @@
 # Custom Inspector JSON schema
 
 Files in this directory define the values, widgets, layout, and optional
-external schema metadata for `CustomInspector`. A file named
-`Data/inspectors/<Name>.json` is loaded by the application and may be reused by
-generators, filters, and renderer settings.
+external schema metadata for `CustomInspector`. Each inspector has a stable
+folder entrypoint at `Data/inspectors/<Name>/Inspector.json`; fragments live
+beside that entrypoint and may be reused by generators, filters, and renderer
+settings.
+
+The current layout is intentionally domain-oriented:
+
+```text
+inspectors/
+  BaseNoise/
+    Inspector.json
+    Noise.json
+    Octaves.json
+    Blend.json
+  CalculatedMask/
+    Inspector.json
+    Mask.json
+    Parameters/
+      Inspector.json
+      Common.json
+      Terrain.json
+      Path.json
+      Noise.json
+      Spiral.json
+      Grid.json
+      Dots.json
+```
+
+Keep `Inspector.json` as the only runtime entrypoint. Include section objects
+inside `Sections` and parameter arrays inside `Params`; do not nest inspector
+sections inside other sections.
 
 ## Top-level document
 
@@ -78,8 +106,6 @@ Every parameter creates one stored value and, unless hidden, one widget:
 | `OptionValues` | integer array | Optional dropdown values, in the same order as `Options`. |
 | `ShaderUniform` | string | Explicit shader uniform. An empty string disables binding. |
 | `Conditions` | object array | Multiple visibility conditions. |
-| `Conditional` | string | Legacy single-condition form. |
-| `ConditionalValue(s)` | scalar/array | Legacy value(s) for `Conditional`. |
 | `Count` | integer | `FloatArray` length when no default array is supplied. |
 | `PointCount` | integer | Initial point count for `Path` or `Curve`. |
 | `BitDepth` | integer | Texture default loading uses 16-bit mode when `>= 16`. |
@@ -124,13 +150,6 @@ present, all conditions must pass before the widget is shown:
   { "Name": "MaskType", "Values": [2, 20] },
   { "Name": "NoiseAlgorithm", "Values": [1, 3] }
 ]
-```
-
-The `Values` form is preferred. The legacy equivalent is:
-
-```json
-"Conditional": "MaskType",
-"ConditionalValues": [2, 20]
 ```
 
 Use integer values from the controlling parameter. For option-backed values,
