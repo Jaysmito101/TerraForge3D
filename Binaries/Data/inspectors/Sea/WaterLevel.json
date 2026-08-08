@@ -1,0 +1,20 @@
+{
+  "Name": "WaterLevel",
+  "Label": "Water Level",
+  "Description": "Controls the sea elevation.",
+  "Params": [
+    {
+      "Name": "SeaLevel",
+      "Type": "Float",
+      "Default": 0.07,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        0.0
+      ],
+      "Label": "Sea Level",
+      "Description": "Vertical water level in terrain field units."
+    }
+  ]
+}

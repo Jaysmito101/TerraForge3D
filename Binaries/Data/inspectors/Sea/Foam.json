@@ -1,0 +1,52 @@
+{
+  "Name": "Foam",
+  "Label": "Foam",
+  "Description": "Shore wash foam and offshore whitecaps.",
+  "Params": [
+    {
+      "Name": "FoamIntensity",
+      "Type": "Float",
+      "Default": 0.22,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        4.0
+      ],
+      "Label": "Foam Intensity",
+      "Description": "Overall brightness and opacity of all foam effects."
+    },
+    {
+      "Name": "ShorefoamWidth",
+      "Type": "Float",
+      "Default": 0.16,
+      "Widget": "Drag",
+      "Sensitivity": 0.005,
+      "Constraints": [
+        0.001,
+        5.0
+      ],
+      "Label": "Shore Foam Width",
+      "Description": "How far the animated shore wash foam extends from the coastline."
+    },
+    {
+      "Name": "FoamColor",
+      "Type": "Vector3",
+      "Default": [
+        0.72,
+        0.86,
+        0.88
+      ],
+      "Widget": "Color",
+      "Label": "Foam Color",
+      "Description": "Color of all foam effects."
+    }
+  ],
+  "Buttons": [
+    {
+      "Action": "ReloadSeaShaders",
+      "Label": "Reload Sea Shaders",
+      "Description": "Reload the sea vertex and fragment shaders after editing shader files."
+    }
+  ]
+}

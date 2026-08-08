@@ -1,0 +1,59 @@
+{
+  "Name": "Lighting",
+  "Label": "Lighting",
+  "Description": "Controls reflection, refraction, scattering, and specular highlights.",
+  "Params": [
+    {
+      "Name": "ReflectionStrength",
+      "Type": "Float",
+      "Default": 1.2,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        4.0
+      ],
+      "Label": "Reflection",
+      "Description": "Strength of sky/environment reflection."
+    },
+    {
+      "Name": "RefractionStrength",
+      "Type": "Float",
+      "Default": 0.035,
+      "Widget": "Drag",
+      "Sensitivity": 0.001,
+      "Constraints": [
+        0.0,
+        0.5
+      ],
+      "Label": "Refraction",
+      "Description": "Screen-space distortion of the underwater scene."
+    },
+    {
+      "Name": "SpecularIntensity",
+      "Type": "Float",
+      "Default": 0.75,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        4.0
+      ],
+      "Label": "Sun Specular",
+      "Description": "Brightness of the sun specular highlight."
+    },
+    {
+      "Name": "ScatterStrength",
+      "Type": "Float",
+      "Default": 0.85,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        4.0
+      ],
+      "Label": "Subsurface Scatter",
+      "Description": "Translucent glow through wave crests when backlit by the sun."
+    }
+  ]
+}

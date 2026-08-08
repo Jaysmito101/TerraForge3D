@@ -1,0 +1,46 @@
+{
+  "Name": "Waves",
+  "Label": "Waves",
+  "Description": "Multi-octave Gerstner wave displacement.",
+  "Params": [
+    {
+      "Name": "WaveAmplitude",
+      "Type": "Float",
+      "Default": 5.5,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        50.0
+      ],
+      "Label": "Amplitude",
+      "Description": "Peak height of the wave displacement."
+    },
+    {
+      "Name": "WaveFrequency",
+      "Type": "Float",
+      "Default": 0.45,
+      "Widget": "Drag",
+      "Sensitivity": 0.1,
+      "Constraints": [
+        0.1,
+        100.0
+      ],
+      "Label": "Frequency",
+      "Description": "Spatial frequency of the base wave. Higher values create denser, shorter waves."
+    },
+    {
+      "Name": "WaveSpeed",
+      "Type": "Float",
+      "Default": 0.08,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        -10.0,
+        10.0
+      ],
+      "Label": "Speed",
+      "Description": "Phase velocity of wave motion. Negative reverses direction."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "Name": "Enabled",
+  "Type": "Bool",
+  "Default": true,
+  "Widget": "Checkbox",
+  "Label": "Enable Sea",
+  "Description": "Render the procedural sea surface over the generated terrain."
+}

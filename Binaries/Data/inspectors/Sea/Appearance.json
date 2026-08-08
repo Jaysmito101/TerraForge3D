@@ -1,0 +1,57 @@
+{
+  "Name": "Appearance",
+  "Label": "Appearance",
+  "Description": "Water color, detail, and depth behavior.",
+  "Params": [
+    {
+      "Name": "ShallowColor",
+      "Type": "Vector3",
+      "Default": [
+        0.008,
+        0.14,
+        0.26
+      ],
+      "Widget": "Color",
+      "Label": "Shallow Color",
+      "Description": "Water color in shallow areas and near the surface."
+    },
+    {
+      "Name": "DeepColor",
+      "Type": "Vector3",
+      "Default": [
+        0.001,
+        0.007,
+        0.03
+      ],
+      "Widget": "Color",
+      "Label": "Deep Color",
+      "Description": "Water color at maximum depth."
+    },
+    {
+      "Name": "DepthScale",
+      "Type": "Float",
+      "Default": 0.42,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.001,
+        100.0
+      ],
+      "Label": "Depth Scale",
+      "Description": "Depth at which the water reaches its deep color."
+    },
+    {
+      "Name": "DetailStrength",
+      "Type": "Float",
+      "Default": 0.26,
+      "Widget": "Drag",
+      "Sensitivity": 0.01,
+      "Constraints": [
+        0.0,
+        2.0
+      ],
+      "Label": "Surface Detail",
+      "Description": "How strongly surface ripples perturb the shading normal."
+    }
+  ]
+}

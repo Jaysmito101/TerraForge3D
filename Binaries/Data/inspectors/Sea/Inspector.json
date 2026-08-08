@@ -1,0 +1,31 @@
+{
+  "Description": "Realistic procedural ocean surface — physically-based waves, absorption, foam, and lighting.",
+  "ShowResetButton": true,
+  "Presets": [
+    {
+      "$include": "./Presets.json"
+    }
+  ],
+  "Params": [
+    {
+      "$include": "./General.json"
+    }
+  ],
+  "Sections": [
+    {
+      "$include": "./WaterLevel.json"
+    },
+    {
+      "$include": "./Waves.json"
+    },
+    {
+      "$include": "./Appearance.json"
+    },
+    {
+      "$include": "./Lighting.json"
+    },
+    {
+      "$include": "./Foam.json"
+    }
+  ]
+}
