@@ -70,6 +70,7 @@
 
 // TerraForge3D Base
 
+#include "AsyncTextureReadback.h"
 #include "Application.h"
 #include "Camera.h"
 #include "DataTexture.h"
@@ -85,6 +86,7 @@
 #include "Shader.h"
 #include "ShaderStorageBuffer.h"
 #include "Texture2D.h"
+#include "Texture2DStorage.h"
 #include "TextureCubemap.h"
 #include "UIFontManager.h"
 #include "Window.h"
