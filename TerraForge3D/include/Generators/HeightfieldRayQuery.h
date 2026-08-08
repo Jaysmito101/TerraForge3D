@@ -69,7 +69,7 @@ namespace tf3d::generators
         HeightfieldRayHit m_LastRayHit;
         uint64_t m_NextSequence          = 1;
         uint64_t m_LastCompletedSequence = 0;
-        uint64_t m_Generation             = 1;
+        uint64_t m_Generation            = 1;
         bool m_HasLastRayHit             = false;
         bool m_HasSubmittedRequest       = false;
         bool m_NeedsRefresh              = true;

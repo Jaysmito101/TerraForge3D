@@ -10,7 +10,7 @@ namespace tf3d::base
     }
 
     bool Texture2DStorage::Allocate(int32_t width, int32_t height, int32_t mipLevels, uint32_t internalFormat,
-                                     uint32_t minFilter, uint32_t magFilter, uint32_t wrapS, uint32_t wrapT)
+                                    uint32_t minFilter, uint32_t magFilter, uint32_t wrapS, uint32_t wrapT)
     {
         if (width <= 0 || height <= 0 || mipLevels <= 0 || internalFormat == 0)
             return false;
@@ -23,7 +23,7 @@ namespace tf3d::base
 
         Release();
         GLint previousActiveTexture = GL_TEXTURE0;
-        GLint previousTexture        = 0;
+        GLint previousTexture       = 0;
         glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
         glActiveTexture(GL_TEXTURE0);
         glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
@@ -40,14 +40,14 @@ namespace tf3d::base
         glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(previousTexture));
         glActiveTexture(previousActiveTexture);
 
-        m_Width           = width;
-        m_Height          = height;
-        m_MipLevels       = mipLevels;
-        m_InternalFormat  = internalFormat;
-        m_MinFilter       = minFilter;
-        m_MagFilter       = magFilter;
-        m_WrapS           = wrapS;
-        m_WrapT           = wrapT;
+        m_Width          = width;
+        m_Height         = height;
+        m_MipLevels      = mipLevels;
+        m_InternalFormat = internalFormat;
+        m_MinFilter      = minFilter;
+        m_MagFilter      = magFilter;
+        m_WrapS          = wrapS;
+        m_WrapT          = wrapT;
         return true;
     }
 

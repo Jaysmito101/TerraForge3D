@@ -122,11 +122,11 @@ namespace tf3d::generators
                                                float terrainHeightOffset,
                                                HeightfieldRayHit &hit,
                                                float heightBias)
-{
-    if (!m_IsReady)
-        return false;
-    return m_RayQuery.Intersect(m_RendererID, m_MipLevels, rayOrigin, rayDirection,
-                                terrainMinimumXZ, terrainWorldSize, terrainHeightOffset, hit, heightBias);
-}
+    {
+        if (!m_IsReady)
+            return false;
+        return m_RayQuery.Intersect(m_RendererID, m_MipLevels, rayOrigin, rayDirection,
+                                    terrainMinimumXZ, terrainWorldSize, terrainHeightOffset, hit, heightBias);
+    }
 
 } // namespace tf3d::generators

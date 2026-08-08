@@ -36,17 +36,17 @@ namespace tf3d::base
     private:
         struct Slot {
             GLuint pixelPackBuffer = 0;
-            GLsync fence            = nullptr;
-            uint64_t token          = 0;
-            bool pending            = false;
+            GLsync fence           = nullptr;
+            uint64_t token         = 0;
+            bool pending           = false;
         };
 
         bool EnsureBuffers(std::size_t byteSize);
         void ReleaseBuffers();
 
         std::vector<Slot> m_Slots;
-        std::size_t m_ByteSize    = 0;
-        std::size_t m_NextSlot    = 0;
+        std::size_t m_ByteSize     = 0;
+        std::size_t m_NextSlot     = 0;
         std::size_t m_PendingCount = 0;
     };
 } // namespace tf3d::base

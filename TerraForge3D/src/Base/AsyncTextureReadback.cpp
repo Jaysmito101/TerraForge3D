@@ -79,7 +79,7 @@ namespace tf3d::base
             return false;
 
         GLint previousActiveTexture = GL_TEXTURE0;
-        GLint previousTexture        = 0;
+        GLint previousTexture       = 0;
         GLint previousPixelPack     = 0;
         glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
         glActiveTexture(GL_TEXTURE0);

@@ -48,10 +48,10 @@ namespace tf3d::base
         int32_t m_Height          = 0;
         int32_t m_MipLevels       = 0;
         uint32_t m_InternalFormat = 0;
-        uint32_t m_MinFilter     = 0;
-        uint32_t m_MagFilter     = 0;
-        uint32_t m_WrapS         = 0;
-        uint32_t m_WrapT         = 0;
+        uint32_t m_MinFilter      = 0;
+        uint32_t m_MagFilter      = 0;
+        uint32_t m_WrapS          = 0;
+        uint32_t m_WrapT          = 0;
     };
 } // namespace tf3d::base
 
