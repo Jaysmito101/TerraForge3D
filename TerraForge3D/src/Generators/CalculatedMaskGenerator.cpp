@@ -38,8 +38,8 @@ namespace tf3d::generators
         }
     } // namespace
 
-    CalculatedMaskGenerator::CalculatedMaskGenerator(ApplicationState *state)
-        : m_AppState(state)
+    CalculatedMaskGenerator::CalculatedMaskGenerator(ApplicationState *state, CalculatedMaskType defaultType)
+        : m_AppState(state), m_DefaultType(defaultType)
     {
         std::string catalogError;
         if (!m_NoiseAlgorithms.LoadFromFile(NoiseAlgorithmCatalog::IndexPath(m_AppState->constants.shadersDir), &catalogError)) {
@@ -167,6 +167,7 @@ namespace tf3d::generators
                 }
             }
         }
+        m_Settings.type = m_DefaultType;
         return LoadInspectorForType(static_cast<int>(m_Settings.type));
     }
 
@@ -307,9 +308,13 @@ namespace tf3d::generators
                         typeIndex = static_cast<int>(candidateIndex);
             }
         }
-        if (typeIndex < 0)
-            typeIndex = glm::clamp(data->Get<int>("MaskType", static_cast<int32_t>(m_Settings.type)),
-                                   0, static_cast<int>(CalculatedMaskType::Count) - 1);
+        if (typeIndex < 0) {
+            typeIndex = data->Get<int>("MaskType", static_cast<int32_t>(m_Settings.type));
+            if (!data->HasKey("MaskTypeID") && !data->HasKey("MaskMode") &&
+                typeIndex >= static_cast<int>(CalculatedMaskType::SlopeRamp))
+                ++typeIndex;
+            typeIndex = glm::clamp(typeIndex, 0, static_cast<int>(CalculatedMaskType::Count) - 1);
+        }
         if (!LoadInspectorForType(typeIndex))
             return;
         const auto inspectorData = data->Get<SerializerNode>("Inspector");

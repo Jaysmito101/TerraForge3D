@@ -23,6 +23,7 @@ namespace tf3d::generators
     enum class CalculatedMaskType {
         HeightRange,
         SlopeRange,
+        SlopeRamp,
         Aspect,
         Curvature,
         Roughness,
@@ -93,7 +94,8 @@ namespace tf3d::generators
     class CalculatedMaskGenerator
     {
     public:
-        CalculatedMaskGenerator(ApplicationState *state);
+        explicit CalculatedMaskGenerator(ApplicationState *state,
+                                         CalculatedMaskType defaultType = CalculatedMaskType::HeightRange);
         ~CalculatedMaskGenerator();
 
         void Resize(int size);
@@ -126,6 +128,7 @@ namespace tf3d::generators
         NoiseAlgorithmCatalog m_NoiseAlgorithms;
         nlohmann::json m_Metadata;
         CalculatedMaskSettings m_Settings;
+        CalculatedMaskType m_DefaultType = CalculatedMaskType::HeightRange;
         int m_Size            = 256;
         bool m_Dirty          = true;
         bool m_MetadataLoaded = false;
