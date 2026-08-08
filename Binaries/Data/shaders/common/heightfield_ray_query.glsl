@@ -2,11 +2,77 @@ const float HEIGHTFIELD_QUERY_EPSILON = 0.000001;
 const float HEIGHTFIELD_QUERY_INFINITE_DISTANCE = 1.0e30;
 const int HEIGHTFIELD_QUERY_MAX_STEPS = 1024;
 
+vec2 HeightfieldPyramidBilinearBounds(sampler2D pyramid, vec2 uv, int level)
+{
+	ivec2 levelSize = textureSize(pyramid, level);
+	ivec2 lastSample = max(levelSize - ivec2(1), ivec2(0));
+	vec2 samplePosition = clamp(uv, vec2(0.0), vec2(1.0)) * vec2(lastSample);
+	ivec2 lower = ivec2(floor(samplePosition));
+	ivec2 upper = min(lower + ivec2(1), lastSample);
+
+	vec2 bounds = vec2(HEIGHTFIELD_QUERY_INFINITE_DISTANCE,
+		-HEIGHTFIELD_QUERY_INFINITE_DISTANCE);
+	vec2 sampleBounds = texelFetch(pyramid, lower, level).rg;
+	bounds.x = min(bounds.x, sampleBounds.x);
+	bounds.y = max(bounds.y, sampleBounds.y);
+	sampleBounds = texelFetch(pyramid, ivec2(upper.x, lower.y), level).rg;
+	bounds.x = min(bounds.x, sampleBounds.x);
+	bounds.y = max(bounds.y, sampleBounds.y);
+	sampleBounds = texelFetch(pyramid, ivec2(lower.x, upper.y), level).rg;
+	bounds.x = min(bounds.x, sampleBounds.x);
+	bounds.y = max(bounds.y, sampleBounds.y);
+	sampleBounds = texelFetch(pyramid, upper, level).rg;
+	bounds.x = min(bounds.x, sampleBounds.x);
+	bounds.y = max(bounds.y, sampleBounds.y);
+	return bounds;
+}
+
+float HeightfieldPyramidSampleBilinear(sampler2D pyramid, vec2 uv)
+{
+	ivec2 levelSize = textureSize(pyramid, 0);
+	ivec2 lastSample = max(levelSize - ivec2(1), ivec2(0));
+	vec2 samplePosition = clamp(uv, vec2(0.0), vec2(1.0)) * vec2(lastSample);
+	ivec2 lower = ivec2(floor(samplePosition));
+	ivec2 upper = min(lower + ivec2(1), lastSample);
+	vec2 blend = samplePosition - vec2(lower);
+
+	float lowerLeft = texelFetch(pyramid, lower, 0).r;
+	float lowerRight = texelFetch(pyramid, ivec2(upper.x, lower.y), 0).r;
+	float upperLeft = texelFetch(pyramid, ivec2(lower.x, upper.y), 0).r;
+	float upperRight = texelFetch(pyramid, upper, 0).r;
+	return mix(mix(lowerLeft, lowerRight, blend.x),
+		mix(upperLeft, upperRight, blend.x), blend.y);
+}
+
 float HeightfieldCellExitDistance(vec2 uv, vec2 directionUv, ivec2 levelSize)
 {
 	vec2 cellCoordinate = floor(clamp(uv, vec2(0.0), vec2(0.999999)) * vec2(levelSize));
 	vec2 cellMinimum = cellCoordinate / vec2(levelSize);
 	vec2 cellMaximum = (cellCoordinate + vec2(1.0)) / vec2(levelSize);
+	float distanceToExit = HEIGHTFIELD_QUERY_INFINITE_DISTANCE;
+
+	if (directionUv.x > HEIGHTFIELD_QUERY_EPSILON) {
+		distanceToExit = min(distanceToExit, (cellMaximum.x - uv.x) / directionUv.x);
+	} else if (directionUv.x < -HEIGHTFIELD_QUERY_EPSILON) {
+		distanceToExit = min(distanceToExit, (cellMinimum.x - uv.x) / directionUv.x);
+	}
+
+	if (directionUv.y > HEIGHTFIELD_QUERY_EPSILON) {
+		distanceToExit = min(distanceToExit, (cellMaximum.y - uv.y) / directionUv.y);
+	} else if (directionUv.y < -HEIGHTFIELD_QUERY_EPSILON) {
+		distanceToExit = min(distanceToExit, (cellMinimum.y - uv.y) / directionUv.y);
+	}
+
+	return max(distanceToExit, 0.0);
+}
+
+float HeightfieldWorldCellExitDistance(vec2 uv, vec2 directionUv, ivec2 levelSize)
+{
+	ivec2 cellCount = max(levelSize - ivec2(1), ivec2(1));
+	vec2 clampedUv = clamp(uv, vec2(0.0), vec2(0.999999));
+	vec2 cellCoordinate = floor(clampedUv * vec2(cellCount));
+	vec2 cellMinimum = cellCoordinate / vec2(cellCount);
+	vec2 cellMaximum = (cellCoordinate + vec2(1.0)) / vec2(cellCount);
 	float distanceToExit = HEIGHTFIELD_QUERY_INFINITE_DISTANCE;
 
 	if (directionUv.x > HEIGHTFIELD_QUERY_EPSILON) {
@@ -132,7 +198,7 @@ void HeightfieldWriteWorldRayHit(
 	out float hitDistance)
 {
 	hitUv = clamp(rayUv, vec2(0.0), vec2(1.0));
-	hitHeight = textureLod(heightPyramid, hitUv, 0.0).r;
+	hitHeight = HeightfieldPyramidSampleBilinear(heightPyramid, hitUv);
 	hitDistance = rayDistance;
 }
 
@@ -176,7 +242,7 @@ bool HeightfieldTraceWorldPyramid(
 		for (int level = pyramidLevels - 1; level >= 0; --level)
 		{
 			ivec2 levelSize = textureSize(heightPyramid, level);
-			vec2 bounds = textureLod(heightPyramid, rayUv, float(level)).rg + terrainHeightOffset;
+			vec2 bounds = HeightfieldPyramidBilinearBounds(heightPyramid, rayUv, level) + terrainHeightOffset;
 			if (!(bounds.x <= bounds.y)) return false;
 
 			if (rayHeight < bounds.x - epsilon)
@@ -184,7 +250,7 @@ bool HeightfieldTraceWorldPyramid(
 				if (rayDirection.y > HEIGHTFIELD_QUERY_EPSILON)
 				{
 					float distanceToMinimum = (bounds.x - epsilon - rayHeight) / rayDirection.y;
-					float distanceToCellExit = HeightfieldCellExitDistance(rayUv, directionUv, levelSize);
+					float distanceToCellExit = HeightfieldWorldCellExitDistance(rayUv, directionUv, levelSize);
 					float maximumAdvance = min(distanceToCellExit, maximumDistance - rayDistance);
 					if (distanceToMinimum >= 0.0 && distanceToMinimum <= maximumAdvance + epsilon)
 					{
@@ -204,7 +270,7 @@ bool HeightfieldTraceWorldPyramid(
 				if (rayDirection.y < -HEIGHTFIELD_QUERY_EPSILON)
 				{
 					float distanceToMaximum = (rayHeight - bounds.y - epsilon) / -rayDirection.y;
-					float distanceToCellExit = HeightfieldCellExitDistance(rayUv, directionUv, levelSize);
+					float distanceToCellExit = HeightfieldWorldCellExitDistance(rayUv, directionUv, levelSize);
 					float maximumAdvance = min(distanceToCellExit, maximumDistance - rayDistance);
 					if (distanceToMaximum >= 0.0 && distanceToMaximum <= maximumAdvance + epsilon)
 					{
@@ -229,7 +295,7 @@ bool HeightfieldTraceWorldPyramid(
 
 		if (!advanced)
 		{
-			float fallbackDistance = HeightfieldCellExitDistance(
+			float fallbackDistance = HeightfieldWorldCellExitDistance(
 				rayUv, directionUv, textureSize(heightPyramid, 0));
 			float remainingDistance = maximumDistance - rayDistance;
 			if (fallbackDistance >= HEIGHTFIELD_QUERY_INFINITE_DISTANCE ||
