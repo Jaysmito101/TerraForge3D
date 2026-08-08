@@ -1,0 +1,14 @@
+{
+  "Description": "Controls environment lighting and the primary sun light used by the renderer.",
+  "ShowResetButton": false,
+  "Params": [
+    {
+      "$include": "./General.json"
+    }
+  ],
+  "Sections": [
+    {
+      "$include": "./Sun.json"
+    }
+  ]
+}

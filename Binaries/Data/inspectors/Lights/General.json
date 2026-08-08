@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "UseSkyLight",
+    "Type": "Bool",
+    "Default": true,
+    "Widget": "Checkbox",
+    "Label": "Use Sky Light",
+    "Description": "Use environment lighting from the loaded skybox when it is available."
+  },
+  {
+    "Name": "SkyLightIntensity",
+    "Type": "Float",
+    "Default": 0.24,
+    "Widget": "Slider",
+    "Constraints": [
+      0.0,
+      1.0
+    ],
+    "Label": "Sky Light Intensity",
+    "Description": "Scales the contribution of environment lighting from the loaded skybox."
+  }
+]
