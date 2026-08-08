@@ -17,7 +17,7 @@ namespace tf3d::generators
     {
         if (m_AppState != nullptr && m_AppState->resourceManager != nullptr) {
             m_Shader         = m_AppState->resourceManager->LoadComputeShader("heightfield/minmax_pyramid/compute", true);
-            m_RayQueryShader = m_AppState->resourceManager->LoadComputeShader("heightfield/pyramid_ray_query", true);
+            m_RayQueryShader = m_AppState->resourceManager->LoadComputeShader("heightfield/pyramid_ray_query/compute", true);
         }
     }
 
