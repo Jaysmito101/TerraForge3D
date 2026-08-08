@@ -134,10 +134,15 @@ namespace tf3d::base
         ImGuiIO &io = ImGui::GetIO();
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            TF3D_PROFILE_SCOPE_DOMAIN("imgui/platform-windows", PerformanceMonitor::Domain::Ui);
             GLFWwindow *backup_current_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
+            {
+                TF3D_PROFILE_SCOPE_DOMAIN("imgui/platform-windows/update", PerformanceMonitor::Domain::Ui);
+                ImGui::UpdatePlatformWindows();
+            }
+            {
+                TF3D_PROFILE_SCOPE_DOMAIN("imgui/platform-windows/render-and-swap", PerformanceMonitor::Domain::Ui);
+                ImGui::RenderPlatformWindowsDefault();
+            }
             glfwMakeContextCurrent(backup_current_context);
         }
     }
