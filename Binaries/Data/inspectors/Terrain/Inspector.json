@@ -1,0 +1,43 @@
+{
+  "Description": "Controls terrain ambient occlusion, base-plane shadows, and terrain global illumination.",
+  "ShowResetButton": false,
+  "Schema": {
+    "properties": {
+      "TerrainGI": {
+        "properties": {
+          "Progress": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "readOnly": true,
+            "title": "GI Progress",
+            "description": "Current terrain GI accumulation progress."
+          },
+          "AccumulatedSamples": {
+            "type": "integer",
+            "readOnly": true,
+            "title": "Accumulated GI Samples",
+            "description": "Number of GI samples accumulated so far."
+          },
+          "Ready": {
+            "type": "boolean",
+            "readOnly": true,
+            "title": "Terrain GI Ready",
+            "description": "Whether the terrain GI cache has a complete published result."
+          }
+        }
+      }
+    }
+  },
+  "Sections": [
+    {
+      "$include": "./AmbientOcclusion.json"
+    },
+    {
+      "$include": "./BasePlaneShadow.json"
+    },
+    {
+      "$include": "./GlobalIllumination.json"
+    }
+  ]
+}

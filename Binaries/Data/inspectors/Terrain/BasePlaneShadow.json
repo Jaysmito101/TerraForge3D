@@ -1,0 +1,20 @@
+{
+  "Name": "BasePlaneShadow",
+  "Label": "Base-Plane Shadow",
+  "Description": "Controls the softness of the shadow projected onto the solid base plane below generated terrain.",
+  "Params": [
+    {
+      "Name": "BasePlaneShadowSoftness",
+      "SerializedName": "Softness",
+      "Type": "Float",
+      "Default": 4.0,
+      "Widget": "Slider",
+      "Constraints": [
+        0.0,
+        12.0
+      ],
+      "Label": "Base-Plane Shadow Softness",
+      "Description": "Softness radius of the terrain shadow on the base plane. Higher values produce a broader, softer shadow."
+    }
+  ]
+}

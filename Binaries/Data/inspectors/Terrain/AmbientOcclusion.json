@@ -1,0 +1,29 @@
+{
+  "Name": "TerrainAO",
+  "Label": "Terrain Ambient Occlusion",
+  "Description": "Controls the terrain ambient-occlusion cache used to add local contact shading.",
+  "Params": [
+    {
+      "Name": "TerrainAOEnabled",
+      "SerializedName": "Enabled",
+      "Type": "Bool",
+      "Default": true,
+      "Widget": "Checkbox",
+      "Label": "Enable Terrain AO",
+      "Description": "Enable ambient occlusion calculated from the terrain heightfield."
+    },
+    {
+      "Name": "TerrainAORadiusFactor",
+      "SerializedName": "RadiusFactor",
+      "Type": "Float",
+      "Default": 0.12,
+      "Widget": "Slider",
+      "Constraints": [
+        0.01,
+        0.5
+      ],
+      "Label": "AO Radius (Terrain Scale)",
+      "Description": "Sampling radius for terrain ambient occlusion, expressed as a fraction of the terrain scale."
+    }
+  ]
+}

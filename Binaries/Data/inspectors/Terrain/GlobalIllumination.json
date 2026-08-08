@@ -1,0 +1,55 @@
+{
+  "Name": "TerrainGI",
+  "Label": "Terrain Global Illumination",
+  "Description": "Controls the progressive terrain GI cache that combines terrain, sun, sky, and self-shadow lighting.",
+  "Params": [
+    {
+      "Name": "TerrainGIEnabled",
+      "SerializedName": "Enabled",
+      "Type": "Bool",
+      "Default": false,
+      "Widget": "Checkbox",
+      "Label": "Enable Terrain GI",
+      "Description": "Enable progressive global illumination calculated over the terrain heightfield."
+    },
+    {
+      "Name": "TerrainGIResolution",
+      "SerializedName": "Resolution",
+      "Type": "Int",
+      "Default": 128,
+      "Widget": "Slider",
+      "Constraints": [
+        32,
+        256
+      ],
+      "Label": "GI Resolution",
+      "Description": "Resolution of the terrain GI cache. Higher values improve spatial detail and increase memory and build cost."
+    },
+    {
+      "Name": "TerrainGITargetSamples",
+      "SerializedName": "TargetSamples",
+      "Type": "Int",
+      "Default": 32,
+      "Widget": "Slider",
+      "Constraints": [
+        1,
+        256
+      ],
+      "Label": "GI Target Samples",
+      "Description": "Total samples accumulated for each terrain GI cache texel before the result is considered complete."
+    },
+    {
+      "Name": "TerrainGISamplesPerDispatch",
+      "SerializedName": "SamplesPerDispatch",
+      "Type": "Int",
+      "Default": 1,
+      "Widget": "Slider",
+      "Constraints": [
+        1,
+        8
+      ],
+      "Label": "GI Samples / Dispatch",
+      "Description": "Number of GI samples built per compute dispatch. Higher values complete faster but use more GPU time per update."
+    }
+  ]
+}
