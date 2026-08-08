@@ -12,9 +12,7 @@ namespace tf3d::renderer
 
     ObjectRenderer::ObjectRenderer(ApplicationState *appState)
     {
-        m_AppState           = appState;
-        m_SharedMemoryBuffer = std::make_shared<ShaderStorageBuffer>();
-        m_SharedMemoryBuffer->SetData(nullptr, sizeof(float) * 4, true);
+        m_AppState = appState;
         glGenVertexArrays(1, &m_PostProcessVao);
         ReloadShaders();
     }
@@ -35,7 +33,6 @@ namespace tf3d::renderer
         glDepthRange(0.0f, 1.0f);
         m_Shader->Bind();
         m_AppState->generationManager->GetHeightmapData()->Bind(0);
-        m_SharedMemoryBuffer->Bind(1);
         auto *slopeTexture         = m_AppState->generationManager->GetSlopeTexture();
         const bool hasSlopeTexture = m_AppState->generationManager->HasSlopeTexture();
         if (slopeTexture && hasSlopeTexture) {
@@ -151,10 +148,6 @@ namespace tf3d::renderer
         }
 
         TF3D_PROFILE_BEGIN(objectMaterialStateProfile, "renderer/object/material-state");
-        const auto &mousePosition = viewport->GetMousePosition();
-        m_Shader->SetUniform1i("u_IsViewportActive", (mousePosition[0] >= 0.0f && mousePosition[1] >= 0.0f) ? 1 : 0);
-        m_Shader->SetUniform2f("u_MousePos", mousePosition[0], mousePosition[1]);
-        m_Shader->SetUniform2f("u_ViewportResolution", viewport->GetWidth(), viewport->GetHeight());
         m_Shader->SetUniform1i("u_RequiresDrawBrush", m_DrawBrushSettings && m_DrawBrushSettings->m_ShowBrushCursor && viewport->IsHovered());
         m_Shader->SetUniform1i("u_DrawMask", m_DrawBrushSettings && m_DrawBrushSettings->m_ShowMask && m_DrawBrushSettings->m_MaskTexture != -1);
         if (m_DrawBrushSettings) {
@@ -200,12 +193,6 @@ namespace tf3d::renderer
             TF3D_PROFILE_GPU_SCOPE("renderer/object/terrain-draw/gpu");
             m_AppState->mainModel->Render();
             TF3D_PROFILE_COUNTER_DOMAIN("gpu/draw-calls", 1.0, PerformanceMonitor::Domain::Gpu);
-        }
-        {
-            TF3D_PROFILE_SCOPE_DOMAIN("renderer/picking/readback", PerformanceMonitor::Domain::Wait);
-            TF3D_PROFILE_VALUE_DOMAIN("renderer/picking/readback-bytes", sizeof(float) * 4, 0, 0,
-                                      PerformanceMonitor::Domain::Wait);
-            m_SharedMemoryBuffer->GetData(viewport->GetPositionOnTerrain().data(), sizeof(float) * 4);
         }
 
         // m_CustomBaseShapeDrawSettings = nullptr;

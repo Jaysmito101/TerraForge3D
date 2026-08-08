@@ -94,6 +94,7 @@ namespace tf3d::renderer
         void UpdatePlanarShadowCache();
         void UpdateHeightfieldAmbientCache();
         void UpdateHeightfieldGICache();
+        void UpdateTerrainPicking(RendererViewport *viewport);
 
         ApplicationState *m_AppState = nullptr;
         // std::shared_ptr<ObjectRenderer> m_ObjectRenderer;

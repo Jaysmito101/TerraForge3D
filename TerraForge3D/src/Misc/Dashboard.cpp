@@ -122,8 +122,9 @@ namespace tf3d::misc
                 PowerOfTwoDropDown("Resolution##GenBasePlane", &resolution, 1, 17);
                 if (ImGui::Button("Generate Plane##GenBasePlane")) {
                     m_AppState->mainModel->mesh->GeneratePlane(resolution, scale, 1.0f, solidDepth);
-                    m_AppState->mainModel->isGeneratedPlane = true;
-                    m_AppState->mainModel->planeSolidDepth  = solidDepth;
+                    m_AppState->mainModel->isGeneratedPlane    = true;
+                    m_AppState->mainModel->generatedPlaneScale = scale;
+                    m_AppState->mainModel->planeSolidDepth     = solidDepth;
                     m_AppState->mainModel->mesh->RecalculateNormals();
                     m_AppState->mainModel->SetupMeshOnGPU();
                     m_AppState->mainModel->UploadToGPU();

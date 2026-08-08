@@ -1,5 +1,6 @@
 #include "Renderer/RendererManager.h"
 #include "Data/ApplicationState.h"
+#include "Generators/HeightfieldPyramid.h"
 #include "Profiler.h"
 
 namespace tf3d::renderer
@@ -173,7 +174,7 @@ namespace tf3d::renderer
         {
             TF3D_PROFILE_SCOPE("renderer/scene");
             auto &positionOnTerrain = viewport->GetPositionOnTerrain();
-            positionOnTerrain[0] = positionOnTerrain[1] = positionOnTerrain[2] = -1.0f;
+            positionOnTerrain.fill(-1.0f);
             switch (viewport->GetMode()) {
                 case RendererViewportMode::Object: {
                     TF3D_PROFILE_SCOPE_DOMAIN("renderer/scene/object", PerformanceMonitor::Domain::Renderer);
@@ -205,12 +206,61 @@ namespace tf3d::renderer
             }
         }
 
+        UpdateTerrainPicking(viewport);
+
         {
             TF3D_PROFILE_SCOPE_DOMAIN("renderer/resolve", PerformanceMonitor::Domain::Renderer);
             TF3D_PROFILE_GPU_SCOPE("renderer/resolve/gpu");
             TF3D_PROFILE_COUNTER_DOMAIN("gpu/framebuffer-resolves", 1.0, PerformanceMonitor::Domain::Gpu);
             viewport->GetFrameBuffer()->Resolve();
         }
+    }
+
+    void RendererManager::UpdateTerrainPicking(RendererViewport *viewport)
+    {
+        TF3D_PROFILE_SCOPE_DOMAIN("renderer/picking/heightfield-ray", PerformanceMonitor::Domain::Renderer);
+        if (viewport == nullptr || viewport->GetMode() != RendererViewportMode::Object ||
+            m_AppState == nullptr || m_AppState->generationManager == nullptr ||
+            m_AppState->mainModel == nullptr || !m_AppState->mainModel->isGeneratedPlane) {
+            return;
+        }
+
+        const auto &mousePosition = viewport->GetMousePosition();
+        const glm::vec2 viewportSize(viewport->GetWidth(), viewport->GetHeight());
+        if (mousePosition[0] < 0.0f || mousePosition[0] > 1.0f ||
+            mousePosition[1] < 0.0f || mousePosition[1] > 1.0f ||
+            viewportSize.x <= 0.0f || viewportSize.y <= 0.0f) {
+            return;
+        }
+
+        const auto ray = viewport->GetCamera().ScreenToWorldRay(
+            glm::vec2(mousePosition[0], mousePosition[1]) * viewportSize, viewportSize);
+        if (!ray.has_value())
+            return;
+
+        auto *heightPyramid = m_AppState->generationManager->GetHeightPyramid();
+        if (heightPyramid == nullptr)
+            return;
+
+        const auto &fieldStatistics  = m_AppState->generationManager->GetFieldStatisticsResult();
+        const float fieldMinimum     = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
+        const float solidDepth       = std::max(m_AppState->mainModel->planeSolidDepth, 0.0001f);
+        const float planeHalfExtent  = std::max(std::abs(m_AppState->mainModel->generatedPlaneScale), 0.0001f);
+        const float terrainWorldSize = planeHalfExtent * 2.0f;
+        const glm::vec2 terrainMinimumXZ(-terrainWorldSize * 0.5f);
+        const float terrainHeightOffset = -fieldMinimum + solidDepth;
+
+        generators::HeightfieldRayHit hit;
+        if (!heightPyramid->IntersectWorldRay(ray->origin, ray->direction, terrainMinimumXZ,
+                                              glm::vec2(terrainWorldSize), terrainHeightOffset, hit)) {
+            return;
+        }
+
+        auto &positionOnTerrain = viewport->GetPositionOnTerrain();
+        positionOnTerrain[0]    = hit.terrainUv.x;
+        positionOnTerrain[1]    = hit.terrainUv.y;
+        positionOnTerrain[2]    = hit.terrainHeight;
+        positionOnTerrain[3]    = hit.distance;
     }
 
     void RendererManager::ShowSettings()

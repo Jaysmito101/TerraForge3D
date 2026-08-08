@@ -12,11 +12,6 @@ in VertexData
 
 layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D u_Heightmap;
 
-layout(std430, binding = 1) buffer SharedDataBuffer1
-{
-	vec4 sharedData1;
-};
-
 uniform sampler2D u_SlopeTexture;
 uniform bool u_HasSlopeTexture;
 uniform sampler2D u_TerrainSelfShadow;
@@ -55,9 +50,6 @@ uniform samplerCube u_IrradianceMap;
 uniform samplerCube u_SpecularMap;
 uniform sampler2D u_BrdfLut;
 
-uniform bool u_IsViewportActive;
-uniform vec2 u_MousePos;
-uniform vec2 u_ViewportResolution;
 uniform bool u_RequiresDrawBrush;
 uniform vec4 u_BrushSettings0;
 uniform vec3 u_MaskColor;
@@ -240,15 +232,6 @@ vec3 ACESFilm(vec3 color)
 
 void main()
 {
-	if (u_IsViewportActive)
-	{
-		float distanceVal = length(gl_FragCoord.xy / u_ViewportResolution - u_MousePos);
-		if (distanceVal < 1.0 / u_ViewportResolution.x)
-		{
-			sharedData1 = vec4(fragmentInput.texCoord.xy, 0.0, distanceVal);
-		}
-	}
-
 	vec3 normal = calculateNormal();
 	if (u_ViewSlope)
 	{
