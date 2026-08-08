@@ -103,7 +103,22 @@ namespace tf3d::inspector
                             widget.SetTooltip(parameter["Tooltip"].get<std::string>());
                         else if (parameter.contains("Description"))
                             widget.SetTooltip(parameter["Description"].get<std::string>());
-                        if (parameter.contains("Conditional")) {
+                        if (parameter.contains("Conditions") && parameter["Conditions"].is_array()) {
+                            widget.ClearCondition();
+                            for (const auto &condition : parameter["Conditions"]) {
+                                if (!condition.is_object())
+                                    continue;
+                                const std::string conditionName = condition.value("Name", condition.value("Conditional", ""));
+                                if (conditionName.empty())
+                                    continue;
+                                if (condition.contains("Values") && condition["Values"].is_array())
+                                    widget.AddRenderOnCondition(conditionName, condition["Values"].get<std::vector<int32_t>>());
+                                else if (condition.contains("ConditionalValues") && condition["ConditionalValues"].is_array())
+                                    widget.AddRenderOnCondition(conditionName, condition["ConditionalValues"].get<std::vector<int32_t>>());
+                                else
+                                    widget.AddRenderOnCondition(conditionName, {condition.value("Value", condition.value("ConditionalValue", 1))});
+                            }
+                        } else if (parameter.contains("Conditional")) {
                             const std::string conditionName = parameter["Conditional"].get<std::string>();
                             if (parameter.contains("ConditionalValues") && parameter["ConditionalValues"].is_array())
                                 widget.SetRenderOnConditions(conditionName, parameter["ConditionalValues"].get<std::vector<int32_t>>());

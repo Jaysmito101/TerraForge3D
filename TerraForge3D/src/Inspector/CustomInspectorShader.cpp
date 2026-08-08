@@ -56,9 +56,16 @@ namespace tf3d::inspector
                             shader.SetUniform1fv(uniformName, values.data(), static_cast<int>(values.size()));
                         break;
                     }
+                    case CustomInspectorValueType::Path: {
+                        const auto points    = uniformValue.template Get<std::vector<glm::vec2>>();
+                        const int pointCount = std::min(static_cast<int>(points.size()), static_cast<int>(CustomInspectorMaxPathPoints));
+                        for (int pointIndex = 0; pointIndex < pointCount; ++pointIndex)
+                            shader.SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", points[pointIndex]);
+                        shader.SetUniform1i(uniformName + "Count", pointCount);
+                        break;
+                    }
                     case CustomInspectorValueType::String:
                     case CustomInspectorValueType::Texture:
-                    case CustomInspectorValueType::Path:
                     case CustomInspectorValueType::Curve:
                     case CustomInspectorValueType::Unknown:
                     case CustomInspectorValueType::Count:

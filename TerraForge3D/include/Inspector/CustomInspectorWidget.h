@@ -9,6 +9,11 @@
 namespace tf3d::inspector
 {
 
+    struct CustomInspectorRenderCondition {
+        std::string name;
+        std::vector<int32_t> values;
+    };
+
     class CustomInspectorWidget
     {
     public:
@@ -94,17 +99,20 @@ namespace tf3d::inspector
         }
         inline void SetRenderOnConditions(const std::string &conditionName, const std::vector<int32_t> &conditionValues)
         {
-            m_UseRenderOnCondition    = true;
-            m_RenderOnConditionName   = conditionName;
-            m_RenderOnConditionValues = conditionValues;
-            m_RenderOnConditionValue  = conditionValues.empty() ? 0 : conditionValues.front();
+            ClearCondition();
+            AddRenderOnCondition(conditionName, conditionValues);
+        }
+        inline void AddRenderOnCondition(const std::string &conditionName, const std::vector<int32_t> &conditionValues)
+        {
+            if (conditionName.empty())
+                return;
+            m_UseRenderOnCondition = true;
+            m_RenderOnConditions.push_back({conditionName, conditionValues});
         }
         inline void ClearCondition()
         {
-            m_UseRenderOnCondition   = false;
-            m_RenderOnConditionName  = "";
-            m_RenderOnConditionValue = 0;
-            m_RenderOnConditionValues.clear();
+            m_UseRenderOnCondition = false;
+            m_RenderOnConditions.clear();
         }
 
         static std::string CustomInspectorWidgetTypeToString(CustomInspectorWidgetType type);
@@ -125,12 +133,10 @@ namespace tf3d::inspector
         std::vector<int32_t> m_SeedHistory;
         std::vector<std::string> m_DropdownOptions;
         std::vector<int32_t> m_DropdownValues;
-        std::string m_ID                    = "";
-        bool m_ShaderUniformConfigured      = false;
-        bool m_UseRenderOnCondition         = false;
-        std::string m_RenderOnConditionName = "";
-        int32_t m_RenderOnConditionValue    = 0;
-        std::vector<int32_t> m_RenderOnConditionValues;
+        std::string m_ID               = "";
+        bool m_ShaderUniformConfigured = false;
+        bool m_UseRenderOnCondition    = false;
+        std::vector<CustomInspectorRenderCondition> m_RenderOnConditions;
     };
 
     struct CustomInspectorSection {

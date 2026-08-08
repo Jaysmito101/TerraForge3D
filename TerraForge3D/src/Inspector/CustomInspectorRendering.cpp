@@ -39,15 +39,16 @@ namespace tf3d::inspector
 
         const auto &widget = widgetIterator->second;
         if (widget.m_UseRenderOnCondition) {
-            if (!Contains(widget.m_RenderOnConditionName))
-                return false;
-            const auto &condition     = m_Values.at(widget.m_RenderOnConditionName);
-            const auto &allowedValues = widget.m_RenderOnConditionValues;
-            if (!allowedValues.empty()) {
-                if (std::find(allowedValues.begin(), allowedValues.end(), condition.Get<int32_t>()) == allowedValues.end())
+            for (const auto &renderCondition : widget.m_RenderOnConditions) {
+                if (!Contains(renderCondition.name))
                     return false;
-            } else if (condition.Get<int32_t>() != widget.m_RenderOnConditionValue) {
-                return false;
+                const auto &condition = m_Values.at(renderCondition.name);
+                if (!renderCondition.values.empty()) {
+                    if (std::find(renderCondition.values.begin(), renderCondition.values.end(), condition.Get<int32_t>()) == renderCondition.values.end())
+                        return false;
+                } else if (condition.Get<int32_t>() != 1) {
+                    return false;
+                }
             }
         }
 
