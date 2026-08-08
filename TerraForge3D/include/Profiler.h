@@ -313,7 +313,6 @@ private:
     std::atomic<uint64_t> m_CurrentFrameStartTicks{0};
     std::atomic<uint64_t> m_NextFrameId{0};
     std::atomic<uint64_t> m_NextEventId{1};
-    std::atomic<uint64_t> m_NextFlowId{1};
 
     std::atomic<uint64_t> m_DroppedEventCount{0};
     std::atomic<uint64_t> m_IncompleteEventCount{0};

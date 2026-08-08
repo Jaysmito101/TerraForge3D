@@ -373,7 +373,7 @@ uint64_t PerformanceMonitor::CurrentFrameId() const
 
 uint64_t PerformanceMonitor::NewFlowId()
 {
-    return m_NextFlowId.fetch_add(1, std::memory_order_relaxed);
+    return NextUniqueId();
 }
 
 bool PerformanceMonitor::IsCapturing() const
