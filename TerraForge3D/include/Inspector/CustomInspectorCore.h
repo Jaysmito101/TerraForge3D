@@ -6,6 +6,7 @@
 #include "Inspector/CustomInspectorWidget.h"
 
 #include <nlohmann/json.hpp>
+#include <filesystem>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -85,6 +86,8 @@ namespace tf3d::inspector
 
         SerializerNode SaveState() const;
         bool LoadState(SerializerNode node);
+        static std::filesystem::path GetConfigPath(const std::filesystem::path &dataDirectory,
+                                                    std::string_view inspectorName);
         bool LoadConfig(ApplicationState *appState, std::string_view inspectorName);
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);

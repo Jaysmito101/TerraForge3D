@@ -4,10 +4,21 @@
 #include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
+#include <filesystem>
 #include <unordered_set>
 
 namespace tf3d::inspector
 {
+
+    std::filesystem::path CustomInspector::GetConfigPath(const std::filesystem::path &dataDirectory,
+                                                         std::string_view inspectorName)
+    {
+        if (dataDirectory.empty() || inspectorName.empty() || inspectorName == "." || inspectorName == ".." ||
+            inspectorName.find_first_of("/\\") != std::string_view::npos)
+            return {};
+
+        return dataDirectory / "inspectors" / std::string(inspectorName) / "Inspector.json";
+    }
 
     bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
     {
@@ -20,17 +31,26 @@ namespace tf3d::inspector
             return false;
         }
 
-        const std::string configPath = appState->constants.dataDir + PATH_SEPARATOR + "inspectors" +
-                                       PATH_SEPARATOR + std::string(inspectorName) + ".json";
-        const utils::JsonIncludeResolver resolver;
+        const auto dataDirectory = std::filesystem::path(appState->constants.dataDir);
+        const auto configPath    = GetConfigPath(dataDirectory, inspectorName);
+        if (configPath.empty()) {
+            TF3D_LOG_ERROR("Invalid inspector metadata name '{}'", inspectorName);
+            return false;
+        }
+
+        utils::JsonIncludeResolverOptions resolverOptions;
+        resolverOptions.rootDirectory = dataDirectory / "inspectors";
+        resolverOptions.pathMode      = utils::JsonIncludePathMode::RelativeToIncludingFile;
+        resolverOptions.restrictToRoot = true;
+        const utils::JsonIncludeResolver resolver(resolverOptions);
         std::string resolveError;
         const auto config = resolver.ResolveFile(configPath, &resolveError);
         if (!config) {
-            TF3D_LOG_ERROR("Could not load inspector metadata '{}': {}", configPath, resolveError);
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}': {}", configPath.string(), resolveError);
             return false;
         }
         if (!LoadConfig(*config)) {
-            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath);
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath.string());
             return false;
         }
         return true;
@@ -103,22 +123,11 @@ namespace tf3d::inspector
                             for (const auto &condition : parameter["Conditions"]) {
                                 if (!condition.is_object())
                                     continue;
-                                const std::string conditionName = condition.value("Name", condition.value("Conditional", ""));
-                                if (conditionName.empty())
+                                const std::string conditionName = condition.value("Name", "");
+                                if (conditionName.empty() || !condition.contains("Values") || !condition["Values"].is_array())
                                     continue;
-                                if (condition.contains("Values") && condition["Values"].is_array())
-                                    widget.AddRenderOnCondition(conditionName, condition["Values"].get<std::vector<int32_t>>());
-                                else if (condition.contains("ConditionalValues") && condition["ConditionalValues"].is_array())
-                                    widget.AddRenderOnCondition(conditionName, condition["ConditionalValues"].get<std::vector<int32_t>>());
-                                else
-                                    widget.AddRenderOnCondition(conditionName, {condition.value("Value", condition.value("ConditionalValue", 1))});
+                                widget.AddRenderOnCondition(conditionName, condition["Values"].get<std::vector<int32_t>>());
                             }
-                        } else if (parameter.contains("Conditional")) {
-                            const std::string conditionName = parameter["Conditional"].get<std::string>();
-                            if (parameter.contains("ConditionalValues") && parameter["ConditionalValues"].is_array())
-                                widget.SetRenderOnConditions(conditionName, parameter["ConditionalValues"].get<std::vector<int32_t>>());
-                            else
-                                widget.SetRenderOnCondition(conditionName, parameter.value("ConditionalValue", 1));
                         }
                     }
                 }
