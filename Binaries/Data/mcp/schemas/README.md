@@ -107,6 +107,92 @@ Keep canonical state definitions separate from update policies. For example,
 input, and `UpdateStateReadOnly.json` can be used to reject fields that are
 returned but must not be written.
 
+## Concrete example: updating a viewport
+
+The existing `tf3d.viewport.update_state` action is assembled from these
+files:
+
+```text
+Actions/UpdateState.json
+├─ $include Common/Action.json
+└─ InputSchema: $include Tools/Viewport/Update.json
+   ├─ $include Common/Object.json
+   └─ State: $include Tools/Viewport/UpdateState.json
+      ├─ $include Common/Object.json
+      └─ Camera.Target: $include Common/Vector3.json
+```
+
+Each object include contributes fields to the object at that location:
+
+`Common/Object.json`:
+
+```json
+{ "type": "object", "additionalProperties": false }
+```
+
+`Tools/Viewport/Update.json`:
+
+```json
+{
+  "$include": "Common/Object.json",
+  "properties": {
+    "ViewportId": { "$include": "Common/ViewportId.json" },
+    "State": { "$include": "Tools/Viewport/UpdateState.json" }
+  },
+  "required": ["ViewportId", "State"]
+}
+```
+
+The result is one root object. It must contain `ViewportId` and `State`; the
+root cannot contain unrelated keys because `additionalProperties` came from
+`Common/Object.json`. `State` is another object. Its `Camera` member is also
+an object, and `Camera.Target` is a vector object with required `X`, `Y`, and
+`Z` members. Because the update state has no `required` list for its nested
+members, it is intentionally a partial update: callers can send only the
+camera fields they want to change.
+
+A valid argument payload can therefore be:
+
+```json
+{
+  "ViewportId": 0,
+  "State": {
+    "Camera": {
+      "Target": { "X": 0.0, "Y": 20.0, "Z": 0.0 },
+      "Distance": 100.0,
+      "Azimuth": 45.0,
+      "Elevation": 30.0,
+      "FieldOfView": 45.0
+    }
+  }
+}
+```
+
+`Camera.Position`, `NearClip`, and other read-only state fields are not part of
+the writable `UpdateState.json` shape. The composed read-only policy is also
+passed to `ValidateWritable`, so a field marked `readOnly` is rejected even if
+it appears in a broader state schema.
+
+The action file connects this shape to behavior:
+
+```json
+{
+  "Name": "tf3d.viewport.update_state",
+  "Title": "Update viewport state",
+  "Description": "Update selected viewport state.",
+  "InputSchema": { "$include": "Tools/Viewport/Update.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}
+```
+
+`Name` is the operation/tool name shown to MCP clients. `InputSchema` describes
+the arguments; it does not execute anything. During startup C++ registers the
+same action file with a handler. When the tool is called, the handler receives
+the JSON arguments above, resolves `ViewportId`, applies the partial `State`,
+and performs domain/read-only checks. In short: schema files describe the
+contract, action metadata names the contract, and C++ supplies the behavior.
+
 ## Read-only update validation
 
 Update handlers may pass the composed schema to
