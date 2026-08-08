@@ -13,8 +13,9 @@ namespace tf3d::renderer
 
     namespace
     {
-        constexpr int32_t WorkgroupSize = 8;
-    }
+        constexpr int32_t WorkgroupSize           = 8;
+        constexpr int32_t MaximumShadowResolution = 2048;
+    } // namespace
 
     TerrainSelfShadow::TerrainSelfShadow(ApplicationState *appState)
         : m_AppState(appState)
@@ -43,6 +44,7 @@ namespace tf3d::renderer
     {
         if (resolution <= 0)
             return;
+        resolution = std::min(resolution, MaximumShadowResolution);
         if (m_RendererID != 0 && m_Resolution == resolution)
             return;
 
@@ -79,15 +81,17 @@ namespace tf3d::renderer
             return false;
 
         const glm::vec3 normalizedSunDirection = sunDirection / directionLength;
+        const int32_t requestedResolution      = heightmap->GetResolution();
+        const int32_t outputResolution         = std::min(requestedResolution, MaximumShadowResolution);
         const bool requiresRebuild             = !m_IsReady ||
                                      m_TerrainRevision != terrainRevision ||
                                      glm::length(normalizedSunDirection - m_SunDirection) > 0.00001f ||
                                      std::abs(m_TerrainWorldSize - terrainWorldSize) > 0.00001f ||
-                                     m_Resolution != heightmap->GetResolution();
+                                     m_Resolution != outputResolution;
         if (!requiresRebuild)
             return false;
 
-        EnsureTexture(heightmap->GetResolution());
+        EnsureTexture(requestedResolution);
 
         heightmap->BindAsTexture(0);
         glActiveTexture(GL_TEXTURE1);

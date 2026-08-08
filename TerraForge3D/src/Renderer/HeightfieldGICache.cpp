@@ -307,10 +307,6 @@ namespace tf3d::renderer
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE0);
-        {
-            TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/finish", PerformanceMonitor::Domain::Wait);
-            glFinish();
-        }
 
         {
             std::lock_guard lock(m_WorkMutex);

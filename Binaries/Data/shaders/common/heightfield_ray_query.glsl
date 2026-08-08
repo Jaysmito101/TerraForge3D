@@ -44,9 +44,26 @@ float HeightfieldPyramidSampleBilinear(sampler2D pyramid, vec2 uv)
 		mix(upperLeft, upperRight, blend.x), blend.y);
 }
 
+ivec2 HeightfieldCellCoordinate(vec2 uv, vec2 directionUv, ivec2 levelSize)
+{
+	vec2 scaledUv = clamp(uv, vec2(0.0), vec2(0.999999)) * vec2(levelSize);
+	ivec2 cellCoordinate = ivec2(floor(scaledUv));
+	for (int axis = 0; axis < 2; ++axis)
+	{
+		float cellBoundary = floor(scaledUv[axis]);
+		if (directionUv[axis] < -HEIGHTFIELD_QUERY_EPSILON &&
+			scaledUv[axis] > HEIGHTFIELD_QUERY_EPSILON &&
+			abs(scaledUv[axis] - cellBoundary) <= 0.00001)
+		{
+			cellCoordinate[axis] -= 1;
+		}
+	}
+	return clamp(cellCoordinate, ivec2(0), max(levelSize - ivec2(1), ivec2(0)));
+}
+
 float HeightfieldCellExitDistance(vec2 uv, vec2 directionUv, ivec2 levelSize)
 {
-	vec2 cellCoordinate = floor(clamp(uv, vec2(0.0), vec2(0.999999)) * vec2(levelSize));
+	ivec2 cellCoordinate = HeightfieldCellCoordinate(uv, directionUv, levelSize);
 	vec2 cellMinimum = cellCoordinate / vec2(levelSize);
 	vec2 cellMaximum = (cellCoordinate + vec2(1.0)) / vec2(levelSize);
 	float distanceToExit = HEIGHTFIELD_QUERY_INFINITE_DISTANCE;
@@ -105,48 +122,57 @@ bool HeightfieldRayOccluded(
 	if (dot(directionUv, directionUv) <= HEIGHTFIELD_QUERY_EPSILON * HEIGHTFIELD_QUERY_EPSILON)
 		return false;
 
-	vec2 rayUv = startUv;
 	float rayDistance = 0.0;
 	float maximumDistance = length(terrainWorldSize) / max(length(rayDirection.xz), HEIGHTFIELD_QUERY_EPSILON);
-
+	int level = pyramidLevels - 1;
 	for (int step = 0; step < HEIGHTFIELD_QUERY_MAX_STEPS; ++step)
 	{
-		if (any(lessThan(rayUv, vec2(0.0))) || any(greaterThan(rayUv, vec2(1.0)))) return false;
+		if (level < 0 || level >= pyramidLevels) return false;
 		if (rayDistance > maximumDistance) return false;
 
+		vec2 rayUv = startUv + directionUv * rayDistance;
+		if (any(lessThan(rayUv, vec2(0.0))) || any(greaterThan(rayUv, vec2(1.0)))) return false;
+
 		float rayHeight = startHeight + rayDistance * rayDirection.y;
-		bool advanced = false;
-		for (int level = pyramidLevels - 1; level >= 0; --level)
+		ivec2 levelSize = textureSize(heightPyramid, level);
+		ivec2 cellCoordinate = HeightfieldCellCoordinate(rayUv, directionUv, levelSize);
+		vec2 bounds = texelFetch(heightPyramid, cellCoordinate, level).rg;
+		float cellExitDistance = rayDistance + max(
+			HeightfieldCellExitDistance(rayUv, directionUv, levelSize),
+			HEIGHTFIELD_QUERY_EPSILON);
+		float parentExitDistance = maximumDistance;
+		if (level < pyramidLevels - 1)
 		{
-			ivec2 levelSize = textureSize(heightPyramid, level);
-			vec2 bounds = textureLod(heightPyramid, rayUv, float(level)).rg;
-
-			if (rayHeight < bounds.x - heightBias) return true;
-			if (rayHeight > bounds.y + heightBias)
-			{
-				float distanceToCellExit = HeightfieldCellExitDistance(rayUv, directionUv, levelSize);
-				if (distanceToCellExit > HEIGHTFIELD_QUERY_EPSILON &&
-					distanceToCellExit < HEIGHTFIELD_QUERY_INFINITE_DISTANCE)
-				{
-					rayDistance += distanceToCellExit;
-					rayUv += directionUv * distanceToCellExit;
-					advanced = true;
-					break;
-				}
-			}
-
-			if (level == 0 && rayHeight <= bounds.y + HEIGHTFIELD_QUERY_EPSILON) return true;
+			ivec2 parentSize = textureSize(heightPyramid, level + 1);
+			parentExitDistance = rayDistance + max(
+				HeightfieldCellExitDistance(rayUv, directionUv, parentSize),
+				HEIGHTFIELD_QUERY_EPSILON);
 		}
 
-		if (!advanced)
+		float intervalExitDistance = min(min(cellExitDistance, parentExitDistance), maximumDistance);
+		if (intervalExitDistance <= rayDistance)
 		{
-			float fallbackDistance = HeightfieldCellExitDistance(rayUv, directionUv, textureSize(heightPyramid, 0));
-			if (fallbackDistance >= HEIGHTFIELD_QUERY_INFINITE_DISTANCE) {
-				return false;
-			}
-			rayDistance += max(fallbackDistance, HEIGHTFIELD_QUERY_EPSILON);
-			rayUv += directionUv * max(fallbackDistance, HEIGHTFIELD_QUERY_EPSILON);
+			rayDistance += HEIGHTFIELD_QUERY_EPSILON;
+			continue;
 		}
+
+		float intervalExitHeight = startHeight + intervalExitDistance * rayDirection.y;
+		if (rayHeight >= bounds.y + heightBias ||
+			(level == 0 && rayHeight > bounds.y + HEIGHTFIELD_QUERY_EPSILON))
+		{
+			bool crossedParent = level < pyramidLevels - 1 &&
+				parentExitDistance <= cellExitDistance + HEIGHTFIELD_QUERY_EPSILON;
+			rayDistance = intervalExitDistance;
+			if (crossedParent)
+				++level;
+			continue;
+		}
+		if (intervalExitHeight < bounds.x - heightBias) return true;
+		if (level == 0) return true;
+
+		// The ray overlaps this node's conservative height range. Descend and
+		// let the child cells resolve the possible intersection.
+		--level;
 	}
 
 	return false;
