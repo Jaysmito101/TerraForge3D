@@ -319,6 +319,8 @@ namespace tf3d::renderer
     void HeightfieldGICache::PollWorkerCompletion()
     {
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/poll", PerformanceMonitor::Domain::Renderer);
+        if (m_Worker != nullptr)
+            m_Worker->PollCompletion();
         if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
             return;
 

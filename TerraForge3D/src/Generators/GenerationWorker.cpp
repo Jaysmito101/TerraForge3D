@@ -5,6 +5,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <chrono>
+
 namespace tf3d::generators
 {
 
@@ -51,7 +53,7 @@ namespace tf3d::generators
         {
             std::lock_guard lock(m_Mutex);
             if (!m_RequestPending.load(std::memory_order_acquire)) {
-                m_LastRequestId = TF3D_PROFILE_NEW_FLOW_ID();
+                m_LastRequestId = NextUniqueId();
                 newRequest      = true;
             }
             requestId        = m_LastRequestId.load(std::memory_order_acquire);
@@ -79,20 +81,69 @@ namespace tf3d::generators
         return true;
     }
 
+    bool GenerationWorker::PollCompletion()
+    {
+        if (!HasContext() || glfwGetCurrentContext() == nullptr)
+            return false;
+
+        {
+            std::lock_guard lock(m_Mutex);
+            if (!m_GpuCompletionPending || m_CompletionFence == nullptr)
+                return false;
+
+            const GLenum waitResult = glClientWaitSync(
+                m_CompletionFence, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+            if (waitResult == GL_TIMEOUT_EXPIRED)
+                return false;
+
+            if (waitResult == GL_WAIT_FAILED) {
+                TF3D_LOG_ERROR("OpenGL completion fence failed for generation worker '{}'", m_Name);
+                glFinish();
+            }
+
+            glMemoryBarrier(GL_ALL_BARRIER_BITS);
+            glDeleteSync(m_CompletionFence);
+            m_CompletionFence      = nullptr;
+            m_GpuCompletionPending = false;
+            m_CompletedRequestId   = m_CompletionRequestId;
+            m_Completed            = true;
+            m_GpuPollRequested     = true;
+            m_Running              = false;
+            m_ActiveRequestId      = 0;
+        }
+        m_Condition.notify_all();
+
+        if (TF3D_PROFILE_CAPTURE_ACTIVE()) {
+            [[maybe_unused]] const uint64_t requestId = m_CompletedRequestId.load(std::memory_order_acquire);
+            const std::string workerKey = m_ProfilePrefix + "/worker";
+            TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "gpu-complete", PerformanceMonitor::Domain::Worker);
+            TF3D_PROFILE_FLOW_END_DOMAIN(workerKey, requestId, PerformanceMonitor::Domain::Worker);
+        }
+        return true;
+    }
+
     void GenerationWorker::WaitForIdle()
     {
         TF3D_PROFILE_BEGIN_LAZY_DOMAIN(waitScope, m_ProfilePrefix + "/queue-wait", PerformanceMonitor::Domain::Wait);
-        std::unique_lock lock(m_Mutex);
-        m_Condition.wait(lock, [this] {
-            return !m_Running.load(std::memory_order_acquire) &&
-                   !m_RequestPending.load(std::memory_order_acquire);
-        });
+        while (true) {
+            PollCompletion();
+            std::unique_lock lock(m_Mutex);
+            const bool idle = !m_Running.load(std::memory_order_acquire) &&
+                              !m_RequestPending.load(std::memory_order_acquire) &&
+                              !m_GpuCompletionPending && !m_GpuPollRequested;
+            if (idle)
+                break;
+            m_Condition.wait_for(lock, std::chrono::milliseconds(1));
+        }
         waitScope.End();
     }
 
     bool GenerationWorker::ConsumeCompleted()
     {
-        return m_Completed.exchange(false, std::memory_order_acq_rel);
+        const bool consumed = m_Completed.exchange(false, std::memory_order_acq_rel);
+        if (consumed)
+            m_Condition.notify_all();
+        return consumed;
     }
 
     void GenerationWorker::Run()
@@ -100,24 +151,62 @@ namespace tf3d::generators
         glfwMakeContextCurrent(m_Window);
         TF3D_PROFILE_THREAD_NAME(m_Name);
         while (true) {
-            bool force         = false;
-            uint64_t requestId = 0;
+            bool force             = false;
+            uint64_t requestId     = 0;
+            bool pollGpuQueries    = false;
+            GLsync completionFence = nullptr;
             {
                 TF3D_PROFILE_BEGIN_LAZY_DOMAIN(queueWaitScope, m_ProfilePrefix + "/queue-wait", PerformanceMonitor::Domain::Wait);
                 std::unique_lock lock(m_Mutex);
                 m_Condition.wait(lock, [this] {
                     return m_StopRequested.load(std::memory_order_acquire) ||
-                           m_RequestPending.load(std::memory_order_acquire);
+                           m_GpuPollRequested ||
+                           (m_RequestPending.load(std::memory_order_acquire) &&
+                            !m_GpuCompletionPending &&
+                            !m_Completed.load(std::memory_order_acquire));
                 });
-                if (m_StopRequested.load(std::memory_order_acquire))
+                if (m_StopRequested.load(std::memory_order_acquire)) {
+                    if (m_CompletionFence != nullptr) {
+                        const GLenum waitResult = glClientWaitSync(
+                            m_CompletionFence, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED);
+                        if (waitResult == GL_WAIT_FAILED)
+                            TF3D_LOG_ERROR("OpenGL completion fence failed while stopping generation worker '{}'", m_Name);
+                        glDeleteSync(m_CompletionFence);
+                        m_CompletionFence = nullptr;
+                    }
+                    m_GpuCompletionPending = false;
+                    m_GpuPollRequested     = false;
+                    m_Running              = false;
+                    m_ActiveRequestId      = 0;
                     break;
+                }
 
-                force            = m_ForceRequested;
-                requestId        = m_LastRequestId.load(std::memory_order_acquire);
-                m_RequestPending = false;
-                m_ForceRequested = false;
-                m_Running        = true;
-                queueWaitScope.End();
+                if (m_GpuPollRequested) {
+                    m_GpuPollRequested = false;
+                    m_Running          = true;
+                    pollGpuQueries     = true;
+                    queueWaitScope.End();
+                } else {
+                    force            = m_ForceRequested;
+                    requestId        = m_LastRequestId.load(std::memory_order_acquire);
+                    m_RequestPending = false;
+                    m_ForceRequested = false;
+                    m_Running        = true;
+                    queueWaitScope.End();
+                }
+            }
+
+            if (pollGpuQueries) {
+                {
+                    TF3D_PROFILE_SCOPE_DOMAIN(m_ProfilePrefix + "/worker/gpu-query-poll", PerformanceMonitor::Domain::Worker);
+                    TF3D_PROFILE_POLL_GPU();
+                }
+                {
+                    std::lock_guard lock(m_Mutex);
+                    m_Running = false;
+                }
+                m_Condition.notify_all();
+                continue;
             }
 
             m_ActiveRequestId        = requestId;
@@ -151,13 +240,30 @@ namespace tf3d::generators
                     TF3D_PROFILE_COUNTER_DOMAIN_FLOW(barrierKey, 1.0, PerformanceMonitor::Domain::Wait, requestId);
                 }
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                if (captureActive) {
-                    const std::string finishKey = m_ProfilePrefix + "/gl-finish";
-                    TF3D_PROFILE_INSTANT_DOMAIN_FLOW(finishKey, PerformanceMonitor::Domain::Wait, requestId);
+                completionFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+                if (completionFence != nullptr) {
+                    glFlush();
+                } else {
+                    TF3D_LOG_ERROR("Failed to create OpenGL completion fence for generation worker '{}'", m_Name);
+                    glFinish();
                 }
-                glFinish();
             }
-            TF3D_PROFILE_DRAIN_GPU();
+
+            if (completionFence != nullptr) {
+                {
+                    std::lock_guard lock(m_Mutex);
+                    m_CompletionFence      = completionFence;
+                    m_CompletionRequestId  = requestId;
+                    m_GpuCompletionPending = true;
+                }
+                if (captureActive) {
+                    const std::string workerKey = m_ProfilePrefix + "/worker";
+                    TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "fence-queued", PerformanceMonitor::Domain::Worker);
+                }
+                continue;
+            }
+
+            TF3D_PROFILE_POLL_GPU();
             if (captureActive) {
                 const std::string workerKey = m_ProfilePrefix + "/worker";
                 TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "gpu-complete", PerformanceMonitor::Domain::Worker);

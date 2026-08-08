@@ -70,6 +70,7 @@ namespace tf3d::generators
             return;
         }
 
+        m_Worker->PollCompletion();
         if (m_Worker->IsCompleted() && !m_Worker->IsRunning()) {
             if (m_Worker->ConsumeCompleted()) {
                 const uint64_t requestId = m_Worker->GetCompletedRequestId();
@@ -108,7 +109,7 @@ namespace tf3d::generators
 
         uint64_t requestId = 0;
         if (!m_Worker->Request(false, &requestId)) {
-            requestId          = TF3D_PROFILE_NEW_FLOW_ID();
+            requestId          = NextUniqueId();
             snapshot.requestId = requestId;
             snapshot.force     = snapshot.dirtyState.RequiresForce();
             StoreGenerationSnapshot(snapshot);

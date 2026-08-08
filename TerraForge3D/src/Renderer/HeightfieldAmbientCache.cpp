@@ -169,10 +169,6 @@ namespace tf3d::renderer
         m_GenerateShader->Unbind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        {
-            TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/finish", PerformanceMonitor::Domain::Wait);
-            glFinish();
-        }
 
         {
             std::lock_guard lock(m_WorkMutex);
@@ -185,6 +181,8 @@ namespace tf3d::renderer
     void HeightfieldAmbientCache::PollWorkerCompletion()
     {
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/poll", PerformanceMonitor::Domain::Renderer);
+        if (m_Worker != nullptr)
+            m_Worker->PollCompletion();
         if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
             return;
 

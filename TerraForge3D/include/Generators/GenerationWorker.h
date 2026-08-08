@@ -4,6 +4,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <functional>
+#include <glad/gl.h>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -26,6 +27,7 @@ namespace tf3d::generators
         GenerationWorker &operator=(const GenerationWorker &) = delete;
 
         bool Request(bool force, uint64_t *requestIdOut = nullptr);
+        bool PollCompletion();
         void WaitForIdle();
         bool ConsumeCompleted();
 
@@ -73,6 +75,10 @@ namespace tf3d::generators
         std::atomic_bool m_Running                 = false;
         std::atomic_bool m_Completed               = false;
         std::atomic_bool m_StopRequested           = false;
+        GLsync m_CompletionFence                   = nullptr;
+        uint64_t m_CompletionRequestId             = 0;
+        bool m_GpuCompletionPending                = false;
+        bool m_GpuPollRequested                    = false;
         std::atomic<uint64_t> m_LastRequestId      = 0;
         std::atomic<uint64_t> m_ActiveRequestId    = 0;
         std::atomic<uint64_t> m_CompletedRequestId = 0;
