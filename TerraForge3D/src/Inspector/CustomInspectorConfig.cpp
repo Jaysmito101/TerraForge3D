@@ -161,6 +161,10 @@ namespace tf3d::inspector
                         sectionConfig.value("Collapsible", false),
                         sectionConfig.value("DefaultOpen", true));
                     section.description = sectionConfig.value("Description", "");
+                    if (sectionConfig.contains("CustomData"))
+                        section.customData = sectionConfig["CustomData"];
+                    else if (sectionConfig.contains("customData"))
+                        section.customData = sectionConfig["customData"];
                     BeginSection(name);
                     loadGroup(sectionConfig);
                     EndSection();

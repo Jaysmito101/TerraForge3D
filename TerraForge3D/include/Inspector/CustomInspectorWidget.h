@@ -3,6 +3,8 @@
 #include "Base/Base.h"
 #include "Inspector/CustomInspectorTypes.h"
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <vector>
 
@@ -145,6 +147,7 @@ namespace tf3d::inspector
         std::string description;
         bool collapsible = false;
         bool defaultOpen = true;
+        nlohmann::json customData = nlohmann::json::object();
     };
 
 } // namespace tf3d::inspector

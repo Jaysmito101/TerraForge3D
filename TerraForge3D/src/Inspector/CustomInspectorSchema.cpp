@@ -130,6 +130,8 @@ namespace tf3d::inspector
             } else if (!section->second.label.empty()) {
                 sectionSchema["description"] = section->second.label;
             }
+            if (!section->second.customData.is_null() && !section->second.customData.empty())
+                sectionSchema["x-customData"] = section->second.customData;
 
             for (const auto &widgetLabel : m_WidgetsOrder) {
                 const auto widgetSection = m_WidgetSections.find(widgetLabel);
