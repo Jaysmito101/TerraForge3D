@@ -88,7 +88,7 @@ namespace tf3d
             {
                 TF3D_PROFILE_SCOPE_DOMAIN("app/update/misc", PerformanceMonitor::Domain::Cpu);
                 // NOTE: This is a temporary hack to fix the brush not working on all viewports
-                appState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(nullptr);
+                appState->rendererManager->GetObjectRenderer()->SetDrawBrushSettings(nullptr);
 
                 // CTRL Shortcuts
                 if ((glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_LEFT_CONTROL) || glfwGetKey(GetWindow()->GetNativeWindow(), GLFW_KEY_RIGHT_CONTROL))) {

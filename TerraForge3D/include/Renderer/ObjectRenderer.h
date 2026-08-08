@@ -5,8 +5,6 @@
 
 namespace tf3d::renderer
 {
-    struct BiomeCustomBaseShapeDrawSettings;
-
     class ObjectRenderer : public RendererBase
     {
     public:
@@ -15,7 +13,7 @@ namespace tf3d::renderer
 
         virtual void Render(RendererViewport *viewport) override;
         virtual void ShowSettings() override;
-        inline void SetCustomBaseShapeDrawSettings(DrawBrushSettings *settings)
+        inline void SetDrawBrushSettings(DrawBrushSettings *settings)
         {
             m_DrawBrushSettings = settings;
         }
