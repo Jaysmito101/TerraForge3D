@@ -245,7 +245,7 @@ void main()
 		float distanceVal = length(gl_FragCoord.xy / u_ViewportResolution - u_MousePos);
 		if (distanceVal < 1.0 / u_ViewportResolution.x)
 		{
-		sharedData1 = vec4(fragmentInput.texCoord.xy, 0.0, distanceVal);
+			sharedData1 = vec4(fragmentInput.texCoord.xy, 0.0, distanceVal);
 		}
 	}
 
