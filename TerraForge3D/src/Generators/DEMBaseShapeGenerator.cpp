@@ -31,8 +31,9 @@ namespace tf3d::generators
         }
 
         if (!loadedFromConfig && PathExist(m_APIKeyConfigPath)) {
-            m_APIKey = ReadShaderSourceFile(m_APIKeyConfigPath, &s_TempBool);
-            if (!m_APIKey.empty() && m_AppState->configManager != nullptr) {
+            bool loadedFromLegacyFile = false;
+            m_APIKey                  = ReadShaderSourceFile(m_APIKeyConfigPath, &loadedFromLegacyFile);
+            if (loadedFromLegacyFile && !m_APIKey.empty() && m_AppState->configManager != nullptr) {
                 m_AppState->configManager->SetString("apiKeys", "maptilerCloud", m_APIKey);
             }
         }
