@@ -8,47 +8,9 @@ layout(binding = 1, r16) uniform image2D u_MaskTexture;
 
 uniform int u_Resolution;
 uniform int u_Mode;
-uniform vec2 u_Range;
-uniform float u_Threshold;
-uniform float u_EdgeFeather;
-uniform float u_EdgeSoftness;
 uniform float u_TileSize;
-uniform float u_Direction;
-uniform float u_DirectionWidth;
-uniform float u_Frequency;
-uniform int u_Seed;
-uniform vec2 u_Center;
-uniform float u_SeaLevel;
-uniform int u_Feature;
-uniform int u_UsePath;
-uniform float u_SampleRadius;
-uniform float u_CurvatureSensitivity;
-uniform float u_CavitySensitivity;
-uniform vec2 u_PathPoints[16];
-uniform int u_PathPointsCount;
-uniform float u_SpiralArms;
-uniform float u_SpiralTurns;
-uniform float u_SpiralThickness;
-uniform float u_SpiralSoftness;
-uniform float u_SpiralRotation;
-uniform int u_SpiralInvert;
-uniform float u_GridCells;
-uniform float u_GridThickness;
-uniform float u_GridSoftness;
-uniform float u_GridRotation;
-uniform int u_GridInvert;
-uniform float u_DotCells;
-uniform float u_DotRadius;
-uniform float u_DotSoftness;
-uniform float u_DotRotation;
-uniform int u_DotInvert;
-uniform int u_NoiseAlgorithm;
-uniform int u_NoiseOctaves;
-uniform float u_Lacunarity;
-uniform float u_Persistence;
-uniform float u_NoiseWarp;
-uniform float u_NoiseJitter;
-uniform vec3 u_Offset;
+
+/* TF3D_CALCULATED_MASK_UNIFORMS */
 
 // common/noise_2d.glsl also exposes the legacy scalar noise helper. Keep its
 // include contract local to this shader while the inspector uses Frequency/Seed.
