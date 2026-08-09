@@ -193,7 +193,6 @@ namespace tf3d::texture_store
             else {
                 it.texThumbnail = new Texture2D(it.thumbnailPath, false);
             }
-
         }
 
         TF3D_LOG_INFO("Texture thumbnails loaded");

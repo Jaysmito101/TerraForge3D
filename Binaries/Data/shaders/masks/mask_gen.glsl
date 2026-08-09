@@ -8,16 +8,24 @@ layout(binding = 1, r16) uniform image2D u_MaskTexture;
 
 uniform int u_Resolution;
 uniform int u_Mode;
-// x = minimum, y = maximum, z = edge softness, w = full tile size
-uniform vec4 u_Range;
-// x = direction angle, y = direction width, z = procedural scale, w = seed
-uniform vec4 u_Settings0;
-// xy = point/center, zw = path endpoint
-uniform vec4 u_Settings1;
-// x = sea level, y = select valleys, z = use path, w = terrain sample radius
-uniform vec4 u_Settings2;
-uniform float u_CurvatureScale;
-uniform float u_CavityScale;
+uniform vec2 u_Range;
+uniform float u_Threshold;
+uniform float u_EdgeFeather;
+uniform float u_EdgeSoftness;
+uniform float u_TileSize;
+uniform float u_Direction;
+uniform float u_DirectionWidth;
+uniform float u_Frequency;
+uniform int u_Seed;
+uniform vec2 u_Center;
+uniform float u_SeaLevel;
+uniform int u_Feature;
+uniform int u_UsePath;
+uniform float u_SampleRadius;
+uniform float u_CurvatureSensitivity;
+uniform float u_CavitySensitivity;
+uniform vec2 u_PathPoints[16];
+uniform int u_PathPointsCount;
 uniform float u_SpiralArms;
 uniform float u_SpiralTurns;
 uniform float u_SpiralThickness;
@@ -34,18 +42,21 @@ uniform float u_DotRadius;
 uniform float u_DotSoftness;
 uniform float u_DotRotation;
 uniform int u_DotInvert;
-uniform vec2 u_PathPoints[16];
-uniform int u_PathPointCount;
 uniform int u_NoiseAlgorithm;
-uniform float u_NoiseScale;
-uniform float u_NoiseSeed;
 uniform int u_NoiseOctaves;
-uniform float u_NoiseLacunarity;
-uniform float u_NoisePersistence;
+uniform float u_Lacunarity;
+uniform float u_Persistence;
 uniform float u_NoiseWarp;
 uniform float u_NoiseJitter;
+uniform vec3 u_Offset;
 
+// common/noise_2d.glsl also exposes the legacy scalar noise helper. Keep its
+// include contract local to this shader while the inspector uses Frequency/Seed.
+#define u_NoiseScale u_Frequency
+#define u_NoiseSeed u_Seed
 #include "common/noise_2d.glsl"
+#undef u_NoiseScale
+#undef u_NoiseSeed
 
 
 int PixelCoordToDataOffset(ivec2 coordinate)
@@ -64,7 +75,7 @@ float RangeMask(float value)
 	float minimum = min(u_Range.x, u_Range.y);
 	float maximum = max(u_Range.x, u_Range.y);
 	float rangeWidth = max(maximum - minimum, 0.000001);
-	float feather = clamp(u_Range.z, 0.0, 0.5);
+	float feather = clamp(u_EdgeFeather, 0.0, 0.5);
 	if (feather <= 0.000001) return value >= minimum && value <= maximum ? 1.0 : 0.0;
 	float normalizedValue = (value - minimum) / rangeWidth;
 	float lower = smoothstep(-feather, feather, normalizedValue);
@@ -74,8 +85,8 @@ float RangeMask(float value)
 
 float ThresholdMask(float value)
 {
-	float threshold = clamp(u_Range.x, 0.0, 1.0);
-	float feather = clamp(u_Range.z, 0.0, 0.5);
+	float threshold = clamp(u_Threshold, 0.0, 1.0);
+	float feather = clamp(u_EdgeFeather, 0.0, 0.5);
 	if (feather <= 0.000001) return value >= threshold ? 1.0 : 0.0;
 	return smoothstep(threshold - feather, threshold + feather, value);
 }
@@ -98,8 +109,8 @@ float FilteredTerrainValue(ivec2 coordinate)
 
 vec2 TerrainGradient(ivec2 coordinate)
 {
-	int sampleRadius = clamp(int(round(u_Settings2.w)), 1, 8);
-	float texelSize = max(u_Range.w / float(u_Resolution), 0.000001);
+	int sampleRadius = clamp(int(round(u_SampleRadius)), 1, 8);
+	float texelSize = max(u_TileSize / float(u_Resolution), 0.000001);
 	float step = float(sampleRadius);
 	float dX =
 		(3.0 * FilteredTerrainValue(coordinate + ivec2( sampleRadius, -sampleRadius)) +
@@ -125,6 +136,18 @@ float SlopeDegrees(ivec2 coordinate)
 	return degrees(atan(length(TerrainGradient(coordinate))));
 }
 
+float SlopeRampMask(float slope)
+{
+	float normalizedSlope = clamp(slope / 90.0, 0.0, 1.0);
+	float minimum = min(u_Range.x, u_Range.y);
+	float maximum = max(u_Range.x, u_Range.y);
+	if (maximum - minimum <= 0.000001)
+		return normalizedSlope >= minimum ? 1.0 : 0.0;
+
+	float ramp = smoothstep(minimum, maximum, normalizedSlope);
+	return u_Range.x <= u_Range.y ? ramp : 1.0 - ramp;
+}
+
 float CurvatureValue(ivec2 coordinate)
 {
 	float center = FilteredTerrainValue(coordinate);
@@ -137,13 +160,13 @@ float CurvatureValue(ivec2 coordinate)
 
 float CurvatureMagnitude(float curvature)
 {
-	float response = 1.0 - exp(-abs(curvature) * max(u_CurvatureScale, 0.001));
+	float response = 1.0 - exp(-abs(curvature) * max(u_CurvatureSensitivity, 0.001));
 	return clamp(response, 0.0, 1.0);
 }
 
 float RidgeValleyStrength(float curvature)
 {
-	return 1.0 - exp(-max(curvature, 0.0) * max(u_CurvatureScale, 0.001));
+	return 1.0 - exp(-max(curvature, 0.0) * max(u_CurvatureSensitivity, 0.001));
 }
 
 float RoughnessValue(ivec2 coordinate)
@@ -171,9 +194,9 @@ float AngleDistance(float a, float b)
 
 float DirectionMask(float angle)
 {
-	float width = clamp(u_Settings0.y, 0.0, 180.0);
-	float distance = AngleDistance(angle, u_Settings0.x);
-	float softness = max(u_Range.z, 0.000001);
+	float width = clamp(u_DirectionWidth, 0.0, 180.0);
+	float distance = AngleDistance(angle, u_Direction);
+	float softness = max(u_EdgeSoftness, 0.000001);
 	softness = min(softness, width > 0.001 ? width * 0.5 : 5.0);
 	return 1.0 - smoothstep(width, width + softness, distance);
 }
@@ -189,7 +212,7 @@ float PointSegmentDistance(vec2 point, vec2 start, vec2 end)
 float PointPathDistance(vec2 point)
 {
 	float result = 1.0e20;
-	int pointCount = clamp(u_PathPointCount, 2, 16);
+	int pointCount = clamp(u_PathPointsCount, 2, 16);
 	for (int pointIndex = 0; pointIndex < 15; ++pointIndex)
 	{
 		if (pointIndex + 1 >= pointCount) break;
@@ -220,13 +243,13 @@ float AmbientCavity(ivec2 coordinate)
 		FilteredTerrainValue(coordinate + ivec2(radius, 0)) + FilteredTerrainValue(coordinate + ivec2(-radius, radius)) +
 		FilteredTerrainValue(coordinate + ivec2(0, radius)) + FilteredTerrainValue(coordinate + ivec2(radius, radius)));
 	float depression = max(average - height, 0.0);
-	return 1.0 - exp(-depression * max(u_CavityScale, 0.001));
+	return 1.0 - exp(-depression * max(u_CavitySensitivity, 0.001));
 }
 
 float SpiralMask(vec2 uv)
 {
 	const float twoPi = 6.28318530718;
-	vec2 offset = uv - u_Settings1.xy;
+	vec2 offset = uv - u_Center;
 	float radius = length(offset);
 	float angle = atan(offset.y, offset.x);
 	float arms = max(u_SpiralArms, 1.0);
@@ -245,7 +268,7 @@ float GridMask(vec2 uv)
 	const float twoPi = 6.28318530718;
 	float rotation = u_GridRotation / 360.0 * twoPi;
 	mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation), sin(rotation), cos(rotation));
-	vec2 gridPosition = rotationMatrix * (uv - u_Settings1.xy) * max(u_GridCells, 1.0);
+	vec2 gridPosition = rotationMatrix * (uv - u_Center) * max(u_GridCells, 1.0);
 	vec2 distanceToLine = abs(fract(gridPosition + 0.5) - 0.5);
 	float lineDistance = min(distanceToLine.x, distanceToLine.y);
 	float halfWidth = clamp(u_GridThickness, 0.001, 0.5);
@@ -260,7 +283,7 @@ float DotMask(vec2 uv)
 	const float twoPi = 6.28318530718;
 	float rotation = u_DotRotation / 360.0 * twoPi;
 	mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation), sin(rotation), cos(rotation));
-	vec2 dotPosition = rotationMatrix * (uv - u_Settings1.xy) * max(u_DotCells, 1.0);
+	vec2 dotPosition = rotationMatrix * (uv - u_Center) * max(u_DotCells, 1.0);
 	vec2 cellOffset = fract(dotPosition + 0.5) - 0.5;
 	float distanceToDot = length(cellOffset);
 	float radius = clamp(u_DotRadius, 0.001, 0.5);
@@ -276,65 +299,20 @@ vec2 SafeNormalize(vec2 value)
 	return lengthValue > 0.000001 ? value / lengthValue : vec2(0.0);
 }
 
+struct MaskContext
+{
+	ivec2 coordinate;
+	vec2 uv;
+};
+
+/* TF3D_CALCULATED_MASK_MODULES */
+
 float TerrainMask(ivec2 coordinate, vec2 uv)
 {
-	float height = TerrainValue(coordinate);
-	float slope = SlopeDegrees(coordinate);
-	vec2 gradient = TerrainGradient(coordinate);
-	float aspect = mod(degrees(atan(gradient.y, gradient.x)) + 360.0, 360.0);
-	float curvature = CurvatureValue(coordinate);
-	float curvatureMagnitude = CurvatureMagnitude(curvature);
-
-	switch (u_Mode)
-	{
-	case TF3D_MASK_HEIGHT_RANGE: return RangeMask(height);
-	case TF3D_MASK_SLOPE_RANGE: return RangeMask(slope);
-	case TF3D_MASK_ASPECT: return DirectionMask(aspect);
-	case TF3D_MASK_CURVATURE: return RangeMask(curvatureMagnitude);
-	case TF3D_MASK_ROUGHNESS: return RangeMask(RoughnessValue(coordinate));
-	case TF3D_MASK_FLATNESS: return RangeMask(1.0 - clamp(slope / 90.0, 0.0, 1.0));
-	case TF3D_MASK_RIDGE_VALLEY: return ThresholdMask(RidgeValleyStrength(u_Settings2.y > 0.5 ? -curvature : curvature));
-	case TF3D_MASK_COASTLINE: return RangeMask(height - u_Settings2.x);
-	case TF3D_MASK_DISTANCE_FROM_COAST: return RangeMask(abs(height - u_Settings2.x));
-	case TF3D_MASK_FLOW_WETNESS: return RangeMask(LocalWetness(coordinate));
-	case TF3D_MASK_AMBIENT_OCCLUSION: return RangeMask(AmbientCavity(coordinate));
-	case TF3D_MASK_EXPOSURE: return RangeMask(0.5 + 0.5 * dot(SafeNormalize(gradient), vec2(cos(radians(u_Settings0.x)), sin(radians(u_Settings0.x)))));
-	case TF3D_MASK_DISTANCE_FROM_BORDER:
-	{
-		float borderDistance = min(min(float(coordinate.x), float(coordinate.y)),
-			min(float(u_Resolution - 1 - coordinate.x), float(u_Resolution - 1 - coordinate.y)));
-		return RangeMask(borderDistance / max(float(u_Resolution) * 0.5, 1.0));
-	}
-	case TF3D_MASK_DISTANCE_FROM_POINT_PATH:
-	{
-		float distanceValue = u_Settings2.z > 0.5
-			? PointPathDistance(uv)
-			: distance(uv, u_Settings1.xy);
-		return RangeMask(distanceValue);
-	}
-	case TF3D_MASK_HEIGHT_CONTOUR: return RangeMask(height);
-	case TF3D_MASK_PROCEDURAL_NOISE:
-	{
-		float noise = tf3d_noise2_fbm(
-			uv, u_NoiseAlgorithm, u_NoiseScale, u_NoiseSeed, u_NoiseOctaves,
-			u_NoiseLacunarity, u_NoisePersistence, u_NoiseWarp, u_NoiseJitter);
-		return RangeMask(0.5 + 0.5 * noise);
-	}
-	case TF3D_MASK_RADIAL_GRADIENT:
-	{
-		float radialDistance = distance(uv, u_Settings1.xy);
-		float innerRadius = min(u_Range.x, u_Range.y);
-		float outerRadius = max(u_Range.x, u_Range.y);
-		float radialFeather = clamp(u_Range.z, 0.0, 0.5);
-		float radialSoftness = (outerRadius - innerRadius) * radialFeather;
-		if (outerRadius - innerRadius <= 0.000001) return radialDistance <= outerRadius ? 1.0 : 0.0;
-		return 1.0 - smoothstep(innerRadius - radialSoftness, outerRadius + radialSoftness, radialDistance);
-	}
-	case TF3D_MASK_SPIRAL: return SpiralMask(uv);
-	case TF3D_MASK_GRID: return GridMask(uv);
-	case TF3D_MASK_DOTS: return DotMask(uv);
-	default: return 0.0;
-	}
+	MaskContext context;
+	context.coordinate = coordinate;
+	context.uv = uv;
+	return tf3d_calculated_mask_dispatch(context);
 }
 
 void main()

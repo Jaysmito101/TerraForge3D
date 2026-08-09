@@ -6,6 +6,11 @@
 #include "Generators/NoiseAlgorithmCatalog.h"
 #include "Inspector/CustomInspector.h"
 
+#include <nlohmann/json.hpp>
+
+#include <unordered_map>
+#include <vector>
+
 namespace tf3d::base
 {
     class ComputeShader;
@@ -20,82 +25,21 @@ using tf3d::data::ApplicationState;
 namespace tf3d::generators
 {
 
-    enum class CalculatedMaskType {
-        HeightRange,
-        SlopeRange,
-        SlopeRamp,
-        Aspect,
-        Curvature,
-        Roughness,
-        Flatness,
-        RidgeValley,
-        Coastline,
-        DistanceFromCoast,
-        FlowWetness,
-        AmbientOcclusion,
-        Exposure,
-        DistanceFromBorder,
-        DistanceFromPointPath,
-        HeightContour,
-        ProceduralNoise,
-        RadialGradient,
-        Spiral,
-        Grid,
-        Dots,
-        Count,
-    };
-
-    struct CalculatedMaskSettings {
-        static constexpr int MaxPathPoints = 16;
-
-        CalculatedMaskType type = CalculatedMaskType::HeightRange;
-        int shaderMode          = 0;
-        float minimum           = 0.25f;
-        float maximum           = 0.75f;
-        float softness          = 0.05f;
-        float angle             = 0.0f;
-        float angleWidth        = 45.0f;
-        float scale             = 4.0f;
-        float seed              = 42.0f;
-        int noiseAlgorithm      = 0;
-        int noiseOctaves        = 5;
-        float noiseLacunarity   = 2.0f;
-        float noisePersistence  = 0.5f;
-        float noiseWarp         = 0.0f;
-        float noiseJitter       = 0.75f;
-        float sampleRadius      = 3.0f;
-        float curvatureScale    = 32.0f;
-        float cavityScale       = 48.0f;
-        float seaLevel          = 0.0f;
-        float spiralArms        = 1.0f;
-        float spiralTurns       = 8.0f;
-        float spiralThickness   = 0.08f;
-        float spiralSoftness    = 0.03f;
-        float spiralRotation    = 0.0f;
-        bool spiralInvert       = false;
-        float gridCells         = 12.0f;
-        float gridThickness     = 0.08f;
-        float gridSoftness      = 0.03f;
-        float gridRotation      = 0.0f;
-        bool gridInvert         = false;
-        float dotCells          = 12.0f;
-        float dotRadius         = 0.24f;
-        float dotSoftness       = 0.03f;
-        float dotRotation       = 0.0f;
-        bool dotInvert          = false;
-        glm::vec2 center        = glm::vec2(0.5f);
-        glm::vec2 pathEnd       = glm::vec2(0.75f, 0.5f);
-        std::array<glm::vec2, MaxPathPoints> pathPoints{};
-        int pathPointCount = 2;
-        bool usePath       = false;
-        bool selectValleys = false;
-    };
-
     class CalculatedMaskGenerator
     {
     public:
+        struct AlgorithmDefinition {
+            std::string id;
+            std::string label;
+            std::string description;
+            std::string shaderPath;
+            std::string shaderSource;
+            nlohmann::json section = nlohmann::json::object();
+            int runtimeMode        = -1;
+        };
+
         explicit CalculatedMaskGenerator(ApplicationState *state,
-                                         CalculatedMaskType defaultType = CalculatedMaskType::HeightRange);
+                                         std::string defaultTypeID = "HeightRange");
         ~CalculatedMaskGenerator();
 
         void Resize(int size);
@@ -109,32 +53,34 @@ namespace tf3d::generators
         {
             return m_Texture.get();
         }
-        inline const CalculatedMaskSettings &GetSettings() const
-        {
-            return m_Settings;
-        }
 
     private:
         bool LoadMetadata();
-        bool LoadInspectorForType(int typeIndex);
-        void SyncSettingsFromInspector();
+        bool BuildShader(const std::string &baseShaderSource);
+        bool RebuildInspector(int typeIndex, bool preserveCurrentState);
+        bool StoreActiveInspectorState();
+        nlohmann::json BuildInspectorConfig(int typeIndex) const;
+        nlohmann::json StripTransientInspectorState(nlohmann::json state) const;
+        void ConfigureAlgorithmSelector();
         int GetSelectedTypeIndex() const;
+        int GetShaderModeForType(int typeIndex) const;
         int FindTypeIndexByID(const std::string &id) const;
+        int FindTypeIndexByMode(int mode) const;
 
         ApplicationState *m_AppState = nullptr;
         std::optional<ComputeShader> m_Shader;
         std::shared_ptr<GeneratorTexture> m_Texture;
         std::shared_ptr<CustomInspector> m_Inspector;
         NoiseAlgorithmCatalog m_NoiseAlgorithms;
-        nlohmann::json m_Metadata;
-        CalculatedMaskSettings m_Settings;
-        CalculatedMaskType m_DefaultType = CalculatedMaskType::HeightRange;
-        int m_Size            = 256;
-        bool m_Dirty          = true;
-        bool m_MetadataLoaded = false;
+        nlohmann::json m_InspectorDocument;
+        std::vector<nlohmann::json> m_CommonSections;
+        std::vector<AlgorithmDefinition> m_Algorithms;
+        std::unordered_map<std::string, nlohmann::json> m_AlgorithmStates;
+        std::string m_DefaultTypeID  = "HeightRange";
+        int m_Size                   = 256;
+        int m_SelectedAlgorithmIndex = -1;
+        bool m_Dirty                 = true;
+        bool m_MetadataLoaded        = false;
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::CalculatedMaskGenerator;
-using tf3d::generators::CalculatedMaskSettings;
-using tf3d::generators::CalculatedMaskType;
