@@ -1,68 +1,11 @@
 #include "Generators/BaseNoiseGenerator.h"
 
 #include "Data/ApplicationState.h"
-#include "Generators/NoiseAlgorithmConfig.h"
 #include "Profiler.h"
 #include "UI/ImGuiComponents.h"
-#include "Utils/Utils.h"
 
 namespace tf3d::generators
 {
-
-    namespace
-    {
-        constexpr int kBaseNoiseOctaveCount = 10;
-
-        void EnsureNoiseValues(CustomInspector &inspector, int defaultNoiseAlgorithm)
-        {
-            if (!inspector.Contains("NoiseAlgorithm"))
-                inspector.Add("NoiseAlgorithm", defaultNoiseAlgorithm);
-            if (!inspector.Contains("NoiseOctaves"))
-                inspector.Add("NoiseOctaves", kBaseNoiseOctaveCount);
-            if (!inspector.Contains("NoiseWarp"))
-                inspector.Add("NoiseWarp", 0.0f);
-            if (!inspector.Contains("NoiseJitter"))
-                inspector.Add("NoiseJitter", 0.75f);
-        }
-
-        std::vector<float> DefaultNoiseOctaveStrengths()
-        {
-            std::vector<float> values(kBaseNoiseOctaveCount, 1.0f);
-            values[0] = values[1] = 0.0f;
-            return values;
-        }
-
-        std::vector<float> NormalizeNoiseOctaveStrengths(const std::vector<float> &source)
-        {
-            auto values = DefaultNoiseOctaveStrengths();
-            for (size_t index = 0; index < source.size() && index < values.size(); ++index)
-                values[index] = glm::clamp(source[index], 0.0f, 1.0f);
-            return values;
-        }
-
-        void EnsureNoiseOctaveComponent(CustomInspector &inspector)
-        {
-            bool hasOctaveComponent = false;
-            std::vector<std::string> legacyWidgetLabels;
-            for (const auto &[label, widget] : inspector.GetWidgets()) {
-                if (widget.GetVariableName() == "OctaveStrengths" && widget.GetType() == CustomInspectorWidgetType::Octaves)
-                    hasOctaveComponent = true;
-                if (widget.GetVariableName().rfind("NoiseOctaveStrength", 0) == 0)
-                    legacyWidgetLabels.push_back(label);
-            }
-            for (const auto &label : legacyWidgetLabels)
-                inspector.RemoveWidget(label);
-
-            if (!hasOctaveComponent) {
-                inspector.BeginSection("Octaves");
-                auto &widget = inspector.AddWidget("Octave Strengths", CustomInspectorWidgetType::Octaves, "OctaveStrengths");
-                widget.SetConstraints(0.0f, 1.0f);
-                widget.SetShaderUniformName("u_NoiseOctaveStrengths");
-                widget.SetTooltip("Controls the contribution of each individual noise layer.");
-                inspector.EndSection();
-            }
-        }
-    } // namespace
 
     BaseNoiseGenerator::BaseNoiseGenerator(ApplicationState *appState)
         : m_AppState(appState), m_Inspector(std::make_shared<CustomInspector>())
@@ -70,65 +13,47 @@ namespace tf3d::generators
         if (m_AppState == nullptr)
             return;
 
-        m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
+        m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState, "SlopeRamp");
         m_MaskTool                = std::make_shared<MaskTool>(m_AppState, glm::vec3(1.0f, 0.65f, 0.1f));
         m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated base-noise mask");
-
-        std::string catalogError;
-        if (!m_NoiseAlgorithms.LoadFromFile(NoiseAlgorithmCatalog::IndexPath(m_AppState->constants.shadersDir), &catalogError)) {
-            TF3D_LOG_ERROR("{}", catalogError);
-        }
+        m_MaskTool->SetPreviewMode(MaskPreviewMode::Generated);
     }
 
-    bool BaseNoiseGenerator::LoadConfig(const nlohmann::json &config, const std::string &source, const std::string &shaderPath)
+    bool BaseNoiseGenerator::Initialize()
     {
-        if (!config.is_object()) {
-            TF3D_LOG_ERROR("Failed to load base-noise generator: metadata is not an object.");
-            return false;
-        }
         if (m_AppState == nullptr || m_AppState->resourceManager == nullptr) {
-            TF3D_LOG_ERROR("Failed to load base-noise generator: application resources are unavailable.");
+            TF3D_LOG_ERROR("Failed to initialize base-noise generator: application resources are unavailable.");
             return false;
         }
 
-        m_ID          = config.value("ID", m_ID);
-        m_Name        = config.value("Name", m_Name);
-        m_Description = config.value("Description", "");
-        m_Source      = source;
-        m_ShaderPath  = shaderPath;
+        if (!m_Inspector->LoadConfig(m_AppState, "BaseNoise"))
+            return false;
 
-        auto inspectorConfig = config;
-        if (!ApplyNoiseAlgorithmMetadata(inspectorConfig, m_NoiseAlgorithms)) {
-            TF3D_LOG_ERROR("Failed to apply noise algorithm metadata for base-noise generator '{}'.", m_Name);
+        bool shaderLoaded = false;
+        const std::string shaderSource = m_AppState->resourceManager->LoadShaderSource(
+            "generation/base_noise/noise_gen", false, &shaderLoaded);
+        if (!shaderLoaded) {
+            TF3D_LOG_ERROR("Failed to load base-noise shader source.");
             return false;
         }
-        if (!m_Inspector->LoadConfig(inspectorConfig))
-            return false;
 
-        m_Shader = m_AppState->resourceManager->GetComputeShader(
-            "BaseNoiseGen_" + m_ID, m_NoiseAlgorithms.InjectShaderDefines(source));
+        m_Shader = m_AppState->resourceManager->GetComputeShader("BaseNoiseGen", shaderSource);
+        if (!m_Shader.has_value()) {
+            TF3D_LOG_ERROR("Failed to compile base-noise shader.");
+            return false;
+        }
+
         m_RequireUpdation = true;
-        return m_Shader.has_value();
-    }
-
-    BaseNoiseGenerator::~BaseNoiseGenerator()
-    {
+        return true;
     }
 
     bool BaseNoiseGenerator::ShowSettings()
     {
-        if (m_Inspector == nullptr)
-            return false;
-
         const auto markChanged = [this](bool changed) {
             m_RequireUpdation = changed || m_RequireUpdation;
         };
 
-        ImGui::PushID(m_ID.c_str());
-        if (!m_Description.empty() && m_Inspector->GetDescription().empty()) {
-            ImGui::TextWrapped("%s", m_Description.c_str());
-            ImGui::Separator();
-        }
+        ImGui::PushID("BaseNoiseGenerator");
         markChanged(m_Inspector->Render());
 
         markChanged(ImGui::Checkbox("Use mask", &m_UseMask));
@@ -167,7 +92,7 @@ namespace tf3d::generators
             return;
 
         const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
-        const std::string scopeKey    = scopePrefix + "/base-noise/" + m_Name;
+        const std::string scopeKey = scopePrefix + "/base-noise";
         TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
 
         const bool useMask = m_UseMask && m_MaskTool != nullptr && m_CalculatedMaskGenerator != nullptr &&
@@ -210,66 +135,11 @@ namespace tf3d::generators
         if (data == nullptr)
             return;
 
-        m_Name        = data->Get<std::string>("Name", m_Name);
-        m_ID          = data->Get<std::string>("ID", m_ID);
-        m_Description = data->Get<std::string>("Description", m_Description);
-        m_Source      = data->Get<std::string>("Source", m_Source);
-        m_ShaderPath  = data->Get<std::string>("ShaderPath", m_ShaderPath);
         m_UseMask     = data->Get<bool>("UseMask", m_UseMask);
         m_InvertMask  = data->Get<bool>("InvertMask", m_InvertMask);
 
-        auto inspector = data->Get<SerializerNode>("Inspector");
-        if (inspector != nullptr) {
-            auto inspectorState = inspector->ToJson();
-            if (inspectorState.contains("Transform") && inspectorState["Transform"].is_object() &&
-                inspectorState["Transform"].contains("Offset")) {
-                if (!inspectorState.contains("Noise") || !inspectorState["Noise"].is_object())
-                    inspectorState["Noise"] = nlohmann::json::object();
-                if (!inspectorState["Noise"].contains("Offset"))
-                    inspectorState["Noise"]["Offset"] = inspectorState["Transform"]["Offset"];
-            }
-            inspectorState.erase("Transform");
-            inspectorState.erase("Filtering");
-            inspectorState.erase("TransformFactor");
-            inspectorState.erase("SlopeSmoothingRadius");
-            inspectorState.erase("SlopeSamplingRadius");
-            inspectorState.erase("TransformRange");
-            inspectorState.erase("UseGaussianPreFilter");
-            m_Inspector->LoadState(CreateSerializerNodeFromJson(inspectorState));
-        }
-
-        auto octaveStrengths            = m_Inspector->Get<std::vector<float>>("OctaveStrengths", DefaultNoiseOctaveStrengths());
-        const auto savedOctaveStrengths = data->Get<std::vector<float>>("OctaveStrengths");
-        if (!savedOctaveStrengths.empty()) {
-            octaveStrengths = savedOctaveStrengths;
-        } else if (!m_Inspector->Contains("OctaveStrengths")) {
-            bool hasLegacyOctaves = false;
-            octaveStrengths       = DefaultNoiseOctaveStrengths();
-            for (int i = 0; i < kBaseNoiseOctaveCount; ++i) {
-                const std::string variableName = "NoiseOctaveStrength" + std::to_string(i);
-                if (!m_Inspector->Contains(variableName))
-                    continue;
-                hasLegacyOctaves                        = true;
-                octaveStrengths[static_cast<size_t>(i)] = m_Inspector->Get(variableName, octaveStrengths[static_cast<size_t>(i)]);
-            }
-            if (!hasLegacyOctaves)
-                octaveStrengths = DefaultNoiseOctaveStrengths();
-        }
-        octaveStrengths = NormalizeNoiseOctaveStrengths(octaveStrengths);
-        if (m_Inspector->Contains("OctaveStrengths")) {
-            if (!m_Inspector->Set("OctaveStrengths", octaveStrengths)) {
-                m_Inspector->Remove("OctaveStrengths");
-                m_Inspector->Add("OctaveStrengths", octaveStrengths);
-            }
-        } else {
-            m_Inspector->Add("OctaveStrengths", octaveStrengths);
-        }
-        for (int i = 0; i < kBaseNoiseOctaveCount; ++i)
-            m_Inspector->Remove("NoiseOctaveStrength" + std::to_string(i));
-        if (!m_Inspector->Contains("NoiseOctaveStrengthsCount"))
-            m_Inspector->Add("NoiseOctaveStrengthsCount", kBaseNoiseOctaveCount);
-        EnsureNoiseOctaveComponent(*m_Inspector);
-        EnsureNoiseValues(*m_Inspector, m_NoiseAlgorithms.DefaultValue());
+        if (const auto inspector = data->Get<SerializerNode>("Inspector"); inspector != nullptr)
+            m_Inspector->LoadState(inspector);
 
         if (m_CalculatedMaskGenerator != nullptr) {
             m_CalculatedMaskGenerator->Load(data->Get<SerializerNode>("CalculatedMask"));
@@ -286,23 +156,10 @@ namespace tf3d::generators
 
     SerializerNode BaseNoiseGenerator::Save()
     {
-        auto octaveStrengths = NormalizeNoiseOctaveStrengths(
-            m_Inspector->Get<std::vector<float>>("OctaveStrengths", DefaultNoiseOctaveStrengths()));
-        if (m_Inspector->Contains("OctaveStrengths"))
-            m_Inspector->Set("OctaveStrengths", octaveStrengths);
-        else
-            m_Inspector->Add("OctaveStrengths", octaveStrengths);
-
         auto node = CreateSerializerNode();
-        node->Set("Name", m_Name);
-        node->Set("ID", m_ID);
-        node->Set("Description", m_Description);
-        node->Set("Source", m_Source);
-        node->Set("ShaderPath", m_ShaderPath);
         node->Set("UseMask", m_UseMask);
         node->Set("InvertMask", m_InvertMask);
         node->Set("Inspector", m_Inspector->SaveState());
-        node->Set("OctaveStrengths", octaveStrengths);
         if (m_CalculatedMaskGenerator != nullptr)
             node->Set("CalculatedMask", m_CalculatedMaskGenerator->Save());
         if (m_MaskTool != nullptr)
