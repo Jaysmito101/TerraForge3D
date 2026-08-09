@@ -317,7 +317,7 @@ namespace tf3d::generators
         m_DrawSettings.m_ShowMask        = showMask;
         m_DrawSettings.m_InvertMask      = m_InvertPreview;
         m_DrawSettings.m_ShowBrushCursor = showBrush;
-        m_AppState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(&m_DrawSettings);
+        m_AppState->rendererManager->GetObjectRenderer()->SetDrawBrushSettings(&m_DrawSettings);
     }
 
     bool MaskTool::ShowPaintedSettings()

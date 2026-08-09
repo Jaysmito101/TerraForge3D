@@ -38,6 +38,7 @@ namespace tf3d::generators
         bool ApplyDrawingShaders();
         SerializerNode Save() const;
         void Load(SerializerNode data);
+        void SetPreviewMode(MaskPreviewMode mode);
 
         void SetGeneratedMaskTexture(GeneratorTexture *texture, const char *label = "Filter mask");
         void ClearGeneratedMaskTexture();
@@ -72,7 +73,6 @@ namespace tf3d::generators
             int mode       = 0;
         };
 
-        void SetPreviewMode(MaskPreviewMode mode);
         void UpdateViewportOverlay(bool showBrush, bool showMask);
         void UpdateVisualizationTexture(GeneratorTexture *sourceTexture);
         bool ShowPaintedSettings();
