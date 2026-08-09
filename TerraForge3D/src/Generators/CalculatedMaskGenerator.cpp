@@ -1,16 +1,11 @@
 #include "Generators/CalculatedMaskGenerator.h"
-#include "Generators/NoiseAlgorithmConfig.h"
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Inspector/CustomInspector.h"
-#include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
-#include <cctype>
-#include <cstring>
 #include <filesystem>
-#include <map>
 #include <regex>
 #include <unordered_set>
 
@@ -21,242 +16,6 @@ namespace tf3d::generators
     {
         constexpr const char *kShaderUniformMarker = "/* TF3D_CALCULATED_MASK_UNIFORMS */";
         constexpr const char *kShaderModuleMarker  = "/* TF3D_CALCULATED_MASK_MODULES */";
-
-        struct UniformDeclaration {
-            std::string type;
-            size_t arraySize = 0;
-        };
-
-        using UniformDeclarationMap = std::map<std::string, UniformDeclaration>;
-
-        bool RegisterUniform(UniformDeclarationMap &uniforms,
-                             const std::string &name,
-                             UniformDeclaration declaration,
-                             std::string *error)
-        {
-            const auto existing = uniforms.find(name);
-            if (existing == uniforms.end()) {
-                uniforms.emplace(name, std::move(declaration));
-                return true;
-            }
-
-            if (existing->second.type == declaration.type && existing->second.arraySize == declaration.arraySize)
-                return true;
-
-            if (error) {
-                *error = "uniform '" + name + "' has conflicting declarations ('" + existing->second.type +
-                         (existing->second.arraySize > 0 ? "[]" : "") + "' and '" + declaration.type +
-                         (declaration.arraySize > 0 ? "[]" : "") + "')";
-            }
-            return false;
-        }
-
-        bool AddUniformParameter(const nlohmann::json &parameter,
-                                 const std::string &owner,
-                                 UniformDeclarationMap &uniforms,
-                                 std::string *error)
-        {
-            auto fail = [&](const std::string &message) {
-                if (error)
-                    *error = owner + ": " + message;
-                return false;
-            };
-
-            if (!parameter.is_object())
-                return fail("parameter must be an object");
-            if (!parameter.contains("Name") || !parameter["Name"].is_string() || parameter["Name"].get<std::string>().empty())
-                return fail("parameter must define a non-empty Name");
-
-            const std::string variableName = parameter["Name"].get<std::string>();
-            std::string uniformName;
-            if (parameter.contains("ShaderUniform")) {
-                if (!parameter["ShaderUniform"].is_string())
-                    return fail("parameter '" + variableName + "' has an invalid ShaderUniform");
-                uniformName = parameter["ShaderUniform"].get<std::string>();
-            } else {
-                uniformName = "u_" + variableName;
-            }
-
-            if (uniformName.empty())
-                return true;
-            if (!utils::IsValidShaderSymbol(uniformName))
-                return fail("parameter '" + variableName + "' resolves to invalid shader uniform '" + uniformName + "'");
-
-            std::string typeName = "Float";
-            if (parameter.contains("Type")) {
-                if (!parameter["Type"].is_string())
-                    return fail("parameter '" + variableName + "' has an invalid Type");
-                typeName = parameter["Type"].get<std::string>();
-            }
-
-            UniformDeclaration declaration;
-            if (typeName == "Int" || typeName == "Bool") {
-                declaration.type = "int";
-            } else if (typeName == "Float") {
-                declaration.type = "float";
-            } else if (typeName == "Vector2") {
-                declaration.type = "vec2";
-            } else if (typeName == "Vector3") {
-                declaration.type = "vec3";
-            } else if (typeName == "Vector4") {
-                declaration.type = "vec4";
-            } else if (typeName == "FloatArray") {
-                if (parameter.contains("Default") && parameter["Default"].is_array()) {
-                    declaration.arraySize = parameter["Default"].size();
-                } else {
-                    if (parameter.contains("Count") && !parameter["Count"].is_number_integer())
-                        return fail("parameter '" + variableName + "' has an invalid FloatArray Count");
-                    declaration.arraySize = static_cast<size_t>(std::max(parameter.value("Count", 1), 1));
-                }
-                if (declaration.arraySize == 0)
-                    return fail("parameter '" + variableName + "' must define a non-empty FloatArray");
-                declaration.type = "float";
-            } else if (typeName == "Path") {
-                declaration.type      = "vec2";
-                declaration.arraySize = tf3d::inspector::CustomInspectorMaxPathPoints;
-            } else {
-                return fail("parameter '" + variableName + "' uses unsupported shader-bound type '" + typeName + "'");
-            }
-
-            if (!RegisterUniform(uniforms, uniformName, declaration, error))
-                return false;
-
-            if (typeName == "Path") {
-                const std::string countName = uniformName + "Count";
-                if (!utils::IsValidShaderSymbol(countName))
-                    return fail("path parameter '" + variableName + "' resolves to invalid count uniform '" + countName + "'");
-                if (!RegisterUniform(uniforms, countName, {"int", 0}, error))
-                    return false;
-            }
-            return true;
-        }
-
-        bool AddUniformsFromSection(const nlohmann::json &section,
-                                    const std::string &owner,
-                                    UniformDeclarationMap &uniforms,
-                                    std::string *error)
-        {
-            if (!section.is_object() || !section.contains("Params"))
-                return true;
-            if (!section["Params"].is_array()) {
-                if (error)
-                    *error = owner + ": Params must be an array";
-                return false;
-            }
-
-            for (const auto &parameter : section["Params"]) {
-                if (!AddUniformParameter(parameter, owner, uniforms, error))
-                    return false;
-            }
-            return true;
-        }
-
-        bool BuildUniformDeclarations(const std::vector<nlohmann::json> &commonSections,
-                                      std::vector<CalculatedMaskGenerator::AlgorithmDefinition> &algorithms,
-                                      std::string &declarations)
-        {
-            UniformDeclarationMap uniforms;
-            for (const auto &section : commonSections) {
-                std::string error;
-                if (!AddUniformsFromSection(section, "common calculated-mask metadata", uniforms, &error)) {
-                    TF3D_LOG_ERROR("Cannot generate calculated-mask uniform declarations: {}", error);
-                    return false;
-                }
-            }
-
-            std::vector<CalculatedMaskGenerator::AlgorithmDefinition> compatibleAlgorithms;
-            compatibleAlgorithms.reserve(algorithms.size());
-            for (auto &algorithm : algorithms) {
-                auto candidateUniforms = uniforms;
-                std::string error;
-                if (!AddUniformsFromSection(algorithm.section, "algorithm '" + algorithm.id + "'", candidateUniforms, &error)) {
-                    TF3D_LOG_ERROR("Skipping calculated mask algorithm '{}': {}", algorithm.id, error);
-                    continue;
-                }
-                uniforms = std::move(candidateUniforms);
-                compatibleAlgorithms.push_back(std::move(algorithm));
-            }
-            algorithms = std::move(compatibleAlgorithms);
-
-            declarations.clear();
-            for (const auto &[name, declaration] : uniforms) {
-                declarations += "uniform " + declaration.type + " " + name;
-                if (declaration.arraySize > 0)
-                    declarations += "[" + std::to_string(declaration.arraySize) + "]";
-                declarations += ";\n";
-            }
-            return true;
-        }
-
-        bool MergeParameters(const nlohmann::json &parameters,
-                             nlohmann::json &merged,
-                             std::string *error)
-        {
-            if (!parameters.is_array()) {
-                if (error)
-                    *error = "Params must be an array";
-                return false;
-            }
-
-            merged = nlohmann::json::array();
-            std::unordered_map<std::string, size_t> indices;
-            for (size_t parameterIndex = 0; parameterIndex < parameters.size(); ++parameterIndex) {
-                const auto &parameter = parameters[parameterIndex];
-                if (!parameter.is_object() || !parameter.contains("Name") || !parameter["Name"].is_string() ||
-                    parameter["Name"].get<std::string>().empty()) {
-                    if (error)
-                        *error = "parameter " + std::to_string(parameterIndex) + " must define a non-empty Name";
-                    return false;
-                }
-
-                const std::string name = parameter["Name"].get<std::string>();
-                const auto existing    = indices.find(name);
-                if (existing == indices.end()) {
-                    indices.emplace(name, merged.size());
-                    merged.push_back(parameter);
-                    continue;
-                }
-
-                auto &base = merged[existing->second];
-                if (base.contains("Type") && parameter.contains("Type") && base["Type"] != parameter["Type"]) {
-                    if (error)
-                        *error = "parameter '" + name + "' changes Type while being overridden";
-                    return false;
-                }
-                utils::MergeObjects(base, parameter);
-            }
-            return true;
-        }
-
-        void RemoveConditions(nlohmann::json &node)
-        {
-            if (node.is_array()) {
-                for (auto &child : node)
-                    RemoveConditions(child);
-                return;
-            }
-            if (!node.is_object())
-                return;
-
-            node.erase("Conditions");
-            for (auto &[key, value] : node.items())
-                RemoveConditions(value);
-        }
-
-        void RemoveFieldRecursive(nlohmann::json &node, const std::string &field)
-        {
-            if (node.is_array()) {
-                for (auto &child : node)
-                    RemoveFieldRecursive(child, field);
-                return;
-            }
-            if (!node.is_object())
-                return;
-
-            node.erase(field);
-            for (auto &[key, value] : node.items())
-                RemoveFieldRecursive(value, field);
-        }
 
         std::string StripGlslComments(const std::string &source)
         {
@@ -406,16 +165,11 @@ namespace tf3d::generators
             }
             generated += "        default: return 1.0;\n    }\n}\n";
 
-            std::string result                 = baseSource;
-            const size_t uniformMarkerPosition = result.find(kShaderUniformMarker);
-            if (uniformMarkerPosition == std::string::npos)
+            std::string result = baseSource;
+            if (!utils::ReplaceAll(result, kShaderUniformMarker, uniformDeclarations))
                 return {};
-            result.replace(uniformMarkerPosition, std::strlen(kShaderUniformMarker), uniformDeclarations);
-
-            const size_t moduleMarkerPosition = result.find(kShaderModuleMarker);
-            if (moduleMarkerPosition == std::string::npos)
+            if (!utils::ReplaceAll(result, kShaderModuleMarker, generated))
                 return {};
-            result.replace(moduleMarkerPosition, std::strlen(kShaderModuleMarker), generated);
             return result;
         }
     } // namespace
@@ -427,10 +181,6 @@ namespace tf3d::generators
             TF3D_LOG_ERROR("Cannot construct calculated mask generator without application state.");
             return;
         }
-
-        std::string catalogError;
-        if (!m_NoiseAlgorithms.LoadFromFile(NoiseAlgorithmCatalog::IndexPath(m_AppState->constants.shadersDir), &catalogError))
-            TF3D_LOG_ERROR("{}", catalogError);
 
         m_Texture   = std::make_shared<GeneratorTexture>(m_Size, m_Size, GeneratorTextureStorage::R16);
         m_Inspector = std::make_shared<CustomInspector>();
@@ -447,10 +197,12 @@ namespace tf3d::generators
         }
 
         if (configLoaded && !m_Algorithms.empty()) {
-            const int defaultIndex = FindTypeIndexByID(m_DefaultTypeID) >= 0
-                                         ? FindTypeIndexByID(m_DefaultTypeID)
-                                         : 0;
-            m_MetadataLoaded       = RebuildInspector(defaultIndex, false);
+            const int defaultIndex   = FindTypeIndexByID(m_DefaultTypeID) >= 0
+                                           ? FindTypeIndexByID(m_DefaultTypeID)
+                                           : 0;
+            m_SelectedAlgorithmIndex = defaultIndex;
+            m_Inspector->Root().Scope("Mask").Set("MaskType", m_Algorithms[defaultIndex].selectionValue);
+            m_MetadataLoaded = true;
         }
 
         if (!m_MetadataLoaded)
@@ -482,11 +234,16 @@ namespace tf3d::generators
         const int defaultIndex = m_SelectedAlgorithmIndex >= 0 && m_SelectedAlgorithmIndex < static_cast<int>(m_Algorithms.size())
                                      ? m_SelectedAlgorithmIndex
                                      : 0;
-        if (m_Inspector == nullptr || !m_Inspector->Contains("MaskType"))
+        if (m_Inspector == nullptr || !m_Inspector->Root().Scope("Mask").Contains("MaskType"))
             return defaultIndex;
 
-        const int selectedMode = m_Inspector->Get<int32_t>("MaskType", defaultIndex);
-        return selectedMode >= 0 && selectedMode < static_cast<int>(m_Algorithms.size()) ? selectedMode : defaultIndex;
+        const int selectedValue = m_Inspector->Root().Scope("Mask").Get<int32_t>(
+            "MaskType", m_Algorithms[defaultIndex].selectionValue);
+        for (size_t index = 0; index < m_Algorithms.size(); ++index) {
+            if (m_Algorithms[index].selectionValue == selectedValue)
+                return static_cast<int>(index);
+        }
+        return defaultIndex;
     }
 
     int CalculatedMaskGenerator::GetShaderModeForType(int typeIndex) const
@@ -498,84 +255,34 @@ namespace tf3d::generators
 
     bool CalculatedMaskGenerator::LoadMetadata()
     {
-        if (m_AppState == nullptr)
+        if (m_AppState == nullptr || m_Inspector == nullptr)
             return false;
-
-        const auto inspectorPath = tf3d::inspector::CustomInspector::GetConfigPath(
-            std::filesystem::path(m_AppState->constants.dataDir), "CalculatedMask");
-        utils::JsonIncludeResolverOptions resolverOptions;
-        resolverOptions.rootDirectory  = std::filesystem::path(m_AppState->constants.dataDir) / "inspectors";
-        resolverOptions.pathMode       = utils::JsonIncludePathMode::RelativeToIncludingFile;
-        resolverOptions.restrictToRoot = true;
-        const utils::JsonIncludeResolver resolver(resolverOptions);
-        std::string resolveError;
-        const auto document = resolver.ResolveFile(inspectorPath, &resolveError);
-        if (!document) {
-            TF3D_LOG_ERROR("Could not load calculated mask inspector '{}': {}", inspectorPath.string(), resolveError);
-            return false;
-        }
-        if (!document->is_object() || !document->contains("Sections") || !(*document)["Sections"].is_array()) {
-            TF3D_LOG_ERROR("Calculated mask inspector '{}' must contain a Sections array.", inspectorPath.string());
-            return false;
-        }
-
-        m_InspectorDocument = *document;
-        m_CommonSections.clear();
         m_Algorithms.clear();
         std::unordered_set<std::string> algorithmIDs;
 
-        for (size_t sectionIndex = 0; sectionIndex < m_InspectorDocument["Sections"].size(); ++sectionIndex) {
-            const auto &section = m_InspectorDocument["Sections"][sectionIndex];
-            if (!section.is_object()) {
-                TF3D_LOG_WARN("Skipping calculated mask inspector section {}: expected an object.", sectionIndex);
-                continue;
-            }
+        if (!m_Inspector->LoadConfig(m_AppState, "CalculatedMask"))
+            return false;
+        m_Inspector->SetShowResetButton(false);
 
-            const auto customDataIterator = section.find("CustomData") != section.end()
-                                                ? section.find("CustomData")
-                                                : section.find("customData");
-            const bool hasCustomData      = customDataIterator != section.end();
-            if (!hasCustomData) {
-                m_CommonSections.push_back(section);
+        for (const auto &sectionName : m_Inspector->GetSectionsOrder()) {
+            const auto shaderPath = m_Inspector->GetSectionCustomDataString(sectionName, "Shader");
+            if (!shaderPath || shaderPath->empty())
                 continue;
-            }
+            if (!utils::IsPascalIdentifier(sectionName) || !algorithmIDs.insert(utils::CanonicalID(sectionName)).second)
+                continue;
 
-            const auto &customData = *customDataIterator;
-            if (!customData.is_object()) {
-                TF3D_LOG_ERROR("Skipping calculated mask section {}: CustomData must be an object.", sectionIndex);
-                continue;
-            }
-            const std::string id         = customData.value("ID", "");
-            const std::string shaderPath = customData.value("Shader", "");
-            if (!utils::IsPascalIdentifier(id) || !algorithmIDs.insert(utils::CanonicalID(id)).second) {
-                TF3D_LOG_ERROR("Skipping calculated mask section {}: CustomData.ID must be a unique PascalCase identifier.", sectionIndex);
-                continue;
-            }
-            if (shaderPath.empty()) {
-                TF3D_LOG_ERROR("Skipping calculated mask algorithm '{}': CustomData.Shader is required.", id);
-                continue;
-            }
-
+            const auto &section = m_Inspector->GetSection(sectionName);
             AlgorithmDefinition algorithm;
-            algorithm.id          = id;
-            algorithm.label       = section.value("Label", section.value("Name", id));
-            algorithm.description = section.value("Description", "");
-            algorithm.shaderPath  = shaderPath;
-            algorithm.section     = section;
-
-            const auto parameters = section.value("Params", nlohmann::json::array());
-            std::string parameterError;
-            nlohmann::json mergedParameters;
-            if (!MergeParameters(parameters, mergedParameters, &parameterError)) {
-                TF3D_LOG_ERROR("Skipping calculated mask algorithm '{}': {}", id, parameterError);
-                continue;
-            }
-            RemoveConditions(mergedParameters);
-            algorithm.section["Params"] = std::move(mergedParameters);
+            algorithm.id             = sectionName;
+            algorithm.label          = section.label.empty() ? sectionName : section.label;
+            algorithm.description    = section.description;
+            algorithm.shaderPath     = *shaderPath;
+            algorithm.selectionValue = m_Inspector->GetSectionSelectionValue(sectionName)
+                                           .value_or(static_cast<int32_t>(m_Algorithms.size()));
             m_Algorithms.push_back(std::move(algorithm));
         }
 
-        return !m_CommonSections.empty();
+        return !m_Algorithms.empty();
     }
 
     bool CalculatedMaskGenerator::BuildShader(const std::string &baseShaderSource)
@@ -590,11 +297,15 @@ namespace tf3d::generators
         }
 
         m_Shader.reset();
-        const std::string sourceWithNoiseDefines = m_NoiseAlgorithms.IsValid()
-                                                       ? m_NoiseAlgorithms.InjectShaderDefines(baseShaderSource)
-                                                       : baseShaderSource;
-        const auto shaderRoot                    = std::filesystem::path(m_AppState->constants.shadersDir);
-        const auto candidates                    = std::move(m_Algorithms);
+        std::string uniformError;
+        const auto uniformDeclarations = m_Inspector->GetShaderUniformDeclarations(&uniformError);
+        if (!uniformDeclarations) {
+            TF3D_LOG_ERROR("Cannot generate calculated-mask uniform declarations: {}", uniformError);
+            return false;
+        }
+
+        const auto shaderRoot = std::filesystem::path(m_AppState->constants.shadersDir);
+        const auto candidates = std::move(m_Algorithms);
         m_Algorithms.clear();
 
         for (auto candidate : candidates) {
@@ -621,12 +332,6 @@ namespace tf3d::generators
             m_Algorithms.push_back(std::move(candidate));
         }
 
-        std::string uniformDeclarations;
-        if (!BuildUniformDeclarations(m_CommonSections, m_Algorithms, uniformDeclarations)) {
-            m_Algorithms.clear();
-            return false;
-        }
-
         if (m_Algorithms.empty()) {
             TF3D_LOG_ERROR("No valid calculated mask algorithms remain; calculated mask shader was not created.");
             return false;
@@ -636,13 +341,26 @@ namespace tf3d::generators
             m_Algorithms[index].runtimeMode = static_cast<int>(index);
         }
 
-        const std::string finalSource = AssembleShader(sourceWithNoiseDefines, uniformDeclarations, m_Algorithms);
+        std::vector<std::string> labels;
+        std::vector<int32_t> values;
+        labels.reserve(m_Algorithms.size());
+        values.reserve(m_Algorithms.size());
+        for (const auto &algorithm : m_Algorithms) {
+            labels.push_back(algorithm.label.empty() ? algorithm.id : algorithm.label);
+            values.push_back(algorithm.selectionValue);
+        }
+        if (!m_Inspector->Root().Scope("Mask").SetDropdownOptions("MaskType", labels, values)) {
+            TF3D_LOG_ERROR("Calculated mask inspector is missing its MaskType dropdown.");
+            m_Algorithms.clear();
+            return false;
+        }
+
+        const std::string finalSource = AssembleShader(baseShaderSource, *uniformDeclarations, m_Algorithms);
         if (finalSource.empty()) {
             TF3D_LOG_ERROR("Calculated mask shader assembly failed; calculated mask generation is unavailable.");
             m_Algorithms.clear();
             return false;
         }
-
 
         m_Shader = m_AppState->resourceManager->GetComputeShader("CalculatedMaskPreview", finalSource);
         if (!m_Shader.has_value()) {
@@ -650,73 +368,6 @@ namespace tf3d::generators
             m_Algorithms.clear();
         }
         return m_Shader.has_value();
-    }
-
-    nlohmann::json CalculatedMaskGenerator::BuildInspectorConfig(int typeIndex) const
-    {
-        nlohmann::json config = m_InspectorDocument;
-        config["Sections"]    = nlohmann::json::array();
-        for (const auto &section : m_CommonSections)
-            config["Sections"].push_back(section);
-        if (typeIndex >= 0 && typeIndex < static_cast<int>(m_Algorithms.size()))
-            config["Sections"].push_back(m_Algorithms[typeIndex].section);
-        return config;
-    }
-
-    nlohmann::json CalculatedMaskGenerator::StripTransientInspectorState(nlohmann::json state) const
-    {
-        RemoveFieldRecursive(state, "MaskType");
-        return state;
-    }
-
-    bool CalculatedMaskGenerator::StoreActiveInspectorState()
-    {
-        if (m_Inspector == nullptr || m_SelectedAlgorithmIndex < 0 || m_SelectedAlgorithmIndex >= static_cast<int>(m_Algorithms.size()))
-            return false;
-        const auto state = m_Inspector->SaveState();
-        if (state == nullptr)
-            return false;
-        m_AlgorithmStates[m_Algorithms[m_SelectedAlgorithmIndex].id] = StripTransientInspectorState(state->ToJson());
-        return true;
-    }
-
-    void CalculatedMaskGenerator::ConfigureAlgorithmSelector()
-    {
-        if (m_Inspector == nullptr || !m_Inspector->HasWidget("Mask type"))
-            return;
-
-        std::vector<std::string> labels;
-        std::vector<int32_t> values;
-        labels.reserve(m_Algorithms.size());
-        values.reserve(m_Algorithms.size());
-        for (size_t index = 0; index < m_Algorithms.size(); ++index) {
-            labels.push_back(m_Algorithms[index].label.empty() ? m_Algorithms[index].id : m_Algorithms[index].label);
-            values.push_back(static_cast<int32_t>(index));
-        }
-        m_Inspector->GetWidget("Mask type").SetDropdownOptions(labels, values);
-    }
-
-    bool CalculatedMaskGenerator::RebuildInspector(int typeIndex, bool preserveCurrentState)
-    {
-        if (m_Inspector == nullptr || typeIndex < 0 || typeIndex >= static_cast<int>(m_Algorithms.size()))
-            return false;
-        if (preserveCurrentState)
-            StoreActiveInspectorState();
-
-        auto config = BuildInspectorConfig(typeIndex);
-        if (m_NoiseAlgorithms.IsValid() && !ApplyNoiseAlgorithmMetadata(config, m_NoiseAlgorithms))
-            return false;
-        if (!m_Inspector->LoadConfig(config))
-            return false;
-
-        m_Inspector->SetShowResetButton(false);
-        ConfigureAlgorithmSelector();
-        const auto savedState = m_AlgorithmStates.find(m_Algorithms[typeIndex].id);
-        if (savedState != m_AlgorithmStates.end())
-            m_Inspector->LoadState(CreateSerializerNodeFromJson(savedState->second));
-        m_Inspector->Set("MaskType", typeIndex);
-        m_SelectedAlgorithmIndex = typeIndex;
-        return true;
     }
 
     int CalculatedMaskGenerator::FindTypeIndexByID(const std::string &id) const
@@ -745,20 +396,25 @@ namespace tf3d::generators
         if (!m_MetadataLoaded || m_Inspector == nullptr || m_Algorithms.empty())
             return false;
 
-        const int previousIndex        = m_SelectedAlgorithmIndex;
+        const int previousIndex        = GetSelectedTypeIndex();
         bool changed                   = m_Inspector->Render();
         const std::string lastAction   = m_Inspector->GetLastAction();
         const std::string lastVariable = m_Inspector->GetLastChangedVariable();
 
         if (lastAction == "ResetRecommended") {
             const int selectedIndex = previousIndex >= 0 ? previousIndex : GetSelectedTypeIndex();
-            if (selectedIndex >= 0 && selectedIndex < static_cast<int>(m_Algorithms.size()))
-                m_AlgorithmStates.erase(m_Algorithms[selectedIndex].id);
-            changed = RebuildInspector(selectedIndex, false) || changed;
+            if (selectedIndex >= 0 && selectedIndex < static_cast<int>(m_Algorithms.size())) {
+                m_Inspector->ResetVisible();
+                m_Inspector->Root().Scope("Mask").Set("MaskType", m_Algorithms[selectedIndex].selectionValue);
+                m_SelectedAlgorithmIndex = selectedIndex;
+                changed                  = true;
+            }
         } else if (lastVariable == "MaskType") {
             const int selectedIndex = GetSelectedTypeIndex();
-            if (selectedIndex != previousIndex)
-                changed = RebuildInspector(selectedIndex, true) || changed;
+            if (selectedIndex != previousIndex) {
+                m_SelectedAlgorithmIndex = selectedIndex;
+                changed                  = true;
+            }
         }
 
         if (changed)
@@ -774,9 +430,9 @@ namespace tf3d::generators
             node->Set("MaskTypeID", m_Algorithms[typeIndex].id);
 
         if (m_Inspector != nullptr) {
-            const auto state = m_Inspector->SaveState();
+            const auto state = m_Inspector->SaveState({"MaskType"});
             if (state != nullptr)
-                node->Set("Inspector", CreateSerializerNodeFromJson(StripTransientInspectorState(state->ToJson())));
+                node->Set("Inspector", state);
         }
         return node;
     }
@@ -794,16 +450,11 @@ namespace tf3d::generators
         if (typeIndex < 0)
             typeIndex = 0;
 
-        m_AlgorithmStates.clear();
-        if (!RebuildInspector(typeIndex, false))
-            return;
-
         const auto inspectorData = data->Get<SerializerNode>("Inspector");
-        if (inspectorData != nullptr) {
-            nlohmann::json inspectorState = StripTransientInspectorState(inspectorData->ToJson());
-            m_Inspector->LoadState(CreateSerializerNodeFromJson(inspectorState));
-        }
-        m_Inspector->Set("MaskType", typeIndex);
+        if (inspectorData != nullptr)
+            m_Inspector->LoadState(inspectorData);
+        m_SelectedAlgorithmIndex = typeIndex;
+        m_Inspector->Root().Scope("Mask").Set("MaskType", m_Algorithms[typeIndex].selectionValue);
         Invalidate();
     }
 
