@@ -29,7 +29,7 @@ namespace tf3d::generators
         if (!m_Inspector->LoadConfig(m_AppState, "BaseNoise"))
             return false;
 
-        bool shaderLoaded = false;
+        bool shaderLoaded              = false;
         const std::string shaderSource = m_AppState->resourceManager->LoadShaderSource(
             "generation/base_noise/noise_gen", false, &shaderLoaded);
         if (!shaderLoaded) {
@@ -92,7 +92,7 @@ namespace tf3d::generators
             return;
 
         const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
-        const std::string scopeKey = scopePrefix + "/base-noise";
+        const std::string scopeKey    = scopePrefix + "/base-noise";
         TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
 
         const bool useMask = m_UseMask && m_MaskTool != nullptr && m_CalculatedMaskGenerator != nullptr &&
@@ -135,8 +135,8 @@ namespace tf3d::generators
         if (data == nullptr)
             return;
 
-        m_UseMask     = data->Get<bool>("UseMask", m_UseMask);
-        m_InvertMask  = data->Get<bool>("InvertMask", m_InvertMask);
+        m_UseMask    = data->Get<bool>("UseMask", m_UseMask);
+        m_InvertMask = data->Get<bool>("InvertMask", m_InvertMask);
 
         if (const auto inspector = data->Get<SerializerNode>("Inspector"); inspector != nullptr)
             m_Inspector->LoadState(inspector);
