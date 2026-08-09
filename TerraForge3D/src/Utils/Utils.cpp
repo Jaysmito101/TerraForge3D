@@ -10,6 +10,7 @@
 #include <httplib/httplib.h>
 #include <iostream>
 #include <initializer_list>
+#include <nlohmann/json.hpp>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <sys/stat.h>
@@ -53,6 +54,45 @@ namespace tf3d::utils
                 return false;
         }
         return true;
+    }
+
+    bool IsPascalIdentifier(const std::string &value)
+    {
+        if (value.empty())
+            return false;
+        if (!std::isupper(static_cast<unsigned char>(value.front())))
+            return false;
+        for (const char character : value) {
+            if (!std::isalnum(static_cast<unsigned char>(character)))
+                return false;
+        }
+        return true;
+    }
+
+    std::string CanonicalID(const std::string &value)
+    {
+        std::string result;
+        result.reserve(value.size());
+        for (const char character : value) {
+            if (std::isalnum(static_cast<unsigned char>(character)))
+                result.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(character))));
+        }
+        return result;
+    }
+
+    void MergeObjects(nlohmann::json &target, const nlohmann::json &source)
+    {
+        if (!target.is_object() || !source.is_object()) {
+            target = source;
+            return;
+        }
+
+        for (const auto &[key, value] : source.items()) {
+            if (target.contains(key) && target[key].is_object() && value.is_object())
+                MergeObjects(target[key], value);
+            else
+                target[key] = value;
+        }
     }
 
     uint64_t NextUniqueId()

@@ -1,4 +1,5 @@
 #include "Utils/JsonIncludeResolver.h"
+#include "Utils/Utils.h"
 
 #include <algorithm>
 #include <fstream>
@@ -64,21 +65,6 @@ namespace tf3d::utils
             *error = "JSON file '" + PathText(path) + "': " + std::string(message);
         }
 
-        void MergeObjects(nlohmann::json &target, const nlohmann::json &source)
-        {
-            if (!target.is_object() || !source.is_object()) {
-                target = source;
-                return;
-            }
-
-            for (const auto &[key, value] : source.items()) {
-                const auto targetValue = target.find(key);
-                if (targetValue != target.end() && targetValue->is_object() && value.is_object())
-                    MergeObjects(*targetValue, value);
-                else
-                    target[key] = value;
-            }
-        }
     } // namespace
 
     JsonIncludeResolver::JsonIncludeResolver(JsonIncludeResolverOptions options)

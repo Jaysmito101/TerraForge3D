@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstring>
 #include <initializer_list>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 
 TF3D_FWD_DEC_CLASS(ProjectManager, tf3d::data)
@@ -16,6 +17,9 @@ namespace tf3d::utils
 
     std::string UChar2Hex(unsigned char c);
     bool IsValidShaderSymbol(const std::string &symbol);
+    bool IsPascalIdentifier(const std::string &value);
+    std::string CanonicalID(const std::string &value);
+    void MergeObjects(nlohmann::json &target, const nlohmann::json &source);
 
     struct Hash {
 
