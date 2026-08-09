@@ -305,8 +305,8 @@ namespace tf3d::generators
                     if (ImGui::Selectable("Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, BaseShape))) {
                         SetUINodeData(i, BaseShape);
                     }
-                    if (ImGui::Selectable("Custom Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, CustomBaseShape))) {
-                        SetUINodeData(i, CustomBaseShape);
+                    if (ImGui::Selectable("Customize Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, CustomizeBaseShape))) {
+                        SetUINodeData(i, CustomizeBaseShape);
                     }
                     if (ImGui::Selectable("Base Noise", m_Ui.selectedNode.m_ID == MakeUINodeID(i, BaseNoise))) {
                         SetUINodeData(i, BaseNoise);
@@ -438,8 +438,8 @@ namespace tf3d::generators
         } else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_BaseShape) {
             if (m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowBaseShapeSettings())
                 m_AppState->generationDirtyManager.MarkBiomes();
-        } else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_CustomBaseShape) {
-            if (m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowCustomBaseShapeSettings())
+        } else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_CustomizeBaseShape) {
+            if (m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowCustomizeBaseShapeSettings())
                 m_AppState->generationDirtyManager.MarkBiomes();
         } else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_BaseNoise) {
             if (m_Field.biomeManagers[m_Ui.selectedNode.m_BiomeIndex]->ShowBaseNoiseSettings())
