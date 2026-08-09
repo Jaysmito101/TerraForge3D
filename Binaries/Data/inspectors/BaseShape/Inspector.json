@@ -1,0 +1,53 @@
+{
+  "ID": "base_shape",
+  "Name": "Base shape catalog",
+  "Description": "Procedural base-shape definitions and their inspector sections.",
+  "ShowResetButton": false,
+  "Sections": [
+    {
+      "$include": "./Shapes/Canyons.json"
+    },
+    {
+      "$include": "./Shapes/Classic.json"
+    },
+    {
+      "$include": "./Shapes/Cliff.json"
+    },
+    {
+      "$include": "./Shapes/Cracks.json"
+    },
+    {
+      "$include": "./Shapes/Crater.json"
+    },
+    {
+      "$include": "./Shapes/Dunes.json"
+    },
+    {
+      "$include": "./Shapes/Flat.json"
+    },
+    {
+      "$include": "./Shapes/Islands.json"
+    },
+    {
+      "$include": "./Shapes/Karst.json"
+    },
+    {
+      "$include": "./Shapes/Mesas.json"
+    },
+    {
+      "$include": "./Shapes/Mountain.json"
+    },
+    {
+      "$include": "./Shapes/RollingHills.json"
+    },
+    {
+      "$include": "./Shapes/Terraces.json"
+    },
+    {
+      "$include": "./Shapes/Volcano.json"
+    },
+    {
+      "$include": "./Shapes/Waves.json"
+    }
+  ]
+}

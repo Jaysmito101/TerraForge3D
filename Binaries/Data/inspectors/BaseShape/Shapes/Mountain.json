@@ -1,0 +1,137 @@
+{
+  "Name": "Mountain",
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "$include": "../../Common/Noise.json"
+        },
+        {
+          "Name": "NoiseFrequency",
+          "Default": 2
+        },
+        {
+          "Name": "NoiseSeed",
+          "Default": 0
+        }
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 0.5,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "Description": "Scales the overall height amplitude of the generated shape.",
+          "Tooltip": "Adjust the overall strength of this base shape."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 1.33,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Description": "Controls the scale of the coordinate space used by the shape.",
+          "Tooltip": "Higher values generally create smaller, more frequent features."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Levels",
+          "Type": "Int",
+          "Default": 12,
+          "Widget": "Slider",
+          "Constraints": [
+            1,
+            24,
+            0,
+            0
+          ],
+          "Description": "Controls the number of recursive detail levels used by the shape.",
+          "Tooltip": "More levels add detail and increase generation cost."
+        },
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 12,
+          "Widget": "Seed",
+          "Description": "Selects the deterministic random pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible layout."
+        },
+        {
+          "Name": "DampingFactor",
+          "Type": "Float",
+          "Label": "Damping Factor",
+          "Default": 0.335,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            0.99,
+            0,
+            0
+          ],
+          "Description": "Controls how quickly successive mountain detail is damped.",
+          "Tooltip": "Higher damping reduces the contribution of later detail."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector2",
+          "Default": [
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Description": "Translates the sampling coordinates without changing the shape's scale.",
+          "Tooltip": "Use the offset to move through the procedural field."
+        }
+      ]
+    }
+  ],
+  "ID": "Mountain",
+  "Description": "Generates a mountain-style procedural base shape with controls for its main form and variation.",
+  "CustomData": {
+    "ID": "Mountain",
+    "Shader": "generation/base_shape/mountain/shape.glsl"
+  }
+}

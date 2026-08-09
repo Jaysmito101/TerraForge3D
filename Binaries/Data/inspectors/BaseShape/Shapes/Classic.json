@@ -1,0 +1,146 @@
+{
+  "ID": "Classic",
+  "Name": "Classic",
+  "Description": "Generates a signed procedural noise landscape with optional recursive detail, absolute-value shaping, and squared-value shaping.",
+  "CustomData": {
+    "ID": "Classic",
+    "Shader": "generation/base_shape/classic/shape.glsl"
+  },
+  "Sections": [
+    {
+      "Name": "Noise",
+      "Label": "Noise",
+      "Description": "Noise source and breakup controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "$include": "../../Common/Noise.json"
+        },
+        {
+          "Name": "NoiseFrequency",
+          "Default": 0.413
+        },
+        {
+          "Name": "NoiseSeed",
+          "Default": 4
+        }
+      ]
+    },
+    {
+      "Name": "Shape",
+      "Label": "Shape",
+      "Description": "Primary form, amplitude, and profile controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Strength",
+          "Type": "Float",
+          "Default": 0.41,
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Constraints": [
+            -4,
+            4,
+            0,
+            0
+          ],
+          "Label": "Strength",
+          "Description": "Scales the final signed height produced by the noise field. Positive values preserve the normal shape; negative values invert it.",
+          "Tooltip": "Overall amplitude and sign of the generated terrain."
+        },
+        {
+          "Name": "Scale",
+          "Type": "Float",
+          "Default": 1,
+          "Widget": "Drag",
+          "Sensitivity": 0.001,
+          "Constraints": [
+            0.001,
+            16,
+            0,
+            0
+          ],
+          "Label": "Scale",
+          "Description": "Scales the sampling coordinates before evaluating noise, changing the size of the terrain features.",
+          "Tooltip": "Higher values produce smaller, more frequent features; lower values produce broader features."
+        },
+        {
+          "Name": "SquareValue",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Square Value",
+          "Description": "Squares the sampled noise value after the optional absolute-value operation, changing the profile of hills and valleys.",
+          "Tooltip": "Enable to bias values toward zero and create a sharper value response."
+        },
+        {
+          "Name": "AbsoluteValue",
+          "Type": "Bool",
+          "Default": false,
+          "Widget": "Checkbox",
+          "Label": "Absolute Value",
+          "Description": "Reflects negative noise values into the positive range before applying strength.",
+          "Tooltip": "Enable to remove negative valleys and keep both sides of the noise field above zero."
+        }
+      ]
+    },
+    {
+      "Name": "Detail",
+      "Label": "Detail",
+      "Description": "Secondary detail, distortion, and deterministic variation.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Levels",
+          "Type": "Int",
+          "Default": 1,
+          "Widget": "Slider",
+          "Constraints": [
+            0,
+            6,
+            0,
+            0
+          ],
+          "Label": "Levels",
+          "Description": "Controls how many recursive coordinate-warping noise levels are applied before the final sample.",
+          "Tooltip": "More levels add complex detail and increase the generator's cost."
+        },
+        {
+          "Name": "Seed",
+          "Type": "Int",
+          "Default": 42,
+          "Widget": "Seed",
+          "Label": "Seed",
+          "Description": "Selects the deterministic noise pattern used by the generator.",
+          "Tooltip": "Change the seed to create a different reproducible terrain layout."
+        }
+      ]
+    },
+    {
+      "Name": "Transform",
+      "Label": "Transform",
+      "Description": "Position and orientation controls.",
+      "Collapsible": true,
+      "DefaultOpen": true,
+      "Params": [
+        {
+          "Name": "Offset",
+          "Type": "Vector3",
+          "Default": [
+            0,
+            0,
+            0
+          ],
+          "Widget": "Drag",
+          "Sensitivity": 0.01,
+          "Label": "Offset",
+          "Description": "Translates the three-dimensional noise sampling position without changing the terrain scale.",
+          "Tooltip": "Use the offset to move through the noise field or align this shape with another generator."
+        }
+      ]
+    }
+  ]
+}
