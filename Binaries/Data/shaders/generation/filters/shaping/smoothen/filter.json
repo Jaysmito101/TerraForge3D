@@ -28,10 +28,10 @@
         "Output": "Smoothened",
         "Uniforms": {
           "u_Exponent": {
-            "Parameter": "Smoothing"
+            "Parameter": "Smoothing.Smoothing"
           },
           "u_Abs": {
-            "Parameter": "Abs"
+            "Parameter": "Smoothing.Abs"
           }
         }
       }

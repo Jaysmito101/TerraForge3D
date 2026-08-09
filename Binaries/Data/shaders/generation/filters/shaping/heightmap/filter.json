@@ -29,32 +29,32 @@
         "Output": "Heightmap",
         "Uniforms": {
           "u_Heightmap": {
-            "Parameter": "Heightmap",
+            "Parameter": "Source.Heightmap",
             "PresenceUniform": "u_HasHeightmap"
           },
           "u_HeightScale": {
-            "Parameter": "HeightScale"
+            "Parameter": "Blend.HeightScale"
           },
           "u_HeightOffset": {
-            "Parameter": "HeightOffset"
+            "Parameter": "Blend.HeightOffset"
           },
           "u_FitToFieldRange": {
-            "Parameter": "FitToFieldRange"
+            "Parameter": "Blend.FitToFieldRange"
           },
           "u_MapScale": {
-            "Parameter": "MapScale"
+            "Parameter": "Source.MapScale"
           },
           "u_MapPosition": {
-            "Parameter": "MapPosition"
+            "Parameter": "Source.MapPosition"
           },
           "u_MapRotation": {
-            "Parameter": "MapRotation"
+            "Parameter": "Source.MapRotation"
           },
           "u_EdgeFeather": {
-            "Parameter": "EdgeFeather"
+            "Parameter": "Blend.EdgeFeather"
           },
           "u_Invert": {
-            "Parameter": "Invert"
+            "Parameter": "Blend.Invert"
           }
         }
       }

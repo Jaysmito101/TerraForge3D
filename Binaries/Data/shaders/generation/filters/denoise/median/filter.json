@@ -28,7 +28,7 @@
         "Output": "MedianA",
         "Uniforms": {
           "u_Radius": {
-            "Parameter": "Radius"
+            "Parameter": "Settings.Radius"
           }
         }
       }
@@ -38,7 +38,7 @@
       "MedianA",
       "MedianB"
     ],
-    "IterationsParameter": "Iterations",
+    "IterationsParameter": "Settings.Iterations",
     "Merge": {
       "Phase": "Merge",
       "Input": "Current",

@@ -28,16 +28,16 @@
         "Output": "FlatArea",
         "Uniforms": {
           "u_Radius": {
-            "Parameter": "Radius"
+            "Parameter": "Smoothing.Radius"
           },
           "u_RangeSigma": {
-            "Parameter": "RangeSigma"
+            "Parameter": "Smoothing.RangeSigma"
           },
           "u_SlopeLimit": {
-            "Parameter": "SlopeLimit"
+            "Parameter": "Smoothing.SlopeLimit"
           },
           "u_SlopeSoftness": {
-            "Parameter": "SlopeSoftness"
+            "Parameter": "Smoothing.SlopeSoftness"
           }
         }
       }

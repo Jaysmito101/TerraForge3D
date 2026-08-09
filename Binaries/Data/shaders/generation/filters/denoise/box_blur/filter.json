@@ -32,7 +32,7 @@
             "Type": "Int"
           },
           "u_Radius": {
-            "Parameter": "Radius"
+            "Parameter": "Smoothing.Radius"
           }
         }
       },
@@ -46,7 +46,7 @@
             "Type": "Int"
           },
           "u_Radius": {
-            "Parameter": "Radius"
+            "Parameter": "Smoothing.Radius"
           }
         }
       }

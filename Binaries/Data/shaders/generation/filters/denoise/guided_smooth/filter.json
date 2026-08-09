@@ -32,10 +32,10 @@
         "Output": "GuidedA",
         "Uniforms": {
           "u_Radius": {
-            "Parameter": "Radius"
+            "Parameter": "Smoothing.Radius"
           },
           "u_Epsilon": {
-            "Parameter": "Epsilon"
+            "Parameter": "Smoothing.Epsilon"
           }
         }
       }
@@ -45,7 +45,7 @@
       "GuidedA",
       "GuidedB"
     ],
-    "IterationsParameter": "Iterations",
+    "IterationsParameter": "Smoothing.Iterations",
     "Merge": {
       "Phase": "Merge",
       "Input": "Current",

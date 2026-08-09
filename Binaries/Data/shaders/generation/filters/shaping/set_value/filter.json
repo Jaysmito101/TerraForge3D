@@ -7,7 +7,7 @@
   "Statistics": {
     "NeedsMinMax": true,
     "NeedsHistogram": true,
-    "RequestedPercentileParameter": "Value"
+    "RequestedPercentileParameter": "Value.Value"
   },
   "Phases": {
     "Value": "set_value",
@@ -29,10 +29,10 @@
         "Output": "Value",
         "Uniforms": {
           "u_Value": {
-            "Parameter": "Value"
+            "Parameter": "Value.Value"
           },
           "u_ValueMode": {
-            "Parameter": "ValueMode"
+            "Parameter": "Value.ValueMode"
           }
         }
       }

@@ -29,11 +29,11 @@
         "Output": "Curved",
         "Uniforms": {
           "u_Curve": {
-            "Parameter": "Curve",
+            "Parameter": "Curve.Curve",
             "PointCountUniform": "u_CurvePointCount"
           },
           "u_Softness": {
-            "Parameter": "Softness"
+            "Parameter": "Falloff.Softness"
           }
         }
       }

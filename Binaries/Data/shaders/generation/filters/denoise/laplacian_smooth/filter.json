@@ -28,7 +28,7 @@
         "Output": "LaplacianA",
         "Uniforms": {
           "u_Weight": {
-            "Parameter": "Weight"
+            "Parameter": "Smoothing.Weight"
           }
         }
       }
@@ -38,7 +38,7 @@
       "LaplacianA",
       "LaplacianB"
     ],
-    "IterationsParameter": "Iterations",
+    "IterationsParameter": "Smoothing.Iterations",
     "Merge": {
       "Phase": "Merge",
       "Input": "Current",

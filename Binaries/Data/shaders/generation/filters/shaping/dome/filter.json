@@ -25,10 +25,10 @@
         "Output": "Dome",
         "Uniforms": {
           "u_CoreStrength": {
-            "Parameter": "CoreStrength"
+            "Parameter": "Shape.CoreStrength"
           },
           "u_Curvature": {
-            "Parameter": "Curvature"
+            "Parameter": "Shape.Curvature"
           }
         }
       }

@@ -24,16 +24,16 @@
         "Output": "Swirled",
         "Uniforms": {
           "u_Center": {
-            "Parameter": "Center"
+            "Parameter": "Warp.Center"
           },
           "u_Turns": {
-            "Parameter": "Turns"
+            "Parameter": "Warp.Turns"
           },
           "u_Radius": {
-            "Parameter": "Radius"
+            "Parameter": "Warp.Radius"
           },
           "u_Falloff": {
-            "Parameter": "Falloff"
+            "Parameter": "Warp.Falloff"
           }
         }
       }

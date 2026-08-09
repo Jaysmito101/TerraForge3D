@@ -7,7 +7,7 @@
   "Statistics": {
     "NeedsMinMax": true,
     "NeedsHistogram": true,
-    "RequestedPercentileParameter": "Threshold"
+    "RequestedPercentileParameter": "Threshold.Threshold"
   },
   "Phases": {
     "Clip": "clip",
@@ -29,16 +29,16 @@
         "Output": "Clipped",
         "Uniforms": {
           "u_Threshold": {
-            "Parameter": "Threshold"
+            "Parameter": "Threshold.Threshold"
           },
           "u_Side": {
-            "Parameter": "Side"
+            "Parameter": "Direction.Side"
           },
           "u_Softness": {
-            "Parameter": "Softness"
+            "Parameter": "Threshold.Softness"
           },
           "u_ThresholdMode": {
-            "Parameter": "ThresholdMode"
+            "Parameter": "Threshold.ThresholdMode"
           }
         }
       }
