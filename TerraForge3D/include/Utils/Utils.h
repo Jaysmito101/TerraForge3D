@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <string_view>
 
 TF3D_FWD_DEC_CLASS(ProjectManager, tf3d::data)
 
@@ -19,6 +20,7 @@ namespace tf3d::utils
     bool IsValidShaderSymbol(const std::string &symbol);
     bool IsPascalIdentifier(const std::string &value);
     std::string CanonicalID(const std::string &value);
+    bool ReplaceAll(std::string &value, std::string_view search, std::string_view replacement);
     void MergeObjects(nlohmann::json &target, const nlohmann::json &source);
 
     struct Hash {

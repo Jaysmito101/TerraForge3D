@@ -80,6 +80,21 @@ namespace tf3d::utils
         return result;
     }
 
+    bool ReplaceAll(std::string &value, std::string_view search, std::string_view replacement)
+    {
+        if (search.empty())
+            return false;
+
+        bool replaced   = false;
+        size_t position = 0;
+        while ((position = value.find(search, position)) != std::string::npos) {
+            value.replace(position, search.size(), replacement);
+            position += replacement.size();
+            replaced = true;
+        }
+        return replaced;
+    }
+
     void MergeObjects(nlohmann::json &target, const nlohmann::json &source)
     {
         if (!target.is_object() || !source.is_object()) {
