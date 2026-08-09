@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "SeaLevel",
+    "Type": "Float",
+    "Default": 0,
+    "Widget": "Drag",
+    "Sensitivity": 0.01,
+    "Constraints": [
+      -100,
+      100
+    ],
+    "Label": "Sea level",
+    "Description": "Height treated as the coastline reference level.",
+    "Tooltip": "Move this to match the waterline of the current terrain."
+  }
+]

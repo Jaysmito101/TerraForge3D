@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "Direction",
+    "Type": "Float",
+    "Default": 0,
+    "Widget": "Drag",
+    "Sensitivity": 0.5,
+    "Constraints": [
+      -360,
+      360
+    ],
+    "Label": "Direction",
+    "Description": "Direction in degrees around the terrain map.",
+    "Tooltip": "Directions wrap around, so -10 degrees and 350 degrees are equivalent."
+  }
+]

@@ -1,0 +1,81 @@
+{
+  "ID": "calculated_mask",
+  "Name": "Calculated terrain mask",
+  "Description": "Builds a reusable mask from height, slope, curvature, noise, and spatial pattern signals.",
+  "ShowResetButton": true,
+  "Sections": [
+    {
+      "$include": "./Mask.json"
+    },
+    {
+      "$include": "./Algorithms/HeightRange.json"
+    },
+    {
+      "$include": "./Algorithms/SlopeRange.json"
+    },
+    {
+      "$include": "./Algorithms/SlopeRamp.json"
+    },
+    {
+      "$include": "./Algorithms/Aspect.json"
+    },
+    {
+      "$include": "./Algorithms/Curvature.json"
+    },
+    {
+      "$include": "./Algorithms/Roughness.json"
+    },
+    {
+      "$include": "./Algorithms/Flatness.json"
+    },
+    {
+      "$include": "./Algorithms/RidgeValley.json"
+    },
+    {
+      "$include": "./Algorithms/Coastline.json"
+    },
+    {
+      "$include": "./Algorithms/DistanceFromCoast.json"
+    },
+    {
+      "$include": "./Algorithms/FlowWetness.json"
+    },
+    {
+      "$include": "./Algorithms/AmbientOcclusion.json"
+    },
+    {
+      "$include": "./Algorithms/Exposure.json"
+    },
+    {
+      "$include": "./Algorithms/DistanceFromBorder.json"
+    },
+    {
+      "$include": "./Algorithms/DistanceFromPointPath.json"
+    },
+    {
+      "$include": "./Algorithms/HeightContour.json"
+    },
+    {
+      "$include": "./Algorithms/ProceduralNoise.json"
+    },
+    {
+      "$include": "./Algorithms/RadialGradient.json"
+    },
+    {
+      "$include": "./Algorithms/Spiral.json"
+    },
+    {
+      "$include": "./Algorithms/Grid.json"
+    },
+    {
+      "$include": "./Algorithms/Dots.json"
+    }
+  ],
+  "Buttons": [
+    {
+      "Action": "ResetRecommended",
+      "Label": "Reset recommended",
+      "Description": "Restores the standard defaults while keeping the selected mask type."
+    }
+  ]
+}

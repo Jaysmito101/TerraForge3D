@@ -1,0 +1,31 @@
+{
+  "Name": "SlopeRamp",
+  "Label": "Slope ramp",
+  "Description": "Gradually increases the mask from flat terrain to steep terrain.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0.25,
+        0.75
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Normalized slope range",
+      "Description": "Normalized slope interval used for the ramp."
+    }
+  ],
+  "CustomData": {
+    "ID": "SlopeRamp",
+    "Shader": "masks/CalculatedMask/slope_ramp.glsl"
+  }
+}

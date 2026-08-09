@@ -1,0 +1,59 @@
+[
+  {
+    "Name": "DotCells",
+    "Type": "Float",
+    "Default": 12,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      64
+    ],
+    "Label": "Dots across map",
+    "Description": "Controls the number of dot cells across the normalized map."
+  },
+  {
+    "Name": "DotRadius",
+    "Type": "Float",
+    "Default": 0.24,
+    "Widget": "Slider",
+    "Constraints": [
+      0.005,
+      0.5
+    ],
+    "Label": "Dot radius",
+    "Description": "Controls the radius of each solid circular dot relative to its cell."
+  },
+  {
+    "Name": "DotSoftness",
+    "Type": "Float",
+    "Default": 0.03,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      0.25
+    ],
+    "Label": "Dot softness",
+    "Description": "Controls how gently each dot fades into the surrounding space."
+  },
+  {
+    "Name": "DotRotation",
+    "Type": "Float",
+    "Default": 0,
+    "Widget": "Drag",
+    "Sensitivity": 0.5,
+    "Constraints": [
+      -360,
+      360
+    ],
+    "Label": "Rotation",
+    "Description": "Rotates the dot lattice around its center in degrees."
+  },
+  {
+    "Name": "DotInvert",
+    "Type": "Bool",
+    "Default": false,
+    "Widget": "Checkbox",
+    "Label": "Invert",
+    "Description": "Swaps the dots and the space between them."
+  }
+]

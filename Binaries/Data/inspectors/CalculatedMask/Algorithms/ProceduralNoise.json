@@ -1,0 +1,61 @@
+{
+  "Name": "ProceduralNoise",
+  "Label": "Procedural noise",
+  "Description": "Builds a reusable mask from the shared procedural noise catalog.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Noise.json"
+    },
+    {
+      "Name": "Frequency",
+      "Default": 4,
+      "Description": "Sampling frequency of the procedural breakup.",
+      "Tooltip": "Higher values create smaller, more frequent patches."
+    },
+    {
+      "Name": "Seed",
+      "Default": 42,
+      "Description": "Deterministically changes the procedural noise pattern.",
+      "Tooltip": "Use a new seed for a different breakup layout without changing its frequency."
+    },
+    {
+      "Name": "NoiseOctaves",
+      "Default": 5,
+      "Description": "Controls how many frequency layers are combined.",
+      "Tooltip": "More octaves add detail at a higher shader cost."
+    },
+    {
+      "Name": "Lacunarity",
+      "Default": 2,
+      "Description": "Controls the frequency multiplier between layers.",
+      "Tooltip": "Higher values separate the detail scales more strongly."
+    },
+    {
+      "Name": "Persistence",
+      "Default": 0.5,
+      "Description": "Controls how much amplitude each layer retains.",
+      "Tooltip": "Higher values keep more fine detail visible."
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0.35,
+        0.65
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Noise range",
+      "Description": "Normalized noise range to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "ProceduralNoise",
+    "Shader": "masks/CalculatedMask/procedural_noise.glsl"
+  }
+}

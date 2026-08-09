@@ -1,0 +1,14 @@
+{
+  "Name": "Roughness",
+  "Label": "Roughness / local variance",
+  "Description": "Selects terrain with strong local height variation.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Roughness",
+    "Shader": "masks/CalculatedMask/roughness.glsl"
+  }
+}

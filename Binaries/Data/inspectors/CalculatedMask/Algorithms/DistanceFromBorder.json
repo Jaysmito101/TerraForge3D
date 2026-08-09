@@ -1,0 +1,28 @@
+{
+  "Name": "DistanceFromBorder",
+  "Label": "Distance from border",
+  "Description": "Selects pixels by normalized distance from the terrain texture border.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0,
+        0.25
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Border distance",
+      "Description": "Normalized border distance range to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "DistanceFromBorder",
+    "Shader": "masks/CalculatedMask/distance_from_border.glsl"
+  }
+}

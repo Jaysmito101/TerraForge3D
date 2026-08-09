@@ -1,0 +1,31 @@
+{
+  "Name": "Coastline",
+  "Label": "Coastline / sea-level band",
+  "Description": "Selects a band around a chosen sea level.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SeaLevel.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        -0.05,
+        0.05
+      ],
+      "Constraints": [
+        -100,
+        100
+      ],
+      "Label": "Height band",
+      "Description": "Height difference from sea level to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "Coastline",
+    "Shader": "masks/CalculatedMask/coastline.glsl"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "Name": "SlopeRange",
+  "Label": "Slope range",
+  "Description": "Selects terrain pixels by slope angle in degrees.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        15,
+        45
+      ],
+      "Constraints": [
+        0,
+        90
+      ],
+      "Label": "Slope range",
+      "Description": "Minimum and maximum slope angle in degrees."
+    }
+  ],
+  "CustomData": {
+    "ID": "SlopeRange",
+    "Shader": "masks/CalculatedMask/slope_range.glsl"
+  }
+}

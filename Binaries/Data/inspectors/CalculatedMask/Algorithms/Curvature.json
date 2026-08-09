@@ -1,0 +1,17 @@
+{
+  "Name": "Curvature",
+  "Label": "Curvature",
+  "Description": "Selects concave and convex terrain response by curvature magnitude.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/Curvature.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Curvature",
+    "Shader": "masks/CalculatedMask/curvature.glsl"
+  }
+}

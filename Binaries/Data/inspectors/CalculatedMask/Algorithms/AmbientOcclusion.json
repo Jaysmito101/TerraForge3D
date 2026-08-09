@@ -1,0 +1,31 @@
+{
+  "Name": "AmbientOcclusion",
+  "Label": "Ambient occlusion / cavity",
+  "Description": "Selects depressions using a local cavity approximation.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/CavitySensitivity.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0.15,
+        0.8
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Cavity range",
+      "Description": "Normalized cavity response range to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "AmbientOcclusion",
+    "Shader": "masks/CalculatedMask/ambient_occlusion.glsl"
+  }
+}

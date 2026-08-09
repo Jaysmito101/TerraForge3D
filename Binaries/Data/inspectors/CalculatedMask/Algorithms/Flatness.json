@@ -1,0 +1,17 @@
+{
+  "Name": "Flatness",
+  "Label": "Flatness",
+  "Description": "Selects flatter terrain using the inverse of normalized slope.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Flatness",
+    "Shader": "masks/CalculatedMask/flatness.glsl"
+  }
+}

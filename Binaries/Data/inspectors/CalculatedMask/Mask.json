@@ -1,0 +1,17 @@
+{
+  "Name": "Mask",
+  "Label": "Mask",
+  "Description": "Select the calculated mask source.",
+  "Collapsible": false,
+  "DefaultOpen": true,
+  "Params": [
+    {
+      "Name": "MaskType",
+      "Type": "Int",
+      "Default": 0,
+      "Widget": "Dropdown",
+      "Label": "Mask type",
+      "Description": "Selects which terrain signal is evaluated."
+    }
+  ]
+}

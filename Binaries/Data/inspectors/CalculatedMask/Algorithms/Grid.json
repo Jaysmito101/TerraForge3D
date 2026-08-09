@@ -1,0 +1,17 @@
+{
+  "Name": "Grid",
+  "Label": "Grid",
+  "Description": "Creates a configurable rotated grid pattern around a normalized center point.",
+  "Params": [
+    {
+      "$include": "../Parameters/Spatial/Center.json"
+    },
+    {
+      "$include": "../Parameters/Pattern/Grid.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Grid",
+    "Shader": "masks/CalculatedMask/grid.glsl"
+  }
+}

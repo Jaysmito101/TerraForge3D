@@ -1,0 +1,34 @@
+{
+  "Name": "Exposure",
+  "Label": "Exposure",
+  "Description": "Selects terrain whose surface normal faces the chosen light direction.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/DirectionAngle.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0.5,
+        1
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Exposure range",
+      "Description": "Normalized directional exposure range to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "Exposure",
+    "Shader": "masks/CalculatedMask/exposure.glsl"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "Name": "HeightRange",
+  "Label": "Height range",
+  "Description": "Selects terrain pixels whose height falls within a softly feathered range.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "HeightRange",
+    "Shader": "masks/CalculatedMask/height_range.glsl"
+  }
+}

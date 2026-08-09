@@ -1,0 +1,31 @@
+{
+  "Name": "FlowWetness",
+  "Label": "Flow accumulation / wetness",
+  "Description": "Approximates locally wet terrain from lowland, concavity, and gentle slope.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0.35,
+        0.8
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Wetness range",
+      "Description": "Normalized local wetness range to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "FlowWetness",
+    "Shader": "masks/CalculatedMask/flow_wetness.glsl"
+  }
+}

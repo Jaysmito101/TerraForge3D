@@ -1,0 +1,17 @@
+{
+  "Name": "RidgeValley",
+  "Label": "Ridge / valley",
+  "Description": "Selects convex ridges or concave valleys from the curvature signal.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/EdgeFeather.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/Feature.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "RidgeValley",
+    "Shader": "masks/CalculatedMask/ridge_valley.glsl"
+  }
+}

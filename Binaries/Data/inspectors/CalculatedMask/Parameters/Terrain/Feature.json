@@ -1,0 +1,45 @@
+[
+  {
+    "Name": "CurvatureSensitivity",
+    "Type": "Float",
+    "Default": 32,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      128
+    ],
+    "Label": "Curvature sensitivity",
+    "Description": "Controls how quickly raw curvature reaches the normalized feature response.",
+    "Tooltip": "Increase this when ridges or valleys are too faint."
+  },
+  {
+    "Name": "Feature",
+    "Type": "Int",
+    "Default": 0,
+    "Widget": "Dropdown",
+    "Options": [
+      "Ridge",
+      "Valley"
+    ],
+    "OptionValues": [
+      0,
+      1
+    ],
+    "Label": "Feature",
+    "Description": "Chooses convex ridges or concave valleys.",
+    "Tooltip": "Ridge and valley strength are evaluated from the same stable curvature signal."
+  },
+  {
+    "Name": "Threshold",
+    "Type": "Float",
+    "Default": 0.2,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      1
+    ],
+    "Label": "Minimum feature strength",
+    "Description": "Minimum normalized ridge or valley response to include.",
+    "Tooltip": "Raise this to reject weak broad curvature and keep only pronounced features."
+  }
+]

@@ -10,6 +10,8 @@ The current layout is intentionally domain-oriented:
 
 ```text
 inspectors/
+  Common/
+    Noise.json
   BaseNoise/
     Inspector.json
     Noise.json
@@ -18,15 +20,18 @@ inspectors/
   CalculatedMask/
     Inspector.json
     Mask.json
+    Algorithms/
+      HeightRange.json
+      SlopeRange.json
+      ...
     Parameters/
-      Inspector.json
-      Common.json
-      Terrain.json
-      Path.json
+      Common/
+        Range.json
+        EdgeFeather.json
+      Terrain/
+      Spatial/
+      Pattern/
       Noise.json
-      Spiral.json
-      Grid.json
-      Dots.json
 ```
 
 Keep `Inspector.json` as the only runtime entrypoint. Include section objects
@@ -66,6 +71,7 @@ interpreted by `CustomInspector` itself.
 | `DefaultOpen` | bool | Initial open state; defaults to `true`. |
 | `Params` | array | Values/widgets in the section. |
 | `Buttons` | array | Actions displayed in the section. |
+| `CustomData` | JSON value | Opaque owner metadata; `CustomInspector` stores it but does not interpret it. |
 
 ## Parameters
 

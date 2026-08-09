@@ -1,0 +1,20 @@
+{
+  "Name": "Aspect",
+  "Label": "Aspect / direction",
+  "Description": "Selects terrain whose slope faces the chosen direction.",
+  "Params": [
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/Direction.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/EdgeSoftness.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Aspect",
+    "Shader": "masks/CalculatedMask/aspect.glsl"
+  }
+}

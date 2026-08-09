@@ -1,0 +1,34 @@
+{
+  "Name": "DistanceFromPointPath",
+  "Label": "Distance from point / path",
+  "Description": "Selects pixels by distance from a center point or editable normalized path.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Spatial/Center.json"
+    },
+    {
+      "$include": "../Parameters/Spatial/Path.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0,
+        0.35
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Distance range",
+      "Description": "Normalized distance range to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "DistanceFromPointPath",
+    "Shader": "masks/CalculatedMask/distance_from_point_path.glsl"
+  }
+}

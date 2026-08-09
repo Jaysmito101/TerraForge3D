@@ -1,0 +1,71 @@
+[
+  {
+    "Name": "SpiralArms",
+    "Type": "Float",
+    "Default": 1,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      8
+    ],
+    "Label": "Arms",
+    "Description": "Controls how many parallel arms run through the spiral."
+  },
+  {
+    "Name": "SpiralTurns",
+    "Type": "Float",
+    "Default": 8,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      32
+    ],
+    "Label": "Turns",
+    "Description": "Controls how many times the arm winds from the center toward the edge."
+  },
+  {
+    "Name": "SpiralThickness",
+    "Type": "Float",
+    "Default": 0.08,
+    "Widget": "Slider",
+    "Constraints": [
+      0.005,
+      0.5
+    ],
+    "Label": "Band thickness",
+    "Description": "Controls the width of the solid part of each spiral band."
+  },
+  {
+    "Name": "SpiralSoftness",
+    "Type": "Float",
+    "Default": 0.03,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      0.25
+    ],
+    "Label": "Band softness",
+    "Description": "Controls how gently each spiral band fades into its surroundings."
+  },
+  {
+    "Name": "SpiralRotation",
+    "Type": "Float",
+    "Default": 0,
+    "Widget": "Drag",
+    "Sensitivity": 0.5,
+    "Constraints": [
+      -360,
+      360
+    ],
+    "Label": "Rotation",
+    "Description": "Rotates the spiral around its center in degrees."
+  },
+  {
+    "Name": "SpiralInvert",
+    "Type": "Bool",
+    "Default": false,
+    "Widget": "Checkbox",
+    "Label": "Invert",
+    "Description": "Swaps the spiral bands and the space between them."
+  }
+]

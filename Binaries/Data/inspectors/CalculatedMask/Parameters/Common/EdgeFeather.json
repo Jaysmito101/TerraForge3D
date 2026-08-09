@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "EdgeFeather",
+    "Type": "Float",
+    "Default": 0.1,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      0.5
+    ],
+    "Label": "Edge feather",
+    "Description": "Softens the transition at the selected threshold.",
+    "Tooltip": "Higher values make the mask transition gradually instead of cutting off abruptly."
+  }
+]

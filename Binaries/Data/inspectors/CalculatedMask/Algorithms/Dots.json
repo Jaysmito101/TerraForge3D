@@ -1,0 +1,17 @@
+{
+  "Name": "Dots",
+  "Label": "Dots",
+  "Description": "Creates a configurable rotated dot lattice around a normalized center point.",
+  "Params": [
+    {
+      "$include": "../Parameters/Spatial/Center.json"
+    },
+    {
+      "$include": "../Parameters/Pattern/Dots.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Dots",
+    "Shader": "masks/CalculatedMask/dots.glsl"
+  }
+}

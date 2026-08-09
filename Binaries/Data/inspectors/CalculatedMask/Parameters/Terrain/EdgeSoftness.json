@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "EdgeSoftness",
+    "Type": "Float",
+    "Default": 10,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      90
+    ],
+    "Label": "Edge softness",
+    "Description": "Softens the directional boundary in degrees.",
+    "Tooltip": "This is an angular softness, not a normalized range feather."
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "Name": "Direction",
+    "Type": "Float",
+    "Default": 0,
+    "Widget": "Drag",
+    "Sensitivity": 0.5,
+    "Constraints": [
+      -360,
+      360
+    ],
+    "Label": "Direction",
+    "Description": "Center direction in degrees around the terrain map.",
+    "Tooltip": "Directions wrap around, so -10 degrees and 350 degrees are equivalent."
+  },
+  {
+    "Name": "DirectionWidth",
+    "Type": "Float",
+    "Default": 45,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      180
+    ],
+    "Label": "Direction width",
+    "Description": "Angular width on either side of the selected direction.",
+    "Tooltip": "Wider values include more slope orientations."
+  }
+]

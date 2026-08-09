@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "SampleRadius",
+    "Type": "Float",
+    "Default": 3,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      8
+    ],
+    "Label": "Slope sample radius",
+    "Description": "Controls the terrain distance used for the stable slope estimate.",
+    "Tooltip": "Larger values reduce small-scale noise but soften narrow features."
+  }
+]

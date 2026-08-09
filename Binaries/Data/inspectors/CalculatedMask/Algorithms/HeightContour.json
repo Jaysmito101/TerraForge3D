@@ -1,0 +1,14 @@
+{
+  "Name": "HeightContour",
+  "Label": "Height contour band",
+  "Description": "Selects a softly feathered band of terrain height for contour-like masks.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "HeightContour",
+    "Shader": "masks/CalculatedMask/height_contour.glsl"
+  }
+}

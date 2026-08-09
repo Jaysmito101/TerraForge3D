@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "CavitySensitivity",
+    "Type": "Float",
+    "Default": 48,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      128
+    ],
+    "Label": "Cavity sensitivity",
+    "Description": "Controls how quickly a depression reaches the normalized cavity response.",
+    "Tooltip": "Lower it when the mask is overwhelmingly white; raise it when cavities are too faint."
+  }
+]

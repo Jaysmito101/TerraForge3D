@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "CurvatureSensitivity",
+    "Type": "Float",
+    "Default": 32,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      128
+    ],
+    "Label": "Curvature sensitivity",
+    "Description": "Controls how quickly raw curvature reaches the normalized response.",
+    "Tooltip": "Increase this when the preview is mostly black; reduce it when nearly everything is white."
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "Name": "UsePath",
+    "Type": "Bool",
+    "Default": false,
+    "Widget": "Checkbox",
+    "Label": "Use point path",
+    "Description": "Use the path editor instead of a single center point.",
+    "Tooltip": "The path is evaluated as the minimum distance to any segment."
+  },
+  {
+    "Name": "Path",
+    "Type": "Path",
+    "Default": [
+      [
+        0.25,
+        0.5
+      ],
+      [
+        0.75,
+        0.5
+      ]
+    ],
+    "PointCount": 2,
+    "Widget": "Path",
+    "Label": "Path editor",
+    "Description": "Shape a reusable normalized polyline with draggable handles.",
+    "Tooltip": "Drag handles to reshape the path.",
+    "ShaderUniform": "u_PathPoints"
+  }
+]

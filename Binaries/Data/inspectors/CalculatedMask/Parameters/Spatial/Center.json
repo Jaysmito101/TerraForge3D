@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "Center",
+    "Type": "Vector2",
+    "Default": [
+      0.5,
+      0.5
+    ],
+    "Widget": "Drag",
+    "Sensitivity": 0.005,
+    "Constraints": [
+      0,
+      1
+    ],
+    "Label": "Center",
+    "Description": "Normalized map coordinate used as the spatial origin.",
+    "Tooltip": "The origin is the bottom-left of the normalized map."
+  }
+]

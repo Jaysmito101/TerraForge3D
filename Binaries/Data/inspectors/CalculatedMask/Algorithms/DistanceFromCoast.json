@@ -1,0 +1,31 @@
+{
+  "Name": "DistanceFromCoast",
+  "Label": "Distance from coast",
+  "Description": "Selects terrain by absolute height distance from a chosen sea level.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SeaLevel.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0,
+        0.5
+      ],
+      "Constraints": [
+        0,
+        100
+      ],
+      "Label": "Height distance",
+      "Description": "Absolute height distance from sea level to include."
+    }
+  ],
+  "CustomData": {
+    "ID": "DistanceFromCoast",
+    "Shader": "masks/CalculatedMask/distance_from_coast.glsl"
+  }
+}

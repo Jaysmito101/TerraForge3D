@@ -1,0 +1,31 @@
+{
+  "Name": "RadialGradient",
+  "Label": "Radial / gradient",
+  "Description": "Creates a soft radial mask around a normalized center point.",
+  "Params": [
+    {
+      "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Spatial/Center.json"
+    },
+    {
+      "Name": "Range",
+      "Type": "Vector2",
+      "Default": [
+        0.1,
+        0.75
+      ],
+      "Constraints": [
+        0,
+        1
+      ],
+      "Label": "Inner / outer radius",
+      "Description": "Normalized inner and outer radius of the gradient."
+    }
+  ],
+  "CustomData": {
+    "ID": "RadialGradient",
+    "Shader": "masks/CalculatedMask/radial_gradient.glsl"
+  }
+}

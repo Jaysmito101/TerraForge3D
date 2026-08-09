@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Range",
+    "Type": "Vector2",
+    "Default": [
+      0.25,
+      0.75
+    ],
+    "Widget": "Drag",
+    "Sensitivity": 0.01,
+    "Constraints": [
+      -100,
+      100
+    ],
+    "Label": "Range",
+    "Description": "Minimum and maximum value to include.",
+    "Tooltip": "The selected signal is softly feathered at both ends."
+  },
+  {
+    "Name": "EdgeFeather",
+    "Type": "Float",
+    "Default": 0.1,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      0.5
+    ],
+    "Label": "Edge feather",
+    "Description": "Feathers the range edges as a fraction of the selected range width.",
+    "Tooltip": "Higher values make the mask transition gradually instead of cutting off abruptly."
+  }
+]

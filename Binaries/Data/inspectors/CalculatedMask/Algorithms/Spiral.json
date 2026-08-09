@@ -1,0 +1,17 @@
+{
+  "Name": "Spiral",
+  "Label": "Spiral",
+  "Description": "Creates a configurable spiral pattern around a normalized center point.",
+  "Params": [
+    {
+      "$include": "../Parameters/Spatial/Center.json"
+    },
+    {
+      "$include": "../Parameters/Pattern/Spiral.json"
+    }
+  ],
+  "CustomData": {
+    "ID": "Spiral",
+    "Shader": "masks/CalculatedMask/spiral.glsl"
+  }
+}

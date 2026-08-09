@@ -1,0 +1,59 @@
+[
+  {
+    "Name": "GridCells",
+    "Type": "Float",
+    "Default": 12,
+    "Widget": "Slider",
+    "Constraints": [
+      1,
+      64
+    ],
+    "Label": "Cells across map",
+    "Description": "Controls the number of grid cells across the normalized map."
+  },
+  {
+    "Name": "GridThickness",
+    "Type": "Float",
+    "Default": 0.08,
+    "Widget": "Slider",
+    "Constraints": [
+      0.005,
+      0.5
+    ],
+    "Label": "Line thickness",
+    "Description": "Controls the width of the solid part of each grid line."
+  },
+  {
+    "Name": "GridSoftness",
+    "Type": "Float",
+    "Default": 0.03,
+    "Widget": "Slider",
+    "Constraints": [
+      0,
+      0.25
+    ],
+    "Label": "Line softness",
+    "Description": "Controls how gently each grid line fades into the surrounding cells."
+  },
+  {
+    "Name": "GridRotation",
+    "Type": "Float",
+    "Default": 0,
+    "Widget": "Drag",
+    "Sensitivity": 0.5,
+    "Constraints": [
+      -360,
+      360
+    ],
+    "Label": "Rotation",
+    "Description": "Rotates the entire grid around its center in degrees."
+  },
+  {
+    "Name": "GridInvert",
+    "Type": "Bool",
+    "Default": false,
+    "Widget": "Checkbox",
+    "Label": "Invert",
+    "Description": "Swaps the grid lines and the space between them."
+  }
+]
