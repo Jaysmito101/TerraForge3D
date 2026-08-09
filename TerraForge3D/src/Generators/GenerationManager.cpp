@@ -60,11 +60,13 @@ namespace tf3d::generators
     void GenerationManager::Update()
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/update", PerformanceMonitor::Domain::Generation);
-        if (m_Ui.updationPaused)
+        const bool resolutionGenerationPending =
+            m_ResolutionGenerationPending.load(std::memory_order_acquire);
+        if (m_Ui.updationPaused && !resolutionGenerationPending)
             return;
         if (!m_Worker->HasContext()) {
-            // TF3D_LOG_DEBUG("GenerationManager::Update() - Running generation on render thread as no shared OpenGL context is available");
-            if (m_AppState->generationDirtyManager.IsDirty()) {
+            if (m_AppState->generationDirtyManager.IsDirty() || resolutionGenerationPending) {
+                m_ResolutionGenerationPending.store(false, std::memory_order_release);
                 RequestGeneration();
             }
             return;
@@ -82,7 +84,9 @@ namespace tf3d::generators
             }
         }
 
-        if (m_AppState->generationDirtyManager.IsDirty() && !m_Worker->IsRunning() && !m_Worker->IsRequestPending()) {
+        if ((m_AppState->generationDirtyManager.IsDirty() || resolutionGenerationPending) &&
+            !m_Worker->IsRunning() && !m_Worker->IsRequestPending()) {
+            m_ResolutionGenerationPending.store(false, std::memory_order_release);
             RequestGeneration();
         }
     }
@@ -595,6 +599,8 @@ namespace tf3d::generators
         for (auto biome : m_Field.biomeManagers) {
             biome->Resize();
         }
+
+        m_ResolutionGenerationPending.store(true, std::memory_order_release);
         return false;
     }
 
