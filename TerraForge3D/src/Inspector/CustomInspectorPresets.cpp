@@ -78,14 +78,6 @@ namespace tf3d::inspector
         };
 
         auto target = values.find(name);
-        if (target == values.end()) {
-            for (auto iterator = values.begin(); iterator != values.end(); ++iterator) {
-                if (iterator->second.GetSerializedName() == name) {
-                    target = iterator;
-                    break;
-                }
-            }
-        }
         if (target == values.end())
             return invalid("unknown inspector value");
 

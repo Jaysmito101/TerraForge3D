@@ -130,8 +130,9 @@ namespace tf3d::inspector
             } else if (!section->second.label.empty()) {
                 sectionSchema["description"] = section->second.label;
             }
-            if (!section->second.customData.is_null() && !section->second.customData.empty())
-                sectionSchema["x-customData"] = section->second.customData;
+            const auto customData = m_SectionCustomData.find(sectionName);
+            if (customData != m_SectionCustomData.end() && !customData->second.is_null() && !customData->second.empty())
+                sectionSchema["x-customData"] = customData->second;
 
             for (const auto &widgetLabel : m_WidgetsOrder) {
                 const auto widgetSection = m_WidgetSections.find(widgetLabel);
@@ -139,7 +140,7 @@ namespace tf3d::inspector
                     continue;
                 const auto widget = m_Widgets.find(widgetLabel);
                 if (widget != m_Widgets.end() && !widget->second.m_VariableName.empty())
-                    addVariable(sectionSchema, widget->second.m_VariableName, &widget->second);
+                    addVariable(sectionSchema, PathForWidget(widgetLabel), &widget->second);
             }
             schema["properties"][sectionName] = sectionSchema;
         }
@@ -149,7 +150,7 @@ namespace tf3d::inspector
             if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
                 continue;
             if (!m_WidgetSections.contains(widgetLabel))
-                addVariable(schema, widget->second.m_VariableName, &widget->second);
+                addVariable(schema, PathForWidget(widgetLabel), &widget->second);
         }
         for (const auto &[name, value] : m_Values)
             addVariable(schema, name, nullptr);

@@ -3,8 +3,6 @@
 #include "Base/Base.h"
 #include "Inspector/CustomInspectorTypes.h"
 
-#include <nlohmann/json.hpp>
-
 #include <string>
 #include <vector>
 
@@ -45,23 +43,6 @@ namespace tf3d::inspector
         inline void SetVariableName(const std::string &variableName)
         {
             m_VariableName = variableName;
-        }
-        inline void SetShaderUniformName(const std::string &uniformName)
-        {
-            m_ShaderUniformName       = uniformName;
-            m_ShaderUniformConfigured = true;
-        }
-        inline void DisableShaderUniform()
-        {
-            SetShaderUniformName("");
-        }
-        inline bool IsShaderUniformConfigured() const
-        {
-            return m_ShaderUniformConfigured;
-        }
-        inline const std::string &GetShaderUniformName() const
-        {
-            return m_ShaderUniformName;
         }
         inline void SetActionName(const std::string &actionName)
         {
@@ -125,7 +106,6 @@ namespace tf3d::inspector
     private:
         std::string m_Label              = "";
         std::string m_VariableName       = "";
-        std::string m_ShaderUniformName  = "";
         std::string m_FontName           = "";
         CustomInspectorWidgetType m_Type = CustomInspectorWidgetType::Unknown;
         float m_Constratins[4]           = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -135,9 +115,8 @@ namespace tf3d::inspector
         std::vector<int32_t> m_SeedHistory;
         std::vector<std::string> m_DropdownOptions;
         std::vector<int32_t> m_DropdownValues;
-        std::string m_ID               = "";
-        bool m_ShaderUniformConfigured = false;
-        bool m_UseRenderOnCondition    = false;
+        std::string m_ID            = "";
+        bool m_UseRenderOnCondition = false;
         std::vector<CustomInspectorRenderCondition> m_RenderOnConditions;
     };
 
@@ -145,9 +124,9 @@ namespace tf3d::inspector
         std::string name;
         std::string label;
         std::string description;
-        bool collapsible          = false;
-        bool defaultOpen          = true;
-        nlohmann::json customData = nlohmann::json::object();
+        bool collapsible = false;
+        bool defaultOpen = true;
+        std::vector<CustomInspectorRenderCondition> renderConditions;
     };
 
 } // namespace tf3d::inspector

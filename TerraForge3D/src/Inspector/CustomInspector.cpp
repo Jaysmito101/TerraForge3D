@@ -2,6 +2,9 @@
 #include "Base/Base.h"
 #include "Utils/Utils.h"
 
+#include <algorithm>
+#include <optional>
+
 namespace tf3d::inspector
 {
 
@@ -14,6 +17,16 @@ namespace tf3d::inspector
 
     CustomInspector::~CustomInspector()
     {
+    }
+
+    InspectorScope CustomInspector::Root()
+    {
+        return InspectorScope(this, {});
+    }
+
+    ConstInspectorScope CustomInspector::Root() const
+    {
+        return ConstInspectorScope(this, {});
     }
 
     CustomInspectorSection &CustomInspector::AddSection(const std::string &name,
@@ -56,28 +69,25 @@ namespace tf3d::inspector
         return m_Sections.at(name);
     }
 
-    const CustomInspectorValue *CustomInspector::FindValue(const std::string &name) const
+    CustomInspectorValue *CustomInspector::FindExactValue(std::string_view path)
     {
-        const auto value = m_Values.find(name);
+        const auto value = m_Values.find(std::string(path));
         return value == m_Values.end() ? nullptr : &value->second;
     }
 
-    bool CustomInspector::Contains(const std::string &name) const
+    const CustomInspectorValue *CustomInspector::FindExactValue(std::string_view path) const
     {
-        return m_Values.find(name) != m_Values.end();
-    }
-
-    void CustomInspector::Remove(const std::string &name)
-    {
-        m_Values.erase(name);
+        const auto value = m_Values.find(std::string(path));
+        return value == m_Values.end() ? nullptr : &value->second;
     }
 
     CustomInspectorValue &CustomInspector::AddVariable(const std::string &name, const CustomInspectorValue &value)
     {
-        m_Values[name] = value;
-        if (m_Values[name].m_SerializedName.empty())
-            m_Values[name].m_SerializedName = name;
-        return (m_Values[name]);
+        const std::string valueKey = m_CurrentSection.empty() ? name : m_CurrentSection + "." + name;
+        m_Values[valueKey]         = value;
+        if (m_Values[valueKey].m_SerializedName.empty())
+            m_Values[valueKey].m_SerializedName = name;
+        return m_Values[valueKey];
     }
 
     CustomInspectorValue &CustomInspector::AddPathVariable(const std::string &name,
@@ -215,6 +225,27 @@ namespace tf3d::inspector
         throw std::runtime_error("Unknown value type");
     }
 
+    std::string CustomInspector::PathForWidget(std::string_view widgetLabel) const
+    {
+        const auto widget = m_Widgets.find(std::string(widgetLabel));
+        if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+            return {};
+
+        const auto section = m_WidgetSections.find(widget->first);
+        if (section == m_WidgetSections.end() || section->second.empty())
+            return widget->second.m_VariableName;
+        return section->second + "." + widget->second.m_VariableName;
+    }
+
+    CustomInspectorValue &CustomInspector::ValueForWidget(const std::string &widgetLabel)
+    {
+        const auto valuePath = PathForWidget(widgetLabel);
+        const auto value     = m_Values.find(valuePath);
+        if (value == m_Values.end())
+            throw std::runtime_error("CustomInspector widget has no matching value: " + widgetLabel);
+        return value->second;
+    }
+
     bool CustomInspector::HasWidget(const std::string &name)
     {
         return m_Widgets.find(name) != m_Widgets.end();
@@ -274,6 +305,154 @@ namespace tf3d::inspector
             default:
                 return AddWidget(label, widgetType, variableName);
         }
+    }
+
+    bool CustomInspector::SetDropdownOptionsAt(std::string_view path,
+                                               const std::vector<std::string> &options,
+                                               const std::vector<int32_t> &values)
+    {
+        for (auto &[label, widget] : m_Widgets) {
+            if (PathForWidget(label) != path)
+                continue;
+            if (widget.m_Type != CustomInspectorWidgetType::Dropdown)
+                return false;
+            widget.SetDropdownOptions(options, values);
+            return true;
+        }
+        return false;
+    }
+
+    std::optional<std::string> CustomInspector::GetSectionCustomDataString(std::string_view sectionName,
+                                                                           std::string_view key) const
+    {
+        const auto section = m_SectionCustomData.find(std::string(sectionName));
+        if (section == m_SectionCustomData.end() || !section->second.is_object())
+            return std::nullopt;
+        const auto value = section->second.find(std::string(key));
+        if (value == section->second.end() || !value->is_string())
+            return std::nullopt;
+        return value->get<std::string>();
+    }
+
+    std::optional<int32_t> CustomInspector::GetSectionSelectionValue(std::string_view sectionName) const
+    {
+        const auto value = m_SectionSelectionValues.find(std::string(sectionName));
+        return value == m_SectionSelectionValues.end()
+                   ? std::nullopt
+                   : std::optional<int32_t>(value->second);
+    }
+
+    const CustomInspectorValue *CustomInspector::FindConditionValue(std::string_view name,
+                                                                    std::string_view sectionName) const
+    {
+        const std::string path = name.find('.') != std::string_view::npos
+                                     ? std::string(name)
+                                 : sectionName.empty() ? std::string(name)
+                                                       : std::string(sectionName) + "." + std::string(name);
+        return FindExactValue(path);
+    }
+
+    bool CustomInspector::IsConditionSatisfied(const std::vector<CustomInspectorRenderCondition> &conditions,
+                                               std::string_view sectionName) const
+    {
+        for (const auto &condition : conditions) {
+            const auto value = FindConditionValue(condition.name, sectionName);
+            if (value == nullptr)
+                return false;
+            if (!condition.values.empty()) {
+                if (std::find(condition.values.begin(), condition.values.end(), value->Get<int32_t>()) == condition.values.end())
+                    return false;
+            } else if (value->Get<int32_t>() != 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool CustomInspector::IsSectionVisible(std::string_view sectionName) const
+    {
+        const auto section = m_Sections.find(std::string(sectionName));
+        return section != m_Sections.end() && IsConditionSatisfied(section->second.renderConditions, sectionName);
+    }
+
+    bool CustomInspector::IsWidgetVisible(std::string_view widgetLabel) const
+    {
+        const auto widget = m_Widgets.find(std::string(widgetLabel));
+        if (widget == m_Widgets.end())
+            return false;
+        const auto section = m_WidgetSections.find(widget->first);
+        if (section != m_WidgetSections.end() && !IsSectionVisible(section->second))
+            return false;
+        return IsConditionSatisfied(widget->second.m_RenderOnConditions,
+                                    section == m_WidgetSections.end() ? std::string_view{} : std::string_view(section->second));
+    }
+
+    void CustomInspector::ConfigureSectionSelector(const nlohmann::json &config)
+    {
+        if (!config.contains("SectionSelector"))
+            return;
+        if (!config["SectionSelector"].is_object()) {
+            TF3D_LOG_ERROR("Inspector metadata field 'SectionSelector' must be an object");
+            return;
+        }
+
+        const auto &selector        = config["SectionSelector"];
+        const std::string path      = selector.value("Parameter", "");
+        const bool deriveFromName   = !selector.contains("CustomDataKey");
+        const std::string customKey = selector.value("CustomDataKey", "");
+        if (path.empty()) {
+            TF3D_LOG_ERROR("Inspector SectionSelector requires Parameter");
+            return;
+        }
+        if (!deriveFromName && customKey.empty()) {
+            TF3D_LOG_ERROR("Inspector SectionSelector CustomDataKey cannot be empty");
+            return;
+        }
+
+        bool selectorFound = false;
+        for (const auto &widgetLabel : m_WidgetsOrder) {
+            const auto widget = m_Widgets.find(widgetLabel);
+            if (widget == m_Widgets.end() || PathForWidget(widgetLabel) != path)
+                continue;
+            if (selectorFound) {
+                TF3D_LOG_ERROR("Inspector SectionSelector parameter '{}' is ambiguous", path);
+                return;
+            }
+            selectorFound = true;
+        }
+        if (!selectorFound) {
+            TF3D_LOG_ERROR("Inspector SectionSelector could not find parameter '{}'.", path);
+            return;
+        }
+
+        std::vector<std::string> labels;
+        std::vector<int32_t> values;
+        for (const auto &sectionName : m_SectionsOrder) {
+            const auto data = m_SectionCustomData.find(sectionName);
+            if (data == m_SectionCustomData.end() || !data->second.is_object())
+                continue;
+
+            std::string selectionID = sectionName;
+            if (!deriveFromName) {
+                const auto selectionValue = data->second.find(customKey);
+                if (selectionValue == data->second.end() || !selectionValue->is_string())
+                    continue;
+                selectionID = selectionValue->get<std::string>();
+            }
+
+            const int32_t value = static_cast<int32_t>(values.size());
+            const auto section  = m_Sections.find(sectionName);
+            labels.push_back(section != m_Sections.end() && !section->second.label.empty()
+                                 ? section->second.label
+                                 : selectionID);
+            values.push_back(value);
+            m_SectionSelectionValues[sectionName] = value;
+            if (section != m_Sections.end())
+                section->second.renderConditions.push_back({path, {value}});
+        }
+
+        if (!SetDropdownOptionsAt(path, labels, values))
+            TF3D_LOG_ERROR("Inspector SectionSelector parameter '{}' is not a Dropdown", path);
     }
 
 } // namespace tf3d::inspector

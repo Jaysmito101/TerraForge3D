@@ -7,6 +7,8 @@
 
 #include <nlohmann/json.hpp>
 #include <filesystem>
+#include <initializer_list>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -18,14 +20,18 @@ namespace tf3d::inspector
 {
     void RenderInspectorTooltip(const std::string &label, const std::string &description);
 
+    template <typename Owner>
+    class InspectorScopeImpl;
+
     class CustomInspector
     {
     public:
         CustomInspector();
         ~CustomInspector();
 
-        bool Contains(const std::string &name) const;
-        void Remove(const std::string &name);
+        InspectorScopeImpl<CustomInspector> Root();
+        InspectorScopeImpl<const CustomInspector> Root() const;
+
         template <typename T>
         CustomInspectorValue &Add(const std::string &name, T defaultValue = {})
         {
@@ -35,36 +41,6 @@ namespace tf3d::inspector
             value.SetDefault(std::move(defaultValue));
             return AddVariable(name, value);
         }
-
-        template <typename T>
-        T Get(const std::string &name, T fallback = {}) const
-        {
-            const auto value = m_Values.find(name);
-            return value == m_Values.end() ? fallback : value->second.Get(fallback);
-        }
-
-        template <typename T>
-        bool Set(const std::string &name, T value)
-        {
-            const auto existing = m_Values.find(name);
-            if (existing == m_Values.end())
-                return false;
-
-            CustomInspectorValue candidate = existing->second;
-            if (!candidate.Set(std::move(value)) || !ValidateValue(name, candidate))
-                return false;
-            existing->second = std::move(candidate);
-            return true;
-        }
-
-        template <typename Function>
-        void ForEachValue(Function &&function) const
-        {
-            for (const auto &[name, value] : m_Values)
-                function(name, value);
-        }
-
-        const CustomInspectorValue *FindValue(const std::string &name) const;
 
         bool HasWidget(const std::string &name);
         CustomInspectorWidget &GetWidget(const std::string &name);
@@ -85,12 +61,18 @@ namespace tf3d::inspector
         CustomInspectorSection &GetSection(const std::string &name);
 
         SerializerNode SaveState() const;
+        SerializerNode SaveState(std::initializer_list<std::string_view> excludedValues) const;
         bool LoadState(SerializerNode node);
         static std::filesystem::path GetConfigPath(const std::filesystem::path &dataDirectory,
                                                    std::string_view inspectorName);
         bool LoadConfig(ApplicationState *appState, std::string_view inspectorName);
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
+        std::optional<std::string> GetShaderUniformDeclarations(std::string *error = nullptr) const;
+        std::optional<std::string> GetSectionCustomDataString(std::string_view sectionName,
+                                                              std::string_view key) const;
+        std::optional<int32_t> GetSectionSelectionValue(std::string_view sectionName) const;
+        void ResetVisible();
         void ApplyToShader(tf3d::base::ShaderCore &shader, std::string_view uniformPrefix = "u_") const;
 
         inline void Reset()
@@ -133,6 +115,8 @@ namespace tf3d::inspector
             m_Sections.clear();
             m_SectionsOrder.clear();
             m_WidgetSections.clear();
+            m_SectionCustomData.clear();
+            m_SectionSelectionValues.clear();
             m_Presets.clear();
             m_CurrentSection.clear();
             m_Description.clear();
@@ -163,12 +147,42 @@ namespace tf3d::inspector
         }
 
     private:
+        template <typename>
+        friend class InspectorScopeImpl;
+
         CustomInspectorValue &AddVariable(const std::string &name, const CustomInspectorValue &value);
+        CustomInspectorValue *FindExactValue(std::string_view path);
+        const CustomInspectorValue *FindExactValue(std::string_view path) const;
+        template <typename T>
+        bool SetExactValue(std::string_view path, T value)
+        {
+            const auto existing = m_Values.find(std::string(path));
+            if (existing == m_Values.end())
+                return false;
+
+            CustomInspectorValue candidate = existing->second;
+            if (!candidate.Set(std::move(value)) || !ValidateValue(existing->first, candidate))
+                return false;
+            existing->second = std::move(candidate);
+            return true;
+        }
+        std::string PathForWidget(std::string_view widgetLabel) const;
+        CustomInspectorValue &ValueForWidget(const std::string &widgetLabel);
         CustomInspectorValue &AddPathVariable(const std::string &name,
                                               const std::array<glm::vec2, CustomInspectorMaxPathPoints> &defaultPoints = {}, int defaultPointCount = 2);
         CustomInspectorValue &AddCurveVariable(const std::string &name,
                                                const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints = {}, int defaultPointCount = 2);
         CustomInspectorValue &AddVairableFromConfig(const nlohmann::json &config);
+        bool IsConditionSatisfied(const std::vector<CustomInspectorRenderCondition> &conditions,
+                                  std::string_view sectionName = {}) const;
+        bool IsWidgetVisible(std::string_view widgetLabel) const;
+        bool IsSectionVisible(std::string_view sectionName) const;
+        const CustomInspectorValue *FindConditionValue(std::string_view name,
+                                                       std::string_view sectionName) const;
+        void ConfigureSectionSelector(const nlohmann::json &config);
+        bool SetDropdownOptionsAt(std::string_view path,
+                                  const std::vector<std::string> &options,
+                                  const std::vector<int32_t> &values = {});
         bool ApplyPresetValues(const nlohmann::json &values, std::string_view presetName, bool commit);
         bool SetPresetValue(std::unordered_map<std::string, CustomInspectorValue> &values,
                             const std::string &name,
@@ -177,18 +191,18 @@ namespace tf3d::inspector
         bool RenderPresetSelector();
         bool ValidateValue(const std::string &name, const CustomInspectorValue &value) const;
         bool RenderWidget(const std::string &widgetLabel);
-        bool RenderSlider(const CustomInspectorWidget &widget);
-        bool RenderDrag(const CustomInspectorWidget &widget);
-        bool RenderColor(const CustomInspectorWidget &widget);
-        bool RenderTexture(const CustomInspectorWidget &widget);
-        bool RenderButton(const CustomInspectorWidget &widget);
-        bool RenderCheckbox(const CustomInspectorWidget &widget);
-        bool RenderInput(const CustomInspectorWidget &widget);
-        bool RenderSeed(CustomInspectorWidget &widget);
-        bool RenderDropdown(const CustomInspectorWidget &widget);
-        bool RenderPath(const CustomInspectorWidget &widget);
-        bool RenderCurve(const CustomInspectorWidget &widget);
-        bool RenderOctaves(const CustomInspectorWidget &widget);
+        bool RenderSlider(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderDrag(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderColor(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderTexture(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderButton(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderCheckbox(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderInput(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderSeed(const std::string &widgetLabel, CustomInspectorWidget &widget);
+        bool RenderDropdown(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderPath(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderCurve(const std::string &widgetLabel, const CustomInspectorWidget &widget);
+        bool RenderOctaves(const std::string &widgetLabel, const CustomInspectorWidget &widget);
 
     private:
         struct Preset {
@@ -204,6 +218,8 @@ namespace tf3d::inspector
         std::unordered_map<std::string, CustomInspectorSection> m_Sections;
         std::vector<std::string> m_SectionsOrder;
         std::unordered_map<std::string, std::string> m_WidgetSections;
+        std::unordered_map<std::string, nlohmann::json> m_SectionCustomData;
+        std::unordered_map<std::string, int32_t> m_SectionSelectionValues;
         nlohmann::json m_SchemaMetadata = nlohmann::json::object();
         std::string m_CurrentSection;
         std::string m_ID = "";

@@ -43,6 +43,19 @@ namespace tf3d::inspector
         {
             return m_SerializedName.empty() ? m_Name : m_SerializedName;
         }
+        inline void SetShaderUniformName(const std::string &uniformName)
+        {
+            m_ShaderUniformName       = uniformName;
+            m_ShaderUniformConfigured = true;
+        }
+        inline bool IsShaderUniformConfigured() const
+        {
+            return m_ShaderUniformConfigured;
+        }
+        inline const std::string &GetShaderUniformName() const
+        {
+            return m_ShaderUniformName;
+        }
 
     private:
         inline int32_t GetInt() const
@@ -430,7 +443,9 @@ namespace tf3d::inspector
     private:
         std::string m_Name              = "";
         std::string m_SerializedName    = "";
+        std::string m_ShaderUniformName = "";
         CustomInspectorValueType m_Type = CustomInspectorValueType::Unknown;
+        bool m_ShaderUniformConfigured  = false;
         int32_t m_IntValue = 0, m_DefaultIntValue = 0;
         float m_FloatValue = 0.0f, m_DefaultFloatValue = 0.0f;
         bool m_BoolValue = false, m_DefaultBoolValue = false;

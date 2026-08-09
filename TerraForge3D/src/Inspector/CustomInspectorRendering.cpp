@@ -38,48 +38,37 @@ namespace tf3d::inspector
             return false;
 
         const auto &widget = widgetIterator->second;
-        if (widget.m_UseRenderOnCondition) {
-            for (const auto &renderCondition : widget.m_RenderOnConditions) {
-                if (!Contains(renderCondition.name))
-                    return false;
-                const auto &condition = m_Values.at(renderCondition.name);
-                if (!renderCondition.values.empty()) {
-                    if (std::find(renderCondition.values.begin(), renderCondition.values.end(), condition.Get<int32_t>()) == renderCondition.values.end())
-                        return false;
-                } else if (condition.Get<int32_t>() != 1) {
-                    return false;
-                }
-            }
-        }
+        if (!IsWidgetVisible(widgetLabel))
+            return false;
 
         ImGui::PushID(widget.m_ID.c_str());
         if (!widget.m_FontName.empty())
             ImGui::PushFont(GetUIFont(widget.m_FontName));
         bool widgetChanged = false;
         if (widget.m_Type == CustomInspectorWidgetType::Slider)
-            widgetChanged = RenderSlider(widget);
+            widgetChanged = RenderSlider(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Drag)
-            widgetChanged = RenderDrag(widget);
+            widgetChanged = RenderDrag(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Color)
-            widgetChanged = RenderColor(widget);
+            widgetChanged = RenderColor(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Texture)
-            widgetChanged = RenderTexture(widget);
+            widgetChanged = RenderTexture(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Path)
-            widgetChanged = RenderPath(widget);
+            widgetChanged = RenderPath(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Curve)
-            widgetChanged = RenderCurve(widget);
+            widgetChanged = RenderCurve(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Octaves)
-            widgetChanged = RenderOctaves(widget);
+            widgetChanged = RenderOctaves(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Button)
-            widgetChanged = RenderButton(widget);
+            widgetChanged = RenderButton(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Checkbox)
-            widgetChanged = RenderCheckbox(widget);
+            widgetChanged = RenderCheckbox(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Input)
-            widgetChanged = RenderInput(widget);
+            widgetChanged = RenderInput(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Seed)
-            widgetChanged = RenderSeed(m_Widgets[widgetLabel]);
+            widgetChanged = RenderSeed(widgetLabel, m_Widgets[widgetLabel]);
         else if (widget.m_Type == CustomInspectorWidgetType::Dropdown)
-            widgetChanged = RenderDropdown(widget);
+            widgetChanged = RenderDropdown(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Separator)
             ImGui::Separator();
         else if (widget.m_Type == CustomInspectorWidgetType::NewLine)
@@ -103,7 +92,7 @@ namespace tf3d::inspector
                 static char s_ResetButtonName[1024];
                 sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
                 if (ImGui::Button(s_ResetButtonName)) {
-                    m_Values[widget.m_VariableName].ResetValue();
+                    ValueForWidget(widgetLabel).ResetValue();
                     widgetChanged         = true;
                     m_LastChangedVariable = widget.m_VariableName;
                 }
@@ -150,6 +139,8 @@ namespace tf3d::inspector
                 const auto section = m_Sections.find(sectionName);
                 if (section == m_Sections.end())
                     continue;
+                if (!IsSectionVisible(sectionName))
+                    continue;
 
                 ImGui::PushID(sectionName.c_str());
                 bool renderSection = true;
@@ -181,10 +172,10 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderSlider(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderSlider(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
                 hasChanged = ImGui::SliderInt(widget.m_Label.c_str(), &value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
@@ -211,10 +202,10 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderDrag(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderDrag(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
                 hasChanged = ImGui::DragInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_FSpeed, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
@@ -262,10 +253,10 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderColor(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderColor(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
                 hasChanged       = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
@@ -292,11 +283,11 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderTexture(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderTexture(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
 
-        auto &value = m_Values[widget.m_VariableName];
+        auto &value = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Texture:
                 break;
@@ -321,10 +312,10 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderDropdown(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderDropdown(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
                 break;
@@ -372,23 +363,24 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderButton(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderButton(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
+        (void)widgetLabel;
         return ImGui::Button(widget.m_Label.c_str());
     }
 
-    bool CustomInspector::RenderPath(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderPath(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
-        auto &value = m_Values[widget.m_VariableName];
+        auto &value = ValueForWidget(widgetLabel);
         if (value.GetType() != CustomInspectorValueType::Path)
             throw std::runtime_error("Invalid data type for Path");
         return utils::DrawPathEditor<CustomInspectorMaxPathPoints>(
             widget.m_Label.c_str(), value.m_PathPoints, value.m_PathPointCount);
     }
 
-    bool CustomInspector::RenderCurve(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderCurve(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
-        auto &value = m_Values[widget.m_VariableName];
+        auto &value = ValueForWidget(widgetLabel);
         if (value.GetType() != CustomInspectorValueType::Curve)
             throw std::runtime_error("Invalid data type for Curve");
 
@@ -397,7 +389,7 @@ namespace tf3d::inspector
             points[index] = ImVec2(value.m_CurvePoints[index].x, value.m_CurvePoints[index].y);
 
         const float width            = std::max(ImGui::GetContentRegionAvail().x, 220.0f);
-        const std::string curveLabel = widget.m_Label + "##" + widget.m_VariableName;
+        const std::string curveLabel = widget.m_Label + "##" + widget.m_ID;
         const bool changed           = ImGui::Curve(curveLabel.c_str(), ImVec2(width, 180.0f),
                                                     static_cast<int>(CustomInspectorMaxCurvePoints), points.data()) != 0;
         int pointCount               = 0;
@@ -410,9 +402,9 @@ namespace tf3d::inspector
         return changed;
     }
 
-    bool CustomInspector::RenderOctaves(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderOctaves(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
-        auto &value = m_Values[widget.m_VariableName];
+        auto &value = ValueForWidget(widgetLabel);
         if (value.GetType() != CustomInspectorValueType::FloatArray)
             throw std::runtime_error("Invalid data type for Octaves");
 
@@ -422,7 +414,7 @@ namespace tf3d::inspector
 
         ImGui::TextUnformatted(widget.m_Label.c_str());
         bool changed = false;
-        ImGui::PushID((widget.m_VariableName + "Values").c_str());
+        ImGui::PushID((widget.m_ID + "Values").c_str());
         for (size_t index = 0; index < octaves.size(); ++index) {
             ImGui::PushID(static_cast<int>(index));
             const std::string label = "Octave " + std::to_string(index + 1);
@@ -441,10 +433,10 @@ namespace tf3d::inspector
         return changed;
     }
 
-    bool CustomInspector::RenderCheckbox(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderCheckbox(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         hasChanged      = ImGui::Checkbox(widget.m_Label.c_str(), &value.m_BoolValue);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
@@ -475,10 +467,10 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderInput(const CustomInspectorWidget &widget)
+    bool CustomInspector::RenderInput(const std::string &widgetLabel, const CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
                 hasChanged = ImGui::InputInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_ISpeed, widget.m_ISpeed * 10);
@@ -510,10 +502,10 @@ namespace tf3d::inspector
         return hasChanged;
     }
 
-    bool CustomInspector::RenderSeed(CustomInspectorWidget &widget)
+    bool CustomInspector::RenderSeed(const std::string &widgetLabel, CustomInspectorWidget &widget)
     {
         bool hasChanged = false;
-        auto &value     = m_Values[widget.m_VariableName];
+        auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
                 hasChanged = ShowSeedSettings(widget.m_Label, &value.m_IntValue, widget.m_SeedHistory);

@@ -58,7 +58,7 @@ namespace tf3d::inspector
         }
 
         for (const auto &[widgetName, widget] : m_Widgets) {
-            if (widget.m_VariableName != name ||
+            if (PathForWidget(widgetName) != name ||
                 (widget.m_Type != CustomInspectorWidgetType::Slider &&
                  widget.m_Type != CustomInspectorWidgetType::Drag &&
                  widget.m_Type != CustomInspectorWidgetType::Octaves))
@@ -84,12 +84,22 @@ namespace tf3d::inspector
 
     SerializerNode CustomInspector::SaveState() const
     {
+        return SaveState({});
+    }
+
+    SerializerNode CustomInspector::SaveState(std::initializer_list<std::string_view> excludedValues) const
+    {
         SerializerNode state = CreateSerializerNode();
         std::unordered_set<std::string> savedVariables;
+        std::unordered_set<std::string> excluded;
+        for (const auto value : excludedValues)
+            excluded.emplace(value);
 
         auto saveValue = [&](SerializerNode target,
                              const std::string &name,
                              const CustomInspectorValue &value) {
+            if (excluded.contains(name) || excluded.contains(value.GetName()) || excluded.contains(value.GetSerializedName()))
+                return;
             if (!value.WriteStateValue(target, value.GetSerializedName()))
                 TF3D_LOG_WARN("Skipping unsupported CustomInspector state field '{}'", name);
         };
@@ -107,7 +117,7 @@ namespace tf3d::inspector
                 const auto widget = m_Widgets.find(widgetLabel);
                 if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
                     continue;
-                const auto value = m_Values.find(widget->second.m_VariableName);
+                const auto value = m_Values.find(PathForWidget(widgetLabel));
                 if (value == m_Values.end() || !savedVariables.insert(value->first).second)
                     continue;
                 saveValue(sectionState, value->first, value->second);
@@ -146,16 +156,9 @@ namespace tf3d::inspector
                 const auto widget = m_Widgets.find(widgetLabel);
                 if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
                     continue;
-                const auto value = m_Values.find(widget->second.m_VariableName);
+                const auto value = m_Values.find(PathForWidget(widgetLabel));
                 if (value != m_Values.end() && value->second.GetSerializedName() == serializedName)
                     return value->first;
-            }
-
-            if (sectionName.empty()) {
-                for (const auto &[name, value] : m_Values) {
-                    if (value.GetSerializedName() == serializedName)
-                        return name;
-                }
             }
             return {};
         };
@@ -201,6 +204,27 @@ namespace tf3d::inspector
         }
         m_SelectedPreset = -1;
         return valid;
+    }
+
+    void CustomInspector::ResetVisible()
+    {
+        std::unordered_set<std::string> resetValues;
+        for (const auto &widgetLabel : m_WidgetsOrder) {
+            if (!IsWidgetVisible(widgetLabel))
+                continue;
+            const auto widget = m_Widgets.find(widgetLabel);
+            if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+                continue;
+            const auto valuePath = PathForWidget(widgetLabel);
+            if (resetValues.insert(valuePath).second) {
+                const auto value = m_Values.find(valuePath);
+                if (value != m_Values.end())
+                    value->second.ResetValue();
+            }
+        }
+        m_SelectedPreset      = 0;
+        m_LastChangedVariable = "Preset";
+        m_LastAction.clear();
     }
 
 } // namespace tf3d::inspector

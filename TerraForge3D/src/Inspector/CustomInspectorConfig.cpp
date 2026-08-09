@@ -79,16 +79,32 @@ namespace tf3d::inspector
         }
         bool hasContent = false;
         try {
-            const auto loadGroup = [&](const nlohmann::json &group) {
+            const auto loadGroup = [&](const nlohmann::json &group, const std::string &sectionName) {
                 if (group.contains("Params") && group["Params"].is_array()) {
                     hasContent = true;
                     for (const auto &parameter : group["Params"]) {
-                        const auto &value = AddVairableFromConfig(parameter);
+                        const std::string name      = parameter.value("Name", "Unnamed");
+                        const std::string valueName = sectionName.empty() ? name : sectionName + "." + name;
+                        auto &value                 = AddVairableFromConfig(parameter);
+                        if (parameter.contains("ShaderUniform")) {
+                            if (parameter["ShaderUniform"].is_string())
+                                value.SetShaderUniformName(parameter["ShaderUniform"].get<std::string>());
+                            else
+                                TF3D_LOG_WARN("Inspector parameter '{}' has an invalid ShaderUniform; expected a string", value.GetName());
+                        }
                         if (parameter.contains("Visible") && parameter["Visible"].is_boolean() && !parameter["Visible"].get<bool>())
                             continue;
                         const std::string widgetType  = parameter.value("Widget", "Input");
                         const std::string widgetLabel = parameter.value("Label", value.GetName());
-                        auto &widget                  = AddWidgetFromString(widgetLabel, widgetType, value.GetName());
+                        std::string widgetKey         = widgetLabel;
+                        if (m_Widgets.contains(widgetKey)) {
+                            widgetKey  = sectionName.empty() ? valueName : sectionName + "/" + widgetLabel;
+                            int suffix = 2;
+                            while (m_Widgets.contains(widgetKey))
+                                widgetKey = (sectionName.empty() ? valueName : sectionName + "/" + widgetLabel) + " " + std::to_string(suffix++);
+                        }
+                        auto &widget = AddWidgetFromString(widgetKey, widgetType, value.GetName());
+                        widget.SetLabel(widgetLabel);
                         if (parameter.contains("Sensitivity"))
                             widget.SetSpeed(parameter["Sensitivity"].get<float>());
                         if (parameter.contains("Options")) {
@@ -107,12 +123,6 @@ namespace tf3d::inspector
                                 const float c3 = constraints.size() > 3 ? constraints[3].get<float>() : 0.0f;
                                 widget.SetConstraints(c0, c1, c2, c3);
                             }
-                        }
-                        if (parameter.contains("ShaderUniform")) {
-                            if (parameter["ShaderUniform"].is_string())
-                                widget.SetShaderUniformName(parameter["ShaderUniform"].get<std::string>());
-                            else
-                                TF3D_LOG_WARN("Inspector parameter '{}' has an invalid ShaderUniform; expected a string", value.GetName());
                         }
                         if (parameter.contains("Tooltip"))
                             widget.SetTooltip(parameter["Tooltip"].get<std::string>());
@@ -148,7 +158,7 @@ namespace tf3d::inspector
             };
 
             if (config.is_object())
-                loadGroup(config);
+                loadGroup(config, {});
 
             if (config.contains("Sections") && config["Sections"].is_array()) {
                 for (const auto &sectionConfig : config["Sections"]) {
@@ -162,14 +172,27 @@ namespace tf3d::inspector
                         sectionConfig.value("DefaultOpen", true));
                     section.description = sectionConfig.value("Description", "");
                     if (sectionConfig.contains("CustomData"))
-                        section.customData = sectionConfig["CustomData"];
+                        m_SectionCustomData[name] = sectionConfig["CustomData"];
                     else if (sectionConfig.contains("customData"))
-                        section.customData = sectionConfig["customData"];
+                        m_SectionCustomData[name] = sectionConfig["customData"];
+                    if (sectionConfig.contains("Conditions") && sectionConfig["Conditions"].is_array()) {
+                        for (const auto &condition : sectionConfig["Conditions"]) {
+                            if (!condition.is_object())
+                                continue;
+                            const std::string conditionName = condition.value("Name", "");
+                            if (conditionName.empty() || !condition.contains("Values") || !condition["Values"].is_array())
+                                continue;
+                            section.renderConditions.push_back(
+                                {conditionName, condition["Values"].get<std::vector<int32_t>>()});
+                        }
+                    }
                     BeginSection(name);
-                    loadGroup(sectionConfig);
+                    loadGroup(sectionConfig, name);
                     EndSection();
                 }
             }
+
+            ConfigureSectionSelector(config);
 
             if (config.contains("WidgetOrder") && config["WidgetOrder"].is_array()) {
                 std::vector<std::string> orderedWidgets;
