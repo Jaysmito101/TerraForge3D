@@ -65,6 +65,20 @@ namespace tf3d::utils
             *error = "JSON file '" + PathText(path) + "': " + std::string(message);
         }
 
+        void AppendArrayItem(nlohmann::json &result, const nlohmann::json &item)
+        {
+            if (item.is_object() && item.contains("Name") && item["Name"].is_string()) {
+                const std::string name = item["Name"].get<std::string>();
+                for (auto &existing : result) {
+                    if (!existing.is_object() || existing.value("Name", "") != name)
+                        continue;
+                    MergeObjects(existing, item);
+                    return;
+                }
+            }
+            result.push_back(item);
+        }
+
     } // namespace
 
     JsonIncludeResolver::JsonIncludeResolver(JsonIncludeResolverOptions options)
@@ -149,10 +163,10 @@ namespace tf3d::utils
 
                 if (item.is_object() && item.contains(INCLUDE_DIRECTIVE) && resolved->is_array()) {
                     for (const auto &includedItem : *resolved) {
-                        result.push_back(includedItem);
+                        AppendArrayItem(result, includedItem);
                     }
                 } else {
-                    result.push_back(*resolved);
+                    AppendArrayItem(result, *resolved);
                 }
             }
             return result;
