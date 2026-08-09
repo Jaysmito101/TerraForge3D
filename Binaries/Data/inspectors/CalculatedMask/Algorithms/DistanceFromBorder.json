@@ -23,6 +23,6 @@
   ],
   "CustomData": {
     "ID": "DistanceFromBorder",
-    "Shader": "masks/CalculatedMask/distance_from_border.glsl"
+    "Shader": "masks/calculated_mask/distance_from_border.glsl"
   }
 }

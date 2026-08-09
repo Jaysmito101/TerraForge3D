@@ -29,6 +29,6 @@
   ],
   "CustomData": {
     "ID": "DistanceFromPointPath",
-    "Shader": "masks/CalculatedMask/distance_from_point_path.glsl"
+    "Shader": "masks/calculated_mask/distance_from_point_path.glsl"
   }
 }

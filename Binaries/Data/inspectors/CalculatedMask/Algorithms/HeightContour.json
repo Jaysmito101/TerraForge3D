@@ -9,6 +9,6 @@
   ],
   "CustomData": {
     "ID": "HeightContour",
-    "Shader": "masks/CalculatedMask/height_contour.glsl"
+    "Shader": "masks/calculated_mask/height_contour.glsl"
   }
 }

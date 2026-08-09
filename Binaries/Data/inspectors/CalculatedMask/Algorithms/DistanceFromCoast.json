@@ -26,6 +26,6 @@
   ],
   "CustomData": {
     "ID": "DistanceFromCoast",
-    "Shader": "masks/CalculatedMask/distance_from_coast.glsl"
+    "Shader": "masks/calculated_mask/distance_from_coast.glsl"
   }
 }

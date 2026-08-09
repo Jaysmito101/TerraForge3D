@@ -26,6 +26,6 @@
   ],
   "CustomData": {
     "ID": "SlopeRamp",
-    "Shader": "masks/CalculatedMask/slope_ramp.glsl"
+    "Shader": "masks/calculated_mask/slope_ramp.glsl"
   }
 }

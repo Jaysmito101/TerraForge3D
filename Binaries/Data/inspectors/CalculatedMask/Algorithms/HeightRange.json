@@ -9,6 +9,6 @@
   ],
   "CustomData": {
     "ID": "HeightRange",
-    "Shader": "masks/CalculatedMask/height_range.glsl"
+    "Shader": "masks/calculated_mask/height_range.glsl"
   }
 }

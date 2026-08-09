@@ -12,6 +12,6 @@
   ],
   "CustomData": {
     "ID": "Grid",
-    "Shader": "masks/CalculatedMask/grid.glsl"
+    "Shader": "masks/calculated_mask/grid.glsl"
   }
 }

@@ -12,6 +12,6 @@
   ],
   "CustomData": {
     "ID": "Spiral",
-    "Shader": "masks/CalculatedMask/spiral.glsl"
+    "Shader": "masks/calculated_mask/spiral.glsl"
   }
 }

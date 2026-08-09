@@ -29,6 +29,6 @@
   ],
   "CustomData": {
     "ID": "Exposure",
-    "Shader": "masks/CalculatedMask/exposure.glsl"
+    "Shader": "masks/calculated_mask/exposure.glsl"
   }
 }

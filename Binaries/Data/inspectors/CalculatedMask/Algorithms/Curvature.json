@@ -12,6 +12,6 @@
   ],
   "CustomData": {
     "ID": "Curvature",
-    "Shader": "masks/CalculatedMask/curvature.glsl"
+    "Shader": "masks/calculated_mask/curvature.glsl"
   }
 }

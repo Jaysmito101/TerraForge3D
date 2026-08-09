@@ -12,6 +12,6 @@
   ],
   "CustomData": {
     "ID": "Flatness",
-    "Shader": "masks/CalculatedMask/flatness.glsl"
+    "Shader": "masks/calculated_mask/flatness.glsl"
   }
 }

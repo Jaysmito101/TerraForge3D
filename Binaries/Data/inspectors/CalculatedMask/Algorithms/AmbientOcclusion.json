@@ -26,6 +26,6 @@
   ],
   "CustomData": {
     "ID": "AmbientOcclusion",
-    "Shader": "masks/CalculatedMask/ambient_occlusion.glsl"
+    "Shader": "masks/calculated_mask/ambient_occlusion.glsl"
   }
 }

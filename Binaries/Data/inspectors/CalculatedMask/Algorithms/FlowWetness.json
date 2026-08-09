@@ -26,6 +26,6 @@
   ],
   "CustomData": {
     "ID": "FlowWetness",
-    "Shader": "masks/CalculatedMask/flow_wetness.glsl"
+    "Shader": "masks/calculated_mask/flow_wetness.glsl"
   }
 }

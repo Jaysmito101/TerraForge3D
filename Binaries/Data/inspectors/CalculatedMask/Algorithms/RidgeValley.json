@@ -12,6 +12,6 @@
   ],
   "CustomData": {
     "ID": "RidgeValley",
-    "Shader": "masks/CalculatedMask/ridge_valley.glsl"
+    "Shader": "masks/calculated_mask/ridge_valley.glsl"
   }
 }

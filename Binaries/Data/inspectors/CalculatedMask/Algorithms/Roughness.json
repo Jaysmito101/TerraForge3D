@@ -9,6 +9,6 @@
   ],
   "CustomData": {
     "ID": "Roughness",
-    "Shader": "masks/CalculatedMask/roughness.glsl"
+    "Shader": "masks/calculated_mask/roughness.glsl"
   }
 }
