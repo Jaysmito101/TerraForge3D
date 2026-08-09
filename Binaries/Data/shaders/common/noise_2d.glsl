@@ -1,3 +1,15 @@
+#define TF3D_NOISE_BILLOW 0
+#define TF3D_NOISE_SIMPLEX 1
+#define TF3D_NOISE_PERLIN 2
+#define TF3D_NOISE_GABOR 3
+#define TF3D_NOISE_VALUE 4
+#define TF3D_NOISE_PHASOR 5
+#define TF3D_NOISE_RIDGED 6
+#define TF3D_NOISE_VORONOI 7
+#define TF3D_NOISE_WHITE 8
+#define TF3D_NOISE_WORLEY 9
+#define TF3D_NOISE_COUNT 10
+
 const float TF3D_NOISE_PI2 = 6.28318530718;
 
 float tf3d_hash12(vec2 p, float seed)
