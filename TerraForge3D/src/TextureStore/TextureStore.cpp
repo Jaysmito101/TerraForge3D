@@ -177,11 +177,7 @@ namespace tf3d::texture_store
     void TextureStore::LoadTextureThumbs()
     {
         TF3D_LOG_INFO("Loading texture thumbnails");
-        int i = 0;
-
         for (auto &it : textureStoreItems) {
-            i++;
-
             if (!FileExists(GetExecutableDir() + PATH_SEPARATOR "Data" PATH_SEPARATOR "cache" PATH_SEPARATOR "texture_thumbnails" PATH_SEPARATOR + it.name + ".png")) {
                 // Log("Thumbnail for texture: " + it.name + " not found.");
                 it.texThumbnail = new Texture2D(GetExecutableDir() + PATH_SEPARATOR
