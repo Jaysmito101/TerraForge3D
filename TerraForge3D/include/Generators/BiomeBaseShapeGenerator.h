@@ -1,16 +1,11 @@
 #pragma once
 
 #include "Base/Base.h"
-#include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/NoiseAlgorithmCatalog.h"
 #include "Inspector/CustomInspector.h"
-#include "Utils/Utils.h"
 #include <nlohmann/json.hpp>
 #include <string_view>
-
-#define BASE_SHAPE_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
 
 namespace tf3d::data
 {
@@ -21,19 +16,14 @@ using tf3d::data::ApplicationState;
 namespace tf3d::generators
 {
 
-    static bool s_TempBool = false;
-
     class BiomeBaseShapeGenerator
     {
     public:
         BiomeBaseShapeGenerator(ApplicationState *appState);
-        ~BiomeBaseShapeGenerator();
-        bool LoadConfig(const std::string &config);
+        ~BiomeBaseShapeGenerator() = default;
         bool LoadConfig(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
         bool ShowSettings();
         void Update(GeneratorData *buffer, GeneratorTexture *seedTexture, std::string_view profilePrefix = {});
-        void Load(SerializerNode data);
-        SerializerNode Save();
 
         inline const std::string &GetName() const
         {
@@ -47,19 +37,15 @@ namespace tf3d::generators
         {
             return m_Description;
         }
-        inline const std::string &GetSource() const
-        {
-            return m_Source;
-        }
         inline bool RequireUpdation() const
         {
             return m_RequireUpdation;
         }
 
     private:
-        nlohmann::json ParseData(const std::string &config);
         bool LoadInspectorFromConfig(const nlohmann::json &metaData);
-        std::string BuildShaderSource();
+        std::string BuildShaderSource(const std::string &templateSource,
+                                      const std::string &uniformDeclarations);
 
     protected:
         ApplicationState *m_AppState = nullptr;
@@ -70,8 +56,7 @@ namespace tf3d::generators
         std::string m_Description = "";
         std::string m_Source      = "";
         std::string m_ShaderPath  = "";
-        NoiseAlgorithmCatalog m_NoiseAlgorithms;
-        bool m_RequireUpdation = true;
+        bool m_RequireUpdation    = true;
     };
 
 } // namespace tf3d::generators
