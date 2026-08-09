@@ -1,204 +1,311 @@
 #include "Generators/BiomeCustomBaseShape.h"
+
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
+#include <algorithm>
+
 namespace tf3d::generators
 {
 
-    BiomeCustomBaseShape::BiomeCustomBaseShape(ApplicationState *appState)
+    BiomeCustomizeBaseShape::BiomeCustomizeBaseShape(ApplicationState *appState)
+        : m_AppState(appState)
     {
-        m_AppState = appState;
-
         m_WorkingDataBuffer = std::make_shared<GeneratorData>();
         m_SwapBuffer        = std::make_shared<GeneratorData>();
-
-        // this is just a preview texture, it is not used for anything else
-        // so its ok for it to be low resolution
-        m_PreviewTexture = std::make_shared<GeneratorTexture>(512, 512);
-
-        // m_Shader = std::make_shared<ComputeShader>(appState->resourceManager->LoadShaderSource("generation/custom_base_shape/custom_base_shape"));
-        m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/custom_base_shape/custom_base_shape");
-
-        m_RequireBaseShapeUpdate = true;
-        m_RequireUpdation        = true;
-        m_Enabled                = false;
+        m_Shader            = m_AppState->resourceManager->LoadComputeShader(
+            "generation/customize_base_shape/customize_base_shape");
+        m_Masks.push_back(CreateMaskLayer("Mask 1"));
     }
 
-    BiomeCustomBaseShape::~BiomeCustomBaseShape()
+    BiomeCustomizeBaseShape::~BiomeCustomizeBaseShape() = default;
+
+    BiomeCustomizeBaseShape::MaskLayer BiomeCustomizeBaseShape::CreateMaskLayer(const std::string &name) const
     {
+        MaskLayer layer;
+        layer.name           = name;
+        layer.maskTool       = std::make_shared<MaskTool>(m_AppState, glm::vec3(1.0f, 0.45f, 0.05f));
+        layer.calculatedMask = std::make_shared<CalculatedMaskGenerator>(m_AppState);
+        layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
+                                                "Calculated customize-base-shape mask");
+        return layer;
     }
 
-    bool BiomeCustomBaseShape::ShowShettings()
+    void BiomeCustomizeBaseShape::AddMaskLayer()
     {
-        bool enabledSwitch = (ImGui::Checkbox("Enabled", &m_Enabled));
+        m_Masks.push_back(CreateMaskLayer("Mask " + std::to_string(m_Masks.size() + 1)));
+        m_SelectedMask    = static_cast<int>(m_Masks.size()) - 1;
+        m_RequireUpdation = true;
+    }
 
-        if (ImGui::Button("Reload Base Shape")) {
-            m_RequireBaseShapeUpdate = true;
-            m_RequireUpdation        = true;
-        }
+    bool BiomeCustomizeBaseShape::ShowSettings()
+    {
+        bool changed = false;
+        changed |= ImGui::Checkbox("Enabled", &m_Enabled);
+        changed |= ImGui::Checkbox("Flatten original base shape", &m_FlattenBaseShape);
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Start customization from zero instead of the generated base-shape result.");
 
-        ImGui::SameLine();
-
-        if (ImGui::Button("Flatten")) {
-            m_WorkingDataBuffer->Bind(1);
-            m_Shader->Bind();
-            m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
-            m_Shader->SetUniform1i("u_Mode", 0); // for transfer
-            m_Shader->SetUniform1f("u_MixFactor", 0.0f);
-            const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-            const auto dispatchSize  = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
-            m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
-            m_RequireUpdation = true;
-        }
-
-        if (ImGui::BeginTabBar("Core Settings Type")) {
-            if (ImGui::BeginTabItem("Draw")) {
-                ImGui::PushID("BiomeCustomBaseShape Edit Mode -> Draw");
-                BIOME_UI_PROPERTY(ShowDrawEditor());
-                ImGui::PopID();
+        ImGui::TextDisabled("The selected base shape runs first; these layers run before base noise and filters.");
+        if (ImGui::BeginTabBar("Customize Base Shape Sections")) {
+            if (ImGui::BeginTabItem("Drawing")) {
+                changed |= ShowDrawingSettings();
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
         }
 
-        return (m_RequireUpdation && m_Enabled) || enabledSwitch;
+        m_RequireUpdation |= changed;
+        return changed;
     }
 
-    void BiomeCustomBaseShape::Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer,
-                                      GeneratorData *swapBuffer, std::string_view profilePrefix)
+    bool BiomeCustomizeBaseShape::ShowDrawingSettings()
     {
-        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
-        const std::string scopeKey    = scopePrefix + "/custom-base-shape";
-        TF3D_PROFILE_SCOPE_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
-
-        if (m_RequireBaseShapeUpdate) {
-            if (sourceBuffer) {
-                sourceBuffer->CopyTo(m_WorkingDataBuffer.get());
-            } else {
-                TF3D_LOG_ERROR("Base-shape load requested with a null source buffer");
-            }
-            m_RequireBaseShapeUpdate = false;
+        bool changed = false;
+        if (ImGui::Button("Add mask")) {
+            AddMaskLayer();
+            changed = true;
         }
 
-        m_WorkingDataBuffer->Bind(0);
-        targetBuffer->Bind(1);
+        ImGui::PushTextWrapPos(0.0f);
+        ImGui::TextDisabled("Each mask is evaluated from the terrain before its layer.");
+        ImGui::PopTextWrapPos();
+
+        int removeIndex            = -1;
+        const ImGuiStyle &style    = ImGui::GetStyle();
+        const float rowHeight      = ImGui::GetFrameHeightWithSpacing();
+        const int rowCount         = std::max(1, static_cast<int>(m_Masks.size()));
+        const float listHeight     = std::min(rowHeight * 6.0f, rowHeight * static_cast<float>(rowCount)) + style.WindowPadding.y * 2.0f;
+        const bool maskListVisible = ImGui::BeginChild("Customize Base Shape Mask List", ImVec2(0.0f, listHeight), true);
+        if (maskListVisible) {
+            for (int maskIndex = 0; maskIndex < static_cast<int>(m_Masks.size()); ++maskIndex) {
+                auto &layer = m_Masks[static_cast<size_t>(maskIndex)];
+                ImGui::PushID(maskIndex);
+                const std::string label = layer.name + (layer.enabled ? "" : " (disabled)");
+
+                const float removeWidth     = ImGui::CalcTextSize("Remove").x + style.FramePadding.x * 2.0f;
+                const float selectableWidth = std::max(
+                    0.0f, ImGui::GetContentRegionAvail().x - removeWidth - style.ItemSpacing.x);
+                if (ImGui::Selectable(label.c_str(), m_SelectedMask == maskIndex, 0,
+                                      ImVec2(selectableWidth, ImGui::GetFrameHeight())))
+                    m_SelectedMask = maskIndex;
+                ImGui::SameLine();
+                ImGui::BeginDisabled(m_Masks.size() <= 1);
+                if (ImGui::SmallButton("Remove"))
+                    removeIndex = maskIndex;
+                ImGui::EndDisabled();
+                ImGui::PopID();
+                if (removeIndex >= 0)
+                    break;
+            }
+            if (m_Masks.empty())
+                ImGui::TextDisabled("No masks. Add one to begin sculpting.");
+        }
+        ImGui::EndChild();
+
+        if (removeIndex >= 0 && removeIndex < static_cast<int>(m_Masks.size())) {
+            m_Masks.erase(m_Masks.begin() + removeIndex);
+            if (m_SelectedMask > removeIndex)
+                --m_SelectedMask;
+            m_SelectedMask = glm::clamp(m_SelectedMask, 0, static_cast<int>(m_Masks.size()) - 1);
+            changed        = true;
+        }
+
+        if (m_Masks.empty())
+            return changed;
+
+        m_SelectedMask = glm::clamp(m_SelectedMask, 0, static_cast<int>(m_Masks.size()) - 1);
+        auto &layer    = m_Masks[static_cast<size_t>(m_SelectedMask)];
+        ImGui::SeparatorText("Selected mask");
+        ImGui::PushID("Customize Base Shape Selected Mask");
+        changed |= ImGui::Checkbox("Layer enabled", &layer.enabled);
+
+        static const char *directions[] = {"Push up", "Push down"};
+        int direction                   = layer.raise ? 0 : 1;
+        if (ShowComboBox("Direction", &direction, directions, IM_ARRAYSIZE(directions))) {
+            layer.raise = direction == 0;
+            changed     = true;
+        }
+        changed |= ImGui::SliderFloat("Strength", &layer.strength, 0.0f, 4.0f);
+        changed |= ImGui::SliderFloat("Smoothing", &layer.smoothing, 0.0f, 1.0f);
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Smooths the mask influence before applying the height offset.");
+
+        if (layer.maskTool != nullptr && layer.calculatedMask != nullptr) {
+            layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
+                                                    "Calculated customize-base-shape mask");
+            if (layer.maskTool->IsShowingGeneratedMask())
+                changed |= layer.calculatedMask->ShowSettings();
+            changed |= layer.maskTool->ShowSettings(true);
+        }
+        ImGui::PopID();
+        return changed;
+    }
+
+    bool BiomeCustomizeBaseShape::UpdateLayerMask(MaskLayer &layer, GeneratorData *source)
+    {
+        if (layer.maskTool == nullptr || layer.calculatedMask == nullptr || source == nullptr)
+            return false;
+
+        if (layer.maskTool->IsShowingGeneratedMask()) {
+            layer.calculatedMask->Invalidate();
+            layer.calculatedMask->Update(source);
+        }
+        layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
+                                                "Calculated customize-base-shape mask");
+        return layer.maskTool->GetPreviewTexture() != nullptr;
+    }
+
+    bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *source, GeneratorData *target,
+                                             const MaskLayer *layer, bool flattenSource,
+                                             std::string_view profilePrefix)
+    {
+        if (!m_Shader || source == nullptr || target == nullptr)
+            return false;
+
+        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
+        const std::string scopeKey    = scopePrefix + "/customize-base-shape";
+        TF3D_PROFILE_SCOPE_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
+
+        source->Bind(0);
+        target->Bind(1);
         m_Shader->Bind();
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
-        m_Shader->SetUniform1i("u_Mode", 0); // for transfer
-        m_Shader->SetUniform1f("u_MixFactor", 1.0f);
+        m_Shader->SetUniform1i("u_UseMask", layer != nullptr ? 1 : 0);
+        m_Shader->SetUniform1i("u_FlattenSource", flattenSource ? 1 : 0);
+        m_Shader->SetUniform1i("u_Direction", layer != nullptr && layer->raise ? 1 : -1);
+        m_Shader->SetUniform1f("u_Strength", layer != nullptr ? glm::max(layer->strength, 0.0f) : 0.0f);
+        m_Shader->SetUniform1f("u_Smoothing", layer != nullptr ? glm::clamp(layer->smoothing, 0.0f, 1.0f) : 0.0f);
+        if (layer != nullptr && layer->maskTool != nullptr) {
+            if (auto *maskTexture = layer->maskTool->GetPreviewTexture())
+                m_Shader->SetUniform1i("u_MaskTexture", maskTexture->Bind(2));
+        }
+
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        const auto dispatchSize  = m_AppState->mainMap.tileResolution / workgroupSize;
+        const auto resolution    = m_AppState->mainMap.tileResolution;
+        const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
         const std::string gpuKey = scopeKey + "/gpu";
         TF3D_PROFILE_GPU_SCOPE(gpuKey);
-        TF3D_PROFILE_VALUE_DOMAIN("generation/custom-base-shape/dispatch", dispatchSize, dispatchSize, 1,
+        TF3D_PROFILE_VALUE_DOMAIN("generation/customize-base-shape/dispatch", dispatchSize, dispatchSize, 1,
                                   PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
+        return true;
+    }
 
-        // m_WorkingDataBuffer->CopyTo(sourceBuffer);
+    void BiomeCustomizeBaseShape::Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer,
+                                         std::string_view profilePrefix)
+    {
+        if (baseShapeBuffer == nullptr || targetBuffer == nullptr)
+            return;
+
+        GeneratorData *current = baseShapeBuffer;
+        bool hasOutput         = false;
+
+        if (m_FlattenBaseShape) {
+            if (!ApplyLayer(baseShapeBuffer, m_WorkingDataBuffer.get(), nullptr, true, profilePrefix)) {
+                baseShapeBuffer->CopyTo(targetBuffer);
+                return;
+            }
+            current   = m_WorkingDataBuffer.get();
+            hasOutput = true;
+        }
+
+        for (auto &layer : m_Masks) {
+            if (!layer.enabled)
+                continue;
+            if (!UpdateLayerMask(layer, current))
+                continue;
+
+            GeneratorData *target = current == m_WorkingDataBuffer.get()
+                                        ? m_SwapBuffer.get()
+                                        : m_WorkingDataBuffer.get();
+            if (!ApplyLayer(current, target, &layer, false, profilePrefix)) {
+                baseShapeBuffer->CopyTo(targetBuffer);
+                return;
+            }
+            current   = target;
+            hasOutput = true;
+        }
+
+        if (!hasOutput)
+            baseShapeBuffer->CopyTo(targetBuffer);
+        else if (current != targetBuffer)
+            current->CopyTo(targetBuffer);
 
         m_RequireUpdation = false;
     }
 
-    SerializerNode BiomeCustomBaseShape::Save()
+    SerializerNode BiomeCustomizeBaseShape::Save() const
     {
-        return CreateSerializerNode();
+        auto node = CreateSerializerNode();
+        node->Set("Enabled", m_Enabled);
+        node->Set("FlattenBaseShape", m_FlattenBaseShape);
+
+        std::vector<SerializerNode> masks;
+        masks.reserve(m_Masks.size());
+        for (const auto &layer : m_Masks) {
+            auto mask = CreateSerializerNode();
+            mask->Set("Name", layer.name);
+            mask->Set("Enabled", layer.enabled);
+            mask->Set("Raise", layer.raise);
+            mask->Set("Strength", layer.strength);
+            mask->Set("Smoothing", layer.smoothing);
+            if (layer.calculatedMask != nullptr)
+                mask->Set("CalculatedMask", layer.calculatedMask->Save());
+            if (layer.maskTool != nullptr)
+                mask->Set("MaskTool", layer.maskTool->Save());
+            masks.push_back(std::move(mask));
+        }
+        node->Set("Masks", masks);
+        return node;
     }
 
-    void BiomeCustomBaseShape::Load(SerializerNode node)
+    void BiomeCustomizeBaseShape::Load(SerializerNode node)
     {
+        if (node == nullptr)
+            return;
+
+        m_Enabled          = node->Get<bool>("Enabled", m_Enabled);
+        m_FlattenBaseShape = node->Get<bool>("FlattenBaseShape", m_FlattenBaseShape);
+        if (node->HasKey("Masks")) {
+            m_Masks.clear();
+            for (const auto &maskNode : node->Get<std::vector<SerializerNode>>("Masks")) {
+                if (maskNode == nullptr)
+                    continue;
+                auto layer      = CreateMaskLayer(maskNode->Get<std::string>("Name", "Mask"));
+                layer.enabled   = maskNode->Get<bool>("Enabled", layer.enabled);
+                layer.raise     = maskNode->Get<bool>("Raise", layer.raise);
+                layer.strength  = maskNode->Get<float>("Strength", layer.strength);
+                layer.smoothing = maskNode->Get<float>("Smoothing", layer.smoothing);
+                if (layer.calculatedMask != nullptr)
+                    layer.calculatedMask->Load(maskNode->Get<SerializerNode>("CalculatedMask"));
+                if (layer.maskTool != nullptr) {
+                    layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
+                                                            "Calculated customize-base-shape mask");
+                    layer.maskTool->Load(maskNode->Get<SerializerNode>("MaskTool"));
+                }
+                m_Masks.push_back(std::move(layer));
+            }
+        }
+        m_SelectedMask    = glm::clamp(m_SelectedMask, 0, std::max(0, static_cast<int>(m_Masks.size()) - 1));
+        m_RequireUpdation = true;
     }
 
-    void BiomeCustomBaseShape::Resize()
+    void BiomeCustomizeBaseShape::Resize()
     {
-        auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
+        const auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_WorkingDataBuffer->Resize(size);
         m_SwapBuffer->Resize(size);
-        m_RequireBaseShapeUpdate = true;
-        m_RequireUpdation        = true;
-    }
-
-    bool BiomeCustomBaseShape::ApplyDrawingShaders()
-    {
-        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-            m_WorkingDataBuffer->Bind(1);
-            m_Shader->Bind();
-            m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
-            if (ImGui::IsKeyDown(ImGuiKey_LeftShift) || m_DrawSettings.m_BrushMode == 1) {
-                m_Shader->SetUniform1i("u_Mode", 2); // for gaussian smooth brush
-                m_WorkingDataBuffer->CopyTo(m_SwapBuffer.get());
-                m_SwapBuffer->Bind(0);
-            } else
-                m_Shader->SetUniform1i("u_Mode", 1); // for basic brush
-            m_Shader->SetUniform2f("u_BrushPosition", m_DrawSettings.m_BrushPositionX, m_DrawSettings.m_BrushPositionY);
-            m_Shader->SetUniform4f("u_BrushSettings0", m_DrawSettings.m_BrushStrength, m_DrawSettings.m_BrushSize, m_DrawSettings.m_BrushFalloff, 0.0f);
-            m_Shader->SetUniform1f("u_MixFactor", ImGui::IsKeyDown(ImGuiKey_LeftCtrl) ? -0.01f : 0.01f);
-            const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-            m_Shader->Dispatch(m_AppState->mainMap.tileResolution / workgroupSize, m_AppState->mainMap.tileResolution / workgroupSize, 1);
-            m_RequireUpdation = true;
+        for (auto &layer : m_Masks) {
+            if (layer.calculatedMask != nullptr)
+                layer.calculatedMask->Resize(m_AppState->mainMap.tileResolution);
+            if (layer.maskTool != nullptr)
+                layer.maskTool->Resize(m_AppState->mainMap.tileResolution);
         }
-
-        return m_RequireUpdation;
-    }
-
-    bool BiomeCustomBaseShape::ShowDrawEditor()
-    {
-        static int s_PrevBrushMode = 0;
-
-        if (!m_Enabled)
-            return false;
-
-        misc::ViewportManager *activeViewport = nullptr;
-        for (auto editor : m_AppState->viewportManagers) {
-            if (editor->IsActive()) {
-                activeViewport = editor;
-                break;
-            }
-        }
-
-        if (activeViewport) {
-            auto posOnTerrain                = activeViewport->GetPositionOnTerrain();
-            m_DrawSettings.m_BrushPositionX  = posOnTerrain.x;
-            m_DrawSettings.m_BrushPositionY  = posOnTerrain.y;
-            m_DrawSettings.m_ShowMask        = false;
-            m_DrawSettings.m_ShowBrushCursor = true;
-            m_AppState->rendererManager->GetObjectRenderer()->SetCustomBaseShapeDrawSettings(&m_DrawSettings);
-
-            if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
-                if (m_DrawSettings.m_BrushMode != 1)
-                    s_PrevBrushMode = m_DrawSettings.m_BrushMode;
-                m_DrawSettings.m_BrushMode = 1;
-
-                if (ImGui::IsKeyDown(ImGuiKey_R)) {
-                    activeViewport->SetControlEnabled(false);
-                    m_DrawSettings.m_BrushSize += ImGui::GetIO().MouseWheel * 0.2f * (m_DrawSettings.m_BrushSize + 0.01f);
-                    m_DrawSettings.m_BrushSize = glm::clamp(m_DrawSettings.m_BrushSize, 0.0f, 2.0f);
-                } else if (ImGui::IsKeyDown(ImGuiKey_S)) {
-                    activeViewport->SetControlEnabled(false);
-                    m_DrawSettings.m_BrushStrength += ImGui::GetIO().MouseWheel * 0.1f;
-                } else if (ImGui::IsKeyDown(ImGuiKey_F)) {
-                    activeViewport->SetControlEnabled(false);
-                    m_DrawSettings.m_BrushFalloff += ImGui::GetIO().MouseWheel * 0.05f;
-                    m_DrawSettings.m_BrushFalloff = glm::clamp(m_DrawSettings.m_BrushFalloff, 0.0f, 1.0f);
-                }
-            } else {
-                m_DrawSettings.m_BrushMode = s_PrevBrushMode;
-            }
-
-            BIOME_UI_PROPERTY(ApplyDrawingShaders());
-        }
-
-        static const char *s_BrushModes[] = {"Basic", "Gaussian Smooth"};
-
-        if (ShowComboBox("Brush Mode", &m_DrawSettings.m_BrushMode, s_BrushModes, IM_ARRAYSIZE(s_BrushModes)))
-            s_PrevBrushMode = m_DrawSettings.m_BrushMode;
-        ImGui::SliderFloat("Brush Size", &m_DrawSettings.m_BrushSize, 0.0f, 2.0f);
-        ImGui::SliderFloat("Brush Fall Off", &m_DrawSettings.m_BrushFalloff, 0.0f, 1.0f);
-        ImGui::DragFloat("Brush Strength", &m_DrawSettings.m_BrushStrength, 0.01f);
-
-        return m_RequireUpdation;
+        m_RequireUpdation = true;
     }
 
 } // namespace tf3d::generators

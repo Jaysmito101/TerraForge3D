@@ -2,12 +2,13 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
+#include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/GeneratorData.h"
-#include "Generators/GeneratorTexture.h"
-#include "Inspector/CustomInspector.h"
-#include "Renderer/ObjectRenderer.h"
-#include "Utils/Utils.h"
+#include "Generators/MaskTool.h"
+
+#include <string>
 #include <string_view>
+#include <vector>
 
 namespace tf3d::data
 {
@@ -18,22 +19,17 @@ using tf3d::data::ApplicationState;
 namespace tf3d::generators
 {
 
-    enum BiomeCustomBaseShapeEditMode {
-        BiomeCustomBaseShapeEditMode_Draw,
-        BiomeCustomBaseShapeEditMode_Count
-    };
-
-    class BiomeCustomBaseShape
+    class BiomeCustomizeBaseShape
     {
     public:
-        BiomeCustomBaseShape(ApplicationState *appState);
-        ~BiomeCustomBaseShape();
+        explicit BiomeCustomizeBaseShape(ApplicationState *appState);
+        ~BiomeCustomizeBaseShape();
 
-        bool ShowShettings();
-        void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorData *swapBuffer,
+        bool ShowSettings();
+        void Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer,
                     std::string_view profilePrefix = {});
 
-        SerializerNode Save();
+        SerializerNode Save() const;
         void Load(SerializerNode node);
 
         inline bool RequireUpdation() const
@@ -44,27 +40,36 @@ namespace tf3d::generators
         {
             return m_Enabled;
         }
-        inline bool RequiresBaseShapeUpdate() const
-        {
-            return m_RequireBaseShapeUpdate;
-        }
 
         void Resize();
 
     private:
-        bool ApplyDrawingShaders();
-        bool ShowDrawEditor();
+        struct MaskLayer {
+            std::string name;
+            bool enabled    = true;
+            bool raise      = true;
+            float strength  = 1.0f;
+            float smoothing = 0.0f;
+            std::shared_ptr<MaskTool> maskTool;
+            std::shared_ptr<CalculatedMaskGenerator> calculatedMask;
+        };
+
+        MaskLayer CreateMaskLayer(const std::string &name) const;
+        void AddMaskLayer();
+        bool ShowDrawingSettings();
+        bool ApplyLayer(GeneratorData *source, GeneratorData *target,
+                        const MaskLayer *layer, bool flattenSource,
+                        std::string_view profilePrefix);
+        bool UpdateLayerMask(MaskLayer &layer, GeneratorData *source);
 
     private:
         data::ApplicationState *m_AppState = nullptr;
         bool m_RequireUpdation             = true;
         bool m_Enabled                     = false;
-        bool m_RequireBaseShapeUpdate      = false;
+        bool m_FlattenBaseShape            = false;
         std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
-        std::shared_ptr<GeneratorTexture> m_PreviewTexture;
-        renderer::DrawBrushSettings m_DrawSettings;
+        std::vector<MaskLayer> m_Masks;
+        int m_SelectedMask = 0;
     };
-
 } // namespace tf3d::generators
-using tf3d::generators::BiomeCustomBaseShape;
