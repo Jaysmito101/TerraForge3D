@@ -4,29 +4,29 @@
     "Label": "Open Sea",
     "Description": "Cool blue open water with calm swells, crisp highlights, and restrained foam.",
     "Values": {
-      "SeaLevel": 0.07,
-      "WaveAmplitude": 5.5,
-      "WaveFrequency": 0.45,
-      "WaveSpeed": 0.08,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.07,
+      "Waves.WaveAmplitude": 5.5,
+      "Waves.WaveFrequency": 0.45,
+      "Waves.WaveSpeed": 0.08,
+      "Appearance.ShallowColor": [
         0.008,
         0.14,
         0.26
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.001,
         0.006,
         0.03
       ],
-      "DepthScale": 0.42,
-      "DetailStrength": 0.26,
-      "ReflectionStrength": 1.2,
-      "RefractionStrength": 0.035,
-      "SpecularIntensity": 0.75,
-      "ScatterStrength": 0.85,
-      "FoamIntensity": 0.22,
-      "ShorefoamWidth": 0.16,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.42,
+      "Appearance.DetailStrength": 0.26,
+      "Lighting.ReflectionStrength": 1.2,
+      "Lighting.RefractionStrength": 0.035,
+      "Lighting.SpecularIntensity": 0.75,
+      "Lighting.ScatterStrength": 0.85,
+      "Foam.FoamIntensity": 0.22,
+      "Foam.ShorefoamWidth": 0.16,
+      "Foam.FoamColor": [
         0.72,
         0.86,
         0.88
@@ -38,29 +38,29 @@
     "Label": "Tropical Lagoon",
     "Description": "Bright turquoise shallows with soft ripples, warm scatter, and pale wash foam.",
     "Values": {
-      "SeaLevel": 0.055,
-      "WaveAmplitude": 4.0,
-      "WaveFrequency": 0.32,
-      "WaveSpeed": 0.035,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.055,
+      "Waves.WaveAmplitude": 4.0,
+      "Waves.WaveFrequency": 0.32,
+      "Waves.WaveSpeed": 0.035,
+      "Appearance.ShallowColor": [
         0.02,
         0.48,
         0.38
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.003,
         0.07,
         0.1
       ],
-      "DepthScale": 0.24,
-      "DetailStrength": 0.28,
-      "ReflectionStrength": 1.2,
-      "RefractionStrength": 0.035,
-      "SpecularIntensity": 0.8,
-      "ScatterStrength": 1.2,
-      "FoamIntensity": 0.25,
-      "ShorefoamWidth": 0.24,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.24,
+      "Appearance.DetailStrength": 0.28,
+      "Lighting.ReflectionStrength": 1.2,
+      "Lighting.RefractionStrength": 0.035,
+      "Lighting.SpecularIntensity": 0.8,
+      "Lighting.ScatterStrength": 1.2,
+      "Foam.FoamIntensity": 0.25,
+      "Foam.ShorefoamWidth": 0.24,
+      "Foam.FoamColor": [
         0.78,
         0.95,
         0.88
@@ -72,29 +72,29 @@
     "Label": "Sandy Beach",
     "Description": "Low warm shallows with a glassy surface and cream-colored shoreline wash.",
     "Values": {
-      "SeaLevel": 0.025,
-      "WaveAmplitude": 3.2,
-      "WaveFrequency": 0.26,
-      "WaveSpeed": 0.05,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.025,
+      "Waves.WaveAmplitude": 3.2,
+      "Waves.WaveFrequency": 0.26,
+      "Waves.WaveSpeed": 0.05,
+      "Appearance.ShallowColor": [
         0.07,
         0.3,
         0.34
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.006,
         0.045,
         0.075
       ],
-      "DepthScale": 0.2,
-      "DetailStrength": 0.12,
-      "ReflectionStrength": 0.65,
-      "RefractionStrength": 0.018,
-      "SpecularIntensity": 0.45,
-      "ScatterStrength": 0.75,
-      "FoamIntensity": 0.34,
-      "ShorefoamWidth": 0.27,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.2,
+      "Appearance.DetailStrength": 0.12,
+      "Lighting.ReflectionStrength": 0.65,
+      "Lighting.RefractionStrength": 0.018,
+      "Lighting.SpecularIntensity": 0.45,
+      "Lighting.ScatterStrength": 0.75,
+      "Foam.FoamIntensity": 0.34,
+      "Foam.ShorefoamWidth": 0.27,
+      "Foam.FoamColor": [
         0.98,
         0.92,
         0.74
@@ -106,29 +106,29 @@
     "Label": "River",
     "Description": "Deep green river water with broad rolling current bands and quiet edge foam.",
     "Values": {
-      "SeaLevel": 0.045,
-      "WaveAmplitude": 4.2,
-      "WaveFrequency": 0.22,
-      "WaveSpeed": 0.18,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.045,
+      "Waves.WaveAmplitude": 4.2,
+      "Waves.WaveFrequency": 0.22,
+      "Waves.WaveSpeed": 0.18,
+      "Appearance.ShallowColor": [
         0.03,
         0.24,
         0.19
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.004,
         0.028,
         0.022
       ],
-      "DepthScale": 0.18,
-      "DetailStrength": 0.42,
-      "ReflectionStrength": 0.55,
-      "RefractionStrength": 0.018,
-      "SpecularIntensity": 0.5,
-      "ScatterStrength": 0.65,
-      "FoamIntensity": 0.22,
-      "ShorefoamWidth": 0.14,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.18,
+      "Appearance.DetailStrength": 0.42,
+      "Lighting.ReflectionStrength": 0.55,
+      "Lighting.RefractionStrength": 0.018,
+      "Lighting.SpecularIntensity": 0.5,
+      "Lighting.ScatterStrength": 0.65,
+      "Foam.FoamIntensity": 0.22,
+      "Foam.ShorefoamWidth": 0.14,
+      "Foam.FoamColor": [
         0.68,
         0.82,
         0.7
@@ -140,29 +140,29 @@
     "Label": "Storm",
     "Description": "Dark rolling storm water with broad heavy swells, sharp light, and broken foam.",
     "Values": {
-      "SeaLevel": 0.075,
-      "WaveAmplitude": 5.8,
-      "WaveFrequency": 0.38,
-      "WaveSpeed": 0.28,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.075,
+      "Waves.WaveAmplitude": 5.8,
+      "Waves.WaveFrequency": 0.38,
+      "Waves.WaveSpeed": 0.28,
+      "Appearance.ShallowColor": [
         0.018,
         0.12,
         0.17
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.001,
         0.005,
         0.02
       ],
-      "DepthScale": 0.42,
-      "DetailStrength": 0.48,
-      "ReflectionStrength": 1.7,
-      "RefractionStrength": 0.065,
-      "SpecularIntensity": 1.25,
-      "ScatterStrength": 1.35,
-      "FoamIntensity": 0.42,
-      "ShorefoamWidth": 0.24,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.42,
+      "Appearance.DetailStrength": 0.48,
+      "Lighting.ReflectionStrength": 1.7,
+      "Lighting.RefractionStrength": 0.065,
+      "Lighting.SpecularIntensity": 1.25,
+      "Lighting.ScatterStrength": 1.35,
+      "Foam.FoamIntensity": 0.42,
+      "Foam.ShorefoamWidth": 0.24,
+      "Foam.FoamColor": [
         0.68,
         0.8,
         0.84
@@ -174,29 +174,29 @@
     "Label": "Deep Ocean",
     "Description": "Midnight blue water with enormous slow swells and a cold, glassy sheen.",
     "Values": {
-      "SeaLevel": 0.09,
-      "WaveAmplitude": 6.0,
-      "WaveFrequency": 0.3,
-      "WaveSpeed": 0.12,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.09,
+      "Waves.WaveAmplitude": 6.0,
+      "Waves.WaveFrequency": 0.3,
+      "Waves.WaveSpeed": 0.12,
+      "Appearance.ShallowColor": [
         0.005,
         0.08,
         0.24
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.0005,
         0.002,
         0.025
       ],
-      "DepthScale": 0.55,
-      "DetailStrength": 0.35,
-      "ReflectionStrength": 2.1,
-      "RefractionStrength": 0.06,
-      "SpecularIntensity": 1.4,
-      "ScatterStrength": 1.3,
-      "FoamIntensity": 0.3,
-      "ShorefoamWidth": 0.18,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.55,
+      "Appearance.DetailStrength": 0.35,
+      "Lighting.ReflectionStrength": 2.1,
+      "Lighting.RefractionStrength": 0.06,
+      "Lighting.SpecularIntensity": 1.4,
+      "Lighting.ScatterStrength": 1.3,
+      "Foam.FoamIntensity": 0.3,
+      "Foam.ShorefoamWidth": 0.18,
+      "Foam.FoamColor": [
         0.62,
         0.78,
         0.85
@@ -208,29 +208,29 @@
     "Label": "Lava Flow",
     "Description": "A molten red-orange flow with slow towering folds and glowing hot crest breaks.",
     "Values": {
-      "SeaLevel": 0.025,
-      "WaveAmplitude": 5.0,
-      "WaveFrequency": 0.24,
-      "WaveSpeed": 0.1,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.025,
+      "Waves.WaveAmplitude": 5.0,
+      "Waves.WaveFrequency": 0.24,
+      "Waves.WaveSpeed": 0.1,
+      "Appearance.ShallowColor": [
         0.95,
         0.09,
         0.005
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.16,
         0.002,
         0.0002
       ],
-      "DepthScale": 0.14,
-      "DetailStrength": 0.25,
-      "ReflectionStrength": 0.35,
-      "RefractionStrength": 0.01,
-      "SpecularIntensity": 0.6,
-      "ScatterStrength": 0.45,
-      "FoamIntensity": 0.35,
-      "ShorefoamWidth": 0.12,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.14,
+      "Appearance.DetailStrength": 0.25,
+      "Lighting.ReflectionStrength": 0.35,
+      "Lighting.RefractionStrength": 0.01,
+      "Lighting.SpecularIntensity": 0.6,
+      "Lighting.ScatterStrength": 0.45,
+      "Foam.FoamIntensity": 0.35,
+      "Foam.ShorefoamWidth": 0.12,
+      "Foam.FoamColor": [
         1.0,
         0.22,
         0.01
@@ -242,29 +242,29 @@
     "Label": "Mudflat",
     "Description": "Opaque brown tidal mud with broad sluggish folds and soft, earthy edge breakup.",
     "Values": {
-      "SeaLevel": 0.0,
-      "WaveAmplitude": 4.6,
-      "WaveFrequency": 0.18,
-      "WaveSpeed": 0.05,
-      "ShallowColor": [
+      "WaterLevel.SeaLevel": 0.0,
+      "Waves.WaveAmplitude": 4.6,
+      "Waves.WaveFrequency": 0.18,
+      "Waves.WaveSpeed": 0.05,
+      "Appearance.ShallowColor": [
         0.3,
         0.2,
         0.08
       ],
-      "DeepColor": [
+      "Appearance.DeepColor": [
         0.045,
         0.025,
         0.008
       ],
-      "DepthScale": 0.25,
-      "DetailStrength": 0.18,
-      "ReflectionStrength": 0.2,
-      "RefractionStrength": 0.005,
-      "SpecularIntensity": 0.25,
-      "ScatterStrength": 0.15,
-      "FoamIntensity": 0.18,
-      "ShorefoamWidth": 0.34,
-      "FoamColor": [
+      "Appearance.DepthScale": 0.25,
+      "Appearance.DetailStrength": 0.18,
+      "Lighting.ReflectionStrength": 0.2,
+      "Lighting.RefractionStrength": 0.005,
+      "Lighting.SpecularIntensity": 0.25,
+      "Lighting.ScatterStrength": 0.15,
+      "Foam.FoamIntensity": 0.18,
+      "Foam.ShorefoamWidth": 0.34,
+      "Foam.FoamColor": [
         0.42,
         0.32,
         0.18
