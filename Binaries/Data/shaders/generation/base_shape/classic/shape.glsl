@@ -16,7 +16,7 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 		);
 	}
 	n = clamp(tf3d_snoise2(seed.xy + vec2(seed.z)), -1.0f, 1.0f);
-	if(u_AbsoluteValue) n = abs(n);
-	if(u_SquareValue) n = n * n;
+	if(u_AbsoluteValue != 0) n = abs(n);
+	if(u_SquareValue != 0) n = n * n;
 	return n * clamp(u_Strength, -4.0f, 4.0f);
 }

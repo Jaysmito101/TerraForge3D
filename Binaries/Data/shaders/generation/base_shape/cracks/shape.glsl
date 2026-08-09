@@ -53,8 +53,8 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	vec3 domain = (seed + offset) * scale + vec3(u_Seed);
 	vec4 voronoiResult = voronoi(domain);
 	float edgeValue = clamp(voronoiResult.w, 0.0f, 1.0f);
-	if(u_AbsoluteValue) edgeValue = abs(edgeValue);
-	if(u_SquareValue) edgeValue = edgeValue * edgeValue;
+	if(u_AbsoluteValue != 0) edgeValue = abs(edgeValue);
+	if(u_SquareValue != 0) edgeValue = edgeValue * edgeValue;
 
 	float strength = clamp(u_Strength, 0.0f, 4.0f);
 	float smoothness = clamp(abs(u_Smoothness), 0.001f, 1.0f);
