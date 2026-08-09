@@ -57,7 +57,7 @@ namespace tf3d::renderer
         }
         inline float GetPlanarShadowSoftness() const
         {
-            return m_TerrainInspector.Get<float>("BasePlaneShadowSoftness", 4.0f);
+            return m_TerrainInspector.Root().Scope("BasePlaneShadow").Get<float>("BasePlaneShadowSoftness", 4.0f);
         }
         inline HeightfieldAmbientCache *GetHeightfieldAmbientCache()
         {

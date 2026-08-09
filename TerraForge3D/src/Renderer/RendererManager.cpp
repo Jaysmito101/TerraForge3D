@@ -96,8 +96,9 @@ namespace tf3d::renderer
             return;
         }
 
-        const bool enableAmbientAo        = m_TerrainInspector.Get<bool>("TerrainAOEnabled", true);
-        const float ambientAoRadiusFactor = m_TerrainInspector.Get<float>("TerrainAORadiusFactor", 0.12f);
+        const auto terrainAoInspector     = m_TerrainInspector.Root().Scope("TerrainAO");
+        const bool enableAmbientAo        = terrainAoInspector.Get<bool>("TerrainAOEnabled", true);
+        const float ambientAoRadiusFactor = terrainAoInspector.Get<float>("TerrainAORadiusFactor", 0.12f);
         m_HeightfieldAmbientCache->SetEnabled(enableAmbientAo);
         const float terrainWorldSize = std::max(std::abs(m_AppState->mainMap.tileSize) * 2.0f, 0.0001f);
         if (!enableAmbientAo) {
@@ -120,10 +121,11 @@ namespace tf3d::renderer
             return;
         }
 
-        const bool enableTerrainGI                = m_TerrainInspector.Get<bool>("TerrainGIEnabled", false);
-        const int32_t terrainGIResolution         = m_TerrainInspector.Get<int32_t>("TerrainGIResolution", 128);
-        const int32_t terrainGITargetSamples      = m_TerrainInspector.Get<int32_t>("TerrainGITargetSamples", 32);
-        const int32_t terrainGISamplesPerDispatch = m_TerrainInspector.Get<int32_t>("TerrainGISamplesPerDispatch", 1);
+        const auto terrainGiInspector             = m_TerrainInspector.Root().Scope("TerrainGI");
+        const bool enableTerrainGI                = terrainGiInspector.Get<bool>("TerrainGIEnabled", false);
+        const int32_t terrainGIResolution         = terrainGiInspector.Get<int32_t>("TerrainGIResolution", 128);
+        const int32_t terrainGITargetSamples      = terrainGiInspector.Get<int32_t>("TerrainGITargetSamples", 32);
+        const int32_t terrainGISamplesPerDispatch = terrainGiInspector.Get<int32_t>("TerrainGISamplesPerDispatch", 1);
         m_HeightfieldGICache->SetEnabled(enableTerrainGI);
         if (!enableTerrainGI) {
             return;

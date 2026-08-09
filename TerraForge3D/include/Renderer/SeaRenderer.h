@@ -43,7 +43,7 @@ namespace tf3d::renderer
 
         inline bool IsEnabled() const
         {
-            return m_Inspector.Get<bool>("Enabled");
+            return m_Inspector.Root().Get<bool>("Enabled");
         }
 
     public:

@@ -100,7 +100,7 @@ namespace tf3d::renderer
         const float fieldMinimum        = fieldStatistics.valid ? fieldStatistics.minimum : 0.0f;
         const float solidDepth          = std::max(m_AppState->mainModel->planeSolidDepth, 0.0001f);
         const float terrainHeightOffset = -fieldMinimum + solidDepth;
-        const float seaWorldHeight      = m_Inspector.Get<float>("SeaLevel") + terrainHeightOffset;
+        const float seaWorldHeight      = m_Inspector.Root().Scope("WaterLevel").Get<float>("SeaLevel") + terrainHeightOffset;
         const glm::vec2 surfaceWorldSize(terrainWorldSize);
         const glm::vec2 surfaceMinimumXZ(-terrainWorldSize * 0.5f);
         m_ElapsedTime = static_cast<float>(glfwGetTime());

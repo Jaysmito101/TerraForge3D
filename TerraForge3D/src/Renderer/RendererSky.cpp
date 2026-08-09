@@ -63,7 +63,7 @@ namespace tf3d::renderer
 
         const std::string changedVariable = m_Inspector.GetLastChangedVariable();
         if (changedVariable == "SkyboxSize" || changedVariable == "IrradianceMapSize") {
-            const std::string path = m_Inspector.Get<std::string>("SkyMapPath");
+            const std::string path = m_Inspector.Root().Get<std::string>("SkyMapPath");
             if (!path.empty() && !LoadSkyMap(path))
                 m_Inspector.LoadState(previousState);
         }
@@ -72,7 +72,7 @@ namespace tf3d::renderer
     void RendererSky::Render(RendererViewport *viewport)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/sky/draw", PerformanceMonitor::Domain::Renderer);
-        if (!m_IsSkyReady || !m_Inspector.Get<bool>("RenderSky", true))
+        if (!m_IsSkyReady || !m_Inspector.Root().Get<bool>("RenderSky", true))
             return;
         glDisable(GL_DEPTH_TEST);
         m_SkyboxShader->Bind();
@@ -104,8 +104,8 @@ namespace tf3d::renderer
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/sky/load", PerformanceMonitor::Domain::Resource);
         if (path.size() < 3)
             return false;
-        const int32_t skyboxSize        = m_Inspector.Get<int32_t>("SkyboxSize", 512);
-        const int32_t irradianceMapSize = m_Inspector.Get<int32_t>("IrradianceMapSize", 32);
+        const int32_t skyboxSize        = m_Inspector.Root().Get<int32_t>("SkyboxSize", 512);
+        const int32_t irradianceMapSize = m_Inspector.Root().Get<int32_t>("IrradianceMapSize", 32);
         if (!IsValidPowerOfTwo(skyboxSize, 64, 4096) ||
             !IsValidPowerOfTwo(irradianceMapSize, 16, 256)) {
             TF3D_LOG_ERROR("Invalid renderer sky map sizes: SkyboxSize={}, IrradianceMapSize={}",
@@ -271,7 +271,7 @@ namespace tf3d::renderer
             glFinish();
         }
 
-        m_Inspector.Set("SkyMapPath", path);
+        m_Inspector.Root().Set("SkyMapPath", path);
         m_IsSkyReady = true;
         return true;
     }
@@ -280,7 +280,7 @@ namespace tf3d::renderer
     {
         if (!LoadSkyboxTexture(path))
             return false;
-        return m_Inspector.Set("SkyMapPath", path);
+        return m_Inspector.Root().Set("SkyMapPath", path);
     }
 
     bool RendererSky::Load(exporters::SerializerNode data)
@@ -302,9 +302,9 @@ namespace tf3d::renderer
         const std::string previousPath          = previousState->Get<std::string>("SkyMapPath", "");
         const int32_t previousSkyboxSize        = previousState->Get<int32_t>("SkyboxSize", 512);
         const int32_t previousIrradianceMapSize = previousState->Get<int32_t>("IrradianceMapSize", 32);
-        const std::string path                  = m_Inspector.Get<std::string>("SkyMapPath");
-        const int32_t skyboxSize                = m_Inspector.Get<int32_t>("SkyboxSize");
-        const int32_t irradianceMapSize         = m_Inspector.Get<int32_t>("IrradianceMapSize");
+        const std::string path                  = m_Inspector.Root().Get<std::string>("SkyMapPath");
+        const int32_t skyboxSize                = m_Inspector.Root().Get<int32_t>("SkyboxSize");
+        const int32_t irradianceMapSize         = m_Inspector.Root().Get<int32_t>("IrradianceMapSize");
         if (!IsValidPowerOfTwo(skyboxSize, 64, 4096) ||
             !IsValidPowerOfTwo(irradianceMapSize, 16, 256)) {
             TF3D_LOG_ERROR("Invalid renderer sky map sizes: SkyboxSize={}, IrradianceMapSize={}",

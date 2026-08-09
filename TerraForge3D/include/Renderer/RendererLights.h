@@ -33,32 +33,32 @@ namespace tf3d::renderer
 
         inline bool IsSkyLightEnabled() const
         {
-            return m_Inspector.Get<bool>("UseSkyLight");
+            return m_Inspector.Root().Get<bool>("UseSkyLight");
         }
 
         inline float GetSkyLightIntensity() const
         {
-            return m_Inspector.Get<float>("SkyLightIntensity");
+            return m_Inspector.Root().Get<float>("SkyLightIntensity");
         }
 
         inline std::string GetSunName() const
         {
-            return m_Inspector.Get<std::string>("Name");
+            return m_Inspector.Root().Scope("Sun").Get<std::string>("Name");
         }
 
         inline glm::vec3 GetSunDirection() const
         {
-            return m_Inspector.Get<glm::vec3>("Direction");
+            return m_Inspector.Root().Scope("Sun").Get<glm::vec3>("Direction");
         }
 
         inline glm::vec3 GetSunColor() const
         {
-            return m_Inspector.Get<glm::vec3>("Color");
+            return m_Inspector.Root().Scope("Sun").Get<glm::vec3>("Color");
         }
 
         inline float GetSunIntensity() const
         {
-            return m_Inspector.Get<float>("Intensity");
+            return m_Inspector.Root().Scope("Sun").Get<float>("Intensity");
         }
 
     private:
