@@ -41,7 +41,11 @@ namespace tf3d::generators
         void Update(GeneratorData *swapBuffer, GeneratorTexture *seedTexture);
         // bool ShowSettings();
         bool ShowBaseShapeSettings();
-        bool ShowCustomBaseShapeSettings();
+        bool ShowCustomizeBaseShapeSettings();
+        inline bool ShowCustomBaseShapeSettings()
+        {
+            return ShowCustomizeBaseShapeSettings();
+        }
         bool ShowGeneralSettings();
         bool ShowBaseNoiseSettings();
         bool ShowMaskToolSettings();
@@ -61,7 +65,7 @@ namespace tf3d::generators
         }
         inline const bool IsUsingCustomBaseShape() const
         {
-            return m_UseCustomBaseShape;
+            return m_CustomizeBaseShape != nullptr && m_CustomizeBaseShape->IsEnabled();
         }
         inline GeneratorData *GetBiomeData() const
         {
@@ -100,7 +104,6 @@ namespace tf3d::generators
             return m_MaskTool->GetPreviewTexture();
         }
 
-        bool AddBaseShapeGenerator(const std::string &config);
         bool AddBaseShapeGenerator(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
@@ -108,9 +111,8 @@ namespace tf3d::generators
 
     private:
         char m_BiomeName[64];
-        bool m_IsEnabled          = true;
-        bool m_UseCustomBaseShape = false;
-        bool m_RequireUpdation    = true;
+        bool m_IsEnabled       = true;
+        bool m_RequireUpdation = true;
         ImVec4 m_Color;
         std::string m_BiomeID        = "";
         ApplicationState *m_AppState = nullptr;
@@ -125,7 +127,7 @@ namespace tf3d::generators
 
         std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
         std::shared_ptr<BaseNoiseGenerator> m_BaseNoiseGenerator;
-        std::shared_ptr<BiomeCustomBaseShape> m_CustomBaseShape;
+        std::shared_ptr<BiomeCustomizeBaseShape> m_CustomizeBaseShape;
         std::shared_ptr<GeneratorDataStatistics> m_Statistics;
         GeneratorDataStatisticsResult m_StatisticsResult;
         bool m_StatisticsDirty       = true;

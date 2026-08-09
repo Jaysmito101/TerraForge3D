@@ -2,101 +2,139 @@
 #include "Base/Base.h"
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
+#include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
 #include <filesystem>
+#include <unordered_set>
 
 #include "Generators/BiomeBaseShapeGenerator.h"
 
 namespace tf3d::generators
 {
 
-    bool BiomeManager::AddBaseShapeGenerator(const std::string &config)
+    namespace
     {
-        m_BaseShapeGenerators.push_back(std::make_shared<BiomeBaseShapeGenerator>(m_AppState));
-        return m_BaseShapeGenerators.back()->LoadConfig(config);
-    }
+        bool ResolveBaseShapeShaderPath(const std::filesystem::path &shaderRoot,
+                                        const std::string &relativePath,
+                                        std::filesystem::path &resolvedPath,
+                                        std::string *error)
+        {
+            auto fail = [&](const std::string &message) {
+                if (error != nullptr)
+                    *error = message;
+                return false;
+            };
+
+            const std::filesystem::path relative(relativePath);
+            if (relative.empty() || relative.is_absolute() || relative.extension() != ".glsl")
+                return fail("shader path must be a relative .glsl path");
+
+            std::error_code errorCode;
+            const auto root = std::filesystem::weakly_canonical(shaderRoot, errorCode);
+            if (errorCode)
+                return fail("could not resolve shader root");
+
+            errorCode.clear();
+            const auto candidate = std::filesystem::weakly_canonical(root / relative, errorCode);
+            if (errorCode || !std::filesystem::is_regular_file(candidate))
+                return fail("shader file does not exist");
+
+            const auto relativeCandidate   = candidate.lexically_relative(root);
+            const std::string relativeText = relativeCandidate.generic_string();
+            if (relativeCandidate.empty() || relativeText == ".." || relativeText.starts_with("../"))
+                return fail("shader path escapes the shader root");
+
+            resolvedPath = candidate;
+            return true;
+        }
+    } // namespace
 
     bool BiomeManager::AddBaseShapeGenerator(const nlohmann::json &config, const std::string &source, const std::string &shaderPath)
     {
-        m_BaseShapeGenerators.push_back(std::make_shared<BiomeBaseShapeGenerator>(m_AppState));
-        return m_BaseShapeGenerators.back()->LoadConfig(config, source, shaderPath);
+        auto generator = std::make_shared<BiomeBaseShapeGenerator>(m_AppState);
+        if (!generator->LoadConfig(config, source, shaderPath))
+            return false;
+        m_BaseShapeGenerators.push_back(std::move(generator));
+        return true;
     }
 
     bool BiomeManager::LoadUpResources()
     {
-        const std::string baseShapeGeneratorsDir = m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "base_shape";
-        std::vector<std::filesystem::path> definitionPaths;
-        std::vector<std::filesystem::path> legacyShaderPaths;
-        for (const auto &directoryEntry : std::filesystem::recursive_directory_iterator(baseShapeGeneratorsDir)) {
-            if (directoryEntry.is_directory())
-                continue;
-            if (directoryEntry.path().filename() == "base_shape.json") {
-                definitionPaths.push_back(directoryEntry.path());
-            } else if (directoryEntry.path().parent_path() == std::filesystem::path(baseShapeGeneratorsDir) &&
-                       directoryEntry.path().extension() == ".glsl") {
-                legacyShaderPaths.push_back(directoryEntry.path());
-            }
-        }
-        std::sort(definitionPaths.begin(), definitionPaths.end());
-        std::sort(legacyShaderPaths.begin(), legacyShaderPaths.end());
-        for (const auto &definitionPath : definitionPaths) {
-            bool loaded                    = false;
-            const std::string configSource = ReadShaderSourceFile(definitionPath.string(), &loaded);
-            if (!loaded)
-                continue;
-            try {
-                const auto config            = nlohmann::json::parse(configSource);
-                const std::string shaderName = config.value("Shader", "shape.glsl");
-                const auto shaderPath        = definitionPath.parent_path() / shaderName;
-                const std::string source     = ReadShaderSourceFile(shaderPath.string(), &loaded);
-                if (!loaded) {
-                    TF3D_LOG_ERROR("Failed to load base-shape shader '{}'.", shaderPath.string());
+        const auto dataDirectory = std::filesystem::path(m_AppState->constants.dataDir);
+        const auto inspectorPath = inspector::CustomInspector::GetConfigPath(dataDirectory, "BaseShape");
+        utils::JsonIncludeResolverOptions resolverOptions;
+        resolverOptions.rootDirectory  = dataDirectory / "inspectors";
+        resolverOptions.pathMode       = utils::JsonIncludePathMode::RelativeToIncludingFile;
+        resolverOptions.restrictToRoot = true;
+        const utils::JsonIncludeResolver jsonResolver(resolverOptions);
+
+        std::string resolveError;
+        const auto catalog = jsonResolver.ResolveFile(inspectorPath, &resolveError);
+        if (!catalog) {
+            TF3D_LOG_ERROR("Failed to load base-shape inspector '{}': {}", inspectorPath.string(), resolveError);
+        } else if (!catalog->is_object() || !catalog->contains("Sections") || !(*catalog)["Sections"].is_array()) {
+            TF3D_LOG_ERROR("Base-shape inspector '{}' must contain a Sections array.", inspectorPath.string());
+        } else {
+            const auto shaderRoot = std::filesystem::path(m_AppState->constants.shadersDir);
+            std::unordered_set<std::string> shapeIDs;
+            for (size_t index = 0; index < (*catalog)["Sections"].size(); ++index) {
+                const auto &shape = (*catalog)["Sections"][index];
+                if (!shape.is_object()) {
+                    TF3D_LOG_WARN("Skipping base-shape inspector section {}: expected an object.", index);
                     continue;
                 }
-                const auto relativeShaderPath = std::filesystem::relative(shaderPath, m_AppState->constants.shadersDir).generic_string();
+
+                const auto customDataIterator = shape.find("CustomData");
+                if (customDataIterator == shape.end() || !customDataIterator->is_object()) {
+                    TF3D_LOG_ERROR("Skipping base-shape inspector section {}: CustomData must be an object.", index);
+                    continue;
+                }
+
+                const auto &customData       = *customDataIterator;
+                const std::string id         = customData.value("ID", "");
+                const std::string shaderName = customData.value("Shader", "");
+                if (!utils::IsPascalIdentifier(id) || !shapeIDs.insert(utils::CanonicalID(id)).second) {
+                    TF3D_LOG_ERROR("Skipping base-shape inspector section {}: CustomData.ID must be a unique PascalCase identifier.", index);
+                    continue;
+                }
+                if (!shape.contains("Sections") || !shape["Sections"].is_array()) {
+                    TF3D_LOG_ERROR("Skipping base-shape '{}': Sections must be an array.", id);
+                    continue;
+                }
+
+                std::filesystem::path shaderPath;
+                std::string shaderPathError;
+                if (!ResolveBaseShapeShaderPath(shaderRoot, shaderName, shaderPath, &shaderPathError)) {
+                    TF3D_LOG_ERROR("Skipping base-shape '{}': {} ({})", id, shaderPathError, shaderName);
+                    continue;
+                }
+
+                bool loaded              = false;
+                const std::string source = ReadShaderSourceFile(shaderPath.string(), &loaded);
+                if (!loaded) {
+                    TF3D_LOG_ERROR("Skipping base-shape '{}': could not read shader '{}'.", id, shaderPath.string());
+                    continue;
+                }
+
+                nlohmann::json config                = shape;
+                config["ID"]                         = id;
+                config["Name"]                       = shape.value("Name", id);
+                config["Description"]                = shape.value("Description", "");
+                const std::string relativeShaderPath = std::filesystem::path(shaderName).generic_string();
                 if (!AddBaseShapeGenerator(config, source, relativeShaderPath))
-                    TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", definitionPath.string());
-            } catch (const nlohmann::json::exception &exception) {
-                TF3D_LOG_ERROR("Failed to parse base-shape metadata '{}': {}", definitionPath.string(), exception.what());
+                    TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", id);
             }
-        }
-        for (const auto &shaderPath : legacyShaderPaths) {
-            const std::string config = ReadShaderSourceFile(shaderPath.string(), &s_TempBool);
-            if (!s_TempBool)
-                continue;
-            if (!AddBaseShapeGenerator(config))
-                TF3D_LOG_ERROR("Failed to load base-shape generator '{}'.", shaderPath.string());
         }
 
-        m_BaseNoiseGenerator           = std::make_shared<BaseNoiseGenerator>(m_AppState);
-        const auto baseNoiseMetadata   = std::filesystem::path(m_AppState->constants.dataDir) / "inspectors" / "BaseNoise.json";
-        const auto baseNoiseShaderPath = std::filesystem::path(m_AppState->constants.shadersDir) / "generation" / "base_noise" / "noise_gen.glsl";
-        bool baseNoiseMetadataLoaded   = false;
-        const auto baseNoiseConfigText = ReadShaderSourceFile(baseNoiseMetadata.string(), &baseNoiseMetadataLoaded);
-        if (!baseNoiseMetadataLoaded) {
-            TF3D_LOG_ERROR("Failed to load base-noise metadata '{}'.", baseNoiseMetadata.string());
-        } else {
-            try {
-                const auto config          = nlohmann::json::parse(baseNoiseConfigText);
-                bool baseNoiseShaderLoaded = false;
-                const auto shaderSource    = m_AppState->resourceManager->LoadShaderSource("generation/base_noise/noise_gen", false, &baseNoiseShaderLoaded);
-                if (!baseNoiseShaderLoaded) {
-                    TF3D_LOG_ERROR("Failed to load base-noise shader '{}'.", baseNoiseShaderPath.string());
-                } else {
-                    const auto relativeShaderPath = std::filesystem::relative(baseNoiseShaderPath, m_AppState->constants.shadersDir).generic_string();
-                    if (!m_BaseNoiseGenerator->LoadConfig(config, shaderSource, relativeShaderPath))
-                        TF3D_LOG_ERROR("Failed to load base-noise generator '{}'.", baseNoiseMetadata.string());
-                }
-            } catch (const nlohmann::json::exception &exception) {
-                TF3D_LOG_ERROR("Failed to parse base-noise metadata '{}': {}", baseNoiseMetadata.string(), exception.what());
-            }
-        }
+        m_BaseNoiseGenerator = std::make_shared<BaseNoiseGenerator>(m_AppState);
+        if (!m_BaseNoiseGenerator->Initialize())
+            TF3D_LOG_ERROR("Failed to initialize base-noise generator.");
 
         m_DEMBaseShapeGenerator   = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
         m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
-        m_CustomBaseShape         = std::make_shared<BiomeCustomBaseShape>(m_AppState);
+        m_CustomizeBaseShape      = std::make_shared<BiomeCustomizeBaseShape>(m_AppState);
         m_MaskTool                = std::make_shared<MaskTool>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
         m_FilterStack             = std::make_shared<BiomeFilterStack>(m_AppState);
         m_Statistics              = std::make_shared<GeneratorDataStatistics>(m_AppState);
@@ -131,7 +169,7 @@ namespace tf3d::generators
     {
         auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_Data->Resize(size);
-        m_CustomBaseShape->Resize();
+        m_CustomizeBaseShape->Resize();
         m_BaseNoiseGenerator->Resize(m_AppState->mainMap.tileResolution);
         m_CalculatedMaskGenerator->Resize(m_AppState->mainMap.tileResolution);
         m_MaskTool->Resize(m_AppState->mainMap.tileResolution);
@@ -150,20 +188,16 @@ namespace tf3d::generators
                                   PerformanceMonitor::Domain::Generation);
         // m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data, seedTexture);
 
-        if (!m_CustomBaseShape->IsEnabled() || m_CustomBaseShape->RequiresBaseShapeUpdate()) {
-            if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) {
-                m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture, profilePrefix);
-            } else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation) {
-                m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture, profilePrefix);
-            }
+        if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_Algorithm) {
+            m_BaseShapeGenerators[m_SelectedBaseShapeGenerator]->Update(m_Data.get(), seedTexture, profilePrefix);
+        } else if (m_SelectedBaseShapeGeneratorMode == BiomeBaseShapeGeneratorMode_GlobalElevation) {
+            m_DEMBaseShapeGenerator->Update(m_Data.get(), seedTexture, profilePrefix);
         }
 
-        if (m_CustomBaseShape->IsEnabled()) {
-            m_CustomBaseShape->Update(m_Data.get(), m_Data.get(), swapBuffer, profilePrefix);
-        }
-
-        m_Data->CopyTo(swapBuffer); // temporary will later be
-        // optimized when filters are implemented
+        if (m_CustomizeBaseShape->IsEnabled())
+            m_CustomizeBaseShape->Update(m_Data.get(), swapBuffer, profilePrefix);
+        else
+            m_Data->CopyTo(swapBuffer);
 
         m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture, profilePrefix);
         m_FilterStack->Update(m_Data.get(), profilePrefix);
@@ -174,10 +208,10 @@ namespace tf3d::generators
         m_StatisticsDirty = true;
     }
 
-    bool BiomeManager::ShowCustomBaseShapeSettings()
+    bool BiomeManager::ShowCustomizeBaseShapeSettings()
     {
         ImGui::PushID(m_BiomeID.data());
-        BIOME_UI_PROPERTY(m_CustomBaseShape->ShowShettings());
+        BIOME_UI_PROPERTY(m_CustomizeBaseShape->ShowSettings());
         ImGui::PopID();
         return m_RequireUpdation;
     }

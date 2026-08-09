@@ -41,7 +41,8 @@ namespace tf3d::generators
         SelectedUINodeObjectType_Filters,
         SelectedUINodeObjectType_BaseNoise,
         SelectedUINodeObjectType_BaseShape,
-        SelectedUINodeObjectType_CustomBaseShape,
+        SelectedUINodeObjectType_CustomizeBaseShape,
+        SelectedUINodeObjectType_CustomBaseShape = SelectedUINodeObjectType_CustomizeBaseShape,
         SelectedUINodeObjectType_MaskTool,
         SelectedUINodeObjectType_Filter,
         SelectedUINodeObjectType_Material

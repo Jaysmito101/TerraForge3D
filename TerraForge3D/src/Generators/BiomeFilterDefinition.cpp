@@ -2,6 +2,7 @@
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
+#include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
@@ -13,19 +14,12 @@ namespace tf3d::generators
         const std::filesystem::path &folder,
         const std::filesystem::path &shaderRoot)
     {
-        const auto metadataPath          = folder / "filter.json";
-        bool loaded                      = false;
-        const std::string metadataSource = ReadShaderSourceFile(metadataPath.string(), &loaded);
-        if (!loaded) {
-            TF3D_LOG_ERROR("Failed to read filter metadata '{}'.", metadataPath.string());
-            return nullptr;
-        }
-
-        nlohmann::json metadata;
-        try {
-            metadata = nlohmann::json::parse(metadataSource);
-        } catch (const nlohmann::json::parse_error &exception) {
-            TF3D_LOG_ERROR("Failed to parse filter metadata '{}': {}", metadataPath.string(), exception.what());
+        const auto metadataPath = folder / "filter.json";
+        const utils::JsonIncludeResolver resolver;
+        std::string resolveError;
+        const auto metadata = resolver.ResolveFile(metadataPath, &resolveError);
+        if (!metadata) {
+            TF3D_LOG_ERROR("Failed to load filter metadata '{}': {}", metadataPath.string(), resolveError);
             return nullptr;
         }
 
@@ -37,17 +31,17 @@ namespace tf3d::generators
         }
 
         auto definition                = std::shared_ptr<BiomeFilterDefinition>(new BiomeFilterDefinition());
-        definition->m_Metadata         = metadata;
+        definition->m_Metadata         = *metadata;
         definition->m_FolderShaderPath = relativeFolder.generic_string();
-        definition->m_ID               = metadata.value("ID", folder.filename().string());
-        definition->m_Name             = metadata.value("Name", definition->m_ID);
-        definition->m_Category         = metadata.value("Category", "Other");
-        definition->m_Description      = metadata.value("Description", "");
-        definition->m_Implementation   = metadata.value("Implementation", "Unknown");
+        definition->m_ID               = metadata->value("ID", folder.filename().string());
+        definition->m_Name             = metadata->value("Name", definition->m_ID);
+        definition->m_Category         = metadata->value("Category", "Other");
+        definition->m_Description      = metadata->value("Description", "");
+        definition->m_Implementation   = metadata->value("Implementation", "Unknown");
         definition->m_SearchText       = definition->m_Category + " " + definition->m_Name + " " + definition->m_ID;
 
-        if (metadata.contains("Phases") && metadata["Phases"].is_object()) {
-            for (const auto &[phase, phaseValue] : metadata["Phases"].items()) {
+        if (metadata->contains("Phases") && (*metadata)["Phases"].is_object()) {
+            for (const auto &[phase, phaseValue] : (*metadata)["Phases"].items()) {
                 if (!phaseValue.is_string())
                     continue;
                 std::filesystem::path phasePath = phaseValue.get<std::string>();
