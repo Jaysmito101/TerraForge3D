@@ -131,9 +131,10 @@ target_link_libraries(${EXECUTABLE_NAME} fmt::fmt)
 target_link_libraries(${EXECUTABLE_NAME} webp)
 
 add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Binaries/Data"
-        "$<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/Data"
+    COMMAND ${CMAKE_COMMAND}
+        -DTF3D_DATA_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/Binaries/Data
+        -DTF3D_DATA_DESTINATION=$<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/Data
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_runtime_data.cmake"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/Third Party License"
         "$<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/Third Party License"
