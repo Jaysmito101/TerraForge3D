@@ -2,9 +2,8 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
-#include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/GeneratorData.h"
-#include "Generators/MaskTool.h"
+#include "Generators/MaskLayer.h"
 
 #include <string>
 #include <string_view>
@@ -44,23 +43,22 @@ namespace tf3d::generators
         void Resize();
 
     private:
-        struct MaskLayer {
+        struct MaskEntry {
             std::string name;
             bool enabled    = true;
             bool raise      = true;
             float strength  = 1.0f;
             float smoothing = 0.0f;
-            std::shared_ptr<MaskTool> maskTool;
-            std::shared_ptr<CalculatedMaskGenerator> calculatedMask;
+            std::shared_ptr<MaskLayer> mask;
         };
 
-        MaskLayer CreateMaskLayer(const std::string &name) const;
+        MaskEntry CreateMaskLayer(const std::string &name) const;
         void AddMaskLayer();
         bool ShowDrawingSettings();
         bool ApplyLayer(GeneratorData *source, GeneratorData *target,
-                        const MaskLayer *layer, bool flattenSource,
+                        const MaskEntry *layer, bool flattenSource,
                         std::string_view profilePrefix);
-        bool UpdateLayerMask(MaskLayer &layer, GeneratorData *source);
+        bool UpdateLayerMask(MaskEntry &layer, GeneratorData *source);
 
     private:
         data::ApplicationState *m_AppState = nullptr;
@@ -69,7 +67,7 @@ namespace tf3d::generators
         bool m_FlattenBaseShape            = false;
         std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
-        std::vector<MaskLayer> m_Masks;
+        std::vector<MaskEntry> m_Masks;
         int m_SelectedMask = 0;
     };
 } // namespace tf3d::generators

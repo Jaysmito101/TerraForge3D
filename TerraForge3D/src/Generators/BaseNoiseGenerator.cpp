@@ -15,10 +15,9 @@ namespace tf3d::generators
         if (m_AppState == nullptr)
             return;
 
-        m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState, "SlopeRamp");
-        m_MaskTool                = std::make_shared<MaskTool>(m_AppState, glm::vec3(1.0f, 0.65f, 0.1f));
-        m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated base-noise mask");
-        m_MaskTool->SetPreviewMode(MaskPreviewMode::Generated);
+        m_MaskLayer = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.65f, 0.1f),
+                                                  "SlopeRamp", "Calculated base-noise mask");
+        m_MaskLayer->SetPreviewMode(MaskPreviewMode::Generated);
     }
 
     bool BaseNoiseGenerator::Initialize()
@@ -59,17 +58,14 @@ namespace tf3d::generators
         markChanged(m_Inspector->Render());
 
         markChanged(ImGui::Checkbox("Use mask", &m_UseMask));
-        if (m_UseMask && m_MaskTool != nullptr && m_CalculatedMaskGenerator != nullptr) {
+        if (m_UseMask && m_MaskLayer != nullptr) {
             if (ImGui::CollapsingHeader("Mask Tool")) {
                 markChanged(ImGui::Checkbox("Invert mask", &m_InvertMask));
-                m_MaskTool->SetInvertPreview(m_InvertMask);
-                m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated base-noise mask");
-                if (m_MaskTool->IsShowingGeneratedMask())
-                    markChanged(m_CalculatedMaskGenerator->ShowSettings());
-                markChanged(m_MaskTool->ShowSettings(true));
+                m_MaskLayer->SetInvertPreview(m_InvertMask);
+                markChanged(m_MaskLayer->ShowSettings(true));
             }
-        } else if (m_MaskTool != nullptr) {
-            m_MaskTool->SetInvertPreview(false);
+        } else if (m_MaskLayer != nullptr) {
+            m_MaskLayer->SetInvertPreview(false);
             ImGui::TextDisabled("Mask: Global");
         }
         ImGui::PopID();
@@ -81,10 +77,8 @@ namespace tf3d::generators
     {
         if (size <= 0)
             return;
-        if (m_CalculatedMaskGenerator != nullptr)
-            m_CalculatedMaskGenerator->Resize(size);
-        if (m_MaskTool != nullptr)
-            m_MaskTool->Resize(size);
+        if (m_MaskLayer != nullptr)
+            m_MaskLayer->Resize(size);
     }
 
     void BaseNoiseGenerator::Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer,
@@ -97,12 +91,10 @@ namespace tf3d::generators
         const std::string scopeKey    = scopePrefix + "/base-noise";
         TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
 
-        const bool useMask = m_UseMask && m_MaskTool != nullptr && m_CalculatedMaskGenerator != nullptr &&
-                             m_MaskTool->GetPreviewTexture() != nullptr;
+        const bool useMask = m_UseMask && m_MaskLayer != nullptr &&
+                             m_MaskLayer->GetPreviewTexture() != nullptr;
         if (useMask) {
-            m_CalculatedMaskGenerator->Invalidate();
-            m_CalculatedMaskGenerator->Update(sourceBuffer);
-            m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated base-noise mask");
+            m_MaskLayer->Update(sourceBuffer);
         }
 
         sourceBuffer->Bind(0);
@@ -123,7 +115,7 @@ namespace tf3d::generators
             m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
         }
         if (useMask) {
-            m_Shader->SetUniform1i("u_MaskTexture", m_MaskTool->GetPreviewTexture()->Bind(3));
+            m_Shader->SetUniform1i("u_MaskTexture", m_MaskLayer->GetPreviewTexture()->Bind(3));
         }
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
@@ -148,15 +140,9 @@ namespace tf3d::generators
         if (const auto inspector = data->Get<SerializerNode>("Inspector"); inspector != nullptr)
             m_Inspector->LoadState(inspector);
 
-        if (m_CalculatedMaskGenerator != nullptr) {
-            m_CalculatedMaskGenerator->Load(data->Get<SerializerNode>("CalculatedMask"));
-            m_CalculatedMaskGenerator->Invalidate();
-        }
-        if (m_MaskTool != nullptr) {
-            m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator != nullptr ? m_CalculatedMaskGenerator->GetTexture() : nullptr,
-                                                "Calculated base-noise mask");
-            m_MaskTool->Load(data->Get<SerializerNode>("MaskTool"));
-            m_MaskTool->SetInvertPreview(m_InvertMask);
+        if (m_MaskLayer != nullptr) {
+            m_MaskLayer->LoadFrom(data);
+            m_MaskLayer->SetInvertPreview(m_InvertMask);
         }
         m_RequireUpdation = true;
     }
@@ -167,10 +153,8 @@ namespace tf3d::generators
         node->Set("UseMask", m_UseMask);
         node->Set("InvertMask", m_InvertMask);
         node->Set("Inspector", m_Inspector->SaveState());
-        if (m_CalculatedMaskGenerator != nullptr)
-            node->Set("CalculatedMask", m_CalculatedMaskGenerator->Save());
-        if (m_MaskTool != nullptr)
-            node->Set("MaskTool", m_MaskTool->Save());
+        if (m_MaskLayer != nullptr)
+            m_MaskLayer->SaveTo(node);
         return node;
     }
 

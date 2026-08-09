@@ -38,6 +38,11 @@ namespace tf3d::generators
                                          std::string defaultTypeID = "HeightRange");
         ~CalculatedMaskGenerator();
 
+        CalculatedMaskGenerator(const CalculatedMaskGenerator &)            = delete;
+        CalculatedMaskGenerator &operator=(const CalculatedMaskGenerator &) = delete;
+        CalculatedMaskGenerator(CalculatedMaskGenerator &&) noexcept = default;
+        CalculatedMaskGenerator &operator=(CalculatedMaskGenerator &&) noexcept = default;
+
         void Resize(int size);
         void Invalidate();
         bool ShowSettings();

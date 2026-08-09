@@ -28,9 +28,8 @@ namespace tf3d::generators
             return;
         m_MergeMode = MergeModeFromString(m_Definition->GetMetadata().value("DefaultMergeMode", "Blend"));
         m_Definition->BuildInspector(*m_Inspector);
-        m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
-        m_MaskTool                = std::make_shared<MaskTool>(m_AppState, glm::vec3(1.0f, 0.0f, 0.0f));
-        m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated filter mask");
+        m_MaskLayer = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.0f, 0.0f),
+                                                  "HeightRange", "Calculated filter mask");
     }
 
     bool BiomeFilter::ShowSettings()
@@ -58,14 +57,11 @@ namespace tf3d::generators
         if (m_UseMask) {
             if (ImGui::CollapsingHeader("Mask Tool")) {
                 changed |= ImGui::Checkbox("Invert mask", &m_InvertMask);
-                m_MaskTool->SetInvertPreview(m_InvertMask);
-                m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated filter mask");
-                if (m_MaskTool->IsShowingGeneratedMask())
-                    changed |= m_CalculatedMaskGenerator->ShowSettings();
-                changed |= m_MaskTool->ShowSettings(true);
+                m_MaskLayer->SetInvertPreview(m_InvertMask);
+                changed |= m_MaskLayer->ShowSettings(true);
             }
         } else {
-            m_MaskTool->SetInvertPreview(false);
+            m_MaskLayer->SetInvertPreview(false);
             ImGui::TextDisabled("Mask: Global");
         }
 
@@ -74,17 +70,14 @@ namespace tf3d::generators
 
     void BiomeFilter::Resize(int size)
     {
-        m_CalculatedMaskGenerator->Resize(size);
-        m_MaskTool->Resize(size);
+        m_MaskLayer->Resize(size);
     }
 
     void BiomeFilter::UpdateGeneratedMask(GeneratorData *sourceData)
     {
         if (!m_UseMask)
             return;
-        m_CalculatedMaskGenerator->Invalidate();
-        m_CalculatedMaskGenerator->Update(sourceData);
-        m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated filter mask");
+        m_MaskLayer->Update(sourceData);
     }
 
     int BiomeFilter::GetIntegerParameter(const std::string &name, int defaultValue) const
@@ -116,10 +109,8 @@ namespace tf3d::generators
             if (parameters != nullptr)
                 m_Inspector->LoadState(parameters);
         }
-        if (m_CalculatedMaskGenerator != nullptr)
-            m_CalculatedMaskGenerator->Load(data->Get<SerializerNode>("CalculatedMask"));
-        if (m_MaskTool != nullptr)
-            m_MaskTool->Load(data->Get<SerializerNode>("MaskTool"));
+        if (m_MaskLayer != nullptr)
+            m_MaskLayer->LoadFrom(data);
     }
 
     SerializerNode BiomeFilter::Save() const
@@ -134,10 +125,8 @@ namespace tf3d::generators
         node->Set("MergeMode", static_cast<int>(m_MergeMode));
         if (m_Inspector != nullptr)
             node->Set("Parameters", m_Inspector->SaveState());
-        if (m_CalculatedMaskGenerator != nullptr)
-            node->Set("CalculatedMask", m_CalculatedMaskGenerator->Save());
-        if (m_MaskTool != nullptr)
-            node->Set("MaskTool", m_MaskTool->Save());
+        if (m_MaskLayer != nullptr)
+            m_MaskLayer->SaveTo(node);
         return node;
     }
 

@@ -5,12 +5,11 @@
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/BiomeCustomBaseShape.h"
 #include "Generators/BiomeFilterStack.h"
-#include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/DEMBaseShapeGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/MaskTool.h"
+#include "Generators/MaskLayer.h"
 
 namespace tf3d::data
 {
@@ -97,11 +96,11 @@ namespace tf3d::generators
         }
         inline GeneratorTexture *GetMaskTexture() const
         {
-            return m_MaskTool->GetPreviewTexture();
+            return m_MaskLayer != nullptr ? m_MaskLayer->GetPreviewTexture() : nullptr;
         }
         inline GeneratorTexture *GetMaskPreviewTexture() const
         {
-            return m_MaskTool->GetPreviewTexture();
+            return m_MaskLayer != nullptr ? m_MaskLayer->GetPreviewTexture() : nullptr;
         }
 
         bool AddBaseShapeGenerator(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
@@ -121,9 +120,7 @@ namespace tf3d::generators
         BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
         std::shared_ptr<BiomeFilterStack> m_FilterStack;
         std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
-        std::shared_ptr<CalculatedMaskGenerator> m_CalculatedMaskGenerator;
-
-        std::shared_ptr<MaskTool> m_MaskTool;
+        std::shared_ptr<MaskLayer> m_MaskLayer;
 
         std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> m_BaseShapeGenerators;
         std::shared_ptr<BaseNoiseGenerator> m_BaseNoiseGenerator;

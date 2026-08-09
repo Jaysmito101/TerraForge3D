@@ -2,10 +2,9 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
-#include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/MaskTool.h"
+#include "Generators/MaskLayer.h"
 #include "Inspector/CustomInspector.h"
 
 #include <string_view>
@@ -45,8 +44,7 @@ namespace tf3d::generators
         bool m_InvertMask                  = false;
         std::optional<base::ComputeShader> m_Shader;
         std::shared_ptr<inspector::CustomInspector> m_Inspector;
-        std::shared_ptr<CalculatedMaskGenerator> m_CalculatedMaskGenerator;
-        std::shared_ptr<MaskTool> m_MaskTool;
+        std::shared_ptr<MaskLayer> m_MaskLayer;
     };
 
 } // namespace tf3d::generators

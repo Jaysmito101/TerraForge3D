@@ -3,9 +3,8 @@
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
 #include "Generators/BiomeFilterDefinition.h"
-#include "Generators/CalculatedMaskGenerator.h"
 #include "Generators/GeneratorData.h"
-#include "Generators/MaskTool.h"
+#include "Generators/MaskLayer.h"
 
 namespace tf3d::data
 {
@@ -104,7 +103,7 @@ namespace tf3d::generators
         }
         inline GeneratorTexture *GetMaskTexture() const
         {
-            return m_MaskTool->GetPreviewTexture();
+            return m_MaskLayer != nullptr ? m_MaskLayer->GetPreviewTexture() : nullptr;
         }
         inline ComputeShader *GetPhaseShader(ApplicationState *appState, const std::string &phase) const
         {
@@ -123,8 +122,7 @@ namespace tf3d::generators
         float m_Strength                 = 1.0f;
         BiomeFilterMergeMode m_MergeMode = BiomeFilterMergeMode::Blend;
 
-        std::shared_ptr<CalculatedMaskGenerator> m_CalculatedMaskGenerator;
-        std::shared_ptr<MaskTool> m_MaskTool;
+        std::shared_ptr<MaskLayer> m_MaskLayer;
     };
 
 } // namespace tf3d::generators

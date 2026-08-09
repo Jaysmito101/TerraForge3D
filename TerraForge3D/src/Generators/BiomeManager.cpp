@@ -133,9 +133,9 @@ namespace tf3d::generators
             TF3D_LOG_ERROR("Failed to initialize base-noise generator.");
 
         m_DEMBaseShapeGenerator   = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
-        m_CalculatedMaskGenerator = std::make_shared<CalculatedMaskGenerator>(m_AppState);
         m_CustomizeBaseShape      = std::make_shared<BiomeCustomizeBaseShape>(m_AppState);
-        m_MaskTool                = std::make_shared<MaskTool>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z));
+        m_MaskLayer               = std::make_shared<MaskLayer>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z),
+                                                                 "HeightRange", "Calculated terrain mask");
         m_FilterStack             = std::make_shared<BiomeFilterStack>(m_AppState);
         m_Statistics              = std::make_shared<GeneratorDataStatistics>(m_AppState);
         return true;
@@ -171,8 +171,7 @@ namespace tf3d::generators
         m_Data->Resize(size);
         m_CustomizeBaseShape->Resize();
         m_BaseNoiseGenerator->Resize(m_AppState->mainMap.tileResolution);
-        m_CalculatedMaskGenerator->Resize(m_AppState->mainMap.tileResolution);
-        m_MaskTool->Resize(m_AppState->mainMap.tileResolution);
+        m_MaskLayer->Resize(m_AppState->mainMap.tileResolution);
         m_FilterStack->Resize(size, m_AppState->mainMap.tileResolution);
         m_RequireUpdation = true;
         m_StatisticsDirty = true;
@@ -201,8 +200,7 @@ namespace tf3d::generators
 
         m_BaseNoiseGenerator->Update(swapBuffer, m_Data.get(), seedTexture, profilePrefix);
         m_FilterStack->Update(m_Data.get(), profilePrefix);
-        m_CalculatedMaskGenerator->Invalidate();
-        m_CalculatedMaskGenerator->Update(m_Data.get());
+        m_MaskLayer->Update(m_Data.get());
 
         m_RequireUpdation = false;
         m_StatisticsDirty = true;
@@ -261,7 +259,7 @@ namespace tf3d::generators
         ImGui::InputText("Biome Name", m_BiomeName, sizeof(m_BiomeName));
         BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &m_IsEnabled));
         if (ImGui::ColorEdit3("Biome Color", reinterpret_cast<float *>(&m_Color))) {
-            m_MaskTool->SetVizColor(m_Color.x, m_Color.y, m_Color.z);
+            m_MaskLayer->SetVizColor(m_Color.x, m_Color.y, m_Color.z);
         }
 
         if (ImGui::CollapsingHeader("Statistics")) {
@@ -300,11 +298,10 @@ namespace tf3d::generators
     bool BiomeManager::ShowMaskToolSettings()
     {
         ImGui::PushID(m_BiomeID.data());
-        if (m_MaskTool->IsShowingGeneratedMask() && ImGui::CollapsingHeader("Generated mask source", ImGuiTreeNodeFlags_DefaultOpen)) {
-            BIOME_UI_PROPERTY(m_CalculatedMaskGenerator->ShowSettings());
+        if (m_MaskLayer->IsShowingGeneratedMask() && ImGui::CollapsingHeader("Generated mask source", ImGuiTreeNodeFlags_DefaultOpen)) {
+            BIOME_UI_PROPERTY(m_MaskLayer->ShowGeneratedSettings());
         }
-        m_MaskTool->SetGeneratedMaskTexture(m_CalculatedMaskGenerator->GetTexture(), "Calculated terrain mask");
-        BIOME_UI_PROPERTY(m_MaskTool->ShowSettings());
+        BIOME_UI_PROPERTY(m_MaskLayer->ShowToolSettings());
         ImGui::PopID();
         return m_RequireUpdation;
     }

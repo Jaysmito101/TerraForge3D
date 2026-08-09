@@ -22,14 +22,12 @@ namespace tf3d::generators
 
     BiomeCustomizeBaseShape::~BiomeCustomizeBaseShape() = default;
 
-    BiomeCustomizeBaseShape::MaskLayer BiomeCustomizeBaseShape::CreateMaskLayer(const std::string &name) const
+    BiomeCustomizeBaseShape::MaskEntry BiomeCustomizeBaseShape::CreateMaskLayer(const std::string &name) const
     {
-        MaskLayer layer;
-        layer.name           = name;
-        layer.maskTool       = std::make_shared<MaskTool>(m_AppState, glm::vec3(1.0f, 0.45f, 0.05f));
-        layer.calculatedMask = std::make_shared<CalculatedMaskGenerator>(m_AppState);
-        layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
-                                                "Calculated customize-base-shape mask");
+        MaskEntry layer;
+        layer.name = name;
+        layer.mask = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.45f, 0.05f),
+                                                 "HeightRange", "Calculated customize-base-shape mask");
         return layer;
     }
 
@@ -133,33 +131,23 @@ namespace tf3d::generators
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Smooths the mask influence before applying the height offset.");
 
-        if (layer.maskTool != nullptr && layer.calculatedMask != nullptr) {
-            layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
-                                                    "Calculated customize-base-shape mask");
-            if (layer.maskTool->IsShowingGeneratedMask())
-                changed |= layer.calculatedMask->ShowSettings();
-            changed |= layer.maskTool->ShowSettings(true);
-        }
+        if (layer.mask != nullptr)
+            changed |= layer.mask->ShowSettings(true);
         ImGui::PopID();
         return changed;
     }
 
-    bool BiomeCustomizeBaseShape::UpdateLayerMask(MaskLayer &layer, GeneratorData *source)
+    bool BiomeCustomizeBaseShape::UpdateLayerMask(MaskEntry &layer, GeneratorData *source)
     {
-        if (layer.maskTool == nullptr || layer.calculatedMask == nullptr || source == nullptr)
+        if (layer.mask == nullptr || source == nullptr)
             return false;
 
-        if (layer.maskTool->IsShowingGeneratedMask()) {
-            layer.calculatedMask->Invalidate();
-            layer.calculatedMask->Update(source);
-        }
-        layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
-                                                "Calculated customize-base-shape mask");
-        return layer.maskTool->GetPreviewTexture() != nullptr;
+        layer.mask->Update(source, true);
+        return layer.mask->GetPreviewTexture() != nullptr;
     }
 
     bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *source, GeneratorData *target,
-                                             const MaskLayer *layer, bool flattenSource,
+                                             const MaskEntry *layer, bool flattenSource,
                                              std::string_view profilePrefix)
     {
         if (!m_Shader || source == nullptr || target == nullptr)
@@ -178,8 +166,8 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Direction", layer != nullptr && layer->raise ? 1 : -1);
         m_Shader->SetUniform1f("u_Strength", layer != nullptr ? glm::max(layer->strength, 0.0f) : 0.0f);
         m_Shader->SetUniform1f("u_Smoothing", layer != nullptr ? glm::clamp(layer->smoothing, 0.0f, 1.0f) : 0.0f);
-        if (layer != nullptr && layer->maskTool != nullptr) {
-            if (auto *maskTexture = layer->maskTool->GetPreviewTexture())
+        if (layer != nullptr && layer->mask != nullptr) {
+            if (auto *maskTexture = layer->mask->GetPreviewTexture())
                 m_Shader->SetUniform1i("u_MaskTexture", maskTexture->Bind(2));
         }
 
@@ -253,10 +241,8 @@ namespace tf3d::generators
             mask->Set("Raise", layer.raise);
             mask->Set("Strength", layer.strength);
             mask->Set("Smoothing", layer.smoothing);
-            if (layer.calculatedMask != nullptr)
-                mask->Set("CalculatedMask", layer.calculatedMask->Save());
-            if (layer.maskTool != nullptr)
-                mask->Set("MaskTool", layer.maskTool->Save());
+            if (layer.mask != nullptr)
+                layer.mask->SaveTo(mask);
             masks.push_back(std::move(mask));
         }
         node->Set("Masks", masks);
@@ -280,13 +266,8 @@ namespace tf3d::generators
                 layer.raise     = maskNode->Get<bool>("Raise", layer.raise);
                 layer.strength  = maskNode->Get<float>("Strength", layer.strength);
                 layer.smoothing = maskNode->Get<float>("Smoothing", layer.smoothing);
-                if (layer.calculatedMask != nullptr)
-                    layer.calculatedMask->Load(maskNode->Get<SerializerNode>("CalculatedMask"));
-                if (layer.maskTool != nullptr) {
-                    layer.maskTool->SetGeneratedMaskTexture(layer.calculatedMask->GetTexture(),
-                                                            "Calculated customize-base-shape mask");
-                    layer.maskTool->Load(maskNode->Get<SerializerNode>("MaskTool"));
-                }
+                if (layer.mask != nullptr)
+                    layer.mask->LoadFrom(maskNode);
                 m_Masks.push_back(std::move(layer));
             }
         }
@@ -300,10 +281,8 @@ namespace tf3d::generators
         m_WorkingDataBuffer->Resize(size);
         m_SwapBuffer->Resize(size);
         for (auto &layer : m_Masks) {
-            if (layer.calculatedMask != nullptr)
-                layer.calculatedMask->Resize(m_AppState->mainMap.tileResolution);
-            if (layer.maskTool != nullptr)
-                layer.maskTool->Resize(m_AppState->mainMap.tileResolution);
+            if (layer.mask != nullptr)
+                layer.mask->Resize(m_AppState->mainMap.tileResolution);
         }
         m_RequireUpdation = true;
     }
