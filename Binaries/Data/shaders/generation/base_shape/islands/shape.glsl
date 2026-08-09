@@ -41,15 +41,15 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	float terrainSeed = float(u_Seed);
 
 	float beachNoise = 0.5f + 0.5f * tf3d_noise2_fbm(
-		uv * terrainScale * 0.1f, u_NoiseAlgorithm, u_NoiseScale,
+		uv * terrainScale * 0.1f, u_NoiseAlgorithm, u_NoiseFrequency,
 		terrainSeed + u_NoiseSeed, u_NoiseOctaves, u_NoiseLacunarity,
 		u_NoisePersistence, u_NoiseWarp, u_NoiseJitter) * beachMask;
 	float forestNoise = 0.5f + 0.5f * tf3d_noise2_fbm(
-		uv * terrainScale * 0.12f, u_NoiseAlgorithm, u_NoiseScale,
+		uv * terrainScale * 0.12f, u_NoiseAlgorithm, u_NoiseFrequency,
 		terrainSeed + 17.0f + u_NoiseSeed, u_NoiseOctaves, u_NoiseLacunarity,
 		u_NoisePersistence, u_NoiseWarp, u_NoiseJitter) * forestMask;
 	float mountainNoise = 0.5f + 0.5f * tf3d_noise2_fbm(
-		uv * terrainScale * 0.14f, u_NoiseAlgorithm, u_NoiseScale,
+		uv * terrainScale * 0.14f, u_NoiseAlgorithm, u_NoiseFrequency,
 		terrainSeed + 31.0f + u_NoiseSeed, u_NoiseOctaves, u_NoiseLacunarity,
 		u_NoisePersistence, u_NoiseWarp, u_NoiseJitter) * mountainMask;
 

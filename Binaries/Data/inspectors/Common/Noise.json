@@ -2,7 +2,7 @@
   {
     "Type": "Int",
     "Widget": "Seed",
-    "Name": "Seed",
+    "Name": "NoiseSeed",
     "Default": 152,
     "Label": "Noise Seed",
     "Description": "Selects the deterministic pattern used by the noise generator.",
@@ -32,9 +32,13 @@
   {
     "Type": "Float",
     "Widget": "Drag",
-    "Name": "Frequency",
+    "Name": "NoiseFrequency",
     "Default": 0.45,
     "Sensitivity": 0.001,
+    "Constraints": [
+      0.001,
+      64
+    ],
     "Label": "Noise Scale",
     "Description": "Controls the size of the shared noise features.",
     "Tooltip": "Higher values create smaller, more closely spaced features."
@@ -47,7 +51,7 @@
       1,
       4
     ],
-    "Name": "Lacunarity",
+    "Name": "NoiseLacunarity",
     "Default": 1.8,
     "Label": "Noise Lacunarity",
     "Description": "Sets the frequency multiplier between successive noise layers.",
@@ -60,7 +64,7 @@
       0,
       0.99
     ],
-    "Name": "Persistence",
+    "Name": "NoisePersistence",
     "Default": 0.55,
     "Label": "Noise Persistence",
     "Description": "Sets how much amplitude each successive noise layer retains.",
@@ -117,7 +121,7 @@
     ]
   },
   {
-    "Name": "Offset",
+    "Name": "NoiseOffset",
     "Type": "Vector3",
     "Default": [
       0,

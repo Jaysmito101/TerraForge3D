@@ -9,72 +9,15 @@
       "DefaultOpen": true,
       "Params": [
         {
-          "Name": "NoiseAlgorithm",
-          "Type": "Int",
-          "Default": "Simplex",
-          "Widget": "Dropdown",
-          "Label": "Noise Algorithm",
-          "Description": "Chooses the noise that bends dune ridges and creates secondary sand bands."
+          "$include": "../../../../inspectors/Common/Noise.json"
         },
         {
-          "Name": "NoiseScale",
-          "Type": "Float",
-          "Default": 0.15,
-          "Widget": "Drag",
-          "Sensitivity": 0.00025,
-          "Constraints": [
-            0.001,
-            64
-          ],
-          "Label": "Noise Scale",
-          "Description": "Sets the spacing of dune ridges and the scale of their surface breakup.",
-          "Tooltip": "Higher values create more closely spaced dune variation."
+          "Name": "NoiseFrequency",
+          "Default": 0.15
         },
         {
           "Name": "NoiseSeed",
-          "Type": "Int",
-          "Default": 0,
-          "Widget": "Input",
-          "Label": "Noise Seed",
-          "Description": "Changes the phase and placement of dune variation without changing its overall scale.",
-          "Tooltip": "Use a new seed for a different dune field."
-        },
-        {
-          "Name": "NoiseWarp",
-          "Type": "Float",
-          "Default": 0,
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Constraints": [
-            0,
-            4
-          ],
-          "Label": "Noise Warp",
-          "Description": "Bends dune ridges so they meander instead of forming straight repeated lines.",
-          "Tooltip": "Increase it for more wind-shaped dune flow."
-        },
-        {
-          "Name": "NoiseJitter",
-          "Type": "Float",
-          "Default": 0.75,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            1
-          ],
-          "Label": "Noise Jitter",
-          "Description": "Offsets cellular feature points used to break up dune bands.",
-          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local dune feature placement.",
-          "Conditions": [
-            {
-              "Name": "NoiseAlgorithm",
-              "Values": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-              ]
-            }
-          ]
+          "Default": 0
         }
       ]
     },

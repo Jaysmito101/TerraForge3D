@@ -12,13 +12,8 @@ uniform float u_TileSize;
 
 /* TF3D_CALCULATED_MASK_UNIFORMS */
 
-// common/noise_2d.glsl also exposes the legacy scalar noise helper. Keep its
-// include contract local to this shader while the inspector uses Frequency/Seed.
-#define u_NoiseScale u_Frequency
-#define u_NoiseSeed u_Seed
+// common/noise_2d.glsl uses the canonical Noise* inspector uniform names.
 #include "common/noise_2d.glsl"
-#undef u_NoiseScale
-#undef u_NoiseSeed
 
 
 int PixelCoordToDataOffset(ivec2 coordinate)

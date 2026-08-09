@@ -9,23 +9,20 @@ layout(TF3D_FIELD_FORMAT, binding = 1) writeonly uniform image2D DataTargetTextu
 
 // uniforms
 uniform int u_Resolution;
-uniform int u_Seed;
 uniform bool u_UseSeedTexture;
 uniform sampler2D u_SeedTexture;
 uniform int u_NoiseAlgorithm;
-// Required by the shared noise helper's compatibility entry points.
-uniform float u_NoiseScale;
-uniform float u_NoiseSeed;
+uniform int u_NoiseSeed;
+uniform float u_NoiseFrequency;
 uniform int u_NoiseOctaves;
 uniform float u_NoiseWarp;
 uniform float u_NoiseJitter;
 uniform float u_Strength;
 uniform float u_Influence;
-uniform float u_Frequency;
-uniform float u_Lacunarity;
-uniform float u_Persistence;
+uniform float u_NoiseLacunarity;
+uniform float u_NoisePersistence;
 uniform int u_MixMethod;
-uniform vec3 u_Offset;
+uniform vec3 u_NoiseOffset;
 uniform float u_NoiseOctaveStrengths[16];
 uniform int u_NoiseOctaveStrengthsCount;
 uniform bool u_UseMask;
@@ -44,19 +41,19 @@ void main(void)
 	{
 		seed = texture(u_SeedTexture, uv).rgb; 
 	}
-	float frequencyInput = clamp(abs(u_Frequency), 0.001f, max(float(u_Resolution), 1.0f));
-	float lacunarity = clamp(u_Lacunarity, 1.0f, 4.0f);
-	float persistence = clamp(u_Persistence, 0.0f, 1.0f);
-	vec3 offsetInput = clamp(u_Offset, vec3(-10000.0f), vec3(10000.0f));
-	seed = seed * frequencyInput + offsetInput + vec3(u_Seed % 100);
+	float frequencyInput = clamp(abs(u_NoiseFrequency), 0.001f, max(float(u_Resolution), 1.0f));
+	float lacunarity = clamp(u_NoiseLacunarity, 1.0f, 4.0f);
+	float persistence = clamp(u_NoisePersistence, 0.0f, 1.0f);
+	vec3 offsetInput = clamp(u_NoiseOffset, vec3(-10000.0f), vec3(10000.0f));
+	seed = seed * frequencyInput + offsetInput + vec3(u_NoiseSeed % 100);
 
 	vec2 noiseDomain = seed.xy;
 	float safeWarp = clamp(abs(u_NoiseWarp), 0.0f, 4.0f);
 	if (safeWarp > 0.0001f)
 	{
 		noiseDomain += vec2(
-			tf3d_noise2(noiseDomain * 0.5f + vec2(17.0f, 5.0f), u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + 13.0f),
-			tf3d_noise2(noiseDomain * 0.5f + vec2(-7.0f, 23.0f), u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + 37.0f)) * safeWarp;
+			tf3d_noise2(noiseDomain * 0.5f + vec2(17.0f, 5.0f), u_NoiseAlgorithm, u_NoiseJitter, float(u_NoiseSeed) + 13.0f),
+			tf3d_noise2(noiseDomain * 0.5f + vec2(-7.0f, 23.0f), u_NoiseAlgorithm, u_NoiseJitter, float(u_NoiseSeed) + 37.0f)) * safeWarp;
 	}
 
 	float n = 0.0f;
@@ -71,7 +68,7 @@ void main(void)
 		float pixelsPerFeature = float(u_Resolution) / max(2.0f * octaveFrequency, 0.0001f);
 		float antiAliasWeight = smoothstep(2.0f, 4.0f, pixelsPerFeature);
 		float effectiveStrength = octaveStrength * antiAliasWeight;
-		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_Seed) + float(i) * 11.73f)
+		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_NoiseSeed) + float(i) * 11.73f)
 			* amplitude * effectiveStrength;
 		amplitudeSum += amplitude * effectiveStrength;
 		noiseDomain = octaveRotation * noiseDomain * lacunarity + vec2(17.13f, 9.71f);

@@ -9,72 +9,15 @@
       "DefaultOpen": true,
       "Params": [
         {
-          "Name": "NoiseAlgorithm",
-          "Type": "Int",
-          "Default": "Simplex",
-          "Widget": "Dropdown",
-          "Label": "Noise Algorithm",
-          "Description": "Chooses the noise that modulates wave height, direction, and phase variation."
+          "$include": "../../../../inspectors/Common/Noise.json"
         },
         {
-          "Name": "NoiseScale",
-          "Type": "Float",
-          "Default": 0.15,
-          "Widget": "Drag",
-          "Sensitivity": 0.00025,
-          "Constraints": [
-            0.001,
-            64
-          ],
-          "Label": "Noise Scale",
-          "Description": "Sets the size of wave distortion and the noise that shifts wave phase.",
-          "Tooltip": "Higher values create more closely spaced wave variation."
+          "Name": "NoiseFrequency",
+          "Default": 0.15
         },
         {
           "Name": "NoiseSeed",
-          "Type": "Int",
-          "Default": 0,
-          "Widget": "Input",
-          "Label": "Noise Seed",
-          "Description": "Rearranges wave distortion and phase variation without changing the main wave scale.",
-          "Tooltip": "Use a new seed for a different wave surface."
-        },
-        {
-          "Name": "NoiseWarp",
-          "Type": "Float",
-          "Default": 0,
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Constraints": [
-            0,
-            4
-          ],
-          "Label": "Noise Warp",
-          "Description": "Bends wave bands and phase sampling so the waves do not remain perfectly uniform.",
-          "Tooltip": "Increase it for more natural, disturbed wave patterns."
-        },
-        {
-          "Name": "NoiseJitter",
-          "Type": "Float",
-          "Default": 0.75,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            1
-          ],
-          "Label": "Noise Jitter",
-          "Description": "Offsets cellular feature points in wave distortion and phase detail.",
-          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local wave variation placement.",
-          "Conditions": [
-            {
-              "Name": "NoiseAlgorithm",
-              "Values": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-              ]
-            }
-          ]
+          "Default": 0
         }
       ]
     },

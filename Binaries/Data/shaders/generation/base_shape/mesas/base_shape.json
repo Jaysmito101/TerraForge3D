@@ -9,72 +9,15 @@
       "DefaultOpen": true,
       "Params": [
         {
-          "Name": "NoiseAlgorithm",
-          "Type": "Int",
-          "Default": "Simplex",
-          "Widget": "Dropdown",
-          "Label": "Noise Algorithm",
-          "Description": "Chooses the noise that shapes mesa tops, edge erosion, and the surrounding floor."
+          "$include": "../../../../inspectors/Common/Noise.json"
         },
         {
-          "Name": "NoiseScale",
-          "Type": "Float",
-          "Default": 0.48,
-          "Widget": "Drag",
-          "Sensitivity": 0.00025,
-          "Constraints": [
-            0.001,
-            64
-          ],
-          "Label": "Noise Scale",
-          "Description": "Sets the size of mesa-top variation, eroded edges, and floor breakup.",
-          "Tooltip": "Higher values create more closely spaced mesa detail."
+          "Name": "NoiseFrequency",
+          "Default": 0.48
         },
         {
           "Name": "NoiseSeed",
-          "Type": "Int",
-          "Default": 0,
-          "Widget": "Input",
-          "Label": "Noise Seed",
-          "Description": "Rearranges mesa edge and surface variation without changing the mesa layout.",
-          "Tooltip": "Use a new seed for a different erosion pattern."
-        },
-        {
-          "Name": "NoiseWarp",
-          "Type": "Float",
-          "Default": 0,
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Constraints": [
-            0,
-            4
-          ],
-          "Label": "Noise Warp",
-          "Description": "Bends mesa erosion and floor breakup so edges feel less uniform.",
-          "Tooltip": "Increase it for more naturally irregular mesa boundaries."
-        },
-        {
-          "Name": "NoiseJitter",
-          "Type": "Float",
-          "Default": 0.75,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            1
-          ],
-          "Label": "Noise Jitter",
-          "Description": "Offsets cellular feature points in mesa erosion and floor detail.",
-          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local erosion placement.",
-          "Conditions": [
-            {
-              "Name": "NoiseAlgorithm",
-              "Values": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-              ]
-            }
-          ]
+          "Default": 0
         }
       ]
     },

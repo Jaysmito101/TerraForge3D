@@ -9,58 +9,11 @@
       "DefaultOpen": true,
       "Params": [
         {
-          "Name": "NoiseAlgorithm",
-          "Type": "Int",
-          "Default": "Simplex",
-          "Widget": "Dropdown",
-          "Label": "Noise Algorithm",
-          "Description": "Chooses the noise that roughens the cliff face and softens its height transitions."
+          "$include": "../../../../inspectors/Common/Noise.json"
         },
         {
           "Name": "NoiseSeed",
-          "Type": "Int",
-          "Default": 0,
-          "Widget": "Input",
-          "Label": "Noise Seed",
-          "Description": "Rearranges the cliff-face breakup while keeping the cliff profile intact.",
-          "Tooltip": "Change the seed to explore different cliff textures."
-        },
-        {
-          "Name": "NoiseWarp",
-          "Type": "Float",
-          "Default": 0,
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Constraints": [
-            0,
-            4
-          ],
-          "Label": "Noise Warp",
-          "Description": "Bends the cliff distortion field to avoid straight, repeated ledges.",
-          "Tooltip": "Increase it for more irregular cliff contours."
-        },
-        {
-          "Name": "NoiseJitter",
-          "Type": "Float",
-          "Default": 0.75,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            1
-          ],
-          "Label": "Noise Jitter",
-          "Description": "Offsets cellular feature points in the cliff breakup.",
-          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes where cliff variations appear.",
-          "Conditions": [
-            {
-              "Name": "NoiseAlgorithm",
-              "Values": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-              ]
-            }
-          ]
+          "Default": 0
         },
         {
           "Name": "Noise",
@@ -77,20 +30,12 @@
           "Tooltip": "Increase noise to add more irregular variation."
         },
         {
-          "Name": "NoiseScale",
-          "Type": "Float",
+          "Name": "NoiseFrequency",
           "Default": 0.15,
-          "Label": "Noise Scale",
-          "Widget": "Drag",
-          "Sensitivity": 0.00025,
           "Constraints": [
             0.001,
-            8,
-            0,
-            0
-          ],
-          "Description": "Sets the size of the noise that roughens the cliff face and height transition.",
-          "Tooltip": "Higher values pack more cliff breakup into the same face."
+            8
+          ]
         }
       ]
     },

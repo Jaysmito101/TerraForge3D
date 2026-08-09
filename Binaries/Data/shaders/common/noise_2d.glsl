@@ -209,7 +209,7 @@ float tf3d_noise2(vec2 p, int algorithm, float jitter, float seed)
 
 float tf3d_snoise2(vec2 p)
 {
-	vec2 domain = p * max(abs(u_NoiseScale), 0.0001);
+	vec2 domain = p * max(abs(u_NoiseFrequency), 0.0001);
 	float warp = clamp(abs(u_NoiseWarp), 0.0, 4.0);
 	if (warp > 0.0001)
 	{

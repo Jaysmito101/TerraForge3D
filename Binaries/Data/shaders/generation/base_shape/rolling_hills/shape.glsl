@@ -18,12 +18,11 @@ float evaluateBaseShape(vec2 uv, vec3 seed)
 	vec2 p = tf3d_rolling_hills_rotate((uv * 2.0f - vec2(1.0f)) * scale + offset + seedOffset, rotation);
 
 	int octaves = clamp(u_Octaves, 1, 16);
-	float persistence = clamp(u_Persistence, 0.0f, 0.95f);
-	float lacunarity = clamp(u_Lacunarity, 1.0f, 4.0f);
+	float persistence = clamp(u_NoisePersistence, 0.0f, 0.95f);
+	float lacunarity = clamp(u_NoiseLacunarity, 1.0f, 4.0f);
 	float hills = 0.5f + 0.5f * tf3d_terrain_fbm2(p, 0.72f, octaves, lacunarity, persistence);
 	float ridges = tf3d_terrain_ridge2(p + vec2(19.0f, -7.0f), 0.52f, octaves, lacunarity, persistence);
 	float ridgeAmount = clamp(u_RidgeAmount, 0.0f, 1.0f);
 	float height = mix(hills, ridges, ridgeAmount);
 	return clamp(height, 0.0f, 1.0f) * clamp(u_Strength, 0.0f, 4.0f);
 }
-

@@ -12,72 +12,15 @@
       "DefaultOpen": true,
       "Params": [
         {
-          "Name": "NoiseAlgorithm",
-          "Type": "Int",
-          "Default": "Simplex",
-          "Widget": "Dropdown",
-          "Label": "Noise Algorithm",
-          "Description": "Chooses the signed noise field that Classic reshapes into its terrain profile."
+          "$include": "../../../../inspectors/Common/Noise.json"
         },
         {
-          "Name": "NoiseScale",
-          "Type": "Float",
-          "Default": 0.413,
-          "Widget": "Drag",
-          "Sensitivity": 0.00025,
-          "Constraints": [
-            0.001,
-            64
-          ],
-          "Label": "Noise Scale",
-          "Description": "Sets the size of the broad Classic terrain features before its shaping modes are applied.",
-          "Tooltip": "Higher values create more closely spaced Classic features."
+          "Name": "NoiseFrequency",
+          "Default": 0.413
         },
         {
           "Name": "NoiseSeed",
-          "Type": "Int",
-          "Default": 4,
-          "Widget": "Input",
-          "Label": "Noise Seed",
-          "Description": "Changes the Classic terrain arrangement without changing the feature size.",
-          "Tooltip": "Use a new seed to get a different signed landscape."
-        },
-        {
-          "Name": "NoiseWarp",
-          "Type": "Float",
-          "Default": 0,
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Constraints": [
-            0,
-            4
-          ],
-          "Label": "Noise Warp",
-          "Description": "Distorts the Classic sampling field before absolute or squared shaping.",
-          "Tooltip": "Increase it to break up smooth, predictable terrain contours."
-        },
-        {
-          "Name": "NoiseJitter",
-          "Type": "Float",
-          "Default": 0.75,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            1
-          ],
-          "Label": "Noise Jitter",
-          "Description": "Offsets cellular feature points used by the Classic noise field.",
-          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes feature placement.",
-          "Conditions": [
-            {
-              "Name": "NoiseAlgorithm",
-              "Values": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-              ]
-            }
-          ]
+          "Default": 4
         }
       ]
     },

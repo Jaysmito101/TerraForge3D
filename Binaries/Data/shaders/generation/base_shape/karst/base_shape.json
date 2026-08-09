@@ -9,72 +9,15 @@
       "DefaultOpen": true,
       "Params": [
         {
-          "Name": "NoiseAlgorithm",
-          "Type": "Int",
-          "Default": "Simplex",
-          "Widget": "Dropdown",
-          "Label": "Noise Algorithm",
-          "Description": "Chooses the noise that breaks up karst ridges, hollows, and the low areas between them."
+          "$include": "../../../../inspectors/Common/Noise.json"
         },
         {
-          "Name": "NoiseScale",
-          "Type": "Float",
-          "Default": 0.15,
-          "Widget": "Drag",
-          "Sensitivity": 0.00025,
-          "Constraints": [
-            0.001,
-            64
-          ],
-          "Label": "Noise Scale",
-          "Description": "Sets the size of karst surface breakup and the spacing of its hollows.",
-          "Tooltip": "Higher values create more closely spaced karst features."
+          "Name": "NoiseFrequency",
+          "Default": 0.15
         },
         {
           "Name": "NoiseSeed",
-          "Type": "Int",
-          "Default": 0,
-          "Widget": "Input",
-          "Label": "Noise Seed",
-          "Description": "Rearranges karst ridges and hollows without changing their overall scale.",
-          "Tooltip": "Use a new seed for a different karst pattern."
-        },
-        {
-          "Name": "NoiseWarp",
-          "Type": "Float",
-          "Default": 0,
-          "Widget": "Drag",
-          "Sensitivity": 0.01,
-          "Constraints": [
-            0,
-            4
-          ],
-          "Label": "Noise Warp",
-          "Description": "Bends the karst field so ridges and hollows flow in less regular paths.",
-          "Tooltip": "Increase it for more natural, weathered karst shapes."
-        },
-        {
-          "Name": "NoiseJitter",
-          "Type": "Float",
-          "Default": 0.75,
-          "Widget": "Slider",
-          "Constraints": [
-            0,
-            1
-          ],
-          "Label": "Noise Jitter",
-          "Description": "Offsets cellular feature points in karst hollows and ridge breakup.",
-          "Tooltip": "Only affects Gabor, Voronoi, and Worley; it changes local karst feature placement.",
-          "Conditions": [
-            {
-              "Name": "NoiseAlgorithm",
-              "Values": [
-                "Gabor",
-                "Voronoi",
-                "Worley"
-              ]
-            }
-          ]
+          "Default": 0
         }
       ]
     },

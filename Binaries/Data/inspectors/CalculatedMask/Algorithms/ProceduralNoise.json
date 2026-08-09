@@ -10,34 +10,24 @@
       "$include": "../Parameters/Noise.json"
     },
     {
-      "Name": "Frequency",
-      "Default": 4,
-      "Description": "Sampling frequency of the procedural breakup.",
-      "Tooltip": "Higher values create smaller, more frequent patches."
+      "Name": "NoiseFrequency",
+      "Default": 4
     },
     {
-      "Name": "Seed",
-      "Default": 42,
-      "Description": "Deterministically changes the procedural noise pattern.",
-      "Tooltip": "Use a new seed for a different breakup layout without changing its frequency."
+      "Name": "NoiseSeed",
+      "Default": 42
     },
     {
       "Name": "NoiseOctaves",
-      "Default": 5,
-      "Description": "Controls how many frequency layers are combined.",
-      "Tooltip": "More octaves add detail at a higher shader cost."
+      "Default": 5
     },
     {
-      "Name": "Lacunarity",
-      "Default": 2,
-      "Description": "Controls the frequency multiplier between layers.",
-      "Tooltip": "Higher values separate the detail scales more strongly."
+      "Name": "NoiseLacunarity",
+      "Default": 2
     },
     {
-      "Name": "Persistence",
-      "Default": 0.5,
-      "Description": "Controls how much amplitude each layer retains.",
-      "Tooltip": "Higher values keep more fine detail visible."
+      "Name": "NoisePersistence",
+      "Default": 0.5
     },
     {
       "Name": "Range",
