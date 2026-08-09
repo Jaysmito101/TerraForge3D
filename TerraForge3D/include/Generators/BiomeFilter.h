@@ -66,7 +66,7 @@ namespace tf3d::generators
         }
         inline const CustomInspectorValue *FindParameter(const std::string &name) const
         {
-            return m_Inspector == nullptr ? nullptr : m_Inspector->FindValue(name);
+            return m_Inspector == nullptr ? nullptr : m_Inspector->Root().Find(name);
         }
         inline bool IsEnabled() const
         {

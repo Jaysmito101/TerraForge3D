@@ -91,14 +91,14 @@ namespace tf3d::generators
     {
         if (m_Inspector == nullptr)
             return defaultValue;
-        return m_Inspector->Get(name, defaultValue);
+        return m_Inspector->Root().Get(name, defaultValue);
     }
 
     float BiomeFilter::GetFloatParameter(const std::string &name, float defaultValue) const
     {
         if (m_Inspector == nullptr)
             return defaultValue;
-        return m_Inspector->Get(name, defaultValue);
+        return m_Inspector->Root().Get(name, defaultValue);
     }
 
     void BiomeFilter::Load(SerializerNode data)
