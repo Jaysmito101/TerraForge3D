@@ -11,7 +11,8 @@
       "Default": 0,
       "Widget": "Dropdown",
       "Label": "Mask type",
-      "Description": "Selects which terrain signal is evaluated."
+      "Description": "Selects which terrain signal is evaluated.",
+      "ShaderUniform": ""
     }
   ]
 }
