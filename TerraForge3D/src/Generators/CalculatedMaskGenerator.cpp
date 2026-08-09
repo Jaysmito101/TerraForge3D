@@ -10,6 +10,7 @@
 #include <cctype>
 #include <cstring>
 #include <filesystem>
+#include <map>
 #include <regex>
 #include <unordered_set>
 
@@ -18,7 +19,174 @@ namespace tf3d::generators
 
     namespace
     {
-        constexpr const char *kShaderModuleMarker = "/* TF3D_CALCULATED_MASK_MODULES */";
+        constexpr const char *kShaderUniformMarker = "/* TF3D_CALCULATED_MASK_UNIFORMS */";
+        constexpr const char *kShaderModuleMarker  = "/* TF3D_CALCULATED_MASK_MODULES */";
+
+        struct UniformDeclaration {
+            std::string type;
+            size_t arraySize = 0;
+        };
+
+        using UniformDeclarationMap = std::map<std::string, UniformDeclaration>;
+
+        bool RegisterUniform(UniformDeclarationMap &uniforms,
+                             const std::string &name,
+                             UniformDeclaration declaration,
+                             std::string *error)
+        {
+            const auto existing = uniforms.find(name);
+            if (existing == uniforms.end()) {
+                uniforms.emplace(name, std::move(declaration));
+                return true;
+            }
+
+            if (existing->second.type == declaration.type && existing->second.arraySize == declaration.arraySize)
+                return true;
+
+            if (error) {
+                *error = "uniform '" + name + "' has conflicting declarations ('" + existing->second.type +
+                         (existing->second.arraySize > 0 ? "[]" : "") + "' and '" + declaration.type +
+                         (declaration.arraySize > 0 ? "[]" : "") + "')";
+            }
+            return false;
+        }
+
+        bool AddUniformParameter(const nlohmann::json &parameter,
+                                 const std::string &owner,
+                                 UniformDeclarationMap &uniforms,
+                                 std::string *error)
+        {
+            auto fail = [&](const std::string &message) {
+                if (error)
+                    *error = owner + ": " + message;
+                return false;
+            };
+
+            if (!parameter.is_object())
+                return fail("parameter must be an object");
+            if (!parameter.contains("Name") || !parameter["Name"].is_string() || parameter["Name"].get<std::string>().empty())
+                return fail("parameter must define a non-empty Name");
+
+            const std::string variableName = parameter["Name"].get<std::string>();
+            std::string uniformName;
+            if (parameter.contains("ShaderUniform")) {
+                if (!parameter["ShaderUniform"].is_string())
+                    return fail("parameter '" + variableName + "' has an invalid ShaderUniform");
+                uniformName = parameter["ShaderUniform"].get<std::string>();
+            } else {
+                uniformName = "u_" + variableName;
+            }
+
+            if (uniformName.empty())
+                return true;
+            if (!utils::IsValidShaderSymbol(uniformName))
+                return fail("parameter '" + variableName + "' resolves to invalid shader uniform '" + uniformName + "'");
+
+            std::string typeName = "Float";
+            if (parameter.contains("Type")) {
+                if (!parameter["Type"].is_string())
+                    return fail("parameter '" + variableName + "' has an invalid Type");
+                typeName = parameter["Type"].get<std::string>();
+            }
+
+            UniformDeclaration declaration;
+            if (typeName == "Int" || typeName == "Bool") {
+                declaration.type = "int";
+            } else if (typeName == "Float") {
+                declaration.type = "float";
+            } else if (typeName == "Vector2") {
+                declaration.type = "vec2";
+            } else if (typeName == "Vector3") {
+                declaration.type = "vec3";
+            } else if (typeName == "Vector4") {
+                declaration.type = "vec4";
+            } else if (typeName == "FloatArray") {
+                if (parameter.contains("Default") && parameter["Default"].is_array()) {
+                    declaration.arraySize = parameter["Default"].size();
+                } else {
+                    if (parameter.contains("Count") && !parameter["Count"].is_number_integer())
+                        return fail("parameter '" + variableName + "' has an invalid FloatArray Count");
+                    declaration.arraySize = static_cast<size_t>(std::max(parameter.value("Count", 1), 1));
+                }
+                if (declaration.arraySize == 0)
+                    return fail("parameter '" + variableName + "' must define a non-empty FloatArray");
+                declaration.type = "float";
+            } else if (typeName == "Path") {
+                declaration.type      = "vec2";
+                declaration.arraySize = tf3d::inspector::CustomInspectorMaxPathPoints;
+            } else {
+                return fail("parameter '" + variableName + "' uses unsupported shader-bound type '" + typeName + "'");
+            }
+
+            if (!RegisterUniform(uniforms, uniformName, declaration, error))
+                return false;
+
+            if (typeName == "Path") {
+                const std::string countName = uniformName + "Count";
+                if (!utils::IsValidShaderSymbol(countName))
+                    return fail("path parameter '" + variableName + "' resolves to invalid count uniform '" + countName + "'");
+                if (!RegisterUniform(uniforms, countName, {"int", 0}, error))
+                    return false;
+            }
+            return true;
+        }
+
+        bool AddUniformsFromSection(const nlohmann::json &section,
+                                    const std::string &owner,
+                                    UniformDeclarationMap &uniforms,
+                                    std::string *error)
+        {
+            if (!section.is_object() || !section.contains("Params"))
+                return true;
+            if (!section["Params"].is_array()) {
+                if (error)
+                    *error = owner + ": Params must be an array";
+                return false;
+            }
+
+            for (const auto &parameter : section["Params"]) {
+                if (!AddUniformParameter(parameter, owner, uniforms, error))
+                    return false;
+            }
+            return true;
+        }
+
+        bool BuildUniformDeclarations(const std::vector<nlohmann::json> &commonSections,
+                                      std::vector<CalculatedMaskGenerator::AlgorithmDefinition> &algorithms,
+                                      std::string &declarations)
+        {
+            UniformDeclarationMap uniforms;
+            for (const auto &section : commonSections) {
+                std::string error;
+                if (!AddUniformsFromSection(section, "common calculated-mask metadata", uniforms, &error)) {
+                    TF3D_LOG_ERROR("Cannot generate calculated-mask uniform declarations: {}", error);
+                    return false;
+                }
+            }
+
+            std::vector<CalculatedMaskGenerator::AlgorithmDefinition> compatibleAlgorithms;
+            compatibleAlgorithms.reserve(algorithms.size());
+            for (auto &algorithm : algorithms) {
+                auto candidateUniforms = uniforms;
+                std::string error;
+                if (!AddUniformsFromSection(algorithm.section, "algorithm '" + algorithm.id + "'", candidateUniforms, &error)) {
+                    TF3D_LOG_ERROR("Skipping calculated mask algorithm '{}': {}", algorithm.id, error);
+                    continue;
+                }
+                uniforms = std::move(candidateUniforms);
+                compatibleAlgorithms.push_back(std::move(algorithm));
+            }
+            algorithms = std::move(compatibleAlgorithms);
+
+            declarations.clear();
+            for (const auto &[name, declaration] : uniforms) {
+                declarations += "uniform " + declaration.type + " " + name;
+                if (declaration.arraySize > 0)
+                    declarations += "[" + std::to_string(declaration.arraySize) + "]";
+                declarations += ";\n";
+            }
+            return true;
+        }
 
         bool MergeParameters(const nlohmann::json &parameters,
                              nlohmann::json &merged,
@@ -219,6 +387,7 @@ namespace tf3d::generators
         }
 
         std::string AssembleShader(const std::string &baseSource,
+                                   const std::string &uniformDeclarations,
                                    const std::vector<CalculatedMaskGenerator::AlgorithmDefinition> &algorithms)
         {
             std::string generated;
@@ -237,11 +406,16 @@ namespace tf3d::generators
             }
             generated += "        default: return 1.0;\n    }\n}\n";
 
-            const size_t markerPosition = baseSource.find(kShaderModuleMarker);
-            if (markerPosition == std::string::npos)
+            std::string result                 = baseSource;
+            const size_t uniformMarkerPosition = result.find(kShaderUniformMarker);
+            if (uniformMarkerPosition == std::string::npos)
                 return {};
-            std::string result = baseSource;
-            result.replace(markerPosition, std::strlen(kShaderModuleMarker), generated);
+            result.replace(uniformMarkerPosition, std::strlen(kShaderUniformMarker), uniformDeclarations);
+
+            const size_t moduleMarkerPosition = result.find(kShaderModuleMarker);
+            if (moduleMarkerPosition == std::string::npos)
+                return {};
+            result.replace(moduleMarkerPosition, std::strlen(kShaderModuleMarker), generated);
             return result;
         }
     } // namespace
@@ -305,14 +479,14 @@ namespace tf3d::generators
     {
         if (m_Algorithms.empty())
             return -1;
-        const int fallback = m_SelectedAlgorithmIndex >= 0 && m_SelectedAlgorithmIndex < static_cast<int>(m_Algorithms.size())
-                                 ? m_SelectedAlgorithmIndex
-                                 : 0;
+        const int defaultIndex = m_SelectedAlgorithmIndex >= 0 && m_SelectedAlgorithmIndex < static_cast<int>(m_Algorithms.size())
+                                     ? m_SelectedAlgorithmIndex
+                                     : 0;
         if (m_Inspector == nullptr || !m_Inspector->Contains("MaskType"))
-            return fallback;
+            return defaultIndex;
 
-        const int selectedMode = m_Inspector->Get<int32_t>("MaskType", fallback);
-        return selectedMode >= 0 && selectedMode < static_cast<int>(m_Algorithms.size()) ? selectedMode : fallback;
+        const int selectedMode = m_Inspector->Get<int32_t>("MaskType", defaultIndex);
+        return selectedMode >= 0 && selectedMode < static_cast<int>(m_Algorithms.size()) ? selectedMode : defaultIndex;
     }
 
     int CalculatedMaskGenerator::GetShaderModeForType(int typeIndex) const
@@ -406,11 +580,16 @@ namespace tf3d::generators
 
     bool CalculatedMaskGenerator::BuildShader(const std::string &baseShaderSource)
     {
+        if (baseShaderSource.find(kShaderUniformMarker) == std::string::npos) {
+            TF3D_LOG_ERROR("Calculated mask shader is missing the inspector uniform declaration marker.");
+            return false;
+        }
         if (baseShaderSource.find(kShaderModuleMarker) == std::string::npos) {
             TF3D_LOG_ERROR("Calculated mask shader is missing the module assembly marker.");
             return false;
         }
 
+        m_Shader.reset();
         const std::string sourceWithNoiseDefines = m_NoiseAlgorithms.IsValid()
                                                        ? m_NoiseAlgorithms.InjectShaderDefines(baseShaderSource)
                                                        : baseShaderSource;
@@ -442,51 +621,33 @@ namespace tf3d::generators
             m_Algorithms.push_back(std::move(candidate));
         }
 
-        const auto assignRuntimeModes = [&]() {
-            for (size_t index = 0; index < m_Algorithms.size(); ++index)
-                m_Algorithms[index].runtimeMode = static_cast<int>(index);
-        };
-        assignRuntimeModes();
-
-        m_Shader.reset();
-        const std::string finalSource = AssembleShader(sourceWithNoiseDefines, m_Algorithms);
-        if (!finalSource.empty())
-            m_Shader = m_AppState->resourceManager->GetComputeShader("CalculatedMaskPreview", finalSource);
-
-        if (!m_Shader.has_value()) {
-            TF3D_LOG_ERROR("Calculated mask shader assembly failed; checking modules individually.");
-
-            const auto candidates = std::move(m_Algorithms);
+        std::string uniformDeclarations;
+        if (!BuildUniformDeclarations(m_CommonSections, m_Algorithms, uniformDeclarations)) {
             m_Algorithms.clear();
-            for (auto candidate : candidates) {
-                const std::vector<AlgorithmDefinition> probeAlgorithms{candidate};
-                const std::string probeSource = AssembleShader(sourceWithNoiseDefines, probeAlgorithms);
-                if (probeSource.empty()) {
-                    TF3D_LOG_ERROR("Skipping calculated mask algorithm '{}': failed to assemble its shader probe.", candidate.id);
-                    continue;
-                }
+            return false;
+        }
 
-                const auto probeShader = m_AppState->resourceManager->GetComputeShader(
-                    "CalculatedMaskModule_" + candidate.id, probeSource);
-                if (!probeShader.has_value()) {
-                    TF3D_LOG_ERROR("Skipping calculated mask algorithm '{}': shader compilation failed.", candidate.id);
-                    continue;
-                }
+        if (m_Algorithms.empty()) {
+            TF3D_LOG_ERROR("No valid calculated mask algorithms remain; calculated mask shader was not created.");
+            return false;
+        }
 
-                m_Algorithms.push_back(std::move(candidate));
-            }
+        for (size_t index = 0; index < m_Algorithms.size(); ++index) {
+            m_Algorithms[index].runtimeMode = static_cast<int>(index);
+        }
 
-            assignRuntimeModes();
-            const std::string filteredSource = AssembleShader(sourceWithNoiseDefines, m_Algorithms);
-            if (!filteredSource.empty())
-                m_Shader = m_AppState->resourceManager->GetComputeShader("CalculatedMaskPreview", filteredSource);
+        const std::string finalSource = AssembleShader(sourceWithNoiseDefines, uniformDeclarations, m_Algorithms);
+        if (finalSource.empty()) {
+            TF3D_LOG_ERROR("Calculated mask shader assembly failed; calculated mask generation is unavailable.");
+            m_Algorithms.clear();
+            return false;
+        }
 
-            if (!m_Shader.has_value()) {
-                TF3D_LOG_ERROR("Calculated mask shader assembly still failed; using the neutral fallback mask.");
-                const std::string fallbackSource = AssembleShader(sourceWithNoiseDefines, {});
-                if (!fallbackSource.empty())
-                    m_Shader = m_AppState->resourceManager->GetComputeShader("CalculatedMaskFallback", fallbackSource);
-            }
+
+        m_Shader = m_AppState->resourceManager->GetComputeShader("CalculatedMaskPreview", finalSource);
+        if (!m_Shader.has_value()) {
+            TF3D_LOG_ERROR("Calculated mask shader compilation failed; calculated mask generation is unavailable.");
+            m_Algorithms.clear();
         }
         return m_Shader.has_value();
     }

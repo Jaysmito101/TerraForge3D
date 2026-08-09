@@ -145,8 +145,8 @@ namespace tf3d::inspector
         std::string name;
         std::string label;
         std::string description;
-        bool collapsible = false;
-        bool defaultOpen = true;
+        bool collapsible          = false;
+        bool defaultOpen          = true;
         nlohmann::json customData = nlohmann::json::object();
     };
 
