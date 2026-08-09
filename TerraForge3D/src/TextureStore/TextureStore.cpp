@@ -194,9 +194,6 @@ namespace tf3d::texture_store
                 it.texThumbnail = new Texture2D(it.thumbnailPath, false);
             }
 
-            if (i % 20 == 0) {
-                TF3D_LOG_DEBUG("Loaded {} of {} texture thumbnails", i, textureStoreItems.size());
-            }
         }
 
         TF3D_LOG_INFO("Texture thumbnails loaded");
