@@ -32,6 +32,11 @@ namespace tf3d::generators
         MaskTool(ApplicationState *state, glm::vec3 vizColor);
         ~MaskTool();
 
+        MaskTool(const MaskTool &)            = delete;
+        MaskTool &operator=(const MaskTool &) = delete;
+        MaskTool(MaskTool &&other) noexcept;
+        MaskTool &operator=(MaskTool &&other) noexcept;
+
         void Resize(int size);
 
         bool ShowSettings(bool showViewportMask = true);

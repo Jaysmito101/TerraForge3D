@@ -8,6 +8,7 @@
 #include "Utils/Utils.h"
 
 #include <cmath>
+#include <utility>
 
 namespace tf3d::generators
 {
@@ -32,6 +33,79 @@ namespace tf3d::generators
     {
         if (s_CurrentlyEditingMaskTool == this)
             s_CurrentlyEditingMaskTool = nullptr;
+    }
+
+    MaskTool::MaskTool(MaskTool &&other) noexcept
+        : m_AppState(other.m_AppState),
+          m_RasterizeShader(std::move(other.m_RasterizeShader)),
+          m_CopyShader(std::move(other.m_CopyShader)),
+          m_StrokeSettingsBuffer(std::move(other.m_StrokeSettingsBuffer)),
+          m_StrokeRangesBuffer(std::move(other.m_StrokeRangesBuffer)),
+          m_StrokePointsBuffer(std::move(other.m_StrokePointsBuffer)),
+          m_BaseTexture(std::move(other.m_BaseTexture)),
+          m_PaintedTexture(std::move(other.m_PaintedTexture)),
+          m_VisualizationTexture(std::move(other.m_VisualizationTexture)),
+          m_ExternalGeneratedTexture(other.m_ExternalGeneratedTexture),
+          m_Strokes(std::move(other.m_Strokes)),
+          m_ActiveStroke(std::move(other.m_ActiveStroke)),
+          m_HasActiveStroke(other.m_HasActiveStroke),
+          m_VizColor(other.m_VizColor),
+          m_InvertPreview(other.m_InvertPreview),
+          m_DrawSettings(other.m_DrawSettings),
+          m_PreviewMode(other.m_PreviewMode),
+          m_GeneratedMaskLabel(std::move(other.m_GeneratedMaskLabel)),
+          m_Size(other.m_Size),
+          m_RequireUpdation(other.m_RequireUpdation),
+          m_IsEditing(other.m_IsEditing),
+          m_PreviousBrushMode(other.m_PreviousBrushMode)
+    {
+        if (s_CurrentlyEditingMaskTool == &other) {
+            s_CurrentlyEditingMaskTool = this;
+        }
+        other.m_AppState                = nullptr;
+        other.m_ExternalGeneratedTexture = nullptr;
+        other.m_HasActiveStroke          = false;
+        other.m_IsEditing                = false;
+    }
+
+    MaskTool &MaskTool::operator=(MaskTool &&other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        if (s_CurrentlyEditingMaskTool == this)
+            s_CurrentlyEditingMaskTool = nullptr;
+
+        m_AppState                 = other.m_AppState;
+        m_RasterizeShader          = std::move(other.m_RasterizeShader);
+        m_CopyShader               = std::move(other.m_CopyShader);
+        m_StrokeSettingsBuffer     = std::move(other.m_StrokeSettingsBuffer);
+        m_StrokeRangesBuffer       = std::move(other.m_StrokeRangesBuffer);
+        m_StrokePointsBuffer       = std::move(other.m_StrokePointsBuffer);
+        m_BaseTexture              = std::move(other.m_BaseTexture);
+        m_PaintedTexture           = std::move(other.m_PaintedTexture);
+        m_VisualizationTexture    = std::move(other.m_VisualizationTexture);
+        m_ExternalGeneratedTexture = other.m_ExternalGeneratedTexture;
+        m_Strokes                  = std::move(other.m_Strokes);
+        m_ActiveStroke             = std::move(other.m_ActiveStroke);
+        m_HasActiveStroke          = other.m_HasActiveStroke;
+        m_VizColor                = other.m_VizColor;
+        m_InvertPreview           = other.m_InvertPreview;
+        m_DrawSettings            = other.m_DrawSettings;
+        m_PreviewMode             = other.m_PreviewMode;
+        m_GeneratedMaskLabel      = std::move(other.m_GeneratedMaskLabel);
+        m_Size                    = other.m_Size;
+        m_RequireUpdation        = other.m_RequireUpdation;
+        m_IsEditing              = other.m_IsEditing;
+        m_PreviousBrushMode      = other.m_PreviousBrushMode;
+
+        if (s_CurrentlyEditingMaskTool == &other)
+            s_CurrentlyEditingMaskTool = this;
+        other.m_AppState                 = nullptr;
+        other.m_ExternalGeneratedTexture = nullptr;
+        other.m_HasActiveStroke          = false;
+        other.m_IsEditing                = false;
+        return *this;
     }
 
     void MaskTool::Resize(int size)
