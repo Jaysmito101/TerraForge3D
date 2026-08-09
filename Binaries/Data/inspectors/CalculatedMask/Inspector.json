@@ -3,6 +3,9 @@
   "Name": "Calculated terrain mask",
   "Description": "Builds a reusable mask from height, slope, curvature, noise, and spatial pattern signals.",
   "ShowResetButton": true,
+  "SectionSelector": {
+    "Parameter": "Mask.MaskType"
+  },
   "Sections": [
     {
       "$include": "./Mask.json"

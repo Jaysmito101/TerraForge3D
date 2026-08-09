@@ -45,7 +45,6 @@
     }
   ],
   "CustomData": {
-    "ID": "ProceduralNoise",
     "Shader": "masks/calculated_mask/procedural_noise.glsl"
   }
 }

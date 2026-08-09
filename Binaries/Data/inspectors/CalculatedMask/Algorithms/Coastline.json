@@ -25,7 +25,6 @@
     }
   ],
   "CustomData": {
-    "ID": "Coastline",
     "Shader": "masks/calculated_mask/coastline.glsl"
   }
 }

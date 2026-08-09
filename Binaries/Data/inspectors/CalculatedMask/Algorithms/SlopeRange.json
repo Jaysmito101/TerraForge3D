@@ -25,7 +25,6 @@
     }
   ],
   "CustomData": {
-    "ID": "SlopeRange",
     "Shader": "masks/calculated_mask/slope_range.glsl"
   }
 }

@@ -11,7 +11,6 @@
     }
   ],
   "CustomData": {
-    "ID": "Dots",
     "Shader": "masks/calculated_mask/dots.glsl"
   }
 }

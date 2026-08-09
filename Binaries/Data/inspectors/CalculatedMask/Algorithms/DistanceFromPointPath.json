@@ -28,7 +28,6 @@
     }
   ],
   "CustomData": {
-    "ID": "DistanceFromPointPath",
     "Shader": "masks/calculated_mask/distance_from_point_path.glsl"
   }
 }

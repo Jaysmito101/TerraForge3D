@@ -14,7 +14,6 @@
     }
   ],
   "CustomData": {
-    "ID": "Aspect",
     "Shader": "masks/calculated_mask/aspect.glsl"
   }
 }

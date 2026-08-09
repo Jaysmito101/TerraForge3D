@@ -25,7 +25,6 @@
     }
   ],
   "CustomData": {
-    "ID": "RadialGradient",
     "Shader": "masks/calculated_mask/radial_gradient.glsl"
   }
 }
