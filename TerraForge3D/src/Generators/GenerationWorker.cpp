@@ -115,7 +115,7 @@ namespace tf3d::generators
 
         if (TF3D_PROFILE_CAPTURE_ACTIVE()) {
             [[maybe_unused]] const uint64_t requestId = m_CompletedRequestId.load(std::memory_order_acquire);
-            const std::string workerKey = m_ProfilePrefix + "/worker";
+            const std::string workerKey               = m_ProfilePrefix + "/worker";
             TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "gpu-complete", PerformanceMonitor::Domain::Worker);
             TF3D_PROFILE_FLOW_END_DOMAIN(workerKey, requestId, PerformanceMonitor::Domain::Worker);
         }

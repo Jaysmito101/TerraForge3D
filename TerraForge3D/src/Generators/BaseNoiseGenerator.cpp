@@ -4,6 +4,8 @@
 #include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 
+#include <algorithm>
+
 namespace tf3d::generators
 {
 
@@ -109,7 +111,12 @@ namespace tf3d::generators
         m_Shader->Bind();
         m_Inspector->ApplyToShader(*m_Shader);
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
-        m_Shader->SetUniform1i("u_UseSeedTexture", (seedTexture != nullptr && m_Inspector->Get("AutoUseSeedTexture", false)) ? 1 : 0);
+        const auto inspectorRoot   = m_Inspector->Root();
+        const auto octaveStrengths = inspectorRoot.Scope("Octaves").Get("OctaveStrengths", std::vector<float>{});
+        m_Shader->SetUniform1i("u_NoiseOctaveStrengthsCount",
+                               std::clamp(static_cast<int>(octaveStrengths.size()), 0, 16));
+        m_Shader->SetUniform1i("u_UseSeedTexture",
+                               (seedTexture != nullptr && inspectorRoot.Scope("Blend").Get("AutoUseSeedTexture", false)) ? 1 : 0);
         m_Shader->SetUniform1i("u_UseMask", useMask ? 1 : 0);
         m_Shader->SetUniform1i("u_InvertMask", useMask && m_InvertMask ? 1 : 0);
         if (seedTexture) {
