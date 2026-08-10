@@ -115,8 +115,8 @@ namespace tf3d::generators
                     const std::string pointCountUniform = binding != nullptr && binding->is_object()
                                                               ? binding->value("PointCountUniform", uniformName + "PointCount")
                                                               : uniformName + "PointCount";
-                    shader->SetUniform1i(pointCountUniform, glm::clamp(static_cast<int>(points.size()), 2, static_cast<int>(CustomInspectorMaxCurvePoints)));
-                    for (size_t pointIndex = 0; pointIndex < CustomInspectorMaxCurvePoints; ++pointIndex) {
+                    shader->SetUniform1i(pointCountUniform, glm::clamp(static_cast<int>(points.size()), 2, static_cast<int>(inspector::CustomInspectorMaxCurvePoints)));
+                    for (size_t pointIndex = 0; pointIndex < inspector::CustomInspectorMaxCurvePoints; ++pointIndex) {
                         const glm::vec2 point = pointIndex < points.size() ? points[pointIndex] : glm::vec2(0.0f);
                         shader->SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", point);
                     }
