@@ -65,37 +65,37 @@ namespace tf3d::inspector
     {
         switch (m_Type) {
             case CustomInspectorValueType::Int:
-                target->Set(name, m_IntValue);
+                target->Set(name, Store().Get<int32_t>());
                 return true;
             case CustomInspectorValueType::Float:
-                target->Set(name, m_FloatValue);
+                target->Set(name, Store().Get<float>());
                 return true;
             case CustomInspectorValueType::Bool:
-                target->Set(name, m_BoolValue);
+                target->Set(name, Store().Get<bool>());
                 return true;
             case CustomInspectorValueType::String:
-                target->Set(name, m_StringValue);
+                target->Set(name, Store().Get<std::string>());
                 return true;
             case CustomInspectorValueType::Vector2:
-                target->Set(name, glm::vec2(m_VectorValue[0], m_VectorValue[1]));
+                target->Set(name, Store().Get<glm::vec2>());
                 return true;
             case CustomInspectorValueType::Vector3:
-                target->Set(name, glm::vec3(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2]));
+                target->Set(name, Store().Get<glm::vec3>());
                 return true;
             case CustomInspectorValueType::Vector4:
-                target->Set(name, glm::vec4(m_VectorValue[0], m_VectorValue[1], m_VectorValue[2], m_VectorValue[3]));
+                target->Set(name, Store().Get<glm::vec4>());
                 return true;
             case CustomInspectorValueType::FloatArray:
-                target->Set(name, m_FloatArrayValue);
+                target->Set(name, Store().Get<std::vector<float>>());
                 return true;
-            case CustomInspectorValueType::Texture:
-                target->Set(name, m_TextureValue ? m_TextureValue->GetPath() : "");
+            case CustomInspectorValueType::Texture: {
+                const auto texture = Store().Get<std::shared_ptr<Texture2D>>();
+                target->Set(name, texture ? texture->GetPath() : "");
                 return true;
+            }
             case CustomInspectorValueType::Path:
-                target->Set(name, Get<std::vector<glm::vec2>>());
-                return true;
             case CustomInspectorValueType::Curve:
-                target->Set(name, Get<std::vector<glm::vec2>>());
+                target->Set(name, Store().Get<std::vector<glm::vec2>>());
                 return true;
             case CustomInspectorValueType::Unknown:
             default:
@@ -107,29 +107,30 @@ namespace tf3d::inspector
     {
         switch (m_Type) {
             case CustomInspectorValueType::Int:
-                return Set(source->Get(name, m_IntValue));
+                return Store().Set(source->Get(name, Store().Get<int32_t>()));
             case CustomInspectorValueType::Float:
-                return Set(source->Get(name, m_FloatValue));
+                return Store().Set(source->Get(name, Store().Get<float>()));
             case CustomInspectorValueType::Bool:
-                return Set(source->Get(name, m_BoolValue));
+                return Store().Set(source->Get(name, Store().Get<bool>()));
             case CustomInspectorValueType::String:
-                return Set(source->Get(name, m_StringValue));
+                return Store().Set(source->Get(name, Store().Get<std::string>()));
             case CustomInspectorValueType::Vector2:
-                return Set(source->Get(name, GetVector2()));
+                return Store().Set(source->Get(name, Store().Get<glm::vec2>()));
             case CustomInspectorValueType::Vector3:
-                return Set(source->Get(name, GetVector3()));
+                return Store().Set(source->Get(name, Store().Get<glm::vec3>()));
             case CustomInspectorValueType::Vector4:
-                return Set(source->Get(name, GetVector4()));
+                return Store().Set(source->Get(name, Store().Get<glm::vec4>()));
             case CustomInspectorValueType::FloatArray:
-                return Set(source->Get(name, m_FloatArrayValue));
+                return Store().Set(source->Get(name, Store().Get<std::vector<float>>()));
             case CustomInspectorValueType::Texture: {
-                const std::string path = source->Get(name, m_TextureValue ? m_TextureValue->GetPath() : "");
-                m_TextureValue         = path.empty() ? nullptr : std::make_shared<Texture2D>(path, false, false, m_TextureLoadAs16Bit);
-                return true;
+                const auto texture     = Store().Get<std::shared_ptr<Texture2D>>();
+                const std::string path = source->Get(name, texture ? texture->GetPath() : "");
+                return Store().Set(path.empty() ? std::shared_ptr<Texture2D>{}
+                                                : std::make_shared<Texture2D>(path, false, false, m_TextureLoadAs16Bit));
             }
             case CustomInspectorValueType::Path:
             case CustomInspectorValueType::Curve:
-                return Set(source->Get(name, Get<std::vector<glm::vec2>>()));
+                return Store().Set(source->Get(name, Store().Get<std::vector<glm::vec2>>()));
             case CustomInspectorValueType::Unknown:
             default:
                 return false;

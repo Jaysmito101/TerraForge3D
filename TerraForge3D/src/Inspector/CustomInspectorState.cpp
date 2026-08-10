@@ -36,9 +36,10 @@ namespace tf3d::inspector
         };
 
         if (value.GetType() == CustomInspectorValueType::FloatArray) {
-            const auto values = value.Get<std::vector<float>>();
-            if (!value.m_DefaultFloatArrayValue.empty() && values.size() != value.m_DefaultFloatArrayValue.size()) {
-                TF3D_LOG_WARN("Invalid CustomInspector value '{}' must contain {} elements", name, value.m_DefaultFloatArrayValue.size());
+            const auto values        = value.Store().Get<std::vector<float>>();
+            const auto defaultValues = value.Store().GetDefault<std::vector<float>>();
+            if (!defaultValues.empty() && values.size() != defaultValues.size()) {
+                TF3D_LOG_WARN("Invalid CustomInspector value '{}' must contain {} elements", name, defaultValues.size());
                 return false;
             }
             for (const auto numericValue : values) {
@@ -49,8 +50,8 @@ namespace tf3d::inspector
             }
         } else {
             const float numericValue = value.GetType() == CustomInspectorValueType::Int
-                                           ? static_cast<float>(value.Get<int32_t>())
-                                           : value.Get<float>();
+                                           ? static_cast<float>(value.Store().Get<int32_t>())
+                                           : value.Store().Get<float>();
             if (!std::isfinite(numericValue)) {
                 TF3D_LOG_WARN("Invalid CustomInspector value '{}' must be finite", name);
                 return false;
@@ -67,14 +68,14 @@ namespace tf3d::inspector
             const float minimum = widget.m_Constratins[0];
             const float maximum = widget.m_Constratins[1];
             if (value.GetType() == CustomInspectorValueType::FloatArray) {
-                for (const auto numericValue : value.Get<std::vector<float>>()) {
+                for (const auto numericValue : value.Store().Get<std::vector<float>>()) {
                     if (!validateRange(numericValue, minimum, maximum))
                         return false;
                 }
             } else {
                 const float numericValue = value.GetType() == CustomInspectorValueType::Int
-                                               ? static_cast<float>(value.Get<int32_t>())
-                                               : value.Get<float>();
+                                               ? static_cast<float>(value.Store().Get<int32_t>())
+                                               : value.Store().Get<float>();
                 if (!validateRange(numericValue, minimum, maximum))
                     return false;
             }
@@ -139,8 +140,9 @@ namespace tf3d::inspector
             return false;
         }
 
-        bool valid               = true;
-        const auto findValueName = [&](const std::string &serializedName,
+        bool valid                          = true;
+        CustomInspectorDataStore candidates = m_DataStore;
+        const auto findValueName            = [&](const std::string &serializedName,
                                        const std::string &sectionName) -> std::string {
             if (sectionName.empty()) {
                 const auto direct = m_Values.find(serializedName);
@@ -175,6 +177,7 @@ namespace tf3d::inspector
             }
 
             CustomInspectorValue candidate = existing->second;
+            candidate.BindDataStore(&candidates, existing->first);
             if (!candidate.ReadStateValue(source, name)) {
                 TF3D_LOG_WARN("Invalid CustomInspector state type for '{}'", name);
                 valid = false;
@@ -184,7 +187,6 @@ namespace tf3d::inspector
                 valid = false;
                 return;
             }
-            existing->second = std::move(candidate);
         };
 
         for (const auto &key : node->GetKeys()) {
@@ -202,6 +204,7 @@ namespace tf3d::inspector
             }
             loadValue(key, {}, node);
         }
+        m_DataStore      = std::move(candidates);
         m_SelectedPreset = -1;
         return valid;
     }
@@ -219,7 +222,7 @@ namespace tf3d::inspector
             if (resetValues.insert(valuePath).second) {
                 const auto value = m_Values.find(valuePath);
                 if (value != m_Values.end())
-                    value->second.ResetValue();
+                    value->second.Store().Reset();
             }
         }
         m_SelectedPreset      = 0;

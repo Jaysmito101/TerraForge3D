@@ -81,25 +81,25 @@ namespace tf3d::generators
             using inspector::CustomInspectorValueType;
             switch (value.GetType()) {
                 case CustomInspectorValueType::Int:
-                    shader->SetUniform1i(uniformName, value.Get<int32_t>());
+                    shader->SetUniform1i(uniformName, value.Store().Get<int32_t>());
                     break;
                 case CustomInspectorValueType::Float:
-                    shader->SetUniform1f(uniformName, value.Get<float>());
+                    shader->SetUniform1f(uniformName, value.Store().Get<float>());
                     break;
                 case CustomInspectorValueType::Bool:
-                    shader->SetUniform1i(uniformName, value.Get<bool>() ? 1 : 0);
+                    shader->SetUniform1i(uniformName, value.Store().Get<bool>() ? 1 : 0);
                     break;
                 case CustomInspectorValueType::Vector2:
-                    shader->SetUniform2f(uniformName, value.Get<glm::vec2>());
+                    shader->SetUniform2f(uniformName, value.Store().Get<glm::vec2>());
                     break;
                 case CustomInspectorValueType::Vector3:
-                    shader->SetUniform3f(uniformName, value.Get<glm::vec3>());
+                    shader->SetUniform3f(uniformName, value.Store().Get<glm::vec3>());
                     break;
                 case CustomInspectorValueType::Vector4:
-                    shader->SetUniform4f(uniformName, value.Get<glm::vec4>());
+                    shader->SetUniform4f(uniformName, value.Store().Get<glm::vec4>());
                     break;
                 case CustomInspectorValueType::Texture: {
-                    const auto texture    = value.Get<std::shared_ptr<Texture2D>>();
+                    const auto texture    = value.Store().Get<std::shared_ptr<Texture2D>>();
                     const bool hasTexture = texture != nullptr && texture->IsLoaded();
                     if (hasTexture)
                         shader->SetUniform1i(uniformName, texture->Bind(textureSlot++));
@@ -111,7 +111,7 @@ namespace tf3d::generators
                     break;
                 }
                 case CustomInspectorValueType::Curve: {
-                    const auto points                   = value.Get<std::vector<glm::vec2>>();
+                    const auto points                   = value.Store().Get<std::vector<glm::vec2>>();
                     const std::string pointCountUniform = binding != nullptr && binding->is_object()
                                                               ? binding->value("PointCountUniform", uniformName + "PointCount")
                                                               : uniformName + "PointCount";

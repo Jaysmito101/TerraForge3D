@@ -40,7 +40,7 @@ namespace tf3d::inspector
         T Get(std::string_view name, T fallback = {}) const
         {
             const auto *value = Find(name);
-            return value == nullptr ? fallback : value->Get(fallback);
+            return value == nullptr ? fallback : value->Store().Get(fallback);
         }
 
         template <typename T>
@@ -65,7 +65,7 @@ namespace tf3d::inspector
             requires MutableInspectorOwner<Owner>
         {
             return m_Inspector != nullptr &&
-                   m_Inspector->m_Values.erase(JoinPath(m_Path, name)) != 0;
+                   m_Inspector->RemoveExactValue(JoinPath(m_Path, name));
         }
 
         bool SetDropdownOptions(std::string_view name,

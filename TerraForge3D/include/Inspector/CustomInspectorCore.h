@@ -2,6 +2,7 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
+#include "Inspector/CustomInspectorDataStore.h"
 #include "Inspector/CustomInspectorValue.h"
 #include "Inspector/CustomInspectorWidget.h"
 
@@ -35,11 +36,19 @@ namespace tf3d::inspector
         template <typename T>
         CustomInspectorValue &Add(const std::string &name, T defaultValue = {})
         {
-            using ValueType = std::decay_t<T>;
-            CustomInspectorValue value(CustomInspectorValue::TypeFor<ValueType>());
-            value.m_Name = name;
-            value.SetDefault(std::move(defaultValue));
-            return AddVariable(name, value);
+            using ValueType             = std::decay_t<T>;
+            CustomInspectorValue &value = AddVariable(name, CustomInspectorValue(CustomInspectorValue::TypeFor<ValueType>()));
+            value.Store().SetDefault(std::move(defaultValue));
+            return value;
+        }
+
+        inline CustomInspectorDataStore &GetDataStore()
+        {
+            return m_DataStore;
+        }
+        inline const CustomInspectorDataStore &GetDataStore() const
+        {
+            return m_DataStore;
         }
 
         bool HasWidget(const std::string &name);
@@ -78,7 +87,7 @@ namespace tf3d::inspector
         inline void Reset()
         {
             for (auto &[name, value] : m_Values)
-                value.ResetValue();
+                value.Store().Reset();
             m_SelectedPreset      = 0;
             m_LastChangedVariable = "Preset";
             m_LastAction.clear();
@@ -110,6 +119,7 @@ namespace tf3d::inspector
         inline void Clear()
         {
             m_Values.clear();
+            m_DataStore.Clear();
             m_Widgets.clear();
             m_WidgetsOrder.clear();
             m_Sections.clear();
@@ -153,6 +163,7 @@ namespace tf3d::inspector
         CustomInspectorValue &AddVariable(const std::string &name, const CustomInspectorValue &value);
         CustomInspectorValue *FindExactValue(std::string_view path);
         const CustomInspectorValue *FindExactValue(std::string_view path) const;
+        bool RemoveExactValue(std::string_view path);
         template <typename T>
         bool SetExactValue(std::string_view path, T value)
         {
@@ -160,10 +171,12 @@ namespace tf3d::inspector
             if (existing == m_Values.end())
                 return false;
 
-            CustomInspectorValue candidate = existing->second;
-            if (!candidate.Set(std::move(value)) || !ValidateValue(existing->first, candidate))
+            CustomInspectorDataStore candidates = m_DataStore;
+            CustomInspectorValue candidate      = existing->second;
+            candidate.BindDataStore(&candidates, existing->first);
+            if (!candidate.Store().Set(std::move(value)) || !ValidateValue(existing->first, candidate))
                 return false;
-            existing->second = std::move(candidate);
+            m_DataStore = std::move(candidates);
             return true;
         }
         std::string PathForWidget(std::string_view widgetLabel) const;
@@ -212,6 +225,7 @@ namespace tf3d::inspector
             nlohmann::json values = nlohmann::json::object();
         };
 
+        CustomInspectorDataStore m_DataStore;
         std::unordered_map<std::string, CustomInspectorValue> m_Values;
         std::unordered_map<std::string, CustomInspectorWidget> m_Widgets;
         std::vector<std::string> m_WidgetsOrder;

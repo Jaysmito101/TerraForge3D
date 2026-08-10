@@ -78,7 +78,7 @@ namespace tf3d::inspector
                     declaration.type = "vec4";
                     break;
                 case CustomInspectorValueType::FloatArray: {
-                    const auto values = value.Get<std::vector<float>>();
+                    const auto values = value.Store().Get<std::vector<float>>();
                     if (values.empty())
                         return fail("value '" + value.GetName() + "' has an empty FloatArray");
                     declaration.type      = "float";

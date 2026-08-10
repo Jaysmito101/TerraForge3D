@@ -92,7 +92,7 @@ namespace tf3d::inspector
                 static char s_ResetButtonName[1024];
                 sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
                 if (ImGui::Button(s_ResetButtonName)) {
-                    ValueForWidget(widgetLabel).ResetValue();
+                    ValueForWidget(widgetLabel).Store().Reset();
                     widgetChanged         = true;
                     m_LastChangedVariable = widget.m_VariableName;
                 }
@@ -178,19 +178,19 @@ namespace tf3d::inspector
         auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
-                hasChanged = ImGui::SliderInt(widget.m_Label.c_str(), &value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
+                hasChanged = ImGui::SliderInt(widget.m_Label.c_str(), value.Store().Edit<int32_t>(), static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
                 break;
             case CustomInspectorValueType::Float:
-                hasChanged = ImGui::SliderFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::SliderFloat(widget.m_Label.c_str(), value.Store().Edit<float>(), widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::Vector2:
-                hasChanged = ImGui::SliderFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::SliderFloat2(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec2>()), widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::Vector3:
-                hasChanged = ImGui::SliderFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::SliderFloat3(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec3>()), widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::Vector4:
-                hasChanged = ImGui::SliderFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::SliderFloat4(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec4>()), widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::String:
             case CustomInspectorValueType::Bool:
@@ -208,40 +208,40 @@ namespace tf3d::inspector
         auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
-                hasChanged = ImGui::DragInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_FSpeed, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
+                hasChanged = ImGui::DragInt(widget.m_Label.c_str(), value.Store().Edit<int32_t>(), widget.m_FSpeed, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
-                value.m_IntValue = std::clamp(value.m_IntValue, static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
+                *value.Store().Edit<int32_t>() = std::clamp(*value.Store().Edit<int32_t>(), static_cast<int32_t>(widget.m_Constratins[0]), static_cast<int32_t>(widget.m_Constratins[1]));
                 break;
             case CustomInspectorValueType::Float:
-                hasChanged = ImGui::DragFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::DragFloat(widget.m_Label.c_str(), value.Store().Edit<float>(), widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
-                value.m_FloatValue = std::clamp(value.m_FloatValue, widget.m_Constratins[0], widget.m_Constratins[1]);
+                *value.Store().Edit<float>() = std::clamp(*value.Store().Edit<float>(), widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::Vector2:
-                hasChanged = ImGui::DragFloat2(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::DragFloat2(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec2>()), widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
-                value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
-                value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec2>()->x = std::clamp(value.Store().Edit<glm::vec2>()->x, widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec2>()->y = std::clamp(value.Store().Edit<glm::vec2>()->y, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::Vector3:
-                hasChanged = ImGui::DragFloat3(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::DragFloat3(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec3>()), widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
-                value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
-                value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
-                value.m_VectorValue[2] = std::clamp(value.m_VectorValue[2], widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec3>()->x = std::clamp(value.Store().Edit<glm::vec3>()->x, widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec3>()->y = std::clamp(value.Store().Edit<glm::vec3>()->y, widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec3>()->z = std::clamp(value.Store().Edit<glm::vec3>()->z, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::Vector4:
-                hasChanged = ImGui::DragFloat4(widget.m_Label.c_str(), value.m_VectorValue, widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
+                hasChanged = ImGui::DragFloat4(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec4>()), widget.m_FSpeed, widget.m_Constratins[0], widget.m_Constratins[1]);
                 if (abs(widget.m_Constratins[0] - widget.m_Constratins[1]) < 0.001f)
                     break; // no constraints
-                value.m_VectorValue[0] = std::clamp(value.m_VectorValue[0], widget.m_Constratins[0], widget.m_Constratins[1]);
-                value.m_VectorValue[1] = std::clamp(value.m_VectorValue[1], widget.m_Constratins[0], widget.m_Constratins[1]);
-                value.m_VectorValue[2] = std::clamp(value.m_VectorValue[2], widget.m_Constratins[0], widget.m_Constratins[1]);
-                value.m_VectorValue[3] = std::clamp(value.m_VectorValue[3], widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec4>()->x = std::clamp(value.Store().Edit<glm::vec4>()->x, widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec4>()->y = std::clamp(value.Store().Edit<glm::vec4>()->y, widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec4>()->z = std::clamp(value.Store().Edit<glm::vec4>()->z, widget.m_Constratins[0], widget.m_Constratins[1]);
+                value.Store().Edit<glm::vec4>()->w = std::clamp(value.Store().Edit<glm::vec4>()->w, widget.m_Constratins[0], widget.m_Constratins[1]);
                 break;
             case CustomInspectorValueType::String:
             case CustomInspectorValueType::Bool:
@@ -258,20 +258,35 @@ namespace tf3d::inspector
         bool hasChanged = false;
         auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
-            case CustomInspectorValueType::Int:
-                hasChanged       = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
-                value.m_IntValue = ImGui::ColorConvertFloat4ToU32(ImVec4(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]));
+            case CustomInspectorValueType::Int: {
+                ImVec4 color = ImGui::ColorConvertU32ToFloat4(static_cast<ImU32>(value.Store().Get<int32_t>()));
+                hasChanged   = ImGui::ColorEdit4(widget.m_Label.c_str(), &color.x);
+                if (hasChanged)
+                    value.Store().Set(static_cast<int32_t>(ImGui::ColorConvertFloat4ToU32(color)));
                 break;
+            }
             case CustomInspectorValueType::Vector3:
-                hasChanged = ImGui::ColorEdit3(widget.m_Label.c_str(), value.m_VectorValue);
+                hasChanged = ImGui::ColorEdit3(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec3>()));
                 break;
             case CustomInspectorValueType::Vector4:
-                hasChanged = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
+                hasChanged = ImGui::ColorEdit4(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec4>()));
                 break;
-            case CustomInspectorValueType::String:
-                hasChanged          = ImGui::ColorEdit4(widget.m_Label.c_str(), value.m_VectorValue);
-                value.m_StringValue = ColorConvertToHexString(value.m_VectorValue[0], value.m_VectorValue[1], value.m_VectorValue[2], value.m_VectorValue[3]);
+            case CustomInspectorValueType::String: {
+                ImU32 packed                  = 0;
+                const std::string colorString = value.Store().Get<std::string>();
+                if (colorString.size() == 8) {
+                    try {
+                        packed = static_cast<ImU32>(std::stoul(colorString, nullptr, 16));
+                    } catch (const std::exception &) {
+                        packed = 0;
+                    }
+                }
+                ImVec4 color = ImGui::ColorConvertU32ToFloat4(packed);
+                hasChanged   = ImGui::ColorEdit4(widget.m_Label.c_str(), &color.x);
+                if (hasChanged)
+                    value.Store().Set(ColorConvertToHexString(color.x, color.y, color.z, color.w));
                 break;
+            }
             case CustomInspectorValueType::Float:
             case CustomInspectorValueType::Bool:
             case CustomInspectorValueType::Vector2:
@@ -301,12 +316,15 @@ namespace tf3d::inspector
             default:
                 throw std::runtime_error(std::string("Invalid data type for Drag"));
         }
-        ImTextureID textureID = value.m_TextureValue ? (ImTextureID)(int64_t)value.m_TextureValue->GetRendererID() : static_cast<ImTextureID>(0);
+        auto *texture         = value.Store().Edit<std::shared_ptr<Texture2D>>();
+        ImTextureID textureID = texture != nullptr && *texture
+                                    ? (ImTextureID)(int64_t)(*texture)->GetRendererID()
+                                    : static_cast<ImTextureID>(0);
         if (ImGui::ImageButton(textureID, ImVec2(widget.m_Constratins[0], widget.m_Constratins[1]))) {
             std::string path = ShowOpenFileDialog("*.*");
             if (path.size() > 3) {
-                value.m_TextureValue = std::make_shared<Texture2D>(path, false, false, value.m_TextureLoadAs16Bit);
-                hasChanged           = true;
+                *texture   = std::make_shared<Texture2D>(path, false, false, value.m_TextureLoadAs16Bit);
+                hasChanged = true;
             }
         }
         return hasChanged;
@@ -334,25 +352,26 @@ namespace tf3d::inspector
         if (widget.m_DropdownOptions.empty())
             return false;
         const bool hasMappedValues = widget.m_DropdownValues.size() == widget.m_DropdownOptions.size();
+        auto *selectedValue        = value.Store().Edit<int32_t>();
         int32_t selectedIndex      = 0;
         if (hasMappedValues) {
-            const auto selected = std::find(widget.m_DropdownValues.begin(), widget.m_DropdownValues.end(), value.m_IntValue);
+            const auto selected = std::find(widget.m_DropdownValues.begin(), widget.m_DropdownValues.end(), *selectedValue);
             if (selected != widget.m_DropdownValues.end()) {
                 selectedIndex = static_cast<int32_t>(std::distance(widget.m_DropdownValues.begin(), selected));
             } else {
-                value.m_IntValue = widget.m_DropdownValues.front();
+                *selectedValue = widget.m_DropdownValues.front();
             }
         } else {
-            selectedIndex    = glm::clamp(value.m_IntValue, 0, static_cast<int32_t>(widget.m_DropdownOptions.size()) - 1);
-            value.m_IntValue = selectedIndex;
+            selectedIndex  = glm::clamp(*selectedValue, 0, static_cast<int32_t>(widget.m_DropdownOptions.size()) - 1);
+            *selectedValue = selectedIndex;
         }
 
         if (ImGui::BeginCombo(widget.m_Label.c_str(), widget.m_DropdownOptions[selectedIndex].c_str())) {
             for (int i = 0; i < static_cast<int32_t>(widget.m_DropdownOptions.size()); i++) {
                 const bool isSelected = (selectedIndex == i);
                 if (ImGui::Selectable(widget.m_DropdownOptions[i].c_str(), isSelected)) {
-                    value.m_IntValue = hasMappedValues ? widget.m_DropdownValues[i] : i;
-                    hasChanged       = true;
+                    *selectedValue = hasMappedValues ? widget.m_DropdownValues[i] : i;
+                    hasChanged     = true;
                 }
                 if (isSelected)
                     ImGui::SetItemDefaultFocus();
@@ -374,8 +393,11 @@ namespace tf3d::inspector
         auto &value = ValueForWidget(widgetLabel);
         if (value.GetType() != CustomInspectorValueType::Path)
             throw std::runtime_error("Invalid data type for Path");
+        auto *path = value.Store().Edit<CustomInspectorPathData>();
+        if (path == nullptr)
+            throw std::runtime_error("Path value is not present in the data store");
         return utils::DrawPathEditor<CustomInspectorMaxPathPoints>(
-            widget.m_Label.c_str(), value.m_PathPoints, value.m_PathPointCount);
+            widget.m_Label.c_str(), path->points, path->pointCount);
     }
 
     bool CustomInspector::RenderCurve(const std::string &widgetLabel, const CustomInspectorWidget &widget)
@@ -384,9 +406,13 @@ namespace tf3d::inspector
         if (value.GetType() != CustomInspectorValueType::Curve)
             throw std::runtime_error("Invalid data type for Curve");
 
+        auto *curve = value.Store().Edit<CustomInspectorCurveData>();
+        if (curve == nullptr)
+            throw std::runtime_error("Curve value is not present in the data store");
+
         std::array<ImVec2, CustomInspectorMaxCurvePoints> points{};
         for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
-            points[index] = ImVec2(value.m_CurvePoints[index].x, value.m_CurvePoints[index].y);
+            points[index] = ImVec2(curve->points[index].x, curve->points[index].y);
 
         const float width            = std::max(ImGui::GetContentRegionAvail().x, 220.0f);
         const std::string curveLabel = widget.m_Label + "##" + widget.m_ID;
@@ -397,8 +423,8 @@ namespace tf3d::inspector
             ++pointCount;
         pointCount = std::clamp(pointCount, 2, static_cast<int>(CustomInspectorMaxCurvePoints));
         for (size_t index = 0; index < CustomInspectorMaxCurvePoints; ++index)
-            value.m_CurvePoints[index] = glm::vec2(points[index].x, points[index].y);
-        value.m_CurvePointCount = pointCount;
+            curve->points[index] = glm::vec2(points[index].x, points[index].y);
+        curve->pointCount = pointCount;
         return changed;
     }
 
@@ -408,23 +434,23 @@ namespace tf3d::inspector
         if (value.GetType() != CustomInspectorValueType::FloatArray)
             throw std::runtime_error("Invalid data type for Octaves");
 
-        auto &octaves = value.m_FloatArrayValue;
-        if (octaves.empty())
+        auto *octaves = value.Store().Edit<std::vector<float>>();
+        if (octaves == nullptr || octaves->empty())
             return false;
 
         ImGui::TextUnformatted(widget.m_Label.c_str());
         bool changed = false;
         ImGui::PushID((widget.m_ID + "Values").c_str());
-        for (size_t index = 0; index < octaves.size(); ++index) {
+        for (size_t index = 0; index < octaves->size(); ++index) {
             ImGui::PushID(static_cast<int>(index));
             const std::string label = "Octave " + std::to_string(index + 1);
             if (ImGui::VSliderFloat("##Value",
                                     ImVec2(20.0f, 200.0f),
-                                    &octaves[index],
+                                    &(*octaves)[index],
                                     widget.m_Constratins[0],
                                     widget.m_Constratins[1]))
                 changed = true;
-            RenderInspectorTooltip(label, std::to_string(octaves[index]));
+            RenderInspectorTooltip(label, std::to_string((*octaves)[index]));
             ImGui::SameLine();
             ImGui::PopID();
         }
@@ -437,32 +463,62 @@ namespace tf3d::inspector
     {
         bool hasChanged = false;
         auto &value     = ValueForWidget(widgetLabel);
-        hasChanged      = ImGui::Checkbox(widget.m_Label.c_str(), &value.m_BoolValue);
+        bool checked    = false;
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
-                value.m_IntValue = (value.m_BoolValue ? 1 : 0);
-                ;
+                checked = value.Store().Get<int32_t>() != 0;
                 break;
             case CustomInspectorValueType::Float:
-                value.m_FloatValue = (value.m_BoolValue ? 1.0f : 0.0f);
+                checked = value.Store().Get<float>() != 0.0f;
                 break;
             case CustomInspectorValueType::Vector2:
+                checked = value.Store().Get<glm::vec2>().x != 0.0f;
+                break;
             case CustomInspectorValueType::Vector3:
+                checked = value.Store().Get<glm::vec3>().x != 0.0f;
+                break;
             case CustomInspectorValueType::Vector4:
-                value.m_VectorValue[0] = (value.m_BoolValue ? 1.0f : 0.0f);
-                value.m_VectorValue[1] = (value.m_BoolValue ? 1.0f : 0.0f);
-                value.m_VectorValue[2] = (value.m_BoolValue ? 1.0f : 0.0f);
-                value.m_VectorValue[3] = (value.m_BoolValue ? 1.0f : 0.0f);
+                checked = value.Store().Get<glm::vec4>().x != 0.0f;
                 break;
             case CustomInspectorValueType::String:
-                value.m_StringValue = (value.m_BoolValue ? "true" : "false");
+                checked = value.Store().Get<std::string>() == "true";
                 break;
             case CustomInspectorValueType::Bool:
+                checked = value.Store().Get<bool>();
                 break;
             case CustomInspectorValueType::Texture:
                 throw std::runtime_error(std::string("Invalid data type for Checkbox"));
             default:
                 throw std::runtime_error(std::string("Invalid data type for Checkbox"));
+        }
+        hasChanged = ImGui::Checkbox(widget.m_Label.c_str(), &checked);
+        if (!hasChanged)
+            return false;
+
+        switch (value.GetType()) {
+            case CustomInspectorValueType::Int:
+                value.Store().Set<int32_t>(checked ? 1 : 0);
+                break;
+            case CustomInspectorValueType::Float:
+                value.Store().Set<float>(checked ? 1.0f : 0.0f);
+                break;
+            case CustomInspectorValueType::Vector2:
+                value.Store().Set(glm::vec2(checked ? 1.0f : 0.0f));
+                break;
+            case CustomInspectorValueType::Vector3:
+                value.Store().Set(glm::vec3(checked ? 1.0f : 0.0f));
+                break;
+            case CustomInspectorValueType::Vector4:
+                value.Store().Set(glm::vec4(checked ? 1.0f : 0.0f));
+                break;
+            case CustomInspectorValueType::String:
+                value.Store().Set(std::string(checked ? "true" : "false"));
+                break;
+            case CustomInspectorValueType::Bool:
+                value.Store().Set(checked);
+                break;
+            default:
+                break;
         }
         return hasChanged;
     }
@@ -473,25 +529,25 @@ namespace tf3d::inspector
         auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
             case CustomInspectorValueType::Int:
-                hasChanged = ImGui::InputInt(widget.m_Label.c_str(), &value.m_IntValue, widget.m_ISpeed, widget.m_ISpeed * 10);
+                hasChanged = ImGui::InputInt(widget.m_Label.c_str(), value.Store().Edit<int32_t>(), widget.m_ISpeed, widget.m_ISpeed * 10);
                 break;
             case CustomInspectorValueType::Float:
-                hasChanged = ImGui::InputFloat(widget.m_Label.c_str(), &value.m_FloatValue, widget.m_FSpeed, widget.m_FSpeed * 10.0f);
+                hasChanged = ImGui::InputFloat(widget.m_Label.c_str(), value.Store().Edit<float>(), widget.m_FSpeed, widget.m_FSpeed * 10.0f);
                 break;
             case CustomInspectorValueType::Vector2:
-                hasChanged = ImGui::InputFloat2(widget.m_Label.c_str(), value.m_VectorValue);
+                hasChanged = ImGui::InputFloat2(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec2>()));
                 break;
             case CustomInspectorValueType::Vector3:
-                hasChanged = ImGui::InputFloat3(widget.m_Label.c_str(), value.m_VectorValue);
+                hasChanged = ImGui::InputFloat3(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec3>()));
                 break;
             case CustomInspectorValueType::Vector4:
-                hasChanged = ImGui::InputFloat4(widget.m_Label.c_str(), value.m_VectorValue);
+                hasChanged = ImGui::InputFloat4(widget.m_Label.c_str(), glm::value_ptr(*value.Store().Edit<glm::vec4>()));
                 break;
             case CustomInspectorValueType::String:
                 static char s_Buffer[4096];
-                std::strcpy(s_Buffer, value.m_StringValue.c_str());
-                hasChanged          = ImGui::InputText(widget.m_Label.c_str(), s_Buffer, sizeof(s_Buffer));
-                value.m_StringValue = s_Buffer;
+                std::strcpy(s_Buffer, value.Store().Get<std::string>().c_str());
+                hasChanged = ImGui::InputText(widget.m_Label.c_str(), s_Buffer, sizeof(s_Buffer));
+                value.Store().Set(std::string(s_Buffer));
                 break;
             case CustomInspectorValueType::Bool:
             case CustomInspectorValueType::Texture:
@@ -507,17 +563,24 @@ namespace tf3d::inspector
         bool hasChanged = false;
         auto &value     = ValueForWidget(widgetLabel);
         switch (value.GetType()) {
-            case CustomInspectorValueType::Int:
-                hasChanged = ShowSeedSettings(widget.m_Label, &value.m_IntValue, widget.m_SeedHistory);
+            case CustomInspectorValueType::Int: {
+                int seed   = value.Store().Get<int32_t>();
+                hasChanged = ShowSeedSettings(widget.m_Label, &seed, widget.m_SeedHistory);
+                if (hasChanged)
+                    value.Store().Set<int32_t>(seed);
                 break;
-            case CustomInspectorValueType::Float:
-                hasChanged         = ShowSeedSettings(widget.m_Label, &value.m_IntValue, widget.m_SeedHistory);
-                value.m_FloatValue = static_cast<float>(value.m_IntValue);
+            }
+            case CustomInspectorValueType::Float: {
+                int seed   = static_cast<int>(value.Store().Get<float>());
+                hasChanged = ShowSeedSettings(widget.m_Label, &seed, widget.m_SeedHistory);
+                if (hasChanged)
+                    value.Store().Set<float>(static_cast<float>(seed));
                 break;
+            }
             case CustomInspectorValueType::String:
-                if (ImGui::Button(("Seed Value: " + value.m_StringValue + " [Click to change]").c_str())) {
-                    value.m_StringValue = GenerateId(8);
-                    hasChanged          = true;
+                if (ImGui::Button(("Seed Value: " + value.Store().Get<std::string>() + " [Click to change]").c_str())) {
+                    value.Store().Set(GenerateId(8));
+                    hasChanged = true;
                 }
                 break;
             case CustomInspectorValueType::Vector2:

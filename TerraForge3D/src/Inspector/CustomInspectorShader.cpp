@@ -30,33 +30,33 @@ namespace tf3d::inspector
 
             switch (uniformValue.GetType()) {
                 case CustomInspectorValueType::Int:
-                    shader.SetUniform1i(uniformName, uniformValue.template Get<int32_t>());
+                    shader.SetUniform1i(uniformName, uniformValue.Store().Get<int32_t>());
                     break;
                 case CustomInspectorValueType::Float:
-                    shader.SetUniform1f(uniformName, uniformValue.template Get<float>());
+                    shader.SetUniform1f(uniformName, uniformValue.Store().Get<float>());
                     break;
                 case CustomInspectorValueType::Bool:
-                    shader.SetUniform1i(uniformName, uniformValue.template Get<bool>() ? 1 : 0);
+                    shader.SetUniform1i(uniformName, uniformValue.Store().Get<bool>() ? 1 : 0);
                     break;
                 case CustomInspectorValueType::Vector2:
-                    shader.SetUniform2f(uniformName, uniformValue.template Get<glm::vec2>());
+                    shader.SetUniform2f(uniformName, uniformValue.Store().Get<glm::vec2>());
                     break;
                 case CustomInspectorValueType::Vector3:
-                    shader.SetUniform3f(uniformName, uniformValue.template Get<glm::vec3>());
+                    shader.SetUniform3f(uniformName, uniformValue.Store().Get<glm::vec3>());
                     break;
                 case CustomInspectorValueType::Vector4: {
-                    const glm::vec4 vector = uniformValue.template Get<glm::vec4>();
+                    const glm::vec4 vector = uniformValue.Store().Get<glm::vec4>();
                     shader.SetUniform4f(uniformName, vector.x, vector.y, vector.z, vector.w);
                     break;
                 }
                 case CustomInspectorValueType::FloatArray: {
-                    const auto values = uniformValue.template Get<std::vector<float>>();
+                    const auto values = uniformValue.Store().Get<std::vector<float>>();
                     if (!values.empty())
                         shader.SetUniform1fv(uniformName, values.data(), static_cast<int>(values.size()));
                     break;
                 }
                 case CustomInspectorValueType::Path: {
-                    const auto points    = uniformValue.template Get<std::vector<glm::vec2>>();
+                    const auto points    = uniformValue.Store().Get<std::vector<glm::vec2>>();
                     const int pointCount = std::min(static_cast<int>(points.size()), static_cast<int>(CustomInspectorMaxPathPoints));
                     for (int pointIndex = 0; pointIndex < pointCount; ++pointIndex)
                         shader.SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", points[pointIndex]);

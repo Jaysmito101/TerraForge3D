@@ -81,10 +81,20 @@ namespace tf3d::inspector
         return value == m_Values.end() ? nullptr : &value->second;
     }
 
+    bool CustomInspector::RemoveExactValue(std::string_view path)
+    {
+        const std::string key(path);
+        const bool removed = m_Values.erase(key) != 0;
+        m_DataStore.Remove(key);
+        return removed;
+    }
+
     CustomInspectorValue &CustomInspector::AddVariable(const std::string &name, const CustomInspectorValue &value)
     {
         const std::string valueKey = m_CurrentSection.empty() ? name : m_CurrentSection + "." + name;
-        m_Values[valueKey]         = value;
+        m_DataStore.Ensure(valueKey, value.GetType());
+        m_Values[valueKey] = value;
+        m_Values[valueKey].BindDataStore(&m_DataStore, valueKey);
         if (m_Values[valueKey].m_SerializedName.empty())
             m_Values[valueKey].m_SerializedName = name;
         return m_Values[valueKey];
@@ -94,31 +104,38 @@ namespace tf3d::inspector
                                                            const std::array<glm::vec2, CustomInspectorMaxPathPoints> &defaultPoints, int defaultPointCount)
     {
         CustomInspectorValue value(CustomInspectorValueType::Path);
-        value.m_DefaultPathPoints = value.m_PathPoints = defaultPoints;
-        value.m_DefaultPathPointCount = value.m_PathPointCount = glm::clamp(defaultPointCount, 1, static_cast<int>(CustomInspectorMaxPathPoints));
-        value.m_Name                                           = name;
-        return AddVariable(name, value);
+        value.m_Name         = name;
+        auto &stored         = AddVariable(name, value);
+        const int pointCount = glm::clamp(defaultPointCount, 1, static_cast<int>(CustomInspectorMaxPathPoints));
+        std::vector<glm::vec2> points;
+        points.reserve(static_cast<size_t>(pointCount));
+        for (int index = 0; index < pointCount; ++index)
+            points.push_back(defaultPoints[static_cast<size_t>(index)]);
+        stored.Store().SetDefault(std::move(points));
+        return stored;
     }
 
     CustomInspectorValue &CustomInspector::AddCurveVariable(const std::string &name,
                                                             const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints, int defaultPointCount)
     {
         CustomInspectorValue value(CustomInspectorValueType::Curve);
-        value.m_CurvePoints.fill(glm::vec2(-1.0f));
-        value.m_DefaultCurvePoints.fill(glm::vec2(-1.0f));
         const int pointCount = glm::clamp(defaultPointCount, 2, static_cast<int>(CustomInspectorMaxCurvePoints));
+        std::vector<glm::vec2> points;
+        points.reserve(static_cast<size_t>(pointCount));
         for (int index = 0; index < pointCount; ++index) {
-            value.m_CurvePoints[index]        = defaultPoints[index];
-            value.m_DefaultCurvePoints[index] = defaultPoints[index];
+            points.push_back(defaultPoints[static_cast<size_t>(index)]);
         }
-        if (value.m_CurvePoints[0].x < 0.0f) {
-            value.m_CurvePoints[0] = value.m_DefaultCurvePoints[0] = glm::vec2(0.0f, 0.0f);
+        if (points[0].x < 0.0f) {
+            points[0] = glm::vec2(0.0f, 0.0f);
         }
-        if (value.m_CurvePoints[1].x < 0.0f || value.m_CurvePoints[1].x <= value.m_CurvePoints[0].x)
-            value.m_CurvePoints[1] = value.m_DefaultCurvePoints[1] = glm::vec2(1.0f, 1.0f);
-        value.m_DefaultCurvePointCount = value.m_CurvePointCount = pointCount;
-        value.m_Name                                             = name;
-        return AddVariable(name, value);
+        if (points[1].x < 0.0f || points[1].x <= points[0].x)
+            points[1] = glm::vec2(1.0f, 1.0f);
+        value.m_Name = name;
+        auto &stored = AddVariable(name, value);
+        if (auto *curve = stored.Store().Edit<CustomInspectorCurveData>(); curve != nullptr)
+            curve->points.fill(glm::vec2(-1.0f));
+        stored.Store().SetDefault(std::move(points));
+        return stored;
     }
 
     CustomInspectorValue &CustomInspector::AddVairableFromConfig(const nlohmann::json &config)
@@ -360,9 +377,9 @@ namespace tf3d::inspector
             if (value == nullptr)
                 return false;
             if (!condition.values.empty()) {
-                if (std::find(condition.values.begin(), condition.values.end(), value->Get<int32_t>()) == condition.values.end())
+                if (std::find(condition.values.begin(), condition.values.end(), value->Store().Get<int32_t>()) == condition.values.end())
                     return false;
-            } else if (value->Get<int32_t>() != 1) {
+            } else if (value->Store().Get<int32_t>() != 1) {
                 return false;
             }
         }

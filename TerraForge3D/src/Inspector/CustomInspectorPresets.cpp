@@ -86,36 +86,36 @@ namespace tf3d::inspector
         switch (candidate.GetType()) {
             case CustomInspectorValueType::Int: {
                 int32_t parsed = 0;
-                converted      = ReadPresetInteger(value, parsed) && candidate.Set(parsed);
+                converted      = ReadPresetInteger(value, parsed) && candidate.Store().Set(parsed);
                 break;
             }
             case CustomInspectorValueType::Float: {
                 float parsed = 0.0f;
-                converted    = ReadPresetFloat(value, parsed) && candidate.Set(parsed);
+                converted    = ReadPresetFloat(value, parsed) && candidate.Store().Set(parsed);
                 break;
             }
             case CustomInspectorValueType::Bool:
-                converted = value.is_boolean() && candidate.Set(value.get<bool>());
+                converted = value.is_boolean() && candidate.Store().Set(value.get<bool>());
                 break;
             case CustomInspectorValueType::String:
-                converted = value.is_string() && candidate.Set(value.get<std::string>());
+                converted = value.is_string() && candidate.Store().Set(value.get<std::string>());
                 break;
             case CustomInspectorValueType::Vector2: {
                 float components[4] = {};
                 converted           = ReadPresetVector(value, 2, components) &&
-                            candidate.Set(glm::vec2(components[0], components[1]));
+                            candidate.Store().Set(glm::vec2(components[0], components[1]));
                 break;
             }
             case CustomInspectorValueType::Vector3: {
                 float components[4] = {};
                 converted           = ReadPresetVector(value, 3, components) &&
-                            candidate.Set(glm::vec3(components[0], components[1], components[2]));
+                            candidate.Store().Set(glm::vec3(components[0], components[1], components[2]));
                 break;
             }
             case CustomInspectorValueType::Vector4: {
                 float components[4] = {};
                 converted           = ReadPresetVector(value, 4, components) &&
-                            candidate.Set(glm::vec4(components[0], components[1], components[2], components[3]));
+                            candidate.Store().Set(glm::vec4(components[0], components[1], components[2], components[3]));
                 break;
             }
             case CustomInspectorValueType::FloatArray: {
@@ -131,7 +131,7 @@ namespace tf3d::inspector
                     }
                     values.push_back(parsed);
                 }
-                converted = !values.empty() && candidate.Set(std::move(values));
+                converted = !values.empty() && candidate.Store().Set(std::move(values));
                 break;
             }
             case CustomInspectorValueType::Texture: {
@@ -139,13 +139,13 @@ namespace tf3d::inspector
                     break;
                 const std::string path = value.get<std::string>();
                 if (path.empty() || path == "null") {
-                    converted = candidate.Set(std::shared_ptr<Texture2D>{});
+                    converted = candidate.Store().Set(std::shared_ptr<Texture2D>{});
                     break;
                 }
                 auto texture = std::make_shared<Texture2D>(path, true, false, candidate.m_TextureLoadAs16Bit);
                 if (!texture->IsLoaded())
                     return invalid("texture could not be loaded");
-                converted = candidate.Set(std::move(texture));
+                converted = candidate.Store().Set(std::move(texture));
                 break;
             }
             case CustomInspectorValueType::Path:
@@ -165,7 +165,7 @@ namespace tf3d::inspector
                     }
                     points.emplace_back(components[0], components[1]);
                 }
-                converted = !points.empty() && candidate.Set(std::move(points));
+                converted = !points.empty() && candidate.Store().Set(std::move(points));
                 break;
             }
             case CustomInspectorValueType::Unknown:
@@ -192,14 +192,18 @@ namespace tf3d::inspector
             return false;
         }
 
-        auto candidates = m_Values;
-        bool valid      = true;
+        CustomInspectorDataStore candidates = m_DataStore;
+        auto candidateValues                = m_Values;
+        for (auto &[name, value] : candidateValues)
+            value.BindDataStore(&candidates, name);
+
+        bool valid = true;
         for (const auto &[name, value] : values.items()) {
-            if (!SetPresetValue(candidates, name, value, presetName))
+            if (!SetPresetValue(candidateValues, name, value, presetName))
                 valid = false;
         }
         if (valid && commit)
-            m_Values = std::move(candidates);
+            m_DataStore = std::move(candidates);
         return valid;
     }
 
