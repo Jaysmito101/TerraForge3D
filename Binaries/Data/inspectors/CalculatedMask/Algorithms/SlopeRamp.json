@@ -13,8 +13,8 @@
       "Name": "Range",
       "Type": "Vector2",
       "Default": [
-        0.25,
-        0.75
+        0.0,
+        1.0
       ],
       "Constraints": [
         0,
