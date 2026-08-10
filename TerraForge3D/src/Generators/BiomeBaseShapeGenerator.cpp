@@ -16,7 +16,7 @@ namespace tf3d::generators
     } // namespace
 
     BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState *appState)
-        : m_AppState(appState), m_Inspector(std::make_shared<CustomInspector>())
+        : m_AppState(appState), m_Inspector(std::make_shared<inspector::CustomInspector>())
     {
         m_RequireUpdation = false;
     }

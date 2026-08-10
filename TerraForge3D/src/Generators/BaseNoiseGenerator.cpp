@@ -10,7 +10,7 @@ namespace tf3d::generators
 {
 
     BaseNoiseGenerator::BaseNoiseGenerator(tf3d::data::ApplicationState *appState)
-        : m_AppState(appState), m_Inspector(std::make_shared<CustomInspector>())
+        : m_AppState(appState), m_Inspector(std::make_shared<inspector::CustomInspector>())
     {
         if (m_AppState == nullptr)
             return;

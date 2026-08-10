@@ -23,7 +23,7 @@ namespace tf3d::generators
 
     BiomeFilter::BiomeFilter(tf3d::data::ApplicationState *appState,
                              std::shared_ptr<BiomeFilterDefinition> definition)
-        : m_AppState(appState), m_Definition(std::move(definition)), m_Inspector(std::make_shared<CustomInspector>()), m_ID(GenerateId(8))
+        : m_AppState(appState), m_Definition(std::move(definition)), m_Inspector(std::make_shared<inspector::CustomInspector>()), m_ID(GenerateId(8))
     {
         if (m_Definition == nullptr)
             return;

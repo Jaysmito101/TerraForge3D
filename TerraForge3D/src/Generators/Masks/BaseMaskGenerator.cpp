@@ -184,7 +184,7 @@ namespace tf3d::generators
             return;
         }
 
-        m_Inspector = std::make_shared<CustomInspector>();
+        m_Inspector = std::make_shared<inspector::CustomInspector>();
         m_Inspector->SetShowResetButton(false);
 
         const bool configLoaded = LoadMetadata();

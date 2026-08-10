@@ -59,7 +59,7 @@ namespace tf3d::generators
         return definition;
     }
 
-    bool BiomeFilterDefinition::BuildInspector(CustomInspector &inspector) const
+    bool BiomeFilterDefinition::BuildInspector(inspector::CustomInspector &inspector) const
     {
         return inspector.LoadConfig(m_Metadata);
     }

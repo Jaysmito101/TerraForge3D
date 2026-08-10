@@ -2,6 +2,7 @@
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
+#include "Inspector/CustomInspectorTypes.h"
 #include "Profiler.h"
 #include "Utils/Utils.h"
 
@@ -75,8 +76,9 @@ namespace tf3d::generators
     namespace
     {
         void SetUniformFromParameter(ComputeShader *shader, const std::string &uniformName,
-                                     const CustomInspectorValue &value, int &textureSlot, const nlohmann::json *binding = nullptr)
+                                     const inspector::CustomInspectorValue &value, int &textureSlot, const nlohmann::json *binding = nullptr)
         {
+            using inspector::CustomInspectorValueType;
             switch (value.GetType()) {
                 case CustomInspectorValueType::Int:
                     shader->SetUniform1i(uniformName, value.Get<int32_t>());
