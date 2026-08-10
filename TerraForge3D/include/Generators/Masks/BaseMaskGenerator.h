@@ -63,7 +63,7 @@ namespace tf3d::generators
         int FindTypeIndexByMode(int mode) const;
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
-        std::shared_ptr<CustomInspector> m_Inspector;
+        std::shared_ptr<inspector::CustomInspector> m_Inspector;
         std::vector<AlgorithmDefinition> m_Algorithms;
         std::string m_DefaultTypeID = "None";
         std::string m_ShaderSource;
