@@ -11,6 +11,13 @@
     },
     {
       "$include": "../Parameters/Terrain/EdgeSoftness.json"
+    },
+    {
+      "Name": "EdgeSoftness",
+      "Constraints": [
+        0,
+        300
+      ]
     }
   ],
   "CustomData": {
