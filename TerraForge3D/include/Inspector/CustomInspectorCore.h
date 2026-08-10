@@ -92,6 +92,9 @@ namespace tf3d::inspector
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
         std::optional<std::string> GetShaderUniformDeclarations(std::string *error = nullptr) const;
+        void ApplyToShader(const CustomInspectorSnapshot &snapshot,
+                           tf3d::base::ShaderCore &shader,
+                           std::string_view uniformPrefix = "u_") const;
         std::optional<std::string> GetSectionCustomDataString(std::string_view sectionName,
                                                               std::string_view key) const;
         std::optional<int32_t> GetSectionSelectionValue(std::string_view sectionName) const;
