@@ -38,23 +38,23 @@ namespace tf3d::inspector
 
         inline std::string GetName() const
         {
-            return m_Name;
+            const auto separator = m_Key.find_last_of('.');
+            return separator == std::string::npos ? m_Key : m_Key.substr(separator + 1);
         }
 
         inline std::string GetSerializedName() const
         {
-            return m_SerializedName.empty() ? m_Name : m_SerializedName;
+            return m_SerializedName.empty() ? GetName() : m_SerializedName;
         }
 
         inline void SetShaderUniformName(const std::string &uniformName)
         {
-            m_ShaderUniformName       = uniformName;
-            m_ShaderUniformConfigured = true;
+            m_ShaderUniformName = uniformName;
         }
 
         inline bool IsShaderUniformConfigured() const
         {
-            return m_ShaderUniformConfigured;
+            return !m_ShaderUniformName.empty();
         }
 
         inline const std::string &GetShaderUniformName() const
@@ -64,13 +64,13 @@ namespace tf3d::inspector
 
         inline StoreView Store()
         {
-            return m_DataStore == nullptr ? StoreView{} : m_DataStore->At(m_DataKey);
+            return m_DataStore == nullptr ? StoreView{} : m_DataStore->At(m_Key);
         }
 
         inline ConstStoreView Store() const
         {
             const auto *store = m_DataStore;
-            return store == nullptr ? ConstStoreView{} : store->At(m_DataKey);
+            return store == nullptr ? ConstStoreView{} : store->At(m_Key);
         }
 
         template <typename T>
@@ -108,21 +108,19 @@ namespace tf3d::inspector
         void BindDataStore(CustomInspectorDataStore *store, std::string_view key)
         {
             m_DataStore = store;
-            m_DataKey   = key;
+            m_Key       = key;
         }
 
         friend class CustomInspector;
 
     private:
-        std::string m_Name;
         std::string m_SerializedName;
         std::string m_ShaderUniformName;
         CustomInspectorValueType m_Type = CustomInspectorValueType::Unknown;
-        bool m_ShaderUniformConfigured  = false;
         bool m_TextureLoadAs16Bit       = false;
 
         CustomInspectorDataStore *m_DataStore = nullptr;
-        std::string m_DataKey;
+        std::string m_Key;
     };
 
 } // namespace tf3d::inspector

@@ -95,8 +95,6 @@ namespace tf3d::inspector
         m_DataStore.Ensure(valueKey, value.GetType());
         m_Values[valueKey] = value;
         m_Values[valueKey].BindDataStore(&m_DataStore, valueKey);
-        if (m_Values[valueKey].m_SerializedName.empty())
-            m_Values[valueKey].m_SerializedName = name;
         return m_Values[valueKey];
     }
 
@@ -104,7 +102,6 @@ namespace tf3d::inspector
                                                            const std::array<glm::vec2, CustomInspectorMaxPathPoints> &defaultPoints, int defaultPointCount)
     {
         CustomInspectorValue value(CustomInspectorValueType::Path);
-        value.m_Name         = name;
         auto &stored         = AddVariable(name, value);
         const int pointCount = glm::clamp(defaultPointCount, 1, static_cast<int>(CustomInspectorMaxPathPoints));
         std::vector<glm::vec2> points;
@@ -130,7 +127,6 @@ namespace tf3d::inspector
         }
         if (points[1].x < 0.0f || points[1].x <= points[0].x)
             points[1] = glm::vec2(1.0f, 1.0f);
-        value.m_Name = name;
         auto &stored = AddVariable(name, value);
         if (auto *curve = stored.Store().Edit<CustomInspectorCurveData>(); curve != nullptr)
             curve->points.fill(glm::vec2(-1.0f));
@@ -141,14 +137,13 @@ namespace tf3d::inspector
     CustomInspectorValue &CustomInspector::AddVairableFromConfig(const nlohmann::json &config)
     {
         std::string name                 = config.contains("Name") ? config["Name"].get<std::string>() : "Unnamed";
-        const std::string serializedName = config.value("SerializedName", name);
+        const std::string serializedName = config.value("SerializedName", "");
         std::string valueTypeName        = "Float";
         if (config.contains("Type"))
             valueTypeName = config["Type"];
         auto valueType            = CustomInspectorValue::CustomInspectorValueTypeFromString(valueTypeName);
         bool hasDefaultValue      = config.contains("Default");
         const auto configureValue = [&](CustomInspectorValue &value) -> CustomInspectorValue & {
-            value.m_Name           = name;
             value.m_SerializedName = serializedName;
             return value;
         };
