@@ -1,7 +1,7 @@
 {
   "Name": "Mask",
-  "Label": "Mask",
-  "Description": "Select the calculated mask source.",
+  "Label": "Base mask",
+  "Description": "Select the optional base mask source.",
   "Collapsible": false,
   "DefaultOpen": true,
   "Params": [
@@ -10,8 +10,8 @@
       "Type": "Int",
       "Default": 0,
       "Widget": "Dropdown",
-      "Label": "Mask type",
-      "Description": "Selects which terrain signal is evaluated.",
+      "Label": "Base mask",
+      "Description": "Selects None or a calculated terrain signal.",
       "ShaderUniform": ""
     }
   ]

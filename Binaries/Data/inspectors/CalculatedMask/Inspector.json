@@ -1,7 +1,7 @@
 {
   "ID": "calculated_mask",
-  "Name": "Calculated terrain mask",
-  "Description": "Builds a reusable mask from height, slope, curvature, noise, and spatial pattern signals.",
+  "Name": "Base mask generator",
+  "Description": "Builds an optional reusable base mask from terrain and spatial signals.",
   "ShowResetButton": true,
   "SectionSelector": {
     "Parameter": "Mask.MaskType"
