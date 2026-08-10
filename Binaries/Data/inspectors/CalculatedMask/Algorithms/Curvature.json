@@ -8,6 +8,18 @@
     },
     {
       "$include": "../Parameters/Terrain/Curvature.json"
+    },
+    {
+      "Name": "Range",
+      "Default": [
+        0.0,
+        0.1
+      ],
+      "Constraints": [
+        0.0,
+        1.0
+      ],
+      "Sensitivity": 0.001
     }
   ],
   "CustomData": {
