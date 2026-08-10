@@ -60,7 +60,7 @@ namespace tf3d::generators
         {
             return m_Definition;
         }
-        inline const CustomInspectorValue *FindParameter(const std::string &name) const
+        inline const inspector::CustomInspectorValue *FindParameter(const std::string &name) const
         {
             return m_Inspector == nullptr ? nullptr : m_Inspector->Root().Find(name);
         }
@@ -102,16 +102,16 @@ namespace tf3d::generators
         {
             return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
         }
-        inline tf3d::base::ComputeShader *GetPhaseShader(tf3d::data::ApplicationState *appState,
+        inline base::ComputeShader *GetPhaseShader(data::ApplicationState *appState,
                                                          const std::string &phase) const
         {
             return m_Definition->GetPhaseShader(appState, phase);
         }
 
     private:
-        tf3d::data::ApplicationState *m_AppState = nullptr;
+        data::ApplicationState *m_AppState = nullptr;
         std::shared_ptr<BiomeFilterDefinition> m_Definition;
-        std::shared_ptr<CustomInspector> m_Inspector;
+        std::shared_ptr<inspector::CustomInspector> m_Inspector;
         std::string m_ID;
 
         bool m_Enabled                   = true;
