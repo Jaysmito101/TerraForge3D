@@ -1,19 +1,15 @@
 #include "Inspector/CustomInspectorWidget.h"
-#include "Base/Base.h"
 #include "Utils/Utils.h"
 
 namespace tf3d::inspector
 {
 
     CustomInspectorWidget::CustomInspectorWidget(CustomInspectorWidgetType type)
+        : m_Type(type), m_ID(GenerateId(16))
     {
-        m_Type = type;
-        m_ID   = GenerateId(16);
     }
 
-    CustomInspectorWidget::~CustomInspectorWidget()
-    {
-    }
+    CustomInspectorWidget::~CustomInspectorWidget() = default;
 
     std::string CustomInspectorWidget::CustomInspectorWidgetTypeToString(CustomInspectorWidgetType type)
     {

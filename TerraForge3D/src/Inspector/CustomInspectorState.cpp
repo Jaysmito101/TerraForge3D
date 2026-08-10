@@ -65,8 +65,8 @@ namespace tf3d::inspector
                  widget.m_Type != CustomInspectorWidgetType::Octaves))
                 continue;
 
-            const float minimum = widget.m_Constratins[0];
-            const float maximum = widget.m_Constratins[1];
+            const float minimum = widget.m_Constraints[0];
+            const float maximum = widget.m_Constraints[1];
             if (value.GetType() == CustomInspectorValueType::FloatArray) {
                 for (const auto numericValue : value.Store().Get<std::vector<float>>()) {
                     if (!validateRange(numericValue, minimum, maximum))

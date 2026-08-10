@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Base/Base.h"
 #include "Inspector/CustomInspectorTypes.h"
 
+#include <array>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -54,10 +55,7 @@ namespace tf3d::inspector
         }
         inline void SetConstraints(float a = 0.0f, float b = 0.0f, float c = 0.0f, float d = 0.0f)
         {
-            m_Constratins[0] = a;
-            m_Constratins[1] = b;
-            m_Constratins[2] = c;
-            m_Constratins[3] = d;
+            m_Constraints = {a, b, c, d};
         }
         inline void SetFontName(const std::string &fontName)
         {
@@ -73,8 +71,7 @@ namespace tf3d::inspector
         }
         inline void SetSpeed(float speed)
         {
-            m_FSpeed = speed;
-            m_ISpeed = static_cast<int32_t>(speed);
+            m_Speed = speed;
         }
         inline void SetRenderOnCondition(const std::string &conditionName, int32_t conditionValue)
         {
@@ -89,12 +86,10 @@ namespace tf3d::inspector
         {
             if (conditionName.empty())
                 return;
-            m_UseRenderOnCondition = true;
             m_RenderOnConditions.push_back({conditionName, conditionValues});
         }
         inline void ClearCondition()
         {
-            m_UseRenderOnCondition = false;
             m_RenderOnConditions.clear();
         }
 
@@ -104,19 +99,20 @@ namespace tf3d::inspector
         friend class CustomInspector;
 
     private:
-        std::string m_Label              = "";
-        std::string m_VariableName       = "";
-        std::string m_FontName           = "";
         CustomInspectorWidgetType m_Type = CustomInspectorWidgetType::Unknown;
-        float m_Constratins[4]           = {0.0f, 0.0f, 0.0f, 0.0f};
-        float m_FSpeed                   = 1.0f;
-        int32_t m_ISpeed                 = 1;
-        std::string m_Tooltip            = "";
+        std::string m_ID;
+
+        std::string m_Label;
+        std::string m_VariableName;
+        std::string m_FontName;
+        std::string m_Tooltip;
+
+        std::array<float, 4> m_Constraints{};
+        float m_Speed = 1.0f;
+
         std::vector<int32_t> m_SeedHistory;
         std::vector<std::string> m_DropdownOptions;
         std::vector<int32_t> m_DropdownValues;
-        std::string m_ID            = "";
-        bool m_UseRenderOnCondition = false;
         std::vector<CustomInspectorRenderCondition> m_RenderOnConditions;
     };
 

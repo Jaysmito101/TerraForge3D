@@ -73,15 +73,15 @@ namespace tf3d::inspector
                     schema["description"] = widget->m_Tooltip;
                 if ((widget->m_Type == CustomInspectorWidgetType::Slider ||
                      widget->m_Type == CustomInspectorWidgetType::Drag) &&
-                    (widget->m_Constratins[0] != 0.0f || widget->m_Constratins[1] != 0.0f)) {
-                    schema["minimum"] = widget->m_Constratins[0];
-                    schema["maximum"] = widget->m_Constratins[1];
+                    (widget->m_Constraints[0] != 0.0f || widget->m_Constraints[1] != 0.0f)) {
+                    schema["minimum"] = widget->m_Constraints[0];
+                    schema["maximum"] = widget->m_Constraints[1];
                 }
                 if (widget->m_Type == CustomInspectorWidgetType::Octaves &&
                     value.GetType() == CustomInspectorValueType::FloatArray &&
-                    (widget->m_Constratins[0] != 0.0f || widget->m_Constratins[1] != 0.0f)) {
-                    schema["items"]["minimum"] = widget->m_Constratins[0];
-                    schema["items"]["maximum"] = widget->m_Constratins[1];
+                    (widget->m_Constraints[0] != 0.0f || widget->m_Constraints[1] != 0.0f)) {
+                    schema["items"]["minimum"] = widget->m_Constraints[0];
+                    schema["items"]["maximum"] = widget->m_Constraints[1];
                 }
                 if (widget->m_Type == CustomInspectorWidgetType::Dropdown &&
                     !widget->m_DropdownOptions.empty()) {
