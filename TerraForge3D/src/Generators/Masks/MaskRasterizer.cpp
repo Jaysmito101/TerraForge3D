@@ -29,7 +29,6 @@ namespace tf3d::generators
         } else {
             TF3D_LOG_ERROR("Mask rasterizer could not be created because the base mask shader source is empty.");
         }
-
     }
 
     void MaskRasterizer::UploadStrokes(const std::vector<MaskStroke> &strokes, const MaskStroke *activeStroke)

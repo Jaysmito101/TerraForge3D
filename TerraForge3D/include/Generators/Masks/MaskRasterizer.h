@@ -39,8 +39,8 @@ namespace tf3d::generators
                     bool rebuildBase);
 
         GeneratorTexture *GetPreviewTexture(GeneratorTexture *sourceTexture,
-                                             GeneratorTexture *visualizationTexture,
-                                             bool invert);
+                                            GeneratorTexture *visualizationTexture,
+                                            bool invert);
 
     private:
         void UploadStrokes(const std::vector<MaskStroke> &strokes, const MaskStroke *activeStroke);

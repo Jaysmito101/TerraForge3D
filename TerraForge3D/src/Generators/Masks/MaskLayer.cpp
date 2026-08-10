@@ -38,15 +38,15 @@ namespace tf3d::generators
         if (this == &other)
             return *this;
 
-        m_AppState          = other.m_AppState;
-        m_BaseMaskGenerator = std::move(other.m_BaseMaskGenerator);
-        m_MaskTool          = std::move(other.m_MaskTool);
-        m_Rasterizer        = std::move(other.m_Rasterizer);
-        m_Texture           = std::move(other.m_Texture);
-        m_BaseTexture       = std::move(other.m_BaseTexture);
+        m_AppState             = other.m_AppState;
+        m_BaseMaskGenerator    = std::move(other.m_BaseMaskGenerator);
+        m_MaskTool             = std::move(other.m_MaskTool);
+        m_Rasterizer           = std::move(other.m_Rasterizer);
+        m_Texture              = std::move(other.m_Texture);
+        m_BaseTexture          = std::move(other.m_BaseTexture);
         m_VisualizationTexture = std::move(other.m_VisualizationTexture);
-        m_LastSourceData    = other.m_LastSourceData;
-        m_BaseNeedsUpdate   = other.m_BaseNeedsUpdate;
+        m_LastSourceData       = other.m_LastSourceData;
+        m_BaseNeedsUpdate      = other.m_BaseNeedsUpdate;
 
         other.m_AppState       = nullptr;
         other.m_LastSourceData = nullptr;
@@ -81,8 +81,8 @@ namespace tf3d::generators
         const int visualizationSize = std::min(m_Texture->GetWidth(), kMaxVisualizationResolution);
         if (m_VisualizationTexture == nullptr) {
             m_VisualizationTexture = std::make_unique<GeneratorTexture>(visualizationSize,
-                                                                         visualizationSize,
-                                                                         GeneratorTextureStorage::R16);
+                                                                        visualizationSize,
+                                                                        GeneratorTextureStorage::R16);
         } else if (m_VisualizationTexture->GetWidth() != visualizationSize) {
             m_VisualizationTexture->Resize(visualizationSize, visualizationSize);
         }
@@ -96,8 +96,7 @@ namespace tf3d::generators
         changed |= m_BaseMaskGenerator.ShowSettings();
         if (m_BaseMaskGenerator.IsNone()) {
             ImGui::TextDisabled("Starts from black; strokes are applied on top.");
-        }
-        else {
+        } else {
             ImGui::TextDisabled("Calculated from the current source terrain.");
         }
         if (changed) {
@@ -117,7 +116,7 @@ namespace tf3d::generators
             m_BaseTexture = std::make_unique<GeneratorTexture>(m_Texture->GetWidth(),
                                                                m_Texture->GetHeight(),
                                                                GeneratorTextureStorage::R16);
-            rebuildBase = true;
+            rebuildBase   = true;
         }
 
         const bool rendered = m_Rasterizer.Render(m_LastSourceData,
@@ -185,16 +184,14 @@ namespace tf3d::generators
             const int oldBaseType = glm::clamp(node->Get<int>("BaseType", 0), 0, 1);
             if (oldBaseType == 0) {
                 m_BaseMaskGenerator.SetTypeID("None");
-            }
-            else if (baseNode == nullptr && oldBaseNode == nullptr) {
+            } else if (baseNode == nullptr && oldBaseNode == nullptr) {
                 m_BaseMaskGenerator.SetTypeID("HeightRange");
             }
         } else if (toolNode != nullptr && toolNode->HasKey("MaskSource")) {
             const int oldSource = toolNode->Get<int>("MaskSource", 0);
             if (oldSource == 0) {
                 m_BaseMaskGenerator.SetTypeID("None");
-            }
-            else if (baseNode == nullptr && oldBaseNode == nullptr) {
+            } else if (baseNode == nullptr && oldBaseNode == nullptr) {
                 m_BaseMaskGenerator.SetTypeID("HeightRange");
             }
         }
