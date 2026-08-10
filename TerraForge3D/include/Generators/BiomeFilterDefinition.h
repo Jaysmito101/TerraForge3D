@@ -25,8 +25,8 @@ namespace tf3d::generators
             const std::filesystem::path &folder,
             const std::filesystem::path &shaderRoot);
 
-        bool BuildInspector(CustomInspector &inspector) const;
-        ComputeShader *GetPhaseShader(ApplicationState *appState, const std::string &phase) const;
+        bool BuildInspector(inspector::CustomInspector &inspector) const;
+        base::ComputeShader *GetPhaseShader(data::ApplicationState *appState, const std::string &phase) const;
         bool NeedsFieldStatistics() const;
         bool NeedsHistogram() const;
         std::string GetRequestedPercentileParameter() const;

@@ -110,7 +110,7 @@ namespace tf3d::renderer
         std::shared_ptr<HeightfieldAmbientCache> m_HeightfieldAmbientCache;
         std::shared_ptr<HeightfieldGICache> m_HeightfieldGICache;
         std::shared_ptr<SeaRenderer> m_SeaRenderer;
-        CustomInspector m_TerrainInspector;
+        inspector::CustomInspector m_TerrainInspector;
     };
 
 } // namespace tf3d::renderer

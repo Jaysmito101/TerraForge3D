@@ -62,7 +62,7 @@ namespace tf3d::renderer
         }
 
     private:
-        CustomInspector m_Inspector;
+        inspector::CustomInspector m_Inspector;
     };
 
 } // namespace tf3d::renderer

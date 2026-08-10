@@ -103,7 +103,7 @@ namespace tf3d::generators
             return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
         }
         inline base::ComputeShader *GetPhaseShader(data::ApplicationState *appState,
-                                                         const std::string &phase) const
+                                                   const std::string &phase) const
         {
             return m_Definition->GetPhaseShader(appState, phase);
         }

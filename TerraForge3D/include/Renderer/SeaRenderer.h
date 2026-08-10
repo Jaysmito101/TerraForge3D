@@ -54,7 +54,7 @@ namespace tf3d::renderer
                           float terrainHeightOffset, float seaWorldHeight,
                           const glm::vec2 &surfaceMinimumXZ, const glm::vec2 &surfaceWorldSize);
 
-        CustomInspector m_Inspector;
+        inspector::CustomInspector m_Inspector;
         uint32_t m_Vao      = 0;
         float m_ElapsedTime = 0.0f;
     };
