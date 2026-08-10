@@ -26,7 +26,16 @@ namespace tf3d::inspector
     void RenderInspectorTooltip(const std::string &label, const std::string &description);
 
     template <typename Owner>
-    class InspectorScopeImpl;
+    class ScopeHandle;
+
+    template <typename Owner>
+    using Scope = ScopeHandle<Owner>;
+
+    // Legacy name kept so existing callers do not need to change immediately.
+    template <typename Owner>
+    using InspectorScopeImpl = ScopeHandle<Owner>;
+
+    class CustomInspectorSnapshot;
 
     class CustomInspector
     {
@@ -34,8 +43,9 @@ namespace tf3d::inspector
         CustomInspector();
         ~CustomInspector();
 
-        InspectorScopeImpl<CustomInspector> Root();
-        InspectorScopeImpl<const CustomInspector> Root() const;
+        Scope<CustomInspector> Root();
+        Scope<const CustomInspector> Root() const;
+        CustomInspectorSnapshot Clone() const;
 
         template <typename T>
         CustomInspectorValue &Add(const std::string &name, T defaultValue = {})
@@ -137,7 +147,7 @@ namespace tf3d::inspector
 
     private:
         template <typename>
-        friend class InspectorScopeImpl;
+        friend class ScopeHandle;
 
         CustomInspectorValue &AddVariable(const std::string &name, const CustomInspectorValue &value);
         CustomInspectorValue *FindExactValue(std::string_view path);

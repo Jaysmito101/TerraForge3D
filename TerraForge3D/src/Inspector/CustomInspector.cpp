@@ -21,7 +21,7 @@ namespace tf3d::inspector
     {
         for (auto &entry : m_ValueState.metadata)
             entry.second.Store().Reset();
-        m_PresetState.selectedIndex              = 0;
+        m_PresetState.selectedIndex            = 0;
         m_InteractionState.lastChangedVariable = "Preset";
         m_InteractionState.lastAction.clear();
     }
@@ -48,12 +48,27 @@ namespace tf3d::inspector
 
     InspectorScope CustomInspector::Root()
     {
-        return InspectorScope(this, {});
+        return InspectorScope(*this, {});
     }
 
     ConstInspectorScope CustomInspector::Root() const
     {
-        return ConstInspectorScope(this, {});
+        return ConstInspectorScope(*this, {});
+    }
+
+    CustomInspectorSnapshot CustomInspector::Clone() const
+    {
+        return CustomInspectorSnapshot(*this);
+    }
+
+    CustomInspectorSnapshot::CustomInspectorSnapshot(const CustomInspector &inspector)
+        : m_DataStore(inspector.GetDataStore().Clone())
+    {
+    }
+
+    SnapshotScope CustomInspectorSnapshot::Root() const
+    {
+        return SnapshotScope(*this, {});
     }
 
     CustomInspectorSection &CustomInspector::AddSection(const std::string &name,

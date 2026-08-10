@@ -1,80 +1,75 @@
 #pragma once
 
-#include "Inspector/CustomInspectorValue.h"
+#include "Inspector/CustomInspectorCore.h"
 
 #include <concepts>
 #include <cstdint>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace tf3d::inspector
 {
 
-    class CustomInspector;
-
     template <typename Owner>
-    concept InspectorOwner =
-        std::same_as<std::remove_const_t<Owner>, CustomInspector>;
-
-    template <typename Owner>
-    concept MutableInspectorOwner =
-        InspectorOwner<Owner> && !std::is_const_v<Owner>;
-
-    template <typename Owner>
-    class InspectorScopeImpl
+    class ScopeHandle
     {
-        static_assert(InspectorOwner<Owner>, "InspectorScopeImpl owner must be CustomInspector or const CustomInspector");
+        static_assert(requires(const Owner &owner) { owner.GetDataStore(); }, "Scope owner must expose a data store");
 
     public:
-        InspectorScopeImpl() = default;
-
-        InspectorScopeImpl Scope(std::string_view path) const
+        ScopeHandle Scope(std::string_view path) const
         {
-            return InspectorScopeImpl(m_Inspector, JoinPath(m_Path, path));
+            return ScopeHandle(m_Owner, JoinPath(m_Path, path));
         }
 
         template <typename T>
         T Get(std::string_view name, T fallback = {}) const
         {
-            const auto *value = Find(name);
-            return value == nullptr ? fallback : value->Store().Get(fallback);
-        }
-
-        template <typename T>
-            requires MutableInspectorOwner<Owner>
-        bool Set(std::string_view name, T value) const
-        {
-            return m_Inspector != nullptr &&
-                   m_Inspector->SetExactValue(JoinPath(m_Path, name), std::move(value));
-        }
-
-        const CustomInspectorValue *Find(std::string_view name) const
-        {
-            return m_Inspector == nullptr ? nullptr : m_Inspector->FindExactValue(JoinPath(m_Path, name));
+            return m_Owner.GetDataStore().At(JoinPath(m_Path, name)).Get(fallback);
         }
 
         bool Contains(std::string_view name) const
         {
-            return Find(name) != nullptr;
+            return m_Owner.GetDataStore().Contains(JoinPath(m_Path, name));
+        }
+
+        template <typename T>
+            requires requires(Owner &owner, std::string_view path, T value) {
+                { owner.SetExactValue(path, std::move(value)) } -> std::same_as<bool>;
+            }
+        bool Set(std::string_view name, T value) const
+        {
+            return m_Owner.SetExactValue(JoinPath(m_Path, name), std::move(value));
+        }
+
+        const CustomInspectorValue *Find(std::string_view name) const
+            requires requires(const Owner &owner, std::string_view path) {
+                { owner.FindExactValue(path) } -> std::same_as<const CustomInspectorValue *>;
+            }
+        {
+            return m_Owner.FindExactValue(JoinPath(m_Path, name));
         }
 
         bool Remove(std::string_view name) const
-            requires MutableInspectorOwner<Owner>
+            requires requires(Owner &owner, std::string_view path) {
+                { owner.RemoveExactValue(path) } -> std::same_as<bool>;
+            }
         {
-            return m_Inspector != nullptr &&
-                   m_Inspector->RemoveExactValue(JoinPath(m_Path, name));
+            return m_Owner.RemoveExactValue(JoinPath(m_Path, name));
         }
 
         bool SetDropdownOptions(std::string_view name,
                                 const std::vector<std::string> &options,
                                 const std::vector<int32_t> &values = {}) const
-            requires MutableInspectorOwner<Owner>
+            requires requires(Owner &owner,
+                              std::string_view path,
+                              const std::vector<std::string> &optionNames,
+                              const std::vector<int32_t> &optionValues) {
+                { owner.SetDropdownOptionsAt(path, optionNames, optionValues) } -> std::same_as<bool>;
+            }
         {
-            return m_Inspector != nullptr &&
-                   m_Inspector->SetDropdownOptionsAt(JoinPath(m_Path, name), options, values);
+            return m_Owner.SetDropdownOptionsAt(JoinPath(m_Path, name), options, values);
         }
 
         const std::string &GetPath() const
@@ -84,9 +79,10 @@ namespace tf3d::inspector
 
     private:
         friend class CustomInspector;
+        friend class CustomInspectorSnapshot;
 
-        InspectorScopeImpl(Owner *inspector, std::string path)
-            : m_Inspector(inspector), m_Path(std::move(path))
+        ScopeHandle(Owner &owner, std::string path)
+            : m_Owner(owner), m_Path(std::move(path))
         {
         }
 
@@ -99,11 +95,11 @@ namespace tf3d::inspector
             return std::string(parent) + "." + std::string(child);
         }
 
-        Owner *m_Inspector = nullptr;
+        Owner &m_Owner;
         std::string m_Path;
     };
 
-    using InspectorScope      = InspectorScopeImpl<CustomInspector>;
-    using ConstInspectorScope = InspectorScopeImpl<const CustomInspector>;
+    using InspectorScope      = Scope<CustomInspector>;
+    using ConstInspectorScope = Scope<const CustomInspector>;
 
 } // namespace tf3d::inspector

@@ -204,7 +204,7 @@ namespace tf3d::inspector
             }
             loadValue(key, {}, node);
         }
-        m_ValueState.dataStore = std::move(candidates);
+        m_ValueState.dataStore      = std::move(candidates);
         m_PresetState.selectedIndex = -1;
         return valid;
     }
@@ -225,7 +225,7 @@ namespace tf3d::inspector
                     value->second.Store().Reset();
             }
         }
-        m_PresetState.selectedIndex             = 0;
+        m_PresetState.selectedIndex            = 0;
         m_InteractionState.lastChangedVariable = "Preset";
         m_InteractionState.lastAction.clear();
     }

@@ -93,7 +93,7 @@ namespace tf3d::inspector
                 sprintf(s_ResetButtonName, "Reset Value (%s)", widget.GetLabel().c_str());
                 if (ImGui::Button(s_ResetButtonName)) {
                     ValueForWidget(widgetLabel).Store().Reset();
-                    widgetChanged         = true;
+                    widgetChanged                          = true;
                     m_InteractionState.lastChangedVariable = widget.m_VariableName;
                 }
                 ImGui::EndPopup();

@@ -238,7 +238,7 @@ namespace tf3d::inspector
                 const bool selected  = m_PresetState.selectedIndex == choice;
                 if (ImGui::Selectable(preset.label.c_str(), selected)) {
                     if (ApplyPresetValues(preset.values, preset.name, true)) {
-                        m_PresetState.selectedIndex             = choice;
+                        m_PresetState.selectedIndex            = choice;
                         m_InteractionState.lastChangedVariable = "Preset";
                         m_InteractionState.lastAction.clear();
                         changed = true;

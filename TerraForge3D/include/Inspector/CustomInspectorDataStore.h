@@ -71,6 +71,15 @@ namespace tf3d::inspector
             m_Entries.clear();
         }
 
+        CustomInspectorDataStore Clone() const
+        {
+            CustomInspectorDataStore copy;
+            copy.m_Entries.reserve(m_Entries.size());
+            for (const auto &[key, entry] : m_Entries)
+                copy.m_Entries.emplace(key, Entry{entry.value, std::monostate{}});
+            return copy;
+        }
+
         template <typename T>
         T *Edit(std::string_view key)
         {
