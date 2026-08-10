@@ -192,8 +192,8 @@ namespace tf3d::inspector
             return false;
         }
 
-        CustomInspectorDataStore candidates = m_DataStore;
-        auto candidateValues                = m_Values;
+        CustomInspectorDataStore candidates = m_ValueState.dataStore;
+        auto candidateValues                = m_ValueState.metadata;
         for (auto &[name, value] : candidateValues)
             value.BindDataStore(&candidates, name);
 
@@ -203,43 +203,44 @@ namespace tf3d::inspector
                 valid = false;
         }
         if (valid && commit)
-            m_DataStore = std::move(candidates);
+            m_ValueState.dataStore = std::move(candidates);
         return valid;
     }
 
     bool CustomInspector::RenderPresetSelector()
     {
-        if (m_Presets.empty())
+        if (m_PresetState.entries.empty())
             return false;
 
         std::string preview     = "Custom";
         std::string description = "Choose a preset or reset all inspector values to their defaults.";
-        if (m_SelectedPreset == 0) {
+        if (m_PresetState.selectedIndex == 0) {
             preview = "Default";
-        } else if (m_SelectedPreset > 0 && static_cast<size_t>(m_SelectedPreset - 1) < m_Presets.size()) {
-            const auto &preset = m_Presets[static_cast<size_t>(m_SelectedPreset - 1)];
+        } else if (m_PresetState.selectedIndex > 0 &&
+                   static_cast<size_t>(m_PresetState.selectedIndex - 1) < m_PresetState.entries.size()) {
+            const auto &preset = m_PresetState.entries[static_cast<size_t>(m_PresetState.selectedIndex - 1)];
             preview            = preset.label;
             description        = preset.description;
         }
 
         bool changed = false;
         if (ImGui::BeginCombo("Preset", preview.c_str())) {
-            if (ImGui::Selectable("Default", m_SelectedPreset == 0)) {
+            if (ImGui::Selectable("Default", m_PresetState.selectedIndex == 0)) {
                 Reset();
                 changed = true;
             }
-            if (m_SelectedPreset == 0)
+            if (m_PresetState.selectedIndex == 0)
                 ImGui::SetItemDefaultFocus();
 
-            for (size_t index = 0; index < m_Presets.size(); ++index) {
-                const auto &preset   = m_Presets[index];
+            for (size_t index = 0; index < m_PresetState.entries.size(); ++index) {
+                const auto &preset   = m_PresetState.entries[index];
                 const int32_t choice = static_cast<int32_t>(index + 1);
-                const bool selected  = m_SelectedPreset == choice;
+                const bool selected  = m_PresetState.selectedIndex == choice;
                 if (ImGui::Selectable(preset.label.c_str(), selected)) {
                     if (ApplyPresetValues(preset.values, preset.name, true)) {
-                        m_SelectedPreset      = choice;
-                        m_LastChangedVariable = "Preset";
-                        m_LastAction.clear();
+                        m_PresetState.selectedIndex             = choice;
+                        m_InteractionState.lastChangedVariable = "Preset";
+                        m_InteractionState.lastAction.clear();
                         changed = true;
                     }
                 }

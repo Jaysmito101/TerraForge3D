@@ -10,13 +10,40 @@ namespace tf3d::inspector
 
     CustomInspector::CustomInspector()
     {
-        m_ID = GenerateId(16);
+        m_InteractionState.id = GenerateId(16);
         AddWidget("Separator", CustomInspectorWidget(CustomInspectorWidgetType::Separator));
         AddWidget("NewLine", CustomInspectorWidget(CustomInspectorWidgetType::NewLine));
     }
 
-    CustomInspector::~CustomInspector()
+    CustomInspector::~CustomInspector() = default;
+
+    void CustomInspector::Reset()
     {
+        for (auto &entry : m_ValueState.metadata)
+            entry.second.Store().Reset();
+        m_PresetState.selectedIndex              = 0;
+        m_InteractionState.lastChangedVariable = "Preset";
+        m_InteractionState.lastAction.clear();
+    }
+
+    void CustomInspector::Clear()
+    {
+        m_ValueState.metadata.clear();
+        m_ValueState.dataStore.Clear();
+        m_WidgetState.byName.clear();
+        m_WidgetState.order.clear();
+        m_SectionState.byName.clear();
+        m_SectionState.order.clear();
+        m_SectionState.widgetSections.clear();
+        m_SectionState.customData.clear();
+        m_SectionState.selectionValues.clear();
+        m_PresetState.entries.clear();
+        m_SectionState.currentName.clear();
+        m_ConfigState.description.clear();
+        m_ConfigState.schemaMetadata = nlohmann::json::object();
+        m_InteractionState.lastChangedVariable.clear();
+        m_InteractionState.lastAction.clear();
+        m_PresetState.selectedIndex = 0;
     }
 
     InspectorScope CustomInspector::Root()
@@ -34,10 +61,10 @@ namespace tf3d::inspector
                                                         bool collapsible,
                                                         bool defaultOpen)
     {
-        auto [it, inserted] = m_Sections.emplace(name, CustomInspectorSection{});
+        auto [it, inserted] = m_SectionState.byName.emplace(name, CustomInspectorSection{});
         if (inserted) {
             it->second.name = name;
-            m_SectionsOrder.push_back(name);
+            m_SectionState.order.push_back(name);
         }
         it->second.label       = label.empty() ? name : label;
         it->second.collapsible = collapsible;
@@ -49,53 +76,53 @@ namespace tf3d::inspector
     {
         if (!HasSection(name))
             AddSection(name);
-        m_CurrentSection = name;
+        m_SectionState.currentName = name;
     }
 
     void CustomInspector::EndSection()
     {
-        m_CurrentSection.clear();
+        m_SectionState.currentName.clear();
     }
 
     bool CustomInspector::HasSection(const std::string &name) const
     {
-        return m_Sections.find(name) != m_Sections.end();
+        return m_SectionState.byName.find(name) != m_SectionState.byName.end();
     }
 
     CustomInspectorSection &CustomInspector::GetSection(const std::string &name)
     {
         if (!HasSection(name))
             return AddSection(name);
-        return m_Sections.at(name);
+        return m_SectionState.byName.at(name);
     }
 
     CustomInspectorValue *CustomInspector::FindExactValue(std::string_view path)
     {
-        const auto value = m_Values.find(std::string(path));
-        return value == m_Values.end() ? nullptr : &value->second;
+        const auto value = m_ValueState.metadata.find(std::string(path));
+        return value == m_ValueState.metadata.end() ? nullptr : &value->second;
     }
 
     const CustomInspectorValue *CustomInspector::FindExactValue(std::string_view path) const
     {
-        const auto value = m_Values.find(std::string(path));
-        return value == m_Values.end() ? nullptr : &value->second;
+        const auto value = m_ValueState.metadata.find(std::string(path));
+        return value == m_ValueState.metadata.end() ? nullptr : &value->second;
     }
 
     bool CustomInspector::RemoveExactValue(std::string_view path)
     {
         const std::string key(path);
-        const bool removed = m_Values.erase(key) != 0;
-        m_DataStore.Remove(key);
+        const bool removed = m_ValueState.metadata.erase(key) != 0;
+        m_ValueState.dataStore.Remove(key);
         return removed;
     }
 
     CustomInspectorValue &CustomInspector::AddVariable(const std::string &name, const CustomInspectorValue &value)
     {
-        const std::string valueKey = m_CurrentSection.empty() ? name : m_CurrentSection + "." + name;
-        m_DataStore.Ensure(valueKey, value.GetType());
-        m_Values[valueKey] = value;
-        m_Values[valueKey].BindDataStore(&m_DataStore, valueKey);
-        return m_Values[valueKey];
+        const std::string valueKey = m_SectionState.currentName.empty() ? name : m_SectionState.currentName + "." + name;
+        m_ValueState.dataStore.Ensure(valueKey, value.GetType());
+        m_ValueState.metadata[valueKey] = value;
+        m_ValueState.metadata[valueKey].BindDataStore(&m_ValueState.dataStore, valueKey);
+        return m_ValueState.metadata[valueKey];
     }
 
     CustomInspectorValue &CustomInspector::AddPathVariable(const std::string &name,
@@ -239,12 +266,12 @@ namespace tf3d::inspector
 
     std::string CustomInspector::PathForWidget(std::string_view widgetLabel) const
     {
-        const auto widget = m_Widgets.find(std::string(widgetLabel));
-        if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+        const auto widget = m_WidgetState.byName.find(std::string(widgetLabel));
+        if (widget == m_WidgetState.byName.end() || widget->second.m_VariableName.empty())
             return {};
 
-        const auto section = m_WidgetSections.find(widget->first);
-        if (section == m_WidgetSections.end() || section->second.empty())
+        const auto section = m_SectionState.widgetSections.find(widget->first);
+        if (section == m_SectionState.widgetSections.end() || section->second.empty())
             return widget->second.m_VariableName;
         return section->second + "." + widget->second.m_VariableName;
     }
@@ -252,42 +279,42 @@ namespace tf3d::inspector
     CustomInspectorValue &CustomInspector::ValueForWidget(const std::string &widgetLabel)
     {
         const auto valuePath = PathForWidget(widgetLabel);
-        const auto value     = m_Values.find(valuePath);
-        if (value == m_Values.end())
+        const auto value     = m_ValueState.metadata.find(valuePath);
+        if (value == m_ValueState.metadata.end())
             throw std::runtime_error("CustomInspector widget has no matching value: " + widgetLabel);
         return value->second;
     }
 
     bool CustomInspector::HasWidget(const std::string &name)
     {
-        return m_Widgets.find(name) != m_Widgets.end();
+        return m_WidgetState.byName.find(name) != m_WidgetState.byName.end();
     }
 
     CustomInspectorWidget &CustomInspector::GetWidget(const std::string &name)
     {
-        return m_Widgets[name];
+        return m_WidgetState.byName[name];
     }
 
     void CustomInspector::RemoveWidget(const std::string &name)
     {
-        m_Widgets.erase(name);
-        m_WidgetsOrder.erase(std::remove(m_WidgetsOrder.begin(), m_WidgetsOrder.end(), name), m_WidgetsOrder.end());
-        m_WidgetSections.erase(name);
+        m_WidgetState.byName.erase(name);
+        m_WidgetState.order.erase(std::remove(m_WidgetState.order.begin(), m_WidgetState.order.end(), name), m_WidgetState.order.end());
+        m_SectionState.widgetSections.erase(name);
     }
 
     CustomInspectorWidget &CustomInspector::AddWidget(const std::string &name, const CustomInspectorWidget &widget)
     {
         if (name == "Separator" || name == "NewLine") {
             if (!HasWidget(name))
-                m_WidgetsOrder.push_back(name);
-            m_Widgets[name] = widget;
-            return m_Widgets[name];
+                m_WidgetState.order.push_back(name);
+            m_WidgetState.byName[name] = widget;
+            return m_WidgetState.byName[name];
         }
-        m_Widgets[name] = widget;
-        m_WidgetsOrder.push_back(name);
-        if (!m_CurrentSection.empty())
-            m_WidgetSections[name] = m_CurrentSection;
-        return m_Widgets[name];
+        m_WidgetState.byName[name] = widget;
+        m_WidgetState.order.push_back(name);
+        if (!m_SectionState.currentName.empty())
+            m_SectionState.widgetSections[name] = m_SectionState.currentName;
+        return m_WidgetState.byName[name];
     }
 
     CustomInspectorWidget &CustomInspector::AddWidget(const std::string &label,
@@ -323,7 +350,7 @@ namespace tf3d::inspector
                                                const std::vector<std::string> &options,
                                                const std::vector<int32_t> &values)
     {
-        for (auto &[label, widget] : m_Widgets) {
+        for (auto &[label, widget] : m_WidgetState.byName) {
             if (PathForWidget(label) != path)
                 continue;
             if (widget.m_Type != CustomInspectorWidgetType::Dropdown)
@@ -337,8 +364,8 @@ namespace tf3d::inspector
     std::optional<std::string> CustomInspector::GetSectionCustomDataString(std::string_view sectionName,
                                                                            std::string_view key) const
     {
-        const auto section = m_SectionCustomData.find(std::string(sectionName));
-        if (section == m_SectionCustomData.end() || !section->second.is_object())
+        const auto section = m_SectionState.customData.find(std::string(sectionName));
+        if (section == m_SectionState.customData.end() || !section->second.is_object())
             return std::nullopt;
         const auto value = section->second.find(std::string(key));
         if (value == section->second.end() || !value->is_string())
@@ -348,8 +375,8 @@ namespace tf3d::inspector
 
     std::optional<int32_t> CustomInspector::GetSectionSelectionValue(std::string_view sectionName) const
     {
-        const auto value = m_SectionSelectionValues.find(std::string(sectionName));
-        return value == m_SectionSelectionValues.end()
+        const auto value = m_SectionState.selectionValues.find(std::string(sectionName));
+        return value == m_SectionState.selectionValues.end()
                    ? std::nullopt
                    : std::optional<int32_t>(value->second);
     }
@@ -383,20 +410,20 @@ namespace tf3d::inspector
 
     bool CustomInspector::IsSectionVisible(std::string_view sectionName) const
     {
-        const auto section = m_Sections.find(std::string(sectionName));
-        return section != m_Sections.end() && IsConditionSatisfied(section->second.renderConditions, sectionName);
+        const auto section = m_SectionState.byName.find(std::string(sectionName));
+        return section != m_SectionState.byName.end() && IsConditionSatisfied(section->second.renderConditions, sectionName);
     }
 
     bool CustomInspector::IsWidgetVisible(std::string_view widgetLabel) const
     {
-        const auto widget = m_Widgets.find(std::string(widgetLabel));
-        if (widget == m_Widgets.end())
+        const auto widget = m_WidgetState.byName.find(std::string(widgetLabel));
+        if (widget == m_WidgetState.byName.end())
             return false;
-        const auto section = m_WidgetSections.find(widget->first);
-        if (section != m_WidgetSections.end() && !IsSectionVisible(section->second))
+        const auto section = m_SectionState.widgetSections.find(widget->first);
+        if (section != m_SectionState.widgetSections.end() && !IsSectionVisible(section->second))
             return false;
         return IsConditionSatisfied(widget->second.m_RenderOnConditions,
-                                    section == m_WidgetSections.end() ? std::string_view{} : std::string_view(section->second));
+                                    section == m_SectionState.widgetSections.end() ? std::string_view{} : std::string_view(section->second));
     }
 
     void CustomInspector::ConfigureSectionSelector(const nlohmann::json &config)
@@ -422,9 +449,9 @@ namespace tf3d::inspector
         }
 
         bool selectorFound = false;
-        for (const auto &widgetLabel : m_WidgetsOrder) {
-            const auto widget = m_Widgets.find(widgetLabel);
-            if (widget == m_Widgets.end() || PathForWidget(widgetLabel) != path)
+        for (const auto &widgetLabel : m_WidgetState.order) {
+            const auto widget = m_WidgetState.byName.find(widgetLabel);
+            if (widget == m_WidgetState.byName.end() || PathForWidget(widgetLabel) != path)
                 continue;
             if (selectorFound) {
                 TF3D_LOG_ERROR("Inspector SectionSelector parameter '{}' is ambiguous", path);
@@ -439,9 +466,9 @@ namespace tf3d::inspector
 
         std::vector<std::string> labels;
         std::vector<int32_t> values;
-        for (const auto &sectionName : m_SectionsOrder) {
-            const auto data = m_SectionCustomData.find(sectionName);
-            if (data == m_SectionCustomData.end() || !data->second.is_object())
+        for (const auto &sectionName : m_SectionState.order) {
+            const auto data = m_SectionState.customData.find(sectionName);
+            if (data == m_SectionState.customData.end() || !data->second.is_object())
                 continue;
 
             std::string selectionID = sectionName;
@@ -453,13 +480,13 @@ namespace tf3d::inspector
             }
 
             const int32_t value = static_cast<int32_t>(values.size());
-            const auto section  = m_Sections.find(sectionName);
-            labels.push_back(section != m_Sections.end() && !section->second.label.empty()
+            const auto section  = m_SectionState.byName.find(sectionName);
+            labels.push_back(section != m_SectionState.byName.end() && !section->second.label.empty()
                                  ? section->second.label
                                  : selectionID);
             values.push_back(value);
-            m_SectionSelectionValues[sectionName] = value;
-            if (section != m_Sections.end())
+            m_SectionState.selectionValues[sectionName] = value;
+            if (section != m_SectionState.byName.end())
                 section->second.renderConditions.push_back({path, {value}});
         }
 

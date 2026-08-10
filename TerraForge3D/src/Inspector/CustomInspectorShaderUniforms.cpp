@@ -128,7 +128,7 @@ namespace tf3d::inspector
     {
         ShaderUniformDeclarationMap uniforms;
         std::string uniformError;
-        for (const auto &[path, value] : m_Values) {
+        for (const auto &[path, value] : m_ValueState.metadata) {
             if (!AddShaderUniformValue(value, path, uniforms, &uniformError)) {
                 if (error)
                     *error = uniformError;

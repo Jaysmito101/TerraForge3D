@@ -33,8 +33,8 @@ namespace tf3d::inspector
 
     bool CustomInspector::RenderWidget(const std::string &widgetLabel)
     {
-        const auto widgetIterator = m_Widgets.find(widgetLabel);
-        if (widgetIterator == m_Widgets.end())
+        const auto widgetIterator = m_WidgetState.byName.find(widgetLabel);
+        if (widgetIterator == m_WidgetState.byName.end())
             return false;
 
         const auto &widget = widgetIterator->second;
@@ -66,7 +66,7 @@ namespace tf3d::inspector
         else if (widget.m_Type == CustomInspectorWidgetType::Input)
             widgetChanged = RenderInput(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Seed)
-            widgetChanged = RenderSeed(widgetLabel, m_Widgets[widgetLabel]);
+            widgetChanged = RenderSeed(widgetLabel, m_WidgetState.byName[widgetLabel]);
         else if (widget.m_Type == CustomInspectorWidgetType::Dropdown)
             widgetChanged = RenderDropdown(widgetLabel, widget);
         else if (widget.m_Type == CustomInspectorWidgetType::Separator)
@@ -78,9 +78,9 @@ namespace tf3d::inspector
 
         if (widgetChanged) {
             if (widget.m_Type == CustomInspectorWidgetType::Button)
-                m_LastAction = widget.m_VariableName;
+                m_InteractionState.lastAction = widget.m_VariableName;
             else if (!widget.m_VariableName.empty())
-                m_LastChangedVariable = widget.m_VariableName;
+                m_InteractionState.lastChangedVariable = widget.m_VariableName;
         }
         if (!widget.m_FontName.empty())
             ImGui::PopFont();
@@ -94,7 +94,7 @@ namespace tf3d::inspector
                 if (ImGui::Button(s_ResetButtonName)) {
                     ValueForWidget(widgetLabel).Store().Reset();
                     widgetChanged         = true;
-                    m_LastChangedVariable = widget.m_VariableName;
+                    m_InteractionState.lastChangedVariable = widget.m_VariableName;
                 }
                 ImGui::EndPopup();
             }
@@ -106,38 +106,38 @@ namespace tf3d::inspector
     bool CustomInspector::Render()
     {
         bool hasChanged = false;
-        m_LastChangedVariable.clear();
-        m_LastAction.clear();
-        ImGui::PushID(m_ID.c_str());
-        if (!m_Description.empty()) {
-            ImGui::TextWrapped("%s", m_Description.c_str());
+        m_InteractionState.lastChangedVariable.clear();
+        m_InteractionState.lastAction.clear();
+        ImGui::PushID(m_InteractionState.id.c_str());
+        if (!m_ConfigState.description.empty()) {
+            ImGui::TextWrapped("%s", m_ConfigState.description.c_str());
             ImGui::Separator();
         }
 
-        if (!m_Presets.empty()) {
+        if (!m_PresetState.entries.empty()) {
             hasChanged = RenderPresetSelector() || hasChanged;
             ImGui::Separator();
         }
 
         const auto renderWidget = [&](const std::string &widgetLabel) {
             const bool widgetChanged = RenderWidget(widgetLabel);
-            if (widgetChanged && m_LastChangedVariable != "Preset")
-                m_SelectedPreset = -1;
+            if (widgetChanged && m_InteractionState.lastChangedVariable != "Preset")
+                m_PresetState.selectedIndex = -1;
             hasChanged = widgetChanged || hasChanged;
         };
 
-        if (m_SectionsOrder.empty()) {
-            for (const auto &widgetLabel : m_WidgetsOrder)
+        if (m_SectionState.order.empty()) {
+            for (const auto &widgetLabel : m_WidgetState.order)
                 renderWidget(widgetLabel);
         } else {
-            for (const auto &widgetLabel : m_WidgetsOrder) {
-                if (!m_WidgetSections.contains(widgetLabel))
+            for (const auto &widgetLabel : m_WidgetState.order) {
+                if (!m_SectionState.widgetSections.contains(widgetLabel))
                     renderWidget(widgetLabel);
             }
 
-            for (const auto &sectionName : m_SectionsOrder) {
-                const auto section = m_Sections.find(sectionName);
-                if (section == m_Sections.end())
+            for (const auto &sectionName : m_SectionState.order) {
+                const auto section = m_SectionState.byName.find(sectionName);
+                if (section == m_SectionState.byName.end())
                     continue;
                 if (!IsSectionVisible(sectionName))
                     continue;
@@ -154,9 +154,9 @@ namespace tf3d::inspector
                     ImGui::Separator();
                 }
                 if (renderSection) {
-                    for (const auto &widgetLabel : m_WidgetsOrder) {
-                        const auto widgetSection = m_WidgetSections.find(widgetLabel);
-                        if (widgetSection != m_WidgetSections.end() && widgetSection->second == sectionName)
+                    for (const auto &widgetLabel : m_WidgetState.order) {
+                        const auto widgetSection = m_SectionState.widgetSections.find(widgetLabel);
+                        if (widgetSection != m_SectionState.widgetSections.end() && widgetSection->second == sectionName)
                             renderWidget(widgetLabel);
                     }
                 }
@@ -164,7 +164,7 @@ namespace tf3d::inspector
             }
         }
 
-        if (m_ShowResetButton && ImGui::Button("Reset to Defaults")) {
+        if (m_ConfigState.showResetButton && ImGui::Button("Reset to Defaults")) {
             Reset();
             hasChanged = true;
         }

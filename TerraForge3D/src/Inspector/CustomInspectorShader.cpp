@@ -7,19 +7,19 @@ namespace tf3d::inspector
 
     void CustomInspector::ApplyToShader(tf3d::base::ShaderCore &shader, std::string_view uniformPrefix) const
     {
-        for (const auto &widgetLabel : m_WidgetsOrder) {
+        for (const auto &widgetLabel : m_WidgetState.order) {
             if (!IsWidgetVisible(widgetLabel))
                 continue;
 
-            const auto widgetIterator = m_Widgets.find(widgetLabel);
-            if (widgetIterator == m_Widgets.end())
+            const auto widgetIterator = m_WidgetState.byName.find(widgetLabel);
+            if (widgetIterator == m_WidgetState.byName.end())
                 continue;
             const auto valuePath = PathForWidget(widgetLabel);
             if (valuePath.empty())
                 continue;
 
-            const auto valueIterator = m_Values.find(valuePath);
-            if (valueIterator == m_Values.end())
+            const auto valueIterator = m_ValueState.metadata.find(valuePath);
+            if (valueIterator == m_ValueState.metadata.end())
                 continue;
             const auto &uniformValue      = valueIterator->second;
             const std::string uniformName = uniformValue.IsShaderUniformConfigured()

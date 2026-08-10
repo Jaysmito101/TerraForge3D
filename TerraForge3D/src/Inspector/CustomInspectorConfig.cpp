@@ -59,23 +59,23 @@ namespace tf3d::inspector
     bool CustomInspector::LoadConfig(const nlohmann::json &config)
     {
         Clear();
-        m_Description = config.contains("Description") && config["Description"].is_string()
-                            ? config["Description"].get<std::string>()
-                            : "";
+        m_ConfigState.description = config.contains("Description") && config["Description"].is_string()
+                                        ? config["Description"].get<std::string>()
+                                        : "";
         if (config.contains("Schema")) {
             if (!config["Schema"].is_object()) {
                 TF3D_LOG_ERROR("Inspector metadata field 'Schema' must be an object");
                 return false;
             }
-            m_SchemaMetadata = config["Schema"];
+            m_ConfigState.schemaMetadata = config["Schema"];
         }
-        m_ShowResetButton = true;
+        m_ConfigState.showResetButton = true;
         if (config.contains("ShowResetButton")) {
             if (!config["ShowResetButton"].is_boolean()) {
                 TF3D_LOG_ERROR("Inspector metadata field 'ShowResetButton' must be a boolean");
                 return false;
             }
-            m_ShowResetButton = config["ShowResetButton"].get<bool>();
+            m_ConfigState.showResetButton = config["ShowResetButton"].get<bool>();
         }
         bool hasContent = false;
         try {
@@ -97,10 +97,10 @@ namespace tf3d::inspector
                         const std::string widgetType  = parameter.value("Widget", "Input");
                         const std::string widgetLabel = parameter.value("Label", value.GetName());
                         std::string widgetKey         = widgetLabel;
-                        if (m_Widgets.contains(widgetKey)) {
+                        if (m_WidgetState.byName.contains(widgetKey)) {
                             widgetKey  = sectionName.empty() ? valueName : sectionName + "/" + widgetLabel;
                             int suffix = 2;
-                            while (m_Widgets.contains(widgetKey))
+                            while (m_WidgetState.byName.contains(widgetKey))
                                 widgetKey = (sectionName.empty() ? valueName : sectionName + "/" + widgetLabel) + " " + std::to_string(suffix++);
                         }
                         auto &widget = AddWidgetFromString(widgetKey, widgetType, value.GetName());
@@ -172,9 +172,9 @@ namespace tf3d::inspector
                         sectionConfig.value("DefaultOpen", true));
                     section.description = sectionConfig.value("Description", "");
                     if (sectionConfig.contains("CustomData"))
-                        m_SectionCustomData[name] = sectionConfig["CustomData"];
+                        m_SectionState.customData[name] = sectionConfig["CustomData"];
                     else if (sectionConfig.contains("customData"))
-                        m_SectionCustomData[name] = sectionConfig["customData"];
+                        m_SectionState.customData[name] = sectionConfig["customData"];
                     if (sectionConfig.contains("Conditions") && sectionConfig["Conditions"].is_array()) {
                         for (const auto &condition : sectionConfig["Conditions"]) {
                             if (!condition.is_object())
@@ -198,11 +198,11 @@ namespace tf3d::inspector
                 std::vector<std::string> orderedWidgets;
                 std::unordered_set<std::string> emittedWidgets;
                 const auto appendWidget = [&](const std::string &identifier) {
-                    if (m_Widgets.contains(identifier) && emittedWidgets.insert(identifier).second) {
+                    if (m_WidgetState.byName.contains(identifier) && emittedWidgets.insert(identifier).second) {
                         orderedWidgets.push_back(identifier);
                         return;
                     }
-                    for (const auto &[label, widget] : m_Widgets) {
+                    for (const auto &[label, widget] : m_WidgetState.byName) {
                         if (widget.m_VariableName == identifier && emittedWidgets.insert(label).second) {
                             orderedWidgets.push_back(label);
                             return;
@@ -213,11 +213,11 @@ namespace tf3d::inspector
                     if (identifier.is_string())
                         appendWidget(identifier.get<std::string>());
                 }
-                for (const auto &label : m_WidgetsOrder) {
+                for (const auto &label : m_WidgetState.order) {
                     if (emittedWidgets.insert(label).second)
                         orderedWidgets.push_back(label);
                 }
-                m_WidgetsOrder = std::move(orderedWidgets);
+                m_WidgetState.order = std::move(orderedWidgets);
             }
 
             if (config.contains("Presets")) {
@@ -241,7 +241,7 @@ namespace tf3d::inspector
                         TF3D_LOG_WARN("Skipping CustomInspector preset with reserved or empty Name '{}'", name);
                         continue;
                     }
-                    if (std::any_of(m_Presets.begin(), m_Presets.end(), [&](const Preset &preset) {
+                    if (std::any_of(m_PresetState.entries.begin(), m_PresetState.entries.end(), [&](const Preset &preset) {
                             return preset.name == name;
                         })) {
                         TF3D_LOG_WARN("Skipping duplicate CustomInspector preset '{}'", name);
@@ -275,7 +275,7 @@ namespace tf3d::inspector
                     preset.values = presetConfig["Values"];
                     if (!ApplyPresetValues(preset.values, preset.name, false))
                         continue;
-                    m_Presets.push_back(std::move(preset));
+                    m_PresetState.entries.push_back(std::move(preset));
                 }
             }
         } catch (const std::exception &exception) {

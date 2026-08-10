@@ -7,12 +7,16 @@
 #include "Inspector/CustomInspectorWidget.h"
 
 #include <nlohmann/json.hpp>
+#include <array>
+#include <cstdint>
 #include <filesystem>
 #include <initializer_list>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
@@ -44,11 +48,11 @@ namespace tf3d::inspector
 
         inline CustomInspectorDataStore &GetDataStore()
         {
-            return m_DataStore;
+            return m_ValueState.dataStore;
         }
         inline const CustomInspectorDataStore &GetDataStore() const
         {
-            return m_DataStore;
+            return m_ValueState.dataStore;
         }
 
         bool HasWidget(const std::string &name);
@@ -84,76 +88,51 @@ namespace tf3d::inspector
         void ResetVisible();
         void ApplyToShader(tf3d::base::ShaderCore &shader, std::string_view uniformPrefix = "u_") const;
 
-        inline void Reset()
-        {
-            for (auto &[name, value] : m_Values)
-                value.Store().Reset();
-            m_SelectedPreset      = 0;
-            m_LastChangedVariable = "Preset";
-            m_LastAction.clear();
-        }
+        void Reset();
 
         inline bool IsResetEnabled() const
         {
-            return m_ShowResetButton;
+            return m_ConfigState.showResetButton;
         }
 
         bool Render();
         inline const std::string &GetDescription() const
         {
-            return m_Description;
+            return m_ConfigState.description;
         }
         inline const std::string &GetLastChangedVariable() const
         {
-            return m_LastChangedVariable;
+            return m_InteractionState.lastChangedVariable;
         }
         inline const std::string &GetLastAction() const
         {
-            return m_LastAction;
+            return m_InteractionState.lastAction;
         }
         inline void SetShowResetButton(bool show)
         {
-            m_ShowResetButton = show;
+            m_ConfigState.showResetButton = show;
         }
 
-        inline void Clear()
-        {
-            m_Values.clear();
-            m_DataStore.Clear();
-            m_Widgets.clear();
-            m_WidgetsOrder.clear();
-            m_Sections.clear();
-            m_SectionsOrder.clear();
-            m_WidgetSections.clear();
-            m_SectionCustomData.clear();
-            m_SectionSelectionValues.clear();
-            m_Presets.clear();
-            m_CurrentSection.clear();
-            m_Description.clear();
-            m_SchemaMetadata = nlohmann::json::object();
-            m_LastChangedVariable.clear();
-            m_LastAction.clear();
-            m_SelectedPreset = 0;
-        }
+        void Clear();
         inline const std::unordered_map<std::string, CustomInspectorWidget> &GetWidgets() const
         {
-            return m_Widgets;
+            return m_WidgetState.byName;
         }
         inline const std::vector<std::string> &GetWidgetsOrder() const
         {
-            return m_WidgetsOrder;
+            return m_WidgetState.order;
         }
         inline const std::unordered_map<std::string, CustomInspectorSection> &GetSections() const
         {
-            return m_Sections;
+            return m_SectionState.byName;
         }
         inline const std::vector<std::string> &GetSectionsOrder() const
         {
-            return m_SectionsOrder;
+            return m_SectionState.order;
         }
         inline const std::unordered_map<std::string, std::string> &GetWidgetSections() const
         {
-            return m_WidgetSections;
+            return m_SectionState.widgetSections;
         }
 
     private:
@@ -167,16 +146,16 @@ namespace tf3d::inspector
         template <typename T>
         bool SetExactValue(std::string_view path, T value)
         {
-            const auto existing = m_Values.find(std::string(path));
-            if (existing == m_Values.end())
+            const auto existing = m_ValueState.metadata.find(std::string(path));
+            if (existing == m_ValueState.metadata.end())
                 return false;
 
-            CustomInspectorDataStore candidates = m_DataStore;
+            CustomInspectorDataStore candidates = m_ValueState.dataStore;
             CustomInspectorValue candidate      = existing->second;
             candidate.BindDataStore(&candidates, existing->first);
             if (!candidate.Store().Set(std::move(value)) || !ValidateValue(existing->first, candidate))
                 return false;
-            m_DataStore = std::move(candidates);
+            m_ValueState.dataStore = std::move(candidates);
             return true;
         }
         std::string PathForWidget(std::string_view widgetLabel) const;
@@ -225,24 +204,48 @@ namespace tf3d::inspector
             nlohmann::json values = nlohmann::json::object();
         };
 
-        CustomInspectorDataStore m_DataStore;
-        std::unordered_map<std::string, CustomInspectorValue> m_Values;
-        std::unordered_map<std::string, CustomInspectorWidget> m_Widgets;
-        std::vector<std::string> m_WidgetsOrder;
-        std::unordered_map<std::string, CustomInspectorSection> m_Sections;
-        std::vector<std::string> m_SectionsOrder;
-        std::unordered_map<std::string, std::string> m_WidgetSections;
-        std::unordered_map<std::string, nlohmann::json> m_SectionCustomData;
-        std::unordered_map<std::string, int32_t> m_SectionSelectionValues;
-        nlohmann::json m_SchemaMetadata = nlohmann::json::object();
-        std::string m_CurrentSection;
-        std::string m_ID = "";
-        std::string m_Description;
-        std::string m_LastChangedVariable;
-        std::string m_LastAction;
-        bool m_ShowResetButton = true;
-        std::vector<Preset> m_Presets;
-        int32_t m_SelectedPreset = 0;
+        struct ValueState {
+            CustomInspectorDataStore dataStore;
+            std::unordered_map<std::string, CustomInspectorValue> metadata;
+        };
+
+        struct WidgetState {
+            std::unordered_map<std::string, CustomInspectorWidget> byName;
+            std::vector<std::string> order;
+        };
+
+        struct SectionState {
+            std::unordered_map<std::string, CustomInspectorSection> byName;
+            std::vector<std::string> order;
+            std::unordered_map<std::string, std::string> widgetSections;
+            std::unordered_map<std::string, nlohmann::json> customData;
+            std::unordered_map<std::string, int32_t> selectionValues;
+            std::string currentName;
+        };
+
+        struct ConfigState {
+            nlohmann::json schemaMetadata = nlohmann::json::object();
+            std::string description;
+            bool showResetButton = true;
+        };
+
+        struct InteractionState {
+            std::string id;
+            std::string lastChangedVariable;
+            std::string lastAction;
+        };
+
+        struct PresetState {
+            std::vector<Preset> entries;
+            int32_t selectedIndex = 0;
+        };
+
+        ValueState m_ValueState;
+        WidgetState m_WidgetState;
+        SectionState m_SectionState;
+        ConfigState m_ConfigState;
+        InteractionState m_InteractionState;
+        PresetState m_PresetState;
     };
 
 } // namespace tf3d::inspector

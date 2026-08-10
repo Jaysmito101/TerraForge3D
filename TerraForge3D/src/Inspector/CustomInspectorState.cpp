@@ -58,7 +58,7 @@ namespace tf3d::inspector
             }
         }
 
-        for (const auto &[widgetName, widget] : m_Widgets) {
+        for (const auto &[widgetName, widget] : m_WidgetState.byName) {
             if (PathForWidget(widgetName) != name ||
                 (widget.m_Type != CustomInspectorWidgetType::Slider &&
                  widget.m_Type != CustomInspectorWidgetType::Drag &&
@@ -105,28 +105,28 @@ namespace tf3d::inspector
                 TF3D_LOG_WARN("Skipping unsupported CustomInspector state field '{}'", name);
         };
 
-        for (const auto &sectionName : m_SectionsOrder) {
-            const auto section = m_Sections.find(sectionName);
-            if (section == m_Sections.end())
+        for (const auto &sectionName : m_SectionState.order) {
+            const auto section = m_SectionState.byName.find(sectionName);
+            if (section == m_SectionState.byName.end())
                 continue;
 
             SerializerNode sectionState = CreateSerializerNode();
-            for (const auto &widgetLabel : m_WidgetsOrder) {
-                const auto widgetSection = m_WidgetSections.find(widgetLabel);
-                if (widgetSection == m_WidgetSections.end() || widgetSection->second != sectionName)
+            for (const auto &widgetLabel : m_WidgetState.order) {
+                const auto widgetSection = m_SectionState.widgetSections.find(widgetLabel);
+                if (widgetSection == m_SectionState.widgetSections.end() || widgetSection->second != sectionName)
                     continue;
-                const auto widget = m_Widgets.find(widgetLabel);
-                if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+                const auto widget = m_WidgetState.byName.find(widgetLabel);
+                if (widget == m_WidgetState.byName.end() || widget->second.m_VariableName.empty())
                     continue;
-                const auto value = m_Values.find(PathForWidget(widgetLabel));
-                if (value == m_Values.end() || !savedVariables.insert(value->first).second)
+                const auto value = m_ValueState.metadata.find(PathForWidget(widgetLabel));
+                if (value == m_ValueState.metadata.end() || !savedVariables.insert(value->first).second)
                     continue;
                 saveValue(sectionState, value->first, value->second);
             }
             state->Set(sectionName, sectionState);
         }
 
-        for (const auto &[name, value] : m_Values) {
+        for (const auto &[name, value] : m_ValueState.metadata) {
             if (savedVariables.insert(name).second)
                 saveValue(state, name, value);
         }
@@ -141,25 +141,25 @@ namespace tf3d::inspector
         }
 
         bool valid                          = true;
-        CustomInspectorDataStore candidates = m_DataStore;
+        CustomInspectorDataStore candidates = m_ValueState.dataStore;
         const auto findValueName            = [&](const std::string &serializedName,
                                        const std::string &sectionName) -> std::string {
             if (sectionName.empty()) {
-                const auto direct = m_Values.find(serializedName);
-                if (direct != m_Values.end() && direct->second.GetSerializedName() == serializedName)
+                const auto direct = m_ValueState.metadata.find(serializedName);
+                if (direct != m_ValueState.metadata.end() && direct->second.GetSerializedName() == serializedName)
                     return direct->first;
             }
 
-            for (const auto &widgetLabel : m_WidgetsOrder) {
-                const auto widgetSection = m_WidgetSections.find(widgetLabel);
+            for (const auto &widgetLabel : m_WidgetState.order) {
+                const auto widgetSection = m_SectionState.widgetSections.find(widgetLabel);
                 if (!sectionName.empty() &&
-                    (widgetSection == m_WidgetSections.end() || widgetSection->second != sectionName))
+                    (widgetSection == m_SectionState.widgetSections.end() || widgetSection->second != sectionName))
                     continue;
-                const auto widget = m_Widgets.find(widgetLabel);
-                if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+                const auto widget = m_WidgetState.byName.find(widgetLabel);
+                if (widget == m_WidgetState.byName.end() || widget->second.m_VariableName.empty())
                     continue;
-                const auto value = m_Values.find(PathForWidget(widgetLabel));
-                if (value != m_Values.end() && value->second.GetSerializedName() == serializedName)
+                const auto value = m_ValueState.metadata.find(PathForWidget(widgetLabel));
+                if (value != m_ValueState.metadata.end() && value->second.GetSerializedName() == serializedName)
                     return value->first;
             }
             return {};
@@ -169,8 +169,8 @@ namespace tf3d::inspector
                              const std::string &sectionName,
                              SerializerNode source) {
             const std::string valueName = findValueName(name, sectionName);
-            const auto existing         = m_Values.find(valueName);
-            if (existing == m_Values.end()) {
+            const auto existing         = m_ValueState.metadata.find(valueName);
+            if (existing == m_ValueState.metadata.end()) {
                 TF3D_LOG_WARN("Invalid CustomInspector state field '{}'", name);
                 valid = false;
                 return;
@@ -190,8 +190,8 @@ namespace tf3d::inspector
         };
 
         for (const auto &key : node->GetKeys()) {
-            const auto section = m_Sections.find(key);
-            if (section != m_Sections.end()) {
+            const auto section = m_SectionState.byName.find(key);
+            if (section != m_SectionState.byName.end()) {
                 const SerializerNode sectionState = node->Get<SerializerNode>(key);
                 if (!sectionState) {
                     TF3D_LOG_WARN("Invalid CustomInspector section '{}': expected an object", key);
@@ -204,30 +204,30 @@ namespace tf3d::inspector
             }
             loadValue(key, {}, node);
         }
-        m_DataStore      = std::move(candidates);
-        m_SelectedPreset = -1;
+        m_ValueState.dataStore = std::move(candidates);
+        m_PresetState.selectedIndex = -1;
         return valid;
     }
 
     void CustomInspector::ResetVisible()
     {
         std::unordered_set<std::string> resetValues;
-        for (const auto &widgetLabel : m_WidgetsOrder) {
+        for (const auto &widgetLabel : m_WidgetState.order) {
             if (!IsWidgetVisible(widgetLabel))
                 continue;
-            const auto widget = m_Widgets.find(widgetLabel);
-            if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+            const auto widget = m_WidgetState.byName.find(widgetLabel);
+            if (widget == m_WidgetState.byName.end() || widget->second.m_VariableName.empty())
                 continue;
             const auto valuePath = PathForWidget(widgetLabel);
             if (resetValues.insert(valuePath).second) {
-                const auto value = m_Values.find(valuePath);
-                if (value != m_Values.end())
+                const auto value = m_ValueState.metadata.find(valuePath);
+                if (value != m_ValueState.metadata.end())
                     value->second.Store().Reset();
             }
         }
-        m_SelectedPreset      = 0;
-        m_LastChangedVariable = "Preset";
-        m_LastAction.clear();
+        m_PresetState.selectedIndex             = 0;
+        m_InteractionState.lastChangedVariable = "Preset";
+        m_InteractionState.lastAction.clear();
     }
 
 } // namespace tf3d::inspector

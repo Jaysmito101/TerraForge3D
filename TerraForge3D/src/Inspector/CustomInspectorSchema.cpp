@@ -109,15 +109,15 @@ namespace tf3d::inspector
         auto addVariable = [&](nlohmann::json &target,
                                const std::string &name,
                                const CustomInspectorWidget *widget) {
-            const auto value = m_Values.find(name);
-            if (value == m_Values.end() || !emitted.insert(name).second)
+            const auto value = m_ValueState.metadata.find(name);
+            if (value == m_ValueState.metadata.end() || !emitted.insert(name).second)
                 return;
             target["properties"][value->second.GetSerializedName()] = buildValueSchema(value->second, widget);
         };
 
-        for (const auto &sectionName : m_SectionsOrder) {
-            const auto section = m_Sections.find(sectionName);
-            if (section == m_Sections.end())
+        for (const auto &sectionName : m_SectionState.order) {
+            const auto section = m_SectionState.byName.find(sectionName);
+            if (section == m_SectionState.byName.end())
                 continue;
             nlohmann::json sectionSchema = {
                 {"type", "object"},
@@ -130,38 +130,38 @@ namespace tf3d::inspector
             } else if (!section->second.label.empty()) {
                 sectionSchema["description"] = section->second.label;
             }
-            const auto customData = m_SectionCustomData.find(sectionName);
-            if (customData != m_SectionCustomData.end() && !customData->second.is_null() && !customData->second.empty())
+            const auto customData = m_SectionState.customData.find(sectionName);
+            if (customData != m_SectionState.customData.end() && !customData->second.is_null() && !customData->second.empty())
                 sectionSchema["x-customData"] = customData->second;
 
-            for (const auto &widgetLabel : m_WidgetsOrder) {
-                const auto widgetSection = m_WidgetSections.find(widgetLabel);
-                if (widgetSection == m_WidgetSections.end() || widgetSection->second != sectionName)
+            for (const auto &widgetLabel : m_WidgetState.order) {
+                const auto widgetSection = m_SectionState.widgetSections.find(widgetLabel);
+                if (widgetSection == m_SectionState.widgetSections.end() || widgetSection->second != sectionName)
                     continue;
-                const auto widget = m_Widgets.find(widgetLabel);
-                if (widget != m_Widgets.end() && !widget->second.m_VariableName.empty())
+                const auto widget = m_WidgetState.byName.find(widgetLabel);
+                if (widget != m_WidgetState.byName.end() && !widget->second.m_VariableName.empty())
                     addVariable(sectionSchema, PathForWidget(widgetLabel), &widget->second);
             }
             schema["properties"][sectionName] = sectionSchema;
         }
 
-        for (const auto &widgetLabel : m_WidgetsOrder) {
-            const auto widget = m_Widgets.find(widgetLabel);
-            if (widget == m_Widgets.end() || widget->second.m_VariableName.empty())
+        for (const auto &widgetLabel : m_WidgetState.order) {
+            const auto widget = m_WidgetState.byName.find(widgetLabel);
+            if (widget == m_WidgetState.byName.end() || widget->second.m_VariableName.empty())
                 continue;
-            if (!m_WidgetSections.contains(widgetLabel))
+            if (!m_SectionState.widgetSections.contains(widgetLabel))
                 addVariable(schema, PathForWidget(widgetLabel), &widget->second);
         }
-        for (const auto &[name, value] : m_Values)
+        for (const auto &[name, value] : m_ValueState.metadata)
             addVariable(schema, name, nullptr);
 
-        if (!m_Presets.empty()) {
+        if (!m_PresetState.entries.empty()) {
             schema["Presets"] = nlohmann::json::array();
             schema["Presets"].push_back({{"Name", "Default"},
                                          {"Label", "Default"},
                                          {"Description", "Reset all inspector values to their schema defaults."},
                                          {"Values", nlohmann::json::object()}});
-            for (const auto &preset : m_Presets) {
+            for (const auto &preset : m_PresetState.entries) {
                 nlohmann::json presetSchema = {
                     {"Name", preset.name},
                     {"Label", preset.label},
@@ -183,7 +183,7 @@ namespace tf3d::inspector
                     target[key] = value;
             }
         };
-        mergeSchema(schema, m_SchemaMetadata, mergeSchema);
+        mergeSchema(schema, m_ConfigState.schemaMetadata, mergeSchema);
         return schema;
     }
 
