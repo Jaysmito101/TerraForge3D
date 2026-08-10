@@ -9,13 +9,9 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/MaskLayer.h"
+#include "Generators/Masks/MaskLayer.h"
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -33,7 +29,7 @@ namespace tf3d::generators
     class BiomeManager
     {
     public:
-        BiomeManager(ApplicationState *appState);
+        BiomeManager(tf3d::data::ApplicationState *appState);
         ~BiomeManager();
 
         void Resize();
@@ -96,11 +92,11 @@ namespace tf3d::generators
         }
         inline GeneratorTexture *GetMaskTexture() const
         {
-            return m_MaskLayer != nullptr ? m_MaskLayer->GetPreviewTexture() : nullptr;
+            return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
         }
         inline GeneratorTexture *GetMaskPreviewTexture() const
         {
-            return m_MaskLayer != nullptr ? m_MaskLayer->GetPreviewTexture() : nullptr;
+            return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
         }
 
         bool AddBaseShapeGenerator(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
@@ -113,8 +109,8 @@ namespace tf3d::generators
         bool m_IsEnabled       = true;
         bool m_RequireUpdation = true;
         ImVec4 m_Color;
-        std::string m_BiomeID        = "";
-        ApplicationState *m_AppState = nullptr;
+        std::string m_BiomeID                    = "";
+        tf3d::data::ApplicationState *m_AppState = nullptr;
         std::shared_ptr<GeneratorData> m_Data;
         int32_t m_SelectedBaseShapeGenerator                         = 0;
         BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;

@@ -9,15 +9,14 @@
 namespace tf3d::generators
 {
 
-    BaseNoiseGenerator::BaseNoiseGenerator(ApplicationState *appState)
+    BaseNoiseGenerator::BaseNoiseGenerator(tf3d::data::ApplicationState *appState)
         : m_AppState(appState), m_Inspector(std::make_shared<CustomInspector>())
     {
         if (m_AppState == nullptr)
             return;
 
         m_MaskLayer = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.65f, 0.1f),
-                                                  "SlopeRamp", "Calculated base-noise mask");
-        m_MaskLayer->SetPreviewMode(MaskPreviewMode::Generated);
+                                                  "SlopeRamp");
     }
 
     bool BaseNoiseGenerator::Initialize()
@@ -92,7 +91,7 @@ namespace tf3d::generators
         TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
 
         const bool useMask = m_UseMask && m_MaskLayer != nullptr &&
-                             m_MaskLayer->GetPreviewTexture() != nullptr;
+                             m_MaskLayer->GetTexture() != nullptr;
         if (useMask) {
             m_MaskLayer->Update(sourceBuffer);
         }
@@ -115,7 +114,7 @@ namespace tf3d::generators
             m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
         }
         if (useMask) {
-            m_Shader->SetUniform1i("u_MaskTexture", m_MaskLayer->GetPreviewTexture()->Bind(3));
+            m_Shader->SetUniform1i("u_MaskTexture", m_MaskLayer->GetTexture()->Bind(3));
         }
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;

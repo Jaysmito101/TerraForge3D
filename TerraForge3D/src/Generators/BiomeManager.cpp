@@ -132,16 +132,16 @@ namespace tf3d::generators
         if (!m_BaseNoiseGenerator->Initialize())
             TF3D_LOG_ERROR("Failed to initialize base-noise generator.");
 
-        m_DEMBaseShapeGenerator   = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
-        m_CustomizeBaseShape      = std::make_shared<BiomeCustomizeBaseShape>(m_AppState);
-        m_MaskLayer               = std::make_shared<MaskLayer>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z),
-                                                                 "HeightRange", "Calculated terrain mask");
-        m_FilterStack             = std::make_shared<BiomeFilterStack>(m_AppState);
-        m_Statistics              = std::make_shared<GeneratorDataStatistics>(m_AppState);
+        m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
+        m_CustomizeBaseShape    = std::make_shared<BiomeCustomizeBaseShape>(m_AppState);
+        m_MaskLayer             = std::make_shared<MaskLayer>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z),
+                                                              "None");
+        m_FilterStack           = std::make_shared<BiomeFilterStack>(m_AppState);
+        m_Statistics            = std::make_shared<GeneratorDataStatistics>(m_AppState);
         return true;
     }
 
-    BiomeManager::BiomeManager(ApplicationState *appState)
+    BiomeManager::BiomeManager(tf3d::data::ApplicationState *appState)
     {
         m_AppState           = appState;
         m_BiomeID            = GenerateId(8);
@@ -298,10 +298,7 @@ namespace tf3d::generators
     bool BiomeManager::ShowMaskToolSettings()
     {
         ImGui::PushID(m_BiomeID.data());
-        if (m_MaskLayer->IsShowingGeneratedMask() && ImGui::CollapsingHeader("Generated mask source", ImGuiTreeNodeFlags_DefaultOpen)) {
-            BIOME_UI_PROPERTY(m_MaskLayer->ShowGeneratedSettings());
-        }
-        BIOME_UI_PROPERTY(m_MaskLayer->ShowToolSettings());
+        BIOME_UI_PROPERTY(m_MaskLayer->ShowSettings());
         ImGui::PopID();
         return m_RequireUpdation;
     }

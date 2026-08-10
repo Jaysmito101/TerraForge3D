@@ -21,7 +21,8 @@ namespace tf3d::generators
         return BiomeFilterMergeMode::Blend;
     }
 
-    BiomeFilter::BiomeFilter(ApplicationState *appState, std::shared_ptr<BiomeFilterDefinition> definition)
+    BiomeFilter::BiomeFilter(tf3d::data::ApplicationState *appState,
+                             std::shared_ptr<BiomeFilterDefinition> definition)
         : m_AppState(appState), m_Definition(std::move(definition)), m_Inspector(std::make_shared<CustomInspector>()), m_ID(GenerateId(8))
     {
         if (m_Definition == nullptr)
@@ -29,7 +30,7 @@ namespace tf3d::generators
         m_MergeMode = MergeModeFromString(m_Definition->GetMetadata().value("DefaultMergeMode", "Blend"));
         m_Definition->BuildInspector(*m_Inspector);
         m_MaskLayer = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.0f, 0.0f),
-                                                  "HeightRange", "Calculated filter mask");
+                                                  "None");
     }
 
     bool BiomeFilter::ShowSettings()

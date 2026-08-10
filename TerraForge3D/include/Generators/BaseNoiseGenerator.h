@@ -4,16 +4,12 @@
 #include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/MaskLayer.h"
+#include "Generators/Masks/MaskLayer.h"
 #include "Inspector/CustomInspector.h"
 
 #include <string_view>
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -21,7 +17,7 @@ namespace tf3d::generators
     class BaseNoiseGenerator
     {
     public:
-        explicit BaseNoiseGenerator(ApplicationState *appState);
+        explicit BaseNoiseGenerator(tf3d::data::ApplicationState *appState);
 
         bool Initialize();
         bool ShowSettings();

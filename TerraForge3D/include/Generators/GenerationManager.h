@@ -175,7 +175,7 @@ namespace tf3d::generators
         UiState m_Ui;
 
         std::unique_ptr<GenerationWorker> m_Worker;
-        std::atomic<uint64_t> m_TerrainRevision = 0;
+        std::atomic<uint64_t> m_TerrainRevision        = 0;
         std::atomic_bool m_ResolutionGenerationPending = false;
         mutable std::mutex m_RequestSnapshotMutex;
         std::optional<GenerationRequestSnapshot> m_PendingGenerationSnapshot;

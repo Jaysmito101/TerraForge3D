@@ -3,17 +3,13 @@
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
-#include "Generators/MaskLayer.h"
+#include "Generators/Masks/MaskLayer.h"
 
 #include <string>
 #include <string_view>
 #include <vector>
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -21,7 +17,7 @@ namespace tf3d::generators
     class BiomeCustomizeBaseShape
     {
     public:
-        explicit BiomeCustomizeBaseShape(ApplicationState *appState);
+        explicit BiomeCustomizeBaseShape(tf3d::data::ApplicationState *appState);
         ~BiomeCustomizeBaseShape();
 
         bool ShowSettings();

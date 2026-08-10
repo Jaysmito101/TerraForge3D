@@ -4,13 +4,9 @@
 #include "Exporters/Serializer.h"
 #include "Generators/BiomeFilterDefinition.h"
 #include "Generators/GeneratorData.h"
-#include "Generators/MaskLayer.h"
+#include "Generators/Masks/MaskLayer.h"
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -26,7 +22,8 @@ namespace tf3d::generators
     class BiomeFilter
     {
     public:
-        BiomeFilter(ApplicationState *appState, std::shared_ptr<BiomeFilterDefinition> definition);
+        BiomeFilter(tf3d::data::ApplicationState *appState,
+                    std::shared_ptr<BiomeFilterDefinition> definition);
         ~BiomeFilter() = default;
 
         bool ShowSettings();
@@ -103,15 +100,16 @@ namespace tf3d::generators
         }
         inline GeneratorTexture *GetMaskTexture() const
         {
-            return m_MaskLayer != nullptr ? m_MaskLayer->GetPreviewTexture() : nullptr;
+            return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
         }
-        inline ComputeShader *GetPhaseShader(ApplicationState *appState, const std::string &phase) const
+        inline tf3d::base::ComputeShader *GetPhaseShader(tf3d::data::ApplicationState *appState,
+                                                         const std::string &phase) const
         {
             return m_Definition->GetPhaseShader(appState, phase);
         }
 
     private:
-        ApplicationState *m_AppState = nullptr;
+        tf3d::data::ApplicationState *m_AppState = nullptr;
         std::shared_ptr<BiomeFilterDefinition> m_Definition;
         std::shared_ptr<CustomInspector> m_Inspector;
         std::string m_ID;
@@ -126,5 +124,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::BiomeFilter;
-using tf3d::generators::BiomeFilterMergeMode;

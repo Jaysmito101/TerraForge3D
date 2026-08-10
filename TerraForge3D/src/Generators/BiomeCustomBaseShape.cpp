@@ -10,7 +10,7 @@
 namespace tf3d::generators
 {
 
-    BiomeCustomizeBaseShape::BiomeCustomizeBaseShape(ApplicationState *appState)
+    BiomeCustomizeBaseShape::BiomeCustomizeBaseShape(tf3d::data::ApplicationState *appState)
         : m_AppState(appState)
     {
         m_WorkingDataBuffer = std::make_shared<GeneratorData>();
@@ -27,7 +27,7 @@ namespace tf3d::generators
         MaskEntry layer;
         layer.name = name;
         layer.mask = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.45f, 0.05f),
-                                                 "HeightRange", "Calculated customize-base-shape mask");
+                                                 "None");
         return layer;
     }
 
@@ -142,8 +142,8 @@ namespace tf3d::generators
         if (layer.mask == nullptr || source == nullptr)
             return false;
 
-        layer.mask->Update(source, true);
-        return layer.mask->GetPreviewTexture() != nullptr;
+        layer.mask->Update(source);
+        return layer.mask->GetTexture() != nullptr;
     }
 
     bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *source, GeneratorData *target,
@@ -167,7 +167,7 @@ namespace tf3d::generators
         m_Shader->SetUniform1f("u_Strength", layer != nullptr ? glm::max(layer->strength, 0.0f) : 0.0f);
         m_Shader->SetUniform1f("u_Smoothing", layer != nullptr ? glm::clamp(layer->smoothing, 0.0f, 1.0f) : 0.0f);
         if (layer != nullptr && layer->mask != nullptr) {
-            if (auto *maskTexture = layer->mask->GetPreviewTexture())
+            if (auto *maskTexture = layer->mask->GetTexture())
                 m_Shader->SetUniform1i("u_MaskTexture", maskTexture->Bind(2));
         }
 
