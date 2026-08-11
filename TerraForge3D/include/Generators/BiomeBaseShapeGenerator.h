@@ -31,11 +31,6 @@ namespace tf3d::generators
         using Revision = base::RevisionTracker::Revision;
 
         struct State {
-            State(Revision revision, inspector::CustomInspectorSnapshot values)
-                : revision(revision), values(std::move(values))
-            {
-            }
-
             Revision revision;
             inspector::CustomInspectorSnapshot values;
         };
@@ -89,7 +84,9 @@ namespace tf3d::generators
 
     private:
         explicit BiomeBaseShapeGenerator(ApplicationState *appState)
-            : m_AppState(appState) { }
+            : m_AppState(appState)
+        {
+        }
 
         bool Initialize(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
         std::string BuildShaderSource(const std::string &templateSource,
