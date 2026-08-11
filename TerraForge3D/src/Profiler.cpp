@@ -286,6 +286,32 @@ struct PerformanceMonitor::Storage {
     std::vector<MetadataEntry> metadata;
 };
 
+std::string PerformanceMonitor::ResolveChildKey(std::string_view key)
+{
+    if (key.empty())
+        return {};
+
+    Recorder &recorder = GetThreadRecorder();
+    if (recorder.depth == 0)
+        return std::string(key);
+
+    const ActiveSpan &parent = recorder.stack[recorder.depth - 1];
+    if (!parent.active || parent.nameIndex == kInvalidNameIndex)
+        return std::string(key);
+
+    const NameEntry &parentName = recorder.names[parent.nameIndex];
+    if (!parentName.ready.load(std::memory_order_acquire) || parentName.text[0] == '\0')
+        return std::string(key);
+
+    const std::string_view parentKey(parentName.text.data());
+    std::string childKey;
+    childKey.reserve(parentKey.size() + 1 + key.size());
+    childKey.append(parentKey);
+    childKey.push_back('/');
+    childKey.append(key);
+    return childKey;
+}
+
 PerformanceMonitor &PerformanceMonitor::Get()
 {
     static PerformanceMonitor monitor;
@@ -401,6 +427,24 @@ bool PerformanceMonitor::IsCaptureGenerationActive(uint64_t generation) const
 PerformanceMonitor::Scope PerformanceMonitor::BeginScope(std::string_view key, Domain domain, uint64_t flowId)
 {
     return BeginScopeInternal(key, domain, flowId);
+}
+
+PerformanceMonitor::Scope PerformanceMonitor::BeginChildScope(std::string_view key, Domain domain, uint64_t flowId)
+{
+    if (GetCaptureMode() == CaptureMode::Off)
+        return {};
+
+    if (domain == Domain::Unknown) {
+        Recorder &recorder = GetThreadRecorder();
+        if (recorder.depth > 0) {
+            const ActiveSpan &parent = recorder.stack[recorder.depth - 1];
+            if (parent.active)
+                domain = parent.domain;
+        }
+        if (domain == Domain::Unknown)
+            domain = Domain::Cpu;
+    }
+    return BeginScope(ResolveChildKey(key), domain, flowId);
 }
 
 PerformanceMonitor::Scope PerformanceMonitor::BeginScopeInternal(std::string_view key, Domain domain, uint64_t flowId)
@@ -791,6 +835,13 @@ PerformanceMonitor::GpuScope PerformanceMonitor::BeginGpuScope(std::string_view 
     m_PendingGpuQueryCount.fetch_add(1, std::memory_order_relaxed);
     return GpuScope(this, context, static_cast<uint32_t>(slotIndex), generation);
 #endif
+}
+
+PerformanceMonitor::GpuScope PerformanceMonitor::BeginChildGpuScope(std::string_view key, Domain domain, uint64_t flowId)
+{
+    if (GetCaptureMode() != CaptureMode::Full)
+        return {};
+    return BeginGpuScope(ResolveChildKey(key), domain, flowId);
 }
 
 void PerformanceMonitor::GpuScope::End()

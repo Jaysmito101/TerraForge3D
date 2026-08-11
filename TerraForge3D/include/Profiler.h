@@ -237,6 +237,8 @@ public:
 
     Scope BeginScope(std::string_view key, Domain domain = Domain::Cpu, uint64_t flowId = 0);
 
+    Scope BeginChildScope(std::string_view key, Domain domain = Domain::Unknown, uint64_t flowId = 0);
+
     template <typename KeyFactory>
     Scope BeginScopeLazy(KeyFactory &&factory, Domain domain = Domain::Cpu, uint64_t flowId = 0)
     {
@@ -244,10 +246,20 @@ public:
             return {};
         return BeginScope(std::forward<KeyFactory>(factory)(), domain, flowId);
     }
+
+    template <typename KeyFactory>
+    Scope BeginChildScopeLazy(KeyFactory &&factory, Domain domain = Domain::Unknown, uint64_t flowId = 0)
+    {
+        if (GetCaptureMode() == CaptureMode::Off)
+            return {};
+        return BeginChildScope(std::forward<KeyFactory>(factory)(), domain, flowId);
+    }
+
     uint64_t BeginEvent(std::string_view key, Domain domain = Domain::Cpu, uint64_t flowId = 0);
     void EndEvent(uint64_t eventId);
 
     GpuScope BeginGpuScope(std::string_view key, Domain domain = Domain::Gpu, uint64_t flowId = 0);
+    GpuScope BeginChildGpuScope(std::string_view key, Domain domain = Domain::Gpu, uint64_t flowId = 0);
 
     template <typename KeyFactory>
     GpuScope BeginGpuScopeLazy(KeyFactory &&factory, Domain domain = Domain::Gpu, uint64_t flowId = 0)
@@ -255,6 +267,14 @@ public:
         if (GetCaptureMode() != CaptureMode::Full)
             return {};
         return BeginGpuScope(std::forward<KeyFactory>(factory)(), domain, flowId);
+    }
+
+    template <typename KeyFactory>
+    GpuScope BeginChildGpuScopeLazy(KeyFactory &&factory, Domain domain = Domain::Gpu, uint64_t flowId = 0)
+    {
+        if (GetCaptureMode() != CaptureMode::Full)
+            return {};
+        return BeginChildGpuScope(std::forward<KeyFactory>(factory)(), domain, flowId);
     }
 
     void PollGpuQueries(bool waitForResults = false);
@@ -296,6 +316,7 @@ private:
     ~PerformanceMonitor();
 
     Scope BeginScopeInternal(std::string_view key, Domain domain, uint64_t flowId);
+    std::string ResolveChildKey(std::string_view key);
     uint64_t BeginEventInternal(std::string_view key, Domain domain, uint64_t flowId, void **recorderOut);
     void EndEventInternal(void *recorder, uint64_t eventId);
     void EndGpuScope(void *state, uint32_t slot, uint64_t generation);
@@ -341,6 +362,9 @@ private:
 #define TF3D_PROFILE_SCOPE_DOMAIN(key, domain) \
     auto TF3D_PROFILE_DETAIL_JOIN(_tf3dProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginScope(key, domain)
 
+#define TF3D_PROFILE_SCOPE_CHILD(key) \
+    auto TF3D_PROFILE_DETAIL_JOIN(_tf3dProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginChildScope(key)
+
 #define TF3D_PROFILE_SCOPE_FLOW(key, domain, flowId) \
     auto TF3D_PROFILE_DETAIL_JOIN(_tf3dProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginScope(key, domain, flowId)
 
@@ -349,6 +373,9 @@ private:
 
 #define TF3D_PROFILE_SCOPE_LAZY_DOMAIN(keyExpression, domain) \
     auto TF3D_PROFILE_DETAIL_JOIN(_tf3dProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginScopeLazy([&]() { return (keyExpression); }, domain)
+
+#define TF3D_PROFILE_SCOPE_CHILD_LAZY(keyExpression) \
+    auto TF3D_PROFILE_DETAIL_JOIN(_tf3dProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginChildScopeLazy([&]() { return (keyExpression); })
 
 #define TF3D_PROFILE_BEGIN_LAZY_DOMAIN(variable, keyExpression, domain) \
     auto variable = ::PerformanceMonitor::Get().BeginScopeLazy([&]() { return (keyExpression); }, domain)
@@ -364,6 +391,10 @@ private:
     auto TF3D_PROFILE_DETAIL_JOIN(_tf3dGpuProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginGpuScopeLazy([&]() { return (key); })
 #define TF3D_PROFILE_GPU_SCOPE_DOMAIN(key, domain) \
     auto TF3D_PROFILE_DETAIL_JOIN(_tf3dGpuProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginGpuScopeLazy([&]() { return (key); }, domain)
+
+#define TF3D_PROFILE_GPU_SCOPE_CHILD(key) \
+    auto TF3D_PROFILE_DETAIL_JOIN(_tf3dGpuProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginChildGpuScopeLazy([&]() { return (key); })
+
 #define TF3D_PROFILE_GPU_SCOPE_FLOW(key, domain, flowId) \
     auto TF3D_PROFILE_DETAIL_JOIN(_tf3dGpuProfileScope_, __LINE__) = ::PerformanceMonitor::Get().BeginGpuScopeLazy([&]() { return (key); }, domain, flowId)
 #define TF3D_PROFILE_BEGIN_GPU_LAZY_DOMAIN_FLOW(variable, keyExpression, domain, flowId) \
@@ -377,6 +408,10 @@ private:
     do {                                           \
         (void)sizeof(key);                         \
         (void)sizeof(domain);                      \
+    } while (false)
+#define TF3D_PROFILE_GPU_SCOPE_CHILD(key) \
+    do {                                  \
+        (void)sizeof(key);                \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE_FLOW(key, domain, flowId) \
     do {                                                 \
@@ -437,6 +472,10 @@ private:
         (void)sizeof(key);                     \
         (void)sizeof(domain);                  \
     } while (false)
+#define TF3D_PROFILE_SCOPE_CHILD(key) \
+    do {                              \
+        (void)sizeof(key);            \
+    } while (false)
 #define TF3D_PROFILE_SCOPE_FLOW(key, domain, flowId) \
     do {                                             \
         (void)sizeof(key);                           \
@@ -451,6 +490,10 @@ private:
     do {                                                      \
         (void)sizeof(keyExpression);                          \
         (void)sizeof(domain);                                 \
+    } while (false)
+#define TF3D_PROFILE_SCOPE_CHILD_LAZY(keyExpression) \
+    do {                                             \
+        (void)sizeof(keyExpression);                 \
     } while (false)
 #define TF3D_PROFILE_BEGIN_LAZY_DOMAIN(variable, keyExpression, domain) \
     [[maybe_unused]] ::PerformanceMonitor::Scope variable = ((void)sizeof(keyExpression), (void)sizeof(domain), ::PerformanceMonitor::Scope{})
@@ -473,6 +516,10 @@ private:
     do {                                           \
         (void)sizeof(key);                         \
         (void)sizeof(domain);                      \
+    } while (false)
+#define TF3D_PROFILE_GPU_SCOPE_CHILD(key) \
+    do {                                  \
+        (void)sizeof(key);                \
     } while (false)
 #define TF3D_PROFILE_GPU_SCOPE_FLOW(key, domain, flowId) \
     do {                                                 \
