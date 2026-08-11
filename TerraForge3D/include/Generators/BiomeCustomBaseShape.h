@@ -21,8 +21,7 @@ namespace tf3d::generators
         ~BiomeCustomizeBaseShape();
 
         bool ShowSettings();
-        void Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer,
-                    std::string_view profilePrefix = {});
+        void Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer);
 
         SerializerNode Save() const;
         void Load(SerializerNode node);
@@ -52,8 +51,7 @@ namespace tf3d::generators
         void AddMaskLayer();
         bool ShowDrawingSettings();
         bool ApplyLayer(GeneratorData *source, GeneratorData *target,
-                        const MaskEntry *layer, bool flattenSource,
-                        std::string_view profilePrefix);
+                        const MaskEntry *layer, bool flattenSource);
         bool UpdateLayerMask(MaskEntry &layer, GeneratorData *source);
 
     private:

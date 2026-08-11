@@ -23,7 +23,7 @@ namespace tf3d::generators
         ~BiomeFilterStack() = default;
 
         void Resize(size_t dataSize, int resolution);
-        void Update(GeneratorData *baseResult, std::string_view profilePrefix = {});
+        void Update(GeneratorData *baseResult);
         bool ShowSettings(int filterIndex);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
@@ -44,14 +44,11 @@ namespace tf3d::generators
         }
 
     private:
-        void RunFilter(const std::shared_ptr<BiomeFilter> &filter, GeneratorData *input, GeneratorData *output,
-                       std::string_view profilePrefix);
+        void RunFilter(const std::shared_ptr<BiomeFilter> &filter, GeneratorData *input, GeneratorData *output);
         void RunPhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &pass,
-                      GeneratorData *input, GeneratorData *output, GeneratorData *reference,
-                      std::string_view profilePrefix);
+                      GeneratorData *input, GeneratorData *output, GeneratorData *reference);
         void RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge,
-                           GeneratorData *input, GeneratorData *operation, GeneratorData *output,
-                           std::string_view profilePrefix);
+                           GeneratorData *input, GeneratorData *operation, GeneratorData *output);
         void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader, const nlohmann::json &bindings);
         void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader);
         void EnsureTempBufferCount(size_t count);

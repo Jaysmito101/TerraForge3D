@@ -50,7 +50,7 @@ namespace tf3d::generators
         ~DEMBaseShapeGenerator();
 
         bool ShowSettings();
-        void Update(GeneratorData *buffer, GeneratorTexture *seedTexture, std::string_view profilePrefix = {});
+        void Update(GeneratorData *buffer, GeneratorTexture *seedTexture);
 
         void Load(SerializerNode data);
         SerializerNode Save();

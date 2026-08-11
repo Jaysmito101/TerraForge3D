@@ -22,8 +22,7 @@ namespace tf3d::generators
         bool Initialize();
         bool ShowSettings();
         void Resize(int size);
-        void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorTexture *seedTexture,
-                    std::string_view profilePrefix = {});
+        void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorTexture *seedTexture);
 
         void Load(SerializerNode data);
         SerializerNode Save();

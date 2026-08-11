@@ -81,14 +81,12 @@ namespace tf3d::generators
     }
 
     void BaseNoiseGenerator::Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer,
-                                    GeneratorTexture *seedTexture, std::string_view profilePrefix)
+                                    GeneratorTexture *seedTexture)
     {
         if (!m_Shader || sourceBuffer == nullptr || targetBuffer == nullptr)
             return;
 
-        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
-        const std::string scopeKey    = scopePrefix + "/base-noise";
-        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_SCOPE_CHILD_LAZY("base-noise");
 
         const bool useMask = m_UseMask && m_MaskLayer != nullptr &&
                              m_MaskLayer->GetTexture() != nullptr;
@@ -118,8 +116,7 @@ namespace tf3d::generators
         }
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
-        const std::string gpuKey = scopeKey + "/gpu";
-        TF3D_PROFILE_GPU_SCOPE(gpuKey);
+        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         TF3D_PROFILE_VALUE_DOMAIN("generation/base-noise/dispatch", dispatchSize, dispatchSize, 1,
                                   PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);

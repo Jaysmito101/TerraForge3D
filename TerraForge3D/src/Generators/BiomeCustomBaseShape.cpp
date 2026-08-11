@@ -147,15 +147,12 @@ namespace tf3d::generators
     }
 
     bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *source, GeneratorData *target,
-                                             const MaskEntry *layer, bool flattenSource,
-                                             std::string_view profilePrefix)
+                                             const MaskEntry *layer, bool flattenSource)
     {
         if (!m_Shader || source == nullptr || target == nullptr)
             return false;
 
-        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
-        const std::string scopeKey    = scopePrefix + "/customize-base-shape";
-        TF3D_PROFILE_SCOPE_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_SCOPE_CHILD("customize-base-shape");
 
         source->Bind(0);
         target->Bind(1);
@@ -174,8 +171,7 @@ namespace tf3d::generators
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto resolution    = m_AppState->mainMap.tileResolution;
         const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
-        const std::string gpuKey = scopeKey + "/gpu";
-        TF3D_PROFILE_GPU_SCOPE(gpuKey);
+        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         TF3D_PROFILE_VALUE_DOMAIN("generation/customize-base-shape/dispatch", dispatchSize, dispatchSize, 1,
                                   PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
@@ -183,8 +179,7 @@ namespace tf3d::generators
         return true;
     }
 
-    void BiomeCustomizeBaseShape::Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer,
-                                         std::string_view profilePrefix)
+    void BiomeCustomizeBaseShape::Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer)
     {
         if (baseShapeBuffer == nullptr || targetBuffer == nullptr)
             return;
@@ -193,7 +188,7 @@ namespace tf3d::generators
         bool hasOutput         = false;
 
         if (m_FlattenBaseShape) {
-            if (!ApplyLayer(baseShapeBuffer, m_WorkingDataBuffer.get(), nullptr, true, profilePrefix)) {
+            if (!ApplyLayer(baseShapeBuffer, m_WorkingDataBuffer.get(), nullptr, true)) {
                 baseShapeBuffer->CopyTo(targetBuffer);
                 return;
             }
@@ -210,7 +205,7 @@ namespace tf3d::generators
             GeneratorData *target = current == m_WorkingDataBuffer.get()
                                         ? m_SwapBuffer.get()
                                         : m_WorkingDataBuffer.get();
-            if (!ApplyLayer(current, target, &layer, false, profilePrefix)) {
+            if (!ApplyLayer(current, target, &layer, false)) {
                 baseShapeBuffer->CopyTo(targetBuffer);
                 return;
             }
