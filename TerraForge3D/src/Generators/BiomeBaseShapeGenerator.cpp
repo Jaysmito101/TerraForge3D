@@ -15,65 +15,82 @@ namespace tf3d::generators
         constexpr std::string_view kSourceMarker   = "/* TF3D_BASE_SHAPE_SOURCE */";
     } // namespace
 
-    BiomeBaseShapeGenerator::BiomeBaseShapeGenerator(ApplicationState *appState)
-        : m_AppState(appState), m_Inspector(std::make_shared<inspector::CustomInspector>())
-    {
-        m_RequireUpdation = false;
-    }
-
     bool BiomeBaseShapeGenerator::ShowSettings()
     {
         ImGui::PushID(m_ID.c_str());
-        if (!m_Description.empty() && m_Inspector->GetDescription().empty()) {
+        if (!m_Description.empty() && m_Inspector.GetDescription().empty()) {
             ImGui::TextWrapped("%s", m_Description.c_str());
             ImGui::Separator();
         }
-        m_RequireUpdation = m_Inspector->Render() || m_RequireUpdation;
+        if (m_Inspector.Render()) {
+            m_UpdateTracker.Publish();
+        }
         ImGui::PopID();
-        return m_RequireUpdation;
+
+        return RequireUpdation();
     }
 
-    void BiomeBaseShapeGenerator::Update(GeneratorData *buffer, GeneratorTexture *seedTexture,
-                                         std::string_view profilePrefix)
+    void BiomeBaseShapeGenerator::Update(const State *state, const GenerationContext *context, GeneratorData *buffer)
     {
-        if (!m_Shader || m_AppState == nullptr || buffer == nullptr)
+        if (state == nullptr || context == nullptr || !m_Shader || m_AppState == nullptr || buffer == nullptr) {
             return;
-
-        const std::string scopePrefix = profilePrefix.empty() ? "generation" : std::string(profilePrefix);
-        const std::string scopeKey    = scopePrefix + "/base-shape/" + m_Name;
-        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(scopeKey, PerformanceMonitor::Domain::Generation);
-
-        buffer->Bind(0);
-        m_Shader->Bind();
-        m_Inspector->ApplyToShader(*m_Shader);
-        m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
-        m_Shader->SetUniform1i("u_UseSeedTexture", seedTexture != nullptr ? 1 : 0);
-        if (seedTexture) {
-            m_Shader->SetUniform1i("u_SeedTexture", seedTexture->Bind(1));
         }
 
-        const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        const auto dispatchSize  = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
-        const std::string gpuKey = scopeKey + "/gpu";
-        TF3D_PROFILE_GPU_SCOPE(gpuKey);
+        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("base-shape/") + m_Name);
+
+        m_Shader->Bind();
+        buffer->Bind(0);
+        m_Inspector.ApplyToShader(state->values, *m_Shader);
+        m_Shader->SetUniform1i("u_Resolution", context->tileResolution);
+        m_Shader->SetUniform1i("u_UseSeedTexture", context->seedTexture != nullptr ? 1 : 0);
+        if (context->seedTexture != nullptr) {
+            m_Shader->SetUniform1i("u_SeedTexture", context->seedTexture->Bind(1));
+        }
+
+        const int32_t workgroupSize = context->gpuWorkgroupSize > 0 ? context->gpuWorkgroupSize : 1;
+        const auto dispatchSize     = (context->tileResolution + workgroupSize - 1) / workgroupSize;
+        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         TF3D_PROFILE_VALUE_DOMAIN("generation/base-shape/dispatch", dispatchSize, dispatchSize, 1,
                                   PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
-        m_RequireUpdation = false;
+
+        m_UpdateTracker.MarkProcessed(state->revision);
     }
 
-    bool BiomeBaseShapeGenerator::LoadInspectorFromConfig(const nlohmann::json &config)
+    bool BiomeBaseShapeGenerator::Load(SerializerNode data)
     {
-        m_Name = config.value("Name", "Unnamed");
-        return m_Inspector->LoadConfig(config);
+        if (data == nullptr) {
+            return false;
+        }
+
+        const auto inspectorState = data->Get<SerializerNode>("Inspector");
+        if (inspectorState == nullptr) {
+            return false;
+        }
+
+        if (!m_Inspector.LoadState(inspectorState)) {
+            return false;
+        }
+
+        m_UpdateTracker.Publish();
+        return true;
     }
+
+    SerializerNode BiomeBaseShapeGenerator::Save() const
+    {
+        auto node = CreateSerializerNode();
+        node->Set("Inspector", m_Inspector.SaveState());
+        return node;
+    }
+
 
     std::string BiomeBaseShapeGenerator::BuildShaderSource(const std::string &templateSource,
                                                            const std::string &uniformDeclarations)
     {
-        if (templateSource.empty())
+        if (templateSource.empty()) {
             return {};
+        }
 
         bool includeSuccess      = false;
         const std::string source = m_AppState->resourceManager->PreprocessShaderSource(m_Source, m_ShaderPath, &includeSuccess);
@@ -91,7 +108,7 @@ namespace tf3d::generators
         return result;
     }
 
-    bool BiomeBaseShapeGenerator::LoadConfig(const nlohmann::json &config,
+    bool BiomeBaseShapeGenerator::Initialize(const nlohmann::json &config,
                                              const std::string &source,
                                              const std::string &shaderPath)
     {
@@ -117,11 +134,14 @@ namespace tf3d::generators
         m_Description = config.value("Description", "");
         m_Source      = source;
         m_ShaderPath  = shaderPath;
-        if (!LoadInspectorFromConfig(config))
-            return false;
+        m_Name        = config.value("Name", "Unnamed");
 
-        std::string uniformError;
-        const auto uniformDeclarations = m_Inspector->GetShaderUniformDeclarations(&uniformError);
+        if (!m_Inspector.LoadConfig(config)) {
+            return false;
+        }
+
+        std::string uniformError = "";
+        const auto uniformDeclarations = m_Inspector.GetShaderUniformDeclarations(&uniformError);
         if (!uniformDeclarations) {
             TF3D_LOG_ERROR("Cannot generate base-shape uniform declarations: {}", uniformError);
             return false;
@@ -147,7 +167,7 @@ namespace tf3d::generators
             return false;
         }
 
-        m_RequireUpdation = true;
+        m_UpdateTracker.Publish();
         return true;
     }
 
