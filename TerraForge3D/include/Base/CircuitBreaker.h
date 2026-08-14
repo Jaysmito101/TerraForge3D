@@ -18,7 +18,7 @@ namespace tf3d::base
 
         using Clock = std::chrono::steady_clock;
 
-        explicit CircuitBreaker(std::size_t failureThreshold = 5,
+        explicit CircuitBreaker(std::size_t failureThreshold           = 5,
                                 std::chrono::milliseconds openDuration = std::chrono::seconds(30))
             : m_FailureThreshold(failureThreshold == 0 ? 1 : failureThreshold),
               m_OpenDuration(openDuration.count() > 0 ? openDuration : std::chrono::milliseconds(1))
@@ -52,9 +52,9 @@ namespace tf3d::base
                 return;
             }
 
-            m_State         = State::Closed;
-            m_FailureCount  = 0;
-            m_OpenUntil     = Clock::time_point::min();
+            m_State        = State::Closed;
+            m_FailureCount = 0;
+            m_OpenUntil    = Clock::time_point::min();
         }
 
         void RecordFailure()
@@ -118,9 +118,9 @@ namespace tf3d::base
         mutable std::mutex m_Mutex;
         const std::size_t m_FailureThreshold;
         const std::chrono::milliseconds m_OpenDuration;
-        State m_State                          = State::Closed;
-        std::size_t m_FailureCount             = 0;
-        Clock::time_point m_OpenUntil          = Clock::time_point::min();
+        State m_State                 = State::Closed;
+        std::size_t m_FailureCount    = 0;
+        Clock::time_point m_OpenUntil = Clock::time_point::min();
     };
 
 } // namespace tf3d::base
