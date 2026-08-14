@@ -64,7 +64,8 @@ namespace tf3d::base
             Revision revision = 0;
         };
 
-        GeneratorState() requires std::default_initializable<T>
+        GeneratorState()
+            requires std::default_initializable<T>
             : m_Value{},
               m_Tracker(1)
         {
