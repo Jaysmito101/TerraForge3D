@@ -70,7 +70,7 @@ if( MSVC )
     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
 endif()
 
-file(GLOB_RECURSE SOURCES
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
      ./TerraForge3D/src/**.cpp
      ./TerraForge3D/src/TerraForge3D.rc
 )
