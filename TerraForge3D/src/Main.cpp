@@ -171,8 +171,8 @@ namespace tf3d
 #endif
             if (appState->windows.styleEditor)
                 ShowStyleEditor(&appState->windows.styleEditor);
-            if (appState->windows.textureStore)
-                appState->textureStore->ShowSettings(&appState->windows.textureStore);
+            // if (appState->windows.textureStore)
+            //     appState->textureStore->ShowSettings(&appState->windows.textureStore);
             if (appState->windows.osLisc)
                 appState->osLiscences->ShowSettings(&appState->windows.osLisc);
             if (appState->windows.supportersTribute)
@@ -254,8 +254,8 @@ namespace tf3d
             appState->mainMenu          = new ui::MainMenu(appState);
             // appState->projectManager = new ProjectManager(appState);
             // appState->serailizer = new Serializer(appState);
-            appState->osLiscences   = new misc::OSLiscences(appState);
-            appState->textureStore  = new texture_store::TextureStore(appState);
+            appState->osLiscences = new misc::OSLiscences(appState);
+            // appState->textureStore  = new texture_store::TextureStore(appState);
             appState->exportManager = new ExportManager(appState);
             appState->styleManager  = new Style();
             for (int i = 0; i < MAX_VIEWPORT_COUNT; i++) {
@@ -320,7 +320,7 @@ namespace tf3d
             delete appState->jobManager;
             delete appState->jobSystem;
             delete appState->eventManager;
-            delete appState->textureStore;
+            // delete appState->textureStore;
             delete appState->styleManager;
             delete appState->generationManager;
             delete appState->dashboard;
