@@ -16,11 +16,7 @@
 #include <string_view>
 #include <utility>
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -28,12 +24,15 @@ namespace tf3d::generators
     class BiomeBaseShapeGenerator
     {
     public:
-        using Revision = base::RevisionTracker::Revision;
-
         struct State {
-            Revision revision;
             inspector::CustomInspectorSnapshot values;
+
+            explicit State(inspector::CustomInspectorSnapshot snapshot)
+                : values(std::move(snapshot))
+            {
+            }
         };
+        using Snapshot = base::GeneratorState<State>::Snapshot;
 
         static inline std::shared_ptr<BiomeBaseShapeGenerator> Create(ApplicationState *appState,
                                                                       const nlohmann::json &config,
@@ -54,15 +53,15 @@ namespace tf3d::generators
         bool Load(SerializerNode data);
         SerializerNode Save() const;
 
-        void Update(const State *state, const GenerationContext *context, GeneratorData *buffer);
+        void Update(const Snapshot *state, const GenerationContext *context, GeneratorData *buffer);
 
-        inline State GetState() const
+        inline Snapshot GetState() const
         {
-            return State(m_UpdateTracker.PublishedRevision(), m_Inspector.Clone());
+            return m_State.Capture();
         }
-        inline Revision GetStateRevision() const
+        inline Snapshot::Revision GetStateRevision() const
         {
-            return m_UpdateTracker.PublishedRevision();
+            return m_State.PublishedRevision();
         }
 
         inline const std::string &GetName() const
@@ -79,12 +78,13 @@ namespace tf3d::generators
         }
         inline bool RequireUpdation() const
         {
-            return m_UpdateTracker.RequiresUpdate();
+            return m_State.RequiresUpdate();
         }
 
     private:
         explicit BiomeBaseShapeGenerator(ApplicationState *appState)
-            : m_AppState(appState)
+            : m_AppState(appState),
+              m_State(State{m_Inspector.Clone()})
         {
         }
 
@@ -93,16 +93,16 @@ namespace tf3d::generators
                                       const std::string &uniformDeclarations);
 
     protected:
+        ApplicationState *m_AppState = nullptr;
         std::optional<base::ComputeShader> m_Shader;
         inspector::CustomInspector m_Inspector;
-        base::RevisionTracker m_UpdateTracker;
+        base::GeneratorState<State> m_State;
 
-        ApplicationState *m_AppState = nullptr;
-        std::string m_Name           = "";
-        std::string m_ID             = "";
-        std::string m_Description    = "";
-        std::string m_Source         = "";
-        std::string m_ShaderPath     = "";
+        std::string m_Name        = "";
+        std::string m_ID          = "";
+        std::string m_Description = "";
+        std::string m_Source      = "";
+        std::string m_ShaderPath  = "";
     };
 
 } // namespace tf3d::generators

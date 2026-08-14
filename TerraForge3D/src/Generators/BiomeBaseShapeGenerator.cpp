@@ -23,14 +23,16 @@ namespace tf3d::generators
             ImGui::Separator();
         }
         if (m_Inspector.Render()) {
-            m_UpdateTracker.Publish();
+            m_State.Replace(State{m_Inspector.Clone()});
         }
         ImGui::PopID();
 
         return RequireUpdation();
     }
 
-    void BiomeBaseShapeGenerator::Update(const State *state, const GenerationContext *context, GeneratorData *buffer)
+    void BiomeBaseShapeGenerator::Update(const Snapshot *state,
+                                         const GenerationContext *context,
+                                         GeneratorData *buffer)
     {
         if (state == nullptr || context == nullptr || !m_Shader || m_AppState == nullptr || buffer == nullptr) {
             return;
@@ -40,7 +42,7 @@ namespace tf3d::generators
 
         m_Shader->Bind();
         buffer->Bind(0);
-        m_Inspector.ApplyToShader(state->values, *m_Shader);
+        m_Inspector.ApplyToShader(state->value.values, *m_Shader);
         m_Shader->SetUniform1i("u_Resolution", context->tileResolution);
         m_Shader->SetUniform1i("u_UseSeedTexture", context->seedTexture != nullptr ? 1 : 0);
         if (context->seedTexture != nullptr) {
@@ -55,7 +57,7 @@ namespace tf3d::generators
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
 
-        m_UpdateTracker.MarkProcessed(state->revision);
+        m_State.MarkProcessed(state->revision);
     }
 
     bool BiomeBaseShapeGenerator::Load(SerializerNode data)
@@ -73,7 +75,7 @@ namespace tf3d::generators
             return false;
         }
 
-        m_UpdateTracker.Publish();
+        m_State.Replace(State{m_Inspector.Clone()});
         return true;
     }
 
@@ -83,7 +85,6 @@ namespace tf3d::generators
         node->Set("Inspector", m_Inspector.SaveState());
         return node;
     }
-
 
     std::string BiomeBaseShapeGenerator::BuildShaderSource(const std::string &templateSource,
                                                            const std::string &uniformDeclarations)
@@ -140,7 +141,7 @@ namespace tf3d::generators
             return false;
         }
 
-        std::string uniformError = "";
+        std::string uniformError       = "";
         const auto uniformDeclarations = m_Inspector.GetShaderUniformDeclarations(&uniformError);
         if (!uniformDeclarations) {
             TF3D_LOG_ERROR("Cannot generate base-shape uniform declarations: {}", uniformError);
@@ -167,7 +168,7 @@ namespace tf3d::generators
             return false;
         }
 
-        m_UpdateTracker.Publish();
+        m_State.Replace(State{m_Inspector.Clone()});
         return true;
     }
 
