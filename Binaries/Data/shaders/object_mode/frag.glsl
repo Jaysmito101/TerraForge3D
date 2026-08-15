@@ -55,6 +55,7 @@ uniform vec4 u_BrushSettings0;
 uniform vec3 u_MaskColor;
 uniform bool u_DrawMask;
 uniform bool u_InvertMask;
+uniform bool u_SignedMask;
 uniform sampler2D u_MaskTexture;
 
 int PixelCoordToDataOffset(int x, int y)
@@ -278,8 +279,17 @@ void main()
 	if (u_DrawMask && fragmentInput.texCoord.z <= 0.5f)
 	{
 		float maskValue = texture(u_MaskTexture, fragmentInput.texCoord.xy).r;
-		if (u_InvertMask) maskValue = 1.0 - maskValue;
-		color = mix(color, u_MaskColor, clamp(maskValue * 0.65, 0.0, 1.0));
+		if (u_SignedMask)
+		{
+			if (u_InvertMask) maskValue = -maskValue;
+			vec3 signedColor = maskValue < 0.0 ? vec3(0.08, 0.35, 1.0) : u_MaskColor;
+			color = mix(color, signedColor, clamp(abs(maskValue) * 0.65, 0.0, 1.0));
+		}
+		else
+		{
+			if (u_InvertMask) maskValue = 1.0 - maskValue;
+			color = mix(color, u_MaskColor, clamp(maskValue * 0.65, 0.0, 1.0));
+		}
 	}
 
 	if (u_RequiresDrawBrush)

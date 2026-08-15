@@ -317,21 +317,35 @@ namespace tf3d::generators
             m_DrawSettings.m_BrushPositionY = position.y;
 
             if (m_IsEditing) {
-                showBrush = true;
-                if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
-                    if (ImGui::IsKeyDown(ImGuiKey_R)) {
+                showBrush            = true;
+                const bool shiftHeld = ImGui::IsKeyDown(ImGuiKey_LeftShift) ||
+                                       ImGui::IsKeyDown(ImGuiKey_RightShift);
+                const bool brushSizeShortcut     = ImGui::IsKeyDown(ImGuiKey_R);
+                const bool brushStrengthShortcut = ImGui::IsKeyDown(ImGuiKey_S);
+                const bool brushFalloffShortcut  = ImGui::IsKeyDown(ImGuiKey_F);
+                if (shiftHeld) {
+                    if (brushSizeShortcut) {
                         activeViewport->SetControlEnabled(false);
                         m_DrawSettings.m_BrushSize = glm::clamp(m_DrawSettings.m_BrushSize + ImGui::GetIO().MouseWheel * 0.2f * (m_DrawSettings.m_BrushSize + 0.01f), 0.005f, 2.0f);
-                    } else if (ImGui::IsKeyDown(ImGuiKey_S)) {
+                    } else if (brushStrengthShortcut) {
                         activeViewport->SetControlEnabled(false);
                         m_DrawSettings.m_BrushStrength = glm::clamp(m_DrawSettings.m_BrushStrength + ImGui::GetIO().MouseWheel * 0.01f, 0.0f, 1.0f);
-                    } else if (ImGui::IsKeyDown(ImGuiKey_F)) {
+                    } else if (brushFalloffShortcut) {
                         activeViewport->SetControlEnabled(false);
                         m_DrawSettings.m_BrushFalloff = glm::clamp(m_DrawSettings.m_BrushFalloff + ImGui::GetIO().MouseWheel * 0.05f, 0.0f, 1.0f);
                     }
+
+                    if (m_AllowNegativeValues && !brushSizeShortcut && !brushStrengthShortcut &&
+                        !brushFalloffShortcut) {
+                        if (m_DrawSettings.m_BrushMode != 2) {
+                            m_PreviousBrushMode = m_DrawSettings.m_BrushMode;
+                        }
+                        m_DrawSettings.m_BrushMode = 2;
+                    }
                 } else if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
-                    if (m_DrawSettings.m_BrushMode != 1)
+                    if (m_DrawSettings.m_BrushMode != 1) {
                         m_PreviousBrushMode = m_DrawSettings.m_BrushMode;
+                    }
                     m_DrawSettings.m_BrushMode = 1;
                 } else {
                     m_DrawSettings.m_BrushMode = m_PreviousBrushMode;

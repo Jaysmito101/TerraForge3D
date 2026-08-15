@@ -6,7 +6,7 @@ namespace tf3d::renderer
 {
     struct DrawBrushSettings {
         float m_BrushSize      = 0.2f;
-        float m_BrushStrength  = 0.5f;
+        float m_BrushStrength  = 0.1f;
         float m_BrushFalloff   = 0.5f;
         float m_BrushPositionX = 0.0f;
         float m_BrushPositionY = 0.0f;
@@ -17,6 +17,7 @@ namespace tf3d::renderer
         glm::vec3 m_MaskColor  = glm::vec3(1.0f);
         bool m_ShowMask        = false;
         bool m_InvertMask      = false;
+        bool m_SignedMask      = false;
         bool m_ShowBrushCursor = false;
     };
 } // namespace tf3d::renderer
