@@ -19,7 +19,8 @@ namespace tf3d::generators
                        bool allowNegativeValues)
         : m_AppState(state),
           m_AllowNegativeValues(allowNegativeValues),
-          m_VizColor(vizColor)
+          m_VizColor(vizColor),
+          m_Id(utils::NextUniqueId())
     {
     }
 
@@ -224,6 +225,8 @@ namespace tf3d::generators
 
     bool MaskTool::ShowStrokeSettings(int resolution)
     {
+        ImGui::PushID(m_Id);
+
         bool changed = false;
         if (!m_IsEditing && ImGui::Button("Edit mask")) {
             if (s_CurrentlyEditingMaskTool != nullptr) {
@@ -242,8 +245,9 @@ namespace tf3d::generators
         ImGui::EndDisabled();
         ImGui::SameLine();
         ImGui::TextDisabled("Ctrl+Z");
-        if (m_IsEditing && ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z))
+        if (m_IsEditing && ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z)) {
             changed |= UndoLastStroke();
+        }
 
         if (m_IsEditing) {
             if (ImGui::Button("Stop editing")) {
@@ -275,6 +279,9 @@ namespace tf3d::generators
             ImGui::TextDisabled("Shift+R:size     Shift+S:strength");
             ImGui::TextDisabled("Shift+F:falloff  Ctrl:erase");
         }
+
+        ImGui::PopID();
+
         return changed;
     }
 

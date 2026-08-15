@@ -91,6 +91,7 @@ namespace tf3d::generators
         bool m_RequireUpdation  = true;
         bool m_IsEditing        = false;
         int m_PreviousBrushMode = 0;
+        uint64_t m_Id           = 0;
 
         static MaskTool *s_CurrentlyEditingMaskTool;
     };
