@@ -31,7 +31,7 @@ namespace tf3d::generators
 
     BiomeCustomizeBaseShape::Snapshot BiomeCustomizeBaseShape::GetState() const
     {
-        auto snapshot = m_State.Capture();
+        auto snapshot  = m_State.Capture();
         auto runtime   = std::make_shared<RuntimeState>();
         runtime->masks = m_RuntimeMasks;
 
@@ -45,9 +45,9 @@ namespace tf3d::generators
     std::shared_ptr<MaskLayer> BiomeCustomizeBaseShape::CreateMaskLayer() const
     {
         return std::make_shared<MaskLayer>(m_AppState,
-                                            glm::vec3(1.0f, 0.45f, 0.05f),
-                                            "None",
-                                            true);
+                                           glm::vec3(1.0f, 0.45f, 0.05f),
+                                           "None",
+                                           true);
     }
 
     BiomeCustomizeBaseShape::MaskState BiomeCustomizeBaseShape::CreateMaskState(const std::string &name)
@@ -174,7 +174,7 @@ namespace tf3d::generators
 
     BiomeCustomizeBaseShape::State BiomeCustomizeBaseShape::CaptureState() const
     {
-        State state = m_UIState;
+        State state            = m_UIState;
         const size_t maskCount = std::min(state.masks.size(), m_RuntimeMasks.size());
         for (size_t maskIndex = 0; maskIndex < maskCount; ++maskIndex) {
             if (m_RuntimeMasks[maskIndex] != nullptr) {
@@ -278,7 +278,7 @@ namespace tf3d::generators
         masks.reserve(m_UIState.masks.size());
         for (size_t maskIndex = 0; maskIndex < m_UIState.masks.size(); ++maskIndex) {
             const auto &layer = m_UIState.masks[maskIndex];
-            auto mask = CreateSerializerNode();
+            auto mask         = CreateSerializerNode();
             mask->Set("Name", layer.name);
             mask->Set("Enabled", layer.enabled);
             mask->Set("Raise", layer.raise);
@@ -307,11 +307,11 @@ namespace tf3d::generators
                 if (maskNode == nullptr) {
                     continue;
                 }
-                auto layer      = CreateMaskState(maskNode->Get<std::string>("Name", "Mask"));
-                layer.enabled   = maskNode->Get<bool>("Enabled", layer.enabled);
-                layer.raise     = maskNode->Get<bool>("Raise", layer.raise);
-                layer.strength  = maskNode->Get<float>("Strength", layer.strength);
-                layer.smoothing = maskNode->Get<float>("Smoothing", layer.smoothing);
+                auto layer             = CreateMaskState(maskNode->Get<std::string>("Name", "Mask"));
+                layer.enabled          = maskNode->Get<bool>("Enabled", layer.enabled);
+                layer.raise            = maskNode->Get<bool>("Raise", layer.raise);
+                layer.strength         = maskNode->Get<float>("Strength", layer.strength);
+                layer.smoothing        = maskNode->Get<float>("Smoothing", layer.smoothing);
                 const size_t maskIndex = m_RuntimeMasks.size() - 1;
                 if (maskIndex < m_RuntimeMasks.size() && m_RuntimeMasks[maskIndex] != nullptr) {
                     m_RuntimeMasks[maskIndex]->LoadFrom(maskNode);
