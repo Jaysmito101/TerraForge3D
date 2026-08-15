@@ -116,10 +116,14 @@ float SlopeRampMask(float slope)
 	float normalizedSlope = clamp(slope / 90.0, 0.0, 1.0);
 	float minimum = min(u_Range.x, u_Range.y);
 	float maximum = max(u_Range.x, u_Range.y);
-	if (maximum - minimum <= 0.000001)
+	float rangeWidth = maximum - minimum;
+	if (rangeWidth <= 0.000001)
+	{
 		return normalizedSlope >= minimum ? 1.0 : 0.0;
+	}
 
-	float ramp = smoothstep(minimum, maximum, normalizedSlope);
+	float feather = clamp(u_EdgeFeather, 0.0, 0.5) * rangeWidth;
+	float ramp = smoothstep(minimum - feather, maximum + feather, normalizedSlope);
 	return u_Range.x <= u_Range.y ? ramp : 1.0 - ramp;
 }
 
