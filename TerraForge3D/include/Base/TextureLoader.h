@@ -117,7 +117,7 @@ namespace tf3d::base
         };
 
         struct QueueEntry {
-            uint64_t requestId            = 0;
+            uint64_t requestId           = 0;
             TextureLoadPriority priority = TextureLoadPriority::Normal;
             uint64_t sequence            = 0;
             uint64_t queueVersion        = 0;
@@ -136,7 +136,7 @@ namespace tf3d::base
                                const TextureLoadOptions &options,
                                bool customDecoder);
         static std::shared_ptr<Texture2D> LoadTexture(const LoadKey &key,
-                                                       const DecodeFunction &decoder);
+                                                      const DecodeFunction &decoder);
 
         uint64_t RequestImpl(std::string path,
                              TextureLoadPriority priority,
