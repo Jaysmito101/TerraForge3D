@@ -43,6 +43,11 @@ namespace tf3d::generators
                                             bool invert);
 
     private:
+        enum class DispatchInput {
+            SourceTerrain,
+            CachedBaseTexture
+        };
+
         void UploadStrokes(const std::vector<MaskStroke> &strokes, const MaskStroke *activeStroke);
         bool Dispatch(GeneratorData *sourceData,
                       const BaseMaskGenerator &baseGenerator,
@@ -50,7 +55,7 @@ namespace tf3d::generators
                       GeneratorTexture *destination,
                       GeneratorTexture *baseTexture,
                       int strokeCount,
-                      bool useCachedBase);
+                      DispatchInput input);
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
         std::optional<tf3d::base::ComputeShader> m_Shader;

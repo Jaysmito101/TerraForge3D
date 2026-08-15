@@ -74,25 +74,30 @@ namespace tf3d::generators
                                   GeneratorTexture *destination,
                                   GeneratorTexture *baseTexture,
                                   int strokeCount,
-                                  bool useCachedBase)
+                                  DispatchInput input)
     {
-        if (destination == nullptr || !m_Shader.has_value() || m_AppState == nullptr)
+        if (destination == nullptr || !m_Shader.has_value() || m_AppState == nullptr) {
             return false;
-        const bool hasBase = baseState.runtimeMode >= 0;
-        if (hasBase && !baseGenerator.IsAvailable())
-            return false;
-        if (hasBase && !useCachedBase && sourceData == nullptr)
-            return false;
+        }
 
-        if (!m_StrokeDataValid)
+        const bool hasBase       = baseState.runtimeMode >= 0;
+        const bool useCachedBase = input == DispatchInput::CachedBaseTexture;
+        if (hasBase && input == DispatchInput::SourceTerrain && sourceData == nullptr) {
             return false;
+        }
 
-        if (hasBase && !useCachedBase)
+        if (!m_StrokeDataValid) {
+            return false;
+        }
+
+        if (hasBase && input == DispatchInput::SourceTerrain) {
             sourceData->Bind(0);
+        }
         destination->BindForCompute(1);
         if (useCachedBase) {
-            if (baseTexture == nullptr)
+            if (baseTexture == nullptr) {
                 return false;
+            }
             baseTexture->Bind(5);
         }
 
@@ -140,20 +145,32 @@ namespace tf3d::generators
             strokeCount += 1;
         }
 
-        const bool hasBase = baseState.runtimeMode >= 0;
+        const bool hasBase                 = baseState.runtimeMode >= 0;
+        GeneratorTexture *inputBaseTexture = nullptr;
+        DispatchInput input                = DispatchInput::SourceTerrain;
         if (hasBase) {
-            if (baseTexture == nullptr || baseTexture->GetWidth() != destination->GetWidth()) {
+            if (!baseGenerator.IsAvailable() || baseTexture == nullptr ||
+                baseTexture->GetWidth() != destination->GetWidth()) {
                 return false;
             }
 
-            if (rebuildBase && !Dispatch(sourceData, baseGenerator, baseState, baseTexture, nullptr, 0, false)) {
-                return false;
+            if (rebuildBase) {
+                if (!Dispatch(sourceData,
+                              baseGenerator,
+                              baseState,
+                              baseTexture,
+                              nullptr,
+                              0,
+                              DispatchInput::SourceTerrain)) {
+                    return false;
+                }
             }
-            
-            return Dispatch(nullptr, baseGenerator, baseState, destination, baseTexture, strokeCount, true);
+
+            inputBaseTexture = baseTexture;
+            input            = DispatchInput::CachedBaseTexture;
         }
 
-        return Dispatch(sourceData, baseGenerator, baseState, destination, nullptr, strokeCount, false);
+        return Dispatch(sourceData, baseGenerator, baseState, destination, inputBaseTexture, strokeCount, input);
     }
 
     GeneratorTexture *MaskRasterizer::GetPreviewTexture(GeneratorTexture *sourceTexture,
