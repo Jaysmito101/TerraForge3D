@@ -18,12 +18,11 @@ namespace tf3d::generators::dem
 {
 
     struct RenderSettings {
-        int32_t tileResolution      = 0;
-        int32_t workgroupSize       = 1;
-        float zoomOnMap             = 1.0f;
-        float mapStrength           = 1.0f;
-        glm::vec2 mapCenter         = glm::vec2(0.0f);
-        bool adaptiveBaseMultiplier = true;
+        int32_t tileResolution = 0;
+        int32_t workgroupSize  = 1;
+        float zoomOnMap        = 1.0f;
+        float mapStrength      = 1.0f;
+        glm::vec2 mapCenter    = glm::vec2(0.0f);
     };
 
     struct RenderTile {

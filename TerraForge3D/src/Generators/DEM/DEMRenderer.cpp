@@ -10,6 +10,8 @@
 namespace tf3d::generators::dem
 {
 
+    constexpr float kZoomStrengthExponent = 0.5f;
+
     struct DispatchRegion {
         glm::ivec2 offset = glm::ivec2(0);
         glm::ivec2 size   = glm::ivec2(0);
@@ -72,8 +74,11 @@ namespace tf3d::generators::dem
 
         m_Shader->SetUniform1i("u_Mode", 1);
         m_Shader->SetUniform1f("u_ZoomOnMap", settings.zoomOnMap);
-        m_Shader->SetUniform1f("u_MapStrength", settings.mapStrength);
-        m_Shader->SetUniform1i("u_AdaptiveBaseMultiplier", settings.adaptiveBaseMultiplier ? 1 : 0);
+        const float zoomStrengthMultiplier =
+            std::pow(std::max(settings.zoomOnMap, 1.0f), kZoomStrengthExponent);
+        const float effectiveMapStrength =
+            std::clamp(settings.mapStrength * zoomStrengthMultiplier, 0.0f, 1000.0f);
+        m_Shader->SetUniform1f("u_MapStrength", effectiveMapStrength);
         {
             TF3D_PROFILE_GPU_SCOPE_CHILD("tiles/gpu");
             for (const auto &tile : tiles) {
