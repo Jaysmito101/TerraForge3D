@@ -1,12 +1,15 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Base/RevisionTracker.h"
 #include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/Masks/MaskLayer.h"
 
+#include <cstdint>
+#include <memory>
 #include <string>
-#include <string_view>
+#include <utility>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
@@ -16,52 +19,86 @@ namespace tf3d::generators
 
     class BiomeCustomizeBaseShape
     {
-    public:
-        explicit BiomeCustomizeBaseShape(tf3d::data::ApplicationState *appState);
-        ~BiomeCustomizeBaseShape();
-
-        bool ShowSettings();
-        void Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer);
-
-        SerializerNode Save() const;
-        void Load(SerializerNode node);
-
-        inline bool RequireUpdation() const
-        {
-            return m_RequireUpdation;
-        }
-        inline bool IsEnabled() const
-        {
-            return m_Enabled;
-        }
-
-        void Resize();
-
     private:
-        struct MaskEntry {
+        struct RuntimeState;
+
+    public:
+        struct MaskState {
             std::string name;
             bool enabled    = true;
             bool raise      = true;
             float strength  = 1.0f;
             float smoothing = 0.0f;
-            std::shared_ptr<MaskLayer> mask;
+            MaskLayer::State maskState;
+
+            MaskState(std::string layerName, MaskLayer::State state);
         };
 
-        MaskEntry CreateMaskLayer(const std::string &name) const;
+        struct State {
+            bool enabled          = false;
+            bool flattenBaseShape = false;
+            std::vector<MaskState> masks;
+        };
+
+        struct Snapshot {
+            using Revision = base::RevisionTracker::Revision;
+
+            State value;
+            Revision revision = 0;
+
+        private:
+            std::shared_ptr<const RuntimeState> runtime;
+            friend class BiomeCustomizeBaseShape;
+        };
+
+        explicit BiomeCustomizeBaseShape(tf3d::data::ApplicationState *appState);
+        ~BiomeCustomizeBaseShape();
+
+        bool ShowSettings();
+        void Update(const Snapshot *state, GeneratorData *baseShapeBuffer);
+
+        Snapshot GetState() const;
+        inline Snapshot::Revision GetStateRevision() const
+        {
+            return m_State.PublishedRevision();
+        }
+        inline bool RequireUpdation() const
+        {
+            return m_State.RequiresUpdate();
+        }
+
+        SerializerNode Save() const;
+        void Load(SerializerNode node);
+
+        inline bool IsEnabled() const
+        {
+            return m_UIState.enabled;
+        }
+
+        void Resize();
+
+    private:
+        std::shared_ptr<MaskLayer> CreateMaskLayer() const;
+        MaskState CreateMaskState(const std::string &name);
         void AddMaskLayer();
         bool ShowDrawingSettings();
-        bool ApplyLayer(GeneratorData *source, GeneratorData *target,
-                        const MaskEntry *layer, bool flattenSource);
-        bool UpdateLayerMask(MaskEntry &layer, GeneratorData *source);
+        State CaptureState() const;
+        bool ApplyLayer(GeneratorData *data, const MaskState *layer,
+                        const MaskLayer *maskLayer, bool flattenSource);
+        bool UpdateLayerMask(const MaskState &layer,
+                             const std::shared_ptr<MaskLayer> &maskLayer,
+                             GeneratorData *source);
+
+        struct RuntimeState {
+            std::vector<std::shared_ptr<MaskLayer>> masks;
+        };
 
     private:
         data::ApplicationState *m_AppState = nullptr;
-        bool m_RequireUpdation             = true;
-        bool m_Enabled                     = false;
-        bool m_FlattenBaseShape            = false;
         std::optional<base::ComputeShader> m_Shader;
-        std::shared_ptr<GeneratorData> m_WorkingDataBuffer, m_SwapBuffer;
-        std::vector<MaskEntry> m_Masks;
+        State m_UIState;
+        base::GeneratorState<State> m_State;
+        std::vector<std::shared_ptr<MaskLayer>> m_RuntimeMasks;
         int m_SelectedMask = 0;
     };
 } // namespace tf3d::generators

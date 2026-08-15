@@ -10,39 +10,66 @@
 namespace tf3d::generators
 {
 
-    BiomeCustomizeBaseShape::BiomeCustomizeBaseShape(tf3d::data::ApplicationState *appState)
-        : m_AppState(appState)
+    BiomeCustomizeBaseShape::MaskState::MaskState(std::string layerName,
+                                                  MaskLayer::State state)
+        : name(std::move(layerName)),
+          maskState(std::move(state))
     {
-        m_WorkingDataBuffer = std::make_shared<GeneratorData>();
-        m_SwapBuffer        = std::make_shared<GeneratorData>();
-        m_Shader            = m_AppState->resourceManager->LoadComputeShader(
+    }
+
+    BiomeCustomizeBaseShape::BiomeCustomizeBaseShape(tf3d::data::ApplicationState *appState)
+        : m_AppState(appState),
+          m_State(m_UIState)
+    {
+        m_UIState.masks.push_back(CreateMaskState("Mask 1"));
+        m_State.Replace(m_UIState);
+        m_Shader = m_AppState->resourceManager->LoadComputeShader(
             "generation/customize_base_shape/customize_base_shape");
-        m_Masks.push_back(CreateMaskLayer("Mask 1"));
     }
 
     BiomeCustomizeBaseShape::~BiomeCustomizeBaseShape() = default;
 
-    BiomeCustomizeBaseShape::MaskEntry BiomeCustomizeBaseShape::CreateMaskLayer(const std::string &name) const
+    BiomeCustomizeBaseShape::Snapshot BiomeCustomizeBaseShape::GetState() const
     {
-        MaskEntry layer;
-        layer.name = name;
-        layer.mask = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.45f, 0.05f),
-                                                 "None");
-        return layer;
+        auto snapshot = m_State.Capture();
+        auto runtime   = std::make_shared<RuntimeState>();
+        runtime->masks = m_RuntimeMasks;
+
+        Snapshot result;
+        result.value    = std::move(snapshot.value);
+        result.revision = snapshot.revision;
+        result.runtime  = std::move(runtime);
+        return result;
+    }
+
+    std::shared_ptr<MaskLayer> BiomeCustomizeBaseShape::CreateMaskLayer() const
+    {
+        return std::make_shared<MaskLayer>(m_AppState,
+                                            glm::vec3(1.0f, 0.45f, 0.05f),
+                                            "None",
+                                            true);
+    }
+
+    BiomeCustomizeBaseShape::MaskState BiomeCustomizeBaseShape::CreateMaskState(const std::string &name)
+    {
+        auto maskLayer = CreateMaskLayer();
+        auto snapshot  = maskLayer->GetState();
+        m_RuntimeMasks.push_back(maskLayer);
+        return MaskState{name, std::move(snapshot.value)};
     }
 
     void BiomeCustomizeBaseShape::AddMaskLayer()
     {
-        m_Masks.push_back(CreateMaskLayer("Mask " + std::to_string(m_Masks.size() + 1)));
-        m_SelectedMask    = static_cast<int>(m_Masks.size()) - 1;
-        m_RequireUpdation = true;
+        m_UIState.masks.push_back(CreateMaskState("Mask " + std::to_string(m_UIState.masks.size() + 1)));
+        m_SelectedMask = static_cast<int>(m_UIState.masks.size()) - 1;
     }
 
     bool BiomeCustomizeBaseShape::ShowSettings()
     {
-        bool changed = false;
-        changed |= ImGui::Checkbox("Enabled", &m_Enabled);
-        changed |= ImGui::Checkbox("Flatten original base shape", &m_FlattenBaseShape);
+        State &settings = m_UIState;
+        bool changed    = false;
+        changed |= ImGui::Checkbox("Enabled", &settings.enabled);
+        changed |= ImGui::Checkbox("Flatten original base shape", &settings.flattenBaseShape);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Start customization from zero instead of the generated base-shape result.");
 
@@ -55,8 +82,11 @@ namespace tf3d::generators
             ImGui::EndTabBar();
         }
 
-        m_RequireUpdation |= changed;
-        return changed;
+        if (changed) {
+            m_UIState = CaptureState();
+            m_State.Replace(m_UIState);
+        }
+        return RequireUpdation();
     }
 
     bool BiomeCustomizeBaseShape::ShowDrawingSettings()
@@ -74,12 +104,12 @@ namespace tf3d::generators
         int removeIndex            = -1;
         const ImGuiStyle &style    = ImGui::GetStyle();
         const float rowHeight      = ImGui::GetFrameHeightWithSpacing();
-        const int rowCount         = std::max(1, static_cast<int>(m_Masks.size()));
+        const int rowCount         = std::max(1, static_cast<int>(m_UIState.masks.size()));
         const float listHeight     = std::min(rowHeight * 6.0f, rowHeight * static_cast<float>(rowCount)) + style.WindowPadding.y * 2.0f;
         const bool maskListVisible = ImGui::BeginChild("Customize Base Shape Mask List", ImVec2(0.0f, listHeight), true);
         if (maskListVisible) {
-            for (int maskIndex = 0; maskIndex < static_cast<int>(m_Masks.size()); ++maskIndex) {
-                auto &layer = m_Masks[static_cast<size_t>(maskIndex)];
+            for (int maskIndex = 0; maskIndex < static_cast<int>(m_UIState.masks.size()); ++maskIndex) {
+                auto &layer = m_UIState.masks[static_cast<size_t>(maskIndex)];
                 ImGui::PushID(maskIndex);
                 const std::string label = layer.name + (layer.enabled ? "" : " (disabled)");
 
@@ -90,7 +120,7 @@ namespace tf3d::generators
                                       ImVec2(selectableWidth, ImGui::GetFrameHeight())))
                     m_SelectedMask = maskIndex;
                 ImGui::SameLine();
-                ImGui::BeginDisabled(m_Masks.size() <= 1);
+                ImGui::BeginDisabled(m_UIState.masks.size() <= 1);
                 if (ImGui::SmallButton("Remove"))
                     removeIndex = maskIndex;
                 ImGui::EndDisabled();
@@ -98,24 +128,27 @@ namespace tf3d::generators
                 if (removeIndex >= 0)
                     break;
             }
-            if (m_Masks.empty())
+            if (m_UIState.masks.empty())
                 ImGui::TextDisabled("No masks. Add one to begin sculpting.");
         }
         ImGui::EndChild();
 
-        if (removeIndex >= 0 && removeIndex < static_cast<int>(m_Masks.size())) {
-            m_Masks.erase(m_Masks.begin() + removeIndex);
+        if (removeIndex >= 0 && removeIndex < static_cast<int>(m_UIState.masks.size())) {
+            m_UIState.masks.erase(m_UIState.masks.begin() + removeIndex);
+            if (removeIndex < static_cast<int>(m_RuntimeMasks.size())) {
+                m_RuntimeMasks.erase(m_RuntimeMasks.begin() + removeIndex);
+            }
             if (m_SelectedMask > removeIndex)
                 --m_SelectedMask;
-            m_SelectedMask = glm::clamp(m_SelectedMask, 0, static_cast<int>(m_Masks.size()) - 1);
+            m_SelectedMask = glm::clamp(m_SelectedMask, 0, static_cast<int>(m_UIState.masks.size()) - 1);
             changed        = true;
         }
 
-        if (m_Masks.empty())
+        if (m_UIState.masks.empty())
             return changed;
 
-        m_SelectedMask = glm::clamp(m_SelectedMask, 0, static_cast<int>(m_Masks.size()) - 1);
-        auto &layer    = m_Masks[static_cast<size_t>(m_SelectedMask)];
+        m_SelectedMask = glm::clamp(m_SelectedMask, 0, static_cast<int>(m_UIState.masks.size()) - 1);
+        auto &layer    = m_UIState.masks[static_cast<size_t>(m_SelectedMask)];
         ImGui::SeparatorText("Selected mask");
         ImGui::PushID("Customize Base Shape Selected Mask");
         changed |= ImGui::Checkbox("Layer enabled", &layer.enabled);
@@ -131,31 +164,49 @@ namespace tf3d::generators
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Smooths the mask influence before applying the height offset.");
 
-        if (layer.mask != nullptr)
-            changed |= layer.mask->ShowSettings(true);
+        if (m_SelectedMask < static_cast<int>(m_RuntimeMasks.size()) &&
+            m_RuntimeMasks[static_cast<size_t>(m_SelectedMask)] != nullptr) {
+            changed |= m_RuntimeMasks[static_cast<size_t>(m_SelectedMask)]->ShowSettings(true);
+        }
         ImGui::PopID();
         return changed;
     }
 
-    bool BiomeCustomizeBaseShape::UpdateLayerMask(MaskEntry &layer, GeneratorData *source)
+    BiomeCustomizeBaseShape::State BiomeCustomizeBaseShape::CaptureState() const
     {
-        if (layer.mask == nullptr || source == nullptr)
-            return false;
-
-        layer.mask->Update(source);
-        return layer.mask->GetTexture() != nullptr;
+        State state = m_UIState;
+        const size_t maskCount = std::min(state.masks.size(), m_RuntimeMasks.size());
+        for (size_t maskIndex = 0; maskIndex < maskCount; ++maskIndex) {
+            if (m_RuntimeMasks[maskIndex] != nullptr) {
+                state.masks[maskIndex].maskState = m_RuntimeMasks[maskIndex]->GetState().value;
+            }
+        }
+        return state;
     }
 
-    bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *source, GeneratorData *target,
-                                             const MaskEntry *layer, bool flattenSource)
+    bool BiomeCustomizeBaseShape::UpdateLayerMask(const MaskState &layer,
+                                                  const std::shared_ptr<MaskLayer> &maskLayer,
+                                                  GeneratorData *source)
     {
-        if (!m_Shader || source == nullptr || target == nullptr)
+        if (maskLayer == nullptr || source == nullptr) {
             return false;
+        }
+
+        return maskLayer->Apply(layer.maskState, source) && maskLayer->GetTexture() != nullptr;
+    }
+
+    bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *data,
+                                             const MaskState *layer,
+                                             const MaskLayer *maskLayer,
+                                             bool flattenSource)
+    {
+        if (!m_Shader || m_AppState == nullptr || data == nullptr) {
+            return false;
+        }
 
         TF3D_PROFILE_SCOPE_CHILD("customize-base-shape");
 
-        source->Bind(0);
-        target->Bind(1);
+        data->Bind(0);
         m_Shader->Bind();
         m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
         m_Shader->SetUniform1i("u_UseMask", layer != nullptr ? 1 : 0);
@@ -163,9 +214,10 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Direction", layer != nullptr && layer->raise ? 1 : -1);
         m_Shader->SetUniform1f("u_Strength", layer != nullptr ? glm::max(layer->strength, 0.0f) : 0.0f);
         m_Shader->SetUniform1f("u_Smoothing", layer != nullptr ? glm::clamp(layer->smoothing, 0.0f, 1.0f) : 0.0f);
-        if (layer != nullptr && layer->mask != nullptr) {
-            if (auto *maskTexture = layer->mask->GetTexture())
+        if (layer != nullptr && maskLayer != nullptr) {
+            if (auto *maskTexture = maskLayer->GetTexture()) {
                 m_Shader->SetUniform1i("u_MaskTexture", maskTexture->Bind(2));
+            }
         }
 
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
@@ -179,65 +231,62 @@ namespace tf3d::generators
         return true;
     }
 
-    void BiomeCustomizeBaseShape::Update(GeneratorData *baseShapeBuffer, GeneratorData *targetBuffer)
+    void BiomeCustomizeBaseShape::Update(const Snapshot *state, GeneratorData *baseShapeBuffer)
     {
-        if (baseShapeBuffer == nullptr || targetBuffer == nullptr)
+        if (state == nullptr || state->runtime == nullptr || baseShapeBuffer == nullptr || !m_Shader || m_AppState == nullptr) {
             return;
-
-        GeneratorData *current = baseShapeBuffer;
-        bool hasOutput         = false;
-
-        if (m_FlattenBaseShape) {
-            if (!ApplyLayer(baseShapeBuffer, m_WorkingDataBuffer.get(), nullptr, true)) {
-                baseShapeBuffer->CopyTo(targetBuffer);
-                return;
-            }
-            current   = m_WorkingDataBuffer.get();
-            hasOutput = true;
         }
 
-        for (auto &layer : m_Masks) {
-            if (!layer.enabled)
-                continue;
-            if (!UpdateLayerMask(layer, current))
-                continue;
-
-            GeneratorData *target = current == m_WorkingDataBuffer.get()
-                                        ? m_SwapBuffer.get()
-                                        : m_WorkingDataBuffer.get();
-            if (!ApplyLayer(current, target, &layer, false)) {
-                baseShapeBuffer->CopyTo(targetBuffer);
-                return;
-            }
-            current   = target;
-            hasOutput = true;
+        if (!state->value.enabled) {
+            m_State.MarkProcessed(state->revision);
+            return;
         }
 
-        if (!hasOutput)
-            baseShapeBuffer->CopyTo(targetBuffer);
-        else if (current != targetBuffer)
-            current->CopyTo(targetBuffer);
+        if (state->value.flattenBaseShape) {
+            if (!ApplyLayer(baseShapeBuffer, nullptr, nullptr, true)) {
+                return;
+            }
+        }
 
-        m_RequireUpdation = false;
+        for (size_t maskIndex = 0; maskIndex < state->value.masks.size(); ++maskIndex) {
+            const auto &layer = state->value.masks[maskIndex];
+            if (!layer.enabled) {
+                continue;
+            }
+            if (maskIndex >= state->runtime->masks.size()) {
+                continue;
+            }
+            const auto &maskLayer = state->runtime->masks[maskIndex];
+            if (!UpdateLayerMask(layer, maskLayer, baseShapeBuffer)) {
+                continue;
+            }
+            if (!ApplyLayer(baseShapeBuffer, &layer, maskLayer.get(), false)) {
+                return;
+            }
+        }
+
+        m_State.MarkProcessed(state->revision);
     }
 
     SerializerNode BiomeCustomizeBaseShape::Save() const
     {
         auto node = CreateSerializerNode();
-        node->Set("Enabled", m_Enabled);
-        node->Set("FlattenBaseShape", m_FlattenBaseShape);
+        node->Set("Enabled", m_UIState.enabled);
+        node->Set("FlattenBaseShape", m_UIState.flattenBaseShape);
 
         std::vector<SerializerNode> masks;
-        masks.reserve(m_Masks.size());
-        for (const auto &layer : m_Masks) {
+        masks.reserve(m_UIState.masks.size());
+        for (size_t maskIndex = 0; maskIndex < m_UIState.masks.size(); ++maskIndex) {
+            const auto &layer = m_UIState.masks[maskIndex];
             auto mask = CreateSerializerNode();
             mask->Set("Name", layer.name);
             mask->Set("Enabled", layer.enabled);
             mask->Set("Raise", layer.raise);
             mask->Set("Strength", layer.strength);
             mask->Set("Smoothing", layer.smoothing);
-            if (layer.mask != nullptr)
-                layer.mask->SaveTo(mask);
+            if (maskIndex < m_RuntimeMasks.size() && m_RuntimeMasks[maskIndex] != nullptr) {
+                m_RuntimeMasks[maskIndex]->SaveTo(mask);
+            }
             masks.push_back(std::move(mask));
         }
         node->Set("Masks", masks);
@@ -249,37 +298,43 @@ namespace tf3d::generators
         if (node == nullptr)
             return;
 
-        m_Enabled          = node->Get<bool>("Enabled", m_Enabled);
-        m_FlattenBaseShape = node->Get<bool>("FlattenBaseShape", m_FlattenBaseShape);
+        m_UIState.enabled          = node->Get<bool>("Enabled", m_UIState.enabled);
+        m_UIState.flattenBaseShape = node->Get<bool>("FlattenBaseShape", m_UIState.flattenBaseShape);
         if (node->HasKey("Masks")) {
-            m_Masks.clear();
+            m_UIState.masks.clear();
+            m_RuntimeMasks.clear();
             for (const auto &maskNode : node->Get<std::vector<SerializerNode>>("Masks")) {
-                if (maskNode == nullptr)
+                if (maskNode == nullptr) {
                     continue;
-                auto layer      = CreateMaskLayer(maskNode->Get<std::string>("Name", "Mask"));
+                }
+                auto layer      = CreateMaskState(maskNode->Get<std::string>("Name", "Mask"));
                 layer.enabled   = maskNode->Get<bool>("Enabled", layer.enabled);
                 layer.raise     = maskNode->Get<bool>("Raise", layer.raise);
                 layer.strength  = maskNode->Get<float>("Strength", layer.strength);
                 layer.smoothing = maskNode->Get<float>("Smoothing", layer.smoothing);
-                if (layer.mask != nullptr)
-                    layer.mask->LoadFrom(maskNode);
-                m_Masks.push_back(std::move(layer));
+                const size_t maskIndex = m_RuntimeMasks.size() - 1;
+                if (maskIndex < m_RuntimeMasks.size() && m_RuntimeMasks[maskIndex] != nullptr) {
+                    m_RuntimeMasks[maskIndex]->LoadFrom(maskNode);
+                }
+                m_UIState.masks.push_back(std::move(layer));
             }
         }
-        m_SelectedMask    = glm::clamp(m_SelectedMask, 0, std::max(0, static_cast<int>(m_Masks.size()) - 1));
-        m_RequireUpdation = true;
+        m_SelectedMask = glm::clamp(m_SelectedMask,
+                                    0,
+                                    std::max(0, static_cast<int>(m_UIState.masks.size()) - 1));
+        m_UIState      = CaptureState();
+        m_State.Replace(m_UIState);
     }
 
     void BiomeCustomizeBaseShape::Resize()
     {
-        const auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
-        m_WorkingDataBuffer->Resize(size);
-        m_SwapBuffer->Resize(size);
-        for (auto &layer : m_Masks) {
-            if (layer.mask != nullptr)
-                layer.mask->Resize(m_AppState->mainMap.tileResolution);
+        for (size_t maskIndex = 0; maskIndex < m_RuntimeMasks.size(); ++maskIndex) {
+            if (m_RuntimeMasks[maskIndex] != nullptr) {
+                m_RuntimeMasks[maskIndex]->Resize(m_AppState->mainMap.tileResolution);
+            }
         }
-        m_RequireUpdation = true;
+        m_UIState = CaptureState();
+        m_State.Replace(m_UIState);
     }
 
 } // namespace tf3d::generators
