@@ -20,22 +20,30 @@ namespace tf3d::inspector
         return std::filesystem::absolute(dataDirectory) / "inspectors" / std::string(inspectorName) / "Inspector.json";
     }
 
-    bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
+    std::optional<nlohmann::json> CustomInspector::LoadConfigDocument(ApplicationState *appState,
+                                                                      std::string_view inspectorName,
+                                                                      std::string *error)
     {
+        const auto setError = [&](std::string message) {
+            if (error != nullptr) {
+                *error = std::move(message);
+            }
+        };
+
         if (appState == nullptr) {
-            TF3D_LOG_ERROR("Cannot load inspector metadata '{}' without application state", inspectorName);
-            return false;
+            setError("application state is null");
+            return std::nullopt;
         }
         if (inspectorName.empty()) {
-            TF3D_LOG_ERROR("Cannot load inspector metadata with an empty name");
-            return false;
+            setError("inspector name is empty");
+            return std::nullopt;
         }
 
         const auto dataDirectory = std::filesystem::path(appState->constants.dataDir);
         const auto configPath    = GetConfigPath(dataDirectory, inspectorName);
         if (configPath.empty()) {
-            TF3D_LOG_ERROR("Invalid inspector metadata name '{}'", inspectorName);
-            return false;
+            setError("inspector name is invalid");
+            return std::nullopt;
         }
 
         utils::JsonIncludeResolverOptions resolverOptions;
@@ -43,14 +51,30 @@ namespace tf3d::inspector
         resolverOptions.pathMode       = utils::JsonIncludePathMode::RelativeToIncludingFile;
         resolverOptions.restrictToRoot = true;
         const utils::JsonIncludeResolver resolver(resolverOptions);
+
         std::string resolveError;
         const auto config = resolver.ResolveFile(configPath, &resolveError);
         if (!config) {
-            TF3D_LOG_ERROR("Could not load inspector metadata '{}': {}", configPath.string(), resolveError);
+            setError(std::move(resolveError));
+            return std::nullopt;
+        }
+
+        if (error != nullptr) {
+            error->clear();
+        }
+        return config;
+    }
+
+    bool CustomInspector::LoadConfig(ApplicationState *appState, std::string_view inspectorName)
+    {
+        std::string resolveError;
+        const auto config = LoadConfigDocument(appState, inspectorName, &resolveError);
+        if (!config) {
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}': {}", inspectorName, resolveError);
             return false;
         }
         if (!LoadConfig(*config)) {
-            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", configPath.string());
+            TF3D_LOG_ERROR("Could not load inspector metadata '{}'", inspectorName);
             return false;
         }
         return true;

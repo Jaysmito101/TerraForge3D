@@ -37,6 +37,13 @@ namespace tf3d::inspector
 
     class CustomInspectorSnapshot;
 
+    struct CustomInspectorShaderOptions {
+        int *textureSlot = nullptr;
+        bool bindCurve   = false;
+        std::string presenceUniform;
+        std::string pointCountUniform;
+    };
+
     class CustomInspector
     {
     public:
@@ -88,10 +95,18 @@ namespace tf3d::inspector
         bool LoadState(SerializerNode node);
         static std::filesystem::path GetConfigPath(const std::filesystem::path &dataDirectory,
                                                    std::string_view inspectorName);
+        static std::optional<nlohmann::json> LoadConfigDocument(ApplicationState *appState,
+                                                                std::string_view inspectorName,
+                                                                std::string *error = nullptr);
         bool LoadConfig(ApplicationState *appState, std::string_view inspectorName);
         nlohmann::json BuildSchema() const;
         bool LoadConfig(const nlohmann::json &config);
         std::optional<std::string> GetShaderUniformDeclarations(std::string *error = nullptr) const;
+        static void ApplyToShader(tf3d::base::ShaderCore &shader,
+                                  const CustomInspectorValue &value,
+                                  const CustomInspectorValue::ConstStoreView &stored,
+                                  std::string_view uniformName,
+                                  const CustomInspectorShaderOptions &options = {});
         void ApplyToShader(const CustomInspectorSnapshot &snapshot,
                            tf3d::base::ShaderCore &shader,
                            std::string_view uniformPrefix = "u_") const;
