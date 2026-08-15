@@ -15,6 +15,7 @@ uniform int u_Resolution;
 uniform sampler2D u_DEMTexture;
 uniform vec4 u_RegionToUpdate;
 uniform float u_RegionTileSize;
+uniform ivec2 u_DispatchOffset;
 uniform float u_ZoomOnMap;
 uniform float u_MapStrength;
 
@@ -56,7 +57,7 @@ vec2 evaluateDEM(vec2 uv)
 	vec2 uv2 = (uv - u_RegionToUpdate.xy) / u_RegionTileSize;
 	
 	float result = 0.0f;
-	result = sampleTerrainElevation(uv2) * 0.00001f * clamp(u_MapStrength, 0.0f, 20.0f);
+	result = sampleTerrainElevation(uv2) * 0.00001f * clamp(u_MapStrength, 0.0f, 1000.0f);
 	return vec2(result, 1.0f); 
 }
 
@@ -76,7 +77,7 @@ void main()
 	}
 	else if (u_Mode == 1) // the generation
 	{
-		uvec2 offsetv2 = gl_GlobalInvocationID.xy;
+		uvec2 offsetv2 = uvec2(u_DispatchOffset) + gl_GlobalInvocationID.xy;
 		if (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;
 		uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
 		vec2 uv = offsetv2 / float(u_Resolution);
