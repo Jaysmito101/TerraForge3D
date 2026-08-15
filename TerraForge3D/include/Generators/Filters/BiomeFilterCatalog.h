@@ -1,12 +1,9 @@
 #pragma once
 
-#include "Generators/BiomeFilterDefinition.h"
+#include "Base/Base.h"
+#include "Generators/Filters/BiomeFilterDefinition.h"
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -29,4 +26,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::BiomeFilterCatalog;

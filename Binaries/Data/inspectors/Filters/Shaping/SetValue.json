@@ -1,0 +1,92 @@
+{
+  "ID": "set_value",
+  "Name": "Set Value",
+  "Category": "Shaping",
+  "Description": "Creates a constant operation field. The standard merge stage then applies it using the selected strength, mask, and merge mode.",
+  "Runtime": {
+    "Implementation": "PhaseChain",
+    "Statistics": {
+      "NeedsMinMax": true,
+      "NeedsHistogram": true,
+      "RequestedPercentileParameter": "Value.Value"
+    },
+    "Shaders": {
+      "Phases": {
+        "Value": "generation/filters/shaping/set_value/set_value",
+        "Merge": "generation/filters/common/merge"
+      }
+    },
+    "Resources": {
+      "Temps": [
+        {
+          "Name": "Value",
+          "Type": "Field"
+        }
+      ]
+    },
+    "Execution": {
+      "Passes": [
+        {
+          "Phase": "Value",
+          "Input": "Current",
+          "Output": "Value",
+          "Uniforms": {
+            "u_Value": {
+              "Parameter": "Value.Value"
+            },
+            "u_ValueMode": {
+              "Parameter": "Value.ValueMode"
+            }
+          }
+        }
+      ],
+      "Merge": {
+        "Phase": "Merge",
+        "Input": "Current",
+        "Operation": "Value",
+        "Output": "Next"
+      }
+    }
+  },
+  "Inspector": {
+    "ShowResetButton": true,
+    "Sections": [
+      {
+        "Name": "Value",
+        "Label": "Value",
+        "Description": "Replacement value controls.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "ValueMode",
+            "Type": "Int",
+            "Default": 0,
+            "Widget": "Dropdown",
+            "Options": [
+              "Absolute",
+              "Normalized range",
+              "Percentile"
+            ],
+            "Label": "Value mode",
+            "Description": "Chooses whether Value is an absolute height, a normalized position in the field range, or a histogram percentile."
+          },
+          {
+            "Name": "Value",
+            "Type": "Float",
+            "Default": 0.0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+              -100.0,
+              100.0
+            ],
+            "Label": "Value",
+            "Description": "The constant terrain value supplied to the merge operation.",
+            "Tooltip": "Override replaces terrain with this value; Add, Subtract, and Multiply combine it with the current terrain."
+          }
+        ]
+      }
+    ]
+  }
+}

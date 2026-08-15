@@ -2,7 +2,7 @@
 
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
-#include "Generators/BiomeFilterDefinition.h"
+#include "Generators/Filters/BiomeFilterDefinition.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/Masks/MaskLayer.h"
 
@@ -10,14 +10,6 @@ TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
-
-    enum class BiomeFilterMergeMode {
-        Override,
-        Add,
-        Subtract,
-        Multiply,
-        Blend,
-    };
 
     class BiomeFilter
     {
@@ -52,7 +44,7 @@ namespace tf3d::generators
         {
             return m_Definition->GetID();
         }
-        inline const std::string &GetImplementation() const
+        inline BiomeFilterImplementation GetImplementation() const
         {
             return m_Definition->GetImplementation();
         }
@@ -113,6 +105,7 @@ namespace tf3d::generators
         std::shared_ptr<BiomeFilterDefinition> m_Definition;
         std::shared_ptr<inspector::CustomInspector> m_Inspector;
         std::string m_ID;
+        bool m_InspectorReady = false;
 
         bool m_Enabled                   = true;
         bool m_UseMask                   = false;

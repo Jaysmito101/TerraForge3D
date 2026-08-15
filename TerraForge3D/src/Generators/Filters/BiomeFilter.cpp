@@ -1,4 +1,4 @@
-#include "Generators/BiomeFilter.h"
+#include "Generators/Filters/BiomeFilter.h"
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
@@ -8,29 +8,16 @@
 namespace tf3d::generators
 {
 
-    BiomeFilterMergeMode MergeModeFromString(const std::string &value)
-    {
-        if (value == "Override")
-            return BiomeFilterMergeMode::Override;
-        if (value == "Add")
-            return BiomeFilterMergeMode::Add;
-        if (value == "Subtract")
-            return BiomeFilterMergeMode::Subtract;
-        if (value == "Multiply")
-            return BiomeFilterMergeMode::Multiply;
-        return BiomeFilterMergeMode::Blend;
-    }
-
     BiomeFilter::BiomeFilter(tf3d::data::ApplicationState *appState,
                              std::shared_ptr<BiomeFilterDefinition> definition)
         : m_AppState(appState), m_Definition(std::move(definition)), m_Inspector(std::make_shared<inspector::CustomInspector>()), m_ID(GenerateId(8))
     {
         if (m_Definition == nullptr)
             return;
-        m_MergeMode = MergeModeFromString(m_Definition->GetMetadata().value("DefaultMergeMode", "Blend"));
-        m_Definition->BuildInspector(*m_Inspector);
-        m_MaskLayer = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.0f, 0.0f),
-                                                  "None");
+        m_MergeMode      = m_Definition->GetRuntime().defaultMergeMode;
+        m_InspectorReady = m_Definition->BuildInspector(*m_Inspector);
+        m_MaskLayer      = std::make_shared<MaskLayer>(m_AppState, glm::vec3(1.0f, 0.0f, 0.0f),
+                                                       "None");
     }
 
     bool BiomeFilter::ShowSettings()
@@ -41,10 +28,9 @@ namespace tf3d::generators
                 ImGui::TextWrapped("%s", m_Definition->GetDescription().c_str());
         }
         changed |= ImGui::Checkbox("Enabled", &m_Enabled);
-        if (m_Inspector != nullptr &&
-            (m_Definition->GetMetadata().contains("Params") ||
-             m_Definition->GetMetadata().contains("Sections")))
+        if (m_InspectorReady) {
             changed |= m_Inspector->Render();
+        }
         changed |= ImGui::SliderFloat("Strength", &m_Strength, 0.0f, 1.0f);
 
         static const char *mergeModes[] = {"Override", "Add", "Subtract", "Multiply", "Blend"};
@@ -78,7 +64,8 @@ namespace tf3d::generators
     {
         if (!m_UseMask)
             return;
-        m_MaskLayer->Update(sourceData);
+        const auto maskState = m_MaskLayer->GetState();
+        m_MaskLayer->Update(&maskState, sourceData);
     }
 
     int BiomeFilter::GetIntegerParameter(const std::string &name, int defaultValue) const

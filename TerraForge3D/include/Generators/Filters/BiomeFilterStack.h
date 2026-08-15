@@ -1,17 +1,12 @@
 #pragma once
 
-#include "Generators/BiomeFilter.h"
-#include "Generators/BiomeFilterCatalog.h"
+#include "Generators/Filters/BiomeFilter.h"
+#include "Generators/Filters/BiomeFilterCatalog.h"
 #include "Generators/GeneratorDataStatistics.h"
 
-#include <string_view>
 #include <vector>
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -49,13 +44,15 @@ namespace tf3d::generators
                       GeneratorData *input, GeneratorData *output, GeneratorData *reference);
         void RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge,
                            GeneratorData *input, GeneratorData *operation, GeneratorData *output);
-        void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader, const nlohmann::json &bindings);
-        void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader);
+        void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter,
+                             base::ComputeShader *shader,
+                             const nlohmann::json &bindings);
+        void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, base::ComputeShader *shader);
         void EnsureTempBufferCount(size_t count);
 
         static constexpr int FieldStatisticsBinding = 4;
 
-        ApplicationState *m_AppState = nullptr;
+        data::ApplicationState *m_AppState = nullptr;
         std::shared_ptr<BiomeFilterCatalog> m_Catalog;
         std::vector<std::shared_ptr<GeneratorData>> m_TempBuffers;
         std::shared_ptr<GeneratorData> m_ResultA;
@@ -70,4 +67,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::BiomeFilterStack;

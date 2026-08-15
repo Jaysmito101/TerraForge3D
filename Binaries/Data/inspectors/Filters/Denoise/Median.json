@@ -1,0 +1,93 @@
+{
+  "ID": "median_filter",
+  "Name": "Median Filter",
+  "Category": "Denoise",
+  "Description": "Removes isolated spikes and pits while retaining strong terrain edges.",
+  "Runtime": {
+    "Implementation": "PhaseChain",
+    "Shaders": {
+      "Phases": {
+        "Filter": "generation/filters/denoise/median/median",
+        "Merge": "generation/filters/common/merge"
+      }
+    },
+    "Resources": {
+      "Temps": [
+        {
+          "Name": "MedianA",
+          "Type": "Field"
+        },
+        {
+          "Name": "MedianB",
+          "Type": "Field"
+        }
+      ]
+    },
+    "Execution": {
+      "Passes": [
+        {
+          "Phase": "Filter",
+          "Input": "Current",
+          "Output": "MedianA",
+          "Uniforms": {
+            "u_Radius": {
+              "Parameter": "Settings.Radius"
+            }
+          }
+        }
+      ],
+      "IterationMode": "PingPong",
+      "IterationBuffers": [
+        "MedianA",
+        "MedianB"
+      ],
+      "IterationsParameter": "Settings.Iterations",
+      "Merge": {
+        "Phase": "Merge",
+        "Input": "Current",
+        "Operation": "IterationResult",
+        "Output": "Next"
+      }
+    }
+  },
+  "Inspector": {
+    "ShowResetButton": true,
+    "Sections": [
+      {
+        "Name": "Settings",
+        "Label": "Settings",
+        "Description": "Filter settings.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Radius",
+            "Type": "Int",
+            "Default": 1,
+            "Widget": "Slider",
+            "Constraints": [
+              0,
+              16,
+              0,
+              0
+            ],
+            "Description": "The square neighborhood radius. Median filtering removes isolated outliers without averaging across cliffs."
+          },
+          {
+            "Name": "Iterations",
+            "Type": "Int",
+            "Default": 1,
+            "Widget": "Slider",
+            "Constraints": [
+              1,
+              4,
+              0,
+              0
+            ],
+            "Description": "Repeats the median operation to remove larger speckle clusters. Keep this low to preserve small landforms."
+          }
+        ]
+      }
+    ]
+  }
+}

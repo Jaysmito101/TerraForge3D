@@ -1,4 +1,4 @@
-#include "Generators/BiomeFilterStack.h"
+#include "Generators/Filters/BiomeFilterStack.h"
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
@@ -75,7 +75,7 @@ namespace tf3d::generators
 
     namespace
     {
-        void SetUniformFromParameter(ComputeShader *shader, const std::string &uniformName,
+        void SetUniformFromParameter(base::ComputeShader *shader, const std::string &uniformName,
                                      const inspector::CustomInspectorValue &value, int &textureSlot, const nlohmann::json *binding = nullptr)
         {
             using inspector::CustomInspectorValueType;
@@ -129,7 +129,7 @@ namespace tf3d::generators
             }
         }
 
-        void SetUniformFromJson(ComputeShader *shader, const std::string &uniformName,
+        void SetUniformFromJson(base::ComputeShader *shader, const std::string &uniformName,
                                 const nlohmann::json &binding, int &textureSlot)
         {
             const nlohmann::json *value = &binding;
@@ -162,7 +162,9 @@ namespace tf3d::generators
         }
     } // namespace
 
-    void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader, const nlohmann::json &bindings)
+    void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter,
+                                           base::ComputeShader *shader,
+                                           const nlohmann::json &bindings)
     {
         if (!bindings.is_object())
             return;
@@ -179,7 +181,7 @@ namespace tf3d::generators
         }
     }
 
-    void BiomeFilterStack::BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, ComputeShader *shader)
+    void BiomeFilterStack::BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, base::ComputeShader *shader)
     {
         if (filter == nullptr || shader == nullptr || m_Statistics == nullptr || !filter->NeedsFieldStatistics())
             return;
@@ -243,10 +245,8 @@ namespace tf3d::generators
     void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter> &filter, GeneratorData *input,
                                      GeneratorData *output)
     {
-        const auto &metadata  = filter->GetDefinition()->GetMetadata();
-        const auto &execution = metadata.contains("Execution")
-                                    ? metadata["Execution"]
-                                    : nlohmann::json::object();
+        const auto &runtime   = filter->GetDefinition()->GetRuntime();
+        const auto &execution = runtime.execution;
         std::vector<nlohmann::json> passes;
         if (execution.contains("Passes") && execution["Passes"].is_array()) {
             for (const auto &pass : execution["Passes"]) {
@@ -273,7 +273,7 @@ namespace tf3d::generators
         resources.emplace("Next", output);
         resources.emplace("Output", output);
 
-        const auto resourcesDescription = metadata.value("Resources", nlohmann::json::object());
+        const auto resourcesDescription = runtime.resources;
         if (!resourcesDescription.is_object()) {
             TF3D_LOG_ERROR("Filter '{}' has an invalid Resources object.", filter->GetName());
             input->CopyTo(output);

@@ -1,0 +1,120 @@
+{
+  "ID": "swirl",
+  "Name": "Swirl",
+  "Category": "Warping",
+  "Description": "Twists terrain around a normalized center with a radius-limited circular warp.",
+  "Runtime": {
+    "Implementation": "PhaseChain",
+    "Shaders": {
+      "Phases": {
+        "Warp": "generation/filters/shaping/swirl/swirl",
+        "Merge": "generation/filters/common/merge"
+      }
+    },
+    "Resources": {
+      "Temps": [
+        {
+          "Name": "Swirled",
+          "Type": "Field"
+        }
+      ]
+    },
+    "Execution": {
+      "Passes": [
+        {
+          "Phase": "Warp",
+          "Input": "Current",
+          "Output": "Swirled",
+          "Uniforms": {
+            "u_Center": {
+              "Parameter": "Warp.Center"
+            },
+            "u_Turns": {
+              "Parameter": "Warp.Turns"
+            },
+            "u_Radius": {
+              "Parameter": "Warp.Radius"
+            },
+            "u_Falloff": {
+              "Parameter": "Warp.Falloff"
+            }
+          }
+        }
+      ],
+      "Merge": {
+        "Phase": "Merge",
+        "Input": "Current",
+        "Operation": "Swirled",
+        "Output": "Next"
+      }
+    }
+  },
+  "Inspector": {
+    "ShowResetButton": true,
+    "Sections": [
+      {
+        "Name": "Warp",
+        "Label": "Warp",
+        "Description": "Circular twist placement and strength controls.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Center",
+            "Type": "Vector2",
+            "Default": [
+              0.5,
+              0.5
+            ],
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+              0.0,
+              1.0
+            ],
+            "Label": "Center",
+            "Description": "Normalized center of the circular twist."
+          },
+          {
+            "Name": "Turns",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+              -4.0,
+              4.0
+            ],
+            "Label": "Turns",
+            "Description": "Number of full rotations applied at the center of the warp.",
+            "Tooltip": "Positive and negative values twist in opposite directions."
+          },
+          {
+            "Name": "Radius",
+            "Type": "Float",
+            "Default": 0.75,
+            "Widget": "Slider",
+            "Constraints": [
+              0.01,
+              2.0
+            ],
+            "Label": "Radius",
+            "Description": "Normalized radius over which the twist fades to zero."
+          },
+          {
+            "Name": "Falloff",
+            "Type": "Float",
+            "Default": 1.5,
+            "Widget": "Slider",
+            "Constraints": [
+              0.1,
+              4.0
+            ],
+            "Label": "Falloff",
+            "Description": "Controls how tightly the rotation is concentrated around the center."
+          }
+        ]
+      }
+    ]
+  }
+}

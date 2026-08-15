@@ -1,0 +1,56 @@
+{
+  "ID": "filters",
+  "Name": "Filter catalog",
+  "Description": "Procedural terrain filters and their inspector metadata.",
+  "ShowResetButton": false,
+  "Sections": [
+    {
+      "$include": "./Denoise/BoxBlur.json"
+    },
+    {
+      "$include": "./Denoise/FlatAreaSmooth.json"
+    },
+    {
+      "$include": "./Denoise/GaussianSmooth.json"
+    },
+    {
+      "$include": "./Denoise/GuidedSmooth.json"
+    },
+    {
+      "$include": "./Denoise/LaplacianSmooth.json"
+    },
+    {
+      "$include": "./Denoise/Median.json"
+    },
+    {
+      "$include": "./Shaping/Clip.json"
+    },
+    {
+      "$include": "./Shaping/Curve.json"
+    },
+    {
+      "$include": "./Shaping/Dome.json"
+    },
+    {
+      "$include": "./Shaping/Flatten.json"
+    },
+    {
+      "$include": "./Shaping/Heightmap.json"
+    },
+    {
+      "$include": "./Shaping/InflateDeflate.json"
+    },
+    {
+      "$include": "./Shaping/Pixelate.json"
+    },
+    {
+      "$include": "./Shaping/SetValue.json"
+    },
+    {
+      "$include": "./Shaping/Smoothen.json"
+    },
+    {
+      "$include": "./Shaping/Swirl.json"
+    }
+  ]
+}
