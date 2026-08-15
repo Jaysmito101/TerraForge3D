@@ -21,7 +21,8 @@ namespace tf3d::generators
     {
     public:
         MaskRasterizer(tf3d::data::ApplicationState *appState,
-                       const BaseMaskGenerator &baseGenerator);
+                       const BaseMaskGenerator &baseGenerator,
+                       bool allowNegativeValues = false);
         ~MaskRasterizer() = default;
 
         MaskRasterizer(const MaskRasterizer &)                = delete;
@@ -58,8 +59,10 @@ namespace tf3d::generators
                       DispatchInput input);
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
+        bool m_AllowNegativeValues               = false;
         std::optional<tf3d::base::ComputeShader> m_Shader;
         std::optional<tf3d::base::ComputeShader> m_CopyShader;
+        std::optional<tf3d::base::ComputeShader> m_SignedPreviewShader;
         std::shared_ptr<tf3d::base::ShaderStorageBuffer> m_StrokeSettingsBuffer;
         std::shared_ptr<tf3d::base::ShaderStorageBuffer> m_StrokeRangesBuffer;
         std::shared_ptr<tf3d::base::ShaderStorageBuffer> m_StrokePointsBuffer;

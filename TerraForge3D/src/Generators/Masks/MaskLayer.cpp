@@ -9,19 +9,24 @@ namespace tf3d::generators
 {
 
     MaskLayer::MaskLayer(tf3d::data::ApplicationState *appState, glm::vec3 vizColor,
-                         std::string defaultTypeID)
+                         std::string defaultTypeID, bool allowNegativeValues)
         : m_AppState(appState),
+          m_AllowNegativeValues(allowNegativeValues),
           m_BaseMaskGenerator(appState, std::move(defaultTypeID)),
-          m_MaskTool(appState, vizColor),
-          m_Rasterizer(appState, m_BaseMaskGenerator),
+          m_MaskTool(appState, vizColor, allowNegativeValues),
+          m_Rasterizer(appState, m_BaseMaskGenerator, allowNegativeValues),
           m_UIState(State{m_BaseMaskGenerator.GetState(), m_MaskTool.GetState()}),
           m_State(m_UIState),
-          m_Texture(std::make_shared<GeneratorTexture>(256, 256, GeneratorTextureStorage::R16))
+          m_Texture(std::make_shared<GeneratorTexture>(
+              256,
+              256,
+              allowNegativeValues ? GeneratorTextureStorage::R16F : GeneratorTextureStorage::R16))
     {
     }
 
     MaskLayer::MaskLayer(MaskLayer &&other) noexcept
         : m_AppState(other.m_AppState),
+          m_AllowNegativeValues(other.m_AllowNegativeValues),
           m_BaseMaskGenerator(std::move(other.m_BaseMaskGenerator)),
           m_MaskTool(std::move(other.m_MaskTool)),
           m_Rasterizer(std::move(other.m_Rasterizer)),
@@ -39,11 +44,12 @@ namespace tf3d::generators
         if (this == &other)
             return *this;
 
-        m_AppState          = other.m_AppState;
-        m_BaseMaskGenerator = std::move(other.m_BaseMaskGenerator);
-        m_MaskTool          = std::move(other.m_MaskTool);
-        m_Rasterizer        = std::move(other.m_Rasterizer);
-        m_UIState           = other.m_State.Capture().value;
+        m_AppState            = other.m_AppState;
+        m_AllowNegativeValues = other.m_AllowNegativeValues;
+        m_BaseMaskGenerator   = std::move(other.m_BaseMaskGenerator);
+        m_MaskTool            = std::move(other.m_MaskTool);
+        m_Rasterizer          = std::move(other.m_Rasterizer);
+        m_UIState             = other.m_State.Capture().value;
         m_State.Replace(m_UIState);
         m_Texture              = std::move(other.m_Texture);
         m_BaseTexture          = std::move(other.m_BaseTexture);
@@ -58,7 +64,10 @@ namespace tf3d::generators
         if (size <= 0)
             return;
         if (m_Texture == nullptr) {
-            m_Texture = std::make_shared<GeneratorTexture>(size, size, GeneratorTextureStorage::R16);
+            m_Texture = std::make_shared<GeneratorTexture>(
+                size,
+                size,
+                m_AllowNegativeValues ? GeneratorTextureStorage::R16F : GeneratorTextureStorage::R16);
         } else {
             m_Texture->Resize(size, size);
         }
@@ -82,7 +91,9 @@ namespace tf3d::generators
         if (m_VisualizationTexture == nullptr) {
             m_VisualizationTexture = std::make_unique<GeneratorTexture>(visualizationSize,
                                                                         visualizationSize,
-                                                                        GeneratorTextureStorage::R16);
+                                                                        m_AllowNegativeValues
+                                                                            ? GeneratorTextureStorage::RGBA32F
+                                                                            : GeneratorTextureStorage::R16);
         } else if (m_VisualizationTexture->GetWidth() != visualizationSize) {
             m_VisualizationTexture->Resize(visualizationSize, visualizationSize);
         }
@@ -98,6 +109,9 @@ namespace tf3d::generators
             ImGui::TextDisabled("Starts from black; strokes are applied on top.");
         } else {
             ImGui::TextDisabled("Calculated from the current source terrain.");
+        }
+        if (m_AllowNegativeValues) {
+            ImGui::TextDisabled("Signed values are enabled: blue is negative, red is positive.");
         }
         return changed;
     }
@@ -118,7 +132,9 @@ namespace tf3d::generators
         } else if (m_BaseTexture == nullptr) {
             m_BaseTexture = std::make_unique<GeneratorTexture>(m_Texture->GetWidth(),
                                                                m_Texture->GetHeight(),
-                                                               GeneratorTextureStorage::R16);
+                                                               m_AllowNegativeValues
+                                                                   ? GeneratorTextureStorage::R16F
+                                                                   : GeneratorTextureStorage::R16);
         }
 
         const MaskStroke *activeStroke = state.tool.activeStroke.has_value()
@@ -140,11 +156,11 @@ namespace tf3d::generators
         bool changed = ShowBaseSettings();
 
         GeneratorTexture *previewTexture = m_Texture.get();
-        if (m_MaskTool.GetInvertPreview()) {
+        if (m_AllowNegativeValues || m_MaskTool.GetInvertPreview()) {
             EnsureVisualizationTexture();
             previewTexture = m_Rasterizer.GetPreviewTexture(m_Texture.get(),
                                                             m_VisualizationTexture.get(),
-                                                            true);
+                                                            m_MaskTool.GetInvertPreview());
         }
         changed |= m_MaskTool.ShowSettings(m_Texture.get(), previewTexture, showViewportMask);
 

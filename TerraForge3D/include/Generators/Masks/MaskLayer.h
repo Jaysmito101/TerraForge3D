@@ -32,7 +32,7 @@ namespace tf3d::generators
         using Snapshot = base::GeneratorState<State>::Snapshot;
 
         MaskLayer(tf3d::data::ApplicationState *appState, glm::vec3 vizColor,
-                  std::string defaultTypeID = "None");
+                  std::string defaultTypeID = "None", bool allowNegativeValues = false);
         ~MaskLayer() = default;
 
         MaskLayer(const MaskLayer &)            = delete;
@@ -63,6 +63,11 @@ namespace tf3d::generators
         void SetInvertPreview(bool invert);
         void SetVizColor(float r, float g, float b);
 
+        inline bool AllowsNegativeValues() const
+        {
+            return m_AllowNegativeValues;
+        }
+
         inline GeneratorTexture *GetTexture() const
         {
             return m_Texture.get();
@@ -77,6 +82,7 @@ namespace tf3d::generators
         void EnsureVisualizationTexture();
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
+        bool m_AllowNegativeValues               = false;
         BaseMaskGenerator m_BaseMaskGenerator;
         MaskTool m_MaskTool;
         MaskRasterizer m_Rasterizer;

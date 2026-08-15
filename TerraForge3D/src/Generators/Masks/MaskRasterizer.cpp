@@ -4,6 +4,7 @@
 #include "Data/ResourceManager.h"
 #include "Generators/Masks/BaseMaskGenerator.h"
 #include "Profiler.h"
+#include "Utils/Utils.h"
 
 #include <glm/common.hpp>
 
@@ -11,8 +12,10 @@ namespace tf3d::generators
 {
 
     MaskRasterizer::MaskRasterizer(tf3d::data::ApplicationState *appState,
-                                   const BaseMaskGenerator &baseGenerator)
-        : m_AppState(appState)
+                                   const BaseMaskGenerator &baseGenerator,
+                                   bool allowNegativeValues)
+        : m_AppState(appState),
+          m_AllowNegativeValues(allowNegativeValues)
     {
         if (m_AppState == nullptr)
             return;
@@ -21,9 +24,18 @@ namespace tf3d::generators
         m_StrokeRangesBuffer   = std::make_shared<ShaderStorageBuffer>();
         m_StrokePointsBuffer   = std::make_shared<ShaderStorageBuffer>();
         m_CopyShader           = m_AppState->resourceManager->LoadComputeShader("generation/utils/mask_copy");
+        if (m_AllowNegativeValues) {
+            m_SignedPreviewShader = m_AppState->resourceManager->LoadComputeShader("generation/utils/mask_visualize");
+        }
 
         if (!baseGenerator.GetShaderSource().empty()) {
-            m_Shader = m_AppState->resourceManager->GetComputeShader("MaskRasterizer", baseGenerator.GetShaderSource());
+            std::string shaderSource = baseGenerator.GetShaderSource();
+            const std::string format = m_AllowNegativeValues ? "r16f" : "r16";
+            if (!utils::ReplaceAll(shaderSource, "TF3D_MASK_FORMAT", format)) {
+                TF3D_LOG_ERROR("Mask rasterizer shader is missing the mask format marker.");
+            } else {
+                m_Shader = m_AppState->resourceManager->GetComputeShader("MaskRasterizer", shaderSource);
+            }
             if (!m_Shader.has_value())
                 TF3D_LOG_ERROR("Mask rasterizer shader compilation failed; mask rendering is unavailable.");
         } else {
@@ -108,6 +120,7 @@ namespace tf3d::generators
         m_Shader->Bind();
         baseGenerator.ApplyToShader(baseState, *m_Shader);
         m_Shader->SetUniform1i("u_Resolution", destination->GetWidth());
+        m_Shader->SetUniform1i("u_AllowNegativeValues", m_AllowNegativeValues ? 1 : 0);
         m_Shader->SetUniform1i("u_UseCachedBase", useCachedBase ? 1 : 0);
         m_Shader->SetUniform1i("u_BaseMask", 5);
         m_Shader->SetUniform1i("u_StrokeCount", strokeCount);
@@ -177,23 +190,38 @@ namespace tf3d::generators
                                                         GeneratorTexture *visualizationTexture,
                                                         bool invert)
     {
-        if (sourceTexture == nullptr || visualizationTexture == nullptr || !invert ||
-            !m_CopyShader.has_value() || m_AppState == nullptr)
+        if (sourceTexture == nullptr || visualizationTexture == nullptr || m_AppState == nullptr) {
             return sourceTexture;
+        }
+
         const int visualizationResolution = visualizationTexture->GetWidth();
-        if (visualizationResolution <= 0)
+        if (visualizationResolution <= 0) {
             return sourceTexture;
+        }
+
+        tf3d::base::ComputeShader *previewShader = nullptr;
+        if (m_AllowNegativeValues) {
+            if (!m_SignedPreviewShader.has_value()) {
+                return sourceTexture;
+            }
+            previewShader = &*m_SignedPreviewShader;
+        } else {
+            if (!invert || !m_CopyShader.has_value()) {
+                return sourceTexture;
+            }
+            previewShader = &*m_CopyShader;
+        }
 
         sourceTexture->Bind(0);
         visualizationTexture->BindForCompute(1);
-        m_CopyShader->Bind();
-        m_CopyShader->SetUniform1i("u_Resolution", visualizationResolution);
-        m_CopyShader->SetUniform1i("u_SourceMask", 0);
-        m_CopyShader->SetUniform1i("u_Invert", 1);
+        previewShader->Bind();
+        previewShader->SetUniform1i("u_Resolution", visualizationResolution);
+        previewShader->SetUniform1i("u_SourceMask", 0);
+        previewShader->SetUniform1i("u_Invert", invert ? 1 : 0);
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (visualizationResolution + workgroupSize - 1) / workgroupSize;
-        m_CopyShader->Dispatch(dispatchSize, dispatchSize, 1);
-        m_CopyShader->SetMemoryBarrier();
+        previewShader->Dispatch(dispatchSize, dispatchSize, 1);
+        previewShader->SetMemoryBarrier();
         return visualizationTexture;
     }
 

@@ -14,8 +14,12 @@ namespace tf3d::generators
 
     MaskTool *MaskTool::s_CurrentlyEditingMaskTool = nullptr;
 
-    MaskTool::MaskTool(tf3d::data::ApplicationState *state, glm::vec3 vizColor)
-        : m_AppState(state), m_VizColor(vizColor)
+    MaskTool::MaskTool(tf3d::data::ApplicationState *state,
+                       glm::vec3 vizColor,
+                       bool allowNegativeValues)
+        : m_AppState(state),
+          m_AllowNegativeValues(allowNegativeValues),
+          m_VizColor(vizColor)
     {
     }
 
@@ -27,6 +31,7 @@ namespace tf3d::generators
 
     MaskTool::MaskTool(MaskTool &&other) noexcept
         : m_AppState(other.m_AppState),
+          m_AllowNegativeValues(other.m_AllowNegativeValues),
           m_Strokes(std::move(other.m_Strokes)),
           m_ActiveStroke(std::move(other.m_ActiveStroke)),
           m_HasActiveStroke(other.m_HasActiveStroke),
@@ -52,16 +57,17 @@ namespace tf3d::generators
         if (s_CurrentlyEditingMaskTool == this)
             s_CurrentlyEditingMaskTool = nullptr;
 
-        m_AppState          = other.m_AppState;
-        m_Strokes           = std::move(other.m_Strokes);
-        m_ActiveStroke      = std::move(other.m_ActiveStroke);
-        m_HasActiveStroke   = other.m_HasActiveStroke;
-        m_VizColor          = other.m_VizColor;
-        m_InvertPreview     = other.m_InvertPreview;
-        m_DrawSettings      = other.m_DrawSettings;
-        m_RequireUpdation   = other.m_RequireUpdation;
-        m_IsEditing         = other.m_IsEditing;
-        m_PreviousBrushMode = other.m_PreviousBrushMode;
+        m_AppState            = other.m_AppState;
+        m_AllowNegativeValues = other.m_AllowNegativeValues;
+        m_Strokes             = std::move(other.m_Strokes);
+        m_ActiveStroke        = std::move(other.m_ActiveStroke);
+        m_HasActiveStroke     = other.m_HasActiveStroke;
+        m_VizColor            = other.m_VizColor;
+        m_InvertPreview       = other.m_InvertPreview;
+        m_DrawSettings        = other.m_DrawSettings;
+        m_RequireUpdation     = other.m_RequireUpdation;
+        m_IsEditing           = other.m_IsEditing;
+        m_PreviousBrushMode   = other.m_PreviousBrushMode;
 
         if (s_CurrentlyEditingMaskTool == &other)
             s_CurrentlyEditingMaskTool = this;
@@ -211,6 +217,7 @@ namespace tf3d::generators
         m_DrawSettings.m_MaskColor       = m_VizColor;
         m_DrawSettings.m_ShowMask        = showMask;
         m_DrawSettings.m_InvertMask      = m_InvertPreview;
+        m_DrawSettings.m_SignedMask      = m_AllowNegativeValues;
         m_DrawSettings.m_ShowBrushCursor = showBrush;
         m_AppState->rendererManager->GetObjectRenderer()->SetDrawBrushSettings(&m_DrawSettings);
     }
@@ -249,8 +256,13 @@ namespace tf3d::generators
             ImGui::SameLine();
             ImGui::TextDisabled("Drag on the terrain to paint");
 
-            static const char *brushModes[] = {"Paint", "Erase"};
-            if (ShowComboBox("Brush mode", &m_DrawSettings.m_BrushMode, brushModes, IM_ARRAYSIZE(brushModes))) {
+            static const char *unsignedBrushModes[] = {"Paint", "Erase"};
+            static const char *signedBrushModes[]   = {"Paint positive", "Erase", "Paint negative"};
+            const char **brushModes                 = m_AllowNegativeValues ? signedBrushModes : unsignedBrushModes;
+            const int brushModeCount                = m_AllowNegativeValues ? IM_ARRAYSIZE(signedBrushModes)
+                                                                            : IM_ARRAYSIZE(unsignedBrushModes);
+            m_DrawSettings.m_BrushMode              = glm::clamp(m_DrawSettings.m_BrushMode, 0, brushModeCount - 1);
+            if (ShowComboBox("Brush mode", &m_DrawSettings.m_BrushMode, brushModes, brushModeCount)) {
                 m_PreviousBrushMode = m_DrawSettings.m_BrushMode;
                 changed             = true;
             }
@@ -275,6 +287,9 @@ namespace tf3d::generators
         ImGui::Separator();
         ImGui::Text("Mask Tool");
         ImGui::TextDisabled("Paint strokes on top of the selected mask base.");
+        if (m_AllowNegativeValues) {
+            ImGui::TextDisabled("Signed preview: blue is negative, red is positive, gray is zero. Paint negative adds -1.");
+        }
 
         if (previewTexture != nullptr) {
             const float previewSize = glm::clamp(ImGui::GetContentRegionAvail().x, 160.0f, 512.0f);

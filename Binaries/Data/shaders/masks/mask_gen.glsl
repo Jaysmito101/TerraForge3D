@@ -4,7 +4,7 @@ layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D TerrainData;
 
-layout(binding = 1, r16) writeonly uniform image2D u_MaskTexture;
+layout(binding = 1, TF3D_MASK_FORMAT) writeonly uniform image2D u_MaskTexture;
 
 layout(std430, binding = 2) readonly buffer StrokeSettingsBuffer
 {
@@ -25,6 +25,7 @@ uniform int u_Resolution;
 uniform int u_Mode;
 uniform float u_TileSize;
 uniform bool u_UseCachedBase;
+uniform bool u_AllowNegativeValues;
 uniform sampler2D u_BaseMask;
 uniform int u_StrokeCount;
 
@@ -330,17 +331,23 @@ void main()
 	vec2 uv = (vec2(coordinate) + vec2(0.5)) / float(u_Resolution);
 
 	float value = 0.0f;
-	if (u_UseCachedBase)
+	if (u_UseCachedBase) {
 		value = texelFetch(u_BaseMask, coordinate, 0).r;
-	else if (u_Mode >= 0)
-		value = clamp(TerrainMask(coordinate, uv), 0.0f, 1.0f);
+	} else if (u_Mode >= 0) {
+		const float calculatedValue = TerrainMask(coordinate, uv);
+		value = u_AllowNegativeValues
+		             ? clamp(calculatedValue, -1.0f, 1.0f)
+		             : clamp(calculatedValue, 0.0f, 1.0f);
+	}
 
 	for (int strokeIndex = 0; strokeIndex < u_StrokeCount; ++strokeIndex)
 	{
 		vec4 settings = u_StrokeSettings[strokeIndex];
 		ivec4 range = u_StrokeRanges[strokeIndex];
 		float influence = strokeInfluence(uv, settings, range.x, range.y);
-		float target = settings.w > 0.5f ? 0.0f : 1.0f;
+		float target = settings.w > 1.5f && u_AllowNegativeValues
+		                   ? -1.0f
+		                   : (settings.w > 0.5f ? 0.0f : 1.0f);
 		value = mix(value, target, influence);
 	}
 

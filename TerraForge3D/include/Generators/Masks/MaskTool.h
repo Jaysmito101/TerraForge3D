@@ -29,7 +29,8 @@ namespace tf3d::generators
             std::optional<MaskStroke> activeStroke;
         };
 
-        MaskTool(tf3d::data::ApplicationState *state, glm::vec3 vizColor);
+        MaskTool(tf3d::data::ApplicationState *state, glm::vec3 vizColor,
+                 bool allowNegativeValues = false);
         ~MaskTool();
 
         MaskTool(const MaskTool &)            = delete;
@@ -78,6 +79,7 @@ namespace tf3d::generators
         void AppendActiveStrokePoint(const glm::vec2 &position, int resolution);
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
+        bool m_AllowNegativeValues               = false;
         std::vector<MaskStroke> m_Strokes;
         MaskStroke m_ActiveStroke;
         bool m_HasActiveStroke = false;
