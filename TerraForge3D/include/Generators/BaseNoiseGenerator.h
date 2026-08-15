@@ -20,6 +20,7 @@ namespace tf3d::generators
         explicit BaseNoiseGenerator(tf3d::data::ApplicationState *appState);
 
         bool Initialize();
+        bool ShowEnabledControl(bool showRecommendation = false);
         bool ShowSettings();
         void Resize(int size);
         void Update(GeneratorData *sourceBuffer, GeneratorData *targetBuffer, GeneratorTexture *seedTexture);

@@ -47,6 +47,17 @@ namespace tf3d::generators
         return true;
     }
 
+    bool BaseNoiseGenerator::ShowEnabledControl(bool showRecommendation)
+    {
+        const bool changed = ImGui::Checkbox("Enable Base Noise##BaseNoiseGenerator", &m_Enabled);
+        m_RequireUpdation  = changed || m_RequireUpdation;
+        if (showRecommendation && m_Enabled) {
+            ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.25f, 1.0f),
+                               "Recommendation: disable Base Noise when using Global Elevation.");
+        }
+        return m_RequireUpdation;
+    }
+
     bool BaseNoiseGenerator::ShowSettings()
     {
         const auto markChanged = [this](bool changed) {
@@ -54,7 +65,7 @@ namespace tf3d::generators
         };
 
         ImGui::PushID("BaseNoiseGenerator");
-        markChanged(ImGui::Checkbox("Enabled", &m_Enabled));
+        markChanged(ShowEnabledControl());
         markChanged(m_Inspector->Render());
 
         markChanged(ImGui::Checkbox("Use mask", &m_UseMask));
