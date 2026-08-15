@@ -94,8 +94,31 @@ namespace tf3d::inspector
                                         tf3d::base::ShaderCore &shader,
                                         std::string_view uniformPrefix) const
     {
-        for (const auto &[path, value] : m_ValueState.metadata) {
-            ApplyValueToShader(shader, value, snapshot.GetDataStore(), path, uniformPrefix);
+        for (const auto &widgetLabel : m_WidgetState.order) {
+            if (!IsWidgetVisible(widgetLabel)) {
+                continue;
+            }
+
+            const auto widgetIterator = m_WidgetState.byName.find(widgetLabel);
+            if (widgetIterator == m_WidgetState.byName.end()) {
+                continue;
+            }
+
+            const auto valuePath = PathForWidget(widgetLabel);
+            if (valuePath.empty()) {
+                continue;
+            }
+
+            const auto valueIterator = m_ValueState.metadata.find(valuePath);
+            if (valueIterator == m_ValueState.metadata.end()) {
+                continue;
+            }
+
+            ApplyValueToShader(shader,
+                               valueIterator->second,
+                               snapshot.GetDataStore(),
+                               valuePath,
+                               uniformPrefix);
         }
     }
 

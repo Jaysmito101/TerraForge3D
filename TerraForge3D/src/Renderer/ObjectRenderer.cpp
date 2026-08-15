@@ -150,6 +150,7 @@ namespace tf3d::renderer
         TF3D_PROFILE_BEGIN(objectMaterialStateProfile, "renderer/object/material-state");
         m_Shader->SetUniform1i("u_RequiresDrawBrush", m_DrawBrushSettings && m_DrawBrushSettings->m_ShowBrushCursor && viewport->IsHovered());
         m_Shader->SetUniform1i("u_DrawMask", m_DrawBrushSettings && m_DrawBrushSettings->m_ShowMask && m_DrawBrushSettings->m_MaskTexture != -1);
+        m_Shader->SetUniform1i("u_SignedMask", m_DrawBrushSettings && m_DrawBrushSettings->m_SignedMask ? 1 : 0);
         if (m_DrawBrushSettings) {
             m_Shader->SetUniform4f("u_BrushSettings0", m_DrawBrushSettings->m_BrushPositionX,
                                    m_DrawBrushSettings->m_BrushPositionY,
