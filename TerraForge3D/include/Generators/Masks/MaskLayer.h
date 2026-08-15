@@ -42,6 +42,7 @@ namespace tf3d::generators
 
         void Resize(int size);
         bool ShowSettings(bool showViewportMask = true);
+        bool Apply(const State &state, GeneratorData *sourceData);
         bool Update(const Snapshot *state, GeneratorData *sourceData);
 
         inline Snapshot GetState() const

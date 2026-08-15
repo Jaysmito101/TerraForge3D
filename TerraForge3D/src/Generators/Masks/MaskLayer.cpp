@@ -171,17 +171,22 @@ namespace tf3d::generators
         return changed;
     }
 
+    bool MaskLayer::Apply(const State &state, GeneratorData *sourceData)
+    {
+        if (sourceData != nullptr && sourceData->GetResolution() > 0 &&
+            (m_Texture == nullptr || m_Texture->GetWidth() != sourceData->GetResolution())) {
+            Resize(sourceData->GetResolution());
+        }
+        return Render(state, sourceData);
+    }
+
     bool MaskLayer::Update(const Snapshot *state, GeneratorData *sourceData)
     {
         if (state == nullptr) {
             return false;
         }
 
-        if (sourceData != nullptr && sourceData->GetResolution() > 0 &&
-            (m_Texture == nullptr || m_Texture->GetWidth() != sourceData->GetResolution())) {
-            Resize(sourceData->GetResolution());
-        }
-        const bool rendered = Render(state->value, sourceData);
+        const bool rendered = Apply(state->value, sourceData);
         if (rendered) {
             m_State.MarkProcessed(state->revision);
         }

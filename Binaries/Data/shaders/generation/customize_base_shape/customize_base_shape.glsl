@@ -2,8 +2,7 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D DataSourceTexture;
-layout(TF3D_FIELD_FORMAT, binding = 1) writeonly uniform image2D DataTargetTexture;
+layout(TF3D_FIELD_FORMAT, binding = 0) uniform image2D DataTexture;
 layout(binding = 2) uniform sampler2D u_MaskTexture;
 
 uniform int u_Resolution;
@@ -42,7 +41,7 @@ void main()
 		return;
 	}
 
-	float value = u_FlattenSource != 0 ? 0.0f : imageLoad(DataSourceTexture, coordinate).r;
+	float value = u_FlattenSource != 0 ? 0.0f : imageLoad(DataTexture, coordinate).r;
 	if (u_UseMask != 0)
 	{
 		float mask = sampleMask(coordinate);
@@ -50,5 +49,5 @@ void main()
 		value += float(u_Direction) * mask * u_Strength;
 	}
 
-	imageStore(DataTargetTexture, coordinate, vec4(value, 0.0f, 0.0f, 0.0f));
+	imageStore(DataTexture, coordinate, vec4(value, 0.0f, 0.0f, 0.0f));
 }
