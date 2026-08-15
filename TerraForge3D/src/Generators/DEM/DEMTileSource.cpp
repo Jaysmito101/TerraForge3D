@@ -226,9 +226,9 @@ namespace tf3d::generators::dem
 
     std::shared_ptr<base::Texture2D> TileSource::DecodeElevation(const std::string &path)
     {
-        int width = 1;
-        int height = 1;
-        int size = 0;
+        int width     = 1;
+        int height    = 1;
+        int size      = 0;
         uint8_t *data = reinterpret_cast<uint8_t *>(ReadBinaryFile(path, &size));
         if (data == nullptr || size <= 0) {
             delete[] data;

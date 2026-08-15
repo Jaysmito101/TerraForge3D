@@ -111,12 +111,12 @@ namespace tf3d::base
             }
 
             PendingLoad request{};
-            request.key          = key;
-            request.priority     = priority;
-            request.requestId    = requestId;
-            request.sequence     = m_NextSequence++;
-            request.decoder      = std::move(decoder);
-            request.queueVersion = 1;
+            request.key             = key;
+            request.priority        = priority;
+            request.requestId       = requestId;
+            request.sequence        = m_NextSequence++;
+            request.decoder         = std::move(decoder);
+            request.queueVersion    = 1;
             const uint64_t sequence = request.sequence;
             if (handler) {
                 request.handlers.emplace_back(std::move(handler));
@@ -254,9 +254,9 @@ namespace tf3d::base
                     pending->second.queueVersion != entry.queueVersion) {
                     continue;
                 }
-                requestId = entry.requestId;
+                requestId  = entry.requestId;
                 requestKey = pending->second.key;
-                decoder   = pending->second.decoder;
+                decoder    = pending->second.decoder;
             }
 
             const auto texture = LoadTexture(requestKey, decoder);
@@ -277,7 +277,7 @@ namespace tf3d::base
 
                 auto &pendingRequest = pending->second;
                 auto handlers        = std::move(pendingRequest.handlers);
-                const auto path       = pendingRequest.key.path;
+                const auto path      = pendingRequest.key.path;
                 m_PendingByKey.erase(pendingRequest.key);
                 m_Pending.erase(pending);
                 for (auto &handler : handlers) {
