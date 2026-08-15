@@ -65,6 +65,7 @@ namespace tf3d::generators
 
     bool MaskRasterizer::Dispatch(GeneratorData *sourceData,
                                   const BaseMaskGenerator &baseGenerator,
+                                  const BaseMaskGenerator::State &baseState,
                                   GeneratorTexture *destination,
                                   GeneratorTexture *baseTexture,
                                   int strokeCount,
@@ -72,7 +73,7 @@ namespace tf3d::generators
     {
         if (destination == nullptr || !m_Shader.has_value() || m_AppState == nullptr)
             return false;
-        const bool hasBase = !baseGenerator.IsNone();
+        const bool hasBase = baseState.runtimeMode >= 0;
         if (hasBase && !baseGenerator.IsAvailable())
             return false;
         if (hasBase && !useCachedBase && sourceData == nullptr)
@@ -95,7 +96,7 @@ namespace tf3d::generators
         m_StrokePointsBuffer->Bind(4);
 
         m_Shader->Bind();
-        baseGenerator.ApplyToShader(*m_Shader);
+        baseGenerator.ApplyToShader(baseState, *m_Shader);
         m_Shader->SetUniform1i("u_Resolution", destination->GetWidth());
         m_Shader->SetUniform1i("u_UseCachedBase", useCachedBase ? 1 : 0);
         m_Shader->SetUniform1i("u_BaseMask", 5);
@@ -111,6 +112,7 @@ namespace tf3d::generators
 
     bool MaskRasterizer::Render(GeneratorData *sourceData,
                                 const BaseMaskGenerator &baseGenerator,
+                                const BaseMaskGenerator::State &baseState,
                                 const std::vector<MaskStroke> &strokes,
                                 const MaskStroke *activeStroke,
                                 GeneratorTexture *destination,
@@ -124,21 +126,24 @@ namespace tf3d::generators
         UploadStrokes(strokes, activeStroke);
 
         int strokeCount = 0;
-        for (const auto &stroke : strokes)
+        for (const auto &stroke : strokes) {
             strokeCount += !stroke.points.empty();
-        if (activeStroke != nullptr && !activeStroke->points.empty())
+        }
+        
+        if (activeStroke != nullptr && !activeStroke->points.empty()) {
             ++strokeCount;
+        }
 
-        const bool hasBase = !baseGenerator.IsNone();
+        const bool hasBase = baseState.runtimeMode >= 0;
         if (hasBase) {
             if (baseTexture == nullptr || baseTexture->GetWidth() != destination->GetWidth())
                 return false;
-            if (rebuildBase && !Dispatch(sourceData, baseGenerator, baseTexture, nullptr, 0, false))
+            if (rebuildBase && !Dispatch(sourceData, baseGenerator, baseState, baseTexture, nullptr, 0, false))
                 return false;
-            return Dispatch(nullptr, baseGenerator, destination, baseTexture, strokeCount, true);
+            return Dispatch(nullptr, baseGenerator, baseState, destination, baseTexture, strokeCount, true);
         }
 
-        return Dispatch(sourceData, baseGenerator, destination, nullptr, strokeCount, false);
+        return Dispatch(sourceData, baseGenerator, baseState, destination, nullptr, strokeCount, false);
     }
 
     GeneratorTexture *MaskRasterizer::GetPreviewTexture(GeneratorTexture *sourceTexture,

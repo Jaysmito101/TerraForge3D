@@ -332,4 +332,14 @@ namespace tf3d::generators
         return m_RequireUpdation;
     }
 
+    MaskTool::State MaskTool::GetState() const
+    {
+        State state{};
+        state.strokes = m_Strokes;
+        if (m_HasActiveStroke) {
+            state.activeStroke = m_ActiveStroke;
+        }
+        return state;
+    }
+
 } // namespace tf3d::generators

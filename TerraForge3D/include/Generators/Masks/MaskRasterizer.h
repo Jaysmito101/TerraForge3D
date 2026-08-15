@@ -3,6 +3,7 @@
 #include "Base/Base.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/Masks/BaseMaskGenerator.h"
 #include "Generators/Masks/MaskTool.h"
 
 #include <memory>
@@ -15,8 +16,6 @@ TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
-
-    class BaseMaskGenerator;
 
     class MaskRasterizer
     {
@@ -32,6 +31,7 @@ namespace tf3d::generators
 
         bool Render(GeneratorData *sourceData,
                     const BaseMaskGenerator &baseGenerator,
+                    const BaseMaskGenerator::State &baseState,
                     const std::vector<MaskStroke> &strokes,
                     const MaskStroke *activeStroke,
                     GeneratorTexture *destination,
@@ -46,6 +46,7 @@ namespace tf3d::generators
         void UploadStrokes(const std::vector<MaskStroke> &strokes, const MaskStroke *activeStroke);
         bool Dispatch(GeneratorData *sourceData,
                       const BaseMaskGenerator &baseGenerator,
+                      const BaseMaskGenerator::State &baseState,
                       GeneratorTexture *destination,
                       GeneratorTexture *baseTexture,
                       int strokeCount,

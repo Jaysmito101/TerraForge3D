@@ -4,6 +4,7 @@
 #include "Exporters/Serializer.h"
 #include "Renderer/BrushSettings.h"
 
+#include <optional>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
@@ -23,6 +24,11 @@ namespace tf3d::generators
     class MaskTool
     {
     public:
+        struct State {
+            std::vector<MaskStroke> strokes;
+            std::optional<MaskStroke> activeStroke;
+        };
+
         MaskTool(tf3d::data::ApplicationState *state, glm::vec3 vizColor);
         ~MaskTool();
 
@@ -36,6 +42,7 @@ namespace tf3d::generators
         bool ShowSettings(tf3d::generators::GeneratorTexture *maskTexture,
                           tf3d::generators::GeneratorTexture *previewTexture,
                           bool showViewportMask = true);
+        State GetState() const;
         SerializerNode Save() const;
         void Load(SerializerNode data);
 

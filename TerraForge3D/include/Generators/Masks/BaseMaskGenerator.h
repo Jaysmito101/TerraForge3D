@@ -3,9 +3,12 @@
 #include "Base/Base.h"
 #include "Exporters/Serializer.h"
 #include "Inspector/CustomInspector.h"
+#include "Inspector/CustomInspectorSnapshot.h"
 
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(ComputeShader, tf3d::base)
@@ -17,6 +20,18 @@ namespace tf3d::generators
     class BaseMaskGenerator
     {
     public:
+        struct State {
+            std::optional<inspector::CustomInspectorSnapshot> values;
+            int runtimeMode = -1;
+
+            State() = default;
+            State(inspector::CustomInspectorSnapshot snapshot, int mode)
+                : values(std::move(snapshot)),
+                  runtimeMode(mode)
+            {
+            }
+        };
+
         struct AlgorithmDefinition {
             std::string id;
             std::string label;
@@ -37,12 +52,13 @@ namespace tf3d::generators
         BaseMaskGenerator &operator=(BaseMaskGenerator &&) noexcept = default;
 
         bool ShowSettings();
+        State GetState() const;
         SerializerNode Save() const;
         void Load(SerializerNode data);
         bool SetTypeID(std::string_view typeID);
         bool IsNone() const;
 
-        void ApplyToShader(tf3d::base::ComputeShader &shader) const;
+        void ApplyToShader(const State &state, tf3d::base::ComputeShader &shader) const;
 
         inline bool IsAvailable() const
         {

@@ -216,8 +216,9 @@ namespace tf3d::generators
 
     int BaseMaskGenerator::GetSelectedTypeIndex() const
     {
-        if (m_Algorithms.empty())
+        if (m_Algorithms.empty()) {
             return -1;
+        }
         const int defaultIndex = m_SelectedAlgorithmIndex >= 0 && m_SelectedAlgorithmIndex < static_cast<int>(m_Algorithms.size())
                                      ? m_SelectedAlgorithmIndex
                                      : 0;
@@ -430,6 +431,16 @@ namespace tf3d::generators
         return changed;
     }
 
+    BaseMaskGenerator::State BaseMaskGenerator::GetState() const
+    {
+        State state{};
+        state.runtimeMode = GetShaderModeForType(GetSelectedTypeIndex());
+        if (m_Inspector != nullptr) {
+            state.values.emplace(m_Inspector->Clone());
+        }
+        return state;
+    }
+
     SerializerNode BaseMaskGenerator::Save() const
     {
         auto node           = CreateSerializerNode();
@@ -465,11 +476,12 @@ namespace tf3d::generators
         m_Inspector->Root().Scope("Mask").Set("MaskType", m_Algorithms[typeIndex].selectionValue);
     }
 
-    void BaseMaskGenerator::ApplyToShader(tf3d::base::ComputeShader &shader) const
+    void BaseMaskGenerator::ApplyToShader(const State &state, tf3d::base::ComputeShader &shader) const
     {
-        if (m_Inspector != nullptr)
-            m_Inspector->ApplyToShader(shader);
-        shader.SetUniform1i("u_Mode", GetShaderModeForType(GetSelectedTypeIndex()));
+        if (m_Inspector != nullptr && state.values.has_value()) {
+            m_Inspector->ApplyToShader(*state.values, shader);
+        }
+        shader.SetUniform1i("u_Mode", state.runtimeMode);
     }
 
 } // namespace tf3d::generators

@@ -14,6 +14,8 @@ namespace tf3d::generators
           m_BaseMaskGenerator(appState, std::move(defaultTypeID)),
           m_MaskTool(appState, vizColor),
           m_Rasterizer(appState, m_BaseMaskGenerator),
+          m_UIState(State{m_BaseMaskGenerator.GetState(), m_MaskTool.GetState()}),
+          m_State(m_UIState),
           m_Texture(std::make_shared<GeneratorTexture>(256, 256, GeneratorTextureStorage::R16))
     {
     }
@@ -23,14 +25,13 @@ namespace tf3d::generators
           m_BaseMaskGenerator(std::move(other.m_BaseMaskGenerator)),
           m_MaskTool(std::move(other.m_MaskTool)),
           m_Rasterizer(std::move(other.m_Rasterizer)),
+          m_UIState(other.m_State.Capture().value),
+          m_State(m_UIState),
           m_Texture(std::move(other.m_Texture)),
           m_BaseTexture(std::move(other.m_BaseTexture)),
-          m_VisualizationTexture(std::move(other.m_VisualizationTexture)),
-          m_LastSourceData(other.m_LastSourceData),
-          m_BaseNeedsUpdate(other.m_BaseNeedsUpdate)
+          m_VisualizationTexture(std::move(other.m_VisualizationTexture))
     {
-        other.m_AppState       = nullptr;
-        other.m_LastSourceData = nullptr;
+        other.m_AppState = nullptr;
     }
 
     MaskLayer &MaskLayer::operator=(MaskLayer &&other) noexcept
@@ -38,18 +39,17 @@ namespace tf3d::generators
         if (this == &other)
             return *this;
 
-        m_AppState             = other.m_AppState;
-        m_BaseMaskGenerator    = std::move(other.m_BaseMaskGenerator);
-        m_MaskTool             = std::move(other.m_MaskTool);
-        m_Rasterizer           = std::move(other.m_Rasterizer);
+        m_AppState          = other.m_AppState;
+        m_BaseMaskGenerator = std::move(other.m_BaseMaskGenerator);
+        m_MaskTool          = std::move(other.m_MaskTool);
+        m_Rasterizer        = std::move(other.m_Rasterizer);
+        m_UIState           = other.m_State.Capture().value;
+        m_State.Replace(m_UIState);
         m_Texture              = std::move(other.m_Texture);
         m_BaseTexture          = std::move(other.m_BaseTexture);
         m_VisualizationTexture = std::move(other.m_VisualizationTexture);
-        m_LastSourceData       = other.m_LastSourceData;
-        m_BaseNeedsUpdate      = other.m_BaseNeedsUpdate;
 
-        other.m_AppState       = nullptr;
-        other.m_LastSourceData = nullptr;
+        other.m_AppState = nullptr;
         return *this;
     }
 
@@ -70,7 +70,6 @@ namespace tf3d::generators
             m_VisualizationTexture->Resize(visualizationSize, visualizationSize);
         }
         m_MaskTool.OnResolutionChanged();
-        m_BaseNeedsUpdate = true;
     }
 
     void MaskLayer::EnsureVisualizationTexture()
@@ -99,36 +98,38 @@ namespace tf3d::generators
         } else {
             ImGui::TextDisabled("Calculated from the current source terrain.");
         }
-        if (changed) {
-            m_BaseNeedsUpdate = true;
-        }
         return changed;
     }
 
-    bool MaskLayer::Render(bool rebuildBase)
+    MaskLayer::State MaskLayer::CaptureState() const
+    {
+        return State{m_BaseMaskGenerator.GetState(), m_MaskTool.GetState()};
+    }
+
+    bool MaskLayer::Render(const State &state, GeneratorData *sourceData)
     {
         if (m_Texture == nullptr)
             return false;
 
-        if (m_BaseMaskGenerator.IsNone()) {
+        if (state.base.runtimeMode < 0) {
             m_BaseTexture.reset();
         } else if (m_BaseTexture == nullptr) {
             m_BaseTexture = std::make_unique<GeneratorTexture>(m_Texture->GetWidth(),
                                                                m_Texture->GetHeight(),
                                                                GeneratorTextureStorage::R16);
-            rebuildBase   = true;
         }
 
-        const bool rendered = m_Rasterizer.Render(m_LastSourceData,
-                                                  m_BaseMaskGenerator,
-                                                  m_MaskTool.GetStrokes(),
-                                                  m_MaskTool.GetActiveStroke(),
-                                                  m_Texture.get(),
-                                                  m_BaseTexture.get(),
-                                                  rebuildBase);
-        if (rendered) {
-            m_BaseNeedsUpdate = false;
-        }
+        const MaskStroke *activeStroke = state.tool.activeStroke.has_value()
+                                             ? &*state.tool.activeStroke
+                                             : nullptr;
+        const bool rendered            = m_Rasterizer.Render(sourceData,
+                                                             m_BaseMaskGenerator,
+                                                             state.base,
+                                                             state.tool.strokes,
+                                                             activeStroke,
+                                                             m_Texture.get(),
+                                                             m_BaseTexture.get(),
+                                                             true);
         return rendered;
     }
 
@@ -146,19 +147,26 @@ namespace tf3d::generators
         changed |= m_MaskTool.ShowSettings(m_Texture.get(), previewTexture, showViewportMask);
 
         if (changed) {
-            Render(m_BaseNeedsUpdate);
+            m_UIState = CaptureState();
+            m_State.Replace(m_UIState);
         }
         return changed;
     }
 
-    bool MaskLayer::Update(GeneratorData *sourceData)
+    bool MaskLayer::Update(const Snapshot *state, GeneratorData *sourceData)
     {
+        if (state == nullptr)
+            return false;
+
         if (sourceData != nullptr && sourceData->GetResolution() > 0 &&
             (m_Texture == nullptr || m_Texture->GetWidth() != sourceData->GetResolution())) {
             Resize(sourceData->GetResolution());
         }
-        m_LastSourceData = sourceData;
-        return Render(true);
+        const bool rendered = Render(state->value, sourceData);
+        if (rendered) {
+            m_State.MarkProcessed(state->revision);
+        }
+        return rendered;
     }
 
     void MaskLayer::SaveTo(SerializerNode node) const
@@ -197,7 +205,8 @@ namespace tf3d::generators
         }
 
         m_MaskTool.Load(toolNode);
-        m_BaseNeedsUpdate = true;
+        m_UIState = CaptureState();
+        m_State.Replace(m_UIState);
     }
 
     void MaskLayer::SetInvertPreview(bool invert)
