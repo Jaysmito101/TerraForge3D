@@ -34,8 +34,10 @@ layout(binding = 3) uniform sampler2D u_MaskTexture;
 void main(void)
 {
 	uvec2 offsetv2 = gl_GlobalInvocationID.xy;
+
 	if (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;
-	vec2 uv = offsetv2 / float(u_Resolution);
+
+	vec2 uv = (vec2(offsetv2) + vec2(0.5f)) / float(u_Resolution);
 	vec3 seed = vec3(uv * 2.0f - vec2(1.0f), 0.0f);
 	if (u_UseSeedTexture)
 	{

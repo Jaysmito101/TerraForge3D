@@ -38,8 +38,9 @@ float smoothedMask(ivec2 coordinate)
 void main()
 {
 	ivec2 coordinate = ivec2(gl_GlobalInvocationID.xy);
-	if (coordinate.x >= u_Resolution || coordinate.y >= u_Resolution)
+	if (coordinate.x >= u_Resolution || coordinate.y >= u_Resolution) {
 		return;
+	}
 
 	float value = u_FlattenSource != 0 ? 0.0f : imageLoad(DataSourceTexture, coordinate).r;
 	if (u_UseMask != 0)

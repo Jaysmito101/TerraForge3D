@@ -19,10 +19,11 @@ void main()
 		return;
 
 	ivec2 pixelCoord = ivec2(invocation);
-	vec2 uv = vec2(invocation) / float(u_Resolution);
+	vec2 uv = (vec2(invocation) + vec2(0.5f)) / float(u_Resolution);
 	vec3 seed = vec3(uv * 2.0 - vec2(1.0), 0.0);
-	if (u_UseSeedTexture)
+	if (u_UseSeedTexture) {
 		seed = texture(u_SeedTexture, uv).rgb;
+	}
 
 	imageStore(DataTexture, pixelCoord, vec4(evaluateBaseShape(uv, seed), 0.0, 0.0, 0.0));
 }

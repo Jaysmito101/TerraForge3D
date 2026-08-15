@@ -90,7 +90,7 @@ void main()
 		ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);
 		ivec2 visualizerSize = imageSize(VisualizerTexture);
 		if (pixelCoord.x >= visualizerSize.x || pixelCoord.y >= visualizerSize.y || u_Resolution < 3) return;
-		vec2 uv = pixelCoord / vec2(imageSize(VisualizerTexture));
+		vec2 uv = (vec2(pixelCoord) + vec2(0.5f)) / vec2(imageSize(VisualizerTexture));
 		uv = vec2(uv.x, 1.0f - uv.y);
 		ivec2 offsetv2 = clamp(ivec2(uv * float(u_Resolution)), ivec2(1), ivec2(u_Resolution - 2));
 		// Get neighboring height values
