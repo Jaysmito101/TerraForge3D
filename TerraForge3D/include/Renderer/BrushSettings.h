@@ -6,7 +6,7 @@ namespace tf3d::renderer
 {
     struct DrawBrushSettings {
         float m_BrushSize      = 0.2f;
-        float m_BrushStrength  = 0.01f;
+        float m_BrushStrength  = 0.025f;
         float m_BrushFalloff   = 0.5f;
         float m_BrushPositionX = 0.0f;
         float m_BrushPositionY = 0.0f;
