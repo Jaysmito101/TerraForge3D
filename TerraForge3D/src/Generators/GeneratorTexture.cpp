@@ -19,6 +19,10 @@ namespace tf3d::generators
             m_Format         = GL_RED;
             m_InternalFormat = GL_R16;
             m_PixelType      = GL_UNSIGNED_SHORT;
+        } else if (m_Storage == GeneratorTextureStorage::R16F) {
+            m_Format         = GL_RED;
+            m_InternalFormat = GL_R16F;
+            m_PixelType      = GL_HALF_FLOAT;
         } else if (m_Storage == GeneratorTextureStorage::RG32F) {
             m_Format         = GL_RG;
             m_InternalFormat = GL_RG32F;
@@ -121,6 +125,8 @@ namespace tf3d::generators
                 for (size_t i = 0; i < values.size(); i++)
                     values[i] = static_cast<uint16_t>(glm::clamp(m_Data[i], 0.0f, 1.0f) * 65535.0f + 0.5f);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, m_Format, m_PixelType, values.data());
+            } else if (m_Storage == GeneratorTextureStorage::R16F) {
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, m_Format, GL_FLOAT, m_Data);
             } else {
                 std::vector<uint8_t> values(m_Width * m_Height);
                 for (size_t i = 0; i < values.size(); i++)
@@ -167,6 +173,9 @@ namespace tf3d::generators
                 if (m_Storage == GeneratorTextureStorage::R16) {
                     const uint16_t data = static_cast<uint16_t>(glm::clamp(r, 0.0f, 1.0f) * 65535.0f + 0.5f);
                     glTexSubImage2D(GL_TEXTURE_2D, 0, pixelX, pixelY, 1, 1, m_Format, m_PixelType, &data);
+                } else if (m_Storage == GeneratorTextureStorage::R16F) {
+                    const float data = r;
+                    glTexSubImage2D(GL_TEXTURE_2D, 0, pixelX, pixelY, 1, 1, m_Format, GL_FLOAT, &data);
                 } else {
                     const uint8_t data = static_cast<uint8_t>(glm::clamp(r, 0.0f, 1.0f) * 255.0f + 0.5f);
                     glTexSubImage2D(GL_TEXTURE_2D, 0, pixelX, pixelY, 1, 1, m_Format, m_PixelType, &data);
@@ -203,6 +212,9 @@ namespace tf3d::generators
             if (m_Storage == GeneratorTextureStorage::R16) {
                 const uint16_t zero = 0;
                 glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);
+            } else if (m_Storage == GeneratorTextureStorage::R16F) {
+                const float zero = 0.0f;
+                glClearTexImage(m_RendererID, 0, m_Format, GL_FLOAT, &zero);
             } else {
                 const uint8_t zero = 0;
                 glClearTexImage(m_RendererID, 0, m_Format, m_PixelType, &zero);

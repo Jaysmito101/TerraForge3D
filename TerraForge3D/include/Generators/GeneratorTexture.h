@@ -9,6 +9,7 @@ namespace tf3d::generators
         RG32F,
         R8,
         R16,
+        R16F,
     };
 
     class GeneratorTexture
@@ -53,7 +54,9 @@ namespace tf3d::generators
         }
         inline const bool IsSingleChannel() const
         {
-            return m_Storage == GeneratorTextureStorage::R8 || m_Storage == GeneratorTextureStorage::R16;
+            return m_Storage == GeneratorTextureStorage::R8 ||
+                   m_Storage == GeneratorTextureStorage::R16 ||
+                   m_Storage == GeneratorTextureStorage::R16F;
         }
         inline const bool IsTwoChannel() const
         {
