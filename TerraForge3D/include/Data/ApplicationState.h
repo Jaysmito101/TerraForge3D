@@ -25,6 +25,8 @@
 #include <array>
 #include <nlohmann/json.hpp>
 
+TF3D_FWD_DEC_CLASS(TextureLoader, tf3d::base)
+
 #ifdef TF3D_ENABLE_MCP
 namespace tf3d
 {
@@ -141,6 +143,7 @@ namespace tf3d::data
         base::EventManager *eventManager       = nullptr;
         data::ResourceManager *resourceManager = nullptr;
         data::ConfigManager *configManager     = nullptr;
+        std::unique_ptr<base::TextureLoader> textureLoader;
 
 #ifdef TF3D_ENABLE_MCP
         bool mcpEnabled                           = true;

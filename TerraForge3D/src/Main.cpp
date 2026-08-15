@@ -11,6 +11,7 @@
 #include "TextureStore/TextureStore.h"
 #include "Utils/Utils.h"
 #include "Base/SplashScreen.h"
+#include "Base/TextureLoader.h"
 #include <iostream>
 #include <string>
 
@@ -53,6 +54,12 @@ namespace tf3d
 #endif
             if (!appState->states.ruinning)
                 return;
+
+            if (appState->textureLoader != nullptr) {
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/textures", PerformanceMonitor::Domain::Io);
+                appState->textureLoader->ProcessCompletions();
+            }
+
             {
                 TF3D_PROFILE_SCOPE_DOMAIN("app/update/jobs", PerformanceMonitor::Domain::Job);
                 {
@@ -246,6 +253,7 @@ namespace tf3d
             appState->jobSystem         = new JobSystem::JobSystem(appState);
             appState->jobManager        = new JobSystem::JobManager(appState);
             appState->eventManager      = new EventManager();
+            appState->textureLoader     = std::make_unique<base::TextureLoader>();
             appState->resourceManager   = ResourceManager::GetInstance(appState);
             appState->dashboard         = new Dashboard(appState);
             appState->generationManager = new GenerationManager(appState);
@@ -323,6 +331,7 @@ namespace tf3d
             // delete appState->textureStore;
             delete appState->styleManager;
             delete appState->generationManager;
+            appState->textureLoader.reset();
             delete appState->dashboard;
             delete appState->rendererManager;
             delete appState->mainModel;

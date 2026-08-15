@@ -14,6 +14,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(Texture2D, tf3d::base)
@@ -60,14 +61,31 @@ namespace tf3d::base
         TextureLoader(const TextureLoader &)            = delete;
         TextureLoader &operator=(const TextureLoader &) = delete;
 
-        uint64_t Request(std::string path,
-                         TextureLoadPriority priority,
-                         CompletionHandler handler,
-                         TextureLoadOptions options = {});
-        uint64_t Request(std::string path,
-                         TextureLoadPriority priority,
-                         DecodeFunction decoder,
-                         CompletionHandler handler);
+        inline uint64_t Request(std::string path,
+                                TextureLoadPriority priority,
+                                CompletionHandler handler,
+                                TextureLoadOptions options = {})
+        {
+            return RequestImpl(std::move(path),
+                               priority,
+                               {},
+                               std::move(handler),
+                               options,
+                               false);
+        }
+
+        inline uint64_t Request(std::string path,
+                                TextureLoadPriority priority,
+                                DecodeFunction decoder,
+                                CompletionHandler handler)
+        {
+            return RequestImpl(std::move(path),
+                               priority,
+                               std::move(decoder),
+                               std::move(handler),
+                               {},
+                               true);
+        }
 
         void ProcessCompletions();
 

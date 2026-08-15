@@ -1,6 +1,7 @@
 #include "Data/ApplicationState.h"
 
 #include "Base/Logging/Logger.h"
+#include "Base/TextureLoader.h"
 
 #include <algorithm>
 #include <string_view>
