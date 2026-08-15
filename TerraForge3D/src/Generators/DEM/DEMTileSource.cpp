@@ -1,18 +1,33 @@
 #include "Generators/DEM/DEMTileSource.h"
 
+#include "Base/Texture2D.h"
+#include "Base/TextureLoader.h"
 #include "Data/ApplicationState.h"
 #include "Utils/Utils.h"
+#include "webp/decode.h"
 
+#include <filesystem>
 #include <utility>
 
 namespace tf3d::generators::dem
 {
 
     TileSource::TileSource(tf3d::data::ApplicationState *appState)
-        : m_Cache(appState != nullptr
+        : m_AppState(appState),
+          m_TextureLoader(appState != nullptr ? appState->textureLoader.get() : nullptr),
+          m_Cache(appState != nullptr
                       ? appState->constants.cacheDir + PATH_SEPARATOR "dem_data" PATH_SEPARATOR "terrain_rgb"
                       : std::string(".")),
-          m_Loader(appState != nullptr ? appState->constants.texturesDir : std::string()),
+          m_LoadingTexture(std::make_shared<base::Texture2D>(
+              (std::filesystem::path(appState != nullptr ? appState->constants.texturesDir : std::string()) /
+               "loading.png")
+                  .string(),
+              false)),
+          m_UnavailableTexture(std::make_shared<base::Texture2D>(
+              (std::filesystem::path(appState != nullptr ? appState->constants.texturesDir : std::string()) /
+               "black.jpg")
+                  .string(),
+              false)),
           m_Downloader(appState,
                        m_Cache.FileFormat(TileAsset::Elevation),
                        m_Cache.FileFormat(TileAsset::Satellite))
@@ -31,8 +46,9 @@ namespace tf3d::generators::dem
 
     std::shared_ptr<base::Texture2D> TileSource::Request(const TileKey &key)
     {
-        if (!key.IsValid())
-            return m_Loader.UnavailableTexture();
+        if (!key.IsValid()) {
+            return m_UnavailableTexture;
+        }
 
         if (const auto loaded = m_Cache.FindLoaded(key, TileAsset::Elevation); loaded != nullptr) {
             if (!m_Cache.HasDiskEntry(key, TileAsset::Satellite))
@@ -45,30 +61,27 @@ namespace tf3d::generators::dem
             if (requestResult == TileRequestResult::Scheduled ||
                 requestResult == TileRequestResult::AlreadyPending ||
                 requestResult == TileRequestResult::RateLimited) {
-                return m_Loader.LoadingTexture();
+                return m_LoadingTexture;
             }
-            if (!m_Cache.HasDiskEntry(key, TileAsset::Elevation))
-                return m_Loader.UnavailableTexture();
+            if (!m_Cache.HasDiskEntry(key, TileAsset::Elevation)) {
+                return m_UnavailableTexture;
+            }
         }
 
         if (!m_Cache.HasDiskEntry(key, TileAsset::Satellite)) {
             m_Downloader.Request(key);
         }
 
-        const auto loadResult = m_Loader.Load(m_Cache.PathFor(key, TileAsset::Elevation));
-        if (loadResult.status == TileLoadStatus::Loaded) {
-            m_Cache.StoreLoaded(key, TileAsset::Elevation, loadResult.texture);
-            return loadResult.texture;
+        if (QueueTextureLoad(key, TileAsset::Elevation)) {
+            return m_LoadingTexture;
         }
-
-        m_Cache.RemoveDiskEntry(key, TileAsset::Elevation);
-        return m_Loader.UnavailableTexture();
+        return m_UnavailableTexture;
     }
 
     std::shared_ptr<base::Texture2D> TileSource::RequestSatellite(const TileKey &key)
     {
         if (!key.IsValid()) {
-            return m_Loader.UnavailableTexture();
+            return m_UnavailableTexture;
         }
 
         if (const auto loaded = m_Cache.FindLoaded(key, TileAsset::Satellite); loaded != nullptr) {
@@ -80,20 +93,17 @@ namespace tf3d::generators::dem
             if (requestResult == TileRequestResult::Scheduled ||
                 requestResult == TileRequestResult::AlreadyPending ||
                 requestResult == TileRequestResult::RateLimited) {
-                return m_Loader.LoadingTexture();
+                return m_LoadingTexture;
             }
-            if (!m_Cache.HasDiskEntry(key, TileAsset::Satellite))
-                return m_Loader.UnavailableTexture();
+            if (!m_Cache.HasDiskEntry(key, TileAsset::Satellite)) {
+                return m_UnavailableTexture;
+            }
         }
 
-        const auto loadResult = m_Loader.LoadSatellite(m_Cache.PathFor(key, TileAsset::Satellite));
-        if (loadResult.status == TileLoadStatus::Loaded) {
-            m_Cache.StoreLoaded(key, TileAsset::Satellite, loadResult.texture);
-            return loadResult.texture;
+        if (QueueTextureLoad(key, TileAsset::Satellite)) {
+            return m_LoadingTexture;
         }
-
-        m_Cache.RemoveDiskEntry(key, TileAsset::Satellite);
-        return m_Loader.UnavailableTexture();
+        return m_UnavailableTexture;
     }
 
     std::shared_ptr<base::Texture2D> TileSource::FindLoaded(const TileKey &key) const
@@ -109,6 +119,12 @@ namespace tf3d::generators::dem
     bool TileSource::IsPending(const TileKey &key) const
     {
         return m_Downloader.IsPending(key);
+    }
+
+    bool TileSource::IsTexturePending(const TileKey &key) const
+    {
+        return key.IsValid() && m_TextureLoader != nullptr &&
+               m_TextureLoader->IsPending(m_Cache.PathFor(key, TileAsset::Elevation));
     }
 
     bool TileSource::IsCircuitOpen() const
@@ -172,6 +188,67 @@ namespace tf3d::generators::dem
     std::size_t TileSource::PendingCount() const
     {
         return m_Downloader.PendingCount();
+    }
+
+    bool TileSource::QueueTextureLoad(const TileKey &key, TileAsset asset)
+    {
+        if (m_TextureLoader == nullptr || !m_TextureLoader->HasContext()) {
+            return false;
+        }
+
+        const std::string path = m_Cache.PathFor(key, asset);
+        const auto priority    = asset == TileAsset::Elevation
+                                     ? base::TextureLoadPriority::High
+                                     : base::TextureLoadPriority::Low;
+        auto completionHandler = [this, key, asset](base::TextureLoadResult result) {
+            if (result.Succeeded()) {
+                m_Cache.StoreLoaded(key, asset, std::move(result.texture));
+                if (m_AppState != nullptr) {
+                    m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::External);
+                }
+            } else {
+                m_Cache.RemoveDiskEntry(key, asset);
+            }
+        };
+
+        if (asset == TileAsset::Elevation) {
+            m_TextureLoader->Request(path,
+                                     priority,
+                                     base::TextureLoader::DecodeFunction(&TileSource::DecodeElevation),
+                                     std::move(completionHandler));
+        } else {
+            m_TextureLoader->Request(path,
+                                     priority,
+                                     std::move(completionHandler));
+        }
+        return true;
+    }
+
+    std::shared_ptr<base::Texture2D> TileSource::DecodeElevation(const std::string &path)
+    {
+        int width = 1;
+        int height = 1;
+        int size = 0;
+        uint8_t *data = reinterpret_cast<uint8_t *>(ReadBinaryFile(path, &size));
+        if (data == nullptr || size <= 0) {
+            delete[] data;
+            return nullptr;
+        }
+
+        auto rgbaData = WebPDecodeRGBA(data, size, &width, &height);
+        if (rgbaData == nullptr || width <= 0 || height <= 0) {
+            delete[] data;
+            if (rgbaData != nullptr) {
+                free(rgbaData);
+            }
+            return nullptr;
+        }
+
+        auto texture = std::make_shared<base::Texture2D>(width, height);
+        texture->SetData(rgbaData, 0, true);
+        delete[] data;
+        free(rgbaData);
+        return texture;
     }
 
 } // namespace tf3d::generators::dem

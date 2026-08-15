@@ -4,6 +4,7 @@
 #include "Generators/DEM/DEMTileTypes.h"
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -32,6 +33,7 @@ namespace tf3d::generators::dem
     private:
         std::string m_ElevationFileFormat;
         std::string m_SatelliteFileFormat;
+        mutable std::mutex m_LoadedMutex;
         std::unordered_map<TileKey, std::shared_ptr<base::Texture2D>, TileKeyHash> m_LoadedElevationTiles;
         std::unordered_map<TileKey, std::shared_ptr<base::Texture2D>, TileKeyHash> m_LoadedSatelliteTiles;
     };

@@ -3,12 +3,12 @@
 #include "Base/Base.h"
 #include "Generators/DEM/DEMTileCache.h"
 #include "Generators/DEM/DEMTileDownloader.h"
-#include "Generators/DEM/DEMTileLoader.h"
 
 #include <cstddef>
 #include <memory>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
+TF3D_FWD_DEC_CLASS(TextureLoader, tf3d::base)
 
 namespace tf3d::generators::dem
 {
@@ -27,6 +27,7 @@ namespace tf3d::generators::dem
         std::shared_ptr<base::Texture2D> FindLoadedSatellite(const TileKey &key) const;
         std::shared_ptr<base::Texture2D> FindBestAvailable(const TileKey &requestedKey, TileKey &resolvedKey);
         bool IsPending(const TileKey &key) const;
+        bool IsTexturePending(const TileKey &key) const;
         bool IsCircuitOpen() const;
 
         void SetApiKey(std::string apiKey);
@@ -51,8 +52,14 @@ namespace tf3d::generators::dem
         }
 
     private:
+        bool QueueTextureLoad(const TileKey &key, TileAsset asset);
+        static std::shared_ptr<base::Texture2D> DecodeElevation(const std::string &path);
+
+        tf3d::data::ApplicationState *m_AppState = nullptr;
+        base::TextureLoader *m_TextureLoader     = nullptr;
         TileCache m_Cache;
-        TileLoader m_Loader;
+        std::shared_ptr<base::Texture2D> m_LoadingTexture;
+        std::shared_ptr<base::Texture2D> m_UnavailableTexture;
         TileDownloader m_Downloader;
     };
 

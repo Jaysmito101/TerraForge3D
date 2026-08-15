@@ -5,9 +5,40 @@
 #include "Profiler.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace tf3d::generators::dem
 {
+
+    struct DispatchRegion {
+        glm::ivec2 offset = glm::ivec2(0);
+        glm::ivec2 size   = glm::ivec2(0);
+    };
+
+    DispatchRegion GetTileDispatchRegion(const glm::vec2 &start,
+                                         const glm::vec2 &end,
+                                         int32_t resolution)
+    {
+        const glm::vec2 clippedStart = glm::clamp(start, glm::vec2(0.0f), glm::vec2(1.0f));
+        const glm::vec2 clippedEnd   = glm::clamp(end, glm::vec2(0.0f), glm::vec2(1.0f));
+        if (clippedStart.x >= clippedEnd.x || clippedStart.y >= clippedEnd.y) {
+            return {};
+        }
+
+        const glm::vec2 pixelStartUV(clippedStart.x, 1.0f - clippedEnd.y);
+        const glm::vec2 pixelEndUV(clippedEnd.x, 1.0f - clippedStart.y);
+        const glm::ivec2 offset(static_cast<int32_t>(std::floor(pixelStartUV.x * resolution)),
+                                static_cast<int32_t>(std::floor(pixelStartUV.y * resolution)));
+        const glm::ivec2 endPixel(static_cast<int32_t>(std::ceil(pixelEndUV.x * resolution)),
+                                  static_cast<int32_t>(std::ceil(pixelEndUV.y * resolution)));
+        const glm::ivec2 clippedOffset   = glm::clamp(offset, glm::ivec2(0), glm::ivec2(resolution));
+        const glm::ivec2 clippedEndPixel = glm::clamp(endPixel, glm::ivec2(0), glm::ivec2(resolution));
+        if (clippedOffset.x >= clippedEndPixel.x || clippedOffset.y >= clippedEndPixel.y) {
+            return {};
+        }
+
+        return {clippedOffset, clippedEndPixel - clippedOffset};
+    }
 
     Renderer::Renderer(tf3d::data::ApplicationState *appState)
         : m_Texture(kPreviewWidth, kPreviewHeight)
@@ -21,7 +52,7 @@ namespace tf3d::generators::dem
                                  GeneratorData *buffer,
                                  std::span<const RenderTile> tiles)
     {
-        RenderStats stats;
+        RenderStats stats{};
         if (!m_Shader || buffer == nullptr || settings.tileResolution <= 0) {
             return stats;
         }
@@ -55,11 +86,19 @@ namespace tf3d::generators::dem
                                          glm::vec2(tileSize * static_cast<float>(tile.key.x),
                                                    tileSize * static_cast<float>(tile.key.y))) *
                                         settings.zoomOnMap;
-                const glm::vec2 end = start + glm::vec2(tileSize * settings.zoomOnMap);
+                const glm::vec2 end                 = start + glm::vec2(tileSize * settings.zoomOnMap);
+                const DispatchRegion dispatchRegion = GetTileDispatchRegion(start, end, settings.tileResolution);
+                if (dispatchRegion.size.x <= 0 || dispatchRegion.size.y <= 0) {
+                    continue;
+                }
+
                 m_Shader->SetUniform1f("u_RegionTileSize", tileSize * settings.zoomOnMap);
+                m_Shader->SetUniform2i("u_DispatchOffset", dispatchRegion.offset.x, dispatchRegion.offset.y);
                 m_Shader->SetUniform1i("u_DEMTexture", tile.texture->Bind(0));
                 m_Shader->SetUniform4f("u_RegionToUpdate", glm::vec4(start, end));
-                m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
+                const int32_t tileDispatchX = (dispatchRegion.size.x + workgroupSize - 1) / workgroupSize;
+                const int32_t tileDispatchY = (dispatchRegion.size.y + workgroupSize - 1) / workgroupSize;
+                m_Shader->Dispatch(tileDispatchX, tileDispatchY, 1);
 
                 if (tile.fallback) {
                     ++stats.tilesFallback;

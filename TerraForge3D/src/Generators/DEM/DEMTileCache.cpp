@@ -38,6 +38,7 @@ namespace tf3d::generators::dem
 
     std::shared_ptr<base::Texture2D> TileCache::FindLoaded(const TileKey &key, TileAsset asset) const
     {
+        std::lock_guard lock(m_LoadedMutex);
         const auto &loadedTiles = asset == TileAsset::Satellite ? m_LoadedSatelliteTiles : m_LoadedElevationTiles;
         const auto iterator     = loadedTiles.find(key);
         return iterator != loadedTiles.end() ? iterator->second : nullptr;
@@ -45,9 +46,11 @@ namespace tf3d::generators::dem
 
     void TileCache::StoreLoaded(const TileKey &key, TileAsset asset, std::shared_ptr<base::Texture2D> texture)
     {
-        if (texture == nullptr)
+        if (texture == nullptr) {
             return;
+        }
 
+        std::lock_guard lock(m_LoadedMutex);
         auto &loadedTiles = asset == TileAsset::Satellite ? m_LoadedSatelliteTiles : m_LoadedElevationTiles;
         loadedTiles[key]  = std::move(texture);
     }
