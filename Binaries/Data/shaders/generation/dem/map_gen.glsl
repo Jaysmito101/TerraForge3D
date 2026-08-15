@@ -80,7 +80,7 @@ void main()
 		uvec2 offsetv2 = uvec2(u_DispatchOffset) + gl_GlobalInvocationID.xy;
 		if (offsetv2.x >= uint(u_Resolution) || offsetv2.y >= uint(u_Resolution)) return;
 		uint offset = PixelCoordToDataOffset(offsetv2.x, offsetv2.y);
-		vec2 uv = offsetv2 / float(u_Resolution);
+		vec2 uv = (vec2(offsetv2) + vec2(0.5f)) / float(u_Resolution);
 		uv = vec2(uv.x, 1.0f - uv.y);
 		vec2 rData = evaluateDEM(uv);
 		if(rData.y > 0.5f) imageStore(DataTexture, ivec2(offsetv2), vec4(rData.x, 0.0, 0.0, 0.0));
