@@ -54,6 +54,7 @@ namespace tf3d::generators
         };
 
         ImGui::PushID("BaseNoiseGenerator");
+        markChanged(ImGui::Checkbox("Enabled", &m_Enabled));
         markChanged(m_Inspector->Render());
 
         markChanged(ImGui::Checkbox("Use mask", &m_UseMask));
@@ -85,6 +86,12 @@ namespace tf3d::generators
     {
         if (!m_Shader || sourceBuffer == nullptr || targetBuffer == nullptr)
             return;
+
+        if (!m_Enabled) {
+            sourceBuffer->CopyTo(targetBuffer);
+            m_RequireUpdation = false;
+            return;
+        }
 
         TF3D_PROFILE_SCOPE_CHILD_LAZY("base-noise");
 
@@ -130,6 +137,7 @@ namespace tf3d::generators
         if (data == nullptr)
             return;
 
+        m_Enabled    = data->Get<bool>("Enabled", m_Enabled);
         m_UseMask    = data->Get<bool>("UseMask", m_UseMask);
         m_InvertMask = data->Get<bool>("InvertMask", m_InvertMask);
 
@@ -146,6 +154,7 @@ namespace tf3d::generators
     SerializerNode BaseNoiseGenerator::Save()
     {
         auto node = CreateSerializerNode();
+        node->Set("Enabled", m_Enabled);
         node->Set("UseMask", m_UseMask);
         node->Set("InvertMask", m_InvertMask);
         node->Set("Inspector", m_Inspector->SaveState());

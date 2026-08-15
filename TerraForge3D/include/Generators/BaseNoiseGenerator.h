@@ -35,6 +35,7 @@ namespace tf3d::generators
     private:
         data::ApplicationState *m_AppState = nullptr;
         bool m_RequireUpdation             = false;
+        bool m_Enabled                     = true;
         bool m_UseMask                     = true;
         bool m_InvertMask                  = false;
         std::optional<base::ComputeShader> m_Shader;
