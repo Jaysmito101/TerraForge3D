@@ -38,18 +38,23 @@ namespace tf3d::generators
         std::vector<glm::vec4> points;
 
         const auto appendStroke = [&](const MaskStroke &stroke) {
-            if (stroke.points.empty())
+            if (stroke.points.empty()) {
                 return;
+            }
             settings.emplace_back(stroke.strength, stroke.size, stroke.falloff, static_cast<float>(stroke.mode));
             ranges.emplace_back(static_cast<int>(points.size()), static_cast<int>(stroke.points.size()), 0, 0);
-            for (const auto &point : stroke.points)
+            for (const auto &point : stroke.points) {
                 points.emplace_back(point.x, point.y, 0.0f, 0.0f);
+            }
         };
 
-        for (const auto &stroke : strokes)
+        for (const auto &stroke : strokes) {
             appendStroke(stroke);
-        if (activeStroke != nullptr)
+        }
+
+        if (activeStroke != nullptr) {
             appendStroke(*activeStroke);
+        }
 
         const glm::vec4 emptySettings(0.0f);
         const glm::ivec4 emptyRange(0);
@@ -120,8 +125,9 @@ namespace tf3d::generators
                                 bool rebuildBase)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/mask/rasterize", PerformanceMonitor::Domain::Generation);
-        if (destination == nullptr || destination->GetWidth() <= 0)
+        if (destination == nullptr || destination->GetWidth() <= 0) {
             return false;
+        }
 
         UploadStrokes(strokes, activeStroke);
 
@@ -129,17 +135,21 @@ namespace tf3d::generators
         for (const auto &stroke : strokes) {
             strokeCount += !stroke.points.empty();
         }
-        
+
         if (activeStroke != nullptr && !activeStroke->points.empty()) {
-            ++strokeCount;
+            strokeCount += 1;
         }
 
         const bool hasBase = baseState.runtimeMode >= 0;
         if (hasBase) {
-            if (baseTexture == nullptr || baseTexture->GetWidth() != destination->GetWidth())
+            if (baseTexture == nullptr || baseTexture->GetWidth() != destination->GetWidth()) {
                 return false;
-            if (rebuildBase && !Dispatch(sourceData, baseGenerator, baseState, baseTexture, nullptr, 0, false))
+            }
+
+            if (rebuildBase && !Dispatch(sourceData, baseGenerator, baseState, baseTexture, nullptr, 0, false)) {
                 return false;
+            }
+            
             return Dispatch(nullptr, baseGenerator, baseState, destination, baseTexture, strokeCount, true);
         }
 

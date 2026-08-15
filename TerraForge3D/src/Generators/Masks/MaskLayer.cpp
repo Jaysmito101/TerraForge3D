@@ -74,8 +74,9 @@ namespace tf3d::generators
 
     void MaskLayer::EnsureVisualizationTexture()
     {
-        if (m_Texture == nullptr || m_Texture->GetWidth() <= 0)
+        if (m_Texture == nullptr || m_Texture->GetWidth() <= 0) {
             return;
+        }
 
         const int visualizationSize = std::min(m_Texture->GetWidth(), kMaxVisualizationResolution);
         if (m_VisualizationTexture == nullptr) {
@@ -108,8 +109,9 @@ namespace tf3d::generators
 
     bool MaskLayer::Render(const State &state, GeneratorData *sourceData)
     {
-        if (m_Texture == nullptr)
+        if (m_Texture == nullptr) {
             return false;
+        }
 
         if (state.base.runtimeMode < 0) {
             m_BaseTexture.reset();
@@ -155,8 +157,9 @@ namespace tf3d::generators
 
     bool MaskLayer::Update(const Snapshot *state, GeneratorData *sourceData)
     {
-        if (state == nullptr)
+        if (state == nullptr) {
             return false;
+        }
 
         if (sourceData != nullptr && sourceData->GetResolution() > 0 &&
             (m_Texture == nullptr || m_Texture->GetWidth() != sourceData->GetResolution())) {
