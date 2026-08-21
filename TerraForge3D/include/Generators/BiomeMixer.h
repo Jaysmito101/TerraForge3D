@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Base/RevisionTracker.h"
 #include "Generators/BiomeManager.h"
+#include "Generators/GenerationContext.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
 
@@ -25,26 +27,40 @@ namespace tf3d::generators
     class BiomeMixer
     {
     public:
+        struct State {
+            BiomeMixerMethod method = BiomeMixerMethod_Simple;
+            SimpleBiomeMixer::State simple;
+        };
+        using Snapshot = base::GeneratorState<State>::Snapshot;
+
         BiomeMixer(ApplicationState *appState);
         ~BiomeMixer();
 
-        void Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer);
-        bool ShowSettings();
+        void Update(const Snapshot *state,
+                    const GenerationContext *context,
+                    const std::vector<BiomeManager::State> &biomeStates,
+                    const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
+                    GeneratorData *heightmapData,
+                    GeneratorData *swapBuffer);
+        bool ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers);
+
+        inline Snapshot GetState() const
+        {
+            return m_State.Capture();
+        }
 
         inline bool IsUpdationRequired()
         {
-            return m_RequireUpdation;
+            return m_State.RequiresUpdate();
         }
 
     private:
-        ApplicationState *m_AppState = nullptr;
-        bool m_RequireUpdation       = true;
-        BiomeMixerMethod m_Method    = BiomeMixerMethod_Simple;
+        State CaptureState() const;
+        void PublishState();
 
-        // This part could be sorted ot better with some inheritance
-        // but thats not really worth it for now
-        // maybe someone could create a pull request for this
         std::shared_ptr<SimpleBiomeMixer> m_SimpleBiomeMixer;
+        State m_UIState;
+        base::GeneratorState<State> m_State;
     };
 } // namespace tf3d::generators
 using tf3d::generators::BiomeMixer;

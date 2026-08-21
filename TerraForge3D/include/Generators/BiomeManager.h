@@ -29,8 +29,6 @@ namespace tf3d::generators
 
     static std::vector<std::string> s_BaseShapeGeneratorModeNames = {"Algorithm", "Global Elevation"};
 
-#define BIOME_UI_PROPERTY(x) m_RequireUpdation = x || m_RequireUpdation
-
     class BiomeManager
     {
     public:

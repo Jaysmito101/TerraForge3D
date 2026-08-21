@@ -7,23 +7,36 @@ namespace tf3d::generators
 {
 
     BiomeMixer::BiomeMixer(ApplicationState *appState)
+        : m_SimpleBiomeMixer(std::make_shared<SimpleBiomeMixer>(appState)),
+          m_State(m_UIState)
     {
-        m_AppState        = appState;
-        m_Method          = BiomeMixerMethod_Simple;
-        m_RequireUpdation = true;
-
-        m_SimpleBiomeMixer = std::make_shared<SimpleBiomeMixer>(appState);
+        PublishState();
     }
 
     BiomeMixer::~BiomeMixer()
     {
     }
 
-    void BiomeMixer::Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer)
+    void BiomeMixer::Update(const Snapshot *state,
+                            const GenerationContext *context,
+                            const std::vector<BiomeManager::State> &biomeStates,
+                            const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
+                            GeneratorData *heightmapData,
+                            GeneratorData *swapBuffer)
     {
-        switch (m_Method) {
+        if (state == nullptr || context == nullptr || heightmapData == nullptr || swapBuffer == nullptr ||
+            m_SimpleBiomeMixer == nullptr) {
+            return;
+        }
+
+        switch (state->value.method) {
             case BiomeMixerMethod_Simple:
-                m_SimpleBiomeMixer->Update(heightmapData, m_SwapBuffer);
+                m_SimpleBiomeMixer->Update(&state->value.simple,
+                                           context,
+                                           biomeStates,
+                                           biomeManagers,
+                                           heightmapData,
+                                           swapBuffer);
                 break;
             case BiomeMixerMethod_AlphaBlend:
                 break;
@@ -32,10 +45,25 @@ namespace tf3d::generators
             default:
                 break;
         }
-        m_RequireUpdation = false;
+        m_State.MarkProcessed(state->revision);
     }
 
-    bool BiomeMixer::ShowSettings()
+    BiomeMixer::State BiomeMixer::CaptureState() const
+    {
+        State state = m_UIState;
+        if (m_SimpleBiomeMixer != nullptr) {
+            state.simple = m_SimpleBiomeMixer->GetState().value;
+        }
+        return state;
+    }
+
+    void BiomeMixer::PublishState()
+    {
+        m_UIState = CaptureState();
+        m_State.Replace(m_UIState);
+    }
+
+    bool BiomeMixer::ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers)
     {
         ImGui::Text("Biome Mixer");
 
@@ -43,15 +71,17 @@ namespace tf3d::generators
             "Simple",
             "Alpha Blend"};
 
-        int method = static_cast<int>(m_Method);
+        int method = static_cast<int>(m_UIState.method);
 
-        BIOME_UI_PROPERTY(ShowComboBox("Method##BiomeMixerMethod", &method, s_Methods, 2));
+        bool changed = ShowComboBox("Method##BiomeMixerMethod", &method, s_Methods, 2);
 
-        m_Method = static_cast<BiomeMixerMethod>(method);
+        m_UIState.method = static_cast<BiomeMixerMethod>(method);
 
-        switch (m_Method) {
+        switch (m_UIState.method) {
             case BiomeMixerMethod_Simple:
-                BIOME_UI_PROPERTY(m_SimpleBiomeMixer->ShowSettings());
+                if (m_SimpleBiomeMixer != nullptr) {
+                    changed |= m_SimpleBiomeMixer->ShowSettings(biomeManagers);
+                }
                 break;
             case BiomeMixerMethod_AlphaBlend:
                 ImGui::Text("TODO");
@@ -60,7 +90,10 @@ namespace tf3d::generators
                 break;
         }
 
-        return m_RequireUpdation;
+        if (changed) {
+            PublishState();
+        }
+        return changed;
     }
 
 } // namespace tf3d::generators
