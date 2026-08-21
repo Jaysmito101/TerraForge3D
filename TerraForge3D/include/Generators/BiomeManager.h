@@ -1,15 +1,20 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Base/RevisionTracker.h"
 #include "Generators/BaseNoiseGenerator.h"
 #include "Generators/BiomeBaseShapeGenerator.h"
 #include "Generators/BiomeCustomBaseShape.h"
-#include "Generators/BiomeFilterStack.h"
+#include "Generators/Filters/BiomeFilterStack.h"
 #include "Generators/DEMBaseShapeGenerator.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/GenerationContext.h"
 #include "Generators/Masks/MaskLayer.h"
+
+#include <atomic>
+#include <optional>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
@@ -29,11 +34,27 @@ namespace tf3d::generators
     class BiomeManager
     {
     public:
+        using Revision = base::RevisionTracker::Revision;
+
+        struct State {
+            Revision revision                         = 0;
+            bool enabled                              = true;
+            BiomeBaseShapeGeneratorMode baseShapeMode = BiomeBaseShapeGeneratorMode_Algorithm;
+            int32_t baseShapeGenerator                = 0;
+            std::optional<BiomeBaseShapeGenerator::Snapshot> baseShape;
+            std::optional<DEMBaseShapeGenerator::Snapshot> demBaseShape;
+            std::optional<BaseNoiseGenerator::Snapshot> baseNoise;
+            std::optional<BiomeCustomizeBaseShape::Snapshot> customBaseShape;
+            std::optional<BiomeFilterStack::Snapshot> filters;
+            std::optional<MaskLayer::Snapshot> mask;
+        };
+
         BiomeManager(tf3d::data::ApplicationState *appState);
         ~BiomeManager();
 
         void Resize();
-        void Update(GeneratorData *swapBuffer, GeneratorTexture *seedTexture);
+        State GetState() const;
+        void Update(const State *state, const GenerationContext *context, GeneratorData *swapBuffer);
         // bool ShowSettings();
         bool ShowBaseShapeSettings();
         bool ShowCustomizeBaseShapeSettings();
@@ -56,7 +77,11 @@ namespace tf3d::generators
         }
         inline const bool IsUpdationRequired() const
         {
-            return m_RequireUpdation;
+            return m_UpdateTracker.RequiresUpdate();
+        }
+        inline bool IsUpdationRequired(const State &state) const
+        {
+            return state.revision != m_UpdateTracker.ProcessedRevision();
         }
         inline const bool IsUsingCustomBaseShape() const
         {
@@ -99,21 +124,22 @@ namespace tf3d::generators
             return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
         }
 
-        bool AddBaseShapeGenerator(const nlohmann::json &config, const std::string &source, const std::string &shaderPath);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
         bool LoadUpResources();
 
     private:
+        void MarkUpdateRequired();
+
         char m_BiomeName[64];
-        bool m_IsEnabled       = true;
-        bool m_RequireUpdation = true;
+        bool m_IsEnabled = true;
         ImVec4 m_Color;
         std::string m_BiomeID                    = "";
         tf3d::data::ApplicationState *m_AppState = nullptr;
         std::shared_ptr<GeneratorData> m_Data;
-        int32_t m_SelectedBaseShapeGenerator                         = 0;
-        BiomeBaseShapeGeneratorMode m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
+        base::RevisionTracker m_UpdateTracker{1};
+        std::atomic<int32_t> m_SelectedBaseShapeGenerator                         = 0;
+        std::atomic<BiomeBaseShapeGeneratorMode> m_SelectedBaseShapeGeneratorMode = BiomeBaseShapeGeneratorMode_Algorithm;
         std::shared_ptr<BiomeFilterStack> m_FilterStack;
         std::shared_ptr<DEMBaseShapeGenerator> m_DEMBaseShapeGenerator;
         std::shared_ptr<MaskLayer> m_MaskLayer;

@@ -2,10 +2,11 @@
 
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
-#include "Inspector/CustomInspectorTypes.h"
+#include "Inspector/CustomInspector.h"
 #include "Profiler.h"
 #include "Utils/Utils.h"
 
+#include <algorithm>
 #include <unordered_map>
 
 namespace tf3d::generators
@@ -24,13 +25,14 @@ namespace tf3d::generators
     {
         m_DataSize   = dataSize;
         m_Resolution = glm::max(resolution, 1);
-        for (const auto &temp : m_TempBuffers)
+        for (const auto &temp : m_TempBuffers) {
             temp->Resize(dataSize);
+        }
         m_ResultA->Resize(dataSize);
         m_ResultB->Resize(dataSize);
-        for (const auto &filter : m_Filters)
+        for (const auto &filter : m_Filters) {
             filter->Resize(m_Resolution);
-        m_RequireUpdation = true;
+        }
     }
 
     void BiomeFilterStack::EnsureTempBufferCount(size_t count)
@@ -48,7 +50,7 @@ namespace tf3d::generators
             return -1;
         m_Filters.push_back(std::make_shared<BiomeFilter>(m_AppState, definition));
         m_Filters.back()->Resize(m_Resolution);
-        m_RequireUpdation = true;
+        PublishState();
         return static_cast<int>(m_Filters.size()) - 1;
     }
 
@@ -57,7 +59,7 @@ namespace tf3d::generators
         if (filterIndex < 0 || filterIndex >= static_cast<int>(m_Filters.size()))
             return false;
         m_Filters.erase(m_Filters.begin() + filterIndex);
-        m_RequireUpdation = true;
+        PublishState();
         return true;
     }
 
@@ -68,65 +70,30 @@ namespace tf3d::generators
         ImGui::PushID(m_Filters[filterIndex]->GetID().c_str());
         const bool changed = m_Filters[filterIndex]->ShowSettings();
         ImGui::PopID();
-        if (changed)
-            m_RequireUpdation = true;
+        if (changed) {
+            PublishState();
+        }
         return changed;
     }
 
     namespace
     {
         void SetUniformFromParameter(base::ComputeShader *shader, const std::string &uniformName,
-                                     const inspector::CustomInspectorValue &value, int &textureSlot, const nlohmann::json *binding = nullptr)
+                                     const inspector::CustomInspectorValue &value,
+                                     const inspector::CustomInspectorValue::ConstStoreView &stored,
+                                     int &textureSlot,
+                                     const nlohmann::json *binding = nullptr)
         {
-            using inspector::CustomInspectorValueType;
-            switch (value.GetType()) {
-                case CustomInspectorValueType::Int:
-                    shader->SetUniform1i(uniformName, value.Store().Get<int32_t>());
-                    break;
-                case CustomInspectorValueType::Float:
-                    shader->SetUniform1f(uniformName, value.Store().Get<float>());
-                    break;
-                case CustomInspectorValueType::Bool:
-                    shader->SetUniform1i(uniformName, value.Store().Get<bool>() ? 1 : 0);
-                    break;
-                case CustomInspectorValueType::Vector2:
-                    shader->SetUniform2f(uniformName, value.Store().Get<glm::vec2>());
-                    break;
-                case CustomInspectorValueType::Vector3:
-                    shader->SetUniform3f(uniformName, value.Store().Get<glm::vec3>());
-                    break;
-                case CustomInspectorValueType::Vector4:
-                    shader->SetUniform4f(uniformName, value.Store().Get<glm::vec4>());
-                    break;
-                case CustomInspectorValueType::Texture: {
-                    const auto texture    = value.Store().Get<std::shared_ptr<Texture2D>>();
-                    const bool hasTexture = texture != nullptr && texture->IsLoaded();
-                    if (hasTexture)
-                        shader->SetUniform1i(uniformName, texture->Bind(textureSlot++));
-                    if (binding != nullptr && binding->is_object()) {
-                        const std::string presenceUniform = binding->value("PresenceUniform", "");
-                        if (!presenceUniform.empty())
-                            shader->SetUniform1i(presenceUniform, hasTexture ? 1 : 0);
-                    }
-                    break;
+            inspector::CustomInspectorShaderOptions options;
+            options.textureSlot = &textureSlot;
+            options.bindCurve   = value.GetType() == inspector::CustomInspectorValueType::Curve;
+            if (binding != nullptr && binding->is_object()) {
+                options.presenceUniform = binding->value("PresenceUniform", "");
+                if (binding->contains("PointCountUniform")) {
+                    options.pointCountUniform = binding->value("PointCountUniform", "");
                 }
-                case CustomInspectorValueType::Curve: {
-                    const auto points                   = value.Store().Get<std::vector<glm::vec2>>();
-                    const std::string pointCountUniform = binding != nullptr && binding->is_object()
-                                                              ? binding->value("PointCountUniform", uniformName + "PointCount")
-                                                              : uniformName + "PointCount";
-                    shader->SetUniform1i(pointCountUniform, glm::clamp(static_cast<int>(points.size()), 2, static_cast<int>(inspector::CustomInspectorMaxCurvePoints)));
-                    for (size_t pointIndex = 0; pointIndex < inspector::CustomInspectorMaxCurvePoints; ++pointIndex) {
-                        const glm::vec2 point = pointIndex < points.size() ? points[pointIndex] : glm::vec2(0.0f);
-                        shader->SetUniform2f(uniformName + "[" + std::to_string(pointIndex) + "]", point);
-                    }
-                    break;
-                }
-                case CustomInspectorValueType::String:
-                case CustomInspectorValueType::Unknown:
-                default:
-                    break;
             }
+            inspector::CustomInspector::ApplyToShader(*shader, value, stored, uniformName, options);
         }
 
         void SetUniformFromJson(base::ComputeShader *shader, const std::string &uniformName,
@@ -163,18 +130,22 @@ namespace tf3d::generators
     } // namespace
 
     void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter,
+                                           const BiomeFilter::State &state,
                                            base::ComputeShader *shader,
                                            const nlohmann::json &bindings)
     {
-        if (!bindings.is_object())
+        if (!bindings.is_object()) {
             return;
+        }
         int textureSlot = 4;
         for (const auto &[uniformName, binding] : bindings.items()) {
             if (binding.is_object() && binding.contains("Parameter")) {
                 const std::string parameterName = binding["Parameter"].get<std::string>();
-                const auto *parameter           = filter->FindParameter(parameterName);
-                if (parameter != nullptr)
-                    SetUniformFromParameter(shader, uniformName, *parameter, textureSlot, &binding);
+                const auto *parameter           = filter != nullptr ? filter->FindParameterMetadata(parameterName) : nullptr;
+                if (parameter != nullptr) {
+                    SetUniformFromParameter(shader, uniformName, *parameter,
+                                            state.values.GetDataStore().At(parameterName), textureSlot, &binding);
+                }
                 continue;
             }
             SetUniformFromJson(shader, uniformName, binding, textureSlot);
@@ -189,7 +160,8 @@ namespace tf3d::generators
         shader->SetUniform1i("u_HasFieldHistogram", filter->NeedsHistogram() ? 1 : 0);
     }
 
-    void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &pass,
+    void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+                                    const nlohmann::json &pass,
                                     GeneratorData *input, GeneratorData *output, GeneratorData *reference)
     {
         const std::string phase = pass.value("Phase", "");
@@ -204,7 +176,7 @@ namespace tf3d::generators
         shader->Bind();
         shader->SetUniform1i("u_Resolution", m_Resolution);
         BindFieldStatistics(filter, shader);
-        SetPassUniforms(filter, shader, pass.value("Uniforms", nlohmann::json::object()));
+        SetPassUniforms(filter, state, shader, pass.value("Uniforms", nlohmann::json::object()));
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_Resolution + workgroupSize - 1) / workgroupSize;
         TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
@@ -212,7 +184,8 @@ namespace tf3d::generators
         shader->SetMemoryBarrier();
     }
 
-    void BiomeFilterStack::RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const nlohmann::json &merge,
+    void BiomeFilterStack::RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+                                         const nlohmann::json &merge,
                                          GeneratorData *input, GeneratorData *operation, GeneratorData *output)
     {
         const std::string phase = merge.value("Phase", "");
@@ -226,14 +199,16 @@ namespace tf3d::generators
         shader->Bind();
         shader->SetUniform1i("u_Resolution", m_Resolution);
         BindFieldStatistics(filter, shader);
-        shader->SetUniform1f("u_Strength", filter->GetStrength());
-        shader->SetUniform1i("u_MergeMode", static_cast<int>(filter->GetMergeMode()));
-        shader->SetUniform1i("u_UseMask", filter->UsesMask() ? 1 : 0);
-        shader->SetUniform1i("u_InvertMask", filter->InvertsMask() ? 1 : 0);
-        SetPassUniforms(filter, shader, merge.value("Uniforms", nlohmann::json::object()));
-        if (filter->UsesMask()) {
-            filter->GetMaskTexture()->Bind(3);
-            shader->SetUniform1i("u_MaskTexture", 3);
+        shader->SetUniform1f("u_Strength", state.strength);
+        shader->SetUniform1i("u_MergeMode", static_cast<int>(state.mergeMode));
+        shader->SetUniform1i("u_UseMask", state.useMask ? 1 : 0);
+        shader->SetUniform1i("u_InvertMask", state.invertMask ? 1 : 0);
+        SetPassUniforms(filter, state, shader, merge.value("Uniforms", nlohmann::json::object()));
+        if (state.useMask) {
+            if (auto *maskTexture = filter->GetMaskTexture(); maskTexture != nullptr) {
+                maskTexture->Bind(3);
+                shader->SetUniform1i("u_MaskTexture", 3);
+            }
         }
         const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
         const auto dispatchSize  = (m_Resolution + workgroupSize - 1) / workgroupSize;
@@ -242,7 +217,8 @@ namespace tf3d::generators
         shader->SetMemoryBarrier();
     }
 
-    void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter> &filter, GeneratorData *input,
+    void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+                                     GeneratorData *input,
                                      GeneratorData *output)
     {
         const auto &runtime   = filter->GetDefinition()->GetRuntime();
@@ -342,8 +318,8 @@ namespace tf3d::generators
         }
 
         const std::string iterationsParameter = execution.value("IterationsParameter", "");
-        const int iterations                  = glm::clamp(iterationsParameter.empty() ? 1 : filter->GetIntegerParameter(iterationsParameter, 1), 0, 64);
-        if (iterations == 0 || filter->GetStrength() <= 0.0f) {
+        const int iterations                  = glm::clamp(iterationsParameter.empty() ? 1 : state.values.Root().Get(iterationsParameter, 1), 0, 64);
+        if (iterations == 0 || state.strength <= 0.0f) {
             input->CopyTo(output);
             return;
         }
@@ -443,7 +419,7 @@ namespace tf3d::generators
                 }
                 reference = referenceResource->second;
             }
-            RunPhase(filter, pass, inputResource->second, outputResource->second, reference);
+            RunPhase(filter, state, pass, inputResource->second, outputResource->second, reference);
             return true;
         };
 
@@ -451,8 +427,9 @@ namespace tf3d::generators
             float requestedPercentile = -1.0f;
             if (filter->NeedsHistogram()) {
                 const std::string percentileParameter = filter->GetRequestedPercentileParameter();
-                if (!percentileParameter.empty() && filter->FindParameter(percentileParameter) != nullptr)
-                    requestedPercentile = filter->GetFloatParameter(percentileParameter, -1.0f);
+                if (!percentileParameter.empty() && state.values.GetDataStore().Contains(percentileParameter)) {
+                    requestedPercentile = state.values.GetDataStore().At(percentileParameter).Get(-1.0f);
+                }
             }
             m_Statistics->Compute(input, m_Resolution, m_StatisticsSampleStride, filter->NeedsHistogram(), requestedPercentile);
         }
@@ -504,22 +481,24 @@ namespace tf3d::generators
             input->CopyTo(output);
             return;
         }
-        RunMergePhase(filter, merge, resources.at(mergeInputName), resources.at(mergeOperationName),
+        RunMergePhase(filter, state, merge, resources.at(mergeInputName), resources.at(mergeOperationName),
                       resources.at(mergeOutputName));
     }
 
     void BiomeFilterStack::Load(SerializerNode data)
     {
-        if (data == nullptr)
+        if (data == nullptr) {
             return;
+        }
         m_Filters.clear();
         for (const auto &filterNode : data->Get<std::vector<SerializerNode>>("Filters")) {
             auto definition = m_Catalog->FindByID(filterNode->Get<std::string>("DefinitionID"));
             const int index = AddFilter(definition);
-            if (index >= 0)
+            if (index >= 0) {
                 m_Filters[index]->Load(filterNode);
+            }
         }
-        m_RequireUpdation = true;
+        PublishState();
     }
 
     SerializerNode BiomeFilterStack::Save() const
@@ -533,25 +512,65 @@ namespace tf3d::generators
         return node;
     }
 
-    void BiomeFilterStack::Update(GeneratorData *baseResult)
+    BiomeFilterStack::State BiomeFilterStack::CaptureState() const
     {
-        if (baseResult == nullptr || m_Filters.empty()) {
-            m_RequireUpdation = false;
+        State state;
+        state.filters.reserve(m_Filters.size());
+        for (const auto &filter : m_Filters) {
+            if (filter != nullptr) {
+                state.filters.push_back(filter->GetState().value);
+            }
+        }
+        return state;
+    }
+
+    void BiomeFilterStack::PublishState()
+    {
+        m_State.Replace(CaptureState());
+    }
+
+    BiomeFilterStack::Snapshot BiomeFilterStack::GetState() const
+    {
+        auto snapshot = m_State.Capture();
+        auto runtime  = std::make_shared<RuntimeState>();
+        runtime->filters.reserve(m_Filters.size());
+        for (const auto &filter : m_Filters) {
+            if (filter != nullptr) {
+                runtime->filters.push_back(filter);
+            }
+        }
+
+        Snapshot result;
+        result.value    = std::move(snapshot.value);
+        result.revision = snapshot.revision;
+        result.runtime  = std::move(runtime);
+        return result;
+    }
+
+    void BiomeFilterStack::Update(const Snapshot *state, GeneratorData *baseResult)
+    {
+        if (state == nullptr || baseResult == nullptr || state->runtime == nullptr || state->value.filters.empty()) {
+            if (state != nullptr) {
+                m_State.MarkProcessed(state->revision);
+            }
             return;
         }
 
-        GeneratorData *current = baseResult;
-        GeneratorData *next    = m_ResultA.get();
-        bool applied           = false;
-        for (int filterIndex = 0; filterIndex < static_cast<int>(m_Filters.size()); filterIndex++) {
-            const auto &filter = m_Filters[filterIndex];
-            if (!filter->IsEnabled())
+        GeneratorData *current   = baseResult;
+        GeneratorData *next      = m_ResultA.get();
+        bool applied             = false;
+        const size_t filterCount = std::min(state->value.filters.size(), state->runtime->filters.size());
+        for (size_t filterIndex = 0; filterIndex < filterCount; filterIndex++) {
+            const auto &filter      = state->runtime->filters[filterIndex];
+            const auto &filterState = state->value.filters[filterIndex];
+            if (filter == nullptr || !filterState.enabled) {
                 continue;
+            }
             TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter/") + filter->GetName());
             TF3D_PROFILE_VALUE_DOMAIN("generation/filter/index", static_cast<uint64_t>(filterIndex), 0, 0,
                                       PerformanceMonitor::Domain::Generation);
-            filter->UpdateGeneratedMask(current);
-            RunFilter(filter, current, next);
+            filter->UpdateGeneratedMask(filterState, current);
+            RunFilter(filter, filterState, current, next);
             current = next;
             next    = current == m_ResultA.get() ? m_ResultB.get() : m_ResultA.get();
             applied = true;
@@ -563,7 +582,7 @@ namespace tf3d::generators
             glMemoryBarrier(GL_ALL_BARRIER_BITS);
             current->CopyTo(baseResult);
         }
-        m_RequireUpdation = false;
+        m_State.MarkProcessed(state->revision);
     }
 
 } // namespace tf3d::generators

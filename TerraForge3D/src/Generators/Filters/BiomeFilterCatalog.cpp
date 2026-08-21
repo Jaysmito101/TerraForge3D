@@ -2,7 +2,6 @@
 
 #include "Data/ApplicationState.h"
 #include "Inspector/CustomInspector.h"
-#include "Utils/JsonIncludeResolver.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
@@ -28,14 +27,8 @@ namespace tf3d::generators
 
         const auto dataDirectory = std::filesystem::path(m_AppState->constants.dataDir);
         const auto inspectorPath = inspector::CustomInspector::GetConfigPath(dataDirectory, "Filters");
-        utils::JsonIncludeResolverOptions resolverOptions;
-        resolverOptions.rootDirectory  = dataDirectory / "inspectors";
-        resolverOptions.pathMode       = utils::JsonIncludePathMode::RelativeToIncludingFile;
-        resolverOptions.restrictToRoot = true;
-        const utils::JsonIncludeResolver resolver(resolverOptions);
-
         std::string resolveError;
-        const auto catalog = resolver.ResolveFile(inspectorPath, &resolveError);
+        const auto catalog = inspector::CustomInspector::LoadConfigDocument(m_AppState, "Filters", &resolveError);
         if (!catalog) {
             TF3D_LOG_ERROR("Failed to load filter inspector '{}': {}", inspectorPath.string(), resolveError);
             return false;
