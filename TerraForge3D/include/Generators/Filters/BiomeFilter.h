@@ -5,6 +5,7 @@
 #include "Exporters/Serializer.h"
 #include "Generators/Filters/BiomeFilterDefinition.h"
 #include "Generators/GeneratorData.h"
+#include "Generators/GenerationContext.h"
 #include "Generators/Masks/MaskLayer.h"
 #include "Inspector/CustomInspectorSnapshot.h"
 
@@ -50,7 +51,9 @@ namespace tf3d::generators
 
         bool ShowSettings();
         void Resize(int size);
-        bool UpdateGeneratedMask(const State &state, GeneratorData *sourceData);
+        bool UpdateGeneratedMask(const State &state,
+                                 const GenerationContext *context,
+                                 GeneratorData *sourceData);
         void Load(SerializerNode data);
         SerializerNode Save() const;
 

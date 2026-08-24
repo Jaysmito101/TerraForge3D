@@ -81,12 +81,14 @@ namespace tf3d::generators
         }
     }
 
-    bool BiomeFilter::UpdateGeneratedMask(const State &state, GeneratorData *sourceData)
+    bool BiomeFilter::UpdateGeneratedMask(const State &state,
+                                          const GenerationContext *context,
+                                          GeneratorData *sourceData)
     {
-        if (!state.useMask || m_MaskLayer == nullptr || sourceData == nullptr) {
+        if (!state.useMask || context == nullptr || m_MaskLayer == nullptr || sourceData == nullptr) {
             return false;
         }
-        return m_MaskLayer->Apply(state.mask, sourceData) && m_MaskLayer->GetTexture() != nullptr;
+        return m_MaskLayer->Apply(state.mask, context, sourceData) && m_MaskLayer->GetTexture() != nullptr;
     }
 
     BiomeFilter::State BiomeFilter::CaptureState() const
