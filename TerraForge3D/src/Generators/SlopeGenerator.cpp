@@ -28,11 +28,13 @@ namespace tf3d::generators
         m_HasData.store(false, std::memory_order_release);
     }
 
-    bool SlopeGenerator::Compute(GeneratorData *heightmap, int32_t resolution)
+    bool SlopeGenerator::Compute(GeneratorData *heightmap, const GenerationContext *context)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/slope/compute", PerformanceMonitor::Domain::Generation);
-        if (heightmap == nullptr || !m_Shader || m_Texture == nullptr || resolution <= 0)
+        if (heightmap == nullptr || context == nullptr || !m_Shader || m_Texture == nullptr ||
+            context->tileResolution <= 0)
             return false;
+        const int32_t resolution = context->tileResolution;
         Resize(resolution);
 
         heightmap->Bind(0);
@@ -41,7 +43,7 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Resolution", resolution);
         m_Shader->SetUniform1f("u_SampleRadius", m_SampleRadius);
 
-        const int workgroupSize = std::max(m_AppState->constants.gpuWorkgroupSize, 1);
+        const int workgroupSize = std::max(context->gpuWorkgroupSize, 1);
         const int dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
         TF3D_PROFILE_GPU_SCOPE("generation/slope/compute/gpu");
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);

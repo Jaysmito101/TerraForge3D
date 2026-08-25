@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Generators/GenerationContext.h"
 #include "Generators/GeneratorTexture.h"
 
 #include <memory>
@@ -27,7 +28,7 @@ namespace tf3d::generators
         ~SlopeGenerator() = default;
 
         void Resize(int32_t resolution);
-        bool Compute(GeneratorData *heightmap, int32_t resolution);
+        bool Compute(GeneratorData *heightmap, const GenerationContext *context);
 
         inline GeneratorTexture *GetTexture() const
         {
