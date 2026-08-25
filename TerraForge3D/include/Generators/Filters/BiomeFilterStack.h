@@ -4,6 +4,7 @@
 #include "Generators/Filters/BiomeFilter.h"
 #include "Generators/Filters/BiomeFilterCatalog.h"
 #include "Generators/GeneratorDataStatistics.h"
+#include "Generators/GenerationContext.h"
 
 #include <memory>
 #include <vector>
@@ -38,7 +39,9 @@ namespace tf3d::generators
         ~BiomeFilterStack() = default;
 
         void Resize(size_t dataSize, int resolution);
-        void Update(const Snapshot *state, GeneratorData *baseResult);
+        void Update(const Snapshot *state,
+                    const GenerationContext *context,
+                    GeneratorData *baseResult);
         bool ShowSettings(int filterIndex);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
@@ -71,23 +74,36 @@ namespace tf3d::generators
     private:
         struct RuntimeState {
             std::vector<std::shared_ptr<BiomeFilter>> filters;
+            std::vector<std::shared_ptr<GeneratorData>> tempBuffers;
+            std::shared_ptr<GeneratorData> resultA;
+            std::shared_ptr<GeneratorData> resultB;
+            std::shared_ptr<GeneratorDataStatistics> statistics;
+            int statisticsSampleStride = 4;
         };
 
         State CaptureState() const;
         void PublishState();
-        void RunFilter(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+        void RunFilter(const RuntimeState &runtime,
+                       const BiomeFilter &filter, const BiomeFilter::State &state,
+                       const GenerationContext &context,
                        GeneratorData *input, GeneratorData *output);
-        void RunPhase(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+        void RunPhase(GeneratorDataStatistics *statistics,
+                      const BiomeFilter &filter, const BiomeFilter::State &state,
+                      const GenerationContext &context,
                       const nlohmann::json &pass,
                       GeneratorData *input, GeneratorData *output, GeneratorData *reference);
-        void RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+        void RunMergePhase(GeneratorDataStatistics *statistics,
+                           const BiomeFilter &filter, const BiomeFilter::State &state,
+                           const GenerationContext &context,
                            const nlohmann::json &merge,
                            GeneratorData *input, GeneratorData *operation, GeneratorData *output);
-        void SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter,
+        void SetPassUniforms(const BiomeFilter &filter,
                              const BiomeFilter::State &state,
                              base::ComputeShader *shader,
                              const nlohmann::json &bindings);
-        void BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, base::ComputeShader *shader);
+        void BindFieldStatistics(GeneratorDataStatistics *statistics,
+                                 const BiomeFilter &filter,
+                                 base::ComputeShader *shader);
         void EnsureTempBufferCount(size_t count);
 
         static constexpr int FieldStatisticsBinding = 4;

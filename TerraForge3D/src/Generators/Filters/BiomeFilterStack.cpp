@@ -50,6 +50,13 @@ namespace tf3d::generators
             return -1;
         m_Filters.push_back(std::make_shared<BiomeFilter>(m_AppState, definition));
         m_Filters.back()->Resize(m_Resolution);
+        const auto &resources = definition->GetRuntime().resources;
+        if (resources.is_object()) {
+            const auto tempDescription = resources.value("Temps", nlohmann::json::array());
+            if (tempDescription.is_array()) {
+                EnsureTempBufferCount(tempDescription.size());
+            }
+        }
         PublishState();
         return static_cast<int>(m_Filters.size()) - 1;
     }
@@ -129,7 +136,7 @@ namespace tf3d::generators
         }
     } // namespace
 
-    void BiomeFilterStack::SetPassUniforms(const std::shared_ptr<BiomeFilter> &filter,
+    void BiomeFilterStack::SetPassUniforms(const BiomeFilter &filter,
                                            const BiomeFilter::State &state,
                                            base::ComputeShader *shader,
                                            const nlohmann::json &bindings)
@@ -141,7 +148,7 @@ namespace tf3d::generators
         for (const auto &[uniformName, binding] : bindings.items()) {
             if (binding.is_object() && binding.contains("Parameter")) {
                 const std::string parameterName = binding["Parameter"].get<std::string>();
-                const auto *parameter           = filter != nullptr ? filter->FindParameterMetadata(parameterName) : nullptr;
+                const auto *parameter           = filter.FindParameterMetadata(parameterName);
                 if (parameter != nullptr) {
                     SetUniformFromParameter(shader, uniformName, *parameter,
                                             state.values.GetDataStore().At(parameterName), textureSlot, &binding);
@@ -152,21 +159,25 @@ namespace tf3d::generators
         }
     }
 
-    void BiomeFilterStack::BindFieldStatistics(const std::shared_ptr<BiomeFilter> &filter, base::ComputeShader *shader)
+    void BiomeFilterStack::BindFieldStatistics(GeneratorDataStatistics *statistics,
+                                               const BiomeFilter &filter,
+                                               base::ComputeShader *shader)
     {
-        if (filter == nullptr || shader == nullptr || m_Statistics == nullptr || !filter->NeedsFieldStatistics())
+        if (shader == nullptr || statistics == nullptr || !filter.NeedsFieldStatistics())
             return;
-        m_Statistics->Bind(FieldStatisticsBinding);
-        shader->SetUniform1i("u_HasFieldHistogram", filter->NeedsHistogram() ? 1 : 0);
+        statistics->Bind(FieldStatisticsBinding);
+        shader->SetUniform1i("u_HasFieldHistogram", filter.NeedsHistogram() ? 1 : 0);
     }
 
-    void BiomeFilterStack::RunPhase(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+    void BiomeFilterStack::RunPhase(GeneratorDataStatistics *statistics,
+                                    const BiomeFilter &filter, const BiomeFilter::State &state,
+                                    const GenerationContext &context,
                                     const nlohmann::json &pass,
                                     GeneratorData *input, GeneratorData *output, GeneratorData *reference)
     {
         const std::string phase = pass.value("Phase", "");
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter-phase/") + filter->GetName() + "/" + phase);
-        auto *shader = filter->GetPhaseShader(m_AppState, phase);
+        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter-phase/") + filter.GetName() + "/" + phase);
+        auto *shader = filter.GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
         input->Bind(0);
@@ -174,55 +185,61 @@ namespace tf3d::generators
             reference->Bind(1);
         output->Bind(2);
         shader->Bind();
-        shader->SetUniform1i("u_Resolution", m_Resolution);
-        BindFieldStatistics(filter, shader);
+        shader->SetUniform1i("u_Resolution", context.tileResolution);
+        BindFieldStatistics(statistics, filter, shader);
         SetPassUniforms(filter, state, shader, pass.value("Uniforms", nlohmann::json::object()));
-        const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        const auto dispatchSize  = (m_Resolution + workgroupSize - 1) / workgroupSize;
+        const auto workgroupSize = std::max(context.gpuWorkgroupSize, 1);
+        const auto resolution    = context.tileResolution;
+        const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
         TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         shader->Dispatch(dispatchSize, dispatchSize, 1);
         shader->SetMemoryBarrier();
     }
 
-    void BiomeFilterStack::RunMergePhase(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+    void BiomeFilterStack::RunMergePhase(GeneratorDataStatistics *statistics,
+                                         const BiomeFilter &filter, const BiomeFilter::State &state,
+                                         const GenerationContext &context,
                                          const nlohmann::json &merge,
                                          GeneratorData *input, GeneratorData *operation, GeneratorData *output)
     {
         const std::string phase = merge.value("Phase", "");
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter-merge/") + filter->GetName() + "/" + phase);
-        auto *shader = filter->GetPhaseShader(m_AppState, phase);
+        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter-merge/") + filter.GetName() + "/" + phase);
+        auto *shader = filter.GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
         input->Bind(0);
         operation->Bind(1);
         output->Bind(2);
         shader->Bind();
-        shader->SetUniform1i("u_Resolution", m_Resolution);
-        BindFieldStatistics(filter, shader);
+        shader->SetUniform1i("u_Resolution", context.tileResolution);
+        BindFieldStatistics(statistics, filter, shader);
         shader->SetUniform1f("u_Strength", state.strength);
         shader->SetUniform1i("u_MergeMode", static_cast<int>(state.mergeMode));
         shader->SetUniform1i("u_UseMask", state.useMask ? 1 : 0);
         shader->SetUniform1i("u_InvertMask", state.invertMask ? 1 : 0);
         SetPassUniforms(filter, state, shader, merge.value("Uniforms", nlohmann::json::object()));
         if (state.useMask) {
-            if (auto *maskTexture = filter->GetMaskTexture(); maskTexture != nullptr) {
+            if (auto *maskTexture = filter.GetMaskTexture(); maskTexture != nullptr) {
                 maskTexture->Bind(3);
                 shader->SetUniform1i("u_MaskTexture", 3);
             }
         }
-        const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        const auto dispatchSize  = (m_Resolution + workgroupSize - 1) / workgroupSize;
+        const auto workgroupSize = std::max(context.gpuWorkgroupSize, 1);
+        const auto resolution    = context.tileResolution;
+        const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
         TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         shader->Dispatch(dispatchSize, dispatchSize, 1);
         shader->SetMemoryBarrier();
     }
 
-    void BiomeFilterStack::RunFilter(const std::shared_ptr<BiomeFilter> &filter, const BiomeFilter::State &state,
+    void BiomeFilterStack::RunFilter(const RuntimeState &runtime,
+                                     const BiomeFilter &filter, const BiomeFilter::State &state,
+                                     const GenerationContext &context,
                                      GeneratorData *input,
                                      GeneratorData *output)
     {
-        const auto &runtime   = filter->GetDefinition()->GetRuntime();
-        const auto &execution = runtime.execution;
+        const auto &definitionRuntime = filter.GetDefinition()->GetRuntime();
+        const auto &execution         = definitionRuntime.execution;
         std::vector<nlohmann::json> passes;
         if (execution.contains("Passes") && execution["Passes"].is_array()) {
             for (const auto &pass : execution["Passes"]) {
@@ -239,7 +256,7 @@ namespace tf3d::generators
         }
         nlohmann::json merge = execution.value("Merge", nlohmann::json::object());
         if (passes.empty() || !merge.is_object() || merge.value("Phase", "").empty()) {
-            TF3D_LOG_ERROR("Filter '{}' has an incomplete phase execution description.", filter->GetName());
+            TF3D_LOG_ERROR("Filter '{}' has an incomplete phase execution description.", filter.GetName());
             input->CopyTo(output);
             return;
         }
@@ -249,35 +266,39 @@ namespace tf3d::generators
         resources.emplace("Next", output);
         resources.emplace("Output", output);
 
-        const auto resourcesDescription = runtime.resources;
+        const auto resourcesDescription = definitionRuntime.resources;
         if (!resourcesDescription.is_object()) {
-            TF3D_LOG_ERROR("Filter '{}' has an invalid Resources object.", filter->GetName());
+            TF3D_LOG_ERROR("Filter '{}' has an invalid Resources object.", filter.GetName());
             input->CopyTo(output);
             return;
         }
         const auto tempDescription = resourcesDescription.value("Temps", nlohmann::json::array());
         if (!tempDescription.is_array()) {
-            TF3D_LOG_ERROR("Filter '{}' has an invalid Resources.Temps declaration.", filter->GetName());
+            TF3D_LOG_ERROR("Filter '{}' has an invalid Resources.Temps declaration.", filter.GetName());
             input->CopyTo(output);
             return;
         }
 
-        EnsureTempBufferCount(tempDescription.size());
+        if (tempDescription.size() > runtime.tempBuffers.size()) {
+            TF3D_LOG_ERROR("Filter '{}' has no captured storage for its temporary resources.", filter.GetName());
+            input->CopyTo(output);
+            return;
+        }
         for (size_t tempIndex = 0; tempIndex < tempDescription.size(); tempIndex++) {
             const auto &declaration = tempDescription.at(tempIndex);
             if (!declaration.is_object()) {
-                TF3D_LOG_ERROR("Filter '{}' has a non-object temporary resource declaration.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' has a non-object temporary resource declaration.", filter.GetName());
                 input->CopyTo(output);
                 return;
             }
             const std::string name = declaration.value("Name", "");
             const std::string type = declaration.value("Type", "Field");
             if (name.empty() || type != "Field" || resources.find(name) != resources.end()) {
-                TF3D_LOG_ERROR("Filter '{}' has an invalid or duplicate temporary resource '{}'.", filter->GetName(), name);
+                TF3D_LOG_ERROR("Filter '{}' has an invalid or duplicate temporary resource '{}'.", filter.GetName(), name);
                 input->CopyTo(output);
                 return;
             }
-            resources.emplace(name, m_TempBuffers[tempIndex].get());
+            resources.emplace(name, runtime.tempBuffers[tempIndex].get());
         }
 
         const bool pingPongIterations = execution.value("IterationMode", "") == "PingPong";
@@ -285,32 +306,32 @@ namespace tf3d::generators
         if (pingPongIterations) {
             const auto bufferNames = execution.value("IterationBuffers", nlohmann::json::array());
             if (!bufferNames.is_array() || bufferNames.size() < 2) {
-                TF3D_LOG_ERROR("Filter '{}' has an incomplete PingPong iteration buffer declaration.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' has an incomplete PingPong iteration buffer declaration.", filter.GetName());
                 input->CopyTo(output);
                 return;
             }
 
             for (size_t bufferIndex = 0; bufferIndex < 2; bufferIndex++) {
                 if (!bufferNames[bufferIndex].is_string()) {
-                    TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong iteration buffer name.", filter->GetName());
+                    TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong iteration buffer name.", filter.GetName());
                     input->CopyTo(output);
                     return;
                 }
                 const auto resource = resources.find(bufferNames[bufferIndex].get<std::string>());
                 if (resource == resources.end() || resource->second == nullptr) {
-                    TF3D_LOG_ERROR("Filter '{}' references an unknown PingPong iteration buffer '{}'.", filter->GetName(), bufferNames[bufferIndex].get<std::string>());
+                    TF3D_LOG_ERROR("Filter '{}' references an unknown PingPong iteration buffer '{}'.", filter.GetName(), bufferNames[bufferIndex].get<std::string>());
                     input->CopyTo(output);
                     return;
                 }
                 iterationBuffers.push_back(resource->second);
             }
             if (iterationBuffers[0] == iterationBuffers[1]) {
-                TF3D_LOG_ERROR("Filter '{}' uses the same resource for both PingPong iteration buffers.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' uses the same resource for both PingPong iteration buffers.", filter.GetName());
                 input->CopyTo(output);
                 return;
             }
             if (resources.find("IterationResult") != resources.end()) {
-                TF3D_LOG_ERROR("Filter '{}' reserves the resource name 'IterationResult'.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' reserves the resource name 'IterationResult'.", filter.GetName());
                 input->CopyTo(output);
                 return;
             }
@@ -325,27 +346,27 @@ namespace tf3d::generators
         }
         const auto validatePass = [&](const nlohmann::json &pass, const char *passGroup) {
             if (!pass.is_object()) {
-                TF3D_LOG_ERROR("Filter '{}' has a non-object {} pass.", filter->GetName(), passGroup);
+                TF3D_LOG_ERROR("Filter '{}' has a non-object {} pass.", filter.GetName(), passGroup);
                 return false;
             }
             const std::string phase = pass.value("Phase", "");
             if (phase.empty()) {
-                TF3D_LOG_ERROR("Filter '{}' has a {} pass without a phase.", filter->GetName(), passGroup);
+                TF3D_LOG_ERROR("Filter '{}' has a {} pass without a phase.", filter.GetName(), passGroup);
                 return false;
             }
-            if (filter->GetPhaseShader(m_AppState, phase) == nullptr) {
-                TF3D_LOG_ERROR("Filter '{}' is missing {} phase '{}'.", filter->GetName(), passGroup, phase);
+            if (filter.GetPhaseShader(m_AppState, phase) == nullptr) {
+                TF3D_LOG_ERROR("Filter '{}' is missing {} phase '{}'.", filter.GetName(), passGroup, phase);
                 return false;
             }
             const std::string inputName  = pass.value("Input", "");
             const std::string outputName = pass.value("Output", "");
             if (inputName.empty() || outputName.empty() || resources.find(inputName) == resources.end() || resources.find(outputName) == resources.end()) {
-                TF3D_LOG_ERROR("Filter '{}' has a {} pass with an unknown or missing Input/Output resource.", filter->GetName(), passGroup);
+                TF3D_LOG_ERROR("Filter '{}' has a {} pass with an unknown or missing Input/Output resource.", filter.GetName(), passGroup);
                 return false;
             }
             const std::string referenceName = pass.value("Reference", "");
             if (!referenceName.empty() && resources.find(referenceName) == resources.end()) {
-                TF3D_LOG_ERROR("Filter '{}' has a {} pass with an unknown Reference resource '{}'.", filter->GetName(), passGroup, referenceName);
+                TF3D_LOG_ERROR("Filter '{}' has a {} pass with an unknown Reference resource '{}'.", filter.GetName(), passGroup, referenceName);
                 return false;
             }
             return true;
@@ -366,29 +387,29 @@ namespace tf3d::generators
         const nlohmann::json setup = execution.value("Setup", nlohmann::json::object());
         if (pingPongIterations && !setup.empty()) {
             if (!setup.is_object()) {
-                TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup phase.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup phase.", filter.GetName());
                 input->CopyTo(output);
                 return;
             }
             const std::string setupPhase = setup.value("Phase", "");
-            if (setupPhase.empty() || filter->GetPhaseShader(m_AppState, setupPhase) == nullptr) {
-                TF3D_LOG_ERROR("Filter '{}' is missing its PingPong setup phase '{}'.", filter->GetName(), setupPhase);
+            if (setupPhase.empty() || filter.GetPhaseShader(m_AppState, setupPhase) == nullptr) {
+                TF3D_LOG_ERROR("Filter '{}' is missing its PingPong setup phase '{}'.", filter.GetName(), setupPhase);
                 input->CopyTo(output);
                 return;
             }
             if (!validatePass(setup, "setup")) {
-                TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup resource declaration.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' has an invalid PingPong setup resource declaration.", filter.GetName());
                 input->CopyTo(output);
                 return;
             }
         }
         if (pingPongIterations && passes.size() != 1) {
-            TF3D_LOG_ERROR("Filter '{}' PingPong execution supports exactly one iterative pass.", filter->GetName());
+            TF3D_LOG_ERROR("Filter '{}' PingPong execution supports exactly one iterative pass.", filter.GetName());
             input->CopyTo(output);
             return;
         }
-        if (filter->GetPhaseShader(m_AppState, merge.value("Phase", "")) == nullptr) {
-            TF3D_LOG_ERROR("Filter '{}' is missing merge phase '{}'.", filter->GetName(), merge.value("Phase", ""));
+        if (filter.GetPhaseShader(m_AppState, merge.value("Phase", "")) == nullptr) {
+            TF3D_LOG_ERROR("Filter '{}' is missing merge phase '{}'.", filter.GetName(), merge.value("Phase", ""));
             input->CopyTo(output);
             return;
         }
@@ -396,7 +417,7 @@ namespace tf3d::generators
         const std::string mergeOperationName = merge.value("Operation", "");
         const std::string mergeOutputName    = merge.value("Output", "");
         if (mergeInputName.empty() || mergeOperationName.empty() || mergeOutputName.empty() || resources.find(mergeInputName) == resources.end() || resources.find(mergeOperationName) == resources.end() || resources.find(mergeOutputName) == resources.end() || resources.at(mergeOutputName) != output || resources.at(mergeOperationName) == output || (!pingPongIterations && resources.at(mergeOperationName) == nullptr)) {
-            TF3D_LOG_ERROR("Filter '{}' has a merge with an unknown or missing Input/Operation/Output resource.", filter->GetName());
+            TF3D_LOG_ERROR("Filter '{}' has a merge with an unknown or missing Input/Operation/Output resource.", filter.GetName());
             input->CopyTo(output);
             return;
         }
@@ -405,7 +426,7 @@ namespace tf3d::generators
             const auto inputResource  = resources.find(pass.value("Input", ""));
             const auto outputResource = resources.find(pass.value("Output", ""));
             if (inputResource == resources.end() || outputResource == resources.end() || inputResource->second == nullptr || outputResource->second == nullptr) {
-                TF3D_LOG_ERROR("Filter '{}' references an uninitialized pass resource.", filter->GetName());
+                TF3D_LOG_ERROR("Filter '{}' references an uninitialized pass resource.", filter.GetName());
                 return false;
             }
 
@@ -414,24 +435,29 @@ namespace tf3d::generators
             if (!referenceName.empty()) {
                 const auto referenceResource = resources.find(referenceName);
                 if (referenceResource == resources.end() || referenceResource->second == nullptr) {
-                    TF3D_LOG_ERROR("Filter '{}' references an uninitialized Reference resource '{}'.", filter->GetName(), referenceName);
+                    TF3D_LOG_ERROR("Filter '{}' references an uninitialized Reference resource '{}'.", filter.GetName(), referenceName);
                     return false;
                 }
                 reference = referenceResource->second;
             }
-            RunPhase(filter, state, pass, inputResource->second, outputResource->second, reference);
+            RunPhase(runtime.statistics.get(), filter, state, context, pass, inputResource->second, outputResource->second, reference);
             return true;
         };
 
-        if (filter->NeedsFieldStatistics() && m_Statistics != nullptr) {
+        if (filter.NeedsFieldStatistics() && runtime.statistics != nullptr) {
             float requestedPercentile = -1.0f;
-            if (filter->NeedsHistogram()) {
-                const std::string percentileParameter = filter->GetRequestedPercentileParameter();
+            if (filter.NeedsHistogram()) {
+                const std::string percentileParameter = filter.GetRequestedPercentileParameter();
                 if (!percentileParameter.empty() && state.values.GetDataStore().Contains(percentileParameter)) {
                     requestedPercentile = state.values.GetDataStore().At(percentileParameter).Get(-1.0f);
                 }
             }
-            m_Statistics->Compute(input, m_Resolution, m_StatisticsSampleStride, filter->NeedsHistogram(), requestedPercentile);
+            runtime.statistics->Compute(input,
+                                        context.tileResolution,
+                                        runtime.statisticsSampleStride,
+                                        filter.NeedsHistogram(),
+                                        requestedPercentile,
+                                        context.gpuWorkgroupSize);
         }
 
         if (pingPongIterations) {
@@ -477,11 +503,11 @@ namespace tf3d::generators
         }
 
         if (resources.at(mergeOperationName) == nullptr) {
-            TF3D_LOG_ERROR("Filter '{}' produced no merge operation resource '{}'.", filter->GetName(), mergeOperationName);
+            TF3D_LOG_ERROR("Filter '{}' produced no merge operation resource '{}'.", filter.GetName(), mergeOperationName);
             input->CopyTo(output);
             return;
         }
-        RunMergePhase(filter, state, merge, resources.at(mergeInputName), resources.at(mergeOperationName),
+        RunMergePhase(runtime.statistics.get(), filter, state, context, merge, resources.at(mergeInputName), resources.at(mergeOperationName),
                       resources.at(mergeOutputName));
     }
 
@@ -531,8 +557,13 @@ namespace tf3d::generators
 
     BiomeFilterStack::Snapshot BiomeFilterStack::GetState() const
     {
-        auto snapshot = m_State.Capture();
-        auto runtime  = std::make_shared<RuntimeState>();
+        auto snapshot                   = m_State.Capture();
+        auto runtime                    = std::make_shared<RuntimeState>();
+        runtime->tempBuffers            = m_TempBuffers;
+        runtime->resultA                = m_ResultA;
+        runtime->resultB                = m_ResultB;
+        runtime->statistics             = m_Statistics;
+        runtime->statisticsSampleStride = m_StatisticsSampleStride;
         runtime->filters.reserve(m_Filters.size());
         for (const auto &filter : m_Filters) {
             if (filter != nullptr) {
@@ -547,21 +578,29 @@ namespace tf3d::generators
         return result;
     }
 
-    void BiomeFilterStack::Update(const Snapshot *state, GeneratorData *baseResult)
+    void BiomeFilterStack::Update(const Snapshot *state,
+                                  const GenerationContext *context,
+                                  GeneratorData *baseResult)
     {
-        if (state == nullptr || baseResult == nullptr || state->runtime == nullptr || state->value.filters.empty()) {
+        if (state == nullptr || context == nullptr || baseResult == nullptr ||
+            state->runtime == nullptr || state->value.filters.empty()) {
             if (state != nullptr) {
                 m_State.MarkProcessed(state->revision);
             }
             return;
         }
 
-        GeneratorData *current   = baseResult;
-        GeneratorData *next      = m_ResultA.get();
+        const auto &runtime    = *state->runtime;
+        GeneratorData *current = baseResult;
+        GeneratorData *next    = runtime.resultA.get();
+        if (next == nullptr || runtime.resultB == nullptr) {
+            m_State.MarkProcessed(state->revision);
+            return;
+        }
         bool applied             = false;
-        const size_t filterCount = std::min(state->value.filters.size(), state->runtime->filters.size());
+        const size_t filterCount = std::min(state->value.filters.size(), runtime.filters.size());
         for (size_t filterIndex = 0; filterIndex < filterCount; filterIndex++) {
-            const auto &filter      = state->runtime->filters[filterIndex];
+            const auto &filter      = runtime.filters[filterIndex];
             const auto &filterState = state->value.filters[filterIndex];
             if (filter == nullptr || !filterState.enabled) {
                 continue;
@@ -569,10 +608,10 @@ namespace tf3d::generators
             TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter/") + filter->GetName());
             TF3D_PROFILE_VALUE_DOMAIN("generation/filter/index", static_cast<uint64_t>(filterIndex), 0, 0,
                                       PerformanceMonitor::Domain::Generation);
-            filter->UpdateGeneratedMask(filterState, current);
-            RunFilter(filter, filterState, current, next);
+            filter->UpdateGeneratedMask(filterState, context, current);
+            RunFilter(runtime, *filter, filterState, *context, current, next);
             current = next;
-            next    = current == m_ResultA.get() ? m_ResultB.get() : m_ResultA.get();
+            next    = current == runtime.resultA.get() ? runtime.resultB.get() : runtime.resultA.get();
             applied = true;
         }
 
