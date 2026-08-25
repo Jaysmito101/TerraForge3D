@@ -185,6 +185,7 @@ namespace tf3d::generators
     }
 
     bool BiomeCustomizeBaseShape::UpdateLayerMask(const MaskState &layer,
+                                                  const GenerationContext *context,
                                                   const std::shared_ptr<MaskLayer> &maskLayer,
                                                   GeneratorData *source)
     {
@@ -192,15 +193,16 @@ namespace tf3d::generators
             return false;
         }
 
-        return maskLayer->Apply(layer.maskState, source) && maskLayer->GetTexture() != nullptr;
+        return maskLayer->Apply(layer.maskState, context, source) && maskLayer->GetTexture() != nullptr;
     }
 
     bool BiomeCustomizeBaseShape::ApplyLayer(GeneratorData *data,
+                                             const GenerationContext *context,
                                              const MaskState *layer,
                                              const MaskLayer *maskLayer,
                                              bool flattenSource)
     {
-        if (!m_Shader || m_AppState == nullptr || data == nullptr) {
+        if (!m_Shader || context == nullptr || data == nullptr || context->tileResolution <= 0) {
             return false;
         }
 
@@ -208,7 +210,7 @@ namespace tf3d::generators
 
         data->Bind(0);
         m_Shader->Bind();
-        m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
+        m_Shader->SetUniform1i("u_Resolution", context->tileResolution);
         m_Shader->SetUniform1i("u_UseMask", layer != nullptr ? 1 : 0);
         m_Shader->SetUniform1i("u_FlattenSource", flattenSource ? 1 : 0);
         m_Shader->SetUniform1i("u_Direction", layer != nullptr && layer->raise ? 1 : -1);
@@ -220,8 +222,8 @@ namespace tf3d::generators
             }
         }
 
-        const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
-        const auto resolution    = m_AppState->mainMap.tileResolution;
+        const auto workgroupSize = std::max(context->gpuWorkgroupSize, 1);
+        const auto resolution    = context->tileResolution;
         const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
         TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         TF3D_PROFILE_VALUE_DOMAIN("generation/customize-base-shape/dispatch", dispatchSize, dispatchSize, 1,
@@ -231,9 +233,12 @@ namespace tf3d::generators
         return true;
     }
 
-    void BiomeCustomizeBaseShape::Update(const Snapshot *state, GeneratorData *baseShapeBuffer)
+    void BiomeCustomizeBaseShape::Update(const Snapshot *state,
+                                         const GenerationContext *context,
+                                         GeneratorData *baseShapeBuffer)
     {
-        if (state == nullptr || state->runtime == nullptr || baseShapeBuffer == nullptr || !m_Shader || m_AppState == nullptr) {
+        if (state == nullptr || state->runtime == nullptr || context == nullptr ||
+            baseShapeBuffer == nullptr || !m_Shader) {
             return;
         }
 
@@ -243,7 +248,7 @@ namespace tf3d::generators
         }
 
         if (state->value.flattenBaseShape) {
-            if (!ApplyLayer(baseShapeBuffer, nullptr, nullptr, true)) {
+            if (!ApplyLayer(baseShapeBuffer, context, nullptr, nullptr, true)) {
                 return;
             }
         }
@@ -257,10 +262,10 @@ namespace tf3d::generators
                 continue;
             }
             const auto &maskLayer = state->runtime->masks[maskIndex];
-            if (!UpdateLayerMask(layer, maskLayer, baseShapeBuffer)) {
+            if (!UpdateLayerMask(layer, context, maskLayer, baseShapeBuffer)) {
                 continue;
             }
-            if (!ApplyLayer(baseShapeBuffer, &layer, maskLayer.get(), false)) {
+            if (!ApplyLayer(baseShapeBuffer, context, &layer, maskLayer.get(), false)) {
                 return;
             }
         }

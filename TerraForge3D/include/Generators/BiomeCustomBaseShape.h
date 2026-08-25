@@ -4,6 +4,7 @@
 #include "Base/RevisionTracker.h"
 #include "Exporters/Serializer.h"
 #include "Generators/GeneratorData.h"
+#include "Generators/GenerationContext.h"
 #include "Generators/Masks/MaskLayer.h"
 
 #include <cstdint>
@@ -55,7 +56,9 @@ namespace tf3d::generators
         ~BiomeCustomizeBaseShape();
 
         bool ShowSettings();
-        void Update(const Snapshot *state, GeneratorData *baseShapeBuffer);
+        void Update(const Snapshot *state,
+                    const GenerationContext *context,
+                    GeneratorData *baseShapeBuffer);
 
         Snapshot GetState() const;
         inline Snapshot::Revision GetStateRevision() const
@@ -83,9 +86,12 @@ namespace tf3d::generators
         void AddMaskLayer();
         bool ShowDrawingSettings();
         State CaptureState() const;
-        bool ApplyLayer(GeneratorData *data, const MaskState *layer,
+        bool ApplyLayer(GeneratorData *data,
+                        const GenerationContext *context,
+                        const MaskState *layer,
                         const MaskLayer *maskLayer, bool flattenSource);
         bool UpdateLayerMask(const MaskState &layer,
+                             const GenerationContext *context,
                              const std::shared_ptr<MaskLayer> &maskLayer,
                              GeneratorData *source);
 
