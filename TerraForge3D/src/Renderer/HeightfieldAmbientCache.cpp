@@ -132,7 +132,7 @@ namespace tf3d::renderer
         if (!enabled)
             m_IsReady = false;
         else if (m_Worker == nullptr) {
-            m_Worker = std::make_unique<GenerationWorker>("Heightfield Ambient Worker", [this](bool) { RunWorkerBuild(); }, "renderer/cache/heightfield-ambient");
+            m_Worker = std::make_unique<GenerationWorker>("Heightfield Ambient Worker", [this](bool, uint64_t) { RunWorkerBuild(); }, "renderer/cache/heightfield-ambient");
         }
     }
 

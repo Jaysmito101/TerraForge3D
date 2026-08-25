@@ -212,7 +212,7 @@ namespace tf3d::renderer
         }
 
         if (m_Worker == nullptr) {
-            m_Worker = std::make_unique<GenerationWorker>("Heightfield GI Worker", [this](bool) { RunWorkerBuild(); }, "renderer/cache/heightfield-gi");
+            m_Worker = std::make_unique<GenerationWorker>("Heightfield GI Worker", [this](bool, uint64_t) { RunWorkerBuild(); }, "renderer/cache/heightfield-gi");
         }
         m_IsReady = m_HasPublishedOutput;
     }
