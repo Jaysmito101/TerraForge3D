@@ -24,7 +24,8 @@ namespace tf3d::generators
     }
 
     void GeneratorDataStatistics::Compute(GeneratorData *data, int resolution, int sampleStride,
-                                          bool includeHistogram, float requestedPercentile)
+                                          bool includeHistogram, float requestedPercentile,
+                                          int gpuWorkgroupSize)
     {
         if (data == nullptr || !m_Shader || m_ResultBuffer == nullptr || resolution <= 0)
             return;
@@ -40,7 +41,7 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_Resolution", resolution);
         m_Shader->SetUniform1i("u_SampleStride", sampleStride);
 
-        const int workgroupSize    = m_AppState->constants.gpuWorkgroupSize;
+        const int workgroupSize    = std::max(gpuWorkgroupSize, 1);
         const int sampleResolution = (resolution + sampleStride - 1) / sampleStride;
         const int dispatchSize     = (sampleResolution + workgroupSize - 1) / workgroupSize;
 

@@ -55,7 +55,8 @@ namespace tf3d::generators
         ~GeneratorDataStatistics() = default;
 
         void Compute(GeneratorData *data, int resolution, int sampleStride = 4,
-                     bool includeHistogram = true, float requestedPercentile = -1.0f);
+                     bool includeHistogram = true, float requestedPercentile = -1.0f,
+                     int gpuWorkgroupSize = 1);
         void Bind(uint32_t binding);
         Result Read() const;
 
