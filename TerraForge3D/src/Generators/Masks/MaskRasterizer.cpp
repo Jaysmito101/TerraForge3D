@@ -81,6 +81,7 @@ namespace tf3d::generators
     }
 
     bool MaskRasterizer::Dispatch(GeneratorData *sourceData,
+                                  const GenerationContext *context,
                                   const BaseMaskGenerator &baseGenerator,
                                   const BaseMaskGenerator::State &baseState,
                                   GeneratorTexture *destination,
@@ -88,7 +89,7 @@ namespace tf3d::generators
                                   int strokeCount,
                                   DispatchInput input)
     {
-        if (destination == nullptr || !m_Shader.has_value() || m_AppState == nullptr) {
+        if (destination == nullptr || context == nullptr || !m_Shader.has_value()) {
             return false;
         }
 
@@ -124,9 +125,9 @@ namespace tf3d::generators
         m_Shader->SetUniform1i("u_UseCachedBase", useCachedBase ? 1 : 0);
         m_Shader->SetUniform1i("u_BaseMask", 5);
         m_Shader->SetUniform1i("u_StrokeCount", strokeCount);
-        m_Shader->SetUniform1f("u_TileSize", m_AppState->mainMap.tileSize);
+        m_Shader->SetUniform1f("u_TileSize", context->tileSize);
 
-        const auto workgroupSize = m_AppState->constants.gpuWorkgroupSize;
+        const auto workgroupSize = std::max(context->gpuWorkgroupSize, 1);
         const auto dispatchSize  = (destination->GetWidth() + workgroupSize - 1) / workgroupSize;
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
@@ -134,6 +135,7 @@ namespace tf3d::generators
     }
 
     bool MaskRasterizer::Render(GeneratorData *sourceData,
+                                const GenerationContext *context,
                                 const BaseMaskGenerator &baseGenerator,
                                 const BaseMaskGenerator::State &baseState,
                                 const std::vector<MaskStroke> &strokes,
@@ -143,7 +145,7 @@ namespace tf3d::generators
                                 bool rebuildBase)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/mask/rasterize", PerformanceMonitor::Domain::Generation);
-        if (destination == nullptr || destination->GetWidth() <= 0) {
+        if (destination == nullptr || context == nullptr || destination->GetWidth() <= 0) {
             return false;
         }
 
@@ -169,6 +171,7 @@ namespace tf3d::generators
 
             if (rebuildBase) {
                 if (!Dispatch(sourceData,
+                              context,
                               baseGenerator,
                               baseState,
                               baseTexture,
@@ -183,7 +186,14 @@ namespace tf3d::generators
             input            = DispatchInput::CachedBaseTexture;
         }
 
-        return Dispatch(sourceData, baseGenerator, baseState, destination, inputBaseTexture, strokeCount, input);
+        return Dispatch(sourceData,
+                        context,
+                        baseGenerator,
+                        baseState,
+                        destination,
+                        inputBaseTexture,
+                        strokeCount,
+                        input);
     }
 
     GeneratorTexture *MaskRasterizer::GetPreviewTexture(GeneratorTexture *sourceTexture,

@@ -121,9 +121,11 @@ namespace tf3d::generators
         return State{m_BaseMaskGenerator.GetState(), m_MaskTool.GetState()};
     }
 
-    bool MaskLayer::Render(const State &state, GeneratorData *sourceData)
+    bool MaskLayer::Render(const State &state,
+                           const GenerationContext *context,
+                           GeneratorData *sourceData)
     {
-        if (m_Texture == nullptr) {
+        if (m_Texture == nullptr || context == nullptr) {
             return false;
         }
 
@@ -141,6 +143,7 @@ namespace tf3d::generators
                                              ? &*state.tool.activeStroke
                                              : nullptr;
         const bool rendered            = m_Rasterizer.Render(sourceData,
+                                                             context,
                                                              m_BaseMaskGenerator,
                                                              state.base,
                                                              state.tool.strokes,
@@ -171,22 +174,26 @@ namespace tf3d::generators
         return changed;
     }
 
-    bool MaskLayer::Apply(const State &state, GeneratorData *sourceData)
+    bool MaskLayer::Apply(const State &state,
+                          const GenerationContext *context,
+                          GeneratorData *sourceData)
     {
         if (sourceData != nullptr && sourceData->GetResolution() > 0 &&
             (m_Texture == nullptr || m_Texture->GetWidth() != sourceData->GetResolution())) {
             Resize(sourceData->GetResolution());
         }
-        return Render(state, sourceData);
+        return Render(state, context, sourceData);
     }
 
-    bool MaskLayer::Update(const Snapshot *state, GeneratorData *sourceData)
+    bool MaskLayer::Update(const Snapshot *state,
+                           const GenerationContext *context,
+                           GeneratorData *sourceData)
     {
         if (state == nullptr) {
             return false;
         }
 
-        const bool rendered = Apply(state->value, sourceData);
+        const bool rendered = Apply(state->value, context, sourceData);
         if (rendered) {
             m_State.MarkProcessed(state->revision);
         }

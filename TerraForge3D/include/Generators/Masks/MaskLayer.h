@@ -6,6 +6,7 @@
 #include "Generators/Masks/BaseMaskGenerator.h"
 #include "Generators/Masks/MaskRasterizer.h"
 #include "Generators/Masks/MaskTool.h"
+#include "Generators/GenerationContext.h"
 
 #include <memory>
 #include <string>
@@ -42,8 +43,12 @@ namespace tf3d::generators
 
         void Resize(int size);
         bool ShowSettings(bool showViewportMask = true);
-        bool Apply(const State &state, GeneratorData *sourceData);
-        bool Update(const Snapshot *state, GeneratorData *sourceData);
+        bool Apply(const State &state,
+                   const GenerationContext *context,
+                   GeneratorData *sourceData);
+        bool Update(const Snapshot *state,
+                    const GenerationContext *context,
+                    GeneratorData *sourceData);
 
         inline Snapshot GetState() const
         {
@@ -74,12 +79,19 @@ namespace tf3d::generators
             return m_Texture.get();
         }
 
+        inline std::shared_ptr<GeneratorTexture> GetTextureHandle() const
+        {
+            return m_Texture;
+        }
+
     private:
         static constexpr int32_t kMaxVisualizationResolution = 512;
 
         bool ShowBaseSettings();
         State CaptureState() const;
-        bool Render(const State &state, GeneratorData *sourceData);
+        bool Render(const State &state,
+                    const GenerationContext *context,
+                    GeneratorData *sourceData);
         void EnsureVisualizationTexture();
 
         tf3d::data::ApplicationState *m_AppState = nullptr;

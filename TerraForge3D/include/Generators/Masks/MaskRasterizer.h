@@ -2,6 +2,7 @@
 
 #include "Base/Base.h"
 #include "Generators/GeneratorData.h"
+#include "Generators/GenerationContext.h"
 #include "Generators/GeneratorTexture.h"
 #include "Generators/Masks/BaseMaskGenerator.h"
 #include "Generators/Masks/MaskTool.h"
@@ -31,6 +32,7 @@ namespace tf3d::generators
         MaskRasterizer &operator=(MaskRasterizer &&) noexcept = default;
 
         bool Render(GeneratorData *sourceData,
+                    const GenerationContext *context,
                     const BaseMaskGenerator &baseGenerator,
                     const BaseMaskGenerator::State &baseState,
                     const std::vector<MaskStroke> &strokes,
@@ -51,6 +53,7 @@ namespace tf3d::generators
 
         void UploadStrokes(const std::vector<MaskStroke> &strokes, const MaskStroke *activeStroke);
         bool Dispatch(GeneratorData *sourceData,
+                      const GenerationContext *context,
                       const BaseMaskGenerator &baseGenerator,
                       const BaseMaskGenerator::State &baseState,
                       GeneratorTexture *destination,
