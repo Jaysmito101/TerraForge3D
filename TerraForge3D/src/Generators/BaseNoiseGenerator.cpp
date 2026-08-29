@@ -9,7 +9,7 @@
 namespace tf3d::generators
 {
 
-    BaseNoiseGenerator::BaseNoiseGenerator(tf3d::data::ApplicationState *appState)
+    BaseNoiseGenerator::BaseNoiseGenerator(data::ApplicationState *appState)
         : m_AppState(appState),
           m_Inspector(std::make_shared<inspector::CustomInspector>()),
           m_UIState(State{true,
@@ -143,7 +143,7 @@ namespace tf3d::generators
 
         bool useMask = state->value.useMask && m_MaskLayer != nullptr;
         if (useMask) {
-            useMask = m_MaskLayer->Apply(state->value.mask, sourceBuffer) &&
+            useMask = m_MaskLayer->Apply(state->value.mask, context, sourceBuffer) &&
                       m_MaskLayer->GetTexture() != nullptr;
         }
 
