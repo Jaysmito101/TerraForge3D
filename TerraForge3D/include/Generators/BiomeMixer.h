@@ -9,11 +9,7 @@
 
 #include "Generators/SimpleBiomeMixer.h"
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -29,38 +25,47 @@ namespace tf3d::generators
     public:
         struct State {
             BiomeMixerMethod method = BiomeMixerMethod_Simple;
-            SimpleBiomeMixer::State simple;
         };
-        using Snapshot = base::GeneratorState<State>::Snapshot;
+        using StateSnapshot = base::GeneratorState<State>::Snapshot;
 
-        BiomeMixer(ApplicationState *appState);
+        struct Snapshot {
+            State value;
+            StateSnapshot::Revision revision = 0;
+            SimpleBiomeMixer::Snapshot simple;
+        };
+
+        struct Runtime {
+            SimpleBiomeMixer::Runtime simple;
+        };
+
+        BiomeMixer(data::ApplicationState *appState);
         ~BiomeMixer();
 
-        void Update(const Snapshot *state,
-                    const GenerationContext *context,
-                    const std::vector<BiomeManager::State> &biomeStates,
-                    const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
-                    GeneratorData *heightmapData,
-                    GeneratorData *swapBuffer);
+        static bool Execute(const Snapshot *state,
+                            const Runtime *runtime,
+                            const GenerationContext *context,
+                            const std::vector<BiomeManager::Snapshot> &biomes,
+                            GeneratorData *heightmapData,
+                            GeneratorData *swapBuffer);
         bool ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers);
+
+        inline Runtime GetRuntime() const
+        {
+            return Runtime{m_SimpleBiomeMixer != nullptr ? m_SimpleBiomeMixer->GetRuntime()
+                                                         : SimpleBiomeMixer::Runtime{}};
+        }
 
         inline Snapshot GetState() const
         {
-            return m_State.Capture();
-        }
-
-        inline bool IsUpdationRequired()
-        {
-            return m_State.RequiresUpdate();
+            const auto state = m_State.Capture();
+            return Snapshot{state.value,
+                            state.revision,
+                            m_SimpleBiomeMixer != nullptr ? m_SimpleBiomeMixer->GetState()
+                                                          : SimpleBiomeMixer::Snapshot{}};
         }
 
     private:
-        State CaptureState() const;
-        void PublishState();
-
         std::shared_ptr<SimpleBiomeMixer> m_SimpleBiomeMixer;
-        State m_UIState;
         base::GeneratorState<State> m_State;
     };
 } // namespace tf3d::generators
-using tf3d::generators::BiomeMixer;

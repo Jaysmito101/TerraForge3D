@@ -6,37 +6,37 @@
 namespace tf3d::generators
 {
 
-    BiomeMixer::BiomeMixer(ApplicationState *appState)
+    BiomeMixer::BiomeMixer(data::ApplicationState *appState)
         : m_SimpleBiomeMixer(std::make_shared<SimpleBiomeMixer>(appState)),
-          m_State(m_UIState)
+          m_State(State{})
     {
-        PublishState();
     }
 
     BiomeMixer::~BiomeMixer()
     {
     }
 
-    void BiomeMixer::Update(const Snapshot *state,
-                            const GenerationContext *context,
-                            const std::vector<BiomeManager::State> &biomeStates,
-                            const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
-                            GeneratorData *heightmapData,
-                            GeneratorData *swapBuffer)
+    bool BiomeMixer::Execute(const Snapshot *snapshot,
+                             const Runtime *runtime,
+                             const GenerationContext *context,
+                             const std::vector<BiomeManager::Snapshot> &biomes,
+                             GeneratorData *heightmapData,
+                             GeneratorData *swapBuffer)
     {
-        if (state == nullptr || context == nullptr || heightmapData == nullptr || swapBuffer == nullptr ||
-            m_SimpleBiomeMixer == nullptr) {
-            return;
+        if (snapshot == nullptr || context == nullptr || heightmapData == nullptr || swapBuffer == nullptr ||
+            runtime == nullptr || runtime->simple.shader == nullptr) {
+            return false;
         }
 
-        switch (state->value.method) {
+        bool producedOutput = false;
+        switch (snapshot->value.method) {
             case BiomeMixerMethod_Simple:
-                m_SimpleBiomeMixer->Update(&state->value.simple,
-                                           context,
-                                           biomeStates,
-                                           biomeManagers,
-                                           heightmapData,
-                                           swapBuffer);
+                producedOutput = SimpleBiomeMixer::Execute(&snapshot->simple.value,
+                                                           &runtime->simple,
+                                                           context,
+                                                           biomes,
+                                                           heightmapData,
+                                                           swapBuffer);
                 break;
             case BiomeMixerMethod_AlphaBlend:
                 break;
@@ -45,22 +45,7 @@ namespace tf3d::generators
             default:
                 break;
         }
-        m_State.MarkProcessed(state->revision);
-    }
-
-    BiomeMixer::State BiomeMixer::CaptureState() const
-    {
-        State state = m_UIState;
-        if (m_SimpleBiomeMixer != nullptr) {
-            state.simple = m_SimpleBiomeMixer->GetState().value;
-        }
-        return state;
-    }
-
-    void BiomeMixer::PublishState()
-    {
-        m_UIState = CaptureState();
-        m_State.Replace(m_UIState);
+        return producedOutput;
     }
 
     bool BiomeMixer::ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers)
@@ -71,13 +56,20 @@ namespace tf3d::generators
             "Simple",
             "Alpha Blend"};
 
-        int method = static_cast<int>(m_UIState.method);
+        const auto stateSnapshot = m_State.Capture();
+        int method              = static_cast<int>(stateSnapshot.value.method);
 
         bool changed = ShowComboBox("Method##BiomeMixerMethod", &method, s_Methods, 2);
+        const auto selectedMethod = static_cast<BiomeMixerMethod>(method);
 
-        m_UIState.method = static_cast<BiomeMixerMethod>(method);
+        if (selectedMethod != stateSnapshot.value.method) {
+            changed |= m_State.Edit([selectedMethod](State &state) {
+                state.method = selectedMethod;
+                return true;
+            });
+        }
 
-        switch (m_UIState.method) {
+        switch (selectedMethod) {
             case BiomeMixerMethod_Simple:
                 if (m_SimpleBiomeMixer != nullptr) {
                     changed |= m_SimpleBiomeMixer->ShowSettings(biomeManagers);
@@ -90,9 +82,6 @@ namespace tf3d::generators
                 break;
         }
 
-        if (changed) {
-            PublishState();
-        }
         return changed;
     }
 
