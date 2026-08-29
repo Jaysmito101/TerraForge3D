@@ -18,7 +18,7 @@ namespace tf3d::generators
     class GenerationWorker
     {
     public:
-        using WorkCallback = std::function<void(bool force)>;
+        using WorkCallback = std::function<void(bool force, uint64_t requestId)>;
 
         GenerationWorker(std::string name, WorkCallback callback, std::string profilePrefix = "generation");
         ~GenerationWorker();

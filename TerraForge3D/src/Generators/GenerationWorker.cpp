@@ -225,7 +225,7 @@ namespace tf3d::generators
                                                    PerformanceMonitor::Domain::Worker, requestId);
                 }
                 if (m_Callback)
-                    m_Callback(force);
+                    m_Callback(force, requestId);
             }
             if (captureActive) {
                 const std::string workerKey = m_ProfilePrefix + "/worker";
