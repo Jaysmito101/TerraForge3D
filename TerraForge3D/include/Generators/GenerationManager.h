@@ -7,6 +7,7 @@
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
 #include "Generators/GenerationDirtyManager.h"
+#include "Generators/GenerationContext.h"
 #include "Generators/HeightfieldPyramid.h"
 #include "Generators/SlopeGenerator.h"
 
@@ -51,7 +52,7 @@ namespace tf3d::generators
     struct SelectedUINode {
         int m_BiomeIndex  = -1;
         int m_FilterIndex = -1;
-        std::string m_BiomeID;
+        BiomeID m_BiomeID;
         SelectedUINodeObjectType m_ObjectName = SelectedUINodeObjectType_None;
         std::string m_ID;
     };
@@ -62,6 +63,7 @@ namespace tf3d::generators
         std::shared_ptr<GeneratorData> swapBuffer;
         std::shared_ptr<GeneratorTexture> seedTexture;
         std::shared_ptr<SlopeGenerator> slopeGenerator;
+        std::shared_ptr<SlopeGenerator> workingSlopeGenerator;
         std::shared_ptr<BiomeMixer> biomeMixer;
         std::shared_ptr<GeneratorDataStatistics> statistics;
         std::shared_ptr<HeightfieldPyramid> heightPyramid;
@@ -84,10 +86,24 @@ namespace tf3d::generators
         uint64_t submittedFrame  = 0;
         uint64_t terrainRevision = 0;
         int32_t tileResolution   = 0;
+        float tileSize           = 1.0f;
         uint32_t biomeCount      = 0;
         uint32_t filterCount     = 0;
-        bool force               = false;
         GenerationDirtyState dirtyState;
+        std::shared_ptr<GeneratorTexture> seedTexture;
+        std::shared_ptr<GeneratorData> workingHeightmapData;
+        std::shared_ptr<GeneratorData> swapBuffer;
+        std::shared_ptr<SlopeGenerator> slopeGenerator;
+        int32_t gpuWorkgroupSize = 1;
+        std::vector<BiomeManager::Snapshot> biomes;
+        BiomeMixer::Snapshot mixer;
+        BiomeMixer::Runtime mixerRuntime;
+    };
+
+    struct GenerationExecutionResult {
+        uint64_t requestId     = 0;
+        uint64_t inputRevision = 0;
+        bool producedOutput    = false;
     };
 
 #define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + std::string(#objectname))
@@ -148,10 +164,6 @@ namespace tf3d::generators
             return m_Field.statisticsResult;
         }
         bool UpdateInternal(const std::string &params = "", void *paramsPtr = nullptr);
-        inline const std::vector<std::shared_ptr<BiomeManager>> &GetBiomeManagers() const
-        {
-            return m_Field.biomeManagers;
-        }
 
     private:
         void WaitForGenerationWorker();
@@ -162,23 +174,28 @@ namespace tf3d::generators
         void ShowFieldStatistics();
         void UpdateFieldStatistics();
         void GenerateHeightmapMipmaps();
-        void CommitHeightfield();
+        bool CommitHeightfield(uint64_t inputRevision);
         void RequestGeneration();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
-        GenerationRequestSnapshot TakeGenerationSnapshot();
-        void StoreGenerationSnapshot(const GenerationRequestSnapshot &snapshot);
-        void ExecuteGeneration();
+        GenerationRequestSnapshot TakeGenerationSnapshot(uint64_t requestId);
+        void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
+        void StoreGenerationSnapshot(GenerationRequestSnapshot snapshot);
+        GenerationExecutionResult ExecuteGeneration(uint64_t requestId);
+        void StoreCompletedGenerationResult(GenerationExecutionResult result);
+        GenerationExecutionResult TakeCompletedGenerationResult();
+        bool IsCurrentGeneration(const GenerationExecutionResult &result) const;
 
     private:
         ApplicationState *m_AppState = nullptr;
         FieldState m_Field;
         UiState m_Ui;
-
-        std::unique_ptr<GenerationWorker> m_Worker;
         std::atomic<uint64_t> m_TerrainRevision        = 0;
         std::atomic_bool m_ResolutionGenerationPending = false;
         mutable std::mutex m_RequestSnapshotMutex;
         std::optional<GenerationRequestSnapshot> m_PendingGenerationSnapshot;
+        mutable std::mutex m_ResultMutex;
+        std::optional<GenerationExecutionResult> m_CompletedGenerationResult;
+        std::unique_ptr<GenerationWorker> m_Worker;
     };
 
 } // namespace tf3d::generators
