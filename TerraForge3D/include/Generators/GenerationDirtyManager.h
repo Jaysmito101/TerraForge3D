@@ -11,9 +11,8 @@ namespace tf3d::generators
         None      = 0,
         Biomes    = 1u << 0,
         Mixer     = 1u << 1,
-        Structure = 1u << 2,
-        Force     = 1u << 3,
-        AllBiomes = 1u << 4
+        Force     = 1u << 2,
+        AllBiomes = 1u << 3
     };
 
     enum class GenerationDirtyCause : uint32_t {
@@ -49,8 +48,6 @@ namespace tf3d::generators
     class GenerationDirtyManager
     {
     public:
-        using StateLock = std::unique_lock<std::mutex>;
-
         inline void Mark(GenerationDirtyScope scope, GenerationDirtyCause cause = GenerationDirtyCause::Unknown)
         {
             std::lock_guard lock(m_DirtyMutex);
@@ -72,11 +69,6 @@ namespace tf3d::generators
         inline void MarkMixer(GenerationDirtyCause cause = GenerationDirtyCause::UiEdit)
         {
             Mark(GenerationDirtyScope::Mixer, cause);
-        }
-
-        inline void MarkStructure(GenerationDirtyCause cause = GenerationDirtyCause::UiEdit)
-        {
-            Mark(GenerationDirtyScope::Structure, cause);
         }
 
         inline void MarkForce(GenerationDirtyCause cause = GenerationDirtyCause::Force)
@@ -117,17 +109,11 @@ namespace tf3d::generators
             return true;
         }
 
-        inline StateLock AcquireStateLock()
-        {
-            return StateLock(m_StateMutex);
-        }
-
     private:
         std::atomic<uint32_t> m_PendingMask = 0;
         std::atomic<uint32_t> m_CauseMask   = 0;
         std::atomic<uint64_t> m_Revision    = 0;
         mutable std::mutex m_DirtyMutex;
-        std::mutex m_StateMutex;
     };
 
 } // namespace tf3d::generators
