@@ -1,108 +1,140 @@
 #include "Generators/SimpleBiomeMixer.h"
+#include "Base/Shader.h"
 #include "Data/ApplicationState.h"
 #include "Profiler.h"
+
+#include <algorithm>
+#include <utility>
 
 namespace tf3d::generators
 {
 
-    SimpleBiomeMixer::SimpleBiomeMixer(ApplicationState *appState)
+    SimpleBiomeMixer::SimpleBiomeMixer(data::ApplicationState *appState)
+        : m_AppState(appState)
     {
-        m_AppState        = appState;
-        m_RequireUpdation = true;
-        // const auto shaderSource = ReadShaderSourceFile(m_AppState->constants.shadersDir + PATH_SEPARATOR "generation" PATH_SEPARATOR "biome_mixer" PATH_SEPARATOR "simple_mixer.glsl", &s_TempBool);
-        // m_Shader = std::make_shared<ComputeShader>(shaderSource);
-        m_Shader = m_AppState->resourceManager->LoadComputeShader("generation/biome_mixer/simple_mixer");
+        auto shader = m_AppState->resourceManager->LoadComputeShader("generation/biome_mixer/simple_mixer");
+        if (shader.has_value()) {
+            m_Shader = std::make_shared<base::ComputeShader>(std::move(*shader));
+        }
     }
 
     SimpleBiomeMixer::~SimpleBiomeMixer()
     {
     }
 
-    void SimpleBiomeMixer::Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer)
+    bool SimpleBiomeMixer::Execute(const State *state,
+                                   const Runtime *runtime,
+                                   const GenerationContext *context,
+                                   const std::vector<BiomeManager::Snapshot> &biomes,
+                                   GeneratorData *heightmapData,
+                                   GeneratorData *swapBuffer)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/mixer/simple", PerformanceMonitor::Domain::Generation);
-        const auto &biomeManagers = m_AppState->generationManager->GetBiomeManagers();
-        auto workgroupSize        = m_AppState->constants.gpuWorkgroupSize;
-        const auto dispatchSize   = (m_AppState->mainMap.tileResolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_VALUE_DOMAIN("generation/mixer/dispatch", dispatchSize, dispatchSize,
-                                  static_cast<uint64_t>(biomeManagers.size()), PerformanceMonitor::Domain::Generation);
+        if (state == nullptr || runtime == nullptr || runtime->shader == nullptr || context == nullptr ||
+            heightmapData == nullptr || swapBuffer == nullptr) {
+            return false;
+        }
 
-        m_Shader->Bind();
-        m_SwapBuffer->Bind(1);
+        const int workgroupSize = std::max(context->gpuWorkgroupSize, 1);
+        const int resolution    = context->tileResolution;
+        if (resolution <= 0) {
+            return false;
+        }
+        const auto dispatchSize = (resolution + workgroupSize - 1) / workgroupSize;
+        TF3D_PROFILE_VALUE_DOMAIN("generation/mixer/dispatch", dispatchSize, dispatchSize,
+                                  static_cast<uint64_t>(biomes.size()), PerformanceMonitor::Domain::Generation);
+
+        runtime->shader->Bind();
+        swapBuffer->Bind(1);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
         // clear the buffer
-        m_Shader->SetUniform1i("u_Resolution", m_AppState->mainMap.tileResolution);
-        m_Shader->SetUniform1i("u_Mode", 0);
+        runtime->shader->SetUniform1i("u_Resolution", resolution);
+        runtime->shader->SetUniform1i("u_Mode", 0);
         {
             const std::string gpuKey = "generation/mixer/simple/clear/gpu";
             TF3D_PROFILE_GPU_SCOPE(gpuKey);
-            m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
-            m_Shader->SetMemoryBarrier();
+            runtime->shader->Dispatch(dispatchSize, dispatchSize, 1);
+            runtime->shader->SetMemoryBarrier();
         }
 
-        std::unordered_map<std::string, SimpleBiomeMixerSettings> biomeSettingsMap;
-
         // mix the biomes
-        m_Shader->SetUniform1i("u_Mode", 1);
-        for (auto &biomeManager : biomeManagers) {
-            auto settings = m_BiomeSettings.find(biomeManager->GetBiomeID());
-            if (settings == m_BiomeSettings.end())
-                m_BiomeSettings[biomeManager->GetBiomeID()] = SimpleBiomeMixerSettings();
-            auto &biomeSettings                          = m_BiomeSettings[biomeManager->GetBiomeID()];
-            biomeSettingsMap[biomeManager->GetBiomeID()] = biomeSettings;
-            // TF3D_LOG_DEBUG("Biome '{}' settings: enabled={}, active={}", biomeManager->GetBiomeName(), biomeSettings.enabled, biomeManager->IsEnabled());
-            if (!(biomeSettings.enabled && biomeManager->IsEnabled()))
+        runtime->shader->SetUniform1i("u_Mode", 1);
+        const size_t biomeCount = biomes.size();
+        for (size_t biomeIndex = 0; biomeIndex < biomeCount; ++biomeIndex) {
+            const auto &biomeSnapshot = biomes[biomeIndex];
+            const auto &biomeRuntime  = biomeSnapshot.runtime;
+            const auto &biomeState    = biomeSnapshot.state;
+            if (!biomeState.enabled || biomeRuntime.data == nullptr) {
                 continue;
+            }
 
-            biomeManager->GetBiomeData()->Bind(0);
-            m_Shader->SetUniform1f("u_Strength", biomeSettings.strength);
-            m_Shader->SetUniform1i("u_UseBiomeMask", biomeSettings.useBiomeMask);
-            if (biomeSettings.useBiomeMask) {
-                biomeManager->GetMaskTexture()->Bind(3);
-                m_Shader->SetUniform1i("u_BiomeMask", 3);
+            const auto settingsIt    = state->biomeSettings.find(biomeRuntime.id);
+            const auto biomeSettings = settingsIt != state->biomeSettings.end()
+                                           ? settingsIt->second
+                                           : SimpleBiomeMixerSettings{};
+            if (!biomeSettings.enabled) {
+                continue;
+            }
+
+            auto *biomeData = biomeRuntime.data.get();
+            biomeData->Bind(0);
+            runtime->shader->SetUniform1f("u_Strength", biomeSettings.strength);
+            auto *maskTexture       = biomeSettings.useBiomeMask ? biomeRuntime.maskTexture.get() : nullptr;
+            const bool useBiomeMask = maskTexture != nullptr;
+            runtime->shader->SetUniform1i("u_UseBiomeMask", useBiomeMask ? 1 : 0);
+            if (useBiomeMask) {
+                maskTexture->Bind(3);
+                runtime->shader->SetUniform1i("u_BiomeMask", 3);
             }
             {
                 const std::string gpuKey = std::string("generation/mixer/simple/biome/") +
-                                           biomeManager->GetBiomeName() + "/gpu";
+                                           biomeRuntime.name + "/gpu";
                 TF3D_PROFILE_GPU_SCOPE(gpuKey);
-                m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
-                m_Shader->SetMemoryBarrier();
+                runtime->shader->Dispatch(dispatchSize, dispatchSize, 1);
+                runtime->shader->SetMemoryBarrier();
             }
         }
 
-        // This is a horrible way to update the map, but it works for now
-        // TODO: Make this better (PRs very welcome)
-        m_BiomeSettings = biomeSettingsMap;
-
-        m_SwapBuffer->CopyTo(heightmapData);
-
-        m_RequireUpdation = false;
+        swapBuffer->CopyTo(heightmapData);
+        return true;
     }
 
-    bool SimpleBiomeMixer::ShowSettings()
+    bool SimpleBiomeMixer::ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers)
     {
-        auto &biomeManagers = m_AppState->generationManager->GetBiomeManagers();
         ImGui::Text("Biomes");
+        return m_State.Edit([&](State &state) {
+            bool changed = false;
 
-        for (auto &biomeManager : biomeManagers) {
-            ImGui::PushID(biomeManager->GetBiomeID().c_str());
+            for (const auto &biomeManager : biomeManagers) {
+                if (biomeManager == nullptr) {
+                    continue;
+                }
 
-            if (ImGui::CollapsingHeader(biomeManager->GetBiomeName())) {
-                auto settings = m_BiomeSettings.find(biomeManager->GetBiomeID());
-                if (settings == m_BiomeSettings.end())
-                    m_BiomeSettings[biomeManager->GetBiomeID()] = SimpleBiomeMixerSettings();
-                auto &biomeSettings = m_BiomeSettings[biomeManager->GetBiomeID()];
+                const auto &biomeID = biomeManager->GetBiomeID();
+                ImGui::PushID(biomeID.c_str());
 
-                BIOME_UI_PROPERTY(ImGui::Checkbox("Enabled", &biomeSettings.enabled));
-                BIOME_UI_PROPERTY(ImGui::SliderFloat("Strength", &biomeSettings.strength, 0.0f, 1.0f));
-                BIOME_UI_PROPERTY(ImGui::Checkbox("Use Biome Mask", &biomeSettings.useBiomeMask));
+                if (ImGui::CollapsingHeader(biomeManager->GetBiomeName())) {
+                    const auto settings = state.biomeSettings.find(biomeID);
+                    auto biomeSettings  = settings != state.biomeSettings.end()
+                                              ? settings->second
+                                              : SimpleBiomeMixerSettings{};
+                    bool biomeChanged   = false;
+
+                    biomeChanged |= ImGui::Checkbox("Enabled", &biomeSettings.enabled);
+                    biomeChanged |= ImGui::SliderFloat("Strength", &biomeSettings.strength, 0.0f, 1.0f);
+                    biomeChanged |= ImGui::Checkbox("Use Biome Mask", &biomeSettings.useBiomeMask);
+                    if (biomeChanged) {
+                        state.biomeSettings[biomeID] = biomeSettings;
+                        changed                      = true;
+                    }
+                }
+
+                ImGui::PopID();
             }
 
-            ImGui::PopID();
-        }
-
-        return m_RequireUpdation;
+            return changed;
+        });
     }
 
 } // namespace tf3d::generators

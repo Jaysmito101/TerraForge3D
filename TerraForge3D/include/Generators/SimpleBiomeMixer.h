@@ -1,15 +1,19 @@
 #pragma once
 
 #include "Base/Base.h"
+#include "Base/RevisionTracker.h"
 #include "Generators/BiomeManager.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/GenerationContext.h"
 
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
+TF3D_FWD_DEC_CLASS(ComputeShader, tf3d::base)
 
 namespace tf3d::generators
 {
@@ -23,19 +27,40 @@ namespace tf3d::generators
     class SimpleBiomeMixer
     {
     public:
-        SimpleBiomeMixer(ApplicationState *state);
+        struct State {
+            std::unordered_map<BiomeID, SimpleBiomeMixerSettings, BiomeIDHash> biomeSettings;
+        };
+        using Snapshot = base::GeneratorState<State>::Snapshot;
+
+        struct Runtime {
+            std::shared_ptr<base::ComputeShader> shader;
+        };
+
+        SimpleBiomeMixer(data::ApplicationState *state);
         ~SimpleBiomeMixer();
 
-        void Update(GeneratorData *heightmapData, GeneratorData *m_SwapBuffer);
-        bool ShowSettings();
+        static bool Execute(const State *state,
+                            const Runtime *runtime,
+                            const GenerationContext *context,
+                            const std::vector<BiomeManager::Snapshot> &biomes,
+                            GeneratorData *heightmapData,
+                            GeneratorData *swapBuffer);
+        bool ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers);
+
+        inline Snapshot GetState() const
+        {
+            return m_State.Capture();
+        }
+
+        inline Runtime GetRuntime() const
+        {
+            return Runtime{m_Shader};
+        }
 
     private:
-        ApplicationState *m_AppState = nullptr;
-        std::optional<ComputeShader> m_Shader;
-        std::unordered_map<std::string, SimpleBiomeMixerSettings> m_BiomeSettings;
-        bool m_RequireUpdation = true;
+        data::ApplicationState *m_AppState = nullptr;
+        std::shared_ptr<base::ComputeShader> m_Shader;
+        base::GeneratorState<State> m_State;
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::SimpleBiomeMixer;
-using tf3d::generators::SimpleBiomeMixerSettings;
