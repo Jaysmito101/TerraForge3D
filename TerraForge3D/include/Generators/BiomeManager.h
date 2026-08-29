@@ -14,12 +14,49 @@
 #include "Generators/Masks/MaskLayer.h"
 
 #include <atomic>
+#include <cstddef>
+#include <functional>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
+
+    class BiomeID
+    {
+    public:
+        BiomeID() = default;
+        explicit BiomeID(std::string value)
+            : m_Value(std::move(value))
+        {
+        }
+
+        inline const std::string &GetValue() const noexcept
+        {
+            return m_Value;
+        }
+
+        inline const char *c_str() const noexcept
+        {
+            return m_Value.c_str();
+        }
+
+        friend bool operator==(const BiomeID &, const BiomeID &) = default;
+
+    private:
+        std::string m_Value;
+    };
+
+    struct BiomeIDHash {
+        std::size_t operator()(const BiomeID &id) const noexcept
+        {
+            return std::hash<std::string>{}(id.GetValue());
+        }
+    };
 
     enum BiomeBaseShapeGeneratorMode {
         BiomeBaseShapeGeneratorMode_Algorithm = 0,
@@ -36,6 +73,7 @@ namespace tf3d::generators
 
         struct State {
             Revision revision                         = 0;
+            bool updateRequired                       = true;
             bool enabled                              = true;
             BiomeBaseShapeGeneratorMode baseShapeMode = BiomeBaseShapeGeneratorMode_Algorithm;
             int32_t baseShapeGenerator                = 0;
@@ -47,23 +85,44 @@ namespace tf3d::generators
             std::optional<MaskLayer::Snapshot> mask;
         };
 
-        BiomeManager(tf3d::data::ApplicationState *appState);
+        struct Runtime {
+            BiomeID id;
+            std::string name;
+            std::shared_ptr<GeneratorData> data;
+            std::shared_ptr<GeneratorTexture> maskTexture;
+            std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> baseShapeGenerators;
+            std::shared_ptr<DEMBaseShapeGenerator> demBaseShapeGenerator;
+            std::shared_ptr<BaseNoiseGenerator> baseNoiseGenerator;
+            std::shared_ptr<BiomeCustomizeBaseShape> customBaseShape;
+            std::shared_ptr<BiomeFilterStack> filterStack;
+            std::shared_ptr<MaskLayer> maskLayer;
+        };
+
+        struct Snapshot {
+            State state;
+            Runtime runtime;
+        };
+
+        BiomeManager(data::ApplicationState *appState);
         ~BiomeManager();
 
         void Resize();
-        State GetState() const;
-        void Update(const State *state, const GenerationContext *context, GeneratorData *swapBuffer);
+        Snapshot CaptureSnapshot() const;
+        static bool Execute(const Snapshot *snapshot,
+                            const GenerationContext *context,
+                            GeneratorData *swapBuffer);
+        void MarkProcessed(Revision revision);
         // bool ShowSettings();
-        bool ShowBaseShapeSettings();
-        bool ShowCustomizeBaseShapeSettings();
-        inline bool ShowCustomBaseShapeSettings()
+        void ShowBaseShapeSettings();
+        void ShowCustomizeBaseShapeSettings();
+        inline void ShowCustomBaseShapeSettings()
         {
-            return ShowCustomizeBaseShapeSettings();
+            ShowCustomizeBaseShapeSettings();
         }
-        bool ShowGeneralSettings();
-        bool ShowBaseNoiseSettings();
-        bool ShowMaskToolSettings();
-        bool ShowFilterSettings(int filterIndex);
+        void ShowGeneralSettings();
+        void ShowBaseNoiseSettings();
+        void ShowMaskToolSettings();
+        void ShowFilterSettings(int filterIndex);
 
         inline const bool IsEnabled() const
         {
@@ -73,21 +132,9 @@ namespace tf3d::generators
         {
             return m_BiomeName;
         }
-        inline const bool IsUpdationRequired() const
-        {
-            return m_UpdateTracker.RequiresUpdate();
-        }
-        inline bool IsUpdationRequired(const State &state) const
-        {
-            return state.revision != m_UpdateTracker.ProcessedRevision();
-        }
         inline const bool IsUsingCustomBaseShape() const
         {
             return m_CustomizeBaseShape != nullptr && m_CustomizeBaseShape->IsEnabled();
-        }
-        inline GeneratorData *GetBiomeData() const
-        {
-            return m_Data.get();
         }
         inline const ImVec4 &GetColor() const
         {
@@ -105,7 +152,7 @@ namespace tf3d::generators
         {
             return m_FilterStack->GetDefinitions();
         }
-        inline const std::string &GetBiomeID() const
+        inline const BiomeID &GetBiomeID() const
         {
             return m_BiomeID;
         }
@@ -113,15 +160,6 @@ namespace tf3d::generators
         {
             strcpy(m_BiomeName, name.c_str());
         }
-        inline GeneratorTexture *GetMaskTexture() const
-        {
-            return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
-        }
-        inline GeneratorTexture *GetMaskPreviewTexture() const
-        {
-            return m_MaskLayer != nullptr ? m_MaskLayer->GetTexture() : nullptr;
-        }
-
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
         bool LoadUpResources();
@@ -132,8 +170,8 @@ namespace tf3d::generators
         char m_BiomeName[64];
         bool m_IsEnabled = true;
         ImVec4 m_Color;
-        std::string m_BiomeID                    = "";
-        tf3d::data::ApplicationState *m_AppState = nullptr;
+        BiomeID m_BiomeID;
+        data::ApplicationState *m_AppState = nullptr;
         std::shared_ptr<GeneratorData> m_Data;
         base::RevisionTracker m_UpdateTracker{1};
         std::atomic<int32_t> m_SelectedBaseShapeGenerator                         = 0;
@@ -147,8 +185,8 @@ namespace tf3d::generators
         std::shared_ptr<BiomeCustomizeBaseShape> m_CustomizeBaseShape;
         std::shared_ptr<GeneratorDataStatistics> m_Statistics;
         GeneratorDataStatisticsResult m_StatisticsResult;
-        bool m_StatisticsDirty       = true;
-        int m_StatisticsSampleStride = 4;
+        std::atomic_bool m_StatisticsDirty = true;
+        int m_StatisticsSampleStride       = 4;
     };
 
 } // namespace tf3d::generators

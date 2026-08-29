@@ -137,10 +137,10 @@ namespace tf3d::generators
         return true;
     }
 
-    BiomeManager::BiomeManager(tf3d::data::ApplicationState *appState)
+    BiomeManager::BiomeManager(data::ApplicationState *appState)
     {
         m_AppState           = appState;
-        m_BiomeID            = GenerateId(8);
+        m_BiomeID            = BiomeID{GenerateId(8)};
         m_Color              = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
         m_Data               = std::make_shared<GeneratorData>();
         static int s_BiomeID = 1;
@@ -178,13 +178,15 @@ namespace tf3d::generators
         m_MaskLayer->Resize(m_AppState->mainMap.tileResolution);
         m_FilterStack->Resize(size, m_AppState->mainMap.tileResolution);
         MarkUpdateRequired();
-        m_StatisticsDirty = true;
+        m_StatisticsDirty.store(true, std::memory_order_release);
     }
 
-    BiomeManager::State BiomeManager::GetState() const
+    BiomeManager::Snapshot BiomeManager::CaptureSnapshot() const
     {
-        State state;
+        Snapshot snapshot;
+        auto &state              = snapshot.state;
         state.revision           = m_UpdateTracker.PublishedRevision();
+        state.updateRequired     = m_UpdateTracker.RequiresUpdate();
         state.enabled            = m_IsEnabled;
         state.baseShapeMode      = m_SelectedBaseShapeGeneratorMode.load(std::memory_order_acquire);
         state.baseShapeGenerator = m_SelectedBaseShapeGenerator.load(std::memory_order_acquire);
@@ -211,78 +213,98 @@ namespace tf3d::generators
         if (m_FilterStack != nullptr) {
             state.filters.emplace(m_FilterStack->GetState());
         }
-        return state;
+        auto &runtime                 = snapshot.runtime;
+        runtime.id                    = m_BiomeID;
+        runtime.name                  = m_BiomeName;
+        runtime.data                  = m_Data;
+        runtime.maskTexture           = m_MaskLayer != nullptr ? m_MaskLayer->GetTextureHandle() : nullptr;
+        runtime.baseShapeGenerators   = m_BaseShapeGenerators;
+        runtime.demBaseShapeGenerator = m_DEMBaseShapeGenerator;
+        runtime.baseNoiseGenerator    = m_BaseNoiseGenerator;
+        runtime.customBaseShape       = m_CustomizeBaseShape;
+        runtime.filterStack           = m_FilterStack;
+        runtime.maskLayer             = m_MaskLayer;
+        return snapshot;
     }
 
-    void BiomeManager::Update(const State *state,
-                              const GenerationContext *context,
-                              GeneratorData *swapBuffer)
+    bool BiomeManager::Execute(const Snapshot *snapshot,
+                               const GenerationContext *context,
+                               GeneratorData *swapBuffer)
     {
-        if (state == nullptr || context == nullptr || swapBuffer == nullptr) {
-            return;
+        if (snapshot == nullptr || snapshot->runtime.data == nullptr ||
+            context == nullptr || swapBuffer == nullptr) {
+            return false;
         }
 
-        if (!state->enabled) {
-            m_UpdateTracker.MarkProcessed(state->revision);
-            return;
+        const auto &state   = snapshot->state;
+        const auto &runtime = snapshot->runtime;
+        if (!state.enabled) {
+            return true;
         }
 
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(m_BiomeName);
-        TF3D_PROFILE_VALUE_DOMAIN("generation/biome/enabled", state->enabled ? 1 : 0, 0, 0,
+        auto *biomeData = runtime.data.get();
+
+        TF3D_PROFILE_SCOPE_CHILD_LAZY(runtime.name);
+        TF3D_PROFILE_VALUE_DOMAIN("generation/biome/enabled", state.enabled ? 1 : 0, 0, 0,
                                   PerformanceMonitor::Domain::Generation);
 
-        if (state->baseShapeMode == BiomeBaseShapeGeneratorMode_Algorithm &&
-            state->baseShapeGenerator >= 0 &&
-            state->baseShapeGenerator < static_cast<int32_t>(m_BaseShapeGenerators.size()) &&
-            state->baseShape.has_value()) {
+        if (state.baseShapeMode == BiomeBaseShapeGeneratorMode_Algorithm &&
+            state.baseShapeGenerator >= 0 &&
+            state.baseShapeGenerator < static_cast<int32_t>(runtime.baseShapeGenerators.size()) &&
+            state.baseShape.has_value()) {
 
-            const auto &generator = m_BaseShapeGenerators[static_cast<size_t>(state->baseShapeGenerator)];
-            generator->Update(&*state->baseShape, context, m_Data.get());
+            const auto &generator = runtime.baseShapeGenerators[static_cast<size_t>(state.baseShapeGenerator)];
+            if (generator != nullptr)
+                generator->Update(&*state.baseShape, context, biomeData);
 
-        } else if (state->baseShapeMode == BiomeBaseShapeGeneratorMode_GlobalElevation &&
-                   state->demBaseShape.has_value()) {
-            m_DEMBaseShapeGenerator->Update(&*state->demBaseShape, context, m_Data.get());
+        } else if (state.baseShapeMode == BiomeBaseShapeGeneratorMode_GlobalElevation &&
+                   runtime.demBaseShapeGenerator != nullptr && state.demBaseShape.has_value()) {
+            runtime.demBaseShapeGenerator->Update(&*state.demBaseShape, context, biomeData);
         }
 
-        if (m_CustomizeBaseShape != nullptr && state->customBaseShape.has_value()) {
-            m_CustomizeBaseShape->Update(&*state->customBaseShape, m_Data.get());
+        if (runtime.customBaseShape != nullptr && state.customBaseShape.has_value()) {
+            runtime.customBaseShape->Update(&*state.customBaseShape, context, biomeData);
         }
-        m_Data->CopyTo(swapBuffer);
+        biomeData->CopyTo(swapBuffer);
 
-        if (m_BaseNoiseGenerator != nullptr && state->baseNoise.has_value()) {
-            m_BaseNoiseGenerator->Update(&*state->baseNoise,
-                                         context,
-                                         swapBuffer,
-                                         m_Data.get());
+        if (runtime.baseNoiseGenerator != nullptr && state.baseNoise.has_value()) {
+            runtime.baseNoiseGenerator->Update(&*state.baseNoise,
+                                               context,
+                                               swapBuffer,
+                                               biomeData);
         } else {
-            swapBuffer->CopyTo(m_Data.get());
+            swapBuffer->CopyTo(biomeData);
         }
-        if (m_FilterStack != nullptr && state->filters.has_value()) {
-            m_FilterStack->Update(&*state->filters, m_Data.get());
+        if (runtime.filterStack != nullptr && state.filters.has_value()) {
+            runtime.filterStack->Update(&*state.filters, context, biomeData);
         }
-        if (state->mask.has_value()) {
-            m_MaskLayer->Update(&*state->mask, m_Data.get());
+        if (runtime.maskLayer != nullptr && state.mask.has_value()) {
+            runtime.maskLayer->Apply(state.mask->value, context, biomeData);
         }
 
-        m_UpdateTracker.MarkProcessed(state->revision);
-        m_StatisticsDirty = true;
+        return true;
     }
 
-    bool BiomeManager::ShowCustomizeBaseShapeSettings()
+    void BiomeManager::MarkProcessed(Revision revision)
     {
-        ImGui::PushID(m_BiomeID.data());
-        const auto previousRevision = m_CustomizeBaseShape->GetStateRevision();
+        m_UpdateTracker.MarkProcessed(revision);
+        m_StatisticsDirty.store(true, std::memory_order_release);
+    }
+
+    void BiomeManager::ShowCustomizeBaseShapeSettings()
+    {
+        ImGui::PushID(m_BiomeID.c_str());
+        const auto previousStateRevision = m_CustomizeBaseShape->GetStateRevision();
         m_CustomizeBaseShape->ShowSettings();
-        if (m_CustomizeBaseShape->GetStateRevision() != previousRevision) {
+        if (m_CustomizeBaseShape->GetStateRevision() != previousStateRevision) {
             MarkUpdateRequired();
         }
         ImGui::PopID();
-        return IsUpdationRequired();
     }
 
-    bool BiomeManager::ShowBaseShapeSettings()
+    void BiomeManager::ShowBaseShapeSettings()
     {
-        ImGui::PushID(m_BiomeID.data());
+        ImGui::PushID(m_BiomeID.c_str());
 
         const auto requestedMode = m_SelectedBaseShapeGeneratorMode.load(std::memory_order_acquire);
         const int modeIndex      = std::clamp(static_cast<int>(requestedMode), 0,
@@ -340,12 +362,11 @@ namespace tf3d::generators
         }
 
         ImGui::PopID();
-        return IsUpdationRequired();
     }
 
-    bool BiomeManager::ShowGeneralSettings()
+    void BiomeManager::ShowGeneralSettings()
     {
-        ImGui::PushID(m_BiomeID.data());
+        ImGui::PushID(m_BiomeID.c_str());
         ImGui::InputText("Biome Name", m_BiomeName, sizeof(m_BiomeName));
         if (ImGui::Checkbox("Enabled", &m_IsEnabled))
             MarkUpdateRequired();
@@ -354,11 +375,16 @@ namespace tf3d::generators
         }
 
         if (ImGui::CollapsingHeader("Statistics")) {
-            if (m_StatisticsDirty && m_Statistics != nullptr && m_Data != nullptr) {
+            if (m_StatisticsDirty.load(std::memory_order_acquire) && m_Statistics != nullptr && m_Data != nullptr) {
                 TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics", PerformanceMonitor::Domain::Generation);
                 {
                     TF3D_PROFILE_GPU_SCOPE("generation/biome/statistics/gpu");
-                    m_Statistics->Compute(m_Data.get(), m_AppState->mainMap.tileResolution, m_StatisticsSampleStride);
+                    m_Statistics->Compute(m_Data.get(),
+                                          m_AppState->mainMap.tileResolution,
+                                          m_StatisticsSampleStride,
+                                          true,
+                                          -1.0f,
+                                          m_AppState->constants.gpuWorkgroupSize);
                 }
                 {
                     TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics/finish", PerformanceMonitor::Domain::Wait);
@@ -368,7 +394,7 @@ namespace tf3d::generators
                     TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics/readback", PerformanceMonitor::Domain::Wait);
                     m_StatisticsResult = m_Statistics->Read();
                 }
-                m_StatisticsDirty = false;
+                m_StatisticsDirty.store(false, std::memory_order_release);
             }
 
             if (!m_StatisticsResult.valid) {
@@ -383,16 +409,14 @@ namespace tf3d::generators
             }
         }
         ImGui::PopID();
-        return IsUpdationRequired();
     }
 
-    bool BiomeManager::ShowMaskToolSettings()
+    void BiomeManager::ShowMaskToolSettings()
     {
-        ImGui::PushID(m_BiomeID.data());
+        ImGui::PushID(m_BiomeID.c_str());
         if (m_MaskLayer->ShowSettings())
             MarkUpdateRequired();
         ImGui::PopID();
-        return IsUpdationRequired();
     }
 
     int BiomeManager::AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition)
@@ -411,23 +435,21 @@ namespace tf3d::generators
         return true;
     }
 
-    bool BiomeManager::ShowFilterSettings(int filterIndex)
+    void BiomeManager::ShowFilterSettings(int filterIndex)
     {
         if (m_FilterStack->ShowSettings(filterIndex))
             MarkUpdateRequired();
-        return IsUpdationRequired();
     }
 
-    bool BiomeManager::ShowBaseNoiseSettings()
+    void BiomeManager::ShowBaseNoiseSettings()
     {
-        ImGui::PushID(m_BiomeID.data());
+        ImGui::PushID(m_BiomeID.c_str());
         const auto previousRevision = m_BaseNoiseGenerator->GetStateRevision();
         m_BaseNoiseGenerator->ShowSettings();
         if (m_BaseNoiseGenerator->GetStateRevision() != previousRevision) {
             MarkUpdateRequired();
         }
         ImGui::PopID();
-        return IsUpdationRequired();
     }
 
 } // namespace tf3d::generators
