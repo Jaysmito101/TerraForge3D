@@ -57,9 +57,9 @@ namespace tf3d::generators
             "Alpha Blend"};
 
         const auto stateSnapshot = m_State.Capture();
-        int method              = static_cast<int>(stateSnapshot.value.method);
+        int method               = static_cast<int>(stateSnapshot.value.method);
 
-        bool changed = ShowComboBox("Method##BiomeMixerMethod", &method, s_Methods, 2);
+        bool changed              = ShowComboBox("Method##BiomeMixerMethod", &method, s_Methods, 2);
         const auto selectedMethod = static_cast<BiomeMixerMethod>(method);
 
         if (selectedMethod != stateSnapshot.value.method) {
