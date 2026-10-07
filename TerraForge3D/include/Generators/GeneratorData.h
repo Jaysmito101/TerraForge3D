@@ -58,5 +58,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::GeneratorData;
-using tf3d::generators::GeneratorDataStorage;
