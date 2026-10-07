@@ -6,11 +6,11 @@
 #include "Inspector/CustomInspectorValue.h"
 #include "Inspector/CustomInspectorWidget.h"
 
-#include <nlohmann/json.hpp>
 #include <array>
 #include <cstdint>
 #include <filesystem>
 #include <initializer_list>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -194,9 +194,12 @@ namespace tf3d::inspector
                                                const std::array<glm::vec2, CustomInspectorMaxCurvePoints> &defaultPoints = {}, int defaultPointCount = 2);
         CustomInspectorValue &AddVairableFromConfig(const nlohmann::json &config);
         bool IsConditionSatisfied(const std::vector<CustomInspectorRenderCondition> &conditions,
-                                  std::string_view sectionName = {}) const;
-        bool IsWidgetVisible(std::string_view widgetLabel) const;
-        bool IsSectionVisible(std::string_view sectionName) const;
+                                  std::string_view sectionName                   = {},
+                                  const CustomInspectorDataStore *capturedValues = nullptr) const;
+        bool IsWidgetVisible(std::string_view widgetLabel,
+                             const CustomInspectorDataStore *capturedValues = nullptr) const;
+        bool IsSectionVisible(std::string_view sectionName,
+                              const CustomInspectorDataStore *capturedValues = nullptr) const;
         const CustomInspectorValue *FindConditionValue(std::string_view name,
                                                        std::string_view sectionName) const;
         void ConfigureSectionSelector(const nlohmann::json &config);

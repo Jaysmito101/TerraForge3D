@@ -407,9 +407,27 @@ namespace tf3d::inspector
     }
 
     bool CustomInspector::IsConditionSatisfied(const std::vector<CustomInspectorRenderCondition> &conditions,
-                                               std::string_view sectionName) const
+                                               std::string_view sectionName,
+                                               const CustomInspectorDataStore *capturedValues) const
     {
         for (const auto &condition : conditions) {
+            if (capturedValues != nullptr) {
+                const std::string path = condition.name.find('.') != std::string::npos
+                                             ? condition.name
+                                         : sectionName.empty() ? condition.name
+                                                               : std::string(sectionName) + "." + condition.name;
+                if (!capturedValues->Contains(path))
+                    return false;
+                const int32_t value = capturedValues->Get<int32_t>(path, 0);
+                if (!condition.values.empty()) {
+                    if (std::find(condition.values.begin(), condition.values.end(), value) == condition.values.end())
+                        return false;
+                } else if (value != 1) {
+                    return false;
+                }
+                continue;
+            }
+
             const auto value = FindConditionValue(condition.name, sectionName);
             if (value == nullptr)
                 return false;
@@ -423,22 +441,26 @@ namespace tf3d::inspector
         return true;
     }
 
-    bool CustomInspector::IsSectionVisible(std::string_view sectionName) const
+    bool CustomInspector::IsSectionVisible(std::string_view sectionName,
+                                           const CustomInspectorDataStore *capturedValues) const
     {
         const auto section = m_SectionState.byName.find(std::string(sectionName));
-        return section != m_SectionState.byName.end() && IsConditionSatisfied(section->second.renderConditions, sectionName);
+        return section != m_SectionState.byName.end() &&
+               IsConditionSatisfied(section->second.renderConditions, sectionName, capturedValues);
     }
 
-    bool CustomInspector::IsWidgetVisible(std::string_view widgetLabel) const
+    bool CustomInspector::IsWidgetVisible(std::string_view widgetLabel,
+                                          const CustomInspectorDataStore *capturedValues) const
     {
         const auto widget = m_WidgetState.byName.find(std::string(widgetLabel));
         if (widget == m_WidgetState.byName.end())
             return false;
         const auto section = m_SectionState.widgetSections.find(widget->first);
-        if (section != m_SectionState.widgetSections.end() && !IsSectionVisible(section->second))
+        if (section != m_SectionState.widgetSections.end() && !IsSectionVisible(section->second, capturedValues))
             return false;
         return IsConditionSatisfied(widget->second.m_RenderOnConditions,
-                                    section == m_SectionState.widgetSections.end() ? std::string_view{} : std::string_view(section->second));
+                                    section == m_SectionState.widgetSections.end() ? std::string_view{} : std::string_view(section->second),
+                                    capturedValues);
     }
 
     void CustomInspector::ConfigureSectionSelector(const nlohmann::json &config)

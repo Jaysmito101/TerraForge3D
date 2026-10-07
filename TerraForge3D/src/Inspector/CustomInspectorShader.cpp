@@ -134,7 +134,7 @@ namespace tf3d::inspector
                                         std::string_view uniformPrefix) const
     {
         for (const auto &widgetLabel : m_WidgetState.order) {
-            if (!IsWidgetVisible(widgetLabel)) {
+            if (!IsWidgetVisible(widgetLabel, &snapshot.GetDataStore())) {
                 continue;
             }
 
