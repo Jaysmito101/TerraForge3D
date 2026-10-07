@@ -238,6 +238,9 @@ namespace tf3d::generators
 
         const auto &state   = snapshot->state;
         const auto &runtime = snapshot->runtime;
+        if (!context->IsCurrent()) {
+            return false;
+        }
         if (!state.enabled) {
             return true;
         }
@@ -262,8 +265,14 @@ namespace tf3d::generators
             runtime.demBaseShapeGenerator->Update(&*state.demBaseShape, context, biomeData);
         }
 
+        if (!context->IsCurrent()) {
+            return false;
+        }
         if (runtime.customBaseShape != nullptr && state.customBaseShape.has_value()) {
             runtime.customBaseShape->Update(&*state.customBaseShape, context, biomeData);
+        }
+        if (!context->IsCurrent()) {
+            return false;
         }
         biomeData->CopyTo(swapBuffer);
 
@@ -275,8 +284,14 @@ namespace tf3d::generators
         } else {
             swapBuffer->CopyTo(biomeData);
         }
+        if (!context->IsCurrent()) {
+            return false;
+        }
         if (runtime.filterStack != nullptr && state.filters.has_value()) {
             runtime.filterStack->Update(&*state.filters, context, biomeData);
+        }
+        if (!context->IsCurrent()) {
+            return false;
         }
         if (runtime.maskLayer != nullptr && state.mask.has_value()) {
             runtime.maskLayer->Apply(state.mask->value, context, biomeData);
@@ -294,9 +309,7 @@ namespace tf3d::generators
     void BiomeManager::ShowCustomizeBaseShapeSettings()
     {
         ImGui::PushID(m_BiomeID.c_str());
-        const auto previousStateRevision = m_CustomizeBaseShape->GetStateRevision();
-        m_CustomizeBaseShape->ShowSettings();
-        if (m_CustomizeBaseShape->GetStateRevision() != previousStateRevision) {
+        if (m_CustomizeBaseShape->ShowSettings()) {
             MarkUpdateRequired();
         }
         ImGui::PopID();
@@ -341,18 +354,14 @@ namespace tf3d::generators
                 }
                 ImGui::EndCombo();
             }
-            const auto previousRevision = generator->GetStateRevision();
-            generator->ShowSettings();
-            if (generator->GetStateRevision() != previousRevision) {
+            if (generator->ShowSettings()) {
                 MarkUpdateRequired();
             }
         } else if (selectedMode == BiomeBaseShapeGeneratorMode_GlobalElevation) {
             if (m_BaseNoiseGenerator != nullptr) {
                 ImGui::Separator();
                 ImGui::TextUnformatted("Base Noise");
-                const auto previousRevision = m_BaseNoiseGenerator->GetStateRevision();
-                m_BaseNoiseGenerator->ShowEnabledControl(true);
-                if (m_BaseNoiseGenerator->GetStateRevision() != previousRevision) {
+                if (m_BaseNoiseGenerator->ShowEnabledControl(true)) {
                     MarkUpdateRequired();
                 }
             }
@@ -444,9 +453,7 @@ namespace tf3d::generators
     void BiomeManager::ShowBaseNoiseSettings()
     {
         ImGui::PushID(m_BiomeID.c_str());
-        const auto previousRevision = m_BaseNoiseGenerator->GetStateRevision();
-        m_BaseNoiseGenerator->ShowSettings();
-        if (m_BaseNoiseGenerator->GetStateRevision() != previousRevision) {
+        if (m_BaseNoiseGenerator->ShowSettings()) {
             MarkUpdateRequired();
         }
         ImGui::PopID();

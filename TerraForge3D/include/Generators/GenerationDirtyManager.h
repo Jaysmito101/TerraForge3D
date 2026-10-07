@@ -89,6 +89,11 @@ namespace tf3d::generators
                     m_Revision.load(std::memory_order_acquire)};
         }
 
+        inline bool IsRevisionCurrent(uint64_t revision) const
+        {
+            return m_Revision.load(std::memory_order_acquire) == revision;
+        }
+
         inline GenerationDirtyState Consume()
         {
             std::lock_guard lock(m_DirtyMutex);

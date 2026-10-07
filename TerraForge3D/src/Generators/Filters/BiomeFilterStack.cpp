@@ -238,6 +238,10 @@ namespace tf3d::generators
                                      GeneratorData *input,
                                      GeneratorData *output)
     {
+        if (!context.IsCurrent()) {
+            return;
+        }
+
         const auto &definitionRuntime = filter.GetDefinition()->GetRuntime();
         const auto &execution         = definitionRuntime.execution;
         std::vector<nlohmann::json> passes;
@@ -445,6 +449,10 @@ namespace tf3d::generators
         };
 
         if (filter.NeedsFieldStatistics() && runtime.statistics != nullptr) {
+            if (!context.IsCurrent()) {
+                return;
+            }
+
             float requestedPercentile = -1.0f;
             if (filter.NeedsHistogram()) {
                 const std::string percentileParameter = filter.GetRequestedPercentileParameter();
@@ -458,13 +466,23 @@ namespace tf3d::generators
                                         filter.NeedsHistogram(),
                                         requestedPercentile,
                                         context.gpuWorkgroupSize);
+            if (!context.IsCurrent()) {
+                return;
+            }
         }
 
         if (pingPongIterations) {
             GeneratorData *iterationInput  = input;
             GeneratorData *iterationOutput = iterationBuffers[0];
             if (!setup.empty()) {
-                if (!runDeclaredPass(setup, nullptr)) {
+                if (!context.IsCurrent()) {
+                    return;
+                }
+                const bool setupRan = runDeclaredPass(setup, nullptr);
+                if (!context.IsCurrent()) {
+                    return;
+                }
+                if (!setupRan) {
                     input->CopyTo(output);
                     return;
                 }
@@ -475,8 +493,15 @@ namespace tf3d::generators
 
             const bool useOriginalInput = execution.value("UseOriginalInput", false);
             for (int iteration = 0; iteration < iterations; iteration++) {
-                const auto &pass = passes.front();
-                if (!runDeclaredPass(pass, useOriginalInput ? input : nullptr)) {
+                if (!context.IsCurrent()) {
+                    return;
+                }
+                const auto &pass   = passes.front();
+                const bool passRan = runDeclaredPass(pass, useOriginalInput ? input : nullptr);
+                if (!context.IsCurrent()) {
+                    return;
+                }
+                if (!passRan) {
                     input->CopyTo(output);
                     return;
                 }
@@ -487,7 +512,14 @@ namespace tf3d::generators
         } else {
             for (int iteration = 0; iteration < iterations; iteration++) {
                 for (const auto &pass : passes) {
-                    if (!runDeclaredPass(pass, nullptr)) {
+                    if (!context.IsCurrent()) {
+                        return;
+                    }
+                    const bool passRan = runDeclaredPass(pass, nullptr);
+                    if (!context.IsCurrent()) {
+                        return;
+                    }
+                    if (!passRan) {
                         input->CopyTo(output);
                         return;
                     }
@@ -496,12 +528,22 @@ namespace tf3d::generators
         }
 
         for (const auto &pass : postPasses) {
-            if (!runDeclaredPass(pass, nullptr)) {
+            if (!context.IsCurrent()) {
+                return;
+            }
+            const bool passRan = runDeclaredPass(pass, nullptr);
+            if (!context.IsCurrent()) {
+                return;
+            }
+            if (!passRan) {
                 input->CopyTo(output);
                 return;
             }
         }
 
+        if (!context.IsCurrent()) {
+            return;
+        }
         if (resources.at(mergeOperationName) == nullptr) {
             TF3D_LOG_ERROR("Filter '{}' produced no merge operation resource '{}'.", filter.GetName(), mergeOperationName);
             input->CopyTo(output);
@@ -600,6 +642,9 @@ namespace tf3d::generators
         bool applied             = false;
         const size_t filterCount = std::min(state->value.filters.size(), runtime.filters.size());
         for (size_t filterIndex = 0; filterIndex < filterCount; filterIndex++) {
+            if (!context->IsCurrent()) {
+                return;
+            }
             const auto &filter      = runtime.filters[filterIndex];
             const auto &filterState = state->value.filters[filterIndex];
             if (filter == nullptr || !filterState.enabled) {
@@ -609,7 +654,13 @@ namespace tf3d::generators
             TF3D_PROFILE_VALUE_DOMAIN("generation/filter/index", static_cast<uint64_t>(filterIndex), 0, 0,
                                       PerformanceMonitor::Domain::Generation);
             filter->UpdateGeneratedMask(filterState, context, current);
+            if (!context->IsCurrent()) {
+                return;
+            }
             RunFilter(runtime, *filter, filterState, *context, current, next);
+            if (!context->IsCurrent()) {
+                return;
+            }
             current = next;
             next    = current == runtime.resultA.get() ? runtime.resultB.get() : runtime.resultA.get();
             applied = true;

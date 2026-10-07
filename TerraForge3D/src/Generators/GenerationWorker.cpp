@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <chrono>
+#include <exception>
 
 namespace tf3d::generators
 {
@@ -42,43 +43,47 @@ namespace tf3d::generators
         }
     }
 
-    bool GenerationWorker::Request(bool force, uint64_t *requestIdOut)
+    GenerationWorker::RequestResult GenerationWorker::Request()
     {
         if (!HasContext()) {
-            return false;
+            return {RequestStatus::Unavailable, 0};
         }
 
-        bool newRequest    = false;
         uint64_t requestId = 0;
         {
             std::lock_guard lock(m_Mutex);
-            if (!m_RequestPending.load(std::memory_order_acquire)) {
-                m_LastRequestId = NextUniqueId();
-                newRequest      = true;
+            if (m_StopRequested.load(std::memory_order_acquire) ||
+                m_RequestPending.load(std::memory_order_acquire) ||
+                m_Running.load(std::memory_order_acquire) ||
+                m_GpuCompletionPending ||
+                m_Completed.load(std::memory_order_acquire)) {
+                return {RequestStatus::Busy, 0};
             }
-            requestId        = m_LastRequestId.load(std::memory_order_acquire);
+            requestId        = NextUniqueId();
+            m_LastRequestId  = requestId;
             m_RequestPending = true;
-            m_ForceRequested = m_ForceRequested || force;
         }
-        if (requestIdOut != nullptr)
-            *requestIdOut = requestId;
         if (TF3D_PROFILE_CAPTURE_ACTIVE()) {
-            if (newRequest) {
-                const std::string requestKey = m_ProfilePrefix + "/request";
-                const std::string forceKey   = m_ProfilePrefix + "/request/force";
-                TF3D_PROFILE_FLOW_BEGIN_DOMAIN(requestKey, requestId, PerformanceMonitor::Domain::Generation);
-                TF3D_PROFILE_FLOW_STEP_DOMAIN(requestKey, requestId, "queued", PerformanceMonitor::Domain::Generation);
-                TF3D_PROFILE_VALUE_DOMAIN_FLOW(forceKey, force ? 1 : 0, 0, 0,
-                                               PerformanceMonitor::Domain::Generation, requestId);
-            } else {
-                const std::string requestKey   = m_ProfilePrefix + "/request";
-                const std::string coalescedKey = m_ProfilePrefix + "/request/coalesced";
-                TF3D_PROFILE_FLOW_STEP_DOMAIN(requestKey, requestId, "coalesced", PerformanceMonitor::Domain::Generation);
-                TF3D_PROFILE_COUNTER_DOMAIN_FLOW(coalescedKey, 1.0, PerformanceMonitor::Domain::Generation, requestId);
-            }
+            const std::string requestKey = m_ProfilePrefix + "/request";
+            TF3D_PROFILE_FLOW_BEGIN_DOMAIN(requestKey, requestId, PerformanceMonitor::Domain::Generation);
+            TF3D_PROFILE_FLOW_STEP_DOMAIN(requestKey, requestId, "queued", PerformanceMonitor::Domain::Generation);
         }
         m_Condition.notify_one();
-        return true;
+        return {RequestStatus::Queued, requestId};
+    }
+
+    bool GenerationWorker::CanAcceptRequest()
+    {
+        if (!HasContext()) {
+            return true;
+        }
+
+        std::lock_guard lock(m_Mutex);
+        return !m_StopRequested.load(std::memory_order_acquire) &&
+               !m_RequestPending.load(std::memory_order_acquire) &&
+               !m_Running.load(std::memory_order_acquire) &&
+               !m_GpuCompletionPending &&
+               !m_Completed.load(std::memory_order_acquire);
     }
 
     bool GenerationWorker::PollCompletion()
@@ -151,7 +156,6 @@ namespace tf3d::generators
         glfwMakeContextCurrent(m_Window);
         TF3D_PROFILE_THREAD_NAME(m_Name);
         while (true) {
-            bool force             = false;
             uint64_t requestId     = 0;
             bool pollGpuQueries    = false;
             GLsync completionFence = nullptr;
@@ -187,10 +191,8 @@ namespace tf3d::generators
                     pollGpuQueries     = true;
                     queueWaitScope.End();
                 } else {
-                    force            = m_ForceRequested;
                     requestId        = m_LastRequestId.load(std::memory_order_acquire);
                     m_RequestPending = false;
-                    m_ForceRequested = false;
                     m_Running        = true;
                     queueWaitScope.End();
                 }
@@ -219,13 +221,14 @@ namespace tf3d::generators
             {
                 TF3D_PROFILE_BEGIN_LAZY_DOMAIN_FLOW(executeScope, m_ProfilePrefix + "/worker/execute",
                                                     PerformanceMonitor::Domain::Worker, requestId);
-                if (captureActive) {
-                    const std::string requestKey = m_ProfilePrefix + "/worker/request";
-                    TF3D_PROFILE_VALUE_DOMAIN_FLOW(requestKey, requestId, force ? 1 : 0, 0,
-                                                   PerformanceMonitor::Domain::Worker, requestId);
+                try {
+                    if (m_Callback)
+                        m_Callback(requestId);
+                } catch (const std::exception &exception) {
+                    TF3D_LOG_ERROR("{} callback failed: {}", m_Name, exception.what());
+                } catch (...) {
+                    TF3D_LOG_ERROR("{} callback failed with an unknown exception", m_Name);
                 }
-                if (m_Callback)
-                    m_Callback(force, requestId);
             }
             if (captureActive) {
                 const std::string workerKey = m_ProfilePrefix + "/worker";

@@ -145,6 +145,7 @@ namespace tf3d
                 TF3D_PROFILE_SCOPE_DOMAIN("app/ui", PerformanceMonitor::Domain::Ui);
                 RenderImGui();
             }
+            appState->generationManager->SchedulePendingGeneration();
         }
 
         virtual void OnOneSecondTick() override
@@ -330,10 +331,10 @@ namespace tf3d
             delete appState->eventManager;
             // delete appState->textureStore;
             delete appState->styleManager;
+            delete appState->rendererManager;
             delete appState->generationManager;
             appState->textureLoader.reset();
             delete appState->dashboard;
-            delete appState->rendererManager;
             delete appState->mainModel;
             delete appState->supportersTribute;
             delete appState->mainMenu;

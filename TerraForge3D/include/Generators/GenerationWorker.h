@@ -18,7 +18,18 @@ namespace tf3d::generators
     class GenerationWorker
     {
     public:
-        using WorkCallback = std::function<void(bool force, uint64_t requestId)>;
+        enum class RequestStatus {
+            Queued,
+            Busy,
+            Unavailable
+        };
+
+        struct RequestResult {
+            RequestStatus status = RequestStatus::Unavailable;
+            uint64_t requestId   = 0;
+        };
+
+        using WorkCallback = std::function<void(uint64_t requestId)>;
 
         GenerationWorker(std::string name, WorkCallback callback, std::string profilePrefix = "generation");
         ~GenerationWorker();
@@ -26,7 +37,8 @@ namespace tf3d::generators
         GenerationWorker(const GenerationWorker &)            = delete;
         GenerationWorker &operator=(const GenerationWorker &) = delete;
 
-        bool Request(bool force, uint64_t *requestIdOut = nullptr);
+        RequestResult Request();
+        bool CanAcceptRequest();
         bool PollCompletion();
         void WaitForIdle();
         bool ConsumeCompleted();
@@ -71,7 +83,6 @@ namespace tf3d::generators
         std::mutex m_Mutex;
         std::condition_variable m_Condition;
         std::atomic_bool m_RequestPending          = false;
-        bool m_ForceRequested                      = false;
         std::atomic_bool m_Running                 = false;
         std::atomic_bool m_Completed               = false;
         std::atomic_bool m_StopRequested           = false;

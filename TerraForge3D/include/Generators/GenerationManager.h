@@ -2,12 +2,12 @@
 #include "Base/Base.h"
 #include "Generators/BiomeManager.h"
 #include "Generators/BiomeMixer.h"
+#include "Generators/GenerationContext.h"
+#include "Generators/GenerationDirtyManager.h"
 #include "Generators/GenerationWorker.h"
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
-#include "Generators/GenerationDirtyManager.h"
-#include "Generators/GenerationContext.h"
 #include "Generators/HeightfieldPyramid.h"
 #include "Generators/SlopeGenerator.h"
 
@@ -15,8 +15,6 @@
 #include <atomic>
 #include <cstdint>
 #include <memory>
-#include <mutex>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -82,7 +80,6 @@ namespace tf3d::generators
     };
 
     struct GenerationRequestSnapshot {
-        uint64_t requestId       = 0;
         uint64_t submittedFrame  = 0;
         uint64_t terrainRevision = 0;
         int32_t tileResolution   = 0;
@@ -94,7 +91,9 @@ namespace tf3d::generators
         std::shared_ptr<GeneratorData> workingHeightmapData;
         std::shared_ptr<GeneratorData> swapBuffer;
         std::shared_ptr<SlopeGenerator> slopeGenerator;
-        int32_t gpuWorkgroupSize = 1;
+        std::shared_ptr<GeneratorDataStatistics> statistics;
+        int32_t gpuWorkgroupSize       = 1;
+        int32_t statisticsSampleStride = 4;
         std::vector<BiomeManager::Snapshot> biomes;
         BiomeMixer::Snapshot mixer;
         BiomeMixer::Runtime mixerRuntime;
@@ -104,6 +103,13 @@ namespace tf3d::generators
         uint64_t requestId     = 0;
         uint64_t inputRevision = 0;
         bool producedOutput    = false;
+        bool superseded        = false;
+        GeneratorDataStatisticsResult statistics;
+    };
+
+    struct ActiveGeneration {
+        GenerationRequestSnapshot snapshot;
+        GenerationExecutionResult result;
     };
 
 #define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + std::string(#objectname))
@@ -123,6 +129,7 @@ namespace tf3d::generators
         ~GenerationManager();
 
         void Update();
+        void SchedulePendingGeneration();
         void ShowSettings();
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
@@ -172,17 +179,14 @@ namespace tf3d::generators
         void ShowSettingsDetailed();
         void ShowSettingsGlobalOptions();
         void ShowFieldStatistics();
-        void UpdateFieldStatistics();
-        void GenerateHeightmapMipmaps();
-        bool CommitHeightfield(uint64_t inputRevision);
+        void GenerateHeightmapMipmaps(GeneratorData *heightmap);
+        bool CommitHeightfield(const GenerationRequestSnapshot &snapshot,
+                               const GenerationExecutionResult &result);
         void RequestGeneration();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
-        GenerationRequestSnapshot TakeGenerationSnapshot(uint64_t requestId);
         void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
-        void StoreGenerationSnapshot(GenerationRequestSnapshot snapshot);
-        GenerationExecutionResult ExecuteGeneration(uint64_t requestId);
-        void StoreCompletedGenerationResult(GenerationExecutionResult result);
-        GenerationExecutionResult TakeCompletedGenerationResult();
+        GenerationExecutionResult ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
+                                                    uint64_t requestId);
         bool IsCurrentGeneration(const GenerationExecutionResult &result) const;
 
     private:
@@ -191,10 +195,8 @@ namespace tf3d::generators
         UiState m_Ui;
         std::atomic<uint64_t> m_TerrainRevision        = 0;
         std::atomic_bool m_ResolutionGenerationPending = false;
-        mutable std::mutex m_RequestSnapshotMutex;
-        std::optional<GenerationRequestSnapshot> m_PendingGenerationSnapshot;
-        mutable std::mutex m_ResultMutex;
-        std::optional<GenerationExecutionResult> m_CompletedGenerationResult;
+        uint64_t m_LastFailedGenerationRevision        = 0;
+        std::unique_ptr<ActiveGeneration> m_ActiveGeneration;
         std::unique_ptr<GenerationWorker> m_Worker;
     };
 

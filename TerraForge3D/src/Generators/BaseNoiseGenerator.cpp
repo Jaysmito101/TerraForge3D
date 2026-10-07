@@ -68,7 +68,7 @@ namespace tf3d::generators
             ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.25f, 1.0f),
                                "Recommendation: disable Base Noise when using Global Elevation.");
         }
-        return RequireUpdation();
+        return changed;
     }
 
     bool BaseNoiseGenerator::ShowSettings()
@@ -94,7 +94,7 @@ namespace tf3d::generators
         if (changed) {
             PublishState();
         }
-        return RequireUpdation();
+        return changed;
     }
 
     void BaseNoiseGenerator::Resize(int size)

@@ -86,7 +86,7 @@ namespace tf3d::generators
             m_UIState = CaptureState();
             m_State.Replace(m_UIState);
         }
-        return RequireUpdation();
+        return changed;
     }
 
     bool BiomeCustomizeBaseShape::ShowDrawingSettings()

@@ -27,9 +27,8 @@ namespace tf3d::generators
 
     bool DEMBaseShapeGenerator::ShowSettings()
     {
-        State &settings            = m_UIState;
-        const auto currentRevision = m_State.PublishedRevision();
-        bool stateChanged          = false;
+        State &settings   = m_UIState;
+        bool stateChanged = false;
 
         if (m_ViewInteractionPending &&
             std::chrono::steady_clock::now() - m_LastViewInteractionTime >=
@@ -73,7 +72,7 @@ namespace tf3d::generators
         }
 
         const State &previewState  = settings;
-        const auto previewRevision = currentRevision + (stateChanged ? 1 : 0);
+        const auto previewRevision = m_State.PublishedRevision() + (stateChanged ? 1 : 0);
         const int previewZoom      = GetEffectiveZoomResolution(previewState);
         const int previewTileCount = GetVisibleTileCount(previewState, previewZoom);
         const auto viewTileStatus  = GetViewTileStatus();
@@ -184,7 +183,7 @@ namespace tf3d::generators
             m_State.Replace(settings);
         }
 
-        return RequireUpdation();
+        return stateChanged;
     }
 
     void DEMBaseShapeGenerator::MarkViewInteraction(State &settings)

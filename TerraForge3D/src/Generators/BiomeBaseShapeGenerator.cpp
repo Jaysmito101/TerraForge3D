@@ -22,12 +22,13 @@ namespace tf3d::generators
             ImGui::TextWrapped("%s", m_Description.c_str());
             ImGui::Separator();
         }
-        if (m_Inspector.Render()) {
+        const bool changed = m_Inspector.Render();
+        if (changed) {
             m_State.Replace(State{m_Inspector.Clone()});
         }
         ImGui::PopID();
 
-        return RequireUpdation();
+        return changed;
     }
 
     void BiomeBaseShapeGenerator::Update(const Snapshot *state,
