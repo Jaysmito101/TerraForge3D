@@ -104,7 +104,6 @@ namespace tf3d::generators
         uint64_t inputRevision = 0;
         bool producedOutput    = false;
         bool superseded        = false;
-        GeneratorDataStatisticsResult statistics;
     };
 
     struct ActiveGeneration {
@@ -180,8 +179,7 @@ namespace tf3d::generators
         void ShowSettingsGlobalOptions();
         void ShowFieldStatistics();
         void GenerateHeightmapMipmaps(GeneratorData *heightmap);
-        bool CommitHeightfield(const GenerationRequestSnapshot &snapshot,
-                               const GenerationExecutionResult &result);
+        bool CommitHeightfield(const GenerationRequestSnapshot &snapshot);
         void RequestGeneration();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
         void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;

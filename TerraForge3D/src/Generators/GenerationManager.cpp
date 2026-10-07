@@ -89,8 +89,7 @@ namespace tf3d::generators
                 const bool current = matchingResult &&
                                      m_ActiveGeneration->result.producedOutput &&
                                      IsCurrentGeneration(m_ActiveGeneration->result);
-                if (current && CommitHeightfield(m_ActiveGeneration->snapshot,
-                                                 m_ActiveGeneration->result)) {
+                if (current && CommitHeightfield(m_ActiveGeneration->snapshot)) {
                     TF3D_PROFILE_FLOW_STEP_DOMAIN("generation/request", requestId, "published",
                                                   PerformanceMonitor::Domain::Generation);
                     TF3D_PROFILE_FLOW_END_DOMAIN("generation/request", requestId, PerformanceMonitor::Domain::Generation);
@@ -174,7 +173,7 @@ namespace tf3d::generators
             TF3D_PROFILE_INSTANT_DOMAIN_FLOW("generation/request/fallback", PerformanceMonitor::Domain::Generation, requestId);
             const auto result    = ExecuteGeneration(snapshot, requestId);
             const bool committed = result.producedOutput && IsCurrentGeneration(result) &&
-                                   CommitHeightfield(snapshot, result);
+                                   CommitHeightfield(snapshot);
             if (!result.producedOutput && !result.superseded) {
                 const auto dirtyState = m_AppState->generationDirtyManager.Snapshot();
                 if (dirtyState.revision == result.inputRevision) {
@@ -339,7 +338,6 @@ namespace tf3d::generators
                 if (!isCurrent()) {
                     return result;
                 }
-                result.statistics = snapshot.statistics->Read();
             }
             if (!isCurrent()) {
                 return result;
@@ -645,8 +643,7 @@ namespace tf3d::generators
         }
     }
 
-    bool GenerationManager::CommitHeightfield(const GenerationRequestSnapshot &snapshot,
-                                              const GenerationExecutionResult &result)
+    bool GenerationManager::CommitHeightfield(const GenerationRequestSnapshot &snapshot)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/commit", PerformanceMonitor::Domain::Generation);
         if (!m_AppState->generationDirtyManager.ConsumeIfRevision(snapshot.dirtyState.revision)) {
@@ -659,7 +656,9 @@ namespace tf3d::generators
         TF3D_PROFILE_SET_METADATA("terrain/revision", std::to_string(terrainRevision));
         TF3D_PROFILE_SET_METADATA("terrain/tile-resolution",
                                   std::to_string(m_AppState->mainMap.tileResolution));
-        m_Field.statisticsResult = result.statistics;
+        m_Field.statisticsResult = snapshot.statistics != nullptr
+                                        ? snapshot.statistics->Read()
+                                        : GeneratorDataStatisticsResult{};
         if (m_Field.heightPyramid != nullptr) {
             m_Field.heightPyramid->Rebuild(m_Field.heightmapData.get());
         }
