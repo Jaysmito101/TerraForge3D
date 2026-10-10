@@ -295,6 +295,33 @@ namespace tf3d::generators
         result.producedOutput = producedOutput;
     }
 
+    bool GenerationManager::CommitHeightfield(const GenerationRequestSnapshot &snapshot)
+    {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/commit", PerformanceMonitor::Domain::Generation);
+        if (!m_DirtyManager.ConsumeIfRevision(snapshot.dirtyState.revision)) {
+            return false;
+        }
+
+        m_Field.heightmapData.swap(m_Field.workingHeightmapData);
+        m_Field.slopeGenerator.swap(m_Field.workingSlopeGenerator);
+        m_Field.terrainRevision.fetch_add(1, std::memory_order_release);
+        m_Field.statisticsResult = snapshot.statistics != nullptr
+                                       ? snapshot.statistics->Read()
+                                       : GeneratorDataStatisticsResult{};
+        if (m_Field.heightPyramid != nullptr) {
+            m_Field.heightPyramid->Rebuild(m_Field.heightmapData.get());
+        }
+        for (const auto &biomeSnapshot : snapshot.biomes) {
+            for (const auto &biome : m_Field.biomeManagers) {
+                if (biome != nullptr && biome->GetBiomeID() == biomeSnapshot.runtime.id) {
+                    biome->MarkProcessed(biomeSnapshot.state.revision);
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+
     bool GenerationManager::IsCurrentGeneration(const GenerationExecutionResult &result) const
     {
         if (!result.producedOutput || result.inputRevision == 0 || m_AppState == nullptr) {
