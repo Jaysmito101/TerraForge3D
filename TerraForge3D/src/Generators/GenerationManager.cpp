@@ -21,8 +21,8 @@ namespace tf3d::generators
                 configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
         }
 
-        statistics      = std::make_shared<GeneratorDataStatistics>(appState);
-        heightPyramid   = std::make_shared<HeightfieldPyramid>(appState);
+        statistics            = std::make_shared<GeneratorDataStatistics>(appState);
+        heightPyramid         = std::make_shared<HeightfieldPyramid>(appState);
         heightmapData         = std::make_shared<GeneratorData>();
         workingHeightmapData  = std::make_shared<GeneratorData>();
         swapBuffer            = std::make_shared<GeneratorData>();
@@ -44,8 +44,8 @@ namespace tf3d::generators
         // if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
 
         m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
-        m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
-        
+        m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(OnForceUpdate));
+
         m_Worker = std::make_unique<GenerationWorker>("Generation Worker", [this](uint64_t requestId) {
             if (m_ActiveGeneration != nullptr) {
                 try {
@@ -90,7 +90,7 @@ namespace tf3d::generators
         if (m_Worker->HasContext()) {
             m_Worker->PollCompletion();
             if (m_Worker->IsCompleted()) {
-                const uint64_t requestId = m_Worker->GetCompletedRequestId();
+                const uint64_t requestId  = m_Worker->GetCompletedRequestId();
                 const bool matchingResult = m_ActiveGeneration != nullptr &&
                                             m_ActiveGeneration->result.requestId == requestId;
                 const bool current = matchingResult &&
@@ -131,9 +131,14 @@ namespace tf3d::generators
         RequestGeneration();
     }
 
-    bool GenerationManager::UpdateInternal(const std::string &, void *)
+    void GenerationManager::MarkForRegeneration()
     {
         m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::External);
+    }
+
+    bool GenerationManager::OnForceUpdate(const std::string &, void *)
+    {
+        MarkForRegeneration();
         return false;
     }
 
@@ -146,11 +151,11 @@ namespace tf3d::generators
         activeGeneration->snapshot = CaptureGenerationSnapshot();
         m_ActiveGeneration         = std::move(activeGeneration);
         const auto &snapshot       = m_ActiveGeneration->snapshot;
-        const auto request = m_Worker->Request();
-        uint64_t requestId = request.requestId;
+        const auto request         = m_Worker->Request();
+        uint64_t requestId         = request.requestId;
         if (request.status == GenerationWorker::RequestStatus::Unavailable) {
-            requestId = NextUniqueId();
-            const auto result    = ExecuteGeneration(snapshot, requestId);
+            requestId         = NextUniqueId();
+            const auto result = ExecuteGeneration(snapshot, requestId);
             if (result.producedOutput && IsCurrentGeneration(result)) {
                 CommitHeightfield(snapshot);
             }
@@ -169,9 +174,9 @@ namespace tf3d::generators
     GenerationRequestSnapshot GenerationManager::CaptureGenerationSnapshot()
     {
         GenerationRequestSnapshot snapshot;
-        snapshot.tileResolution  = m_AppState->mainMap.tileResolution;
-        snapshot.tileSize        = m_AppState->mainMap.tileSize;
-        snapshot.dirtyState      = m_AppState->generationDirtyManager.Snapshot();
+        snapshot.tileResolution = m_AppState->mainMap.tileResolution;
+        snapshot.tileSize       = m_AppState->mainMap.tileSize;
+        snapshot.dirtyState     = m_AppState->generationDirtyManager.Snapshot();
         CaptureGenerationState(snapshot);
         return snapshot;
     }
@@ -254,12 +259,12 @@ namespace tf3d::generators
                 return result;
             }
             bool producedOutput = false;
-            producedOutput = BiomeMixer::Execute(&snapshot.mixer,
-                                                 &snapshot.mixerRuntime,
-                                                 &context,
-                                                 snapshot.biomes,
-                                                 snapshot.workingHeightmapData.get(),
-                                                 snapshot.swapBuffer.get());
+            producedOutput      = BiomeMixer::Execute(&snapshot.mixer,
+                                                      &snapshot.mixerRuntime,
+                                                      &context,
+                                                      snapshot.biomes,
+                                                      snapshot.workingHeightmapData.get(),
+                                                      snapshot.swapBuffer.get());
             if (!isCurrent()) {
                 return result;
             }

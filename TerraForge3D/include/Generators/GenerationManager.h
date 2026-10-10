@@ -73,7 +73,7 @@ namespace tf3d::generators
     };
 
     struct UiState {
-        explicit UiState();
+        UiState();
 
         bool updationPaused             = false;
         bool useSeedFromActiveMesh      = false;
@@ -84,8 +84,8 @@ namespace tf3d::generators
     };
 
     struct GenerationRequestSnapshot {
-        int32_t tileResolution   = 0;
-        float tileSize           = 1.0f;
+        int32_t tileResolution = 0;
+        float tileSize         = 1.0f;
         GenerationDirtyState dirtyState;
         std::shared_ptr<GeneratorTexture> seedTexture;
         std::shared_ptr<GeneratorData> workingHeightmapData;
@@ -129,6 +129,7 @@ namespace tf3d::generators
 
         void Update();
         void SchedulePendingGeneration();
+        void MarkForRegeneration();
         void ShowSettings();
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
@@ -170,9 +171,9 @@ namespace tf3d::generators
         {
             return m_Field.statisticsResult;
         }
-        bool UpdateInternal(const std::string &params = "", void *paramsPtr = nullptr);
-        
+
     private:
+        bool OnForceUpdate(const std::string &params, void *paramsPtr);
         void WaitForGenerationWorker();
         void PullSeedTextureFromActiveMesh();
         void ShowSettingsInspector();
@@ -185,7 +186,7 @@ namespace tf3d::generators
         GenerationRequestSnapshot CaptureGenerationSnapshot();
         void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
         GenerationExecutionResult ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
-            uint64_t requestId);
+                                                    uint64_t requestId);
         bool IsCurrentGeneration(const GenerationExecutionResult &result) const;
 
     private:

@@ -193,7 +193,7 @@ namespace tf3d::generators
                 continue;
             }
 
-            m_ActiveRequestId        = requestId;
+            m_ActiveRequestId = requestId;
             {
                 TF3D_PROFILE_SCOPE_LAZY_DOMAIN(m_ProfilePrefix + "/execute", PerformanceMonitor::Domain::Worker);
                 try {

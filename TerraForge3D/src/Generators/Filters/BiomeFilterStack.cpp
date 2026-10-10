@@ -175,7 +175,7 @@ namespace tf3d::generators
                                     GeneratorData *input, GeneratorData *output, GeneratorData *reference)
     {
         const std::string phase = pass.value("Phase", "");
-        auto *shader = filter.GetPhaseShader(m_AppState, phase);
+        auto *shader            = filter.GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
         input->Bind(0);
@@ -200,7 +200,7 @@ namespace tf3d::generators
                                          GeneratorData *input, GeneratorData *operation, GeneratorData *output)
     {
         const std::string phase = merge.value("Phase", "");
-        auto *shader = filter.GetPhaseShader(m_AppState, phase);
+        auto *shader            = filter.GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
         input->Bind(0);

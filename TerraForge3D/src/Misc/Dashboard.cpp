@@ -69,7 +69,7 @@ namespace tf3d::misc
         ImGui::NewLine();
 
         if (ImGui::Button("Regenerate")) {
-            m_AppState->generationManager->UpdateInternal();
+            m_AppState->generationManager->MarkForRegeneration();
         }
 
         ImGui::Separator();
