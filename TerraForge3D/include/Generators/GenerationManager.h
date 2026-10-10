@@ -76,6 +76,7 @@ namespace tf3d::generators
         std::shared_ptr<HeightfieldPyramid> heightPyramid;
         std::vector<std::shared_ptr<BiomeManager>> biomeManagers;
         GeneratorDataStatisticsResult statisticsResult;
+        std::atomic<uint64_t> terrainRevision = 0;
         int statisticsSampleStride = 4;
     };
 
@@ -152,7 +153,7 @@ namespace tf3d::generators
 
         inline uint64_t GetTerrainRevision() const
         {
-            return m_TerrainRevision.load(std::memory_order_acquire);
+            return m_Field.terrainRevision.load(std::memory_order_acquire);
         }
 
         inline GeneratorTexture *GetSlopeTexture() const
@@ -196,9 +197,6 @@ namespace tf3d::generators
         GenerationDirtyManager m_DirtyManager;
         FieldState m_Field;
         UiState m_Ui;
-
-        std::atomic<uint64_t> m_TerrainRevision        = 0;
-        std::atomic_bool m_ResolutionGenerationPending = false;
 
         uint64_t m_LastFailedGenerationRevision = 0;
         std::unique_ptr<ActiveGeneration> m_ActiveGeneration;

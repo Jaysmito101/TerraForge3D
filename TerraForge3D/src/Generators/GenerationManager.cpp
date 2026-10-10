@@ -112,20 +112,17 @@ namespace tf3d::generators
 
     void GenerationManager::SchedulePendingGeneration()
     {
-        const bool resolutionGenerationPending =
-            m_ResolutionGenerationPending.load(std::memory_order_acquire);
-        if (m_Ui.updationPaused && !resolutionGenerationPending) {
+        const bool resizeRequiresGeneration = m_DirtyManager.HasCause(GenerationDirtyCause::Resize);
+        if (m_Ui.updationPaused && !resizeRequiresGeneration) {
             return;
         }
 
-        if ((!m_DirtyManager.IsDirty() && !resolutionGenerationPending) ||
-            m_ActiveGeneration != nullptr ||
+        if (!m_DirtyManager.IsDirty() || m_ActiveGeneration != nullptr ||
             m_DirtyManager.Snapshot().revision == m_LastFailedGenerationRevision ||
             !m_Worker->CanAcceptRequest()) {
             return;
         }
 
-        m_ResolutionGenerationPending.store(false, std::memory_order_release);
         RequestGeneration();
     }
 
@@ -149,8 +146,7 @@ namespace tf3d::generators
         auto activeGeneration      = std::make_unique<ActiveGeneration>();
         activeGeneration->snapshot = CaptureGenerationSnapshot();
         m_ActiveGeneration         = std::move(activeGeneration);
-
-        const auto &snapshot       = m_ActiveGeneration->snapshot;
+        
         const auto request         = m_Worker->Request();
 
         switch (request.status) {
@@ -608,7 +604,7 @@ namespace tf3d::generators
 
         m_Field.heightmapData.swap(m_Field.workingHeightmapData);
         m_Field.slopeGenerator.swap(m_Field.workingSlopeGenerator);
-        m_TerrainRevision.fetch_add(1, std::memory_order_release);
+        m_Field.terrainRevision.fetch_add(1, std::memory_order_release);
         m_Field.statisticsResult = snapshot.statistics != nullptr
                                        ? snapshot.statistics->Read()
                                        : GeneratorDataStatisticsResult{};
@@ -680,7 +676,6 @@ namespace tf3d::generators
             biome->Resize();
         }
 
-        m_ResolutionGenerationPending.store(true, std::memory_order_release);
         return false;
     }
 
