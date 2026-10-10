@@ -73,7 +73,7 @@ namespace tf3d::generators
     };
 
     struct UiState {
-        UiState();
+        explicit UiState();
 
         bool updationPaused             = false;
         bool useSeedFromActiveMesh      = false;
