@@ -70,6 +70,7 @@ namespace tf3d::generators
         {
             return m_Request.phase.load(std::memory_order_acquire) == WorkerPhase::RequestQueued;
         }
+
     private:
         enum class WorkerPhase {
             Idle,
@@ -98,9 +99,9 @@ namespace tf3d::generators
             std::atomic<WorkerPhase> phase{WorkerPhase::Idle};
             std::optional<base::SyncFence> completionFence;
 
-            std::atomic<uint64_t> lastRequestId      = 0;
-            std::atomic<uint64_t> activeRequestId    = 0;
-            uint64_t completedRequestId = 0;
+            std::atomic<uint64_t> lastRequestId   = 0;
+            std::atomic<uint64_t> activeRequestId = 0;
+            uint64_t completedRequestId           = 0;
         };
 
         enum class WorkItemType {

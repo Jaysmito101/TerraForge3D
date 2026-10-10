@@ -136,8 +136,8 @@ namespace tf3d::generators
                 if (m_Request.completionFence.has_value() && glfwGetCurrentContext() == nullptr) {
                     return std::nullopt;
                 }
-                completedRequestId              = m_Request.completedRequestId;
-                m_Request.completedRequestId    = 0;
+                completedRequestId           = m_Request.completedRequestId;
+                m_Request.completedRequestId = 0;
                 m_Request.completionFence.reset();
                 m_Request.phase = WorkerPhase::Idle;
             }
