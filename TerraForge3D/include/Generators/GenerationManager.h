@@ -56,6 +56,8 @@ namespace tf3d::generators
     };
 
     struct FieldState {
+        explicit FieldState(ApplicationState *appState);
+
         std::shared_ptr<GeneratorData> heightmapData;
         std::shared_ptr<GeneratorData> workingHeightmapData;
         std::shared_ptr<GeneratorData> swapBuffer;
@@ -71,6 +73,8 @@ namespace tf3d::generators
     };
 
     struct UiState {
+        explicit UiState();
+
         bool updationPaused             = false;
         bool useSeedFromActiveMesh      = false;
         int32_t seedTextureResolution   = 256;
@@ -140,6 +144,7 @@ namespace tf3d::generators
         bool IsWindowVisible() const;
         void SetWindowVisible(bool visible);
         bool *IsWindowVisiblePtr();
+
         inline GeneratorData *GetHeightmapData() const
         {
             return m_Field.heightmapData.get();
@@ -166,7 +171,7 @@ namespace tf3d::generators
             return m_Field.statisticsResult;
         }
         bool UpdateInternal(const std::string &params = "", void *paramsPtr = nullptr);
-
+        
     private:
         void WaitForGenerationWorker();
         void PullSeedTextureFromActiveMesh();
@@ -180,7 +185,7 @@ namespace tf3d::generators
         GenerationRequestSnapshot CaptureGenerationSnapshot();
         void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
         GenerationExecutionResult ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
-                                                    uint64_t requestId);
+            uint64_t requestId);
         bool IsCurrentGeneration(const GenerationExecutionResult &result) const;
 
     private:

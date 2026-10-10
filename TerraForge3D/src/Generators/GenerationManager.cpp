@@ -12,27 +12,40 @@
 namespace tf3d::generators
 {
 
+    FieldState::FieldState(ApplicationState *appState)
+    {
+        std::string configuredStorage;
+        if (appState->configManager != nullptr &&
+            appState->configManager->GetString("generation", "field_storage", configuredStorage)) {
+            GeneratorData::SetDefaultStorage(
+                configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
+        }
+
+        statistics      = std::make_shared<GeneratorDataStatistics>(appState);
+        heightPyramid   = std::make_shared<HeightfieldPyramid>(appState);
+        heightmapData         = std::make_shared<GeneratorData>();
+        workingHeightmapData  = std::make_shared<GeneratorData>();
+        swapBuffer            = std::make_shared<GeneratorData>();
+        slopeGenerator        = std::make_shared<SlopeGenerator>(appState, appState->mainMap.tileResolution);
+        workingSlopeGenerator = std::make_shared<SlopeGenerator>(appState, appState->mainMap.tileResolution);
+        biomeMixer            = std::make_shared<BiomeMixer>(appState);
+        biomeManagers.push_back(std::make_shared<BiomeManager>(appState));
+        biomeManagers.back()->SetName("Default Global");
+    }
+
+    UiState::UiState()
+        : fieldStorageUiMode(GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0)
+    {
+    }
+
     GenerationManager::GenerationManager(ApplicationState *appState)
+        : m_AppState(appState), m_Field(appState), m_Ui()
     {
         // if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
-        m_AppState = appState;
-        std::string configuredStorage;
-        if (m_AppState->configManager != nullptr && m_AppState->configManager->GetString("generation", "field_storage", configuredStorage)) {
-            GeneratorData::SetDefaultStorage(configuredStorage == "R16F" ? GeneratorDataStorage::R16F : GeneratorDataStorage::R32F);
-        }
-        m_Ui.fieldStorageUiMode = GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0;
-        m_Field.statistics      = std::make_shared<GeneratorDataStatistics>(m_AppState);
-        m_Field.heightPyramid   = std::make_shared<HeightfieldPyramid>(m_AppState);
+
         m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
         m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(UpdateInternal));
-        m_Field.heightmapData         = std::make_shared<GeneratorData>();
-        m_Field.workingHeightmapData  = std::make_shared<GeneratorData>();
-        m_Field.swapBuffer            = std::make_shared<GeneratorData>();
-        m_Field.slopeGenerator        = std::make_shared<SlopeGenerator>(m_AppState, m_AppState->mainMap.tileResolution);
-        m_Field.workingSlopeGenerator = std::make_shared<SlopeGenerator>(m_AppState, m_AppState->mainMap.tileResolution);
-        m_Field.biomeMixer            = std::make_shared<BiomeMixer>(m_AppState);
-        m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState));
-        m_Field.biomeManagers.back()->SetName("Default Global");
+        
         m_Worker = std::make_unique<GenerationWorker>("Generation Worker", [this](uint64_t requestId) {
             if (m_ActiveGeneration != nullptr) {
                 try {
