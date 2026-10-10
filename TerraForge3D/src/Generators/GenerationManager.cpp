@@ -147,13 +147,13 @@ namespace tf3d::generators
 
         switch (m_Worker->Request().status) {
             case GenerationWorker::RequestStatus::Queued:
-                // GenerationWorker executes the callback on its thread; Update consumes the result after GPU completion.
+                // generation worker executes the callback on its thread
                 return;
             case GenerationWorker::RequestStatus::Busy:
                 m_ActiveGeneration.reset();
                 return;
             case GenerationWorker::RequestStatus::Unavailable: {
-                // Without a worker context, execute synchronously on the render thread.
+                // without a worker context execute synchronously on the render thread.
                 const uint64_t requestId = NextUniqueId();
                 ExecuteActiveGeneration(requestId);
                 CompleteActiveGeneration(requestId);
