@@ -39,8 +39,8 @@ namespace tf3d::base
         struct Slot {
             GLuint pixelPackBuffer = 0;
             std::optional<SyncFence> fence;
-            uint64_t token         = 0;
-            bool pending           = false;
+            uint64_t token = 0;
+            bool pending   = false;
         };
 
         bool EnsureBuffers(std::size_t byteSize);

@@ -9,7 +9,8 @@ namespace tf3d::base
     class SyncFence
     {
     public:
-        explicit SyncFence(GLbitfield barrierBits = 0) noexcept : m_Handle(nullptr)
+        explicit SyncFence(GLbitfield barrierBits = 0) noexcept
+            : m_Handle(nullptr)
         {
             if (barrierBits != 0) {
                 glMemoryBarrier(barrierBits);
@@ -22,7 +23,10 @@ namespace tf3d::base
             }
         }
 
-        explicit SyncFence(GLsync handle) noexcept : m_Handle(handle) {}
+        explicit SyncFence(GLsync handle) noexcept
+            : m_Handle(handle)
+        {
+        }
 
         ~SyncFence()
         {
@@ -32,7 +36,8 @@ namespace tf3d::base
         SyncFence(const SyncFence &)            = delete;
         SyncFence &operator=(const SyncFence &) = delete;
 
-        SyncFence(SyncFence &&other) noexcept : m_Handle(std::exchange(other.m_Handle, nullptr))
+        SyncFence(SyncFence &&other) noexcept
+            : m_Handle(std::exchange(other.m_Handle, nullptr))
         {
         }
 
