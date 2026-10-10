@@ -15,6 +15,11 @@ namespace tf3d::base
                 glMemoryBarrier(barrierBits);
             }
             m_Handle = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+            if (m_Handle != nullptr) {
+                glFlush();
+            } else {
+                glFinish();
+            }
         }
 
         explicit SyncFence(GLsync handle) noexcept : m_Handle(handle) {}
