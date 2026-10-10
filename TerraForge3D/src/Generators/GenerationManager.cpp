@@ -43,29 +43,59 @@ namespace tf3d::generators
         m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
         m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(OnForceUpdate));
 
+        // GenerationWorker invokes this callback on its thread with its shared OpenGL context current.
         m_Worker = std::make_unique<GenerationWorker>(
-            "Generation Worker", [this](uint64_t requestId) { ExecuteActiveGeneration(requestId); });
+            "Generation Worker",
+            [this](uint64_t requestId) { ExecuteActiveGeneration(requestId); });
 
         m_DirtyManager.MarkForce(GenerationDirtyCause::Force);
     }
 
     void GenerationManager::ExecuteActiveGeneration(uint64_t requestId)
     {
-        if (m_ActiveGeneration != nullptr) {
-            try {
-                m_ActiveGeneration->result = ExecuteGeneration(m_ActiveGeneration->snapshot, requestId);
-            } catch (const std::exception &exception) {
-                TF3D_LOG_ERROR("Generation request {} failed: {}", requestId, exception.what());
-                m_ActiveGeneration->result = {
-                    requestId, m_ActiveGeneration->snapshot.dirtyState.revision, false};
-            } catch (...) {
-                TF3D_LOG_ERROR("Generation request {} failed with an unknown exception", requestId);
-                m_ActiveGeneration->result = {
-                    requestId, m_ActiveGeneration->snapshot.dirtyState.revision, false};
-            }
-        } else {
-            TF3D_LOG_ERROR("Generation worker completed request {} without an active job", requestId);
+        if (m_ActiveGeneration == nullptr) {
+            return;
         }
+
+        const auto &snapshot = m_ActiveGeneration->snapshot;
+        try {
+            m_ActiveGeneration->result = ExecuteGeneration(snapshot, requestId);
+        } catch (const std::exception &exception) {
+            TF3D_LOG_ERROR("Generation request {} failed: {}", requestId, exception.what());
+            m_ActiveGeneration->result = {requestId, snapshot.dirtyState.revision, false};
+        } catch (...) {
+            TF3D_LOG_ERROR("Generation request {} failed with an unknown exception", requestId);
+            m_ActiveGeneration->result = {requestId, snapshot.dirtyState.revision, false};
+        }
+    }
+
+    void GenerationManager::CompleteActiveGeneration(uint64_t requestId)
+    {
+        if (m_ActiveGeneration == nullptr) {
+            TF3D_LOG_ERROR("Generation completed request {}, but GenerationManager has no active generation",
+                           requestId);
+            return;
+        }
+
+        const auto &result = m_ActiveGeneration->result;
+        if (result.requestId != requestId) {
+            TF3D_LOG_ERROR("Generation completed request {}, but the active generation has a result for request {}",
+                           requestId, result.requestId);
+            m_ActiveGeneration.reset();
+            return;
+        }
+
+        if (result.producedOutput && IsCurrentGeneration(result)) {
+            CommitHeightfield(m_ActiveGeneration->snapshot);
+        }
+
+        if (!result.producedOutput && !result.superseded) {
+            const auto dirtyState = m_DirtyManager.Snapshot();
+            if (dirtyState.revision == result.inputRevision) {
+                m_LastFailedGenerationRevision = dirtyState.revision;
+            }
+        }
+        m_ActiveGeneration.reset();
     }
 
     void GenerationManager::Update()
@@ -74,30 +104,7 @@ namespace tf3d::generators
         if (m_Worker->HasContext()) {
             m_Worker->Poll();
             if (const auto completedRequestId = m_Worker->TryConsumeCompleted()) {
-                const uint64_t requestId = *completedRequestId;
-                if (m_ActiveGeneration == nullptr) {
-                    TF3D_LOG_ERROR(
-                        "Generation worker completed request {}, but GenerationManager has no active generation",
-                        requestId);
-                } else if (m_ActiveGeneration->result.requestId != requestId) {
-                    TF3D_LOG_ERROR(
-                        "Generation worker completed request {}, but the active generation has a result for request {}",
-                        requestId, m_ActiveGeneration->result.requestId);
-                    m_ActiveGeneration.reset();
-                } else {
-                    const auto &result = m_ActiveGeneration->result;
-                    const bool current = result.producedOutput && IsCurrentGeneration(result);
-                    if (current) {
-                        CommitHeightfield(m_ActiveGeneration->snapshot);
-                    }
-                    if (!result.producedOutput && !result.superseded) {
-                        const auto dirtyState = m_DirtyManager.Snapshot();
-                        if (dirtyState.revision == result.inputRevision) {
-                            m_LastFailedGenerationRevision = dirtyState.revision;
-                        }
-                    }
-                    m_ActiveGeneration.reset();
-                }
+                CompleteActiveGeneration(*completedRequestId);
             }
         }
         SchedulePendingGeneration();
@@ -142,25 +149,24 @@ namespace tf3d::generators
         auto activeGeneration      = std::make_unique<ActiveGeneration>();
         activeGeneration->snapshot = CaptureGenerationSnapshot();
         m_ActiveGeneration         = std::move(activeGeneration);
+
         const auto &snapshot       = m_ActiveGeneration->snapshot;
         const auto request         = m_Worker->Request();
-        uint64_t requestId         = request.requestId;
 
-        if (request.status == GenerationWorker::RequestStatus::Unavailable) {
-            requestId         = NextUniqueId();
-            const auto result = ExecuteGeneration(snapshot, requestId);
-            if (result.producedOutput && IsCurrentGeneration(result)) {
-                CommitHeightfield(snapshot);
+        switch (request.status) {
+            case GenerationWorker::RequestStatus::Queued:
+                // GenerationWorker executes the callback on its thread; Update consumes the result after GPU completion.
+                return;
+            case GenerationWorker::RequestStatus::Busy:
+                m_ActiveGeneration.reset();
+                return;
+            case GenerationWorker::RequestStatus::Unavailable: {
+                // Without a worker context, execute synchronously on the render thread.
+                const uint64_t requestId = NextUniqueId();
+                ExecuteActiveGeneration(requestId);
+                CompleteActiveGeneration(requestId);
+                return;
             }
-            if (!result.producedOutput && !result.superseded) {
-                const auto dirtyState = m_DirtyManager.Snapshot();
-                if (dirtyState.revision == result.inputRevision) {
-                    m_LastFailedGenerationRevision = dirtyState.revision;
-                }
-            }
-            m_ActiveGeneration.reset();
-        } else if (request.status == GenerationWorker::RequestStatus::Busy) {
-            m_ActiveGeneration.reset();
         }
     }
 
