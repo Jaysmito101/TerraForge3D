@@ -104,7 +104,9 @@ namespace tf3d::generators
             Runtime runtime;
         };
 
-        BiomeManager(data::ApplicationState *appState, GenerationDirtyManager *dirtyManager);
+        BiomeManager(data::ApplicationState *appState,
+                     GenerationDirtyManager *dirtyManager,
+                     const std::string &name = "Biome");
         ~BiomeManager();
 
         void Resize();
@@ -156,10 +158,6 @@ namespace tf3d::generators
         inline const BiomeID &GetBiomeID() const
         {
             return m_BiomeID;
-        }
-        inline void SetName(const std::string &name)
-        {
-            strcpy(m_BiomeName, name.c_str());
         }
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);

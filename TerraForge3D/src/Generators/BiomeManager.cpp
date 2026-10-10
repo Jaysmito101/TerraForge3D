@@ -137,14 +137,15 @@ namespace tf3d::generators
         return true;
     }
 
-    BiomeManager::BiomeManager(data::ApplicationState *appState, GenerationDirtyManager *dirtyManager)
+    BiomeManager::BiomeManager(data::ApplicationState *appState,
+                               GenerationDirtyManager *dirtyManager,
+                               const std::string &name)
         : m_AppState(appState), m_DirtyManager(dirtyManager)
     {
-        m_BiomeID            = BiomeID{GenerateId(8)};
-        m_Color              = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
-        m_Data               = std::make_shared<GeneratorData>();
-        static int s_BiomeID = 1;
-        snprintf(m_BiomeName, 64, "Biome %d", s_BiomeID++);
+        m_BiomeID = BiomeID{GenerateId(8)};
+        m_Color   = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
+        m_Data    = std::make_shared<GeneratorData>();
+        snprintf(m_BiomeName, sizeof(m_BiomeName), "%s", name.c_str());
         LoadUpResources();
         // m_SelectedBaseShapeGeneratorMode.store(BiomeBaseShapeGeneratorMode_GlobalElevation);
         for (auto i = 0; i < static_cast<int32_t>(m_BaseShapeGenerators.size()); i++) {
