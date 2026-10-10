@@ -88,6 +88,10 @@ namespace tf3d::generators
         m_Size       = size;
         m_Resolution = resolution;
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Resolution, m_Resolution, 0, GL_RED, GL_FLOAT, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
