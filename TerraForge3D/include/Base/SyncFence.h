@@ -9,7 +9,14 @@ namespace tf3d::base
     class SyncFence
     {
     public:
-        explicit SyncFence() noexcept : m_Handle(glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0)) {}
+        explicit SyncFence(GLbitfield barrierBits = 0) noexcept : m_Handle(nullptr)
+        {
+            if (barrierBits != 0) {
+                glMemoryBarrier(barrierBits);
+            }
+            m_Handle = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        }
+
         explicit SyncFence(GLsync handle) noexcept : m_Handle(handle) {}
 
         ~SyncFence()
