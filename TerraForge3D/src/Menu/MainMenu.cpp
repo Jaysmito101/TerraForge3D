@@ -163,7 +163,7 @@ namespace tf3d::ui
             ImGui::EndMenu();
         }
         ShowWindowMenuItem("Dashboard", appState->dashboard->IsWindowVisiblePtr());
-        ShowWindowMenuItem("Generation Manager", appState->generationManager->IsWindowVisiblePtr());
+        ShowWindowMenuItem("Generation Manager", &appState->windows.generationManager);
         ShowWindowMenuItem("Renderer Settings", appState->rendererManager->IsWindowVisiblePtr());
         ShowWindowMenuItem("Export Manager", appState->exportManager->IsWindowOpenPtr());
         ShowWindowMenuItem("Job Manager", appState->jobManager->IsWindowOpenPtr());

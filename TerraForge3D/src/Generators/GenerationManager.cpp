@@ -66,22 +66,6 @@ namespace tf3d::generators
         m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::Force);
     }
 
-    bool GenerationManager::IsWindowVisible() const
-    {
-        return m_AppState != nullptr && m_AppState->windows.generationManager;
-    }
-
-    void GenerationManager::SetWindowVisible(bool visible)
-    {
-        if (m_AppState != nullptr)
-            m_AppState->windows.generationManager = visible;
-    }
-
-    bool *GenerationManager::IsWindowVisiblePtr()
-    {
-        return m_AppState != nullptr ? &m_AppState->windows.generationManager : nullptr;
-    }
-
     void GenerationManager::Update()
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/update", PerformanceMonitor::Domain::Generation);

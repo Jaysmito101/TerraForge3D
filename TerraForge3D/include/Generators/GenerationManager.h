@@ -134,14 +134,11 @@ namespace tf3d::generators
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
 
-        bool IsWindowVisible() const;
-        void SetWindowVisible(bool visible);
-        bool *IsWindowVisiblePtr();
-
         inline const bool IsUpdationPaused() const
         {
             return m_Ui.updationPaused;
         }
+
         inline void SetUpdationPaused(bool paused)
         {
             m_Ui.updationPaused = paused;
@@ -151,23 +148,28 @@ namespace tf3d::generators
         {
             return m_Field.heightmapData.get();
         }
+
         inline HeightfieldPyramid *GetHeightPyramid() const
         {
             return m_Field.heightPyramid.get();
         }
+
         inline uint64_t GetTerrainRevision() const
         {
             return m_TerrainRevision.load(std::memory_order_acquire);
         }
+
         inline GeneratorTexture *GetSlopeTexture() const
         {
             return m_Field.slopeGenerator != nullptr ? m_Field.slopeGenerator->GetTexture() : nullptr;
         }
+
         inline bool HasSlopeTexture() const
         {
             return m_Field.slopeGenerator != nullptr && m_Field.slopeGenerator->IsReady() &&
                    !m_Worker->IsRunning() && !m_Worker->IsRequestPending();
         }
+
         inline const GeneratorDataStatisticsResult &GetFieldStatisticsResult() const
         {
             return m_Field.statisticsResult;
