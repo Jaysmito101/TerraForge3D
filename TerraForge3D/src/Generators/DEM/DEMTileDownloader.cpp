@@ -258,7 +258,7 @@ namespace tf3d::generators::dem
                 state->queue.pop_front();
             }
 
-            const auto result                      = Download(state, request);
+            const auto result = Download(state, request);
             {
                 std::lock_guard lock(state->mutex);
                 if (!state->alive)
