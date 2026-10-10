@@ -85,6 +85,7 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "ShaderStorageBuffer.h"
+#include "SyncFence.h"
 #include "Texture2D.h"
 #include "Texture2DStorage.h"
 #include "TextureCubemap.h"

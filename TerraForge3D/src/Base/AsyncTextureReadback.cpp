@@ -43,10 +43,7 @@ namespace tf3d::base
         glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING, &previousPixelPackBuffer);
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
         for (auto &slot : m_Slots) {
-            if (slot.fence != nullptr) {
-                glDeleteSync(slot.fence);
-                slot.fence = nullptr;
-            }
+            slot.fence.reset();
             if (slot.pixelPackBuffer != 0) {
                 glDeleteBuffers(1, &slot.pixelPackBuffer);
                 slot.pixelPackBuffer = 0;
@@ -89,13 +86,14 @@ namespace tf3d::base
         glBindTexture(GL_TEXTURE_2D, textureRendererID);
         glBindBuffer(GL_PIXEL_PACK_BUFFER, slot.pixelPackBuffer);
         glGetTexImage(GL_TEXTURE_2D, 0, format, type, nullptr);
-        slot.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        slot.fence.emplace();
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, static_cast<GLuint>(previousPixelPack));
         glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(previousTexture));
         glActiveTexture(previousActiveTexture);
 
-        if (slot.fence == nullptr) {
+        if (!slot.fence.has_value() || !*slot.fence) {
+            slot.fence.reset();
             glFinish();
             return false;
         }
@@ -110,10 +108,10 @@ namespace tf3d::base
     std::optional<AsyncTextureReadback::Result> AsyncTextureReadback::Poll()
     {
         for (auto &slot : m_Slots) {
-            if (!slot.pending || slot.fence == nullptr)
+            if (!slot.pending || !slot.fence.has_value())
                 continue;
 
-            const GLenum waitResult = glClientWaitSync(slot.fence, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+            const GLenum waitResult = slot.fence->ClientWait(GL_SYNC_FLUSH_COMMANDS_BIT, 0);
             if (waitResult == GL_TIMEOUT_EXPIRED)
                 continue;
 
@@ -135,8 +133,7 @@ namespace tf3d::base
                 glBindBuffer(GL_PIXEL_PACK_BUFFER, static_cast<GLuint>(previousPixelPack));
             }
 
-            glDeleteSync(slot.fence);
-            slot.fence   = nullptr;
+            slot.fence.reset();
             slot.token   = 0;
             slot.pending = false;
             --m_PendingCount;

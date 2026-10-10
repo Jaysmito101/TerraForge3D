@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Base/SyncFence.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <glad/gl.h>
@@ -36,7 +38,7 @@ namespace tf3d::base
     private:
         struct Slot {
             GLuint pixelPackBuffer = 0;
-            GLsync fence           = nullptr;
+            std::optional<SyncFence> fence;
             uint64_t token         = 0;
             bool pending           = false;
         };
