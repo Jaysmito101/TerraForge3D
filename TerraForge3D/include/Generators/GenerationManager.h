@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(ComputeShader, tf3d::base)
@@ -115,6 +116,11 @@ namespace tf3d::generators
     };
 
     struct ActiveGeneration {
+        explicit ActiveGeneration(GenerationRequestSnapshot snapshot)
+            : snapshot(std::move(snapshot))
+        {
+        }
+
         GenerationRequestSnapshot snapshot;
         GenerationExecutionResult result;
     };

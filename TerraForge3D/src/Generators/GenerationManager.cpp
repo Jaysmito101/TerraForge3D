@@ -143,10 +143,8 @@ namespace tf3d::generators
             return;
         }
 
-        auto activeGeneration      = std::make_unique<ActiveGeneration>();
-        activeGeneration->snapshot = CaptureGenerationSnapshot();
-        m_ActiveGeneration         = std::move(activeGeneration);
-        
+        m_ActiveGeneration = std::make_unique<ActiveGeneration>(CaptureGenerationSnapshot());
+
         const auto request         = m_Worker->Request();
 
         switch (request.status) {
