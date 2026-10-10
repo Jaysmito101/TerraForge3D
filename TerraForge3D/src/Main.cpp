@@ -145,7 +145,6 @@ namespace tf3d
                 TF3D_PROFILE_SCOPE_DOMAIN("app/ui", PerformanceMonitor::Domain::Ui);
                 RenderImGui();
             }
-            appState->generationManager->SchedulePendingGeneration();
         }
 
         virtual void OnOneSecondTick() override

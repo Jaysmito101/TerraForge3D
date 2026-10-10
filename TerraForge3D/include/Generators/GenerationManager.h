@@ -125,7 +125,6 @@ namespace tf3d::generators
         ~GenerationManager() = default;
 
         void Update();
-        void SchedulePendingGeneration();
         void MarkForRegeneration();
         void ShowSettings();
 
@@ -182,6 +181,7 @@ namespace tf3d::generators
         void ShowFieldStatistics();
         void GenerateHeightmapMipmaps(GeneratorData *heightmap);
         bool CommitHeightfield(const GenerationRequestSnapshot &snapshot);
+        void SchedulePendingGeneration();
         void RequestGeneration();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
         void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
