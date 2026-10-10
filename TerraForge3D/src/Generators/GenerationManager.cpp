@@ -294,8 +294,8 @@ namespace tf3d::generators
         }
 
         TF3D_RETURN_IF_GENERATION_STALE(context, result);
-        if (producedOutput) {
-            GenerateHeightmapMipmaps(snapshot.workingHeightmapData.get());
+        if (producedOutput && snapshot.workingHeightmapData != nullptr) {
+            snapshot.workingHeightmapData->GenerateMipmaps();
         }
         result.producedOutput = producedOutput;
     }
@@ -631,27 +631,6 @@ namespace tf3d::generators
             }
         }
         return true;
-    }
-
-    void GenerationManager::GenerateHeightmapMipmaps(GeneratorData *heightmap)
-    {
-        if (heightmap == nullptr || heightmap->GetResolution() <= 0) {
-            return;
-        }
-
-        TF3D_PROFILE_SCOPE_DOMAIN("generation/heightfield-mipmap", PerformanceMonitor::Domain::Generation);
-        TF3D_PROFILE_GPU_SCOPE("generation/heightfield-mipmap/gpu");
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-        heightmap->BindAsTexture(0);
-        int32_t mipLevels = 1;
-        for (int32_t mipSize = heightmap->GetResolution(); mipSize > 1; mipSize >>= 1)
-            ++mipLevels;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void GenerationManager::ShowFieldStatistics()

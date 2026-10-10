@@ -186,7 +186,6 @@ namespace tf3d::generators
         void ShowSettingsDetailed();
         void ShowSettingsGlobalOptions();
         void ShowFieldStatistics();
-        void GenerateHeightmapMipmaps(GeneratorData *heightmap);
         bool CommitHeightfield(const GenerationRequestSnapshot &snapshot);
         void SchedulePendingGeneration();
         void RequestGeneration();
