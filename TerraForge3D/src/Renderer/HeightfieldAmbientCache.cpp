@@ -117,7 +117,7 @@ namespace tf3d::renderer
             m_PendingWork = work;
             m_WorkPending = true;
         }
-        if (m_Worker->Request().status != GenerationWorker::RequestStatus::Queued) {
+        if (m_Worker->Request().status != generators::GenerationWorker::RequestStatus::Queued) {
             std::lock_guard lock(m_WorkMutex);
             m_WorkPending = false;
             m_PendingWork = {};
@@ -132,7 +132,7 @@ namespace tf3d::renderer
         if (!enabled)
             m_IsReady = false;
         else if (m_Worker == nullptr) {
-            m_Worker = std::make_unique<GenerationWorker>("Heightfield Ambient Worker", [this](uint64_t) { RunWorkerBuild(); }, "renderer/cache/heightfield-ambient");
+            m_Worker = std::make_unique<generators::GenerationWorker>("Heightfield Ambient Worker", [this](uint64_t) { RunWorkerBuild(); }, "renderer/cache/heightfield-ambient");
         }
     }
 
@@ -182,7 +182,7 @@ namespace tf3d::renderer
     {
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/poll", PerformanceMonitor::Domain::Renderer);
         if (m_Worker != nullptr)
-            m_Worker->PollCompletion();
+            m_Worker->Poll();
         if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
             return;
 

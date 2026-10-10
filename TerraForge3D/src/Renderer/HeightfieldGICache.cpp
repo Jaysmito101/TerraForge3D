@@ -192,7 +192,7 @@ namespace tf3d::renderer
         TF3D_PROFILE_VALUE_DOMAIN("renderer/cache/heightfield-gi/request", resolution,
                                   static_cast<uint64_t>(work.sampleStart), static_cast<uint64_t>(work.samplesThisDispatch),
                                   PerformanceMonitor::Domain::Renderer);
-        if (m_Worker->Request().status != GenerationWorker::RequestStatus::Queued) {
+        if (m_Worker->Request().status != generators::GenerationWorker::RequestStatus::Queued) {
             std::lock_guard lock(m_WorkMutex);
             m_WorkPending = false;
             m_PendingWork = {};
@@ -212,7 +212,7 @@ namespace tf3d::renderer
         }
 
         if (m_Worker == nullptr) {
-            m_Worker = std::make_unique<GenerationWorker>("Heightfield GI Worker", [this](uint64_t) { RunWorkerBuild(); }, "renderer/cache/heightfield-gi");
+            m_Worker = std::make_unique<generators::GenerationWorker>("Heightfield GI Worker", [this](uint64_t) { RunWorkerBuild(); }, "renderer/cache/heightfield-gi");
         }
         m_IsReady = m_HasPublishedOutput;
     }
@@ -320,7 +320,7 @@ namespace tf3d::renderer
     {
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/poll", PerformanceMonitor::Domain::Renderer);
         if (m_Worker != nullptr)
-            m_Worker->PollCompletion();
+            m_Worker->Poll();
         if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
             return;
 
