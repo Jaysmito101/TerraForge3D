@@ -125,7 +125,7 @@ namespace tf3d::generators
     {
     public:
         GenerationManager(ApplicationState *appState);
-        ~GenerationManager();
+        ~GenerationManager() = default;
 
         void Update();
         void SchedulePendingGeneration();
@@ -133,6 +133,10 @@ namespace tf3d::generators
         void ShowSettings();
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
+
+        bool IsWindowVisible() const;
+        void SetWindowVisible(bool visible);
+        bool *IsWindowVisiblePtr();
 
         inline const bool IsUpdationPaused() const
         {
@@ -142,9 +146,6 @@ namespace tf3d::generators
         {
             m_Ui.updationPaused = paused;
         }
-        bool IsWindowVisible() const;
-        void SetWindowVisible(bool visible);
-        bool *IsWindowVisiblePtr();
 
         inline GeneratorData *GetHeightmapData() const
         {
@@ -201,8 +202,3 @@ namespace tf3d::generators
     };
 
 } // namespace tf3d::generators
-using tf3d::generators::FieldState;
-using tf3d::generators::GenerationManager;
-using tf3d::generators::GenerationRequestSnapshot;
-using tf3d::generators::SelectedUINode;
-using tf3d::generators::UiState;

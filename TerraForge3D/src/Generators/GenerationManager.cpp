@@ -66,8 +66,6 @@ namespace tf3d::generators
         m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::Force);
     }
 
-    GenerationManager::~GenerationManager() = default;
-
     bool GenerationManager::IsWindowVisible() const
     {
         return m_AppState != nullptr && m_AppState->windows.generationManager;
