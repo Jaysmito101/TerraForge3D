@@ -2,6 +2,7 @@
 #include "Data/ApplicationState.h"
 #include "Data/ConfigManager.h"
 #include "Profiler.h"
+#include "Utils/Utils.h"
 #include <exception>
 
 namespace tf3d::generators
@@ -27,13 +28,16 @@ namespace tf3d::generators
         biomeManagers.push_back(std::make_shared<BiomeManager>(appState, dirtyManager, "Default Global"));
     }
 
-    UiState::UiState()
+    UiState::UiState(ApplicationState *appState)
         : fieldStorageUiMode(GeneratorData::GetDefaultStorage() == GeneratorDataStorage::R16F ? 1 : 0)
     {
+        if (appState != nullptr && appState->configManager != nullptr) {
+            appState->configManager->GetBool("generation", "use_worker_thread", useWorkerThread);
+        }
     }
 
     GenerationManager::GenerationManager(ApplicationState *appState)
-        : m_AppState(appState), m_DirtyManager(), m_Field(appState, &m_DirtyManager), m_Ui()
+        : m_AppState(appState), m_DirtyManager(), m_Field(appState, &m_DirtyManager), m_Ui(appState)
     {
         m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
         m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(OnForceUpdate));
@@ -114,7 +118,7 @@ namespace tf3d::generators
 
         if (!m_DirtyManager.IsDirty() || m_ActiveGeneration != nullptr ||
             m_DirtyManager.Snapshot().revision == m_LastFailedGenerationRevision ||
-            !m_Worker->CanAcceptRequest()) {
+            (m_Ui.useWorkerThread && !m_Worker->CanAcceptRequest())) {
             return;
         }
 
@@ -134,11 +138,16 @@ namespace tf3d::generators
 
     void GenerationManager::RequestGeneration()
     {
-        if (m_ActiveGeneration != nullptr || !m_Worker->CanAcceptRequest()) {
+        if (m_ActiveGeneration != nullptr ||
+            (m_Ui.useWorkerThread && !m_Worker->CanAcceptRequest())) {
             return;
         }
 
         m_ActiveGeneration = std::make_unique<ActiveGeneration>(CaptureGenerationSnapshot());
+        if (!m_Ui.useWorkerThread) {
+            ExecuteGenerationOnRenderThread();
+            return;
+        }
 
         switch (m_Worker->Request().status) {
             case GenerationWorker::RequestStatus::Queued:
@@ -148,13 +157,17 @@ namespace tf3d::generators
                 m_ActiveGeneration.reset();
                 return;
             case GenerationWorker::RequestStatus::Unavailable: {
-                // without a worker context execute synchronously on the render thread.
-                const uint64_t requestId = NextUniqueId();
-                ExecuteActiveGeneration(requestId);
-                CompleteActiveGeneration(requestId);
+                ExecuteGenerationOnRenderThread();
                 return;
             }
         }
+    }
+
+    void GenerationManager::ExecuteGenerationOnRenderThread()
+    {
+        const uint64_t requestId = tf3d::utils::NextUniqueId();
+        ExecuteActiveGeneration(requestId);
+        CompleteActiveGeneration(requestId);
     }
 
     GenerationRequestSnapshot GenerationManager::CaptureGenerationSnapshot()

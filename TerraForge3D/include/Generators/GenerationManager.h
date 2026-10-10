@@ -82,9 +82,10 @@ namespace tf3d::generators
     };
 
     struct UiState {
-        explicit UiState();
+        explicit UiState(ApplicationState *appState);
 
         bool updationPaused             = false;
+        bool useWorkerThread            = true;
         bool useSeedFromActiveMesh      = false;
         int32_t seedTextureResolution   = 256;
         int fieldStorageUiMode          = 0;
@@ -189,6 +190,7 @@ namespace tf3d::generators
         bool CommitHeightfield(const GenerationRequestSnapshot &snapshot);
         void SchedulePendingGeneration();
         void RequestGeneration();
+        void ExecuteGenerationOnRenderThread();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
         void ExecuteActiveGeneration(uint64_t requestId);
         void CompleteActiveGeneration(uint64_t requestId);

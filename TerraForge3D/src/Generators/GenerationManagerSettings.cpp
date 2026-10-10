@@ -391,6 +391,16 @@ namespace tf3d::generators
     {
         ImGui::Begin("Generation Settings", &m_AppState->windows.generationManager);
 
+        if (!m_Ui.useWorkerThread) {
+            ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.2f, 1.0f),
+                               "Warning: inline generation is selected. New requests will run on the render thread and may pause the UI.");
+            ImGui::Separator();
+        } else if (!m_Worker->HasContext()) {
+            ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.2f, 1.0f),
+                               "Warning: the generation worker is unavailable. Generation is running inline on the render thread, so the UI may pause while it runs.");
+            ImGui::Separator();
+        }
+
         if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_GlobalOptions) {
             ShowSettingsGlobalOptions();
         } else {
@@ -409,6 +419,15 @@ namespace tf3d::generators
 
         ImGui::Checkbox("Use Seed Texture", &m_Ui.useSeedFromActiveMesh);
         ImGui::Checkbox("Auto Updation Paused", &m_Ui.updationPaused);
+
+        if (ImGui::Checkbox("Run Generation on Worker Thread", &m_Ui.useWorkerThread) &&
+            m_AppState->configManager != nullptr) {
+            m_AppState->configManager->SetBool("generation", "use_worker_thread", m_Ui.useWorkerThread);
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("When disabled, generation runs inline on the render thread and may pause the UI.");
+        }
+
         UpdateSeedTextureState(context);
 
         if (!m_Ui.useSeedFromActiveMesh || m_Field.seedTexture == nullptr ||
