@@ -10,6 +10,70 @@
 namespace tf3d::misc
 {
 
+    namespace
+    {
+
+        void DrawGenerationStatusOverlay(const generators::GenerationCanvasStatus &status,
+                                         const ImVec2 &imageMin,
+                                         const ImVec2 &imageMax)
+        {
+            if (!status.hasOutput && !status.isGenerating) {
+                return;
+            }
+
+            const bool isPreview     = status.hasOutput && !status.outputIsCurrent;
+            const ImU32 statusColor  = isPreview ? IM_COL32(255, 190, 92, 255) : IM_COL32(105, 210, 145, 255);
+            const ImU32 spinnerColor = isPreview ? statusColor : IM_COL32(105, 185, 255, 255);
+            constexpr float padding  = 7.0f;
+            constexpr float margin   = 12.0f;
+            constexpr float iconSize = 14.0f;
+            constexpr float spinner  = 12.0f;
+            constexpr float spacing  = 5.0f;
+            constexpr float height   = 30.0f;
+            const float iconWidth    = status.hasOutput ? iconSize : 0.0f;
+            const float spinnerWidth = status.isGenerating ? spinner + (status.hasOutput ? spacing : 0.0f) : 0.0f;
+            const float width        = padding * 2.0f + std::max(iconWidth + spinnerWidth,
+                                                          status.hasOutput ? iconSize : spinner);
+            const ImVec2 panelMin(imageMax.x - width - margin, imageMin.y + margin);
+            const ImVec2 panelMax(panelMin.x + width, panelMin.y + height);
+            ImDrawList *drawList = ImGui::GetWindowDrawList();
+            drawList->AddRectFilled(panelMin, panelMax, IM_COL32(20, 24, 31, 225), 6.0f);
+
+            float contentX      = panelMin.x + padding;
+            const float centerY = panelMin.y + height * 0.5f;
+            if (status.hasOutput) {
+                const ImVec2 center(contentX + iconSize * 0.5f, centerY);
+                if (isPreview) {
+                    drawList->AddLine(ImVec2(center.x - 6.0f, center.y), ImVec2(center.x, center.y - 4.0f),
+                                      statusColor, 1.8f);
+                    drawList->AddLine(ImVec2(center.x, center.y - 4.0f), ImVec2(center.x + 6.0f, center.y),
+                                      statusColor, 1.8f);
+                    drawList->AddLine(ImVec2(center.x + 6.0f, center.y), ImVec2(center.x, center.y + 4.0f),
+                                      statusColor, 1.8f);
+                    drawList->AddLine(ImVec2(center.x, center.y + 4.0f), ImVec2(center.x - 6.0f, center.y),
+                                      statusColor, 1.8f);
+                    drawList->AddCircleFilled(center, 1.8f, statusColor, 12);
+                } else {
+                    drawList->AddCircle(center, 6.0f, statusColor, 18, 1.6f);
+                    drawList->AddLine(ImVec2(center.x - 3.0f, center.y), ImVec2(center.x - 0.8f, center.y + 2.2f),
+                                      statusColor, 1.8f);
+                    drawList->AddLine(ImVec2(center.x - 0.8f, center.y + 2.2f),
+                                      ImVec2(center.x + 3.4f, center.y - 2.5f), statusColor, 1.8f);
+                }
+                contentX += iconSize + (status.isGenerating ? spacing : 0.0f);
+            }
+
+            if (status.isGenerating) {
+                const ImVec2 center(contentX + spinner * 0.5f, centerY);
+                const float angle = static_cast<float>(ImGui::GetTime() * 4.5);
+                drawList->PathClear();
+                drawList->PathArcTo(center, 4.5f, angle, angle + 4.5f, 18);
+                drawList->PathStroke(spinnerColor, false, 2.0f);
+            }
+        }
+
+    } // namespace
+
     ViewportManager::ViewportManager(ApplicationState *appState)
     {
         static uint32_t s_ViewportID = 1;
@@ -200,7 +264,13 @@ namespace tf3d::misc
         m_Height         = imageSize.y;
         m_RendererViewport->SetAspectRatio(m_Width / (m_Height + 0.000000001f));
         ImGui::Image((ImTextureID)(uint64_t)m_RendererViewport->GetFrameBuffer()->GetColorTexture(), imageSize, ImVec2(0, 1), ImVec2(1, 0));
-        m_IsActive = ImGui::IsItemHovered();
+        const ImVec2 imageMin = ImGui::GetItemRectMin();
+        const ImVec2 imageMax = ImGui::GetItemRectMax();
+        m_IsActive            = ImGui::IsItemHovered();
+        if (m_RendererViewport->GetMode() != renderer::RendererViewportMode::TextureSlot &&
+            m_AppState->generationManager != nullptr) {
+            DrawGenerationStatusOverlay(m_AppState->generationManager->GetCanvasStatus(), imageMin, imageMax);
+        }
         ImGui::EndChild();
         this->ShowSettingPopUp();
         ImGui::End();
