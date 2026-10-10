@@ -195,6 +195,14 @@ namespace tf3d::generators
         void CompleteActiveGeneration(uint64_t requestId);
         GenerationExecutionResult ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
                                                     uint64_t requestId);
+        bool ExecuteBiomeStage(const GenerationRequestSnapshot &snapshot,
+                               const GenerationContext &context,
+                               GenerationExecutionResult &result,
+                               bool &biomeWorkRequested,
+                               bool &biomeUpdateFailed) const;
+        void ExecuteHeightfieldStage(const GenerationRequestSnapshot &snapshot,
+                                     const GenerationContext &context,
+                                     GenerationExecutionResult &result);
         bool IsCurrentGeneration(const GenerationExecutionResult &result) const;
 
     private:

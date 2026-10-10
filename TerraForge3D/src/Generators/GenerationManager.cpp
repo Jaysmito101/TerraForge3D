@@ -197,94 +197,109 @@ namespace tf3d::generators
         m_Worker->WaitForIdle();
     }
 
+#define TF3D_RETURN_IF_GENERATION_STALE(context, result, ...)                                       \
+    do {                                                                                            \
+        const bool tf3d_generation_is_current = (context).IsCurrent();                              \
+        (result).superseded                   = (result).superseded || !tf3d_generation_is_current; \
+        if (!tf3d_generation_is_current) {                                                          \
+            return __VA_ARGS__;                                                                     \
+        }                                                                                           \
+    } while (false)
+
     GenerationExecutionResult GenerationManager::ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
                                                                    uint64_t requestId)
     {
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/execute", PerformanceMonitor::Domain::Generation);
         GenerationExecutionResult result{requestId, snapshot.dirtyState.revision, false};
         const auto &dirtyState = snapshot.dirtyState;
-        TF3D_PROFILE_SCOPE_DOMAIN("generation/execute", PerformanceMonitor::Domain::Generation);
 
-        const bool forceUpdate     = dirtyState.RequiresForce();
-        const bool updateAllBiomes = dirtyState.Has(GenerationDirtyScope::AllBiomes);
         const GenerationContext context{snapshot.seedTexture.get(), snapshot.tileResolution,
                                         snapshot.gpuWorkgroupSize, snapshot.tileSize,
                                         &m_DirtyManager, dirtyState.revision};
-        const auto isCurrent = [&result, &context] {
-            const bool current = context.IsCurrent();
-            result.superseded  = result.superseded || !current;
-            return current;
-        };
-        if (!isCurrent()) {
+
+        TF3D_RETURN_IF_GENERATION_STALE(context, result, result);
+        bool biomeWorkRequested = false, biomeUpdateFailed = false;
+        if (!ExecuteBiomeStage(snapshot, context, result, biomeWorkRequested, biomeUpdateFailed)) {
             return result;
         }
-        const size_t biomeCount = snapshot.biomes.size();
-        bool biomeWorkRequested = false;
-        bool biomeUpdateFailed  = false;
-        for (size_t biomeIndex = 0; biomeIndex < biomeCount; ++biomeIndex) {
-            if (!isCurrent()) {
-                return result;
-            }
-            const auto &biomeSnapshot = snapshot.biomes[biomeIndex];
-            const auto &biomeState    = biomeSnapshot.state;
-            if (biomeSnapshot.runtime.data != nullptr &&
-                (biomeState.updateRequired || updateAllBiomes || forceUpdate)) {
-                biomeWorkRequested = true;
-                if (!BiomeManager::Execute(&biomeSnapshot,
-                                           &context,
-                                           snapshot.swapBuffer.get()) &&
-                    biomeState.enabled) {
-                    biomeUpdateFailed = true;
-                }
-                if (!isCurrent()) {
-                    return result;
-                }
-            }
+
+        const bool forceUpdate              = dirtyState.RequiresForce();
+        const bool heightfieldWorkRequested = biomeWorkRequested ||
+                                              dirtyState.Has(GenerationDirtyScope::Mixer) || forceUpdate;
+
+        if (heightfieldWorkRequested && !biomeUpdateFailed) {
+            TF3D_RETURN_IF_GENERATION_STALE(context, result, result);
+            ExecuteHeightfieldStage(snapshot, context, result);
         }
-        if (biomeWorkRequested || dirtyState.Has(GenerationDirtyScope::Mixer) || forceUpdate) {
-            if (biomeUpdateFailed || !isCurrent()) {
-                return result;
-            }
-            bool producedOutput = false;
-            producedOutput      = BiomeMixer::Execute(&snapshot.mixer,
-                                                      &snapshot.mixerRuntime,
-                                                      &context,
-                                                      snapshot.biomes,
-                                                      snapshot.workingHeightmapData.get(),
-                                                      snapshot.swapBuffer.get());
-            if (!isCurrent()) {
-                return result;
-            }
-            if (producedOutput) {
-                producedOutput = snapshot.slopeGenerator != nullptr &&
-                                 snapshot.slopeGenerator->Compute(snapshot.workingHeightmapData.get(), &context);
-            }
-            if (!isCurrent()) {
-                return result;
-            }
-            if (producedOutput && snapshot.statistics != nullptr) {
-                TF3D_PROFILE_SCOPE_CHILD("statistics");
-                TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
-                snapshot.statistics->Compute(snapshot.workingHeightmapData.get(),
-                                             snapshot.tileResolution,
-                                             snapshot.statisticsSampleStride,
-                                             true,
-                                             -1.0f,
-                                             snapshot.gpuWorkgroupSize);
-                if (!isCurrent()) {
-                    return result;
-                }
-            }
-            if (!isCurrent()) {
-                return result;
-            }
-            if (producedOutput) {
-                GenerateHeightmapMipmaps(snapshot.workingHeightmapData.get());
-            }
-            result.producedOutput = producedOutput;
-            return result;
-        }
+
         return result;
     }
+
+    bool GenerationManager::ExecuteBiomeStage(const GenerationRequestSnapshot &snapshot,
+                                              const GenerationContext &context,
+                                              GenerationExecutionResult &result,
+                                              bool &biomeWorkRequested,
+                                              bool &biomeUpdateFailed) const
+    {
+        const auto &dirtyState     = snapshot.dirtyState;
+        const bool forceUpdate     = dirtyState.RequiresForce();
+        const bool updateAllBiomes = dirtyState.Has(GenerationDirtyScope::AllBiomes);
+
+        const size_t biomeCount = snapshot.biomes.size();
+        for (size_t biomeIndex = 0; biomeIndex < biomeCount; ++biomeIndex) {
+            TF3D_RETURN_IF_GENERATION_STALE(context, result, false);
+
+            const auto &biomeSnapshot = snapshot.biomes[biomeIndex];
+            const auto &biomeState    = biomeSnapshot.state;
+            if (biomeSnapshot.runtime.data == nullptr || (!biomeState.updateRequired && !updateAllBiomes && !forceUpdate)) {
+                continue;
+            }
+
+            biomeWorkRequested = true;
+            if (!BiomeManager::Execute(&biomeSnapshot, &context, snapshot.swapBuffer.get()) && biomeState.enabled) {
+                biomeUpdateFailed = true;
+            }
+        }
+        return true;
+    }
+
+    void GenerationManager::ExecuteHeightfieldStage(const GenerationRequestSnapshot &snapshot,
+                                                    const GenerationContext &context,
+                                                    GenerationExecutionResult &result)
+    {
+        bool producedOutput = BiomeMixer::Execute(&snapshot.mixer,
+                                                  &snapshot.mixerRuntime,
+                                                  &context,
+                                                  snapshot.biomes,
+                                                  snapshot.workingHeightmapData.get(),
+                                                  snapshot.swapBuffer.get());
+
+        TF3D_RETURN_IF_GENERATION_STALE(context, result);
+        if (producedOutput) {
+            producedOutput = snapshot.slopeGenerator != nullptr &&
+                             snapshot.slopeGenerator->Compute(snapshot.workingHeightmapData.get(), &context);
+        }
+        TF3D_RETURN_IF_GENERATION_STALE(context, result);
+
+        if (producedOutput && snapshot.statistics != nullptr) {
+            TF3D_PROFILE_SCOPE_CHILD("statistics");
+            TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
+            snapshot.statistics->Compute(snapshot.workingHeightmapData.get(),
+                                         snapshot.tileResolution,
+                                         snapshot.statisticsSampleStride,
+                                         true,
+                                         -1.0f,
+                                         snapshot.gpuWorkgroupSize);
+            TF3D_RETURN_IF_GENERATION_STALE(context, result);
+        }
+
+        TF3D_RETURN_IF_GENERATION_STALE(context, result);
+        if (producedOutput) {
+            GenerateHeightmapMipmaps(snapshot.workingHeightmapData.get());
+        }
+        result.producedOutput = producedOutput;
+    }
+
 
     bool GenerationManager::IsCurrentGeneration(const GenerationExecutionResult &result) const
     {
@@ -620,8 +635,9 @@ namespace tf3d::generators
 
     void GenerationManager::GenerateHeightmapMipmaps(GeneratorData *heightmap)
     {
-        if (heightmap == nullptr || heightmap->GetResolution() <= 0)
+        if (heightmap == nullptr || heightmap->GetResolution() <= 0) {
             return;
+        }
 
         TF3D_PROFILE_SCOPE_DOMAIN("generation/heightfield-mipmap", PerformanceMonitor::Domain::Generation);
         TF3D_PROFILE_GPU_SCOPE("generation/heightfield-mipmap/gpu");
