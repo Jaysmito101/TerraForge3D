@@ -388,6 +388,18 @@ namespace tf3d::inspector
         return value->get<std::string>();
     }
 
+    std::optional<bool> CustomInspector::GetSectionCustomDataBool(std::string_view sectionName,
+                                                                  std::string_view key) const
+    {
+        const auto section = m_SectionState.customData.find(std::string(sectionName));
+        if (section == m_SectionState.customData.end() || !section->second.is_object())
+            return std::nullopt;
+        const auto value = section->second.find(std::string(key));
+        if (value == section->second.end() || !value->is_boolean())
+            return std::nullopt;
+        return value->get<bool>();
+    }
+
     std::optional<int32_t> CustomInspector::GetSectionSelectionValue(std::string_view sectionName) const
     {
         const auto value = m_SectionState.selectionValues.find(std::string(sectionName));

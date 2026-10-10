@@ -112,6 +112,8 @@ namespace tf3d::inspector
                            std::string_view uniformPrefix = "u_") const;
         std::optional<std::string> GetSectionCustomDataString(std::string_view sectionName,
                                                               std::string_view key) const;
+        std::optional<bool> GetSectionCustomDataBool(std::string_view sectionName,
+                                                     std::string_view key) const;
         std::optional<int32_t> GetSectionSelectionValue(std::string_view sectionName) const;
         void ResetVisible();
         void ApplyToShader(tf3d::base::ShaderCore &shader, std::string_view uniformPrefix = "u_") const;
