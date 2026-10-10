@@ -63,11 +63,6 @@ namespace tf3d::generators
             m_LastRequestId  = requestId;
             m_RequestPending = true;
         }
-        if (TF3D_PROFILE_CAPTURE_ACTIVE()) {
-            const std::string requestKey = m_ProfilePrefix + "/request";
-            TF3D_PROFILE_FLOW_BEGIN_DOMAIN(requestKey, requestId, PerformanceMonitor::Domain::Generation);
-            TF3D_PROFILE_FLOW_STEP_DOMAIN(requestKey, requestId, "queued", PerformanceMonitor::Domain::Generation);
-        }
         m_Condition.notify_one();
         return {RequestStatus::Queued, requestId};
     }
@@ -118,18 +113,12 @@ namespace tf3d::generators
         }
         m_Condition.notify_all();
 
-        if (TF3D_PROFILE_CAPTURE_ACTIVE()) {
-            [[maybe_unused]] const uint64_t requestId = m_CompletedRequestId.load(std::memory_order_acquire);
-            const std::string workerKey               = m_ProfilePrefix + "/worker";
-            TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "gpu-complete", PerformanceMonitor::Domain::Worker);
-            TF3D_PROFILE_FLOW_END_DOMAIN(workerKey, requestId, PerformanceMonitor::Domain::Worker);
-        }
         return true;
     }
 
     void GenerationWorker::WaitForIdle()
     {
-        TF3D_PROFILE_BEGIN_LAZY_DOMAIN(waitScope, m_ProfilePrefix + "/queue-wait", PerformanceMonitor::Domain::Wait);
+        TF3D_PROFILE_SCOPE_LAZY_DOMAIN(m_ProfilePrefix + "/wait-for-idle", PerformanceMonitor::Domain::Wait);
         while (true) {
             PollCompletion();
             std::unique_lock lock(m_Mutex);
@@ -140,7 +129,6 @@ namespace tf3d::generators
                 break;
             m_Condition.wait_for(lock, std::chrono::milliseconds(1));
         }
-        waitScope.End();
     }
 
     bool GenerationWorker::ConsumeCompleted()
@@ -160,7 +148,6 @@ namespace tf3d::generators
             bool pollGpuQueries    = false;
             GLsync completionFence = nullptr;
             {
-                TF3D_PROFILE_BEGIN_LAZY_DOMAIN(queueWaitScope, m_ProfilePrefix + "/queue-wait", PerformanceMonitor::Domain::Wait);
                 std::unique_lock lock(m_Mutex);
                 m_Condition.wait(lock, [this] {
                     return m_StopRequested.load(std::memory_order_acquire) ||
@@ -189,20 +176,15 @@ namespace tf3d::generators
                     m_GpuPollRequested = false;
                     m_Running          = true;
                     pollGpuQueries     = true;
-                    queueWaitScope.End();
                 } else {
                     requestId        = m_LastRequestId.load(std::memory_order_acquire);
                     m_RequestPending = false;
                     m_Running        = true;
-                    queueWaitScope.End();
                 }
             }
 
             if (pollGpuQueries) {
-                {
-                    TF3D_PROFILE_SCOPE_DOMAIN(m_ProfilePrefix + "/worker/gpu-query-poll", PerformanceMonitor::Domain::Worker);
-                    TF3D_PROFILE_POLL_GPU();
-                }
+                TF3D_PROFILE_POLL_GPU();
                 {
                     std::lock_guard lock(m_Mutex);
                     m_Running = false;
@@ -212,15 +194,8 @@ namespace tf3d::generators
             }
 
             m_ActiveRequestId        = requestId;
-            const bool captureActive = TF3D_PROFILE_CAPTURE_ACTIVE();
-            if (captureActive) {
-                const std::string workerKey = m_ProfilePrefix + "/worker";
-                TF3D_PROFILE_FLOW_BEGIN_DOMAIN(workerKey, requestId, PerformanceMonitor::Domain::Worker);
-                TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "started", PerformanceMonitor::Domain::Worker);
-            }
             {
-                TF3D_PROFILE_BEGIN_LAZY_DOMAIN_FLOW(executeScope, m_ProfilePrefix + "/worker/execute",
-                                                    PerformanceMonitor::Domain::Worker, requestId);
+                TF3D_PROFILE_SCOPE_LAZY_DOMAIN(m_ProfilePrefix + "/execute", PerformanceMonitor::Domain::Worker);
                 try {
                     if (m_Callback)
                         m_Callback(requestId);
@@ -230,18 +205,9 @@ namespace tf3d::generators
                     TF3D_LOG_ERROR("{} callback failed with an unknown exception", m_Name);
                 }
             }
-            if (captureActive) {
-                const std::string workerKey = m_ProfilePrefix + "/worker";
-                TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "callback-complete", PerformanceMonitor::Domain::Worker);
-            }
 
             {
-                TF3D_PROFILE_BEGIN_LAZY_DOMAIN_FLOW(synchronizeScope, m_ProfilePrefix + "/worker/synchronize",
-                                                    PerformanceMonitor::Domain::Wait, requestId);
-                if (captureActive) {
-                    const std::string barrierKey = m_ProfilePrefix + "/barriers";
-                    TF3D_PROFILE_COUNTER_DOMAIN_FLOW(barrierKey, 1.0, PerformanceMonitor::Domain::Wait, requestId);
-                }
+                TF3D_PROFILE_SCOPE_LAZY_DOMAIN(m_ProfilePrefix + "/synchronize", PerformanceMonitor::Domain::Wait);
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
                 completionFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
                 if (completionFence != nullptr) {
@@ -259,19 +225,10 @@ namespace tf3d::generators
                     m_CompletionRequestId  = requestId;
                     m_GpuCompletionPending = true;
                 }
-                if (captureActive) {
-                    const std::string workerKey = m_ProfilePrefix + "/worker";
-                    TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "fence-queued", PerformanceMonitor::Domain::Worker);
-                }
                 continue;
             }
 
             TF3D_PROFILE_POLL_GPU();
-            if (captureActive) {
-                const std::string workerKey = m_ProfilePrefix + "/worker";
-                TF3D_PROFILE_FLOW_STEP_DOMAIN(workerKey, requestId, "gpu-complete", PerformanceMonitor::Domain::Worker);
-                TF3D_PROFILE_FLOW_END_DOMAIN(workerKey, requestId, PerformanceMonitor::Domain::Worker);
-            }
 
             {
                 std::lock_guard lock(m_Mutex);

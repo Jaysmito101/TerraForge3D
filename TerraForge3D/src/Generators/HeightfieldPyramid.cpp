@@ -98,7 +98,6 @@ namespace tf3d::generators
             glBindImageTexture(0, m_RendererID, level, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
             glDispatchCompute((outputWidth + WorkgroupSize - 1) / WorkgroupSize,
                               (outputHeight + WorkgroupSize - 1) / WorkgroupSize, 1);
-            TF3D_PROFILE_COUNTER_DOMAIN("gpu/dispatches", 1.0, PerformanceMonitor::Domain::Gpu);
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
             sourceWidth  = outputWidth;

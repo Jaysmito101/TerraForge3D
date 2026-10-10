@@ -1,7 +1,6 @@
 #include "Generators/BaseNoiseGenerator.h"
 
 #include "Data/ApplicationState.h"
-#include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 
 #include <algorithm>
@@ -139,8 +138,6 @@ namespace tf3d::generators
             return;
         }
 
-        TF3D_PROFILE_SCOPE_CHILD_LAZY("base-noise");
-
         bool useMask = state->value.useMask && m_MaskLayer != nullptr;
         if (useMask) {
             useMask = m_MaskLayer->Apply(state->value.mask, context, sourceBuffer) &&
@@ -172,9 +169,6 @@ namespace tf3d::generators
         }
         const int32_t workgroupSize = context->gpuWorkgroupSize > 0 ? context->gpuWorkgroupSize : 1;
         const auto dispatchSize     = (context->tileResolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
-        TF3D_PROFILE_VALUE_DOMAIN("generation/base-noise/dispatch", dispatchSize, dispatchSize, 1,
-                                  PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
 

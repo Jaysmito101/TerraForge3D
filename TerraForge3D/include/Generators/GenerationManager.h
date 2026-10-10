@@ -80,12 +80,8 @@ namespace tf3d::generators
     };
 
     struct GenerationRequestSnapshot {
-        uint64_t submittedFrame  = 0;
-        uint64_t terrainRevision = 0;
         int32_t tileResolution   = 0;
         float tileSize           = 1.0f;
-        uint32_t biomeCount      = 0;
-        uint32_t filterCount     = 0;
         GenerationDirtyState dirtyState;
         std::shared_ptr<GeneratorTexture> seedTexture;
         std::shared_ptr<GeneratorData> workingHeightmapData;

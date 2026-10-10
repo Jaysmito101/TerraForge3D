@@ -3,7 +3,6 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Inspector/CustomInspector.h"
-#include "Profiler.h"
 #include "Utils/Utils.h"
 
 #include <algorithm>
@@ -176,7 +175,6 @@ namespace tf3d::generators
                                     GeneratorData *input, GeneratorData *output, GeneratorData *reference)
     {
         const std::string phase = pass.value("Phase", "");
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter-phase/") + filter.GetName() + "/" + phase);
         auto *shader = filter.GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
@@ -191,7 +189,6 @@ namespace tf3d::generators
         const auto workgroupSize = std::max(context.gpuWorkgroupSize, 1);
         const auto resolution    = context.tileResolution;
         const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         shader->Dispatch(dispatchSize, dispatchSize, 1);
         shader->SetMemoryBarrier();
     }
@@ -203,7 +200,6 @@ namespace tf3d::generators
                                          GeneratorData *input, GeneratorData *operation, GeneratorData *output)
     {
         const std::string phase = merge.value("Phase", "");
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter-merge/") + filter.GetName() + "/" + phase);
         auto *shader = filter.GetPhaseShader(m_AppState, phase);
         if (shader == nullptr)
             return;
@@ -227,7 +223,6 @@ namespace tf3d::generators
         const auto workgroupSize = std::max(context.gpuWorkgroupSize, 1);
         const auto resolution    = context.tileResolution;
         const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
         shader->Dispatch(dispatchSize, dispatchSize, 1);
         shader->SetMemoryBarrier();
     }
@@ -650,9 +645,6 @@ namespace tf3d::generators
             if (filter == nullptr || !filterState.enabled) {
                 continue;
             }
-            TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("filter/") + filter->GetName());
-            TF3D_PROFILE_VALUE_DOMAIN("generation/filter/index", static_cast<uint64_t>(filterIndex), 0, 0,
-                                      PerformanceMonitor::Domain::Generation);
             filter->UpdateGeneratedMask(filterState, context, current);
             if (!context->IsCurrent()) {
                 return;
@@ -667,8 +659,6 @@ namespace tf3d::generators
         }
 
         if (applied && current != baseResult) {
-            TF3D_PROFILE_SCOPE_CHILD("filter/merge-copy");
-            TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
             glMemoryBarrier(GL_ALL_BARRIER_BITS);
             current->CopyTo(baseResult);
         }

@@ -1,7 +1,6 @@
 #include "Generators/BiomeCustomBaseShape.h"
 
 #include "Data/ApplicationState.h"
-#include "Profiler.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
@@ -206,8 +205,6 @@ namespace tf3d::generators
             return false;
         }
 
-        TF3D_PROFILE_SCOPE_CHILD("customize-base-shape");
-
         data->Bind(0);
         m_Shader->Bind();
         m_Shader->SetUniform1i("u_Resolution", context->tileResolution);
@@ -225,9 +222,6 @@ namespace tf3d::generators
         const auto workgroupSize = std::max(context->gpuWorkgroupSize, 1);
         const auto resolution    = context->tileResolution;
         const auto dispatchSize  = (resolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
-        TF3D_PROFILE_VALUE_DOMAIN("generation/customize-base-shape/dispatch", dispatchSize, dispatchSize, 1,
-                                  PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
         return true;

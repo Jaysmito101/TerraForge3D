@@ -1,7 +1,6 @@
 #include "Generators/BiomeBaseShapeGenerator.h"
 
 #include "Data/ApplicationState.h"
-#include "Profiler.h"
 #include "Utils/Utils.h"
 
 #include <string_view>
@@ -39,8 +38,6 @@ namespace tf3d::generators
             return;
         }
 
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(std::string("base-shape/") + m_Name);
-
         m_Shader->Bind();
         buffer->Bind(0);
         m_Inspector.ApplyToShader(state->value.values, *m_Shader);
@@ -52,9 +49,6 @@ namespace tf3d::generators
 
         const int32_t workgroupSize = context->gpuWorkgroupSize > 0 ? context->gpuWorkgroupSize : 1;
         const auto dispatchSize     = (context->tileResolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_GPU_SCOPE_CHILD("gpu");
-        TF3D_PROFILE_VALUE_DOMAIN("generation/base-shape/dispatch", dispatchSize, dispatchSize, 1,
-                                  PerformanceMonitor::Domain::Generation);
         m_Shader->Dispatch(dispatchSize, dispatchSize, 1);
         m_Shader->SetMemoryBarrier();
 

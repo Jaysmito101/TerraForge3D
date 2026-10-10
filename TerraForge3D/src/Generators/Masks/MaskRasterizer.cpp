@@ -3,7 +3,6 @@
 #include "Data/ApplicationState.h"
 #include "Data/ResourceManager.h"
 #include "Generators/Masks/BaseMaskGenerator.h"
-#include "Profiler.h"
 #include "Utils/Utils.h"
 
 #include <glm/common.hpp>
@@ -144,7 +143,6 @@ namespace tf3d::generators
                                 GeneratorTexture *baseTexture,
                                 bool rebuildBase)
     {
-        TF3D_PROFILE_SCOPE_DOMAIN("generation/mask/rasterize", PerformanceMonitor::Domain::Generation);
         if (destination == nullptr || context == nullptr || destination->GetWidth() <= 0) {
             return false;
         }

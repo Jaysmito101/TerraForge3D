@@ -3,7 +3,6 @@
 #include "Data/ApplicationState.h"
 #include "Generators/DEM/DEMRenderer.h"
 #include "Generators/DEM/DEMTileSource.h"
-#include "Profiler.h"
 #include "imgui/imgui_internal.h"
 
 #include <algorithm>
@@ -256,8 +255,6 @@ namespace tf3d::generators
             return;
         }
 
-        TF3D_PROFILE_SCOPE_CHILD("dem-base-shape");
-
         State settings          = state->value;
         settings.zoomOnMap      = std::clamp(settings.zoomOnMap, 1.0f, 4096.0f);
         settings.mapCenter.x    = std::clamp(settings.mapCenter.x, -4.0f, 4.0f);
@@ -340,11 +337,6 @@ namespace tf3d::generators
                                 viewBlockedCount};
         }
 
-        TF3D_PROFILE_VALUE_DOMAIN("generation/dem/visible-tiles",
-                                  static_cast<uint64_t>(m_VisibleTileCount),
-                                  static_cast<uint64_t>(m_TilesFallbackCount),
-                                  static_cast<uint64_t>(m_TilesUsingCount),
-                                  PerformanceMonitor::Domain::Generation);
         m_State.MarkProcessed(state->revision);
     }
 

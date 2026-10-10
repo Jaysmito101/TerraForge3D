@@ -245,11 +245,10 @@ namespace tf3d::generators
             return true;
         }
 
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/biome", PerformanceMonitor::Domain::Generation);
         auto *biomeData = runtime.data.get();
 
-        TF3D_PROFILE_SCOPE_CHILD_LAZY(runtime.name);
-        TF3D_PROFILE_VALUE_DOMAIN("generation/biome/enabled", state.enabled ? 1 : 0, 0, 0,
-                                  PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_GPU_SCOPE("generation/biome/gpu");
 
         if (state.baseShapeMode == BiomeBaseShapeGeneratorMode_Algorithm &&
             state.baseShapeGenerator >= 0 &&
@@ -386,23 +385,14 @@ namespace tf3d::generators
         if (ImGui::CollapsingHeader("Statistics")) {
             if (m_StatisticsDirty.load(std::memory_order_acquire) && m_Statistics != nullptr && m_Data != nullptr) {
                 TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics", PerformanceMonitor::Domain::Generation);
-                {
-                    TF3D_PROFILE_GPU_SCOPE("generation/biome/statistics/gpu");
-                    m_Statistics->Compute(m_Data.get(),
-                                          m_AppState->mainMap.tileResolution,
-                                          m_StatisticsSampleStride,
-                                          true,
-                                          -1.0f,
-                                          m_AppState->constants.gpuWorkgroupSize);
-                }
-                {
-                    TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics/finish", PerformanceMonitor::Domain::Wait);
-                    glFinish();
-                }
-                {
-                    TF3D_PROFILE_SCOPE_DOMAIN("generation/biome/statistics/readback", PerformanceMonitor::Domain::Wait);
-                    m_StatisticsResult = m_Statistics->Read();
-                }
+                m_Statistics->Compute(m_Data.get(),
+                                      m_AppState->mainMap.tileResolution,
+                                      m_StatisticsSampleStride,
+                                      true,
+                                      -1.0f,
+                                      m_AppState->constants.gpuWorkgroupSize);
+                glFinish();
+                m_StatisticsResult = m_Statistics->Read();
                 m_StatisticsDirty.store(false, std::memory_order_release);
             }
 

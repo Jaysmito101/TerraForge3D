@@ -41,22 +41,17 @@ namespace tf3d::generators
             return false;
         }
         const auto dispatchSize = (resolution + workgroupSize - 1) / workgroupSize;
-        TF3D_PROFILE_VALUE_DOMAIN("generation/mixer/dispatch", dispatchSize, dispatchSize,
-                                  static_cast<uint64_t>(biomes.size()), PerformanceMonitor::Domain::Generation);
 
         runtime->shader->Bind();
         swapBuffer->Bind(1);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
+        TF3D_PROFILE_GPU_SCOPE("generation/mixer/simple/gpu");
 
         // clear the buffer
         runtime->shader->SetUniform1i("u_Resolution", resolution);
         runtime->shader->SetUniform1i("u_Mode", 0);
-        {
-            const std::string gpuKey = "generation/mixer/simple/clear/gpu";
-            TF3D_PROFILE_GPU_SCOPE(gpuKey);
-            runtime->shader->Dispatch(dispatchSize, dispatchSize, 1);
-            runtime->shader->SetMemoryBarrier();
-        }
+        runtime->shader->Dispatch(dispatchSize, dispatchSize, 1);
+        runtime->shader->SetMemoryBarrier();
 
         // mix the biomes
         runtime->shader->SetUniform1i("u_Mode", 1);
@@ -87,13 +82,8 @@ namespace tf3d::generators
                 maskTexture->Bind(3);
                 runtime->shader->SetUniform1i("u_BiomeMask", 3);
             }
-            {
-                const std::string gpuKey = std::string("generation/mixer/simple/biome/") +
-                                           biomeRuntime.name + "/gpu";
-                TF3D_PROFILE_GPU_SCOPE(gpuKey);
-                runtime->shader->Dispatch(dispatchSize, dispatchSize, 1);
-                runtime->shader->SetMemoryBarrier();
-            }
+            runtime->shader->Dispatch(dispatchSize, dispatchSize, 1);
+            runtime->shader->SetMemoryBarrier();
         }
 
         swapBuffer->CopyTo(heightmapData);
