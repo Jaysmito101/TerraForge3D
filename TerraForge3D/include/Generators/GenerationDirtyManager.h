@@ -81,6 +81,11 @@ namespace tf3d::generators
             return m_PendingMask.load(std::memory_order_acquire) != 0;
         }
 
+        inline bool HasCause(GenerationDirtyCause cause) const
+        {
+            return (m_CauseMask.load(std::memory_order_acquire) & static_cast<uint32_t>(cause)) != 0;
+        }
+
         inline GenerationDirtyState Snapshot() const
         {
             std::lock_guard lock(m_DirtyMutex);
