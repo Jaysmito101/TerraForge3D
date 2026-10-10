@@ -26,6 +26,9 @@ namespace tf3d::generators
             m_Context.thread = std::thread(&GenerationWorker::Run, this);
         } else {
             TF3D_LOG_ERROR("Failed to create shared generation OpenGL context; generation will run on the render thread");
+            tf3d::utils::ShowMessageBox(
+                "The generation worker could not create a shared OpenGL context. Generation will run on the render thread and may temporarily block the UI (UI might feel laggy).",
+                "Warning");
         }
     }
 
