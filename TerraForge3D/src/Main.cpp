@@ -257,7 +257,7 @@ namespace tf3d
             appState->textureLoader     = std::make_unique<base::TextureLoader>();
             appState->resourceManager   = ResourceManager::GetInstance(appState);
             appState->dashboard         = new Dashboard(appState);
-            appState->generationManager = new GenerationManager(appState);
+            appState->generationManager = new generators::GenerationManager(appState);
             appState->supportersTribute = new misc::SupportersTribute();
             appState->rendererManager   = new renderer::RendererManager(appState);
             appState->mainMenu          = new ui::MainMenu(appState);
