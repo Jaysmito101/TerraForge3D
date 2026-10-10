@@ -18,16 +18,8 @@
 #include <string>
 #include <vector>
 
-namespace tf3d::base
-{
-    class ComputeShader;
-}
-using tf3d::base::ComputeShader;
-namespace tf3d::data
-{
-    class ApplicationState;
-}
-using tf3d::data::ApplicationState;
+TF3D_FWD_DEC_CLASS(ComputeShader, tf3d::base)
+TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
 
 namespace tf3d::generators
 {
@@ -48,6 +40,21 @@ namespace tf3d::generators
     };
 
     struct SelectedUINode {
+        SelectedUINode() = default;
+
+        explicit SelectedUINode(int biomeIndex,
+                                SelectedUINodeObjectType objectType,
+                                const char *nodeName)
+            : m_BiomeIndex(biomeIndex), m_FilterIndex(-1), m_ObjectName(objectType),
+              m_ID(MakeBiomeNodeID(biomeIndex, nodeName))
+        {
+        }
+
+        static std::string MakeBiomeNodeID(int biomeIndex, const char *nodeName)
+        {
+            return std::to_string(biomeIndex) + "_Biome" + nodeName;
+        }
+
         int m_BiomeIndex  = -1;
         int m_FilterIndex = -1;
         BiomeID m_BiomeID;
@@ -110,16 +117,6 @@ namespace tf3d::generators
         GenerationRequestSnapshot snapshot;
         GenerationExecutionResult result;
     };
-
-#define MakeUINodeID(index1, objectname) (std::to_string(index1) + std::string("_Biome") + std::string(#objectname))
-
-#define SetUINodeData(index, objectname)                                         \
-    {                                                                            \
-        m_Ui.selectedNode.m_BiomeIndex  = index;                                 \
-        m_Ui.selectedNode.m_FilterIndex = -1;                                    \
-        m_Ui.selectedNode.m_ID          = MakeUINodeID(index, objectname);       \
-        m_Ui.selectedNode.m_ObjectName  = SelectedUINodeObjectType_##objectname; \
-    }
 
     class GenerationManager
     {
@@ -188,6 +185,7 @@ namespace tf3d::generators
         void RequestGeneration();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
         void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
+        void ExecuteActiveGeneration(uint64_t requestId);
         GenerationExecutionResult ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
                                                     uint64_t requestId);
         bool IsCurrentGeneration(const GenerationExecutionResult &result) const;

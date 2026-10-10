@@ -29,8 +29,7 @@ namespace tf3d::generators
         slopeGenerator        = std::make_shared<SlopeGenerator>(appState, appState->mainMap.tileResolution);
         workingSlopeGenerator = std::make_shared<SlopeGenerator>(appState, appState->mainMap.tileResolution);
         biomeMixer            = std::make_shared<BiomeMixer>(appState);
-        biomeManagers.push_back(std::make_shared<BiomeManager>(appState, dirtyManager));
-        biomeManagers.back()->SetName("Default Global");
+        biomeManagers.push_back(std::make_shared<BiomeManager>(appState, dirtyManager, "Default Global"));
     }
 
     UiState::UiState()
@@ -41,36 +40,39 @@ namespace tf3d::generators
     GenerationManager::GenerationManager(ApplicationState *appState)
         : m_AppState(appState), m_DirtyManager(), m_Field(appState, &m_DirtyManager), m_Ui()
     {
-        // if (!BiomeManager::LoadBaseShapeGenerators(appState)) Log("Failed to load Base Shape Generators!");
-
         m_AppState->eventManager->Subscribe("TileResolutionChanged", BIND_EVENT_FN(OnTileResolutionChange));
         m_AppState->eventManager->Subscribe("ForceUpdate", BIND_EVENT_FN(OnForceUpdate));
 
-        m_Worker = std::make_unique<GenerationWorker>("Generation Worker", [this](uint64_t requestId) {
-            if (m_ActiveGeneration != nullptr) {
-                try {
-                    m_ActiveGeneration->result = ExecuteGeneration(m_ActiveGeneration->snapshot, requestId);
-                } catch (const std::exception &exception) {
-                    TF3D_LOG_ERROR("Generation request {} failed: {}", requestId, exception.what());
-                    m_ActiveGeneration->result = {
-                        requestId, m_ActiveGeneration->snapshot.dirtyState.revision, false};
-                } catch (...) {
-                    TF3D_LOG_ERROR("Generation request {} failed with an unknown exception", requestId);
-                    m_ActiveGeneration->result = {
-                        requestId, m_ActiveGeneration->snapshot.dirtyState.revision, false};
-                }
-            } else {
-                TF3D_LOG_ERROR("Generation worker completed request {} without an active job", requestId);
-            }
-        });
+        m_Worker = std::make_unique<GenerationWorker>(
+            "Generation Worker", [this](uint64_t requestId) { ExecuteActiveGeneration(requestId); });
+
         m_DirtyManager.MarkForce(GenerationDirtyCause::Force);
+    }
+
+    void GenerationManager::ExecuteActiveGeneration(uint64_t requestId)
+    {
+        if (m_ActiveGeneration != nullptr) {
+            try {
+                m_ActiveGeneration->result = ExecuteGeneration(m_ActiveGeneration->snapshot, requestId);
+            } catch (const std::exception &exception) {
+                TF3D_LOG_ERROR("Generation request {} failed: {}", requestId, exception.what());
+                m_ActiveGeneration->result = {
+                    requestId, m_ActiveGeneration->snapshot.dirtyState.revision, false};
+            } catch (...) {
+                TF3D_LOG_ERROR("Generation request {} failed with an unknown exception", requestId);
+                m_ActiveGeneration->result = {
+                    requestId, m_ActiveGeneration->snapshot.dirtyState.revision, false};
+            }
+        } else {
+            TF3D_LOG_ERROR("Generation worker completed request {} without an active job", requestId);
+        }
     }
 
     void GenerationManager::Update()
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/update", PerformanceMonitor::Domain::Generation);
         if (m_Worker->HasContext()) {
-            m_Worker->PollCompletion();
+            m_Worker->Poll();
             if (m_Worker->IsCompleted()) {
                 const uint64_t requestId  = m_Worker->GetCompletedRequestId();
                 const bool matchingResult = m_ActiveGeneration != nullptr &&
@@ -330,8 +332,9 @@ namespace tf3d::generators
         const bool biomesOpen = ImGui::TreeNodeEx("Biomes", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
         ImGui::SameLine();
         if (ImGui::Button("Add##BiomeAdd")) {
-            m_Field.biomeManagers.push_back(std::make_shared<BiomeManager>(m_AppState, &m_DirtyManager));
-            m_Field.biomeManagers.back()->SetName("Biome " + std::to_string(m_Field.biomeManagers.size()));
+            const std::string biomeName = "Biome " + std::to_string(m_Field.biomeManagers.size() + 1);
+            m_Field.biomeManagers.push_back(
+                std::make_shared<BiomeManager>(m_AppState, &m_DirtyManager, biomeName));
             m_DirtyManager.MarkMixer();
         }
         if (biomesOpen) {
@@ -349,7 +352,8 @@ namespace tf3d::generators
                     TF3D_LOG_DEBUG("Active biome managers: {}", m_Field.biomeManagers.size());
                     m_DirtyManager.MarkBiomes();
                     m_DirtyManager.MarkMixer();
-                    SetUINodeData(-1, None);
+                    m_Ui.selectedNode =
+                        SelectedUINode(-1, SelectedUINodeObjectType_None, "None");
                     deleteBiome = true;
                 }
                 if (deleteBiome) {
@@ -360,20 +364,31 @@ namespace tf3d::generators
                     break;
                 }
                 if (biomeOpen) {
-                    if (ImGui::Selectable("General", m_Ui.selectedNode.m_ID == MakeUINodeID(i, General))) {
-                        SetUINodeData(i, General);
+                    if (ImGui::Selectable(
+                            "General", m_Ui.selectedNode.m_ID == SelectedUINode::MakeBiomeNodeID(i, "General"))) {
+                        m_Ui.selectedNode =
+                            SelectedUINode(i, SelectedUINodeObjectType_General, "General");
                     }
-                    if (ImGui::Selectable("Mask", m_Ui.selectedNode.m_ID == MakeUINodeID(i, MaskTool))) {
-                        SetUINodeData(i, MaskTool);
+                    if (ImGui::Selectable(
+                            "Mask", m_Ui.selectedNode.m_ID == SelectedUINode::MakeBiomeNodeID(i, "MaskTool"))) {
+                        m_Ui.selectedNode =
+                            SelectedUINode(i, SelectedUINodeObjectType_MaskTool, "MaskTool");
                     }
-                    if (ImGui::Selectable("Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, BaseShape))) {
-                        SetUINodeData(i, BaseShape);
+                    if (ImGui::Selectable(
+                            "Base Shape", m_Ui.selectedNode.m_ID == SelectedUINode::MakeBiomeNodeID(i, "BaseShape"))) {
+                        m_Ui.selectedNode =
+                            SelectedUINode(i, SelectedUINodeObjectType_BaseShape, "BaseShape");
                     }
-                    if (ImGui::Selectable("Customize Base Shape", m_Ui.selectedNode.m_ID == MakeUINodeID(i, CustomizeBaseShape))) {
-                        SetUINodeData(i, CustomizeBaseShape);
+                    if (ImGui::Selectable("Customize Base Shape",
+                                          m_Ui.selectedNode.m_ID ==
+                                              SelectedUINode::MakeBiomeNodeID(i, "CustomizeBaseShape"))) {
+                        m_Ui.selectedNode = SelectedUINode(
+                            i, SelectedUINodeObjectType_CustomizeBaseShape, "CustomizeBaseShape");
                     }
-                    if (ImGui::Selectable("Base Noise", m_Ui.selectedNode.m_ID == MakeUINodeID(i, BaseNoise))) {
-                        SetUINodeData(i, BaseNoise);
+                    if (ImGui::Selectable(
+                            "Base Noise", m_Ui.selectedNode.m_ID == SelectedUINode::MakeBiomeNodeID(i, "BaseNoise"))) {
+                        m_Ui.selectedNode =
+                            SelectedUINode(i, SelectedUINodeObjectType_BaseNoise, "BaseNoise");
                     }
                     const bool filtersOpen = ImGui::TreeNodeEx("Filters", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
                     ImGui::SameLine();
@@ -455,7 +470,8 @@ namespace tf3d::generators
                                         if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_Filter &&
                                             m_Ui.selectedNode.m_BiomeIndex == i &&
                                             m_Ui.selectedNode.m_FilterIndex == filterIndex) {
-                                            SetUINodeData(i, General);
+                                            m_Ui.selectedNode =
+                                                SelectedUINode(i, SelectedUINodeObjectType_General, "General");
                                             m_Ui.selectedNode.m_BiomeID = biome->GetBiomeID();
                                         } else if (m_Ui.selectedNode.m_ObjectName == SelectedUINodeObjectType_Filter &&
                                                    m_Ui.selectedNode.m_BiomeIndex == i &&
