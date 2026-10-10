@@ -184,7 +184,6 @@ namespace tf3d::generators
         void SchedulePendingGeneration();
         void RequestGeneration();
         GenerationRequestSnapshot CaptureGenerationSnapshot();
-        void CaptureGenerationState(GenerationRequestSnapshot &snapshot) const;
         void ExecuteActiveGeneration(uint64_t requestId);
         GenerationExecutionResult ExecuteGeneration(const GenerationRequestSnapshot &snapshot,
                                                     uint64_t requestId);

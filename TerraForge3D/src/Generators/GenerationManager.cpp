@@ -138,12 +138,14 @@ namespace tf3d::generators
         if (m_ActiveGeneration != nullptr || !m_Worker->CanAcceptRequest()) {
             return;
         }
+
         auto activeGeneration      = std::make_unique<ActiveGeneration>();
         activeGeneration->snapshot = CaptureGenerationSnapshot();
         m_ActiveGeneration         = std::move(activeGeneration);
         const auto &snapshot       = m_ActiveGeneration->snapshot;
         const auto request         = m_Worker->Request();
         uint64_t requestId         = request.requestId;
+
         if (request.status == GenerationWorker::RequestStatus::Unavailable) {
             requestId         = NextUniqueId();
             const auto result = ExecuteGeneration(snapshot, requestId);
@@ -164,16 +166,10 @@ namespace tf3d::generators
 
     GenerationRequestSnapshot GenerationManager::CaptureGenerationSnapshot()
     {
-        GenerationRequestSnapshot snapshot;
-        snapshot.tileResolution = m_AppState->mainMap.tileResolution;
-        snapshot.tileSize       = m_AppState->mainMap.tileSize;
-        snapshot.dirtyState     = m_DirtyManager.Snapshot();
-        CaptureGenerationState(snapshot);
-        return snapshot;
-    }
-
-    void GenerationManager::CaptureGenerationState(GenerationRequestSnapshot &snapshot) const
-    {
+        GenerationRequestSnapshot snapshot{};
+        snapshot.tileResolution         = m_AppState->mainMap.tileResolution;
+        snapshot.tileSize               = m_AppState->mainMap.tileSize;
+        snapshot.dirtyState             = m_DirtyManager.Snapshot();
         snapshot.seedTexture            = m_Field.seedTexture;
         snapshot.workingHeightmapData   = m_Field.workingHeightmapData;
         snapshot.swapBuffer             = m_Field.swapBuffer;
@@ -195,6 +191,7 @@ namespace tf3d::generators
                 snapshot.biomes.emplace_back();
             }
         }
+        return snapshot;
     }
 
     void GenerationManager::WaitForGenerationWorker()
