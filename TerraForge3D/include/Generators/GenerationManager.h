@@ -78,7 +78,7 @@ namespace tf3d::generators
         std::vector<std::shared_ptr<BiomeManager>> biomeManagers;
         GeneratorDataStatisticsResult statisticsResult;
         std::atomic<uint64_t> terrainRevision = 0;
-        int statisticsSampleStride = 4;
+        int statisticsSampleStride            = 4;
     };
 
     struct UiState {

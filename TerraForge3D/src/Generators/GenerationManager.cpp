@@ -145,9 +145,7 @@ namespace tf3d::generators
 
         m_ActiveGeneration = std::make_unique<ActiveGeneration>(CaptureGenerationSnapshot());
 
-        const auto request         = m_Worker->Request();
-
-        switch (request.status) {
+        switch (m_Worker->Request().status) {
             case GenerationWorker::RequestStatus::Queued:
                 // GenerationWorker executes the callback on its thread; Update consumes the result after GPU completion.
                 return;
