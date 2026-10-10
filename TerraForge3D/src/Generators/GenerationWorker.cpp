@@ -63,9 +63,9 @@ namespace tf3d::generators
                 return {RequestStatus::Busy, 0};
             }
 
-            requestId                    = NextUniqueId();
-            m_Request.lastRequestId      = requestId;
-            m_Request.phase              = WorkerPhase::RequestQueued;
+            requestId               = NextUniqueId();
+            m_Request.lastRequestId = requestId;
+            m_Request.phase         = WorkerPhase::RequestQueued;
         }
         m_Condition.notify_one();
         return {RequestStatus::Queued, requestId};

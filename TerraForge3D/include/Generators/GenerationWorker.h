@@ -94,7 +94,6 @@ namespace tf3d::generators
             std::atomic<uint64_t> lastRequestId   = 0;
             std::atomic<uint64_t> activeRequestId = 0;
             uint64_t completedRequestId           = 0;
-
         };
 
         enum class WorkItemType {
