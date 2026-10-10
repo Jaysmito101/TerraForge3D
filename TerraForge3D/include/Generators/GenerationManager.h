@@ -195,12 +195,14 @@ namespace tf3d::generators
     private:
         ApplicationState *m_AppState = nullptr;
 
-        GenerationDirtyManager m_DirtyManager; 
+        GenerationDirtyManager m_DirtyManager;
         FieldState m_Field;
         UiState m_Ui;
+
         std::atomic<uint64_t> m_TerrainRevision        = 0;
         std::atomic_bool m_ResolutionGenerationPending = false;
-        uint64_t m_LastFailedGenerationRevision        = 0;
+
+        uint64_t m_LastFailedGenerationRevision = 0;
         std::unique_ptr<ActiveGeneration> m_ActiveGeneration;
         std::unique_ptr<GenerationWorker> m_Worker;
     };

@@ -57,7 +57,7 @@ namespace tf3d::generators::dem
         static std::shared_ptr<base::Texture2D> DecodeElevation(const std::string &path);
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
-        GenerationDirtyManager *m_DirtyManager = nullptr;
+        GenerationDirtyManager *m_DirtyManager   = nullptr;
         base::TextureLoader *m_TextureLoader     = nullptr;
         TileCache m_Cache;
         std::shared_ptr<base::Texture2D> m_LoadingTexture;

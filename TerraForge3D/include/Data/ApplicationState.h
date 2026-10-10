@@ -134,7 +134,7 @@ namespace tf3d::data
         renderer::RendererManager *rendererManager = nullptr;
         Dashboard *dashboard                       = nullptr;
         misc::ViewportManager *viewportManagers[MAX_VIEWPORT_COUNT];
-        misc::Style *styleManager                        = nullptr;
+        misc::Style *styleManager = nullptr;
 
         generators::GenerationManager *generationManager = nullptr;
 

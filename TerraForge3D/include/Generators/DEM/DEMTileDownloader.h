@@ -90,7 +90,7 @@ namespace tf3d::generators::dem
         bool IsCircuitOpen() const;
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
-        GenerationDirtyManager *m_DirtyManager = nullptr;
+        GenerationDirtyManager *m_DirtyManager   = nullptr;
         std::shared_ptr<SharedState> m_State;
         std::thread m_WorkerThread;
     };

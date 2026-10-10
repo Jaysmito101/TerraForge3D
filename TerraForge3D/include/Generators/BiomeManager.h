@@ -172,7 +172,7 @@ namespace tf3d::generators
         bool m_IsEnabled = true;
         ImVec4 m_Color;
         BiomeID m_BiomeID;
-        data::ApplicationState *m_AppState = nullptr;
+        data::ApplicationState *m_AppState     = nullptr;
         GenerationDirtyManager *m_DirtyManager = nullptr;
         std::shared_ptr<GeneratorData> m_Data;
         base::RevisionTracker m_UpdateTracker{1};
