@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Base/SyncFence.h"
-
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -40,7 +38,6 @@ namespace tf3d::generators
 
         RequestResult Request();
         bool CanAcceptRequest();
-        bool Poll();
         void WaitForIdle();
         std::optional<uint64_t> TryConsumeCompleted();
 
@@ -62,9 +59,7 @@ namespace tf3d::generators
         {
             const WorkerPhase phase = m_Request.phase.load(std::memory_order_acquire);
             return phase == WorkerPhase::ExecutingRequest ||
-                   phase == WorkerPhase::AwaitingGpuCompletion ||
-                   phase == WorkerPhase::ProfilerDrainQueued ||
-                   phase == WorkerPhase::DrainingGpuProfiler;
+                   phase == WorkerPhase::AwaitingGpuCompletion;
         }
         inline bool IsRequestPending() const
         {
@@ -77,8 +72,6 @@ namespace tf3d::generators
             RequestQueued,
             ExecutingRequest,
             AwaitingGpuCompletion,
-            ProfilerDrainQueued,
-            DrainingGpuProfiler,
             CompletionReady,
             StopRequested,
             Stopped
@@ -97,16 +90,15 @@ namespace tf3d::generators
 
         struct RequestState {
             std::atomic<WorkerPhase> phase{WorkerPhase::Idle};
-            std::optional<base::SyncFence> completionFence;
 
             std::atomic<uint64_t> lastRequestId   = 0;
             std::atomic<uint64_t> activeRequestId = 0;
             uint64_t completedRequestId           = 0;
+
         };
 
         enum class WorkItemType {
             Stop,
-            DrainGpuProfiler,
             GenerateRequest
         };
 
@@ -117,13 +109,12 @@ namespace tf3d::generators
 
         void Run();
         WorkItem WaitForWorkItem();
-        void HandleStop(std::unique_lock<std::mutex> &);
         void ExecuteRequest(uint64_t requestId);
 
         WorkerConfig m_Config;
         ThreadContext m_Context;
 
-        // m_Mutex protects request transitions, the completed request ID, and the completion fence.
+        // m_Mutex protects request transitions and the completed request ID
         std::mutex m_Mutex;
         std::condition_variable m_Condition;
 
