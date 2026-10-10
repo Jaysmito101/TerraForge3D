@@ -321,7 +321,6 @@ namespace tf3d::renderer
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-gi/poll", PerformanceMonitor::Domain::Renderer);
         if (m_Worker == nullptr)
             return;
-        m_Worker->Poll();
 
         WorkParameters completed;
         uint64_t requestId = 0;
@@ -337,6 +336,7 @@ namespace tf3d::renderer
             m_WorkComplete = false;
         }
 
+        glMemoryBarrier(GL_ALL_BARRIER_BITS);
         if (!m_Enabled || !InputsMatch(completed)) {
             TF3D_PROFILE_COUNTER_DOMAIN_FLOW("renderer/cache/heightfield-gi/stale-result", 1.0,
                                              PerformanceMonitor::Domain::Renderer, requestId);
