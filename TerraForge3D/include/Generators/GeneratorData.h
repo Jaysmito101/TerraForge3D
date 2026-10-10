@@ -21,6 +21,7 @@ namespace tf3d::generators
         ~GeneratorData();
         void Bind(uint32_t slot = 0);
         void BindAsTexture(uint32_t slot = 0);
+        void GenerateMipmaps();
         void Resize(size_t size);
         void SetData(const void *data, size_t offset = 0, size_t size = 0);
         bool CopyTo(const GeneratorData *other);

@@ -52,6 +52,31 @@ namespace tf3d::generators
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
     }
 
+    void GeneratorData::GenerateMipmaps()
+    {
+        if (m_Resolution <= 0) {
+            return;
+        }
+
+        TF3D_PROFILE_SCOPE_DOMAIN("generation/heightfield-mipmap", PerformanceMonitor::Domain::Generation);
+        TF3D_PROFILE_GPU_SCOPE("generation/heightfield-mipmap/gpu");
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT |
+                        GL_TEXTURE_FETCH_BARRIER_BIT);
+        BindAsTexture(0);
+
+        int32_t mipLevels = 1;
+        for (int32_t mipSize = m_Resolution; mipSize > 1; mipSize >>= 1) {
+            ++mipLevels;
+        }
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     void GeneratorData::Resize(size_t size)
     {
         if (size == 0)
