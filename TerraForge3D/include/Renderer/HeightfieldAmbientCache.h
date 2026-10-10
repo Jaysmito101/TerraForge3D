@@ -57,7 +57,7 @@ namespace tf3d::renderer
 
         ApplicationState *m_AppState = nullptr;
         std::optional<ComputeShader> m_GenerateShader;
-        std::unique_ptr<GenerationWorker> m_Worker;
+        std::unique_ptr<generators::GenerationWorker> m_Worker;
         uint32_t m_RendererID        = 0;
         uint32_t m_WorkingRendererID = 0;
         int32_t m_Resolution         = 0;
