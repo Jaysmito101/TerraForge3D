@@ -84,14 +84,24 @@ namespace tf3d::generators
             return;
         }
 
-        if (result.producedOutput && IsCurrentGeneration(result)) {
-            CommitHeightfield(m_ActiveGeneration->snapshot);
+        const auto dirtyState          = m_DirtyManager.Snapshot();
+        const uint64_t currentRevision = dirtyState.revision;
+        const bool currentOutput = result.producedOutput && result.inputRevision != 0 && m_AppState != nullptr &&
+                                   currentRevision == result.inputRevision;
+        const bool previewOutput = result.producedOutput && !result.superseded && !currentOutput &&
+                                   m_ActiveGeneration->usedWorkerThread && !m_Ui.updationPaused &&
+                                   currentRevision > result.inputRevision &&
+                                   dirtyState.causeMask == static_cast<uint32_t>(GenerationDirtyCause::UiEdit) &&
+                                   m_AppState != nullptr &&
+                                   m_ActiveGeneration->snapshot.tileResolution == m_AppState->mainMap.tileResolution;
+        if (currentOutput || previewOutput) {
+            CommitHeightfield(m_ActiveGeneration->snapshot, currentOutput);
         }
 
         if (!result.producedOutput && !result.superseded) {
-            const auto dirtyState = m_DirtyManager.Snapshot();
-            if (dirtyState.revision == result.inputRevision) {
-                m_LastFailedGenerationRevision = dirtyState.revision;
+            const auto failedState = m_DirtyManager.Snapshot();
+            if (failedState.revision == result.inputRevision) {
+                m_LastFailedGenerationRevision = failedState.revision;
             }
         }
         m_ActiveGeneration.reset();
@@ -101,8 +111,8 @@ namespace tf3d::generators
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/update", PerformanceMonitor::Domain::Generation);
         if (m_Worker->HasContext()) {
-            m_Worker->Poll();
             if (const auto completedRequestId = m_Worker->TryConsumeCompleted()) {
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
                 CompleteActiveGeneration(*completedRequestId);
             }
         }
@@ -143,20 +153,25 @@ namespace tf3d::generators
             return;
         }
 
-        m_ActiveGeneration = std::make_unique<ActiveGeneration>(CaptureGenerationSnapshot());
+        auto snapshot                        = CaptureGenerationSnapshot();
+        m_ActiveGeneration                   = std::make_unique<ActiveGeneration>(std::move(snapshot));
+        m_ActiveGeneration->usedWorkerThread = m_Ui.useWorkerThread && m_Worker->HasContext();
         if (!m_Ui.useWorkerThread) {
             ExecuteGenerationOnRenderThread();
             return;
         }
 
-        switch (m_Worker->Request().status) {
+        const auto workerRequest = m_Worker->Request();
+        switch (workerRequest.status) {
             case GenerationWorker::RequestStatus::Queued:
                 // generation worker executes the callback on its thread
                 return;
             case GenerationWorker::RequestStatus::Busy:
+                TF3D_LOG_WARN("Generation request was rejected because the worker is busy");
                 m_ActiveGeneration.reset();
                 return;
             case GenerationWorker::RequestStatus::Unavailable: {
+                m_ActiveGeneration->usedWorkerThread = false;
                 ExecuteGenerationOnRenderThread();
                 return;
             }
@@ -308,10 +323,13 @@ namespace tf3d::generators
         result.producedOutput = producedOutput;
     }
 
-    bool GenerationManager::CommitHeightfield(const GenerationRequestSnapshot &snapshot)
+    bool GenerationManager::CommitHeightfield(const GenerationRequestSnapshot &snapshot, bool consumeDirtyRevision)
     {
         TF3D_PROFILE_SCOPE_DOMAIN("generation/commit", PerformanceMonitor::Domain::Generation);
-        if (!m_DirtyManager.ConsumeIfRevision(snapshot.dirtyState.revision)) {
+        if (m_AppState == nullptr || snapshot.tileResolution != m_AppState->mainMap.tileResolution) {
+            return false;
+        }
+        if (consumeDirtyRevision && !m_DirtyManager.ConsumeIfRevision(snapshot.dirtyState.revision)) {
             return false;
         }
 
@@ -333,16 +351,6 @@ namespace tf3d::generators
             }
         }
         return true;
-    }
-
-    bool GenerationManager::IsCurrentGeneration(const GenerationExecutionResult &result) const
-    {
-        if (!result.producedOutput || result.inputRevision == 0 || m_AppState == nullptr) {
-            return false;
-        }
-
-        const auto dirtyState = m_DirtyManager.Snapshot();
-        return dirtyState.revision == result.inputRevision;
     }
 
     bool GenerationManager::OnTileResolutionChange(const std::string, void *)

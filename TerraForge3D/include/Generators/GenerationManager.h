@@ -124,6 +124,7 @@ namespace tf3d::generators
 
         GenerationRequestSnapshot snapshot;
         GenerationExecutionResult result;
+        bool usedWorkerThread                           = false;
     };
 
     class GenerationManager
@@ -187,7 +188,7 @@ namespace tf3d::generators
         void ShowSettingsDetailed();
         void ShowSettingsGlobalOptions();
         void ShowFieldStatistics();
-        bool CommitHeightfield(const GenerationRequestSnapshot &snapshot);
+        bool CommitHeightfield(const GenerationRequestSnapshot &snapshot, bool consumeDirtyRevision);
         void SchedulePendingGeneration();
         void RequestGeneration();
         void ExecuteGenerationOnRenderThread();
@@ -204,7 +205,6 @@ namespace tf3d::generators
         void ExecuteHeightfieldStage(const GenerationRequestSnapshot &snapshot,
                                      const GenerationContext &context,
                                      GenerationExecutionResult &result);
-        bool IsCurrentGeneration(const GenerationExecutionResult &result) const;
 
     private:
         ApplicationState *m_AppState = nullptr;
