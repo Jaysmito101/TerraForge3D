@@ -127,24 +127,26 @@ namespace tf3d::generators
         }
     }
 
-    bool GenerationWorker::ConsumeCompleted()
+    std::optional<uint64_t> GenerationWorker::TryConsumeCompleted()
     {
-        bool consumed = false;
+        std::optional<uint64_t> completedRequestId;
         {
             std::lock_guard lock(m_Mutex);
             if (m_Request.phase.load(std::memory_order_acquire) == WorkerPhase::CompletionReady) {
                 if (m_Request.completionFence.has_value() && glfwGetCurrentContext() == nullptr) {
-                    return false;
+                    return std::nullopt;
                 }
+                completedRequestId              = m_Request.completedRequestId;
+                m_Request.completedRequestId    = 0;
                 m_Request.completionFence.reset();
                 m_Request.phase = WorkerPhase::Idle;
-                consumed        = true;
             }
         }
-        if (consumed) {
-            m_Condition.notify_all();
+        if (!completedRequestId) {
+            return std::nullopt;
         }
-        return consumed;
+        m_Condition.notify_all();
+        return completedRequestId;
     }
 
     void GenerationWorker::Run()

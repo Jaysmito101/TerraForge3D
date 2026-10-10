@@ -42,7 +42,7 @@ namespace tf3d::generators
         bool CanAcceptRequest();
         bool Poll();
         void WaitForIdle();
-        bool ConsumeCompleted();
+        std::optional<uint64_t> TryConsumeCompleted();
 
         inline uint64_t GetLastRequestId() const
         {
@@ -52,11 +52,6 @@ namespace tf3d::generators
         inline uint64_t GetActiveRequestId() const
         {
             return m_Request.activeRequestId.load(std::memory_order_acquire);
-        }
-
-        inline uint64_t GetCompletedRequestId() const
-        {
-            return m_Request.completedRequestId.load(std::memory_order_acquire);
         }
 
         inline bool HasContext() const
@@ -75,11 +70,6 @@ namespace tf3d::generators
         {
             return m_Request.phase.load(std::memory_order_acquire) == WorkerPhase::RequestQueued;
         }
-        inline bool IsCompleted() const
-        {
-            return m_Request.phase.load(std::memory_order_acquire) == WorkerPhase::CompletionReady;
-        }
-
     private:
         enum class WorkerPhase {
             Idle,
@@ -110,7 +100,7 @@ namespace tf3d::generators
 
             std::atomic<uint64_t> lastRequestId      = 0;
             std::atomic<uint64_t> activeRequestId    = 0;
-            std::atomic<uint64_t> completedRequestId = 0;
+            uint64_t completedRequestId = 0;
         };
 
         enum class WorkItemType {
@@ -132,7 +122,7 @@ namespace tf3d::generators
         WorkerConfig m_Config;
         ThreadContext m_Context;
 
-        // m_Mutex protects request transitions and RequestState::completionFence.
+        // m_Mutex protects request transitions, the completed request ID, and the completion fence.
         std::mutex m_Mutex;
         std::condition_variable m_Condition;
 

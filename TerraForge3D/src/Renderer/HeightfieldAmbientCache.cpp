@@ -181,21 +181,24 @@ namespace tf3d::renderer
     void HeightfieldAmbientCache::PollWorkerCompletion()
     {
         TF3D_PROFILE_SCOPE_DOMAIN("renderer/cache/heightfield-ambient/poll", PerformanceMonitor::Domain::Renderer);
-        if (m_Worker != nullptr)
-            m_Worker->Poll();
-        if (m_Worker == nullptr || m_Worker->IsRunning() || m_Worker->IsRequestPending())
+        if (m_Worker == nullptr)
             return;
+        m_Worker->Poll();
 
         WorkParameters completed;
+        uint64_t requestId = 0;
         {
             std::lock_guard lock(m_WorkMutex);
             if (!m_WorkComplete)
                 return;
+            const auto completedRequestId = m_Worker->TryConsumeCompleted();
+            if (!completedRequestId) {
+                return;
+            }
+            requestId      = *completedRequestId;
             completed      = m_CompletedWork;
             m_WorkComplete = false;
         }
-        const uint64_t requestId = m_Worker->GetCompletedRequestId();
-        m_Worker->ConsumeCompleted();
         std::swap(m_RendererID, m_WorkingRendererID);
         m_TerrainRevision  = completed.terrainRevision;
         m_TerrainWorldSize = completed.terrainWorldSize;
