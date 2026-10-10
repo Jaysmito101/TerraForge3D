@@ -73,27 +73,34 @@ namespace tf3d::generators
         TF3D_PROFILE_SCOPE_DOMAIN("generation/update", PerformanceMonitor::Domain::Generation);
         if (m_Worker->HasContext()) {
             m_Worker->Poll();
-            if (m_Worker->IsCompleted()) {
-                const uint64_t requestId  = m_Worker->GetCompletedRequestId();
-                const bool matchingResult = m_ActiveGeneration != nullptr &&
-                                            m_ActiveGeneration->result.requestId == requestId;
-                const bool current = matchingResult &&
-                                     m_ActiveGeneration->result.producedOutput &&
-                                     IsCurrentGeneration(m_ActiveGeneration->result);
-                if (current) {
-                    CommitHeightfield(m_ActiveGeneration->snapshot);
-                }
-                if (matchingResult && !m_ActiveGeneration->result.producedOutput &&
-                    !m_ActiveGeneration->result.superseded) {
-                    const auto dirtyState = m_DirtyManager.Snapshot();
-                    if (dirtyState.revision == m_ActiveGeneration->result.inputRevision) {
-                        m_LastFailedGenerationRevision = dirtyState.revision;
+            if (const auto completedRequestId = m_Worker->TryConsumeCompleted()) {
+                const uint64_t requestId = *completedRequestId;
+                if (m_ActiveGeneration == nullptr) {
+                    TF3D_LOG_ERROR(
+                        "Generation worker completed request {}, but GenerationManager has no active generation",
+                        requestId);
+                } else if (m_ActiveGeneration->result.requestId != requestId) {
+                    TF3D_LOG_ERROR(
+                        "Generation worker completed request {}, but the active generation has a result for request {}",
+                        requestId, m_ActiveGeneration->result.requestId);
+                    m_ActiveGeneration.reset();
+                } else {
+                    const auto &result = m_ActiveGeneration->result;
+                    const bool current = result.producedOutput && IsCurrentGeneration(result);
+                    if (current) {
+                        CommitHeightfield(m_ActiveGeneration->snapshot);
                     }
+                    if (!result.producedOutput && !result.superseded) {
+                        const auto dirtyState = m_DirtyManager.Snapshot();
+                        if (dirtyState.revision == result.inputRevision) {
+                            m_LastFailedGenerationRevision = dirtyState.revision;
+                        }
+                    }
+                    m_ActiveGeneration.reset();
                 }
-                m_ActiveGeneration.reset();
-                m_Worker->ConsumeCompleted();
             }
         }
+        SchedulePendingGeneration();
     }
 
     void GenerationManager::SchedulePendingGeneration()
@@ -658,7 +665,7 @@ namespace tf3d::generators
         TF3D_PROFILE_SCOPE_DOMAIN("generation/resize", PerformanceMonitor::Domain::Generation);
         WaitForGenerationWorker();
         m_ActiveGeneration.reset();
-        m_Worker->ConsumeCompleted();
+        m_Worker->TryConsumeCompleted();
         auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);
         m_Field.heightmapData->Resize(size);
         m_Field.workingHeightmapData->Resize(size);
