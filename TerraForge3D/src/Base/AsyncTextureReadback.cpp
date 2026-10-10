@@ -94,7 +94,6 @@ namespace tf3d::base
 
         if (!slot.fence.has_value() || !*slot.fence) {
             slot.fence.reset();
-            glFinish();
             return false;
         }
 
