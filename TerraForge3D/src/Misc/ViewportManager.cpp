@@ -5,6 +5,7 @@
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
+#include <cmath>
 #include <string>
 
 namespace tf3d::misc
@@ -12,6 +13,11 @@ namespace tf3d::misc
 
     namespace
     {
+
+        ImVec2 IconPoint(const ImVec2 &center, float scale, float x, float y)
+        {
+            return ImVec2(center.x + (x - 12.0f) * scale, center.y + (y - 12.0f) * scale);
+        }
 
         void DrawGenerationStatusOverlay(const generators::GenerationCanvasStatus &status,
                                          const ImVec2 &imageMin,
@@ -21,54 +27,73 @@ namespace tf3d::misc
                 return;
             }
 
-            const bool isPreview     = status.hasOutput && !status.outputIsCurrent;
-            const ImU32 statusColor  = isPreview ? IM_COL32(255, 190, 92, 255) : IM_COL32(105, 210, 145, 255);
-            const ImU32 spinnerColor = isPreview ? statusColor : IM_COL32(105, 185, 255, 255);
-            constexpr float padding  = 7.0f;
-            constexpr float margin   = 12.0f;
-            constexpr float iconSize = 14.0f;
-            constexpr float spinner  = 12.0f;
-            constexpr float spacing  = 5.0f;
-            constexpr float height   = 30.0f;
-            const float iconWidth    = status.hasOutput ? iconSize : 0.0f;
-            const float spinnerWidth = status.isGenerating ? spinner + (status.hasOutput ? spacing : 0.0f) : 0.0f;
-            const float width        = padding * 2.0f + std::max(iconWidth + spinnerWidth,
-                                                          status.hasOutput ? iconSize : spinner);
-            const ImVec2 panelMin(imageMax.x - width - margin, imageMin.y + margin);
-            const ImVec2 panelMax(panelMin.x + width, panelMin.y + height);
+            const bool isPreview        = status.hasOutput && !status.outputIsCurrent;
+            const char *label           = !status.hasOutput     ? "BUILDING"
+                                          : isPreview           ? "PREVIEW"
+                                          : status.isGenerating ? "UPDATING"
+                                                                : "CURRENT";
+            const ImU32 statusColor     = isPreview ? IM_COL32(248, 184, 95, 255) : IM_COL32(130, 220, 170, 255);
+            const ImU32 spinnerColor    = isPreview ? statusColor : IM_COL32(130, 190, 255, 255);
+            constexpr float panelWidth  = 108.0f;
+            constexpr float panelHeight = 32.0f;
+            constexpr float margin      = 12.0f;
+            constexpr float iconScale   = 0.75f;
+            constexpr float lineWidth   = 2.0f * iconScale;
+            constexpr float fontSize    = 13.5f;
+            const ImVec2 panelMin(imageMax.x - panelWidth - margin, imageMin.y + margin);
+            const ImVec2 panelMax(panelMin.x + panelWidth, panelMin.y + panelHeight);
             ImDrawList *drawList = ImGui::GetWindowDrawList();
-            drawList->AddRectFilled(panelMin, panelMax, IM_COL32(20, 24, 31, 225), 6.0f);
+            drawList->AddRectFilled(panelMin, panelMax, IM_COL32(18, 22, 30, 230), 7.0f);
+            drawList->AddRect(panelMin, panelMax, IM_COL32(255, 255, 255, 24), 7.0f, ImDrawFlags_None, 1.0f);
 
-            float contentX      = panelMin.x + padding;
-            const float centerY = panelMin.y + height * 0.5f;
-            if (status.hasOutput) {
-                const ImVec2 center(contentX + iconSize * 0.5f, centerY);
-                if (isPreview) {
-                    drawList->AddLine(ImVec2(center.x - 6.0f, center.y), ImVec2(center.x, center.y - 4.0f),
-                                      statusColor, 1.8f);
-                    drawList->AddLine(ImVec2(center.x, center.y - 4.0f), ImVec2(center.x + 6.0f, center.y),
-                                      statusColor, 1.8f);
-                    drawList->AddLine(ImVec2(center.x + 6.0f, center.y), ImVec2(center.x, center.y + 4.0f),
-                                      statusColor, 1.8f);
-                    drawList->AddLine(ImVec2(center.x, center.y + 4.0f), ImVec2(center.x - 6.0f, center.y),
-                                      statusColor, 1.8f);
-                    drawList->AddCircleFilled(center, 1.8f, statusColor, 12);
-                } else {
-                    drawList->AddCircle(center, 6.0f, statusColor, 18, 1.6f);
-                    drawList->AddLine(ImVec2(center.x - 3.0f, center.y), ImVec2(center.x - 0.8f, center.y + 2.2f),
-                                      statusColor, 1.8f);
-                    drawList->AddLine(ImVec2(center.x - 0.8f, center.y + 2.2f),
-                                      ImVec2(center.x + 3.4f, center.y - 2.5f), statusColor, 1.8f);
-                }
-                contentX += iconSize + (status.isGenerating ? spacing : 0.0f);
+            // Match the 24-unit, 2px line proportions used by Lucide's eye, circle-check, and loader-circle icons.
+            const ImVec2 iconCenter(panelMin.x + 16.0f, panelMin.y + panelHeight * 0.5f);
+            if (!status.hasOutput) {
+                drawList->PathClear();
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 8.0f, 3.0f));
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 12.0f, 11.0f));
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 17.0f, 6.0f));
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 24.0f, 20.0f));
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 0.0f, 20.0f));
+                drawList->PathStroke(spinnerColor, ImDrawFlags_Closed, lineWidth);
+            } else if (isPreview) {
+                drawList->PathClear();
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 2.0f, 12.0f));
+                drawList->PathBezierCubicCurveTo(IconPoint(iconCenter, iconScale, 5.5f, 4.5f),
+                                                 IconPoint(iconCenter, iconScale, 18.5f, 4.5f),
+                                                 IconPoint(iconCenter, iconScale, 22.0f, 12.0f), 16);
+                drawList->PathBezierCubicCurveTo(IconPoint(iconCenter, iconScale, 18.5f, 19.5f),
+                                                 IconPoint(iconCenter, iconScale, 5.5f, 19.5f),
+                                                 IconPoint(iconCenter, iconScale, 2.0f, 12.0f), 16);
+                drawList->PathStroke(statusColor, ImDrawFlags_Closed, lineWidth);
+                drawList->AddCircle(IconPoint(iconCenter, iconScale, 12.0f, 12.0f), 3.0f * iconScale,
+                                    statusColor, 20, lineWidth);
+            } else {
+                drawList->AddCircle(iconCenter, 10.0f * iconScale, statusColor, 32, lineWidth);
+                drawList->PathClear();
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 9.0f, 12.0f));
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 11.0f, 14.0f));
+                drawList->PathLineTo(IconPoint(iconCenter, iconScale, 15.0f, 10.0f));
+                drawList->PathStroke(statusColor, ImDrawFlags_None, lineWidth);
             }
 
+            drawList->AddText(ImGui::GetFont(), fontSize,
+                              ImVec2(panelMin.x + 31.0f, panelMin.y + (panelHeight - fontSize) * 0.5f),
+                              IM_COL32(235, 239, 246, 255), label);
+
             if (status.isGenerating) {
-                const ImVec2 center(contentX + spinner * 0.5f, centerY);
-                const float angle = static_cast<float>(ImGui::GetTime() * 4.5);
+                const ImVec2 spinnerCenter(panelMax.x - 14.0f, panelMin.y + panelHeight * 0.5f);
+                const float angle  = static_cast<float>(ImGui::GetTime() * 4.5);
+                const float radius = 9.0f * iconScale;
                 drawList->PathClear();
-                drawList->PathArcTo(center, 4.5f, angle, angle + 4.5f, 18);
-                drawList->PathStroke(spinnerColor, false, 2.0f);
+                drawList->PathArcTo(spinnerCenter, radius, angle, angle + 5.0f, 36);
+                drawList->PathStroke(spinnerColor, ImDrawFlags_None, lineWidth);
+                drawList->AddCircleFilled(ImVec2(spinnerCenter.x + std::cos(angle) * radius,
+                                                 spinnerCenter.y + std::sin(angle) * radius),
+                                          lineWidth * 0.5f, spinnerColor, 8);
+                drawList->AddCircleFilled(ImVec2(spinnerCenter.x + std::cos(angle + 5.0f) * radius,
+                                                 spinnerCenter.y + std::sin(angle + 5.0f) * radius),
+                                          lineWidth * 0.5f, spinnerColor, 8);
             }
         }
 
