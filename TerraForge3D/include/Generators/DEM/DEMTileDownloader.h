@@ -2,6 +2,7 @@
 
 #include "Base/Base.h"
 #include "Generators/DEM/DEMTileTypes.h"
+#include "Generators/GenerationDirtyManager.h"
 
 #include <chrono>
 #include <condition_variable>
@@ -39,6 +40,7 @@ namespace tf3d::generators::dem
         static constexpr int32_t kCircuitOpenSeconds          = 30;
 
         TileDownloader(tf3d::data::ApplicationState *appState,
+                       GenerationDirtyManager *dirtyManager,
                        std::string elevationCacheFileFormat,
                        std::string satelliteCacheFileFormat);
         ~TileDownloader();
@@ -88,6 +90,7 @@ namespace tf3d::generators::dem
         bool IsCircuitOpen() const;
 
         tf3d::data::ApplicationState *m_AppState = nullptr;
+        GenerationDirtyManager *m_DirtyManager = nullptr;
         std::shared_ptr<SharedState> m_State;
         std::thread m_WorkerThread;
     };

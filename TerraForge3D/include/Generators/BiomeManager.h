@@ -10,6 +10,7 @@
 #include "Generators/GeneratorData.h"
 #include "Generators/GeneratorDataStatistics.h"
 #include "Generators/GeneratorTexture.h"
+#include "Generators/GenerationDirtyManager.h"
 #include "Generators/GenerationContext.h"
 #include "Generators/Masks/MaskLayer.h"
 
@@ -103,7 +104,7 @@ namespace tf3d::generators
             Runtime runtime;
         };
 
-        BiomeManager(data::ApplicationState *appState);
+        BiomeManager(data::ApplicationState *appState, GenerationDirtyManager *dirtyManager);
         ~BiomeManager();
 
         void Resize();
@@ -172,6 +173,7 @@ namespace tf3d::generators
         ImVec4 m_Color;
         BiomeID m_BiomeID;
         data::ApplicationState *m_AppState = nullptr;
+        GenerationDirtyManager *m_DirtyManager = nullptr;
         std::shared_ptr<GeneratorData> m_Data;
         base::RevisionTracker m_UpdateTracker{1};
         std::atomic<int32_t> m_SelectedBaseShapeGenerator                         = 0;

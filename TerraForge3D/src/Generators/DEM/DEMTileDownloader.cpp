@@ -25,7 +25,6 @@ namespace tf3d::generators::dem
         std::string apiHostURL                                = "https://api.maptiler.com";
         std::string elevationApiPathURLFormat                 = "/tiles/terrain-rgb-v2/{0}/{1}/{2}.webp?key={3}";
         std::string satelliteApiPathURLFormat                 = "/tiles/satellite-v2/{0}/{1}/{2}.jpg?key={3}";
-        tf3d::data::ApplicationState *appState                = nullptr;
         bool alive                                            = true;
         bool allowRequests                                    = true;
         int32_t requestsThisUpdate                            = 0;
@@ -36,9 +35,11 @@ namespace tf3d::generators::dem
     };
 
     TileDownloader::TileDownloader(tf3d::data::ApplicationState *appState,
+                                   GenerationDirtyManager *dirtyManager,
                                    std::string elevationCacheFileFormat,
                                    std::string satelliteCacheFileFormat)
         : m_AppState(appState),
+          m_DirtyManager(dirtyManager),
           m_State(std::make_shared<SharedState>())
     {
         if (m_AppState == nullptr) {
@@ -47,7 +48,6 @@ namespace tf3d::generators::dem
 
         m_State->elevationCacheFileFormat = std::move(elevationCacheFileFormat);
         m_State->satelliteCacheFileFormat = std::move(satelliteCacheFileFormat);
-        m_State->appState                 = appState;
 
         if (m_AppState->configManager != nullptr) {
             m_AppState->configManager->GetString("apiKeys", "maptilerCloud", m_State->apiKey);
@@ -259,7 +259,6 @@ namespace tf3d::generators::dem
             }
 
             const auto result                      = Download(state, request);
-            tf3d::data::ApplicationState *appState = nullptr;
             {
                 std::lock_guard lock(state->mutex);
                 if (!state->alive)
@@ -272,11 +271,11 @@ namespace tf3d::generators::dem
                     state->circuit.RecordFailure();
                 else
                     state->circuit.AbortRequest();
-                appState = state->appState;
             }
 
-            if ((result == DownloadResult::Succeeded || result == DownloadResult::Failed) && appState != nullptr)
-                appState->generationDirtyManager.MarkForce(GenerationDirtyCause::External);
+            if (result == DownloadResult::Succeeded || result == DownloadResult::Failed) {
+                m_DirtyManager->MarkForce(GenerationDirtyCause::External);
+            }
         }
     }
 

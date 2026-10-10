@@ -128,7 +128,7 @@ namespace tf3d::generators
         if (!m_BaseNoiseGenerator->Initialize())
             TF3D_LOG_ERROR("Failed to initialize base-noise generator.");
 
-        m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState);
+        m_DEMBaseShapeGenerator = std::make_shared<DEMBaseShapeGenerator>(m_AppState, m_DirtyManager);
         m_CustomizeBaseShape    = std::make_shared<BiomeCustomizeBaseShape>(m_AppState);
         m_MaskLayer             = std::make_shared<MaskLayer>(m_AppState, glm::vec3(m_Color.x, m_Color.y, m_Color.z),
                                                               "None");
@@ -137,9 +137,9 @@ namespace tf3d::generators
         return true;
     }
 
-    BiomeManager::BiomeManager(data::ApplicationState *appState)
+    BiomeManager::BiomeManager(data::ApplicationState *appState, GenerationDirtyManager *dirtyManager)
+        : m_AppState(appState), m_DirtyManager(dirtyManager)
     {
-        m_AppState           = appState;
         m_BiomeID            = BiomeID{GenerateId(8)};
         m_Color              = ImVec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f);
         m_Data               = std::make_shared<GeneratorData>();
@@ -164,9 +164,7 @@ namespace tf3d::generators
     void BiomeManager::MarkUpdateRequired()
     {
         m_UpdateTracker.Publish();
-        if (m_AppState != nullptr) {
-            m_AppState->generationDirtyManager.MarkBiomes();
-        }
+        m_DirtyManager->MarkBiomes();
     }
 
     void BiomeManager::Resize()

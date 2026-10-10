@@ -5,7 +5,6 @@
 #include "Data/ConfigManager.h"
 #include "Data/ResourceManager.h"
 #include "Exporters/ExportManager.h"
-#include "Generators/GenerationDirtyManager.h"
 #include "Job/Job.h"
 #include "Job/JobManager.h"
 #include "Job/JobSystem.h"
@@ -136,8 +135,9 @@ namespace tf3d::data
         Dashboard *dashboard                       = nullptr;
         misc::ViewportManager *viewportManagers[MAX_VIEWPORT_COUNT];
         misc::Style *styleManager                        = nullptr;
+
         generators::GenerationManager *generationManager = nullptr;
-        generators::GenerationDirtyManager generationDirtyManager;
+
         job::JobSystem *jobSystem              = nullptr;
         job::JobManager *jobManager            = nullptr;
         base::EventManager *eventManager       = nullptr;

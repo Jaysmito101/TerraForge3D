@@ -13,9 +13,10 @@
 namespace tf3d::generators
 {
 
-    DEMBaseShapeGenerator::DEMBaseShapeGenerator(ApplicationState *appState)
+    DEMBaseShapeGenerator::DEMBaseShapeGenerator(ApplicationState *appState,
+                                                 GenerationDirtyManager *dirtyManager)
         : m_State(State{}),
-          m_Tiles(std::make_unique<dem::TileSource>(appState)),
+          m_Tiles(std::make_unique<dem::TileSource>(appState, dirtyManager)),
           m_Renderer(std::make_unique<dem::Renderer>(appState))
     {
         const auto apiKey = m_Tiles->GetApiKey();

@@ -12,8 +12,10 @@
 namespace tf3d::generators::dem
 {
 
-    TileSource::TileSource(tf3d::data::ApplicationState *appState)
+    TileSource::TileSource(tf3d::data::ApplicationState *appState,
+                           GenerationDirtyManager *dirtyManager)
         : m_AppState(appState),
+          m_DirtyManager(dirtyManager),
           m_TextureLoader(appState != nullptr ? appState->textureLoader.get() : nullptr),
           m_Cache(appState != nullptr
                       ? appState->constants.cacheDir + PATH_SEPARATOR "dem_data" PATH_SEPARATOR "terrain_rgb"
@@ -29,6 +31,7 @@ namespace tf3d::generators::dem
                   .string(),
               false)),
           m_Downloader(appState,
+                       dirtyManager,
                        m_Cache.FileFormat(TileAsset::Elevation),
                        m_Cache.FileFormat(TileAsset::Satellite))
     {
@@ -203,9 +206,7 @@ namespace tf3d::generators::dem
         auto completionHandler = [this, key, asset](base::TextureLoadResult result) {
             if (result.Succeeded()) {
                 m_Cache.StoreLoaded(key, asset, std::move(result.texture));
-                if (m_AppState != nullptr) {
-                    m_AppState->generationDirtyManager.MarkForce(GenerationDirtyCause::External);
-                }
+                m_DirtyManager->MarkForce(GenerationDirtyCause::External);
             } else {
                 m_Cache.RemoveDiskEntry(key, asset);
             }

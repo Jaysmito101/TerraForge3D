@@ -56,7 +56,7 @@ namespace tf3d::generators
     };
 
     struct FieldState {
-        explicit FieldState(ApplicationState *appState);
+        explicit FieldState(ApplicationState *appState, GenerationDirtyManager *dirtyManager);
 
         std::shared_ptr<GeneratorData> heightmapData;
         std::shared_ptr<GeneratorData> workingHeightmapData;
@@ -194,6 +194,8 @@ namespace tf3d::generators
 
     private:
         ApplicationState *m_AppState = nullptr;
+
+        GenerationDirtyManager m_DirtyManager; 
         FieldState m_Field;
         UiState m_Ui;
         std::atomic<uint64_t> m_TerrainRevision        = 0;

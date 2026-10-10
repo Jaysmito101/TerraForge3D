@@ -4,6 +4,7 @@
 #include "Base/RevisionTracker.h"
 #include "Exporters/Serializer.h"
 #include "Generators/DEM/DEMTileTypes.h"
+#include "Generators/GenerationDirtyManager.h"
 #include "Generators/GenerationContext.h"
 #include "Generators/GeneratorData.h"
 #include "Utils/Utils.h"
@@ -33,7 +34,7 @@ namespace tf3d::generators
         };
         using Snapshot = base::GeneratorState<State>::Snapshot;
 
-        DEMBaseShapeGenerator(ApplicationState *appState);
+        DEMBaseShapeGenerator(ApplicationState *appState, GenerationDirtyManager *dirtyManager);
         ~DEMBaseShapeGenerator();
 
         bool ShowSettings();
