@@ -78,7 +78,7 @@ namespace tf3d::generators
         return m_Request.phase.load(std::memory_order_acquire) == WorkerPhase::Idle;
     }
 
-    bool GenerationWorker::PollCompletion()
+    bool GenerationWorker::Poll()
     {
         if (!HasContext() || glfwGetCurrentContext() == nullptr) {
             return false;
@@ -115,10 +115,10 @@ namespace tf3d::generators
     {
         TF3D_PROFILE_SCOPE_LAZY_DOMAIN(m_Config.profilePrefix + "/wait-for-idle", PerformanceMonitor::Domain::Wait);
         while (true) {
-            PollCompletion();
+            Poll();
             std::unique_lock lock(m_Mutex);
             const WorkerPhase phase = m_Request.phase.load(std::memory_order_acquire);
-            const bool idle = phase == WorkerPhase::Idle || phase == WorkerPhase::CompletionReady ||
+            const bool idle         = phase == WorkerPhase::Idle || phase == WorkerPhase::CompletionReady ||
                               phase == WorkerPhase::Stopped;
             if (idle) {
                 break;
@@ -195,7 +195,7 @@ namespace tf3d::generators
             return {WorkItemType::DrainGpuProfiler};
         }
 
-        const uint64_t requestId = m_Request.lastRequestId.load(std::memory_order_acquire);
+        const uint64_t requestId  = m_Request.lastRequestId.load(std::memory_order_acquire);
         m_Request.activeRequestId = requestId;
         m_Request.phase           = WorkerPhase::ExecutingRequest;
         return {WorkItemType::GenerateRequest, requestId};

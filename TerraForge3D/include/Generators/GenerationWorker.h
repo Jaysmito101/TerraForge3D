@@ -40,7 +40,7 @@ namespace tf3d::generators
 
         RequestResult Request();
         bool CanAcceptRequest();
-        bool PollCompletion();
+        bool Poll();
         void WaitForIdle();
         bool ConsumeCompleted();
 
