@@ -34,6 +34,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 build
+.terraforge3d-build.lock
 Release
 Debug
 [*].dir

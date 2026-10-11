@@ -16,6 +16,8 @@ RECONFIGURE=0
 REBUILD=0
 CLEAN_ALL=0
 CMAKE_ARGS=()
+BUILD_LOCK_DIR="$ROOT_DIR/.terraforge3d-build.lock"
+BUILD_LOCK_HELD=0
 
 usage() {
     cat <<EOF
@@ -63,6 +65,84 @@ EOF
 die() {
     echo "Error: $*" >&2
     exit 1
+}
+
+cleanup_build_lock() {
+    if [[ "$BUILD_LOCK_HELD" -eq 1 ]]; then
+        rm -rf -- "$BUILD_LOCK_DIR"
+        BUILD_LOCK_HELD=0
+    fi
+}
+
+trap cleanup_build_lock EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+build_lock_owner_is_alive() {
+    local owner_pid="$1"
+    local owner_start="$2"
+    local current_start
+
+    [[ "$owner_pid" =~ ^[0-9]+$ ]] || return 1
+    kill -0 "$owner_pid" 2>/dev/null || return 1
+
+    if [[ -n "$owner_start" ]]; then
+        current_start="$(ps -p "$owner_pid" -o lstart= 2>/dev/null | sed 's/^[[:space:]]*//')"
+        [[ -z "$current_start" || "$current_start" == "$owner_start" ]] || return 1
+    fi
+
+    return 0
+}
+
+acquire_build_lock() {
+    local owner_file
+    local owner_pid
+    local owner_start
+    local stale_lock
+    local wait_seconds=0
+    local wait_logged=0
+
+    while ! mkdir -- "$BUILD_LOCK_DIR" 2>/dev/null; do
+        if [[ "$wait_logged" -eq 0 ]]; then
+            echo "Another TerraForge3D session is already running; waiting for it to finish..." >&2
+            wait_logged=1
+        fi
+
+        owner_file="$BUILD_LOCK_DIR/owner"
+        if [[ ! -f "$owner_file" ]]; then
+            sleep 1
+            wait_seconds=$((wait_seconds + 1))
+            if (( wait_seconds % 5 == 0 )); then
+                echo "Still waiting for the active TerraForge3D session to finish..." >&2
+            fi
+            stale_lock="${BUILD_LOCK_DIR}.stale.$$.$RANDOM"
+            if mv -- "$BUILD_LOCK_DIR" "$stale_lock" 2>/dev/null; then
+                rm -rf -- "$stale_lock"
+            fi
+            continue
+        fi
+
+        IFS=' ' read -r owner_pid owner_start < "$owner_file" || true
+        if ! build_lock_owner_is_alive "$owner_pid" "$owner_start"; then
+            stale_lock="${BUILD_LOCK_DIR}.stale.$$.$RANDOM"
+            if mv -- "$BUILD_LOCK_DIR" "$stale_lock" 2>/dev/null; then
+                rm -rf -- "$stale_lock"
+            fi
+            continue
+        fi
+
+        wait_seconds=$((wait_seconds + 1))
+        if (( wait_seconds == 1 || wait_seconds % 5 == 0 )); then
+            echo "Waiting for TerraForge3D session PID $owner_pid to finish..." >&2
+        fi
+        sleep 1
+    done
+
+    printf '%s %s\n' "$$" "$(ps -p "$$" -o lstart= 2>/dev/null | sed 's/^[[:space:]]*//')" > "$BUILD_LOCK_DIR/owner"
+    BUILD_LOCK_HELD=1
+    if [[ "$wait_logged" -eq 1 ]]; then
+        echo "Previous TerraForge3D session finished; continuing." >&2
+    fi
 }
 
 require_command() {
@@ -411,6 +491,10 @@ case "$BUILD_DIR" in
     "$BUILD_ROOT"/*) ;;
     *) die "Build directory must be inside $BUILD_ROOT" ;;
 esac
+
+if [[ "$COMMAND" != "help" ]]; then
+    acquire_build_lock
+fi
 
 case "$COMMAND" in
     configure|build|run|all)

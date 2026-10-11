@@ -14,6 +14,8 @@ $ScriptArgs = @($args)
 
 $RootDir = (Resolve-Path $PSScriptRoot).Path
 $DefaultBuildRoot = Join-Path $RootDir "build"
+$BuildMutex = $null
+$BuildMutexAcquired = $false
 
 function Show-Help {
     Write-Host @"
@@ -179,6 +181,62 @@ function Invoke-Checked {
     & $Tool @Arguments
     if ($LASTEXITCODE -ne 0) {
         throw "$Tool failed with exit code $LASTEXITCODE"
+    }
+}
+
+function Get-BuildMutexName {
+    $HashAlgorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        $Bytes = [Text.Encoding]::UTF8.GetBytes($RootDir.ToLowerInvariant())
+        $Hash = $HashAlgorithm.ComputeHash($Bytes)
+    }
+    finally {
+        $HashAlgorithm.Dispose()
+    }
+
+    return "Local\TerraForge3D.Build." + ([BitConverter]::ToString($Hash) -replace "-", "")
+}
+
+function Enter-BuildLock {
+    $script:BuildMutex = New-Object Threading.Mutex($false, (Get-BuildMutexName))
+    $WaitSeconds = 0
+    $WaitLogged = $false
+    try {
+        try {
+            while (-not $script:BuildMutex.WaitOne(1000)) {
+                $WaitSeconds++
+                if (-not $WaitLogged) {
+                    Write-Host "Another TerraForge3D session is already running; waiting for it to finish..."
+                    $WaitLogged = $true
+                }
+                elseif ($WaitSeconds % 5 -eq 0) {
+                    Write-Host "Still waiting for the active TerraForge3D session to finish..."
+                }
+            }
+        }
+        catch [Threading.AbandonedMutexException] {
+            Write-Warning "Recovered an abandoned TerraForge3D build session lock."
+        }
+        $script:BuildMutexAcquired = $true
+        if ($WaitLogged) {
+            Write-Host "Previous TerraForge3D session finished; continuing."
+        }
+    }
+    catch {
+        $script:BuildMutex.Dispose()
+        $script:BuildMutex = $null
+        throw
+    }
+}
+
+function Exit-BuildLock {
+    if ($script:BuildMutex -and $script:BuildMutexAcquired) {
+        $script:BuildMutex.ReleaseMutex()
+        $script:BuildMutexAcquired = $false
+    }
+    if ($script:BuildMutex) {
+        $script:BuildMutex.Dispose()
+        $script:BuildMutex = $null
     }
 }
 
@@ -530,41 +588,47 @@ if ($Command -eq "help") {
     exit 0
 }
 
-if ($Command -eq "setup") {
-    Invoke-Setup
-    exit 0
-}
-
-if ($Command -in @("configure", "build", "run", "all")) {
-    if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
-        throw "CMake was not found on PATH."
+Enter-BuildLock
+try {
+    if ($Command -eq "setup") {
+        Invoke-Setup
+        return
     }
 
-    if ($GeneratorInfo.Id -eq "ninja" -and -not (Get-Command ninja -ErrorAction SilentlyContinue)) {
-        throw "Ninja was selected but was not found on PATH. Install Ninja or use --generator visualstudio."
-    }
+    if ($Command -in @("configure", "build", "run", "all")) {
+        if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
+            throw "CMake was not found on PATH."
+        }
 
-    if ($GeneratorInfo.Id -eq "ninja") {
-        foreach ($Tool in @("clang-cl", "lld-link", "llvm-lib")) {
-            if (-not (Get-Command $Tool -ErrorAction SilentlyContinue)) {
-                throw "Ninja requires $Tool for the Windows Clang toolchain. Install LLVM or use --generator visualstudio."
+        if ($GeneratorInfo.Id -eq "ninja" -and -not (Get-Command ninja -ErrorAction SilentlyContinue)) {
+            throw "Ninja was selected but was not found on PATH. Install Ninja or use --generator visualstudio."
+        }
+
+        if ($GeneratorInfo.Id -eq "ninja") {
+            foreach ($Tool in @("clang-cl", "lld-link", "llvm-lib")) {
+                if (-not (Get-Command $Tool -ErrorAction SilentlyContinue)) {
+                    throw "Ninja requires $Tool for the Windows Clang toolchain. Install LLVM or use --generator visualstudio."
+                }
             }
         }
     }
-}
 
-if (-not $NoSetup -and $Command -in @("configure", "build", "run", "all")) {
-    Invoke-Setup
-}
-
-switch ($Command) {
-    "configure" { Invoke-Configure }
-    "build" { Invoke-Build }
-    "format" { Invoke-Format }
-    "run" { Invoke-Run }
-    "clean" { Invoke-Clean }
-    "all" {
-        Invoke-Configure
-        Invoke-Build
+    if (-not $NoSetup -and $Command -in @("configure", "build", "run", "all")) {
+        Invoke-Setup
     }
+
+    switch ($Command) {
+        "configure" { Invoke-Configure }
+        "build" { Invoke-Build }
+        "format" { Invoke-Format }
+        "run" { Invoke-Run }
+        "clean" { Invoke-Clean }
+        "all" {
+            Invoke-Configure
+            Invoke-Build
+        }
+    }
+}
+finally {
+    Exit-BuildLock
 }
