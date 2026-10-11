@@ -64,8 +64,13 @@ namespace tf3d::generators
             return m_State.PublishedRevision();
         }
 
-        void Load(SerializerNode data);
+        bool Load(SerializerNode data);
         SerializerNode Save();
+        nlohmann::json GetSettingsSchema() const
+        {
+            return m_Inspector != nullptr ? m_Inspector->BuildSchema() : nlohmann::json::object();
+        }
+        nlohmann::json GetBaseMaskSchema() const;
 
         inline bool RequireUpdation() const
         {

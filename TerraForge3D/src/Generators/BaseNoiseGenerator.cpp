@@ -189,25 +189,39 @@ namespace tf3d::generators
         m_State.MarkProcessed(state->revision);
     }
 
-    void BaseNoiseGenerator::Load(SerializerNode data)
+    bool BaseNoiseGenerator::Load(SerializerNode data)
     {
         if (data == nullptr) {
-            return;
+            return false;
+        }
+
+        if (data->HasKey("BaseMask") && m_MaskLayer != nullptr &&
+            !m_MaskLayer->ValidateBaseMask(data->Get<SerializerNode>("BaseMask"))) {
+            return false;
+        }
+
+        if (const auto inspector = data->Get<SerializerNode>("Inspector"); inspector != nullptr) {
+            if (m_Inspector == nullptr || !m_Inspector->LoadState(inspector)) {
+                return false;
+            }
         }
 
         m_UIState.enabled    = data->Get<bool>("Enabled", m_UIState.enabled);
         m_UIState.useMask    = data->Get<bool>("UseMask", m_UIState.useMask);
         m_UIState.invertMask = data->Get<bool>("InvertMask", m_UIState.invertMask);
 
-        if (const auto inspector = data->Get<SerializerNode>("Inspector"); inspector != nullptr) {
-            m_Inspector->LoadState(inspector);
-        }
-
-        if (m_MaskLayer != nullptr) {
+        if (m_MaskLayer != nullptr && (data->HasKey("BaseMask") || data->HasKey("MaskTool"))) {
             m_MaskLayer->LoadFrom(data);
             m_MaskLayer->SetInvertPreview(m_UIState.invertMask);
         }
         PublishState();
+        return true;
+    }
+
+    nlohmann::json BaseNoiseGenerator::GetBaseMaskSchema() const
+    {
+        return m_MaskLayer != nullptr ? m_MaskLayer->GetBaseMaskSchema()
+                                      : nlohmann::json{{"type", "object"}, {"additionalProperties", false}};
     }
 
     SerializerNode BaseNoiseGenerator::Save()
