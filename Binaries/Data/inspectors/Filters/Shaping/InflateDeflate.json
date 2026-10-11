@@ -2,7 +2,7 @@
   "ID": "inflate_deflate",
   "Name": "Inflate / Deflate",
   "Category": "Shaping",
-  "Description": "Pushes terrain uphill toward local highs or downhill toward local lows using a directional morphological pass.",
+  "Description": "Broadly expands local highs or lows with a smooth, circular-neighborhood morphological pass.",
   "Runtime": {
     "Implementation": "PhaseChain",
     "Statistics": {
@@ -59,7 +59,7 @@
       {
         "Name": "Direction",
         "Label": "Direction",
-        "Description": "Choose whether the local slope is pushed uphill or downhill.",
+        "Description": "Choose whether local highs or lows expand across the terrain.",
         "Collapsible": true,
         "DefaultOpen": true,
         "Params": [
@@ -73,7 +73,7 @@
               "Deflate downhill"
             ],
             "Label": "Operation",
-            "Description": "Inflate expands local highs uphill; Deflate expands local lows downhill."
+            "Description": "Inflate broadly expands nearby highs; Deflate broadly expands nearby lows."
           },
           {
             "Name": "Radius",
@@ -82,17 +82,17 @@
             "Widget": "Slider",
             "Constraints": [
               1,
-              32
+              64
             ],
             "Label": "Push distance",
-            "Description": "Maximum distance sampled along the local slope in texels."
+            "Description": "Neighborhood radius in 1K-reference texels; the same value covers the same terrain-space area at every map resolution."
           }
         ]
       },
       {
         "Name": "Slope",
-        "Label": "Slope gating",
-        "Description": "Limit the operation to meaningful slopes.",
+        "Label": "Slope boost",
+        "Description": "Gentle terrain gets one full neighborhood pass; steeper slopes get up to twice the displacement.",
         "Collapsible": true,
         "DefaultOpen": true,
         "Params": [
@@ -105,8 +105,8 @@
               0.0,
               0.5
             ],
-            "Label": "Slope limit",
-            "Description": "Normalized slope below which the operation is suppressed."
+            "Label": "Boost threshold",
+            "Description": "Slope above which the operation reaches twice its baseline displacement."
           },
           {
             "Name": "SlopeSoftness",
@@ -117,8 +117,8 @@
               0.0001,
               0.5
             ],
-            "Label": "Slope softness",
-            "Description": "Smooth transition from no operation to full inflation or deflation."
+            "Label": "Boost softness",
+            "Description": "Smooth transition from the baseline pass to twice its displacement."
           }
         ]
       }
