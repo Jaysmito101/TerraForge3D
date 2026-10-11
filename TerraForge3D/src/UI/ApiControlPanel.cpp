@@ -55,10 +55,18 @@ namespace tf3d::ui
             m_CopyMessage = "API URL copied.";
         }
         ImGui::SameLine();
-        const std::string playgroundUrl = "http://" + stats.host + ":" + std::to_string(stats.port) + "/api/docs";
+        const std::string apiOrigin     = "http://" + stats.host + ":" + std::to_string(stats.port);
+        const std::string playgroundUrl = apiOrigin + "/api/docs";
         if (ImGui::Button("Copy playground URL")) {
             ImGui::SetClipboardText(playgroundUrl.c_str());
             m_CopyMessage = "Playground URL copied.";
+        }
+        if (ImGui::Button("Copy agent prompt")) {
+            const std::string skillGuideUrl = apiOrigin + "/api/skill.md";
+            const std::string prompt =
+                "To get started with TerraForge3D, fetch the API skill guide at " + skillGuideUrl + ".";
+            ImGui::SetClipboardText(prompt.c_str());
+            m_CopyMessage = "Agent prompt copied.";
         }
         if (!m_CopyMessage.empty()) {
             ImGui::TextDisabled("%s", m_CopyMessage.c_str());
