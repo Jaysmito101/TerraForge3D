@@ -76,6 +76,10 @@ namespace tf3d::generators
         {
             return m_Description;
         }
+        nlohmann::json GetSettingsSchema() const
+        {
+            return m_Inspector.BuildSchema();
+        }
         inline bool RequireUpdation() const
         {
             return m_State.RequiresUpdate();
