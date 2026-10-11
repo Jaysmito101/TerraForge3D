@@ -251,6 +251,16 @@ namespace tf3d::generators
         m_State.Replace(m_UIState);
     }
 
+    bool MaskLayer::ValidateBaseMask(const SerializerNode &settings) const
+    {
+        return m_BaseMaskGenerator.ValidateState(settings);
+    }
+
+    nlohmann::json MaskLayer::GetBaseMaskSchema() const
+    {
+        return m_BaseMaskGenerator.GetSchema();
+    }
+
     void MaskLayer::SetInvertPreview(bool invert)
     {
         m_MaskTool.SetInvertPreview(invert);

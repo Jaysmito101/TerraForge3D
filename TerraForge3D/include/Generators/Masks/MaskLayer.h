@@ -66,6 +66,8 @@ namespace tf3d::generators
 
         void SaveTo(SerializerNode node) const;
         void LoadFrom(SerializerNode node);
+        bool ValidateBaseMask(const SerializerNode &settings) const;
+        nlohmann::json GetBaseMaskSchema() const;
 
         void SetInvertPreview(bool invert);
         void SetVizColor(float r, float g, float b);
