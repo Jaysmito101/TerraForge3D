@@ -36,6 +36,7 @@ namespace tf3d::generators
         static std::shared_ptr<BiomeFilterDefinition> LoadFromConfig(const nlohmann::json &config);
 
         bool BuildInspector(inspector::CustomInspector &inspector) const;
+        nlohmann::json BuildParameterSchema() const;
         base::ComputeShader *GetPhaseShader(data::ApplicationState *appState, const std::string &phase) const;
 
         inline const BiomeFilterRuntimeConfig &GetRuntime() const

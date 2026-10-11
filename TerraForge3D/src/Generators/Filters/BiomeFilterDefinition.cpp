@@ -110,6 +110,15 @@ namespace tf3d::generators
         return inspector.LoadConfig(m_InspectorConfig);
     }
 
+    nlohmann::json BiomeFilterDefinition::BuildParameterSchema() const
+    {
+        inspector::CustomInspector inspector;
+        if (!BuildInspector(inspector)) {
+            return nlohmann::json{{"type", "object"}, {"additionalProperties", false}};
+        }
+        return inspector.BuildSchema();
+    }
+
     ComputeShader *BiomeFilterDefinition::GetPhaseShader(ApplicationState *appState, const std::string &phase) const
     {
         const auto path = m_PhaseShaderPaths.find(phase);
