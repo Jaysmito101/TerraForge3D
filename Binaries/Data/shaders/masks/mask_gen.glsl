@@ -2,7 +2,7 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(TF3D_FIELD_FORMAT, binding = 0) readonly uniform image2D TerrainData;
+layout(binding = 0) uniform sampler2D TerrainData;
 
 layout(binding = 1, TF3D_MASK_FORMAT) writeonly uniform image2D u_MaskTexture;
 
@@ -43,7 +43,28 @@ int PixelCoordToDataOffset(ivec2 coordinate)
 float TerrainValue(ivec2 coordinate)
 {
 	coordinate = clamp(coordinate, ivec2(0), ivec2(u_Resolution - 1));
-	return imageLoad(TerrainData, coordinate).r;
+	return texelFetch(TerrainData, coordinate, 0).r;
+}
+
+float TerrainValueAtLod(ivec2 coordinate, float lod)
+{
+	coordinate = clamp(coordinate, ivec2(0), ivec2(u_Resolution - 1));
+	vec2 uv = (vec2(coordinate) + vec2(0.5)) / float(u_Resolution);
+	return textureLod(TerrainData, uv, lod).r;
+}
+
+const float kMaskReferenceResolution = 1024.0;
+
+int ResolutionScaledRadius(float referenceRadius)
+{
+	float scaledRadius = max(referenceRadius, 0.125) * float(u_Resolution) / kMaskReferenceResolution;
+	int maximumRadius = max(u_Resolution - 1, 1);
+	return clamp(int(round(scaledRadius)), 1, maximumRadius);
+}
+
+float TerrainReferenceRadius()
+{
+	return clamp(u_SampleRadius, 0.125, 8.0);
 }
 
 float RangeMask(float value)
@@ -67,25 +88,32 @@ float ThresholdMask(float value)
 	return smoothstep(threshold - feather, threshold + feather, value);
 }
 
-float FilteredTerrainValue(ivec2 coordinate)
+float FilteredTerrainValueAtRadius(ivec2 coordinate, int filterRadius)
 {
 	float sum = 0.0;
 	float weightSum = 0.0;
+	float lod = log2(float(max(filterRadius, 1)));
 	for (int y = -1; y <= 1; ++y)
 	{
 		for (int x = -1; x <= 1; ++x)
 		{
 			float weight = float((x == 0 ? 2 : 1) * (y == 0 ? 2 : 1));
-			sum += TerrainValue(coordinate + ivec2(x, y)) * weight;
+			sum += TerrainValueAtLod(coordinate + ivec2(x, y) * filterRadius, lod) * weight;
 			weightSum += weight;
 		}
 	}
 	return sum / weightSum;
 }
 
+float FilteredTerrainValue(ivec2 coordinate)
+{
+	int filterRadius = ResolutionScaledRadius(min(TerrainReferenceRadius(), 1.0));
+	return FilteredTerrainValueAtRadius(coordinate, filterRadius);
+}
+
 vec2 TerrainGradient(ivec2 coordinate)
 {
-	int sampleRadius = clamp(int(round(u_SampleRadius)), 1, 8);
+	int sampleRadius = ResolutionScaledRadius(TerrainReferenceRadius());
 	float texelSize = max(u_TileSize / float(u_Resolution), 0.000001);
 	float step = float(sampleRadius);
 	float dX =
@@ -130,12 +158,16 @@ float SlopeRampMask(float slope)
 
 float CurvatureValue(ivec2 coordinate)
 {
-	float center = FilteredTerrainValue(coordinate);
-	float neighbors = FilteredTerrainValue(coordinate + ivec2(-1, 0))
-		+ FilteredTerrainValue(coordinate + ivec2(1, 0))
-		+ FilteredTerrainValue(coordinate + ivec2(0, -1))
-		+ FilteredTerrainValue(coordinate + ivec2(0, 1));
-	return 4.0 * center - neighbors;
+	float referenceRadius = TerrainReferenceRadius();
+	int sampleRadius = ResolutionScaledRadius(referenceRadius);
+	float center = FilteredTerrainValueAtRadius(coordinate, sampleRadius);
+	float neighbors = FilteredTerrainValueAtRadius(coordinate + ivec2(-sampleRadius, 0), sampleRadius)
+		+ FilteredTerrainValueAtRadius(coordinate + ivec2(sampleRadius, 0), sampleRadius)
+		+ FilteredTerrainValueAtRadius(coordinate + ivec2(0, -sampleRadius), sampleRadius)
+		+ FilteredTerrainValueAtRadius(coordinate + ivec2(0, sampleRadius), sampleRadius);
+	float referenceToSampleRatio = referenceRadius * float(u_Resolution) /
+		(float(sampleRadius) * kMaskReferenceResolution);
+	return (4.0 * center - neighbors) * referenceToSampleRatio * referenceToSampleRatio;
 }
 
 float CurvatureMagnitude(float curvature)
@@ -152,13 +184,14 @@ float RidgeValleyStrength(float curvature)
 float RoughnessValue(ivec2 coordinate)
 {
 	float center = FilteredTerrainValue(coordinate);
+	int sampleRadius = ResolutionScaledRadius(TerrainReferenceRadius());
 	float total = 0.0;
 	for (int y = -1; y <= 1; ++y)
 	{
 		for (int x = -1; x <= 1; ++x)
 		{
 			if (x == 0 && y == 0) continue;
-			total += abs(FilteredTerrainValue(coordinate + ivec2(x, y)) - center);
+			total += abs(FilteredTerrainValue(coordinate + ivec2(x, y) * sampleRadius) - center);
 		}
 	}
 	float average = total / 8.0;
@@ -204,11 +237,15 @@ float PointPathDistance(vec2 point)
 float LocalWetness(ivec2 coordinate)
 {
 	float height = FilteredTerrainValue(coordinate);
+	int sampleRadius = ResolutionScaledRadius(TerrainReferenceRadius());
 	float average = 0.25 * (
-		FilteredTerrainValue(coordinate + ivec2(-1, 0)) + FilteredTerrainValue(coordinate + ivec2(1, 0)) +
-		FilteredTerrainValue(coordinate + ivec2(0, -1)) + FilteredTerrainValue(coordinate + ivec2(0, 1)));
+		FilteredTerrainValue(coordinate + ivec2(-sampleRadius, 0)) +
+		FilteredTerrainValue(coordinate + ivec2(sampleRadius, 0)) +
+		FilteredTerrainValue(coordinate + ivec2(0, -sampleRadius)) +
+		FilteredTerrainValue(coordinate + ivec2(0, sampleRadius)));
 	float lowland = 1.0 - clamp(height * 0.5 + 0.5, 0.0, 1.0);
-	float concavity = clamp((average - height) * 8.0 + 0.5, 0.0, 1.0);
+	float referenceRadius = TerrainReferenceRadius();
+	float concavity = clamp((average - height) * 8.0 / (referenceRadius * referenceRadius) + 0.5, 0.0, 1.0);
 	float gentle = 1.0 - clamp(SlopeDegrees(coordinate) / 90.0, 0.0, 1.0);
 	return clamp(lowland * 0.45 + concavity * 0.35 + gentle * 0.20, 0.0, 1.0);
 }
@@ -216,7 +253,7 @@ float LocalWetness(ivec2 coordinate)
 float AmbientCavity(ivec2 coordinate)
 {
 	float height = FilteredTerrainValue(coordinate);
-	const int radius = 2;
+	int radius = ResolutionScaledRadius(TerrainReferenceRadius());
 	float average = 0.125 * (
 		FilteredTerrainValue(coordinate + ivec2(-radius, -radius)) + FilteredTerrainValue(coordinate + ivec2(0, -radius)) +
 		FilteredTerrainValue(coordinate + ivec2(radius, -radius)) + FilteredTerrainValue(coordinate + ivec2(-radius, 0)) +
