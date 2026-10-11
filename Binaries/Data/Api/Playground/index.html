@@ -3,298 +3,992 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TerraForge3D API Playground</title>
+  <meta name="color-scheme" content="dark">
+  <title>API Workspace | TerraForge3D</title>
   <style>
-    :root { color-scheme: dark; font: 15px/1.5 system-ui, sans-serif; background: #111820; color: #e7edf4; }
-    body { margin: 0; }
-    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 48px; }
-    header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
-    h1 { margin: 0; font-size: 1.5rem; }
-    nav { display: flex; gap: 14px; }
-    a { color: #8cc8ff; }
-    .layout { display: grid; grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.7fr); gap: 18px; }
-    section { min-width: 0; border: 1px solid #33404d; border-radius: 9px; background: #19232d; padding: 16px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; }
-    select, textarea, button { font: inherit; }
-    textarea { box-sizing: border-box; width: 100%; min-height: 220px; resize: vertical; border: 1px solid #465664; border-radius: 6px; background: #10171e; color: inherit; padding: 9px; font: 13px/1.5 ui-monospace, monospace; tab-size: 2; }
-    pre { overflow: auto; max-height: 360px; margin: 8px 0 0; padding: 12px; border-radius: 6px; background: #10171e; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .muted { color: #a8b4c0; }
-    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0; }
-    button { border: 1px solid #465664; border-radius: 6px; background: #233343; color: inherit; padding: 8px 12px; cursor: pointer; text-align: left; }
-    button:hover:not(:disabled) { background: #2e465d; }
-    button:disabled { opacity: .55; cursor: wait; }
-    .primary { border: 0; background: #347cb5; }
-    #directory { display: grid; gap: 7px; margin-top: 12px; }
-    #directory button { width: 100%; }
-    .directory-kind { display: block; color: #a8b4c0; font-size: .82rem; }
-    .error { color: #ff9c9c; }
-    #resultImage { display: none; max-width: 100%; height: auto; margin-top: 12px; border: 1px solid #465664; border-radius: 6px; }
-    @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } main { padding: 18px 12px 32px; } }
+    :root {
+      color-scheme: dark;
+      --bg: #0f0c12;
+      --panel: #141216;
+      --panel-raised: #1a171f;
+      --panel-hover: #24212a;
+      --border: #29252f;
+      --border-strong: #393440;
+      --text: #cccbd1;
+      --text-strong: #f2f0f5;
+      --muted: #85818c;
+      --accent: #a99bea;
+      --accent-soft: rgba(169, 155, 234, .13);
+      --green: #82c99b;
+      --amber: #d9b77b;
+      --red: #df8585;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      --sans: Inter, "Segoe UI", system-ui, sans-serif;
+      font-family: var(--sans);
+      font-size: 13px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; min-height: 0; margin: 0; overflow: hidden; }
+    body { background: var(--bg); }
+    button, input, textarea, select { font: inherit; }
+    button { color: inherit; }
+    .app { width: 100%; height: 100dvh; min-height: 0; display: grid; grid-template-rows: 54px minmax(0, 1fr); }
+    .topbar {
+      display: flex; align-items: center; gap: 18px; padding: 0 18px;
+      border-bottom: 1px solid var(--border); background: rgba(20, 18, 22, .94);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 205px; color: var(--text-strong); font-weight: 650; letter-spacing: .01em; }
+    .brand-mark {
+      width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid #514965;
+      border-radius: 7px; color: #c0b4f2; background: linear-gradient(145deg, #282333, #17151c);
+      font-size: 12px; font-weight: 750;
+    }
+    .brand-name { white-space: nowrap; }
+    .brand-divider { width: 1px; height: 20px; background: var(--border-strong); }
+    .product-name { color: var(--muted); font-weight: 500; }
+    .topbar-spacer { flex: 1; }
+    .connection { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
+    .connection-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 3px rgba(217,183,123,.08); }
+    .connection.online .connection-dot { background: var(--green); box-shadow: 0 0 0 3px rgba(130,201,155,.08); }
+    .connection.offline .connection-dot { background: var(--red); box-shadow: 0 0 0 3px rgba(223,133,133,.08); }
+    .top-link { color: var(--muted); text-decoration: none; padding: 7px 9px; border-radius: 6px; }
+    .top-link:hover { color: var(--text-strong); background: var(--panel-hover); }
+    .mobile-tabs { display: none; }
+    .workspace { display: grid; grid-template-columns: 242px minmax(330px, 1fr) 390px; min-height: 0; overflow: hidden; }
+    .pane { min-width: 0; min-height: 0; background: var(--panel); }
+    .sidebar { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; border-right: 1px solid var(--border); }
+    .side-heading { padding: 19px 15px 12px; }
+    .eyebrow { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .side-title-row { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; }
+    .side-title { margin: 0; color: var(--text-strong); font-size: 14px; font-weight: 620; }
+    .count { min-width: 22px; padding: 3px 6px; text-align: center; border-radius: 5px; background: var(--panel-raised); color: var(--muted); font: 11px var(--mono); }
+    .search-wrap { position: relative; margin: 0 12px 12px; }
+    .search-icon { position: absolute; left: 10px; top: 9px; color: var(--muted); font-size: 13px; pointer-events: none; }
+    .search { width: 100%; height: 33px; padding: 0 35px 0 30px; outline: 0; border: 1px solid var(--border); border-radius: 7px; background: #100e13; color: var(--text-strong); }
+    .search:focus, .field-input:focus, .json-editor:focus { border-color: #665b87; box-shadow: 0 0 0 2px rgba(169,155,234,.09); }
+    .search::placeholder, .field-input::placeholder { color: #625e69; }
+    .search-shortcut { position: absolute; right: 8px; top: 8px; padding: 1px 4px; border: 1px solid var(--border); border-radius: 4px; color: #706c77; font: 10px var(--mono); }
+    .catalog { min-height: 0; overflow: auto; padding: 2px 8px 12px; scrollbar-color: #38343e transparent; scrollbar-width: thin; }
+    .catalog-label { padding: 7px 8px 6px; color: #706c77; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .crumbs { display: flex; align-items: center; gap: 4px; padding: 1px 8px 8px; color: var(--muted); }
+    .crumb { padding: 2px 0; border: 0; background: none; color: inherit; cursor: pointer; }
+    .crumb:hover { color: var(--text-strong); }
+    .crumb-sep { color: #514d57; }
+    .catalog-row {
+      width: 100%; display: flex; align-items: center; gap: 9px; min-height: 35px;
+      padding: 6px 8px; border: 0; border-radius: 6px; background: transparent;
+      text-align: left; cursor: pointer;
+    }
+    .catalog-row:hover { background: var(--panel-hover); }
+    .catalog-row.selected { background: var(--accent-soft); color: var(--text-strong); }
+    .folder-icon { width: 16px; color: #9e90d5; text-align: center; font-size: 13px; }
+    .folder-name { flex: 1; overflow: hidden; color: var(--text); text-overflow: ellipsis; white-space: nowrap; }
+    .chevron { color: #716c78; font-size: 15px; }
+    .method { flex: none; width: 40px; padding: 3px 0; border-radius: 4px; text-align: center; font: 700 9px var(--mono); letter-spacing: .02em; }
+    .method.get { color: #86c99d; background: rgba(130,201,155,.1); }
+    .method.post { color: #9dbbe9; background: rgba(130,165,218,.12); }
+    .method.patch { color: #d9b77b; background: rgba(217,183,123,.11); }
+    .method.delete { color: #df8585; background: rgba(223,133,133,.1); }
+    .operation-copy { flex: 1; min-width: 0; }
+    .operation-name { overflow: hidden; color: var(--text); text-overflow: ellipsis; white-space: nowrap; font: 11px var(--mono); }
+    .operation-title { overflow: hidden; margin-top: 3px; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+    .sidebar-footer { padding: 11px 14px; border-top: 1px solid var(--border); color: #706c77; font-size: 10px; }
+    .reference { display: grid; grid-template-rows: auto auto minmax(0, 1fr); background: var(--bg); }
+    .reference.empty { position: relative; }
+    .reference.empty > .reference-head { position: absolute; inset: 0; display: grid; place-items: center; border-bottom: 0; }
+    .reference-head { padding: 24px 28px 17px; border-bottom: 1px solid var(--border); }
+    .empty-state { height: 100%; display: grid; place-items: center; padding: 30px; color: var(--muted); text-align: center; }
+    .empty-card { max-width: 310px; }
+    .empty-symbol { width: 42px; height: 42px; display: grid; place-items: center; margin: 0 auto 14px; border: 1px solid var(--border-strong); border-radius: 12px; color: #9b8ed1; background: var(--panel); font: 20px var(--mono); }
+    .empty-title { color: var(--text-strong); font-size: 14px; font-weight: 600; }
+    .empty-copy { margin-top: 7px; line-height: 1.6; }
+    .op-topline { display: flex; align-items: center; gap: 10px; }
+    .op-id { color: var(--muted); font: 11px var(--mono); overflow-wrap: anywhere; }
+    .op-title { margin: 12px 0 7px; color: var(--text-strong); font-size: 23px; font-weight: 620; letter-spacing: -.03em; }
+    .op-description { max-width: 760px; margin: 0; color: #a5a1ac; font-size: 12px; line-height: 1.65; }
+    .path-line { margin-top: 15px; padding: 9px 11px; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: 6px; background: #100e13; color: #c4bfce; font: 11px var(--mono); }
+    .op-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .badge { padding: 4px 7px; border: 1px solid var(--border); border-radius: 5px; color: var(--muted); font-size: 10px; }
+    .badge.warning { color: var(--amber); border-color: rgba(217,183,123,.24); }
+    .ref-toolbar { min-height: 47px; display: flex; align-items: end; padding: 0 28px; border-bottom: 1px solid var(--border); }
+    .tab-button { position: relative; height: 46px; padding: 0 12px; border: 0; background: none; color: var(--muted); cursor: pointer; }
+    .tab-button:hover { color: var(--text); }
+    .tab-button.active { color: var(--text-strong); }
+    .tab-button.active::after { position: absolute; right: 10px; bottom: -1px; left: 10px; height: 2px; border-radius: 2px; background: var(--accent); content: ""; }
+    .ref-actions { display: flex; gap: 7px; margin: 0 0 8px auto; }
+    .ref-content { min-height: 0; overflow: auto; padding: 21px 28px 30px; scrollbar-color: #38343e transparent; scrollbar-width: thin; }
+    .section-heading { margin: 0 0 11px; color: var(--text-strong); font-size: 12px; font-weight: 620; }
+    .section { margin-bottom: 24px; }
+    .section-copy { color: #9b97a2; font-size: 11px; line-height: 1.65; }
+    .param-list { display: grid; gap: 7px; }
+    .param-card { display: grid; grid-template-columns: minmax(115px, .7fr) minmax(0, 1.3fr); gap: 12px; align-items: start; padding: 10px 11px; border: 1px solid var(--border); border-radius: 7px; background: var(--panel); }
+    .param-name { color: #d8d4df; font: 11px var(--mono); overflow-wrap: anywhere; }
+    .required-mark { color: var(--red); }
+    .type-label { margin-top: 5px; color: #7d7884; font: 10px var(--mono); }
+    .param-description { color: #96919d; font-size: 10px; line-height: 1.5; }
+    .schema-code { position: relative; margin: 0; padding: 15px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #100e13; color: #c5c0cc; font: 10px/1.65 var(--mono); tab-size: 2; white-space: pre; }
+    .link-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .inline-link { color: #a99bea; text-decoration: none; font-size: 11px; }
+    .inline-link:hover { color: #c4b9f4; text-decoration: underline; }
+    .runner { display: grid; grid-template-rows: auto minmax(0, 1fr); border-left: 1px solid var(--border); background: var(--panel); }
+    .runner-head { display: flex; align-items: center; justify-content: space-between; min-height: 57px; padding: 0 17px; border-bottom: 1px solid var(--border); }
+    .runner-title { color: var(--text-strong); font-size: 13px; font-weight: 620; }
+    .runner-head-actions { display: flex; gap: 6px; }
+    .runner-content { min-height: 0; overflow: auto; padding: 15px 16px 20px; scrollbar-color: #38343e transparent; scrollbar-width: thin; }
+    .runner-empty { display: grid; place-items: center; height: 100%; min-height: 180px; padding: 25px; color: var(--muted); text-align: center; line-height: 1.6; }
+    .runner-intro { margin: 0 0 14px; color: #89848f; font-size: 11px; line-height: 1.55; }
+    .runner-target { display: flex; align-items: center; gap: 9px; margin-bottom: 13px; padding: 9px; border: 1px solid var(--border); border-radius: 7px; background: #100e13; }
+    .runner-path { min-width: 0; overflow: hidden; color: #c4bfce; text-overflow: ellipsis; white-space: nowrap; font: 10px var(--mono); }
+    .field-list { display: grid; gap: 10px; }
+    .field { display: grid; gap: 5px; }
+    .field-label-row { display: flex; align-items: center; gap: 6px; }
+    .field-label { color: #c7c2ce; font-size: 11px; font-weight: 550; }
+    .field-hint { color: #77727e; font-size: 10px; }
+    .field-input { width: 100%; height: 32px; padding: 0 9px; border: 1px solid var(--border); border-radius: 6px; outline: 0; background: #100e13; color: var(--text-strong); font: 11px var(--mono); }
+    select.field-input { padding-right: 25px; }
+    .args-heading { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 8px; }
+    .args-heading:first-child { margin-top: 0; }
+    .minor-heading { color: #aba6b1; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .json-editor { display: block; width: 100%; min-height: 150px; resize: vertical; padding: 10px; border: 1px solid var(--border); border-radius: 7px; outline: 0; background: #100e13; color: #c5c0cc; font: 10px/1.6 var(--mono); tab-size: 2; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 29px; padding: 0 9px;
+      border: 1px solid var(--border-strong); border-radius: 6px; background: var(--panel-raised); color: #b7b2be;
+      font-size: 10px; cursor: pointer; transition: background .12s ease, border-color .12s ease, color .12s ease;
+    }
+    .button:hover { border-color: #514b5b; background: #24212a; color: var(--text-strong); }
+    .button:disabled { opacity: .55; cursor: wait; }
+    .button.primary { border-color: #776ba1; background: #4a4069; color: #f2efff; }
+    .button.primary:hover { background: #5b4f80; }
+    .button.subtle { border-color: transparent; background: transparent; color: var(--muted); }
+    .button.subtle:hover { border-color: var(--border); background: var(--panel-raised); color: var(--text); }
+    .runner-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .runner-actions .button.primary { flex: 1; min-height: 34px; font-weight: 620; }
+    .send-shortcut { color: #c7bee6; font: 9px var(--mono); opacity: .75; }
+    .response-area { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border); }
+    .response-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+    .response-title { color: #c6c1cc; font-size: 11px; font-weight: 600; }
+    .response-status { padding: 3px 6px; border-radius: 4px; background: var(--panel-raised); color: var(--muted); font: 10px var(--mono); }
+    .response-status.ok { color: var(--green); }
+    .response-status.bad { color: var(--red); }
+    .response-time { margin-left: auto; color: #77727e; font: 10px var(--mono); }
+    .response-actions { display: flex; gap: 3px; }
+    .response-head .button { min-height: 23px; padding: 0 6px; font-size: 9px; }
+    .response-output { min-height: 64px; max-height: 280px; padding: 10px; overflow: auto; border: 1px solid var(--border); border-radius: 7px; background: #100e13; color: #aaa5b1; font: 10px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .response-image { display: block; max-width: 100%; max-height: 280px; margin: 10px auto 0; border: 1px solid var(--border); border-radius: 6px; }
+    .response-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; color: #716d78; font-size: 9px; }
+    .toast { position: fixed; z-index: 5; right: 18px; bottom: 18px; padding: 9px 12px; transform: translateY(12px); opacity: 0; border: 1px solid var(--border-strong); border-radius: 7px; background: #25222b; color: var(--text-strong); box-shadow: 0 8px 28px rgba(0,0,0,.35); pointer-events: none; transition: .18s ease; }
+    .toast.visible { transform: translateY(0); opacity: 1; }
+    .loading { padding: 12px; color: var(--muted); font-size: 11px; }
+    .error-note { padding: 10px; border: 1px solid rgba(223,133,133,.22); border-radius: 6px; background: rgba(223,133,133,.05); color: #d49a9a; font-size: 11px; line-height: 1.5; }
+    .hidden { display: none !important; }
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 218px minmax(280px, 1fr) 344px; }
+      .reference-head { padding-right: 21px; padding-left: 21px; }
+      .ref-toolbar { padding-right: 21px; padding-left: 21px; }
+      .ref-content { padding-right: 21px; padding-left: 21px; }
+    }
+    @media (max-width: 900px) {
+      .app { grid-template-rows: 52px 38px minmax(0, 1fr); }
+      .brand { min-width: 0; }
+      .brand-divider, .product-name { display: none; }
+      .topbar { gap: 10px; padding: 0 12px; }
+      .mobile-tabs { display: flex; align-items: stretch; gap: 3px; padding: 4px 9px 0; border-bottom: 1px solid var(--border); background: var(--panel); }
+      .mobile-tab { flex: 1; border: 0; border-radius: 5px 5px 0 0; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
+      .mobile-tab.active { background: var(--panel-raised); color: var(--text-strong); }
+      .workspace { display: block; position: relative; }
+      .workspace > .pane { position: absolute; inset: 0; display: none; }
+      .workspace[data-mobile-view="operations"] > .sidebar,
+      .workspace[data-mobile-view="reference"] > .reference,
+      .workspace[data-mobile-view="try"] > .runner { display: grid; }
+      .sidebar { border-right: 0; }
+      .runner { border-left: 0; }
+      .reference-head { padding: 20px 20px 14px; }
+      .ref-toolbar { padding: 0 20px; }
+      .ref-content { padding: 18px 20px 25px; }
+    }
+    @media (max-width: 520px) {
+      .topbar { padding: 0 9px; }
+      .brand { gap: 7px; font-size: 12px; }
+      .brand-mark { width: 23px; height: 23px; }
+      .connection { font-size: 0; }
+      .connection-dot { width: 8px; height: 8px; }
+      .top-link { padding: 6px; font-size: 10px; }
+      .reference-head { padding: 17px 15px 13px; }
+      .op-title { font-size: 20px; }
+      .ref-toolbar { padding: 0 10px; }
+      .ref-content { padding: 15px 13px 23px; }
+      .param-card { grid-template-columns: minmax(90px, .8fr) minmax(0, 1.2fr); gap: 8px; }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <header>
-      <h1>TerraForge3D API Playground</h1>
-      <nav aria-label="API documents">
-        <a id="statusLink" href="#">Status</a>
-        <a id="openApiLink" href="#">OpenAPI</a>
-        <a id="rootSkillLink" href="#">API skill</a>
-      </nav>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">TF</span>
+        <span class="brand-name">TerraForge3D</span>
+        <span class="brand-divider"></span>
+        <span class="product-name">API workspace</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span id="connection" class="connection"><span class="connection-dot"></span><span id="connection-label">Connecting</span></span>
+      <a id="openapi-link" class="top-link" target="_blank" rel="noreferrer">OpenAPI</a>
+      <a id="skill-link" class="top-link" target="_blank" rel="noreferrer">Skill guide</a>
     </header>
-    <div class="layout">
-      <section aria-labelledby="browseTitle">
-        <h2 id="browseTitle">Browse operations</h2>
-        <div class="row">
-          <button id="back" type="button" disabled>Up one level</button>
-          <span id="breadcrumb" class="muted">Loading…</span>
+    <nav class="mobile-tabs" aria-label="Workspace panels">
+      <button class="mobile-tab active" data-view="operations">Operations</button>
+      <button class="mobile-tab" data-view="reference">Reference</button>
+      <button class="mobile-tab" data-view="try">Try it</button>
+    </nav>
+    <div id="workspace" class="workspace" data-mobile-view="operations">
+      <aside class="pane sidebar" aria-label="API operations">
+        <div class="side-heading">
+          <div class="eyebrow">Explore</div>
+          <div class="side-title-row"><h1 class="side-title">Operations</h1><span id="operation-count" class="count">—</span></div>
         </div>
-        <div id="directory" aria-live="polite"></div>
-        <p id="description" class="muted"></p>
-        <p id="endpoint" class="muted"></p>
-        <p><a id="skillLink" href="#" hidden>Operation skill</a> <a id="schemaLink" href="#" hidden>Argument schema</a></p>
-      </section>
-      <section aria-labelledby="requestTitle">
-        <h2 id="requestTitle">Try an operation</h2>
-        <label for="arguments">JSON arguments</label>
-        <textarea id="arguments" spellcheck="false" aria-describedby="argumentHelp" disabled>{}</textarea>
-        <p id="argumentHelp" class="muted">Choose an operation to load its composed schema and prepare arguments.</p>
-        <div class="row">
-          <button id="send" class="primary" type="button" disabled>Send request</button>
-          <span id="requestStatus" class="muted" role="status"></span>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input id="search" class="search" type="search" placeholder="Filter this folder" autocomplete="off" aria-label="Filter operations and groups">
+          <span class="search-shortcut">/</span>
         </div>
-        <h3>Response</h3>
-        <pre id="response" aria-live="polite">Browse a group, then choose one operation.</pre>
-        <img id="resultImage" alt="Viewport capture returned by the API">
-      </section>
+        <div id="catalog" class="catalog"><div class="loading">Loading API catalog…</div></div>
+        <div class="sidebar-footer">Select an operation to inspect its schema and try a request.</div>
+      </aside>
+      <main class="pane reference empty" aria-label="Operation reference">
+        <div id="reference-head" class="reference-head">
+          <div class="empty-state">
+            <div class="empty-card">
+              <div class="empty-symbol">⌘</div>
+              <div class="empty-title">Choose an operation</div>
+              <div class="empty-copy">Browse the API catalog, then inspect a focused reference or send a request from the Try it panel.</div>
+            </div>
+          </div>
+        </div>
+        <div id="reference-toolbar" class="ref-toolbar hidden">
+          <button class="tab-button active" data-ref-tab="overview">Overview</button>
+          <button class="tab-button" data-ref-tab="schema">Schema</button>
+          <div class="ref-actions">
+            <button id="copy-schema" class="button subtle" type="button">Copy schema</button>
+          </div>
+        </div>
+        <div id="reference-content" class="ref-content hidden"></div>
+      </main>
+      <aside class="pane runner" aria-label="Request playground">
+        <div class="runner-head">
+          <div class="runner-title">Try it</div>
+          <div class="runner-head-actions">
+            <button id="copy-curl" class="button subtle" type="button" disabled>Copy cURL</button>
+          </div>
+        </div>
+        <div id="runner-content" class="runner-content">
+          <div class="runner-empty">Choose an operation to configure and send a request.</div>
+        </div>
+      </aside>
     </div>
-  </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script>
-    const directoryView = document.querySelector("#directory");
-    const breadcrumb = document.querySelector("#breadcrumb");
-    const backButton = document.querySelector("#back");
-    const description = document.querySelector("#description");
-    const endpoint = document.querySelector("#endpoint");
-    const argumentEditor = document.querySelector("#arguments");
-    const sendButton = document.querySelector("#send");
-    const requestStatus = document.querySelector("#requestStatus");
-    const responseView = document.querySelector("#response");
-    const resultImage = document.querySelector("#resultImage");
-    const skillLink = document.querySelector("#skillLink");
-    const schemaLink = document.querySelector("#schemaLink");
-    const history = [];
-    let selectedOperation = null;
-    let imageUrl = null;
+    (() => {
+      "use strict";
+      const apiPrefix = window.location.pathname.replace(/\/api\/docs\/?$/, "").replace(/\/$/, "");
+      const apiUrl = (path) => window.location.origin + apiPrefix + (path.startsWith("/") ? path : "/" + path);
+      const el = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      };
+      const state = {
+        directory: null,
+        directoryStack: [],
+        operationCount: 0,
+        selected: null,
+        document: null,
+        schema: null,
+        activeRefTab: "overview",
+        activeMobileView: "operations",
+        responseUrl: null,
+        responseText: null,
+        toastTimer: null,
+        loadingRequest: false,
+        requestSequence: 0,
+        directorySequence: 0
+      };
+      const catalog = document.getElementById("catalog");
+      const search = document.getElementById("search");
+      const refHead = document.getElementById("reference-head");
+      const refToolbar = document.getElementById("reference-toolbar");
+      const refContent = document.getElementById("reference-content");
+      const runnerContent = document.getElementById("runner-content");
 
-    function exampleFor(schema) {
-      if (schema && Object.hasOwn(schema, "const")) return schema.const;
-      if (Array.isArray(schema?.enum) && schema.enum.length > 0) return schema.enum[0];
-      if (schema?.type === "object") {
-        const result = {};
-        const required = new Set(schema.required || []);
-        for (const [key, child] of Object.entries(schema.properties || {})) {
-          if (required.has(key)) result[key] = exampleFor(child);
-        }
-        return result;
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("visible");
+        window.clearTimeout(state.toastTimer);
+        state.toastTimer = window.setTimeout(() => toast.classList.remove("visible"), 1800);
       }
-      if (schema?.type === "array") return [];
-      if (schema?.type === "integer" || schema?.type === "number") return schema.minimum ?? 0;
-      if (schema?.type === "boolean") return false;
-      if (schema?.type === "string") return "";
-      return null;
-    }
 
-    const publicPathPrefix = window.location.pathname.replace(/\/api\/docs\/?$/, "");
+      async function copyText(text, label) {
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast(label + " copied");
+        } catch (_) {
+          const temporary = el("textarea");
+          temporary.value = text;
+          temporary.style.position = "fixed";
+          temporary.style.opacity = "0";
+          document.body.append(temporary);
+          temporary.select();
+          const ok = document.execCommand("copy");
+          temporary.remove();
+          showToast(ok ? label + " copied" : "Copy unavailable");
+        }
+      }
 
-    function apiUrl(path) {
-      const route = new URL(path, window.location.origin);
-      const routePath = route.pathname.replace(/^\/+/, "");
-      const pathname = `${publicPathPrefix}/${routePath}`.replace(/\/{2,}/g, "/");
-      const url = new URL(pathname, window.location.origin);
-      url.search = route.search;
-      url.hash = route.hash;
-      return url;
-    }
+      async function getJson(path) {
+        const response = await fetch(apiUrl(path), { headers: { "Accept": "application/json" } });
+        if (!response.ok) {
+          throw new Error("Request failed (" + response.status + ")");
+        }
+        return response.json();
+      }
 
-    document.querySelector("#statusLink").href = apiUrl("/api/v1/status");
-    document.querySelector("#openApiLink").href = apiUrl("/api/v1/openapi.json");
-    document.querySelector("#rootSkillLink").href = apiUrl("/api/skill.md");
+      function setConnection(online, label) {
+        const badge = document.getElementById("connection");
+        badge.classList.toggle("online", online);
+        badge.classList.toggle("offline", !online);
+        document.getElementById("connection-label").textContent = label;
+      }
 
-    async function readJson(path) {
-      const response = await fetch(apiUrl(path));
-      if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`);
-      return response.json();
-    }
+      async function checkConnection() {
+        try {
+          const result = await getJson("/api/v1/status");
+          setConnection(true, result && result.status ? String(result.status) : "Connected");
+        } catch (_) {
+          setConnection(false, "Unavailable");
+        }
+      }
 
-    function clearSelectedOperation() {
-      selectedOperation = null;
-      description.textContent = "";
-      endpoint.textContent = "";
-      skillLink.hidden = true;
-      schemaLink.hidden = true;
-      argumentEditor.disabled = true;
-      argumentEditor.value = "{}";
-      sendButton.disabled = true;
-      responseView.textContent = "Choose an operation to load its schema and prepare arguments.";
-      responseView.classList.remove("error");
-      resultImage.style.display = "none";
-    }
-
-    function addDirectoryButton(label, kind, activate) {
-      const button = document.createElement("button");
-      const title = document.createElement("span");
-      const detail = document.createElement("span");
-      title.textContent = label;
-      detail.className = "directory-kind";
-      detail.textContent = kind;
-      button.append(title, detail);
-      button.addEventListener("click", activate);
-      directoryView.append(button);
-    }
-
-    function renderDirectory(catalog) {
-      directoryView.replaceChildren();
-      const currentPath = catalog.path.replace("/api/v1/operations", "").replaceAll("/", " › ");
-      breadcrumb.textContent = currentPath || "All operation groups";
-      backButton.disabled = history.length === 0;
-
-      for (const child of catalog.children || []) {
-        addDirectoryButton(child.name, "Group", () => {
-          history.push(catalog.path);
-          openDirectory(child.path);
+      function setMobileView(view) {
+        state.activeMobileView = view;
+        document.getElementById("workspace").dataset.mobileView = view;
+        document.querySelectorAll(".mobile-tab").forEach((button) => {
+          button.classList.toggle("active", button.dataset.view === view);
         });
       }
 
-      for (const operation of catalog.operations || []) {
-        addDirectoryButton(`${operation.title} · ${operation.method}`, operation.path, () => {
-          openOperation(operation);
+      function setDirectoryLoading() {
+        catalog.replaceChildren(el("div", "loading", "Loading folder…"));
+      }
+
+      async function openDirectory(path, name) {
+        const directoryToken = ++state.directorySequence;
+        setDirectoryLoading();
+        try {
+          const directory = await getJson(path);
+          if (directoryToken !== state.directorySequence) return;
+          state.directory = directory;
+          state.directoryStack.push({ path: path, name: name });
+          renderCatalog();
+          if (path === "/api/v1/operations") {
+            document.getElementById("operation-count").textContent = "…";
+            countOperations(directory).then((count) => {
+              state.operationCount = count;
+              document.getElementById("operation-count").textContent = String(count);
+            });
+          }
+        } catch (error) {
+          if (directoryToken === state.directorySequence) {
+            catalog.replaceChildren(errorBox("Could not load this folder. " + error.message));
+          }
+        }
+      }
+
+      async function countOperations(directory, visited) {
+        const seen = visited || new Set();
+        let count = Array.isArray(directory.operations) ? directory.operations.length : 0;
+        const children = Array.isArray(directory.children) ? directory.children : [];
+        for (const child of children) {
+          if (seen.has(child.path)) continue;
+          seen.add(child.path);
+          try {
+            count += await countOperations(await getJson(child.path), seen);
+          } catch (_) {
+          }
+        }
+        return count;
+      }
+
+      function openRoot() {
+        state.directoryStack = [];
+        openDirectory("/api/v1/operations", "Operations");
+      }
+
+      function errorBox(message) {
+        return el("div", "error-note", message);
+      }
+
+      function renderCatalog() {
+        catalog.replaceChildren();
+        if (!state.directory) {
+          catalog.append(el("div", "loading", "Loading API catalog…"));
+          return;
+        }
+        const query = search.value.trim().toLowerCase();
+        const crumbRow = el("div", "crumbs");
+        const rootButton = el("button", "crumb", "Operations");
+        rootButton.type = "button";
+        rootButton.addEventListener("click", openRoot);
+        crumbRow.append(rootButton);
+        state.directoryStack.forEach((crumb, index) => {
+          if (index === 0) return;
+          crumbRow.append(el("span", "crumb-sep", "/"));
+          const button = el("button", "crumb", crumb.name);
+          button.type = "button";
+          button.addEventListener("click", () => {
+            const target = state.directoryStack[index];
+            state.directoryStack = state.directoryStack.slice(0, index);
+            openDirectory(target.path, target.name);
+          });
+          crumbRow.append(button);
         });
-      }
+        catalog.append(crumbRow);
 
-      if (directoryView.childElementCount === 0) {
-        const empty = document.createElement("p");
-        empty.className = "muted";
-        empty.textContent = "This group has no child groups or operations.";
-        directoryView.append(empty);
-      }
-    }
-
-    async function openDirectory(path) {
-      clearSelectedOperation();
-      try {
-        renderDirectory(await readJson(path));
-      } catch (error) {
-        directoryView.replaceChildren();
-        breadcrumb.textContent = "Could not open group";
-        responseView.textContent = error.message;
-        responseView.classList.add("error");
-      }
-    }
-
-    async function openOperation(summary) {
-      clearSelectedOperation();
-      responseView.textContent = "Loading operation details and schema…";
-      try {
-        const operation = await readJson(summary.document);
-        const schemaResponse = await fetch(apiUrl(operation.schema));
-        if (!schemaResponse.ok) throw new Error(`${operation.schema} returned HTTP ${schemaResponse.status}`);
-        operation.inputSchema = await schemaResponse.json();
-        selectedOperation = operation;
-        description.textContent = operation.description;
-        endpoint.textContent = `${operation.method} ${operation.path}`;
-        skillLink.href = apiUrl(operation.skill);
-        schemaLink.href = apiUrl(operation.schema);
-        skillLink.hidden = false;
-        schemaLink.hidden = false;
-        argumentEditor.disabled = false;
-        argumentEditor.value = JSON.stringify(exampleFor(operation.inputSchema), null, 2);
-        sendButton.disabled = false;
-        responseView.textContent = "Ready to send. Edit the JSON arguments if needed.";
-        responseView.classList.remove("error");
-      } catch (error) {
-        responseView.textContent = error.message;
-        responseView.classList.add("error");
-      }
-    }
-
-    function parameterText(value, name) {
-      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-        return String(value);
-      }
-      throw new Error(`Argument ${name} must be a string, number, or boolean.`);
-    }
-
-    async function sendRequest() {
-      if (!selectedOperation) return;
-      sendButton.disabled = true;
-      requestStatus.textContent = "Sending…";
-      responseView.classList.remove("error");
-      resultImage.style.display = "none";
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
-
-      try {
-        const argumentsObject = JSON.parse(argumentEditor.value);
-        if (argumentsObject === null || Array.isArray(argumentsObject) || typeof argumentsObject !== "object") {
-          throw new Error("JSON arguments must be an object.");
+        const children = Array.isArray(state.directory.children) ? state.directory.children : [];
+        const operations = Array.isArray(state.directory.operations) ? state.directory.operations : [];
+        const visibleChildren = children.filter((child) => child.name.toLowerCase().includes(query));
+        const visibleOperations = operations.filter((operation) =>
+          (operation.name + " " + operation.title + " " + operation.operationId + " " + operation.description).toLowerCase().includes(query));
+        if (visibleChildren.length) {
+          catalog.append(el("div", "catalog-label", "Groups"));
+          visibleChildren.forEach((child) => {
+            const button = el("button", "catalog-row");
+            button.type = "button";
+            button.append(el("span", "folder-icon", "▸"), el("span", "folder-name", child.name), el("span", "chevron", "›"));
+            button.addEventListener("click", () => openDirectory(child.path, child.name));
+            catalog.append(button);
+          });
         }
-
-        const remainingArguments = { ...argumentsObject };
-        let requestPath = selectedOperation.path;
-        for (const parameter of selectedOperation.pathParameters || []) {
-          if (!Object.hasOwn(remainingArguments, parameter.name)) {
-            throw new Error(`Missing path argument: ${parameter.name}`);
-          }
-          const value = encodeURIComponent(parameterText(remainingArguments[parameter.name], parameter.name));
-          requestPath = requestPath.replace(`{${parameter.name}}`, value);
-          delete remainingArguments[parameter.name];
+        if (visibleOperations.length) {
+          catalog.append(el("div", "catalog-label", "Operations"));
+          visibleOperations.forEach((operation) => {
+            const button = el("button", "catalog-row" + (state.selected && state.selected.operationId === operation.operationId ? " selected" : ""));
+            button.type = "button";
+            const method = el("span", "method " + String(operation.method || "get").toLowerCase(), operation.method || "GET");
+            const copy = el("span", "operation-copy");
+            copy.append(el("div", "operation-name", operation.name), el("div", "operation-title", operation.title));
+            button.append(method, copy);
+            button.title = operation.description || operation.operationId;
+            button.addEventListener("click", () => selectOperation(operation));
+            catalog.append(button);
+          });
         }
+        if (!visibleChildren.length && !visibleOperations.length) {
+          catalog.append(el("div", "loading", query ? "No matches in this folder." : "This folder is empty."));
+        }
+      }
 
-        const options = { method: selectedOperation.method, headers: {} };
-        if (selectedOperation.method === "GET") {
-          const query = new URLSearchParams();
-          for (const parameter of selectedOperation.queryParameters || []) {
-            if (!Object.hasOwn(remainingArguments, parameter.name)) continue;
-            query.set(parameter.name, parameterText(remainingArguments[parameter.name], parameter.name));
-            delete remainingArguments[parameter.name];
+      function typeName(schema) {
+        if (!schema) return "any";
+        if (schema.type) return Array.isArray(schema.type) ? schema.type.join(" | ") : String(schema.type);
+        if (schema.enum) return "enum";
+        if (schema.oneOf) return "one of";
+        if (schema.anyOf) return "any of";
+        return "object";
+      }
+
+      function addParamList(parent, title, items) {
+        if (!Array.isArray(items) || !items.length) return;
+        const section = el("section", "section");
+        section.append(el("h3", "section-heading", title));
+        const list = el("div", "param-list");
+        items.forEach((item) => {
+          const card = el("div", "param-card");
+          const left = el("div");
+          const name = el("div", "param-name");
+          name.append(document.createTextNode(item.name || "parameter"));
+          if (item.required) name.append(el("span", "required-mark", " *"));
+          left.append(name, el("div", "type-label", typeName(item.schema)));
+          card.append(left, el("div", "param-description", item.schema && item.schema.description ? item.schema.description : "—"));
+          list.append(card);
+        });
+        section.append(list);
+        parent.append(section);
+      }
+
+      function renderReference() {
+        const doc = state.document;
+        if (!doc) return;
+        refHead.replaceChildren();
+        const method = el("span", "method " + String(doc.method || "get").toLowerCase(), doc.method || "GET");
+        const topline = el("div", "op-topline");
+        topline.append(method, el("span", "op-id", doc.operationId || ""));
+        const title = el("h2", "op-title", doc.title || doc.operationId || "Operation");
+        const description = el("p", "op-description", doc.description || "No description provided.");
+        const path = el("div", "path-line", doc.path || "");
+        const badges = el("div", "op-badges");
+        if (doc.readOnly) badges.append(el("span", "badge", "Read only"));
+        if (doc.destructive) badges.append(el("span", "badge warning", "Destructive"));
+        if (doc.longRunning) badges.append(el("span", "badge", "Long running"));
+        refHead.append(topline, title, description, path, badges);
+        refToolbar.classList.remove("hidden");
+        refContent.classList.remove("hidden");
+        renderReferenceTab();
+      }
+
+      function renderReferenceTab() {
+        refContent.replaceChildren();
+        if (state.activeRefTab === "schema") {
+          refContent.append(el("div", "section-copy", "Composed JSON Schema for this operation."));
+          refContent.append(el("pre", "schema-code", JSON.stringify(state.schema || {}, null, 2)));
+          return;
+        }
+        const doc = state.document;
+        const intro = el("section", "section");
+        intro.append(el("h3", "section-heading", "Request"));
+        intro.append(el("div", "section-copy", doc.method + " " + doc.path + " · Arguments are validated by the API before execution."));
+        refContent.append(intro);
+        addParamList(refContent, "Path parameters", doc.pathParameters);
+        addParamList(refContent, "Query parameters", doc.queryParameters);
+        if (doc.requestBodySchema) {
+          const body = el("section", "section");
+          body.append(el("h3", "section-heading", "JSON body"));
+          body.append(el("div", "section-copy", "Send a JSON object matching the request schema."));
+          refContent.append(body);
+        }
+        const links = el("div", "link-row");
+        const schemaLink = el("a", "inline-link", "Open schema ↗");
+        schemaLink.href = apiUrl(state.selected.schema);
+        schemaLink.target = "_blank";
+        schemaLink.rel = "noreferrer";
+        const skillLink = el("a", "inline-link", "Operation skill ↗");
+        skillLink.href = apiUrl(state.selected.skill);
+        skillLink.target = "_blank";
+        skillLink.rel = "noreferrer";
+        links.append(schemaLink, skillLink);
+        refContent.append(links);
+      }
+
+      function defaultValue(schema, depth) {
+        if (!schema || depth > 8) return {};
+        if (Object.prototype.hasOwnProperty.call(schema, "const")) return schema.const;
+        if (Array.isArray(schema.enum) && schema.enum.length) return schema.enum[0];
+        if (Array.isArray(schema.oneOf) && schema.oneOf.length) return defaultValue(schema.oneOf[0], depth + 1);
+        if (Array.isArray(schema.anyOf) && schema.anyOf.length) return defaultValue(schema.anyOf[0], depth + 1);
+        const type = Array.isArray(schema.type) ? schema.type.find((item) => item !== "null") : schema.type;
+        if (type === "object" || schema.properties) {
+          const output = {};
+          const required = Array.isArray(schema.required) ? schema.required : [];
+          required.forEach((key) => {
+            if (schema.properties && schema.properties[key]) output[key] = defaultValue(schema.properties[key], depth + 1);
+          });
+          return output;
+        }
+        if (type === "array") return [];
+        if (type === "boolean") return false;
+        if (type === "integer" || type === "number") return schema.minimum !== undefined ? schema.minimum : 0;
+        if (type === "string") return "";
+        if (type === "null") return null;
+        return {};
+      }
+
+      function fieldInput(item, initial, scope) {
+        const schema = item.schema || {};
+        const field = el("label", "field");
+        const row = el("span", "field-label-row");
+        row.append(el("span", "field-label", item.name || "value"));
+        if (item.required) row.append(el("span", "required-mark", "*"));
+        field.append(row);
+        let input;
+        if (Array.isArray(schema.enum) && schema.enum.length) {
+          input = el("select", "field-input");
+          if (!item.required) {
+            const emptyOption = el("option", "", "Not set");
+            emptyOption.value = "";
+            emptyOption.selected = initial === undefined || initial === null;
+            input.append(emptyOption);
           }
-          if (Object.keys(remainingArguments).length > 0) {
-            throw new Error(`Unknown GET argument: ${Object.keys(remainingArguments).join(", ")}`);
-          }
-          if (query.size > 0) requestPath += `?${query.toString()}`;
+          schema.enum.forEach((value) => {
+            const option = el("option", "", String(value));
+            option.value = String(value);
+            if (Object.is(value, initial)) option.selected = true;
+            input.append(option);
+          });
         } else {
+          input = el("input", "field-input");
+          input.type = schema.type === "integer" || schema.type === "number" ? "number" : "text";
+          if (input.type === "number" && schema.type === "integer") input.step = "1";
+          else if (input.type === "number") input.step = "any";
+          input.value = initial === undefined || initial === null ? "" : String(initial);
+          input.placeholder = item.required ? "Required" : "Optional";
+        }
+        input.dataset.parameter = item.name;
+        input.dataset.parameterScope = scope;
+        input.dataset.valueType = typeName(schema);
+        input.dataset.required = item.required ? "true" : "false";
+        field.append(input);
+        if (schema.description) field.append(el("span", "field-hint", schema.description));
+        return field;
+      }
+
+      function parameterItems(doc, key) {
+        return Array.isArray(doc[key]) ? doc[key] : [];
+      }
+
+      function renderRunner() {
+        runnerContent.replaceChildren();
+        const doc = state.document;
+        if (!doc) {
+          runnerContent.append(el("div", "runner-empty", "Choose an operation to configure and send a request."));
+          document.getElementById("copy-curl").disabled = true;
+          return;
+        }
+        document.getElementById("copy-curl").disabled = false;
+        runnerContent.append(el("p", "runner-intro", "Configure the arguments, then send a request to the running application."));
+        const target = el("div", "runner-target");
+        target.append(
+          el("span", "method " + String(doc.method || "get").toLowerCase(), doc.method || "GET"),
+          el("span", "runner-path", doc.path || "")
+        );
+        runnerContent.append(target);
+        const pathParams = parameterItems(doc, "pathParameters");
+        const queryParams = parameterItems(doc, "queryParameters");
+        if (pathParams.length) {
+          const pathHeading = el("div", "args-heading");
+          pathHeading.append(el("span", "minor-heading", "Path parameters"));
+          runnerContent.append(pathHeading);
+          const list = el("div", "field-list");
+          pathParams.forEach((item) => list.append(fieldInput(item, item.required ? defaultValue(item.schema, 0) : undefined, "path")));
+          runnerContent.append(list);
+        }
+        if (queryParams.length) {
+          const queryHeading = el("div", "args-heading");
+          queryHeading.append(el("span", "minor-heading", "Query parameters"));
+          runnerContent.append(queryHeading);
+          const list = el("div", "field-list");
+          queryParams.forEach((item) => list.append(fieldInput(item, item.required ? defaultValue(item.schema, 0) : undefined, "query")));
+          runnerContent.append(list);
+        }
+        if (doc.requestBodySchema) {
+          const heading = el("div", "args-heading");
+          heading.append(el("span", "minor-heading", "JSON body"));
+          const format = el("button", "button subtle", "Format");
+          format.type = "button";
+          format.addEventListener("click", formatBody);
+          heading.append(format);
+          runnerContent.append(heading);
+          const editor = el("textarea", "json-editor");
+          editor.id = "request-body";
+          editor.spellcheck = false;
+          editor.setAttribute("aria-label", "JSON request body");
+          editor.value = JSON.stringify(defaultValue(doc.requestBodySchema, 0), null, 2);
+          runnerContent.append(editor);
+        }
+        const actions = el("div", "runner-actions");
+        const send = el("button", "button primary", "Send request");
+        send.id = "send-request";
+        send.type = "button";
+        send.append(el("span", "send-shortcut", "Ctrl ↵"));
+        send.addEventListener("click", sendRequest);
+        actions.append(send);
+        runnerContent.append(actions);
+      }
+
+      async function selectOperation(summary) {
+        state.requestSequence += 1;
+        state.loadingRequest = false;
+        clearResponse();
+        document.querySelector(".reference").classList.remove("empty");
+        state.selected = summary;
+        state.document = null;
+        state.schema = null;
+        state.activeRefTab = "overview";
+        document.querySelectorAll(".tab-button").forEach((button) => button.classList.toggle("active", button.dataset.refTab === "overview"));
+        renderCatalog();
+        refHead.replaceChildren(el("div", "loading", "Loading operation reference…"));
+        refToolbar.classList.add("hidden");
+        refContent.classList.add("hidden");
+        runnerContent.replaceChildren(el("div", "loading", "Preparing request…"));
+        setMobileView("reference");
+        try {
+          const results = await Promise.all([
+            getJson(summary.operation),
+            getJson(summary.schema)
+          ]);
+          if (!state.selected || state.selected.operationId !== summary.operationId) return;
+          state.document = results[0];
+          state.schema = results[1];
+          renderReference();
+          renderRunner();
+        } catch (error) {
+          refHead.replaceChildren(errorBox("Could not load the operation. " + error.message));
+          runnerContent.replaceChildren(el("div", "runner-empty", "Operation details are unavailable."));
+        }
+      }
+
+      function formatBody() {
+        const editor = document.getElementById("request-body");
+        if (!editor) return;
+        try {
+          editor.value = JSON.stringify(JSON.parse(editor.value || "{}"), null, 2);
+        } catch (_) {
+          showToast("Body is not valid JSON");
+        }
+      }
+
+      function readParameterInputs() {
+        const values = { path: {}, query: {} };
+        const inputs = runnerContent.querySelectorAll("[data-parameter]");
+        for (const input of inputs) {
+          const name = input.dataset.parameter;
+          const scope = input.dataset.parameterScope;
+          const raw = input.value.trim();
+          if (!raw && input.dataset.required === "true") {
+            input.focus();
+            throw new Error(name + " is required.");
+          }
+          if (!raw) continue;
+          const valueType = input.dataset.valueType;
+          if (valueType === "integer" || valueType === "number") {
+            const number = Number(raw);
+            if (!Number.isFinite(number)) {
+              input.focus();
+              throw new Error(name + " must be a number.");
+            }
+            values[scope][name] = number;
+          } else if (valueType === "boolean") {
+            values[scope][name] = raw.toLowerCase() === "true";
+          } else {
+            values[scope][name] = raw;
+          }
+        }
+        return values;
+      }
+
+      function buildRequest() {
+        const doc = state.document;
+        const values = readParameterInputs();
+        let path = doc.path;
+        path = path.replace(/\{([^}]+)\}/g, (_, name) => {
+          if (!Object.prototype.hasOwnProperty.call(values.path, name)) throw new Error(name + " is required.");
+          return encodeURIComponent(String(values.path[name]));
+        });
+        const url = new URL(apiUrl(path));
+        parameterItems(doc, "queryParameters").forEach((parameter) => {
+          if (Object.prototype.hasOwnProperty.call(values.query, parameter.name)) {
+            url.searchParams.set(parameter.name, String(values.query[parameter.name]));
+          }
+        });
+        const options = { method: doc.method, headers: { "Accept": "application/json" } };
+        if (doc.requestBodySchema) {
+          const editor = document.getElementById("request-body");
+          let body;
+          try {
+            body = JSON.parse(editor.value);
+          } catch (_) {
+            throw new Error("Request body must be valid JSON.");
+          }
+          if (!body || Array.isArray(body) || typeof body !== "object") throw new Error("Request body must be a JSON object.");
           options.headers["Content-Type"] = "application/json";
-          options.body = JSON.stringify(remainingArguments);
+          options.body = JSON.stringify(body);
         }
-
-        const response = await fetch(apiUrl(requestPath), options);
-        const contentType = response.headers.get("Content-Type") || "";
-        requestStatus.textContent = `HTTP ${response.status}`;
-        if (contentType.startsWith("image/")) {
-          imageUrl = URL.createObjectURL(await response.blob());
-          resultImage.src = imageUrl;
-          resultImage.style.display = "block";
-          responseView.textContent = `${contentType} · ${response.headers.get("X-Image-Width") || "?"} × ${response.headers.get("X-Image-Height") || "?"}`;
-        } else {
-          const responseText = await response.text();
-          try { responseView.textContent = JSON.stringify(JSON.parse(responseText), null, 2); }
-          catch { responseView.textContent = responseText; }
-          if (!response.ok) responseView.classList.add("error");
-        }
-      } catch (error) {
-        requestStatus.textContent = "Request failed";
-        responseView.textContent = error.message;
-        responseView.classList.add("error");
-      } finally {
-        sendButton.disabled = selectedOperation === null;
+        return { url: url, options: options };
       }
-    }
 
-    backButton.addEventListener("click", () => {
-      const previousPath = history.pop();
-      if (previousPath) openDirectory(previousPath);
-    });
-    sendButton.addEventListener("click", sendRequest);
-    openDirectory("/api/v1/operations");
+      function shellQuote(value) {
+        return "'" + String(value).replace(/'/g, "'\\''") + "'";
+      }
+
+      function curlCommand(request) {
+        const headers = request.options.headers;
+        let command = "curl -X " + request.options.method + " " + shellQuote(request.url.href);
+        Object.keys(headers).forEach((key) => {
+          command += " \\\n  -H " + shellQuote(key + ": " + headers[key]);
+        });
+        if (request.options.body !== undefined) {
+          command += " \\\n  --data " + shellQuote(request.options.body);
+        }
+        return command;
+      }
+
+      async function copyCurl() {
+        try {
+          await copyText(curlCommand(buildRequest()), "cURL command");
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      function clearResponseImage() {
+        if (state.responseUrl) {
+          URL.revokeObjectURL(state.responseUrl);
+          state.responseUrl = null;
+        }
+      }
+
+      function clearResponse() {
+        clearResponseImage();
+        state.responseText = null;
+        const panel = runnerContent.querySelector(".response-area");
+        if (panel) panel.remove();
+      }
+
+      function addResponseActions(heading) {
+        const actions = el("div", "response-actions");
+        const copy = el("button", "button subtle", "Copy");
+        copy.type = "button";
+        copy.addEventListener("click", () => copyText(state.responseText || "", "Response"));
+        const clear = el("button", "button subtle", "Clear");
+        clear.type = "button";
+        clear.addEventListener("click", clearResponse);
+        actions.append(copy, clear);
+        heading.append(actions);
+      }
+
+      function responsePanel() {
+        let panel = runnerContent.querySelector(".response-area");
+        if (!panel) {
+          panel = el("section", "response-area");
+          panel.id = "response-area";
+          runnerContent.append(panel);
+        }
+        return panel;
+      }
+
+      async function sendRequest() {
+        if (state.loadingRequest || !state.document) return;
+        let request;
+        try {
+          request = buildRequest();
+        } catch (error) {
+          showToast(error.message);
+          return;
+        }
+        const send = document.getElementById("send-request");
+        const requestToken = ++state.requestSequence;
+        const operationId = state.selected.operationId;
+        state.loadingRequest = true;
+        if (send) {
+          send.disabled = true;
+          send.firstChild.textContent = "Sending… ";
+        }
+        const startedAt = performance.now();
+        try {
+          const response = await fetch(request.url.href, request.options);
+          if (requestToken !== state.requestSequence || !state.selected || state.selected.operationId !== operationId) return;
+          const contentType = response.headers.get("content-type") || "";
+          let body;
+          if (contentType.startsWith("image/")) {
+            body = await response.blob();
+          } else {
+            const raw = await response.text();
+            if (contentType.includes("json")) {
+              try { body = JSON.stringify(JSON.parse(raw), null, 2); }
+              catch (_) { body = raw || "(empty response)"; }
+            } else {
+              body = raw || "(empty response)";
+            }
+          }
+          const elapsed = Math.round(performance.now() - startedAt);
+          clearResponseImage();
+          state.responseText = body instanceof Blob
+            ? "HTTP " + response.status + " " + response.statusText + "\n" + (body.type || "image response") + " · " + formatBytes(body.size)
+            : "HTTP " + response.status + " " + response.statusText + "\n\n" + body;
+          const panel = responsePanel();
+          panel.replaceChildren();
+          const heading = el("div", "response-head");
+          heading.append(el("span", "response-title", "Response"));
+          heading.append(el("span", "response-status " + (response.ok ? "ok" : "bad"), String(response.status) + " " + response.statusText));
+          heading.append(el("span", "response-time", elapsed + " ms"));
+          addResponseActions(heading);
+          panel.append(heading);
+          if (body instanceof Blob) {
+            state.responseUrl = URL.createObjectURL(body);
+            const image = el("img", "response-image");
+            image.src = state.responseUrl;
+            image.alt = "Image response";
+            panel.append(image);
+            const imageMeta = el("div", "response-meta");
+            imageMeta.append(el("span", "", body.type || "image response"), el("span", "", formatBytes(body.size)));
+            panel.append(imageMeta);
+          } else {
+            const output = el("pre", "response-output", body);
+            panel.append(output);
+            const meta = el("div", "response-meta");
+            meta.append(el("span", "", contentType || "text/plain"), el("span", "", formatBytes(new Blob([body]).size)));
+            panel.append(meta);
+          }
+          runnerContent.scrollTo({ top: runnerContent.scrollHeight, behavior: "smooth" });
+        } catch (error) {
+          if (requestToken !== state.requestSequence || !state.selected || state.selected.operationId !== operationId) return;
+          clearResponseImage();
+          state.responseText = "Network error\n\n" + (error.message || "Could not reach the API.");
+          const panel = responsePanel();
+          panel.replaceChildren();
+          const heading = el("div", "response-head");
+          heading.append(el("span", "response-title", "Response"), el("span", "response-status bad", "Network error"));
+          addResponseActions(heading);
+          panel.append(heading, el("pre", "response-output", error.message || "Could not reach the API."));
+          runnerContent.scrollTo({ top: runnerContent.scrollHeight, behavior: "smooth" });
+        } finally {
+          if (requestToken === state.requestSequence) {
+            state.loadingRequest = false;
+            const currentSend = document.getElementById("send-request");
+            if (currentSend) {
+              currentSend.disabled = false;
+              currentSend.firstChild.textContent = "Send request ";
+            }
+          }
+        }
+      }
+
+      function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + " B";
+        return (bytes / 1024).toFixed(1) + " KB";
+      }
+
+      document.getElementById("openapi-link").href = apiUrl("/api/v1/openapi.json");
+      document.getElementById("skill-link").href = apiUrl("/api/skill.md");
+      document.getElementById("copy-curl").addEventListener("click", copyCurl);
+      document.getElementById("copy-schema").addEventListener("click", () => {
+        if (state.schema) copyText(JSON.stringify(state.schema, null, 2), "Schema");
+      });
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.activeRefTab = button.dataset.refTab;
+          document.querySelectorAll(".tab-button").forEach((tab) => tab.classList.toggle("active", tab === button));
+          renderReferenceTab();
+        });
+      });
+      document.querySelectorAll(".mobile-tab").forEach((button) => {
+        button.addEventListener("click", () => setMobileView(button.dataset.view));
+      });
+      search.addEventListener("input", renderCatalog);
+      document.addEventListener("keydown", (event) => {
+        const target = event.target;
+        const inEditor = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+        if (event.key === "/" && !inEditor && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          event.preventDefault();
+          search.focus();
+        }
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && state.document) {
+          event.preventDefault();
+          if (window.matchMedia("(max-width: 900px)").matches) setMobileView("try");
+          sendRequest();
+        }
+        if (event.key === "Escape" && document.activeElement === search) {
+          search.value = "";
+          renderCatalog();
+          search.blur();
+        }
+      });
+      checkConnection();
+      window.setInterval(checkConnection, 30000);
+      openRoot();
+    })();
   </script>
 </body>
 </html>
