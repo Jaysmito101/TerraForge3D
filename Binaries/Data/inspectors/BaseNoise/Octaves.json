@@ -18,6 +18,12 @@
         1,
         1,
         1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1
       ],
       "Widget": "Octaves",
@@ -32,7 +38,7 @@
     {
       "Name": "NoiseOctaveStrengthsCount",
       "Type": "Int",
-      "Default": 10,
+      "Default": 16,
       "Visible": false
     }
   ]

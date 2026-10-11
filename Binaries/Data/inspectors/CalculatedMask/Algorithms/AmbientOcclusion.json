@@ -10,6 +10,13 @@
       "$include": "../Parameters/Terrain/CavitySensitivity.json"
     },
     {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "Name": "SampleRadius",
+      "Default": 2
+    },
+    {
       "Name": "Range",
       "Type": "Vector2",
       "Default": [

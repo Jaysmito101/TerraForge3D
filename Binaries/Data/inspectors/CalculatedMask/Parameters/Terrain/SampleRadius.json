@@ -5,11 +5,11 @@
     "Default": 3,
     "Widget": "Slider",
     "Constraints": [
-      1,
+      0.125,
       8
     ],
-    "Label": "Slope sample radius",
-    "Description": "Controls the terrain distance used for the stable slope estimate.",
-    "Tooltip": "Larger values reduce small-scale noise but soften narrow features."
+    "Label": "Terrain sample radius (1K reference)",
+    "Description": "Sets the world-space footprint in pixels at a 1024 map resolution.",
+    "Tooltip": "The footprint scales with map resolution. Smaller values reveal finer terrain features when the map supports them."
   }
 ]

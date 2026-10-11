@@ -5,6 +5,13 @@
   "Params": [
     {
       "$include": "../Parameters/Common/Range.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "Name": "SampleRadius",
+      "Default": 1
     }
   ],
   "CustomData": {

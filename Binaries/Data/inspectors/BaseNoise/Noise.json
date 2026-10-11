@@ -7,6 +7,16 @@
   "Params": [
     {
       "$include": "../Common/Noise.json"
+    },
+    {
+      "Name": "NoiseOctaves",
+      "Default": 16,
+      "Constraints": [
+        1,
+        24
+      ],
+      "Description": "Extra layers fade in as map resolution can represent them.",
+      "Tooltip": "Higher resolutions can use the extra layers for finer terrain detail."
     }
   ]
 }

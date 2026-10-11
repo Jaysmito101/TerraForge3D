@@ -8,6 +8,13 @@
     },
     {
       "$include": "../Parameters/Terrain/Feature.json"
+    },
+    {
+      "$include": "../Parameters/Terrain/SampleRadius.json"
+    },
+    {
+      "Name": "SampleRadius",
+      "Default": 1
     }
   ],
   "CustomData": {
