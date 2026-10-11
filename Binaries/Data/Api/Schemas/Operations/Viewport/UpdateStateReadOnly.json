@@ -7,7 +7,7 @@
     },
     "Camera": { "$include": "Operations/Viewport/State/Camera.json" },
     "Render": { "$include": "Operations/Viewport/State/Render.json" },
-    "Interoperation": { "$include": "Operations/Viewport/State/Interoperation.json" },
+    "Interaction": { "$include": "Operations/Viewport/State/Interaction.json" },
     "Viewport": { "$include": "Operations/Viewport/State/Viewport.json" }
   }
 }

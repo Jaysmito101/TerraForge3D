@@ -10,7 +10,7 @@
     "Heightmap": { "$include": "Operations/Viewport/State/Heightmap.json" },
     "TextureSlot": { "$include": "Operations/Viewport/State/TextureSlot.json" },
     "Render": { "$include": "Operations/Viewport/State/Render.json" },
-    "Interoperation": { "$include": "Operations/Viewport/State/Interoperation.json" },
+    "Interaction": { "$include": "Operations/Viewport/State/Interaction.json" },
     "Viewport": { "$include": "Operations/Viewport/State/Viewport.json" }
   },
   "required": [
@@ -20,7 +20,7 @@
     "Heightmap",
     "TextureSlot",
     "Render",
-    "Interoperation",
+    "Interaction",
     "Viewport"
   ]
 }

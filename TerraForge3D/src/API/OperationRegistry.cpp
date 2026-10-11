@@ -204,9 +204,11 @@ namespace
         const auto schemaType = entry.inputSchema.find("type");
         const auto properties = entry.inputSchema.find("properties");
         if (schemaType == entry.inputSchema.end() || !schemaType->is_string() ||
-            schemaType->get<std::string>() != "object" || properties == entry.inputSchema.end() ||
-            !properties->is_object()) {
-            TF3D_LOG_ERROR("API operation '{}' input schema must describe an object", entry.name);
+            schemaType->get<std::string>() != "object" ||
+            (properties != entry.inputSchema.end() && !properties->is_object())) {
+            TF3D_LOG_ERROR(
+                "API operation '{}' input schema must describe an object with an optional object-valued 'properties' field",
+                entry.name);
             return false;
         }
 
@@ -216,7 +218,7 @@ namespace
                                     std::any_of(required->begin(), required->end(), [&parameter](const nlohmann::json &field) {
                                         return field.is_string() && field.get<std::string>() == parameter;
                                     });
-            if (!properties->contains(parameter) || !isRequired) {
+            if (properties == entry.inputSchema.end() || !properties->contains(parameter) || !isRequired) {
                 TF3D_LOG_ERROR(
                     "API operation '{}' path parameter '{}' must be a required input schema property",
                     entry.name,
@@ -233,18 +235,20 @@ namespace
         }
 
         if (entry.method == tf3d::api::ApiHttpMethod::Get) {
-            for (auto property = properties->begin(); property != properties->end(); ++property) {
-                const bool isPathParameter =
-                    std::find(pathParameters.begin(), pathParameters.end(), property.key()) != pathParameters.end();
-                if (isPathParameter || IsScalarParameterSchema(property.value())) {
-                    continue;
-                }
+            if (properties != entry.inputSchema.end()) {
+                for (auto property = properties->begin(); property != properties->end(); ++property) {
+                    const bool isPathParameter =
+                        std::find(pathParameters.begin(), pathParameters.end(), property.key()) != pathParameters.end();
+                    if (isPathParameter || IsScalarParameterSchema(property.value())) {
+                        continue;
+                    }
 
-                TF3D_LOG_ERROR(
-                    "API operation '{}' query parameter '{}' must have a scalar schema type",
-                    entry.name,
-                    property.key());
-                return false;
+                    TF3D_LOG_ERROR(
+                        "API operation '{}' query parameter '{}' must have a scalar schema type",
+                        entry.name,
+                        property.key());
+                    return false;
+                }
             }
         }
         return true;
