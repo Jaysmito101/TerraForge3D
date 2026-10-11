@@ -6,11 +6,34 @@
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
 namespace tf3d::generators
 {
+
+    namespace
+    {
+        bool IsValidStrokeMode(MaskStrokeMode mode, bool allowNegativeValues)
+        {
+            switch (mode) {
+                case MaskStrokeMode::Paint:
+                case MaskStrokeMode::Erase:
+                    return true;
+                case MaskStrokeMode::PaintNegative:
+                    return allowNegativeValues;
+            }
+            return false;
+        }
+
+        bool IsValidStrokePoint(const glm::vec2 &point)
+        {
+            return std::isfinite(point.x) && std::isfinite(point.y) &&
+                   point.x >= 0.0f && point.x <= 1.0f &&
+                   point.y >= 0.0f && point.y <= 1.0f;
+        }
+    } // namespace
 
     MaskTool *MaskTool::s_CurrentlyEditingMaskTool = nullptr;
 
@@ -38,6 +61,7 @@ namespace tf3d::generators
           m_HasActiveStroke(other.m_HasActiveStroke),
           m_VizColor(other.m_VizColor),
           m_InvertPreview(other.m_InvertPreview),
+          m_PreviewVisible(other.m_PreviewVisible),
           m_DrawSettings(other.m_DrawSettings),
           m_RequireUpdation(other.m_RequireUpdation),
           m_IsEditing(other.m_IsEditing),
@@ -65,6 +89,7 @@ namespace tf3d::generators
         m_HasActiveStroke     = other.m_HasActiveStroke;
         m_VizColor            = other.m_VizColor;
         m_InvertPreview       = other.m_InvertPreview;
+        m_PreviewVisible      = other.m_PreviewVisible;
         m_DrawSettings        = other.m_DrawSettings;
         m_RequireUpdation     = other.m_RequireUpdation;
         m_IsEditing           = other.m_IsEditing;
@@ -88,6 +113,7 @@ namespace tf3d::generators
     {
         auto node = CreateSerializerNode();
         node->Set("InvertPreview", m_InvertPreview);
+        node->Set("PreviewVisible", m_PreviewVisible);
 
         std::vector<SerializerNode> strokes;
         strokes.reserve(m_Strokes.size() + (m_HasActiveStroke ? 1 : 0));
@@ -97,7 +123,7 @@ namespace tf3d::generators
             strokeNode->Set("Strength", stroke.strength);
             strokeNode->Set("Size", stroke.size);
             strokeNode->Set("Falloff", stroke.falloff);
-            strokeNode->Set("Mode", stroke.mode);
+            strokeNode->Set("Mode", static_cast<int>(stroke.mode));
             strokes.push_back(std::move(strokeNode));
         };
         for (const auto &stroke : m_Strokes)
@@ -123,12 +149,14 @@ namespace tf3d::generators
             stroke.strength = strokeNode->Get<float>("Strength", 0.0f);
             stroke.size     = strokeNode->Get<float>("Size", 0.0f);
             stroke.falloff  = strokeNode->Get<float>("Falloff", 0.0f);
-            stroke.mode     = strokeNode->Get<int>("Mode", 0);
+            stroke.mode     = static_cast<MaskStrokeMode>(
+                glm::clamp(strokeNode->Get<int>("Mode", 0), 0, m_AllowNegativeValues ? 2 : 1));
             if (!stroke.points.empty())
                 m_Strokes.push_back(std::move(stroke));
         }
 
         m_InvertPreview = data->Get<bool>("InvertPreview", m_InvertPreview);
+        m_PreviewVisible = data->Get<bool>("PreviewVisible", m_PreviewVisible);
         m_IsEditing     = false;
         if (s_CurrentlyEditingMaskTool == this)
             s_CurrentlyEditingMaskTool = nullptr;
@@ -168,7 +196,8 @@ namespace tf3d::generators
         m_ActiveStroke.strength = glm::clamp(m_DrawSettings.m_BrushStrength, 0.0f, 1.0f);
         m_ActiveStroke.size     = glm::max(m_DrawSettings.m_BrushSize, 0.000001f);
         m_ActiveStroke.falloff  = glm::clamp(m_DrawSettings.m_BrushFalloff, 0.0f, 1.0f);
-        m_ActiveStroke.mode     = m_DrawSettings.m_BrushMode;
+        m_ActiveStroke.mode     = static_cast<MaskStrokeMode>(
+            glm::clamp(m_DrawSettings.m_BrushMode, 0, m_AllowNegativeValues ? 2 : 1));
         m_ActiveStroke.points.push_back(position);
         m_HasActiveStroke = true;
     }
@@ -298,6 +327,9 @@ namespace tf3d::generators
             ImGui::TextDisabled("Signed preview: blue is negative, red is positive, gray is zero. Paint negative adds -1.");
         }
 
+        ImGui::Checkbox("Show mask preview in viewport", &m_PreviewVisible);
+        ImGui::Checkbox("Invert preview", &m_InvertPreview);
+
         if (previewTexture != nullptr) {
             const float previewSize = glm::clamp(ImGui::GetContentRegionAvail().x, 160.0f, 512.0f);
             ImGui::Image(previewTexture->GetTextureID(), ImVec2(previewSize, previewSize));
@@ -387,6 +419,60 @@ namespace tf3d::generators
             state.activeStroke = m_ActiveStroke;
         }
         return state;
+    }
+
+    bool MaskTool::BeginStroke(MaskStroke stroke)
+    {
+        if (m_HasActiveStroke || stroke.points.size() != 1 ||
+            !IsValidStrokePoint(stroke.points.front()) ||
+            !std::isfinite(stroke.size) || stroke.size < 0.005f || stroke.size > 2.0f ||
+            !std::isfinite(stroke.strength) || stroke.strength < 0.0f || stroke.strength > 1.0f ||
+            !std::isfinite(stroke.falloff) || stroke.falloff < 0.0f || stroke.falloff > 1.0f ||
+            !IsValidStrokeMode(stroke.mode, m_AllowNegativeValues)) {
+            return false;
+        }
+
+        m_ActiveStroke    = std::move(stroke);
+        m_HasActiveStroke = true;
+        m_RequireUpdation = true;
+        return true;
+    }
+
+    bool MaskTool::AppendStrokePoints(const std::vector<glm::vec2> &points)
+    {
+        if (!m_HasActiveStroke || points.empty()) {
+            return false;
+        }
+        if (!std::all_of(points.begin(), points.end(), IsValidStrokePoint)) {
+            return false;
+        }
+
+        m_ActiveStroke.points.insert(m_ActiveStroke.points.end(), points.begin(), points.end());
+        m_RequireUpdation = true;
+        return true;
+    }
+
+    bool MaskTool::FinishStroke()
+    {
+        if (!m_HasActiveStroke) {
+            return false;
+        }
+
+        FinishActiveStroke();
+        return true;
+    }
+
+    bool MaskTool::ClearStrokes()
+    {
+        if (m_Strokes.empty() && !m_HasActiveStroke) {
+            return false;
+        }
+
+        m_Strokes.clear();
+        m_ActiveStroke    = MaskStroke{};
+        m_HasActiveStroke = false;
+        m_RequireUpdation = true;
+        return true;
     }
 
 } // namespace tf3d::generators
