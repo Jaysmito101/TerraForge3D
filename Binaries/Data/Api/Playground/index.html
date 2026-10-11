@@ -950,6 +950,10 @@
         return (bytes / 1024).toFixed(1) + " KB";
       }
 
+      const logoUrl = apiUrl("/api/docs/logo.png");
+      document.getElementById("favicon-link").href = logoUrl;
+      document.getElementById("brand-logo").src = logoUrl;
+      document.getElementById("empty-logo").src = logoUrl;
       document.getElementById("openapi-link").href = apiUrl("/api/v1/openapi.json");
       document.getElementById("skill-link").href = apiUrl("/api/skill.md");
       document.getElementById("copy-curl").addEventListener("click", copyCurl);
