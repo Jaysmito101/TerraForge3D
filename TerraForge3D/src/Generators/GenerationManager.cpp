@@ -129,6 +129,31 @@ namespace tf3d::generators
             hasOutput && !dirtyState.IsDirty() && m_OutputInputRevision == dirtyState.revision};
     }
 
+    GenerationLifecycleSnapshot GenerationManager::GetLifecycleSnapshot() const
+    {
+        const auto dirtyState = m_DirtyManager.Snapshot();
+
+        GenerationLifecycleSnapshot snapshot;
+        snapshot.canvas = {
+            m_HasCommittedOutput,
+            m_ActiveGeneration != nullptr,
+            m_HasCommittedOutput && !dirtyState.IsDirty() &&
+                m_OutputInputRevision == dirtyState.revision};
+        snapshot.inputRevision          = dirtyState.revision;
+        snapshot.outputInputRevision    = m_OutputInputRevision;
+        snapshot.lastFailedRevision     = m_LastFailedGenerationRevision;
+        snapshot.activeInputRevision    = m_ActiveGeneration != nullptr
+                                              ? m_ActiveGeneration->snapshot.dirtyState.revision
+                                              : 0;
+        snapshot.terrainRevision        = m_Field.terrainRevision.load(std::memory_order_acquire);
+        snapshot.outputTileResolution   = m_OutputTileResolution;
+        snapshot.outputTileSize         = m_OutputTileSize;
+        snapshot.inputIsDirty           = dirtyState.IsDirty();
+        snapshot.updatesPaused          = m_Ui.updationPaused;
+        snapshot.statistics             = m_Field.statisticsResult;
+        return snapshot;
+    }
+
     void GenerationManager::SchedulePendingGeneration()
     {
         const bool resizeRequiresGeneration = m_DirtyManager.HasCause(GenerationDirtyCause::Resize);
@@ -360,8 +385,10 @@ namespace tf3d::generators
                 }
             }
         }
-        m_OutputInputRevision = snapshot.dirtyState.revision;
-        m_HasCommittedOutput  = true;
+        m_OutputInputRevision  = snapshot.dirtyState.revision;
+        m_OutputTileResolution = snapshot.tileResolution;
+        m_OutputTileSize       = snapshot.tileSize;
+        m_HasCommittedOutput   = true;
         return true;
     }
 
@@ -377,8 +404,10 @@ namespace tf3d::generators
         m_Field.swapBuffer->Resize(size);
         m_Field.slopeGenerator->Resize(m_AppState->mainMap.tileResolution);
         m_Field.workingSlopeGenerator->Resize(m_AppState->mainMap.tileResolution);
-        m_OutputInputRevision = 0;
-        m_HasCommittedOutput  = false;
+        m_OutputInputRevision  = 0;
+        m_OutputTileResolution = 0;
+        m_OutputTileSize       = 0.0f;
+        m_HasCommittedOutput   = false;
         m_DirtyManager.MarkForce(GenerationDirtyCause::Resize);
         for (auto biome : m_Field.biomeManagers) {
             biome->Resize();

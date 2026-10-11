@@ -122,6 +122,20 @@ namespace tf3d::generators
         bool outputIsCurrent = false;
     };
 
+    struct GenerationLifecycleSnapshot {
+        GenerationCanvasStatus canvas;
+        uint64_t inputRevision         = 0;
+        uint64_t outputInputRevision   = 0;
+        uint64_t lastFailedRevision    = 0;
+        uint64_t activeInputRevision   = 0;
+        uint64_t terrainRevision       = 0;
+        int32_t outputTileResolution   = 0;
+        float outputTileSize           = 0.0f;
+        bool inputIsDirty              = false;
+        bool updatesPaused             = false;
+        GeneratorDataStatisticsResult statistics;
+    };
+
     struct ActiveGeneration {
         explicit ActiveGeneration(GenerationRequestSnapshot snapshot)
             : snapshot(std::move(snapshot))
@@ -143,6 +157,7 @@ namespace tf3d::generators
         void MarkForRegeneration();
         void ShowSettings();
         GenerationCanvasStatus GetCanvasStatus() const;
+        GenerationLifecycleSnapshot GetLifecycleSnapshot() const;
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
 
@@ -222,6 +237,8 @@ namespace tf3d::generators
 
         uint64_t m_LastFailedGenerationRevision = 0;
         uint64_t m_OutputInputRevision          = 0;
+        int32_t m_OutputTileResolution          = 0;
+        float m_OutputTileSize                  = 0.0f;
         bool m_HasCommittedOutput               = false;
         std::unique_ptr<ActiveGeneration> m_ActiveGeneration;
         std::unique_ptr<GenerationWorker> m_Worker;
