@@ -4,8 +4,7 @@
     "Enabled": { "type": "boolean" },
     "UseMask": { "type": "boolean" },
     "InvertMask": { "type": "boolean" },
-    "Inspector": { "$runtime": "Generation.BaseNoiseInspector" },
-    "BaseMask": { "$runtime": "Generation.BaseMask" }
+    "Inspector": { "$runtime": "Generation.BaseNoiseInspector" }
   },
   "additionalProperties": false
 }

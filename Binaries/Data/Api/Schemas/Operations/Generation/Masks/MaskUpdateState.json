@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "BaseMask": { "$runtime": "Generation.BaseMask" },
+    "Preview": { "$include": "Operations/Generation/Masks/MaskPreviewUpdate.json" }
+  },
+  "minProperties": 1,
+  "additionalProperties": false
+}

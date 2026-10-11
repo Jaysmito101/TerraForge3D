@@ -4,9 +4,9 @@
   "Method": "PATCH",
   "Path": "/api/v1/generation/biomes/{BiomeId}/custom-base-shape",
   "Title": "Update custom base shape",
-  "Description": "Partially update custom base-shape enablement, flattening, or the ordered layer list. Layer mask configuration and drawing strokes are read-only here and are preserved when layer values are edited.",
+  "Description": "Partially update custom base-shape enablement, flattening, or the ordered layer list. Mask references are read-only; update each layer's base mask and strokes through its mask operations.",
   "InputSchema": { "$include": "Operations/Generation/CustomBaseShapeUpdateInput.json" },
-  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/CustomBaseShapeStateReadOnly.json" },
   "Annotations": { "readOnlyHint": false },
   "Flags": ["None"]
 }

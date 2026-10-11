@@ -4,14 +4,14 @@
   "Method": "GET",
   "Path": "/api/v1/generation/biomes/{BiomeId}/base-noise",
   "Title": "Get biome base noise",
-  "Description": "Read base-noise enablement, optional mask usage, and composed inspector settings. BaseMask and MaskTool state is included for discovery; drawing inputs are handled by the mask operations.",
+  "Description": "Read base-noise enablement, optional mask usage, composed inspector settings, and an operation reference to its shared mask resource. Read or edit mask settings and strokes through that reference.",
   "InputSchema": {
     "type": "object",
     "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
     "required": ["BiomeId"],
     "additionalProperties": false
   },
-  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BaseNoiseStateReadOnly.json" },
   "Annotations": { "readOnlyHint": true },
   "Flags": ["ReadOnly"]
 }

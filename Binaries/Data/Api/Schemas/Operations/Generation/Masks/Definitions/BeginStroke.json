@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.strokes.begin",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}/strokes/begin",
+  "Title": "Begin mask stroke",
+  "Description": "Start one interactive stroke with its initial normalized terrain UV point and brush settings. A mask can have only one active stroke.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/StrokeBeginInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

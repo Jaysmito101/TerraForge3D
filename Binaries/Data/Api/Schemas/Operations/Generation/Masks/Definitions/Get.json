@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}",
+  "Title": "Get biome mask",
+  "Description": "Read one mask layer, its revision and resolution, base-mask settings, preview options, stroke counts, limits, coordinate contract, and operation references. Filter targets require FilterId; custom-base-shape targets require MaskIndex.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/MaskGetInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

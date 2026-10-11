@@ -4,9 +4,9 @@
   "Method": "PATCH",
   "Path": "/api/v1/generation/biomes/{BiomeId}/base-noise",
   "Title": "Update biome base noise",
-  "Description": "Partially update base-noise enablement, optional mask usage, and inspector values. Inspector values use the same generated schema and validation as the in-app inspector. Mask drawing state is read-only here.",
+  "Description": "Partially update base-noise enablement, optional mask usage, and inspector values. Inspector values use the same generated schema and validation as the in-app inspector; mask settings and strokes have their own operations.",
   "InputSchema": { "$include": "Operations/Generation/BaseNoiseUpdateInput.json" },
-  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BaseNoiseStateReadOnly.json" },
   "Annotations": { "readOnlyHint": false },
   "Flags": ["None"]
 }

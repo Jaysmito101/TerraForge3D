@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.strokes.finish",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}/strokes/finish",
+  "Title": "Finish mask stroke",
+  "Description": "Finish the current stroke and add it to the bounded undo history.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/MaskTargetInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

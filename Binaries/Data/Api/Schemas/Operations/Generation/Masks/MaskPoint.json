@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "U": { "type": "number", "minimum": 0, "maximum": 1, "description": "Normalized terrain coordinate: 0 at minimum world X and 1 at maximum world X." },
+    "V": { "type": "number", "minimum": 0, "maximum": 1, "description": "Normalized terrain coordinate: 0 at maximum world Z and 1 at minimum world Z." }
+  },
+  "required": ["U", "V"],
+  "additionalProperties": false
+}

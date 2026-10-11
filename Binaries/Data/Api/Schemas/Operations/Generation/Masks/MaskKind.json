@@ -1,0 +1,4 @@
+{
+  "type": "string",
+  "enum": ["biome", "base-noise", "custom-base-shape", "filter"]
+}

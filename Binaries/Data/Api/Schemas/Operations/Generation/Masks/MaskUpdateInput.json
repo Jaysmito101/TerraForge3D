@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "BiomeId": { "type": "string", "minLength": 1 },
+    "MaskKind": { "$include": "Operations/Generation/Masks/MaskKind.json" },
+    "FilterId": { "type": "string", "minLength": 1 },
+    "MaskIndex": { "type": "integer", "minimum": 0, "maximum": 31 },
+    "State": { "$include": "Operations/Generation/Masks/MaskUpdateState.json" }
+  },
+  "required": ["BiomeId", "MaskKind", "State"],
+  "additionalProperties": false
+}

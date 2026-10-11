@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.strokes.append",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}/strokes/append",
+  "Title": "Append mask stroke points",
+  "Description": "Append between 1 and 1024 normalized terrain UV points to the active stroke. Points are validated as a batch before any are applied.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/StrokeAppendInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

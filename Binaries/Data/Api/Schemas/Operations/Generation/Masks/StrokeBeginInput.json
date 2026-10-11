@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "BiomeId": { "type": "string", "minLength": 1 },
+    "MaskKind": { "$include": "Operations/Generation/Masks/MaskKind.json" },
+    "FilterId": { "type": "string", "minLength": 1 },
+    "MaskIndex": { "type": "integer", "minimum": 0, "maximum": 31 },
+    "Point": { "$include": "Operations/Generation/Masks/MaskPoint.json" },
+    "Size": { "type": "number", "minimum": 0.005, "maximum": 2, "description": "Brush radius in normalized terrain UV units." },
+    "Strength": { "type": "number", "minimum": 0, "maximum": 1 },
+    "Falloff": { "type": "number", "minimum": 0, "maximum": 1 },
+    "Mode": { "type": "string", "enum": ["paint", "erase", "paint-negative"], "description": "paint-negative is available only on signed custom base-shape masks." }
+  },
+  "required": ["BiomeId", "MaskKind", "Point", "Size", "Strength", "Falloff", "Mode"],
+  "additionalProperties": false
+}

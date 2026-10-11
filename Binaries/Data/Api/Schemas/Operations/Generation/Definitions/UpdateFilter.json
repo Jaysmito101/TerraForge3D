@@ -4,7 +4,7 @@
   "Method": "PATCH",
   "Path": "/api/v1/generation/biomes/{BiomeId}/filters/{FilterId}",
   "Title": "Update biome filter",
-  "Description": "Partially update filter behavior and parameters. Parameters are dynamically checked against this filter instance's composed inspector schema before the filter state is published.",
+  "Description": "Partially update filter behavior and parameters. Parameters are dynamically checked against this filter instance's composed inspector schema. Its mask is a separate referenced resource.",
   "InputSchema": { "$include": "Operations/Generation/FilterUpdateInput.json" },
   "ResponseSchema": { "$include": "Operations/Generation/FilterStateResponse.json" },
   "Annotations": { "readOnlyHint": false },

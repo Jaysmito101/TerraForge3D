@@ -4,14 +4,14 @@
   "Method": "GET",
   "Path": "/api/v1/generation/biomes/{BiomeId}/custom-base-shape",
   "Title": "Get custom base shape",
-  "Description": "Read custom base-shape enablement, flattening, ordered mask layers, and each layer's mask and drawing state.",
+  "Description": "Read custom base-shape enablement, flattening, and ordered mask layers. Each layer includes a reference to its mask resource and drawing operations.",
   "InputSchema": {
     "type": "object",
     "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
     "required": ["BiomeId"],
     "additionalProperties": false
   },
-  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/CustomBaseShapeStateReadOnly.json" },
   "Annotations": { "readOnlyHint": true },
   "Flags": ["ReadOnly"]
 }

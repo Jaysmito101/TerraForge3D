@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "kind": { "$include": "Operations/Generation/Masks/MaskKind.json" },
+    "baseMask": { "$runtime": "Generation.BaseMask" }
+  },
+  "required": ["kind", "baseMask"],
+  "additionalProperties": false
+}

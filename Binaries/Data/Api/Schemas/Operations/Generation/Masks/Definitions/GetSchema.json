@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.get_schema",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}/schema",
+  "Title": "Get mask base settings schema",
+  "Description": "Return the composed base-mask settings schema for this exact mask layer. Use MaskKind and, for filter or custom-base-shape layers, FilterId or MaskIndex to select the mask.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/MaskGetInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskBaseSchemaResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

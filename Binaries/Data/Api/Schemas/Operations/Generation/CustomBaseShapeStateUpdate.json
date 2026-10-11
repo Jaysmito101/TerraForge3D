@@ -15,8 +15,7 @@
           "Raise": { "type": "boolean" },
           "Strength": { "type": "number", "minimum": 0, "maximum": 4 },
           "Smoothing": { "type": "number", "minimum": 0, "maximum": 1 },
-          "BaseMask": { "$include": "Operations/Generation/GenericObject.json", "readOnly": true },
-          "MaskTool": { "$include": "Operations/Generation/GenericObject.json", "readOnly": true }
+          "Mask": { "$include": "Operations/Generation/OperationReference.json", "readOnly": true }
         },
         "additionalProperties": false
       }

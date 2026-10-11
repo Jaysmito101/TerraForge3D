@@ -5,8 +5,7 @@
     "UseMask": { "type": "boolean" },
     "InvertMask": { "type": "boolean" },
     "Inspector": { "$runtime": "Generation.BaseNoiseInspector" },
-    "BaseMask": { "$runtime": "Generation.BaseMask" },
-    "MaskTool": { "$include": "Operations/Generation/GenericObject.json", "readOnly": true }
+    "Mask": { "$include": "Operations/Generation/OperationReference.json", "readOnly": true }
   },
   "additionalProperties": false
 }

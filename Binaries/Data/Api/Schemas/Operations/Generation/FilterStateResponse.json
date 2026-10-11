@@ -9,13 +9,12 @@
     "Strength": { "type": "number", "minimum": 0, "maximum": 1 },
     "MergeMode": { "type": "string", "enum": ["override", "add", "subtract", "multiply", "blend"] },
     "Parameters": { "$include": "Operations/Generation/GenericObject.json" },
-    "BaseMask": { "$include": "Operations/Generation/GenericObject.json" },
-    "MaskTool": { "$include": "Operations/Generation/GenericObject.json" },
+    "Mask": { "$include": "Operations/Generation/OperationReference.json" },
     "Name": { "type": "string" },
     "Category": { "type": "string" },
     "Position": { "type": "integer", "minimum": 0 },
     "Schema": { "$include": "Operations/Generation/OperationReference.json" }
   },
-  "required": ["ID", "DefinitionID", "Enabled", "UseMask", "InvertMask", "Strength", "MergeMode", "Parameters", "Name", "Category", "Position", "Schema"],
+  "required": ["ID", "DefinitionID", "Enabled", "UseMask", "InvertMask", "Strength", "MergeMode", "Parameters", "Mask", "Name", "Category", "Position", "Schema"],
   "additionalProperties": true
 }

@@ -7,8 +7,9 @@
     "baseShape": { "$include": "Operations/Generation/GenericObject.json" },
     "baseNoise": { "$include": "Operations/Generation/GenericObject.json" },
     "customBaseShape": { "$include": "Operations/Generation/GenericObject.json" },
+    "mask": { "$include": "Operations/Generation/OperationReference.json" },
     "filters": { "type": "array", "items": { "$include": "Operations/Generation/FilterStateResponse.json" } }
   },
-  "required": ["id", "order", "general", "baseShape", "baseNoise", "customBaseShape", "filters"],
+  "required": ["id", "order", "general", "baseShape", "baseNoise", "customBaseShape", "mask", "filters"],
   "additionalProperties": false
 }

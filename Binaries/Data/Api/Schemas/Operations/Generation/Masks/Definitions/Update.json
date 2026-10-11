@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.update",
+  "Method": "PATCH",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}",
+  "Title": "Update mask settings",
+  "Description": "Partially update the composed base-mask settings or display-only preview options. Preview visibility and inversion do not change generated terrain revisions.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/MaskUpdateInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

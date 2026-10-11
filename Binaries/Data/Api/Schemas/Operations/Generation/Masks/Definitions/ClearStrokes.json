@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.strokes.clear",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}/strokes/clear",
+  "Title": "Clear mask strokes",
+  "Description": "Remove all completed and active strokes from the selected mask. Base-mask settings are preserved.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/MaskTargetInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": false, "destructiveHint": true },
+  "Flags": ["Destructive"]
+}

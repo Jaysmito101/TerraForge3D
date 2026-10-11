@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.masks.strokes.undo",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/masks/{MaskKind}/strokes/undo",
+  "Title": "Undo mask stroke",
+  "Description": "Discard the active stroke, or remove the most recently completed stroke when no stroke is active.",
+  "InputSchema": { "$include": "Operations/Generation/Masks/MaskTargetInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/Masks/MaskStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}
