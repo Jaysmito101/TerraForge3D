@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>API Workspace | TerraForge3D</title>
+  <link id="favicon-link" rel="icon" type="image/png" href="/api/docs/logo.png">
   <style>
     :root {
       color-scheme: dark;
@@ -41,9 +42,8 @@
     }
     .brand { display: flex; align-items: center; gap: 10px; min-width: 205px; color: var(--text-strong); font-weight: 650; letter-spacing: .01em; }
     .brand-mark {
-      width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid #514965;
-      border-radius: 7px; color: #c0b4f2; background: linear-gradient(145deg, #282333, #17151c);
-      font-size: 12px; font-weight: 750;
+      width: 30px; height: 30px; display: block; flex: none; object-fit: contain;
+      filter: brightness(0) invert(.95);
     }
     .brand-name { white-space: nowrap; }
     .brand-divider { width: 1px; height: 20px; background: var(--border-strong); }
@@ -101,7 +101,7 @@
     .reference-head { padding: 24px 28px 17px; border-bottom: 1px solid var(--border); }
     .empty-state { height: 100%; display: grid; place-items: center; padding: 30px; color: var(--muted); text-align: center; }
     .empty-card { max-width: 310px; }
-    .empty-symbol { width: 42px; height: 42px; display: grid; place-items: center; margin: 0 auto 14px; border: 1px solid var(--border-strong); border-radius: 12px; color: #9b8ed1; background: var(--panel); font: 20px var(--mono); }
+    .empty-symbol { width: 56px; height: 56px; display: block; margin: 0 auto 14px; object-fit: contain; filter: brightness(0) invert(.95); opacity: .92; }
     .empty-title { color: var(--text-strong); font-size: 14px; font-weight: 600; }
     .empty-copy { margin-top: 7px; line-height: 1.6; }
     .op-topline { display: flex; align-items: center; gap: 10px; }
@@ -227,7 +227,7 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">TF</span>
+        <img id="brand-logo" class="brand-mark" src="/api/docs/logo.png" alt="TerraForge3D logo">
         <span class="brand-name">TerraForge3D</span>
         <span class="brand-divider"></span>
         <span class="product-name">API workspace</span>
@@ -260,7 +260,7 @@
         <div id="reference-head" class="reference-head">
           <div class="empty-state">
             <div class="empty-card">
-              <div class="empty-symbol">⌘</div>
+              <img id="empty-logo" class="empty-symbol" src="/api/docs/logo.png" alt="TerraForge3D logo">
               <div class="empty-title">Choose an operation</div>
               <div class="empty-copy">Browse the API catalog, then inspect a focused reference or send a request from the Try it panel.</div>
             </div>
