@@ -3,9 +3,10 @@
 #include <httplib.h>
 
 #include "API/Operations/CoreOperations.h"
-#include "API/Operations/GenerationOperations.h"
 #include "API/Operations/GenerationGraphOperations.h"
+#include "API/Operations/GenerationOperations.h"
 #include "API/Operations/GenerationSettingsOperations.h"
+#include "API/Operations/MaskOperations.h"
 #include "API/Operations/SceneOperations.h"
 #include "API/Operations/ViewportOperations.h"
 #include "API/SchemaTemplate.h"
@@ -595,6 +596,7 @@ namespace tf3d::api
         RegisterGenerationOperations(operations, applicationState);
         RegisterGenerationSettingsOperations(operations, applicationState);
         RegisterGenerationGraphOperations(operations, applicationState);
+        RegisterMaskOperations(operations, applicationState);
         RegisterViewportOperations(operations, applicationState);
         RegisterSceneOperations(operations, applicationState);
         operationRegistryComplete = ValidateOperationInventory(operations);

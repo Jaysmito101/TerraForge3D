@@ -82,14 +82,49 @@ namespace tf3d::api
             return false;
         }
 
-        nlohmann::json BuildFilterState(const BiomeFilter &filter, int32_t position)
+        nlohmann::json BuildMaskOperationReference(std::string_view operationId,
+                                                   std::string_view biomeId,
+                                                   std::string_view kind,
+                                                   std::string_view targetKey   = {},
+                                                   std::string_view targetValue = {})
+        {
+            nlohmann::json parameters = {
+                {"BiomeId", std::string(biomeId)},
+                {"MaskKind", std::string(kind)}};
+            if (!targetKey.empty()) {
+                parameters[std::string(targetKey)] = std::string(targetValue);
+            }
+            return {{"operationId", operationId}, {"parameters", std::move(parameters)}};
+        }
+
+        nlohmann::json BuildMaskReference(std::string_view biomeId,
+                                          std::string_view kind,
+                                          std::string_view targetKey   = {},
+                                          std::string_view targetValue = {})
+        {
+            return BuildMaskOperationReference("tf3d.generation.biomes.masks.get",
+                                               biomeId,
+                                               kind,
+                                               targetKey,
+                                               targetValue);
+        }
+
+        nlohmann::json BuildFilterState(const BiomeFilter &filter,
+                                        int32_t position,
+                                        std::string_view biomeId)
         {
             nlohmann::json state = filter.Save()->ToJson();
-            state["MergeMode"]   = MergeModeName(state.value("MergeMode", 4));
-            state["Name"]        = filter.GetName();
-            state["Category"]    = filter.GetCategory();
-            state["Position"]    = position;
-            state["Schema"]      = {
+            state.erase("BaseMask");
+            state.erase("MaskTool");
+            state["MergeMode"] = MergeModeName(state.value("MergeMode", 4));
+            state["Name"]      = filter.GetName();
+            state["Category"]  = filter.GetCategory();
+            state["Position"]  = position;
+            state["Mask"]      = BuildMaskReference(biomeId,
+                                                    "filter",
+                                                    "FilterId",
+                                                    filter.GetID());
+            state["Schema"]    = {
                 {"operationId", "tf3d.generation.filter_catalog.get_schema"},
                 {"parameters", {{"FilterDefinitionId", filter.GetDefinitionID()}}}};
             return state;
@@ -187,13 +222,45 @@ namespace tf3d::api
             return response;
         }
 
+        nlohmann::json BuildBaseNoiseResponse(BiomeManager &biome)
+        {
+            nlohmann::json response = biome.SaveBaseNoiseSettings()->ToJson();
+            response.erase("BaseMask");
+            response.erase("MaskTool");
+            response["Mask"] = BuildMaskReference(biome.GetBiomeID().GetValue(), "base-noise");
+            return response;
+        }
+
+        nlohmann::json BuildCustomBaseShapeResponse(BiomeManager &biome)
+        {
+            nlohmann::json response = biome.SaveCustomBaseShapeSettings()->ToJson();
+            auto masks              = response.find("Masks");
+            if (masks != response.end() && masks->is_array()) {
+                for (std::size_t index = 0; index < masks->size(); ++index) {
+                    nlohmann::json &mask = (*masks)[index];
+                    if (!mask.is_object()) {
+                        continue;
+                    }
+                    mask.erase("BaseMask");
+                    mask.erase("MaskTool");
+                    mask["Mask"] = BuildMaskReference(biome.GetBiomeID().GetValue(),
+                                                      "custom-base-shape",
+                                                      "MaskIndex",
+                                                      std::to_string(index));
+                }
+            }
+            return response;
+        }
+
         nlohmann::json BuildBiomeGraph(BiomeManager &biome, int32_t order)
         {
             nlohmann::json filters = nlohmann::json::array();
             const auto &stack      = biome.GetFilters();
             for (std::size_t index = 0; index < stack.size(); ++index) {
                 if (stack[index] != nullptr) {
-                    filters.push_back(BuildFilterState(*stack[index], static_cast<int32_t>(index)));
+                    filters.push_back(BuildFilterState(*stack[index],
+                                                       static_cast<int32_t>(index),
+                                                       biome.GetBiomeID().GetValue()));
                 }
             }
             return {
@@ -201,8 +268,9 @@ namespace tf3d::api
                 {"order", order},
                 {"general", biome.SaveGeneralSettings()->ToJson()},
                 {"baseShape", BuildBaseShapeResponse(biome)},
-                {"baseNoise", biome.SaveBaseNoiseSettings()->ToJson()},
-                {"customBaseShape", biome.SaveCustomBaseShapeSettings()->ToJson()},
+                {"baseNoise", BuildBaseNoiseResponse(biome)},
+                {"customBaseShape", BuildCustomBaseShapeResponse(biome)},
+                {"mask", BuildMaskReference(biome.GetBiomeID().GetValue(), "biome")},
                 {"filters", std::move(filters)}};
         }
 
@@ -390,7 +458,7 @@ namespace tf3d::api
             if (!ResolveBiome(applicationState, arguments, biome, failure)) {
                 return failure;
             }
-            return ApiResult::Success(biome->SaveBaseNoiseSettings()->ToJson());
+            return ApiResult::Success(BuildBaseNoiseResponse(*biome));
         }
 
         ApiResult ListBaseShapeAlgorithms(tf3d::data::ApplicationState *applicationState)
@@ -438,7 +506,7 @@ namespace tf3d::api
             if (!biome->LoadBaseNoiseSettings(CreateSerializerNodeFromJson(state), error)) {
                 return ApiResult::Failure(ApiErrorType::InvalidArguments, std::move(error));
             }
-            return ApiResult::Success(biome->SaveBaseNoiseSettings()->ToJson());
+            return ApiResult::Success(BuildBaseNoiseResponse(*biome));
         }
 
         ApiResult GetCustomBaseShape(tf3d::data::ApplicationState *applicationState,
@@ -449,7 +517,7 @@ namespace tf3d::api
             if (!ResolveBiome(applicationState, arguments, biome, failure)) {
                 return failure;
             }
-            return ApiResult::Success(biome->SaveCustomBaseShapeSettings()->ToJson());
+            return ApiResult::Success(BuildCustomBaseShapeResponse(*biome));
         }
 
         ApiResult UpdateCustomBaseShape(tf3d::data::ApplicationState *applicationState,
@@ -470,7 +538,7 @@ namespace tf3d::api
             if (!biome->LoadCustomBaseShapeSettings(CreateSerializerNodeFromJson(state), error)) {
                 return ApiResult::Failure(ApiErrorType::InvalidArguments, std::move(error));
             }
-            return ApiResult::Success(biome->SaveCustomBaseShapeSettings()->ToJson());
+            return ApiResult::Success(BuildCustomBaseShapeResponse(*biome));
         }
 
         ApiResult GetFilterCatalog(tf3d::data::ApplicationState *applicationState,
@@ -543,7 +611,9 @@ namespace tf3d::api
             const auto &stack      = biome->GetFilters();
             for (std::size_t index = 0; index < stack.size(); ++index) {
                 if (stack[index] != nullptr) {
-                    filters.push_back(BuildFilterState(*stack[index], static_cast<int32_t>(index)));
+                    filters.push_back(BuildFilterState(*stack[index],
+                                                       static_cast<int32_t>(index),
+                                                       biome->GetBiomeID().GetValue()));
                 }
             }
             return ApiResult::Success({{"items", std::move(filters)}, {"count", stack.size()}});
@@ -576,7 +646,7 @@ namespace tf3d::api
             }
             const auto filter = biome->FindFilter(filterId);
             return filter != nullptr
-                       ? ApiResult::Success(BuildFilterState(*filter, target))
+                       ? ApiResult::Success(BuildFilterState(*filter, target, biome->GetBiomeID().GetValue()))
                        : ApiResult::Failure(ApiErrorType::TaskException, "The new filter could not be read back.");
         }
 
@@ -594,7 +664,9 @@ namespace tf3d::api
                 return ApiResult::Failure(ApiErrorType::FilterNotFound,
                                           "FilterId does not exist in this biome.");
             }
-            return ApiResult::Success(BuildFilterState(*filter, FindFilterPosition(*biome, filterId)));
+            return ApiResult::Success(BuildFilterState(*filter,
+                                                       FindFilterPosition(*biome, filterId),
+                                                       biome->GetBiomeID().GetValue()));
         }
 
         ApiResult UpdateFilter(tf3d::data::ApplicationState *applicationState,
@@ -637,7 +709,9 @@ namespace tf3d::api
             if (!biome->LoadFilter(filterId, CreateSerializerNodeFromJson(state), error)) {
                 return ApiResult::Failure(ApiErrorType::InvalidArguments, std::move(error));
             }
-            return ApiResult::Success(BuildFilterState(*filter, FindFilterPosition(*biome, filterId)));
+            return ApiResult::Success(BuildFilterState(*filter,
+                                                       FindFilterPosition(*biome, filterId),
+                                                       biome->GetBiomeID().GetValue()));
         }
 
         ApiResult MoveFilter(tf3d::data::ApplicationState *applicationState,
