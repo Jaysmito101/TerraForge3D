@@ -85,4 +85,57 @@ namespace tf3d::generators
         return changed;
     }
 
+    SerializerNode BiomeMixer::Save(
+        const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers) const
+    {
+        auto settings    = CreateSerializerNode();
+        const auto state = m_State.Capture();
+        settings->Set("Method", state.value.method == BiomeMixerMethod_AlphaBlend ? "alphaBlend" : "simple");
+        if (m_SimpleBiomeMixer != nullptr) {
+            settings->Set("Simple", m_SimpleBiomeMixer->Save(biomeManagers));
+        }
+        return settings;
+    }
+
+    bool BiomeMixer::Load(
+        const SerializerNode &settings,
+        const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
+        std::string &error)
+    {
+        error.clear();
+        if (settings == nullptr || settings->GetKeys().empty()) {
+            error = "At least one biome mixer setting must be provided.";
+            return false;
+        }
+
+        auto nextMethod = m_State.Capture().value.method;
+        if (settings->HasKey("Method")) {
+            const std::string method = settings->Get<std::string>("Method", "");
+            if (method == "simple") {
+                nextMethod = BiomeMixerMethod_Simple;
+            } else if (method == "alphaBlend") {
+                error = "The Alpha Blend mixer is not implemented yet.";
+                return false;
+            } else {
+                error = "Method must be 'simple'.";
+                return false;
+            }
+        }
+
+        const auto simpleSettings = settings->Get<SerializerNode>("Simple");
+        if (simpleSettings != nullptr) {
+            if (nextMethod != BiomeMixerMethod_Simple || m_SimpleBiomeMixer == nullptr ||
+                !m_SimpleBiomeMixer->Load(simpleSettings, biomeManagers, error)) {
+                if (error.empty()) {
+                    error = "Simple mixer settings are unavailable for the selected method.";
+                }
+                return false;
+            }
+            nextMethod = BiomeMixerMethod_Simple;
+        }
+
+        m_State.Replace(State{nextMethod});
+        return true;
+    }
+
 } // namespace tf3d::generators

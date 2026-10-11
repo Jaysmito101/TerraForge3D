@@ -48,6 +48,10 @@ namespace tf3d::generators
                             GeneratorData *heightmapData,
                             GeneratorData *swapBuffer);
         bool ShowSettings(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers);
+        SerializerNode Save(const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers) const;
+        bool Load(const SerializerNode &settings,
+                  const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
+                  std::string &error);
 
         inline Runtime GetRuntime() const
         {
