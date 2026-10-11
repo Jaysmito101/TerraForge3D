@@ -4,6 +4,8 @@
 #include "Profiler.h"
 
 #include <algorithm>
+#include <cmath>
+#include <unordered_set>
 #include <utility>
 
 namespace tf3d::generators
@@ -125,6 +127,85 @@ namespace tf3d::generators
 
             return changed;
         });
+    }
+
+    SerializerNode SimpleBiomeMixer::Save(
+        const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers) const
+    {
+        auto settings = CreateSerializerNode();
+        std::vector<SerializerNode> biomeSettings;
+        biomeSettings.reserve(biomeManagers.size());
+
+        const auto state = m_State.Capture();
+        for (const auto &biome : biomeManagers) {
+            if (biome == nullptr) {
+                continue;
+            }
+            const BiomeID &biomeId               = biome->GetBiomeID();
+            const auto found                     = state.value.biomeSettings.find(biomeId);
+            const SimpleBiomeMixerSettings value = found != state.value.biomeSettings.end()
+                                                       ? found->second
+                                                       : SimpleBiomeMixerSettings{};
+            auto entry                           = CreateSerializerNode();
+            entry->Set("BiomeID", biomeId.GetValue());
+            entry->Set("Enabled", value.enabled);
+            entry->Set("Strength", value.strength);
+            entry->Set("UseBiomeMask", value.useBiomeMask);
+            biomeSettings.push_back(std::move(entry));
+        }
+        settings->Set("Biomes", biomeSettings);
+        return settings;
+    }
+
+    bool SimpleBiomeMixer::Load(
+        const SerializerNode &settings,
+        const std::vector<std::shared_ptr<BiomeManager>> &biomeManagers,
+        std::string &error)
+    {
+        error.clear();
+        if (settings == nullptr || !settings->HasKey("Biomes")) {
+            error = "Simple mixer settings require a Biomes array.";
+            return false;
+        }
+
+        std::unordered_set<std::string> knownBiomes;
+        for (const auto &biome : biomeManagers) {
+            if (biome != nullptr) {
+                knownBiomes.insert(biome->GetBiomeID().GetValue());
+            }
+        }
+
+        State next;
+        std::unordered_set<std::string> seen;
+        for (const auto &entry : settings->Get<std::vector<SerializerNode>>("Biomes")) {
+            if (entry == nullptr) {
+                error = "Simple mixer Biomes entries must be objects.";
+                return false;
+            }
+            const std::string biomeId = entry->Get<std::string>("BiomeID", "");
+            const float strength      = entry->Get<float>("Strength", 1.0f);
+            if (!knownBiomes.contains(biomeId)) {
+                error = "Simple mixer settings reference an unknown BiomeID.";
+                return false;
+            }
+            if (!seen.insert(biomeId).second) {
+                error = "Simple mixer settings contain a duplicate BiomeID.";
+                return false;
+            }
+            if (!std::isfinite(strength) || strength < 0.0f || strength > 1.0f) {
+                error = "Simple mixer Strength must be finite and between 0 and 1.";
+                return false;
+            }
+            next.biomeSettings.emplace(
+                BiomeID{biomeId},
+                SimpleBiomeMixerSettings{
+                    entry->Get<bool>("Enabled", true),
+                    strength,
+                    entry->Get<bool>("UseBiomeMask", false)});
+        }
+
+        m_State.Replace(std::move(next));
+        return true;
     }
 
 } // namespace tf3d::generators
