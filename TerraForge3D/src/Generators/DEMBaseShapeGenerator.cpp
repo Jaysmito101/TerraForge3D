@@ -341,17 +341,29 @@ namespace tf3d::generators
         m_State.MarkProcessed(state->revision);
     }
 
-    void DEMBaseShapeGenerator::Load(SerializerNode data)
+    bool DEMBaseShapeGenerator::Load(SerializerNode data)
     {
         if (data == nullptr)
-            return;
+            return false;
 
-        m_UIState.zoomOnMap          = data->Get<float>("ZoomOnMap", 1.0f);
-        m_UIState.zoomResolution     = data->Get<int>("ZoomResolution", 0);
-        m_UIState.autoZoomResolution = data->Get<bool>("AutoZoomResolution", true);
-        m_UIState.mapStrength        = data->Get<float>("MapStrength", 1.0f);
-        m_UIState.mapCenter          = data->Get<glm::vec2>("MapCenter", glm::vec2(0.0f));
+        State next              = m_UIState;
+        next.zoomOnMap          = data->Get<float>("ZoomOnMap", next.zoomOnMap);
+        next.zoomResolution     = data->Get<int>("ZoomResolution", next.zoomResolution);
+        next.autoZoomResolution = data->Get<bool>("AutoZoomResolution", next.autoZoomResolution);
+        next.mapStrength        = data->Get<float>("MapStrength", next.mapStrength);
+        next.mapCenter          = data->Get<glm::vec2>("MapCenter", next.mapCenter);
+        if (!std::isfinite(next.zoomOnMap) || next.zoomOnMap < 1.0f || next.zoomOnMap > 4096.0f ||
+            next.zoomResolution < 0 || next.zoomResolution > static_cast<int32_t>(dem::kMaxTileZoom) ||
+            !std::isfinite(next.mapStrength) || next.mapStrength < 0.0f || next.mapStrength > kMaxMapStrength ||
+            !std::isfinite(next.mapCenter.x) || !std::isfinite(next.mapCenter.y) ||
+            next.mapCenter.x < -4.0f || next.mapCenter.x > 4.0f ||
+            next.mapCenter.y < -4.0f || next.mapCenter.y > 4.0f) {
+            return false;
+        }
+
+        m_UIState = next;
         m_State.Replace(m_UIState);
+        return true;
     }
 
     SerializerNode DEMBaseShapeGenerator::Save()

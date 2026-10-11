@@ -49,7 +49,7 @@ namespace tf3d::generators
             return m_State.PublishedRevision();
         }
 
-        void Load(SerializerNode data);
+        bool Load(SerializerNode data);
         SerializerNode Save();
 
         inline bool RequireUpdation() const
