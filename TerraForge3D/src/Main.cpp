@@ -22,9 +22,9 @@
 
 #include "Inspector/CustomInspector.h"
 
-#ifdef TF3D_ENABLE_MCP
-#include "MCP/TerraForgeMcpServer.h"
-#include "UI/McpControlPanel.h"
+#ifdef TF3D_ENABLE_API
+#include "API/ApiServer.h"
+#include "UI/ApiControlPanel.h"
 #endif
 
 namespace tf3d
@@ -46,10 +46,10 @@ namespace tf3d
         virtual void OnUpdate(float deltatime) override
         {
             TF3D_PROFILE_SCOPE_DOMAIN("app/update", PerformanceMonitor::Domain::Cpu);
-#ifdef TF3D_ENABLE_MCP
-            if (appState->mcpServer) {
-                TF3D_PROFILE_SCOPE_DOMAIN("app/update/mcp", PerformanceMonitor::Domain::Io);
-                appState->mcpServer->Update();
+#ifdef TF3D_ENABLE_API
+            if (appState->apiServer) {
+                TF3D_PROFILE_SCOPE_DOMAIN("app/update/api", PerformanceMonitor::Domain::Io);
+                appState->apiServer->Update();
             }
 #endif
             if (!appState->states.ruinning)
@@ -172,9 +172,9 @@ namespace tf3d
             appState->jobManager->ShowSettings();
             appState->rendererManager->ShowSettings();
             TF3D_PROFILE_RENDER_UI(&appState->windows.performanceMonitor);
-#ifdef TF3D_ENABLE_MCP
-            if (appState->mcpControlPanel)
-                appState->mcpControlPanel->ShowSettings();
+#ifdef TF3D_ENABLE_API
+            if (appState->apiControlPanel)
+                appState->apiControlPanel->ShowSettings();
 #endif
             if (appState->windows.styleEditor)
                 ShowStyleEditor(&appState->windows.styleEditor);
@@ -216,9 +216,9 @@ namespace tf3d
             appState->constants.modelsDir     = appState->constants.dataDir + PATH_SEPARATOR "models";
             appState->constants.stylesDir     = appState->constants.dataDir + PATH_SEPARATOR "styles";
             appState->configManager           = new ConfigManager();
-#ifdef TF3D_ENABLE_MCP
-            appState->mcpEnabled = true;
-            appState->configManager->GetBool("mcp", "enabled", appState->mcpEnabled);
+#ifdef TF3D_ENABLE_API
+            appState->apiEnabled = true;
+            appState->configManager->GetBool("api", "enabled", appState->apiEnabled);
 #endif
 
             ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
@@ -299,27 +299,27 @@ namespace tf3d
             appState->eventManager->RaiseEvent("TileResolutionChanged", "256");
             appState->eventManager->RaiseEvent("OnStartUpComplete");
 
-#ifdef TF3D_ENABLE_MCP
-            appState->mcpServer = new mcp_layer::TerraForgeMcpServer(appState, appState->constants.logsDir);
-            if (appState->mcpEnabled && !appState->mcpServer->Start()) {
-                TF3D_LOG_ERROR("Failed to start the TerraForge3D MCP server");
-            } else if (!appState->mcpEnabled) {
-                TF3D_LOG_INFO("TerraForge3D MCP server is disabled in the user config");
+#ifdef TF3D_ENABLE_API
+            appState->apiServer = new api::ApiServer(appState, appState->constants.logsDir);
+            if (appState->apiEnabled && !appState->apiServer->Start()) {
+                TF3D_LOG_ERROR("Failed to start the TerraForge3D API server");
+            } else if (!appState->apiEnabled) {
+                TF3D_LOG_INFO("TerraForge3D API server is disabled in the user config");
             }
-            appState->mcpControlPanel = new ui::McpControlPanel(appState);
+            appState->apiControlPanel = new ui::ApiControlPanel(appState);
 #endif
         }
 
         void OnEnd() override
         {
-#ifdef TF3D_ENABLE_MCP
-            if (appState->mcpServer) {
-                appState->mcpServer->Stop();
-                delete appState->mcpServer;
-                appState->mcpServer = nullptr;
+#ifdef TF3D_ENABLE_API
+            if (appState->apiServer) {
+                appState->apiServer->Stop();
+                delete appState->apiServer;
+                appState->apiServer = nullptr;
             }
-            delete appState->mcpControlPanel;
-            appState->mcpControlPanel = nullptr;
+            delete appState->apiControlPanel;
+            appState->apiControlPanel = nullptr;
 #endif
             appState->eventManager->RaiseEvent("OnEnd");
             for (int i = 0; i < MAX_VIEWPORT_COUNT; i++)

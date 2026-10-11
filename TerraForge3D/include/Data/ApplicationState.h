@@ -26,16 +26,16 @@
 
 TF3D_FWD_DEC_CLASS(TextureLoader, tf3d::base)
 
-#ifdef TF3D_ENABLE_MCP
+#ifdef TF3D_ENABLE_API
 namespace tf3d
 {
-    namespace mcp_layer
+    namespace api
     {
-        class TerraForgeMcpServer;
+        class ApiServer;
     }
     namespace ui
     {
-        class McpControlPanel;
+        class ApiControlPanel;
     }
 } // namespace tf3d
 #endif
@@ -54,7 +54,7 @@ namespace tf3d::data
         bool exportManager      = false;
         bool jobManager         = false;
         bool performanceMonitor = false;
-        bool mcpControlPanel    = true;
+        bool apiControlPanel    = true;
 
         bool styleEditor       = false;
         bool textureStore      = false;
@@ -145,10 +145,10 @@ namespace tf3d::data
         data::ConfigManager *configManager     = nullptr;
         std::unique_ptr<base::TextureLoader> textureLoader;
 
-#ifdef TF3D_ENABLE_MCP
-        bool mcpEnabled                           = true;
-        mcp_layer::TerraForgeMcpServer *mcpServer = nullptr;
-        ui::McpControlPanel *mcpControlPanel      = nullptr;
+#ifdef TF3D_ENABLE_API
+        bool apiEnabled                      = true;
+        api::ApiServer *apiServer            = nullptr;
+        ui::ApiControlPanel *apiControlPanel = nullptr;
 #endif
 
         struct

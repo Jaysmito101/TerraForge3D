@@ -43,7 +43,7 @@ namespace tf3d::data
             {"ExportManager", exportManager},
             {"JobManager", jobManager},
             {"PerformanceMonitor", performanceMonitor},
-            {"McpControlPanel", mcpControlPanel},
+            {"ApiControlPanel", apiControlPanel},
             {"StyleEditor", styleEditor},
             {"TextureStore", textureStore},
             {"OsLisc", osLisc},
@@ -64,7 +64,7 @@ namespace tf3d::data
         LoadBoolean(data, "ExportManager", exportManager);
         LoadBoolean(data, "JobManager", jobManager);
         LoadBoolean(data, "PerformanceMonitor", performanceMonitor);
-        LoadBoolean(data, "McpControlPanel", mcpControlPanel);
+        LoadBoolean(data, "ApiControlPanel", apiControlPanel);
         LoadBoolean(data, "StyleEditor", styleEditor);
         LoadBoolean(data, "TextureStore", textureStore);
         LoadBoolean(data, "OsLisc", osLisc);

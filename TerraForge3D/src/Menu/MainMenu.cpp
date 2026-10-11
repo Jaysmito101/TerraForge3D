@@ -8,8 +8,8 @@
 #include "Profiler.h"
 #include "Utils/Utils.h"
 
-#ifdef TF3D_ENABLE_MCP
-#include "UI/McpControlPanel.h"
+#ifdef TF3D_ENABLE_API
+#include "UI/ApiControlPanel.h"
 #endif
 
 namespace tf3d::ui
@@ -172,9 +172,9 @@ namespace tf3d::ui
         ShowWindowMenuItem("Texture Store", &appState->windows.textureStore);
         ShowWindowMenuItem("Supporters", &appState->windows.supportersTribute);
         ShowWindowMenuItem("Open Source Liscenses", &appState->windows.osLisc);
-#ifdef TF3D_ENABLE_MCP
-        if (appState->mcpControlPanel)
-            ShowWindowMenuItem("MCP Server", appState->mcpControlPanel->IsWindowVisiblePtr());
+#ifdef TF3D_ENABLE_API
+        if (appState->apiControlPanel)
+            ShowWindowMenuItem("API Server", appState->apiControlPanel->IsWindowVisiblePtr());
 #endif
     }
 

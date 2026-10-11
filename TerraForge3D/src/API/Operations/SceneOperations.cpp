@@ -1,7 +1,7 @@
-#include "MCP/Tools/SceneTools.h"
+#include "API/Operations/SceneOperations.h"
 
-#include "MCP/SchemaTemplate.h"
-#include "MCP/ToolHelpers.h"
+#include "API/OperationHelpers.h"
+#include "API/SchemaTemplate.h"
 
 #include "Base/Logging/Logger.h"
 #include "Data/ApplicationState.h"
@@ -12,29 +12,29 @@
 #include <string>
 #include <string_view>
 
-namespace tf3d::mcp_layer
+namespace tf3d::api
 {
 
     namespace
     {
         renderer::RendererManager *ResolveRendererManager(
-            ApplicationState *applicationState,
-            McpResult &failure)
+            tf3d::data::ApplicationState *applicationState,
+            ApiResult &failure)
         {
             if (applicationState == nullptr || applicationState->rendererManager == nullptr) {
-                failure = McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+                failure = ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D renderer settings are unavailable.");
                 return nullptr;
             }
             return applicationState->rendererManager;
         }
 
-        bool ValidateSkyMapPath(const std::string &path, McpResult &failure)
+        bool ValidateSkyMapPath(const std::string &path, ApiResult &failure)
         {
             if (path.empty()) {
-                failure = McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+                failure = ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "The sky map path cannot be empty.");
                 return false;
             }
@@ -42,8 +42,8 @@ namespace tf3d::mcp_layer
             std::error_code error;
             const std::filesystem::path filePath(path);
             if (!std::filesystem::is_regular_file(filePath, error) || error) {
-                failure = McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+                failure = ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "The sky map path must point to a readable file.",
                     {{"Path", path}});
                 return false;
@@ -53,18 +53,18 @@ namespace tf3d::mcp_layer
 
         bool ReadSkyMapPath(const nlohmann::json &arguments,
                             std::string &path,
-                            McpResult &failure)
+                            ApiResult &failure)
         {
             const auto value = arguments.find("Path");
             if (value == arguments.end()) {
-                failure = McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+                failure = ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "'Path' is required.");
                 return false;
             }
             if (!value->is_string()) {
-                failure = McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+                failure = ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "'Path' must be a string.");
                 return false;
             }
@@ -73,28 +73,30 @@ namespace tf3d::mcp_layer
             return ValidateSkyMapPath(path, failure);
         }
 
-        McpResult GetTerrainState(ApplicationState *applicationState)
+        ApiResult GetTerrainState(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return failure;
-            return tool_helpers::GetSerializedState(
+            }
+            return operation_helpers::GetSerializedState(
                 [rendererManager] { return rendererManager->SaveTerrainSettings(); });
         }
 
-        McpResult UpdateTerrainState(ApplicationState *applicationState,
+        ApiResult UpdateTerrainState(tf3d::data::ApplicationState *applicationState,
                                      const nlohmann::json &arguments,
                                      const std::optional<nlohmann::json> &readOnlySchema)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return failure;
+            }
 
-            return tool_helpers::UpdateSerializedState(
+            return operation_helpers::UpdateSerializedState(
                 arguments,
-                tool_helpers::SchemaPointer(readOnlySchema),
+                operation_helpers::SchemaPointer(readOnlySchema),
                 [rendererManager] { return rendererManager->SaveTerrainSettings(); },
                 [rendererManager](const auto &state) {
                     return rendererManager->LoadTerrainSettings(state);
@@ -102,302 +104,330 @@ namespace tf3d::mcp_layer
                 "The requested terrain renderer settings were rejected.");
         }
 
-        McpResult GetLightsState(ApplicationState *applicationState)
+        ApiResult GetLightsState(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr || rendererManager->GetRendererLights() == nullptr)
-                return failure.ok
-                           ? McpResult::Failure(
-                                 McpErrorType::InvalidArguments,
+            if (rendererManager == nullptr || rendererManager->GetRendererLights() == nullptr) {
+                return failure.IsSuccess()
+                           ? ApiResult::Failure(
+                                 ApiErrorType::InvalidArguments,
                                  "TerraForge3D light settings are unavailable.")
                            : failure;
-            return tool_helpers::GetSerializedState(
+            }
+            return operation_helpers::GetSerializedState(
                 [rendererManager] { return rendererManager->GetRendererLights()->Save(); });
         }
 
-        McpResult GetSkyState(ApplicationState *applicationState)
+        ApiResult GetSkyState(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr || rendererManager->GetSkyRenderer() == nullptr)
-                return failure.ok
-                           ? McpResult::Failure(
-                                 McpErrorType::InvalidArguments,
+            if (rendererManager == nullptr || rendererManager->GetSkyRenderer() == nullptr) {
+                return failure.IsSuccess()
+                           ? ApiResult::Failure(
+                                 ApiErrorType::InvalidArguments,
                                  "TerraForge3D sky settings are unavailable.")
                            : failure;
-            return tool_helpers::GetSerializedState(
+            }
+            return operation_helpers::GetSerializedState(
                 [rendererManager] { return rendererManager->GetSkyRenderer()->Save(); });
         }
 
-        McpResult UpdateSkyState(ApplicationState *applicationState,
+        ApiResult UpdateSkyState(tf3d::data::ApplicationState *applicationState,
                                  const nlohmann::json &arguments,
                                  const std::optional<nlohmann::json> &readOnlySchema)
         {
             const nlohmann::json *state = nullptr;
-            McpResult failure;
-            if (!tool_helpers::ReadState(arguments, state, failure))
+            ApiResult failure;
+            if (!operation_helpers::ReadState(arguments, state, failure)) {
                 return failure;
+            }
 
             const auto path = state->find("SkyMapPath");
             if (path != state->end()) {
-                if (!path->is_string())
-                    return McpResult::Failure(
-                        McpErrorType::InvalidArguments,
+                if (!path->is_string()) {
+                    return ApiResult::Failure(
+                        ApiErrorType::InvalidArguments,
                         "'SkyMapPath' must be a string.");
-                if (!ValidateSkyMapPath(path->get<std::string>(), failure))
+                }
+                if (!ValidateSkyMapPath(path->get<std::string>(), failure)) {
                     return failure;
+                }
             }
 
-            McpResult rendererFailure;
+            ApiResult rendererFailure;
             auto *rendererManager = ResolveRendererManager(applicationState, rendererFailure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return rendererFailure;
+            }
             auto *sky = rendererManager->GetSkyRenderer();
-            if (sky == nullptr)
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            if (sky == nullptr) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D sky settings are unavailable.");
+            }
 
-            return tool_helpers::ApplySerializedState(
+            return operation_helpers::ApplySerializedState(
                 *state,
-                tool_helpers::SchemaPointer(readOnlySchema),
+                operation_helpers::SchemaPointer(readOnlySchema),
                 [sky] { return sky->Save(); },
                 [sky](const auto &data) { return sky->Load(data); },
                 "The requested renderer settings were rejected.");
         }
 
-        McpResult LoadSkyMap(ApplicationState *applicationState,
+        ApiResult LoadSkyMap(tf3d::data::ApplicationState *applicationState,
                              const nlohmann::json &arguments)
         {
             std::string path;
-            McpResult failure;
-            if (!ReadSkyMapPath(arguments, path, failure))
+            ApiResult failure;
+            if (!ReadSkyMapPath(arguments, path, failure)) {
                 return failure;
+            }
 
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return failure;
+            }
             auto *sky = rendererManager->GetSkyRenderer();
-            if (sky == nullptr)
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            if (sky == nullptr) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D sky settings are unavailable.");
-            if (!sky->LoadSkyMap(path))
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            }
+            if (!sky->LoadSkyMap(path)) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D could not load the requested sky map.",
                     {{"Path", path}});
-            return tool_helpers::GetSerializedState([sky] { return sky->Save(); });
+            }
+            return operation_helpers::GetSerializedState([sky] { return sky->Save(); });
         }
 
-        McpResult ReloadSkyShaders(ApplicationState *applicationState)
+        ApiResult ReloadSkyShaders(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return failure;
+            }
             auto *sky = rendererManager->GetSkyRenderer();
-            if (sky == nullptr)
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            if (sky == nullptr) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D sky settings are unavailable.");
+            }
             sky->ReloadShaders();
-            return tool_helpers::GetSerializedState([sky] { return sky->Save(); });
+            return operation_helpers::GetSerializedState([sky] { return sky->Save(); });
         }
 
-        McpResult GetSeaState(ApplicationState *applicationState)
+        ApiResult GetSeaState(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr || rendererManager->GetSeaRenderer() == nullptr)
-                return failure.ok
-                           ? McpResult::Failure(
-                                 McpErrorType::InvalidArguments,
+            if (rendererManager == nullptr || rendererManager->GetSeaRenderer() == nullptr) {
+                return failure.IsSuccess()
+                           ? ApiResult::Failure(
+                                 ApiErrorType::InvalidArguments,
                                  "TerraForge3D sea settings are unavailable.")
                            : failure;
-            return tool_helpers::GetSerializedState(
+            }
+            return operation_helpers::GetSerializedState(
                 [rendererManager] { return rendererManager->GetSeaRenderer()->Save(); });
         }
 
-        McpResult ReloadSeaShaders(ApplicationState *applicationState)
+        ApiResult ReloadSeaShaders(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return failure;
+            }
             auto *sea = rendererManager->GetSeaRenderer();
-            if (sea == nullptr)
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            if (sea == nullptr) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D sea settings are unavailable.");
+            }
             sea->ReloadShaders();
-            return tool_helpers::GetSerializedState([sea] { return sea->Save(); });
+            return operation_helpers::GetSerializedState([sea] { return sea->Save(); });
         }
 
-        McpResult ResetSeaSettings(ApplicationState *applicationState)
+        ApiResult ResetSeaSettings(tf3d::data::ApplicationState *applicationState)
         {
-            McpResult failure;
+            ApiResult failure;
             auto *rendererManager = ResolveRendererManager(applicationState, failure);
-            if (rendererManager == nullptr)
+            if (rendererManager == nullptr) {
                 return failure;
+            }
             auto *sea = rendererManager->GetSeaRenderer();
-            if (sea == nullptr)
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            if (sea == nullptr) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "TerraForge3D sea settings are unavailable.");
-            if (!sea->ResetSettings())
-                return McpResult::Failure(
-                    McpErrorType::InvalidArguments,
+            }
+            if (!sea->ResetSettings()) {
+                return ApiResult::Failure(
+                    ApiErrorType::InvalidArguments,
                     "Reset is not enabled for TerraForge3D sea settings.");
-            return tool_helpers::GetSerializedState([sea] { return sea->Save(); });
+            }
+            return operation_helpers::GetSerializedState([sea] { return sea->Save(); });
         }
 
-        McpSchemaRuntimeProvider BuildSceneSchemaRuntime(ApplicationState *applicationState)
+        ApiSchemaRuntimeProvider BuildSceneSchemaRuntime(tf3d::data::ApplicationState *applicationState)
         {
             return [applicationState](std::string_view name) -> std::optional<nlohmann::json> {
-                if (applicationState == nullptr || applicationState->rendererManager == nullptr)
+                if (applicationState == nullptr || applicationState->rendererManager == nullptr) {
                     return std::nullopt;
+                }
 
                 if (name == "Sea.State") {
-                    if (applicationState->rendererManager->GetSeaRenderer() == nullptr)
+                    if (applicationState->rendererManager->GetSeaRenderer() == nullptr) {
                         return std::nullopt;
+                    }
                     return applicationState->rendererManager->GetSeaRenderer()->GetSettingsSchema();
                 }
 
                 if (name == "Lights.State") {
-                    if (applicationState->rendererManager->GetRendererLights() == nullptr)
+                    if (applicationState->rendererManager->GetRendererLights() == nullptr) {
                         return std::nullopt;
+                    }
                     return applicationState->rendererManager->GetRendererLights()->GetSettingsSchema();
                 }
 
                 if (name == "Sky.State") {
-                    if (applicationState->rendererManager->GetSkyRenderer() == nullptr)
+                    if (applicationState->rendererManager->GetSkyRenderer() == nullptr) {
                         return std::nullopt;
+                    }
                     return applicationState->rendererManager->GetSkyRenderer()->GetSettingsSchema();
                 }
 
-                if (name == "Terrain.State")
+                if (name == "Terrain.State") {
                     return applicationState->rendererManager->GetTerrainSettingsSchema();
+                }
 
                 return std::nullopt;
             };
         }
     } // namespace
 
-    void RegisterMcpSceneTools(ActionRegistry &actions, ApplicationState *applicationState)
+    void RegisterSceneOperations(OperationRegistry &operations, tf3d::data::ApplicationState *applicationState)
     {
-        const McpSchemaRuntimeProvider runtime = BuildSceneSchemaRuntime(applicationState);
+        const ApiSchemaRuntimeProvider runtime = BuildSceneSchemaRuntime(applicationState);
         const auto terrainReadOnlySchema =
-            McpSchemaTemplate::ComposeDefault("Tools/Terrain/UpdateStateReadOnly.json", runtime);
+            ApiSchemaTemplate::ComposeDefault("Operations/Terrain/UpdateStateReadOnly.json", runtime);
         const auto skyReadOnlySchema =
-            McpSchemaTemplate::ComposeDefault("Tools/Sky/UpdateStateReadOnly.json", runtime);
+            ApiSchemaTemplate::ComposeDefault("Operations/Sky/UpdateStateReadOnly.json", runtime);
 
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Terrain/Actions/GetState.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Terrain/Definitions/GetState.json",
             [applicationState](const nlohmann::json &) {
                 return GetTerrainState(applicationState);
             });
-        TF3D_MCP_REGISTER_ACTION_WITH_RUNTIME(
-            actions,
-            "Tools/Terrain/Actions/UpdateState.json",
+        TF3D_API_REGISTER_OPERATION_WITH_RUNTIME(
+            operations,
+            "Operations/Terrain/Definitions/UpdateState.json",
             runtime,
             [applicationState, terrainReadOnlySchema](const nlohmann::json &arguments) {
                 return UpdateTerrainState(applicationState, arguments, terrainReadOnlySchema);
             });
 
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Lights/Actions/GetState.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Lights/Definitions/GetState.json",
             [applicationState](const nlohmann::json &) {
                 return GetLightsState(applicationState);
             });
-        TF3D_MCP_REGISTER_ACTION_WITH_RUNTIME(
-            actions,
-            "Tools/Lights/Actions/UpdateState.json",
+        TF3D_API_REGISTER_OPERATION_WITH_RUNTIME(
+            operations,
+            "Operations/Lights/Definitions/UpdateState.json",
             runtime,
             [applicationState](const nlohmann::json &arguments) {
-                McpResult failure;
+                ApiResult failure;
                 auto *rendererManager = ResolveRendererManager(applicationState, failure);
-                if (rendererManager == nullptr)
+                if (rendererManager == nullptr) {
                     return failure;
+                }
                 auto *lights = rendererManager->GetRendererLights();
-                if (lights == nullptr)
-                    return McpResult::Failure(
-                        McpErrorType::InvalidArguments,
+                if (lights == nullptr) {
+                    return ApiResult::Failure(
+                        ApiErrorType::InvalidArguments,
                         "TerraForge3D light settings are unavailable.");
-                return tool_helpers::UpdateSerializedState(
+                }
+                return operation_helpers::UpdateSerializedState(
                     arguments,
                     nullptr,
                     [lights] { return lights->Save(); },
                     [lights](const auto &state) { return lights->Load(state); });
             });
 
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Sky/Actions/GetState.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Sky/Definitions/GetState.json",
             [applicationState](const nlohmann::json &) {
                 return GetSkyState(applicationState);
             });
-        TF3D_MCP_REGISTER_ACTION_WITH_RUNTIME(
-            actions,
-            "Tools/Sky/Actions/UpdateState.json",
+        TF3D_API_REGISTER_OPERATION_WITH_RUNTIME(
+            operations,
+            "Operations/Sky/Definitions/UpdateState.json",
             runtime,
             [applicationState, skyReadOnlySchema](const nlohmann::json &arguments) {
                 return UpdateSkyState(applicationState, arguments, skyReadOnlySchema);
             });
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Sky/Actions/LoadMap.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Sky/Definitions/LoadMap.json",
             [applicationState](const nlohmann::json &arguments) {
                 return LoadSkyMap(applicationState, arguments);
             });
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Sky/Actions/ReloadShaders.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Sky/Definitions/ReloadShaders.json",
             [applicationState](const nlohmann::json &) {
                 return ReloadSkyShaders(applicationState);
             });
 
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Sea/Actions/GetState.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Sea/Definitions/GetState.json",
             [applicationState](const nlohmann::json &) {
                 return GetSeaState(applicationState);
             });
-        TF3D_MCP_REGISTER_ACTION_WITH_RUNTIME(
-            actions,
-            "Tools/Sea/Actions/UpdateState.json",
+        TF3D_API_REGISTER_OPERATION_WITH_RUNTIME(
+            operations,
+            "Operations/Sea/Definitions/UpdateState.json",
             runtime,
             [applicationState](const nlohmann::json &arguments) {
-                McpResult failure;
+                ApiResult failure;
                 auto *rendererManager = ResolveRendererManager(applicationState, failure);
-                if (rendererManager == nullptr)
+                if (rendererManager == nullptr) {
                     return failure;
+                }
                 auto *sea = rendererManager->GetSeaRenderer();
-                if (sea == nullptr)
-                    return McpResult::Failure(
-                        McpErrorType::InvalidArguments,
+                if (sea == nullptr) {
+                    return ApiResult::Failure(
+                        ApiErrorType::InvalidArguments,
                         "TerraForge3D sea settings are unavailable.");
-                return tool_helpers::UpdateSerializedState(
+                }
+                return operation_helpers::UpdateSerializedState(
                     arguments,
                     nullptr,
                     [sea] { return sea->Save(); },
                     [sea](const auto &state) { return sea->Load(state); });
             });
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Sea/Actions/ReloadShaders.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Sea/Definitions/ReloadShaders.json",
             [applicationState](const nlohmann::json &) {
                 return ReloadSeaShaders(applicationState);
             });
-        TF3D_MCP_REGISTER_ACTION(
-            actions,
-            "Tools/Sea/Actions/Reset.json",
+        TF3D_API_REGISTER_OPERATION(
+            operations,
+            "Operations/Sea/Definitions/Reset.json",
             [applicationState](const nlohmann::json &) {
                 return ResetSeaSettings(applicationState);
             });
     }
 
-} // namespace tf3d::mcp_layer
+} // namespace tf3d::api

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MCP/McpResult.h"
+#include "API/ApiResult.h"
 
 #include <atomic>
 #include <chrono>
@@ -13,18 +13,18 @@
 #include <queue>
 #include <thread>
 
-namespace tf3d::mcp_layer
+namespace tf3d::api
 {
 
     class MainThreadRequestQueue
     {
     public:
-        using Task = std::function<McpResult()>;
+        using Task = std::function<ApiResult()>;
 
         MainThreadRequestQueue();
         ~MainThreadRequestQueue();
 
-        McpResult Execute(
+        ApiResult Execute(
             Task task,
             std::chrono::milliseconds timeout = std::chrono::milliseconds(5000));
 
@@ -35,7 +35,7 @@ namespace tf3d::mcp_layer
     private:
         struct PendingRequest {
             Task task;
-            std::promise<McpResult> promise;
+            std::promise<ApiResult> promise;
             std::atomic<bool> cancelled = false;
         };
 
@@ -45,4 +45,4 @@ namespace tf3d::mcp_layer
         bool stopped = false;
     };
 
-} // namespace tf3d::mcp_layer
+} // namespace tf3d::api

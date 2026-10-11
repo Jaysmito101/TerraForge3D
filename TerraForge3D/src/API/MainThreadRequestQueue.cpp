@@ -1,8 +1,8 @@
-#include "MCP/MainThreadRequestQueue.h"
+#include "API/MainThreadRequestQueue.h"
 
 #include <exception>
 
-namespace tf3d::mcp_layer
+namespace tf3d::api
 {
 
     MainThreadRequestQueue::MainThreadRequestQueue()
@@ -15,37 +15,39 @@ namespace tf3d::mcp_layer
         Shutdown();
     }
 
-    McpResult MainThreadRequestQueue::Execute(Task task, std::chrono::milliseconds timeout)
+    ApiResult MainThreadRequestQueue::Execute(Task task, std::chrono::milliseconds timeout)
     {
-        if (!task)
-            return McpResult::Failure(McpErrorType::InvalidTask,
-                                      "MCP request did not contain executable work");
+        if (!task) {
+            return ApiResult::Failure(ApiErrorType::InvalidTask,
+                                      "API request did not contain executable work");
+        }
         {
             std::lock_guard<std::mutex> lock(mutex);
-            if (stopped)
-                return McpResult::Failure(McpErrorType::Shutdown,
+            if (stopped) {
+                return ApiResult::Failure(ApiErrorType::Shutdown,
                                           "TerraForge3D is shutting down");
+            }
         }
 
         if (std::this_thread::get_id() == ownerThread) {
             try {
                 return task();
             } catch (const std::exception &exception) {
-                return McpResult::Failure(McpErrorType::TaskException, exception.what());
+                return ApiResult::Failure(ApiErrorType::TaskException, exception.what());
             } catch (...) {
-                return McpResult::Failure(McpErrorType::TaskException,
-                                          "MCP main-thread task failed");
+                return ApiResult::Failure(ApiErrorType::TaskException,
+                                          "API main-thread task failed");
             }
         }
 
         auto pending                  = std::make_shared<PendingRequest>();
         pending->task                 = std::move(task);
-        std::future<McpResult> result = pending->promise.get_future();
+        std::future<ApiResult> result = pending->promise.get_future();
 
         {
             std::lock_guard<std::mutex> lock(mutex);
             if (stopped) {
-                return McpResult::Failure(McpErrorType::Shutdown,
+                return ApiResult::Failure(ApiErrorType::Shutdown,
                                           "TerraForge3D is shutting down");
             }
             requests.push(pending);
@@ -53,26 +55,28 @@ namespace tf3d::mcp_layer
 
         if (result.wait_for(timeout) != std::future_status::ready) {
             pending->cancelled.store(true, std::memory_order_release);
-            return McpResult::Failure(
-                McpErrorType::Timeout,
-                "TerraForge3D did not complete the MCP request before its deadline");
+            return ApiResult::Failure(
+                ApiErrorType::Timeout,
+                "TerraForge3D did not complete the API request before its deadline");
         }
 
         return result.get();
     }
 
-    size_t MainThreadRequestQueue::Drain(size_t maxTasks)
+    std::size_t MainThreadRequestQueue::Drain(std::size_t maxTasks)
     {
-        if (std::this_thread::get_id() != ownerThread)
+        if (std::this_thread::get_id() != ownerThread) {
             return 0;
+        }
 
-        size_t processed = 0;
+        std::size_t processed = 0;
         while (processed < maxTasks) {
             std::shared_ptr<PendingRequest> pending;
             {
                 std::lock_guard<std::mutex> lock(mutex);
-                if (requests.empty())
+                if (requests.empty()) {
                     break;
+                }
                 pending = std::move(requests.front());
                 requests.pop();
             }
@@ -82,16 +86,16 @@ namespace tf3d::mcp_layer
                     pending->promise.set_value(pending->task());
                 } catch (const std::exception &exception) {
                     pending->promise.set_value(
-                        McpResult::Failure(McpErrorType::TaskException, exception.what()));
+                        ApiResult::Failure(ApiErrorType::TaskException, exception.what()));
                 } catch (...) {
                     pending->promise.set_value(
-                        McpResult::Failure(McpErrorType::TaskException,
-                                           "MCP main-thread task failed"));
+                        ApiResult::Failure(ApiErrorType::TaskException,
+                                           "API main-thread task failed"));
                 }
             } else {
                 pending->promise.set_value(
-                    McpResult::Failure(McpErrorType::Cancelled,
-                                       "MCP request expired before execution"));
+                    ApiResult::Failure(ApiErrorType::Cancelled,
+                                       "API request expired before execution"));
             }
 
             ++processed;
@@ -105,8 +109,9 @@ namespace tf3d::mcp_layer
         std::queue<std::shared_ptr<PendingRequest>> pendingRequests;
         {
             std::lock_guard<std::mutex> lock(mutex);
-            if (stopped && requests.empty())
+            if (stopped && requests.empty()) {
                 return;
+            }
             stopped = true;
             pendingRequests.swap(requests);
         }
@@ -114,7 +119,7 @@ namespace tf3d::mcp_layer
         while (!pendingRequests.empty()) {
             pendingRequests.front()->cancelled.store(true, std::memory_order_release);
             pendingRequests.front()->promise.set_value(
-                McpResult::Failure(McpErrorType::Shutdown,
+                ApiResult::Failure(ApiErrorType::Shutdown,
                                    "TerraForge3D is shutting down"));
             pendingRequests.pop();
         }
@@ -126,4 +131,4 @@ namespace tf3d::mcp_layer
         return stopped;
     }
 
-} // namespace tf3d::mcp_layer
+} // namespace tf3d::api

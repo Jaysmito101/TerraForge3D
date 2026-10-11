@@ -8,24 +8,24 @@
 #include <string>
 #include <string_view>
 
-namespace tf3d::mcp_layer
+namespace tf3d::api
 {
 
-    using McpSchemaRuntimeProvider =
+    using ApiSchemaRuntimeProvider =
         std::function<std::optional<nlohmann::json>(std::string_view name)>;
 
-    class McpSchemaTemplate
+    class ApiSchemaTemplate
     {
     public:
-        explicit McpSchemaTemplate(std::filesystem::path root = {});
+        explicit ApiSchemaTemplate(std::filesystem::path root = {});
 
         std::optional<nlohmann::json> Compose(
             std::string_view templatePath,
-            McpSchemaRuntimeProvider runtime = {}) const;
+            ApiSchemaRuntimeProvider runtime = {}) const;
 
         static std::optional<nlohmann::json> ComposeDefault(
             std::string_view templatePath,
-            McpSchemaRuntimeProvider runtime = {});
+            ApiSchemaRuntimeProvider runtime = {});
 
         static std::filesystem::path DefaultRoot();
         static void Merge(nlohmann::json &target, const nlohmann::json &source);
@@ -35,15 +35,20 @@ namespace tf3d::mcp_layer
             const nlohmann::json &schema,
             std::string &error);
 
+        static bool Validate(
+            const nlohmann::json &value,
+            const nlohmann::json &schema,
+            nlohmann::json &errors);
+
     private:
         std::optional<nlohmann::json> ResolveNode(
             const nlohmann::json &node,
             const std::filesystem::path &currentFile,
-            const McpSchemaRuntimeProvider &runtime) const;
+            const ApiSchemaRuntimeProvider &runtime) const;
 
         std::optional<std::filesystem::path> ResolvePath(const std::filesystem::path &path) const;
 
         std::filesystem::path root;
     };
 
-} // namespace tf3d::mcp_layer
+} // namespace tf3d::api
