@@ -103,7 +103,7 @@ namespace tf3d::generators
         }
 
         if (hasBase && input == DispatchInput::SourceTerrain) {
-            sourceData->Bind(0);
+            sourceData->BindAsTexture(0);
         }
         destination->BindForCompute(1);
         if (useCachedBase) {
@@ -168,6 +168,10 @@ namespace tf3d::generators
             }
 
             if (rebuildBase) {
+                if (sourceData == nullptr) {
+                    return false;
+                }
+                sourceData->GenerateMipmaps();
                 if (!Dispatch(sourceData,
                               context,
                               baseGenerator,
