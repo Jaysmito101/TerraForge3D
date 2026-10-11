@@ -1,0 +1,161 @@
+{
+  "ID": "ridged",
+  "Name": "Ridged Peaks",
+  "Category": "Shaping",
+  "Description": "Sharpens high terrain into narrower, ridge-like peaks while preserving each peak's maximum height.",
+  "Runtime": {
+    "Implementation": "PhaseChain",
+    "Defaults": {
+      "MergeMode": "Override"
+    },
+    "Statistics": {
+      "NeedsMinMax": true,
+      "NeedsHistogram": false
+    },
+    "Shaders": {
+      "Phases": {
+        "Ridged": "generation/filters/shaping/ridged/ridged",
+        "Merge": "generation/filters/common/merge"
+      }
+    },
+    "Resources": {
+      "Temps": [
+        {
+          "Name": "Ridged",
+          "Type": "Field"
+        }
+      ]
+    },
+    "Execution": {
+      "Passes": [
+        {
+          "Phase": "Ridged",
+          "Input": "Current",
+          "Output": "Ridged",
+          "Uniforms": {
+            "u_PeakThreshold": {
+              "Parameter": "Peaks.Threshold"
+            },
+            "u_Sharpness": {
+              "Parameter": "Peaks.Sharpness"
+            },
+            "u_Feather": {
+              "Parameter": "Peaks.Feather"
+            },
+            "u_NoiseFrequency": {
+              "Parameter": "Detail.Frequency"
+            },
+            "u_NoiseOctaves": {
+              "Parameter": "Detail.Octaves"
+            },
+            "u_DetailStrength": {
+              "Parameter": "Detail.DetailStrength"
+            }
+          }
+        }
+      ],
+      "Merge": {
+        "Phase": "Merge",
+        "Input": "Current",
+        "Operation": "Ridged",
+        "Output": "Next"
+      }
+    }
+  },
+  "Inspector": {
+    "ShowResetButton": true,
+    "Sections": [
+      {
+        "Name": "Peaks",
+        "Label": "Peak shaping",
+        "Description": "Controls which heights are sharpened and how narrow the peaks become.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Threshold",
+            "Type": "Float",
+            "Default": 0.5,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              0.95
+            ],
+            "Label": "Peak threshold",
+            "Description": "Normalized height above which terrain is sharpened. Lower terrain is unchanged."
+          },
+          {
+            "Name": "Sharpness",
+            "Type": "Float",
+            "Default": 2.0,
+            "Widget": "Slider",
+            "Constraints": [
+              1.0,
+              8.0
+            ],
+            "Label": "Ridge sharpness",
+            "Description": "Higher values compress more of each peak's shoulders while preserving its top. A value of 1 leaves the terrain unchanged."
+          },
+          {
+            "Name": "Feather",
+            "Type": "Float",
+            "Default": 0.08,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              0.5
+            ],
+            "Label": "Feather",
+            "Description": "Blends peak shaping in gradually above the threshold. Zero uses a crisp threshold."
+          }
+        ]
+      },
+      {
+        "Name": "Detail",
+        "Label": "Ridged detail",
+        "Description": "Adds resolution-aware detail to sharpened peaks. Each octave doubles frequency and halves amplitude.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Frequency",
+            "Type": "Float",
+            "Default": 4.0,
+            "Widget": "Drag",
+            "Sensitivity": 0.01,
+            "Constraints": [
+              0.1,
+              64.0
+            ],
+            "Label": "Detail scale",
+            "Description": "Sets the size of the first ridge octave. Higher values create finer detail."
+          },
+          {
+            "Name": "Octaves",
+            "Type": "Int",
+            "Default": 8,
+            "Widget": "Slider",
+            "Constraints": [
+              1,
+              8
+            ],
+            "Label": "Octaves",
+            "Description": "Number of detail layers. Each octave adds finer detail when the terrain resolution can represent it."
+          },
+          {
+            "Name": "DetailStrength",
+            "Type": "Float",
+            "Default": 0.8,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              1.0
+            ],
+            "Label": "Detail strength",
+            "Description": "Controls how strongly octave detail changes the peak shoulders."
+          }
+        ]
+      }
+    ]
+  }
+}

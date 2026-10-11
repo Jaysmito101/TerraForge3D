@@ -44,6 +44,9 @@
       "$include": "./Shaping/Pixelate.json"
     },
     {
+      "$include": "./Shaping/Ridged.json"
+    },
+    {
       "$include": "./Shaping/SetValue.json"
     },
     {
