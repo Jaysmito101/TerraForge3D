@@ -55,6 +55,8 @@ namespace tf3d::generators
         State GetState() const;
         SerializerNode Save() const;
         void Load(SerializerNode data);
+        bool ValidateState(const SerializerNode &data) const;
+        nlohmann::json GetSchema() const;
         bool SetTypeID(std::string_view typeID);
         bool IsNone() const;
 

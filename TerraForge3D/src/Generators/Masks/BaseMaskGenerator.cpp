@@ -402,6 +402,55 @@ namespace tf3d::generators
         return changed;
     }
 
+    bool BaseMaskGenerator::ValidateState(const SerializerNode &data) const
+    {
+        if (data == nullptr || m_AppState == nullptr || m_Algorithms.empty()) {
+            return false;
+        }
+        const auto idNode = data->HasKey("MaskTypeID")
+                                ? data->Get<std::string>("MaskTypeID", "")
+                                : std::string{};
+        if (!idNode.empty() && FindTypeIndexByID(idNode) < 0) {
+            return false;
+        }
+
+        const auto inspectorState = data->Get<SerializerNode>("Inspector");
+        if (inspectorState == nullptr) {
+            return true;
+        }
+        inspector::CustomInspector candidate;
+        if (!candidate.LoadConfig(m_AppState, "CalculatedMask")) {
+            return false;
+        }
+        candidate.SetShowResetButton(false);
+        return candidate.LoadState(inspectorState);
+    }
+
+    nlohmann::json BaseMaskGenerator::GetSchema() const
+    {
+        nlohmann::json typeSchema = {
+            {"type", "string"},
+            {"enum", nlohmann::json::array()},
+            {"x-enumNames", nlohmann::json::array()}};
+        for (const auto &algorithm : m_Algorithms) {
+            typeSchema["enum"].push_back(algorithm.id);
+            typeSchema["x-enumNames"].push_back(algorithm.label);
+        }
+
+        nlohmann::json inspectorSchema = m_Inspector != nullptr
+                                             ? m_Inspector->BuildSchema()
+                                             : nlohmann::json{{"type", "object"}, {"additionalProperties", false}};
+        auto &maskSection              = inspectorSchema["properties"]["Mask"]["properties"];
+        if (maskSection.is_object() && maskSection.contains("MaskType")) {
+            maskSection["MaskType"]["readOnly"] = true;
+        }
+
+        return {
+            {"type", "object"},
+            {"properties", {{"MaskTypeID", std::move(typeSchema)}, {"Inspector", std::move(inspectorSchema)}}},
+            {"additionalProperties", false}};
+    }
+
     bool BaseMaskGenerator::ShowSettings()
     {
         if (!m_MetadataLoaded || m_Inspector == nullptr || m_Algorithms.empty())
