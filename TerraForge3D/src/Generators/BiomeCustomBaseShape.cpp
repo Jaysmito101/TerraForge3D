@@ -325,6 +325,17 @@ namespace tf3d::generators
         m_State.Replace(m_UIState);
     }
 
+    MaskLayer *BiomeCustomizeBaseShape::GetMaskLayer(std::size_t index) const
+    {
+        return index < m_RuntimeMasks.size() ? m_RuntimeMasks[index].get() : nullptr;
+    }
+
+    void BiomeCustomizeBaseShape::PublishMaskState()
+    {
+        m_UIState = CaptureState();
+        m_State.Replace(m_UIState);
+    }
+
     void BiomeCustomizeBaseShape::Resize()
     {
         for (size_t maskIndex = 0; maskIndex < m_RuntimeMasks.size(); ++maskIndex) {

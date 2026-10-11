@@ -8,6 +8,7 @@
 #include "Generators/Masks/MaskLayer.h"
 
 #include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>
@@ -72,6 +73,9 @@ namespace tf3d::generators
 
         SerializerNode Save() const;
         void Load(SerializerNode node);
+
+        MaskLayer *GetMaskLayer(std::size_t index) const;
+        void PublishMaskState();
 
         inline bool IsEnabled() const
         {
