@@ -155,9 +155,9 @@ namespace tf3d::generators
                 m_Strokes.push_back(std::move(stroke));
         }
 
-        m_InvertPreview = data->Get<bool>("InvertPreview", m_InvertPreview);
+        m_InvertPreview  = data->Get<bool>("InvertPreview", m_InvertPreview);
         m_PreviewVisible = data->Get<bool>("PreviewVisible", m_PreviewVisible);
-        m_IsEditing     = false;
+        m_IsEditing      = false;
         if (s_CurrentlyEditingMaskTool == this)
             s_CurrentlyEditingMaskTool = nullptr;
         m_RequireUpdation = true;

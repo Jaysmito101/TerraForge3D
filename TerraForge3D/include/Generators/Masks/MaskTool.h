@@ -21,9 +21,9 @@ namespace tf3d::generators
 
     struct MaskStroke {
         std::vector<glm::vec2> points;
-        float strength = 0.0f;
-        float size     = 0.0f;
-        float falloff  = 0.0f;
+        float strength      = 0.0f;
+        float size          = 0.0f;
+        float falloff       = 0.0f;
         MaskStrokeMode mode = MaskStrokeMode::Paint;
     };
 
@@ -111,8 +111,8 @@ namespace tf3d::generators
         MaskStroke m_ActiveStroke;
         bool m_HasActiveStroke = false;
 
-        glm::vec3 m_VizColor = glm::vec3(0.2f, 0.2f, 0.2f);
-        bool m_InvertPreview = false;
+        glm::vec3 m_VizColor  = glm::vec3(0.2f, 0.2f, 0.2f);
+        bool m_InvertPreview  = false;
         bool m_PreviewVisible = true;
         renderer::DrawBrushSettings m_DrawSettings;
 
