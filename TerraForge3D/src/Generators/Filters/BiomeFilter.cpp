@@ -61,12 +61,10 @@ namespace tf3d::generators
             if (ImGui::CollapsingHeader("Mask Tool")) {
                 changed |= ImGui::Checkbox("Invert mask", &m_UIState.invertMask);
                 if (m_MaskLayer != nullptr) {
-                    m_MaskLayer->SetInvertPreview(m_UIState.invertMask);
                     changed |= m_MaskLayer->ShowSettings(true);
                 }
             }
         } else if (m_MaskLayer != nullptr) {
-            m_MaskLayer->SetInvertPreview(false);
             ImGui::TextDisabled("Mask: Global");
         }
 
@@ -107,6 +105,11 @@ namespace tf3d::generators
     {
         m_UIState = CaptureState();
         m_State.Replace(m_UIState);
+    }
+
+    void BiomeFilter::PublishMaskState()
+    {
+        PublishState();
     }
 
     BiomeFilter::Snapshot BiomeFilter::GetState() const
