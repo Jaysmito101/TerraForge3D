@@ -137,7 +137,9 @@ namespace tf3d::generators
             const float resultContentHeight = static_cast<float>(std::max<std::size_t>(definitionsByCategory.size(), 1)) *
                                                   resultLineHeight +
                                               ImGui::GetStyle().WindowPadding.y * 2.0f;
-            const float resultsHeight = std::clamp(resultContentHeight, 64.0f, 600.0f);
+            const float maxResultsHeight     = std::max(64.0f, maxPopupHeight - 96.0f);
+            const float preferredResultsHeight = std::min(400.0f, maxResultsHeight);
+            const float resultsHeight = std::clamp(resultContentHeight, preferredResultsHeight, maxResultsHeight);
             if (ImGui::BeginChild("##FilterResults", ImVec2(0.0f, resultsHeight), false)) {
                 if (definitionsByCategory.empty()) {
                     ImGui::TextDisabled("No filters match the search.");
