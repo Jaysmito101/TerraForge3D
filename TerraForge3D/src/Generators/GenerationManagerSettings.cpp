@@ -5,13 +5,19 @@
 #include "Base/Model.h"
 #include "Data/ApplicationState.h"
 #include "Data/ConfigManager.h"
+#include "Exporters/Serializer.h"
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
+#include <algorithm>
 #include <cstddef>
+#include <cmath>
+#include <cstdint>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 #include <vector>
 
 namespace tf3d::generators
@@ -19,7 +25,32 @@ namespace tf3d::generators
     namespace
     {
 
-        constexpr int kFilterSearchBufferSize = 128;
+        constexpr int kFilterSearchBufferSize       = 128;
+        constexpr int32_t kMinimumApiTileResolution = 16;
+        constexpr int32_t kMaximumApiTileResolution = 1 << 20;
+        constexpr int32_t kMinimumApiSeedResolution = 4;
+        constexpr int32_t kMaximumApiSeedResolution = 1 << 20;
+        constexpr int32_t kMaximumTileCount         = 1000000;
+
+        bool IsPowerOfTwoInRange(int32_t value, int32_t minimum, int32_t maximum)
+        {
+            return value >= minimum && value <= maximum && (value & (value - 1)) == 0;
+        }
+
+        int32_t GetMaximumTextureSize()
+        {
+            GLint maximumTextureSize = 0;
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maximumTextureSize);
+            return maximumTextureSize;
+        }
+
+        void ClearSeedTexture(GeneratorTexture &texture)
+        {
+            texture.MakeCPUCopy();
+            texture.ZeroCPUCopy();
+            texture.UploadCPUCopy();
+            texture.FreeCPUCopy();
+        }
 
         struct SettingsViewContext {
             ApplicationState &appState;
@@ -339,8 +370,11 @@ namespace tf3d::generators
             int storageMode             = context.ui.fieldStorageUiMode;
             const char *storageLabels[] = {"R32F (32-bit float)", "R16F (16-bit float)"};
             if (ImGui::Combo("Field Storage", &storageMode, storageLabels, IM_ARRAYSIZE(storageLabels))) {
-                context.ui.fieldStorageUiMode         = storageMode;
-                context.ui.fieldStorageRestartPending = true;
+                context.ui.fieldStorageUiMode = storageMode;
+                const auto requestedStorage   = storageMode == 1 ? GeneratorDataStorage::R16F
+                                                                 : GeneratorDataStorage::R32F;
+                context.ui.fieldStorageRestartPending =
+                    requestedStorage != context.field.heightmapData->GetStorage();
                 if (context.appState.configManager != nullptr) {
                     context.appState.configManager->SetString(
                         "generation", "field_storage", storageMode == 1 ? "R16F" : "R32F");
@@ -369,6 +403,277 @@ namespace tf3d::generators
         }
 
     } // namespace
+
+    exporters::SerializerNode GenerationManager::SaveGlobalSettings() const
+    {
+        auto settings = exporters::CreateSerializerNode();
+        auto tile     = exporters::CreateSerializerNode();
+        tile->Set("resolution", m_AppState != nullptr ? m_AppState->mainMap.tileResolution : 0);
+        tile->Set("size", m_AppState != nullptr ? m_AppState->mainMap.tileSize : 0.0f);
+        settings->Set("tile", tile);
+        settings->Set("autoUpdatePaused", m_Ui.updationPaused);
+
+        auto seedTexture = exporters::CreateSerializerNode();
+        seedTexture->Set("enabled", m_Ui.useSeedFromActiveMesh);
+        seedTexture->Set("resolution", m_Ui.seedTextureResolution);
+        seedTexture->Set("source", m_Ui.seedTextureSource);
+        settings->Set("seedTexture", seedTexture);
+
+        const auto requestedStorage = m_Ui.fieldStorageUiMode == 1
+                                          ? GeneratorDataStorage::R16F
+                                          : GeneratorDataStorage::R32F;
+        settings->Set("fieldStorage", requestedStorage);
+        return settings;
+    }
+
+    exporters::SerializerNode GenerationManager::GetGlobalSettingsStatus() const
+    {
+        auto status             = exporters::CreateSerializerNode();
+        auto tile               = exporters::CreateSerializerNode();
+        const int32_t tileCount = m_AppState != nullptr ? m_AppState->mainMap.tileCount : 0;
+        tile->Set("count", tileCount);
+        tile->Set("mapResolution", m_AppState != nullptr ? m_AppState->mainMap.mapResolution : 0);
+        status->Set("tile", tile);
+
+        auto limits = exporters::CreateSerializerNode();
+        limits->Set("maximumTextureSize", GetMaximumTextureSize());
+        status->Set("limits", limits);
+
+        const auto dirtyState = m_DirtyManager.Snapshot();
+        auto dirty            = exporters::CreateSerializerNode();
+        dirty->Set("isDirty", dirtyState.IsDirty());
+        dirty->Set("revision", std::to_string(dirtyState.revision));
+        dirty->Set("scopeMask", dirtyState.mask);
+        dirty->Set("causeMask", dirtyState.causeMask);
+        status->Set("dirty", dirty);
+
+        const auto activeStorage    = m_Field.heightmapData != nullptr
+                                          ? m_Field.heightmapData->GetStorage()
+                                          : GeneratorData::GetDefaultStorage();
+        const auto requestedStorage = m_Ui.fieldStorageUiMode == 1
+                                          ? GeneratorDataStorage::R16F
+                                          : GeneratorDataStorage::R32F;
+        auto fieldStorage           = exporters::CreateSerializerNode();
+        fieldStorage->Set("active", activeStorage);
+        fieldStorage->Set("restartRequired", activeStorage != requestedStorage);
+        status->Set("fieldStorage", fieldStorage);
+        return status;
+    }
+
+    GenerationGlobalSettingsApplyResult GenerationManager::LoadGlobalSettings(
+        const exporters::SerializerNode &settings,
+        std::string &error)
+    {
+        error.clear();
+
+        if (settings == nullptr) {
+            error = "Generation settings payload is unavailable.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const bool hasTileSettings = settings->HasKey("tile");
+        const auto tileSettings    = settings->Get<exporters::SerializerNode>("tile");
+        const bool hasSeedSettings = settings->HasKey("seedTexture");
+        const auto seedSettings    = settings->Get<exporters::SerializerNode>("seedTexture");
+
+        if ((hasTileSettings && tileSettings == nullptr) || (hasSeedSettings && seedSettings == nullptr)) {
+            error = "Tile and seedTexture settings must be objects.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const bool hasTileResolution = tileSettings != nullptr && tileSettings->HasKey("resolution");
+        const bool hasTileSize       = tileSettings != nullptr && tileSettings->HasKey("size");
+        const bool hasUpdatesPaused  = settings->HasKey("autoUpdatePaused");
+        const bool hasSeedEnabled    = seedSettings != nullptr && seedSettings->HasKey("enabled");
+        const bool hasSeedResolution = seedSettings != nullptr && seedSettings->HasKey("resolution");
+        const bool hasSeedSource     = seedSettings != nullptr && seedSettings->HasKey("source");
+        const bool hasFieldStorage   = settings->HasKey("fieldStorage");
+        const bool hasUpdate         = hasTileResolution || hasTileSize || hasUpdatesPaused || hasSeedEnabled ||
+                               hasSeedResolution || hasSeedSource || hasFieldStorage;
+        if (!hasUpdate) {
+            error = "At least one generation setting must be provided.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        if (m_AppState == nullptr) {
+            error = "Generation settings are unavailable.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const int32_t nextTileResolution = hasTileResolution
+                                               ? tileSettings->Get<int32_t>("resolution")
+                                               : m_AppState->mainMap.tileResolution;
+        if (hasTileResolution &&
+            !IsPowerOfTwoInRange(nextTileResolution, kMinimumApiTileResolution, kMaximumApiTileResolution)) {
+            error = "tileResolution must be a power of two from 16 through 1048576.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+        if (hasTileResolution) {
+            const int32_t maximumTextureSize = GetMaximumTextureSize();
+            if (maximumTextureSize <= 0 || nextTileResolution > maximumTextureSize) {
+                error = "tileResolution exceeds the active GPU's maximum 2D texture size.";
+                return GenerationGlobalSettingsApplyResult::Invalid;
+            }
+        }
+
+        int32_t nextTileCount = m_AppState->mainMap.tileCount;
+        if (hasTileSize) {
+            const float requestedSize = tileSettings->Get<float>("size");
+            if (!std::isfinite(requestedSize) || requestedSize <= 0.0f || requestedSize > 1.0f) {
+                error = "tileSize must be finite and between 1 / 1000000 and 1.";
+                return GenerationGlobalSettingsApplyResult::Invalid;
+            }
+
+            const double requestedCount = 1.0 / static_cast<double>(requestedSize);
+            if (!std::isfinite(requestedCount) || requestedCount < 1.0 ||
+                requestedCount > static_cast<double>(kMaximumTileCount)) {
+                error = "tileSize must correspond to a tile count from 1 through 1000000.";
+                return GenerationGlobalSettingsApplyResult::Invalid;
+            }
+
+            nextTileCount              = static_cast<int32_t>(std::llround(requestedCount));
+            const float normalizedSize = 1.0f / static_cast<float>(nextTileCount);
+            const float sizeTolerance  = std::max(1.0e-8f, normalizedSize * 1.0e-6f);
+            if (std::abs(requestedSize - normalizedSize) > sizeTolerance) {
+                error = "tileSize must be the reciprocal of a whole tile count.";
+                return GenerationGlobalSettingsApplyResult::Invalid;
+            }
+        }
+
+        const int64_t nextMapResolution = static_cast<int64_t>(nextTileResolution) * nextTileCount;
+        if (nextMapResolution > std::numeric_limits<int32_t>::max()) {
+            error = "tileResolution multiplied by tile count exceeds the supported map resolution.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const int32_t nextSeedResolution = hasSeedResolution
+                                               ? seedSettings->Get<int32_t>("resolution")
+                                               : m_Ui.seedTextureResolution;
+        if (hasSeedResolution &&
+            !IsPowerOfTwoInRange(nextSeedResolution, kMinimumApiSeedResolution, kMaximumApiSeedResolution)) {
+            error = "seedTextureResolution must be a power of two from 4 through 1048576.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+        if (hasSeedResolution) {
+            const int32_t maximumTextureSize = GetMaximumTextureSize();
+            if (maximumTextureSize <= 0 || nextSeedResolution > maximumTextureSize) {
+                error = "seedTextureResolution exceeds the active GPU's maximum 2D texture size.";
+                return GenerationGlobalSettingsApplyResult::Invalid;
+            }
+        }
+
+        const bool nextSeedEnabled = hasSeedEnabled
+                                         ? seedSettings->Get<bool>("enabled")
+                                         : m_Ui.useSeedFromActiveMesh;
+        const auto nextSeedSource  = hasSeedSource
+                                         ? seedSettings->Get<GenerationSeedTextureSource>("source")
+                                         : m_Ui.seedTextureSource;
+        if (nextSeedSource != GenerationSeedTextureSource::None &&
+            nextSeedSource != GenerationSeedTextureSource::MainModel) {
+            error = "seedTexture.source is not a supported source.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const auto nextFieldStorage = hasFieldStorage
+                                          ? settings->Get<GeneratorDataStorage>("fieldStorage")
+                                          : GeneratorDataStorage::R32F;
+        if (hasFieldStorage && nextFieldStorage != GeneratorDataStorage::R16F &&
+            nextFieldStorage != GeneratorDataStorage::R32F) {
+            error = "fieldStorage is not a supported storage format.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const bool seedResolutionChanged = nextSeedResolution != m_Ui.seedTextureResolution;
+        const bool seedEnabledChanged    = nextSeedEnabled != m_Ui.useSeedFromActiveMesh;
+        const bool seedSourceChanged     = nextSeedSource != m_Ui.seedTextureSource;
+        const bool seedTextureChanged    = (nextSeedEnabled || m_Ui.useSeedFromActiveMesh) &&
+                                        (seedResolutionChanged || seedEnabledChanged || seedSourceChanged);
+        const bool needsMainModel = nextSeedEnabled && nextSeedSource == GenerationSeedTextureSource::MainModel &&
+                                    (seedSourceChanged || seedEnabledChanged || seedResolutionChanged);
+        if (needsMainModel &&
+            (m_AppState->mainModel == nullptr || m_AppState->mainModel->mesh == nullptr)) {
+            error = "The mainModel seed source is unavailable.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        const bool tileResolutionChanged = nextTileResolution != m_AppState->mainMap.tileResolution;
+        const bool tileCountChanged      = nextTileCount != m_AppState->mainMap.tileCount;
+        if ((tileResolutionChanged || tileCountChanged) && m_AppState->eventManager == nullptr) {
+            error = "Tile settings cannot be applied because the application event manager is unavailable.";
+            return GenerationGlobalSettingsApplyResult::Invalid;
+        }
+
+        if (hasFieldStorage) {
+            if (m_AppState->configManager == nullptr) {
+                error = "Field storage cannot be changed because application configuration is unavailable.";
+                return GenerationGlobalSettingsApplyResult::PersistenceFailed;
+            }
+            const char *storageName = nextFieldStorage == GeneratorDataStorage::R16F ? "R16F" : "R32F";
+            if (!m_AppState->configManager->SetString("generation", "field_storage", storageName)) {
+                error = "The field storage selection could not be saved to application configuration.";
+                return GenerationGlobalSettingsApplyResult::PersistenceFailed;
+            }
+        }
+
+        if (hasUpdatesPaused) {
+            m_Ui.updationPaused = settings->Get<bool>("autoUpdatePaused");
+        }
+
+        if (hasFieldStorage) {
+            m_Ui.fieldStorageUiMode         = nextFieldStorage == GeneratorDataStorage::R16F ? 1 : 0;
+            const auto activeStorage        = m_Field.heightmapData != nullptr
+                                                  ? m_Field.heightmapData->GetStorage()
+                                                  : GeneratorData::GetDefaultStorage();
+            m_Ui.fieldStorageRestartPending = nextFieldStorage != activeStorage;
+        }
+
+        m_AppState->mainMap.tileResolution = nextTileResolution;
+        m_AppState->mainMap.tileCount      = nextTileCount;
+        m_AppState->mainMap.mapResolution  = static_cast<int32_t>(nextMapResolution);
+        m_AppState->mainMap.tileSize       = 1.0f / static_cast<float>(nextTileCount);
+        m_AppState->mainMap.currentTileX   = std::clamp(m_AppState->mainMap.currentTileX, 0, nextTileCount - 1);
+        m_AppState->mainMap.currentTileY   = std::clamp(m_AppState->mainMap.currentTileY, 0, nextTileCount - 1);
+        m_AppState->mainMap.tileOffsetX    = m_AppState->mainMap.currentTileX * m_AppState->mainMap.tileSize;
+        m_AppState->mainMap.tileOffsetY    = m_AppState->mainMap.currentTileY * m_AppState->mainMap.tileSize;
+
+        if (seedTextureChanged) {
+            WaitForGenerationWorker();
+            m_ActiveGeneration.reset();
+            m_Worker->TryConsumeCompleted();
+        }
+
+        m_Ui.useSeedFromActiveMesh = nextSeedEnabled;
+        m_Ui.seedTextureResolution = nextSeedResolution;
+        m_Ui.seedTextureSource     = nextSeedSource;
+        if (nextSeedEnabled) {
+            if (m_Field.seedTexture == nullptr) {
+                m_Field.seedTexture = std::make_shared<GeneratorTexture>(nextSeedResolution, nextSeedResolution);
+            } else if (m_Field.seedTexture->GetWidth() != nextSeedResolution ||
+                       m_Field.seedTexture->GetHeight() != nextSeedResolution) {
+                m_Field.seedTexture->Resize(nextSeedResolution, nextSeedResolution);
+            }
+
+            if (nextSeedSource == GenerationSeedTextureSource::MainModel && needsMainModel) {
+                PullSeedTextureFromActiveMesh();
+            } else if (nextSeedSource == GenerationSeedTextureSource::None && seedSourceChanged) {
+                ClearSeedTexture(*m_Field.seedTexture);
+            }
+        } else if (seedEnabledChanged) {
+            m_Field.seedTexture.reset();
+        }
+
+        if (seedTextureChanged) {
+            m_DirtyManager.MarkAllBiomes();
+        }
+
+        if (tileResolutionChanged) {
+            m_AppState->eventManager->RaiseEvent("TileResolutionChanged", std::to_string(nextTileResolution));
+        } else if (tileCountChanged) {
+            m_DirtyManager.MarkForce(GenerationDirtyCause::External);
+        }
+
+        return GenerationGlobalSettingsApplyResult::Applied;
+    }
 
     void GenerationManager::ShowSettings()
     {
@@ -472,10 +777,12 @@ namespace tf3d::generators
 
     void GenerationManager::PullSeedTextureFromActiveMesh()
     {
-        if (!m_Ui.useSeedFromActiveMesh) {
+        if (!m_Ui.useSeedFromActiveMesh || m_Field.seedTexture == nullptr || m_AppState == nullptr ||
+            m_AppState->mainModel == nullptr || m_AppState->mainModel->mesh == nullptr) {
             return;
         }
 
+        m_Ui.seedTextureSource = GenerationSeedTextureSource::MainModel;
         m_Field.seedTexture->MakeCPUCopy();
         m_Field.seedTexture->ZeroCPUCopy();
         const auto mesh = m_AppState->mainModel->mesh;

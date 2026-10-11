@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Base.h"
+#include "Exporters/Serializer.h"
 #include "Generators/BiomeManager.h"
 #include "Generators/BiomeMixer.h"
 #include "Generators/GenerationContext.h"
@@ -81,15 +82,21 @@ namespace tf3d::generators
         int statisticsSampleStride            = 4;
     };
 
+    enum class GenerationSeedTextureSource {
+        None,
+        MainModel
+    };
+
     struct UiState {
         explicit UiState(ApplicationState *appState);
 
-        bool updationPaused             = false;
-        bool useWorkerThread            = true;
-        bool useSeedFromActiveMesh      = false;
-        int32_t seedTextureResolution   = 256;
-        int fieldStorageUiMode          = 0;
-        bool fieldStorageRestartPending = false;
+        bool updationPaused                           = false;
+        bool useWorkerThread                          = true;
+        bool useSeedFromActiveMesh                    = false;
+        int32_t seedTextureResolution                 = 256;
+        GenerationSeedTextureSource seedTextureSource = GenerationSeedTextureSource::None;
+        int fieldStorageUiMode                        = 0;
+        bool fieldStorageRestartPending               = false;
         SelectedUINode selectedNode;
     };
 
@@ -124,16 +131,22 @@ namespace tf3d::generators
 
     struct GenerationLifecycleSnapshot {
         GenerationCanvasStatus canvas;
-        uint64_t inputRevision         = 0;
-        uint64_t outputInputRevision   = 0;
-        uint64_t lastFailedRevision    = 0;
-        uint64_t activeInputRevision   = 0;
-        uint64_t terrainRevision       = 0;
-        int32_t outputTileResolution   = 0;
-        float outputTileSize           = 0.0f;
-        bool inputIsDirty              = false;
-        bool updatesPaused             = false;
+        uint64_t inputRevision       = 0;
+        uint64_t outputInputRevision = 0;
+        uint64_t lastFailedRevision  = 0;
+        uint64_t activeInputRevision = 0;
+        uint64_t terrainRevision     = 0;
+        int32_t outputTileResolution = 0;
+        float outputTileSize         = 0.0f;
+        bool inputIsDirty            = false;
+        bool updatesPaused           = false;
         GeneratorDataStatisticsResult statistics;
+    };
+
+    enum class GenerationGlobalSettingsApplyResult {
+        Applied,
+        Invalid,
+        PersistenceFailed
     };
 
     struct ActiveGeneration {
@@ -158,6 +171,11 @@ namespace tf3d::generators
         void ShowSettings();
         GenerationCanvasStatus GetCanvasStatus() const;
         GenerationLifecycleSnapshot GetLifecycleSnapshot() const;
+        exporters::SerializerNode SaveGlobalSettings() const;
+        exporters::SerializerNode GetGlobalSettingsStatus() const;
+        GenerationGlobalSettingsApplyResult LoadGlobalSettings(
+            const exporters::SerializerNode &settings,
+            std::string &error);
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
 

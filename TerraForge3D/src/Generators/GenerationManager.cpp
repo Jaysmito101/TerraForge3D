@@ -139,18 +139,18 @@ namespace tf3d::generators
             m_ActiveGeneration != nullptr,
             m_HasCommittedOutput && !dirtyState.IsDirty() &&
                 m_OutputInputRevision == dirtyState.revision};
-        snapshot.inputRevision          = dirtyState.revision;
-        snapshot.outputInputRevision    = m_OutputInputRevision;
-        snapshot.lastFailedRevision     = m_LastFailedGenerationRevision;
-        snapshot.activeInputRevision    = m_ActiveGeneration != nullptr
-                                              ? m_ActiveGeneration->snapshot.dirtyState.revision
-                                              : 0;
-        snapshot.terrainRevision        = m_Field.terrainRevision.load(std::memory_order_acquire);
-        snapshot.outputTileResolution   = m_OutputTileResolution;
-        snapshot.outputTileSize         = m_OutputTileSize;
-        snapshot.inputIsDirty           = dirtyState.IsDirty();
-        snapshot.updatesPaused          = m_Ui.updationPaused;
-        snapshot.statistics             = m_Field.statisticsResult;
+        snapshot.inputRevision        = dirtyState.revision;
+        snapshot.outputInputRevision  = m_OutputInputRevision;
+        snapshot.lastFailedRevision   = m_LastFailedGenerationRevision;
+        snapshot.activeInputRevision  = m_ActiveGeneration != nullptr
+                                            ? m_ActiveGeneration->snapshot.dirtyState.revision
+                                            : 0;
+        snapshot.terrainRevision      = m_Field.terrainRevision.load(std::memory_order_acquire);
+        snapshot.outputTileResolution = m_OutputTileResolution;
+        snapshot.outputTileSize       = m_OutputTileSize;
+        snapshot.inputIsDirty         = dirtyState.IsDirty();
+        snapshot.updatesPaused        = m_Ui.updationPaused;
+        snapshot.statistics           = m_Field.statisticsResult;
         return snapshot;
     }
 
