@@ -27,6 +27,7 @@ uniform float u_NoiseOctaveStrengths[16];
 uniform int u_NoiseOctaveStrengthsCount;
 uniform bool u_UseMask;
 uniform bool u_InvertMask;
+uniform float u_MaskFilterLod;
 layout(binding = 3) uniform sampler2D u_MaskTexture;
 
 #include "common/noise_2d.glsl"
@@ -104,7 +105,7 @@ void main(void)
 	float maskValue = 1.0f;
 	if (u_UseMask)
 	{
-		maskValue = texelFetch(u_MaskTexture, ivec2(offsetv2), 0).r;
+		maskValue = textureLod(u_MaskTexture, uv, u_MaskFilterLod).r;
 		if (u_InvertMask) maskValue = 1.0f - maskValue;
 	}
 	float influence = clamp(u_Influence * maskValue, 0.0f, 1.0f);

@@ -4,6 +4,7 @@
 #include "UI/ImGuiComponents.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace tf3d::generators
 {
@@ -138,10 +139,21 @@ namespace tf3d::generators
             return;
         }
 
-        bool useMask = state->value.useMask && m_MaskLayer != nullptr;
+        bool useMask        = state->value.useMask && m_MaskLayer != nullptr;
+        float maskFilterLod = 0.0f;
         if (useMask) {
             useMask = m_MaskLayer->Apply(state->value.mask, context, sourceBuffer) &&
                       m_MaskLayer->GetTexture() != nullptr;
+            if (useMask && state->value.mask.base.values.has_value()) {
+                const auto maskValues = state->value.mask.base.values->Root();
+                if (maskValues.Contains("SampleRadius")) {
+                    const float referenceRadius =
+                        std::clamp(maskValues.Get<float>("SampleRadius", 1.0f), 0.125f, 8.0f);
+                    const float sampleRadius = std::max(
+                        referenceRadius * static_cast<float>(context->tileResolution) / 1024.0f, 1.0f);
+                    maskFilterLod = std::log2(sampleRadius);
+                }
+            }
         }
 
         sourceBuffer->Bind(0);
@@ -161,6 +173,7 @@ namespace tf3d::generators
                                    : 0);
         m_Shader->SetUniform1i("u_UseMask", useMask ? 1 : 0);
         m_Shader->SetUniform1i("u_InvertMask", useMask && state->value.invertMask ? 1 : 0);
+        m_Shader->SetUniform1f("u_MaskFilterLod", maskFilterLod);
         if (context->seedTexture != nullptr) {
             m_Shader->SetUniform1i("u_SeedTexture", context->seedTexture->Bind(1));
         }
