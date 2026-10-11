@@ -54,8 +54,12 @@ namespace tf3d::generators
         bool UpdateGeneratedMask(const State &state,
                                  const GenerationContext *context,
                                  GeneratorData *sourceData);
-        void Load(SerializerNode data);
+        bool Load(SerializerNode data);
         SerializerNode Save() const;
+        nlohmann::json GetParameterSchema() const
+        {
+            return m_Inspector != nullptr ? m_Inspector->BuildSchema() : nlohmann::json::object();
+        }
 
         Snapshot GetState() const;
         inline Snapshot::Revision GetStateRevision() const

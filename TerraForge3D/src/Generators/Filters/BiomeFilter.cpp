@@ -5,6 +5,8 @@
 #include "UI/ImGuiComponents.h"
 #include "Utils/Utils.h"
 
+#include <cmath>
+
 namespace tf3d::generators
 {
 
@@ -112,27 +114,40 @@ namespace tf3d::generators
         return m_State.Capture();
     }
 
-    void BiomeFilter::Load(SerializerNode data)
+    bool BiomeFilter::Load(SerializerNode data)
     {
         if (data == nullptr) {
-            return;
+            return false;
         }
+
+        const float strength = data->Get<float>("Strength", m_UIState.strength);
+        const int mergeMode  = data->Get<int>("MergeMode", static_cast<int>(m_UIState.mergeMode));
+        if (!std::isfinite(strength) || strength < 0.0f || strength > 1.0f || mergeMode < 0 || mergeMode > 4) {
+            return false;
+        }
+
+        const auto parameters = data->Get<SerializerNode>("Parameters");
+        if (parameters != nullptr && m_Definition != nullptr) {
+            inspector::CustomInspector candidate;
+            if (!m_Definition->BuildInspector(candidate) || !candidate.LoadState(parameters)) {
+                return false;
+            }
+            if (m_Inspector == nullptr || !m_Inspector->LoadState(parameters)) {
+                return false;
+            }
+        }
+
         m_ID                 = data->Get<std::string>("ID", m_ID);
         m_UIState.enabled    = data->Get<bool>("Enabled", m_UIState.enabled);
         m_UIState.useMask    = data->Get<bool>("UseMask", m_UIState.useMask);
         m_UIState.invertMask = data->Get<bool>("InvertMask", m_UIState.invertMask);
-        m_UIState.strength   = data->Get<float>("Strength", m_UIState.strength);
-        m_UIState.mergeMode  = static_cast<BiomeFilterMergeMode>(glm::clamp(data->Get<int>("MergeMode", static_cast<int>(m_UIState.mergeMode)), 0, 4));
-        if (m_Inspector != nullptr) {
-            auto parameters = data->Get<SerializerNode>("Parameters");
-            if (parameters != nullptr) {
-                m_Inspector->LoadState(parameters);
-            }
-        }
+        m_UIState.strength   = strength;
+        m_UIState.mergeMode  = static_cast<BiomeFilterMergeMode>(mergeMode);
         if (m_MaskLayer != nullptr) {
             m_MaskLayer->LoadFrom(data);
         }
         PublishState();
+        return true;
     }
 
     SerializerNode BiomeFilter::Save() const
