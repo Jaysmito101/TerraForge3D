@@ -188,14 +188,36 @@ namespace tf3d::generators
             input            = DispatchInput::CachedBaseTexture;
         }
 
-        const bool rendered = Dispatch(sourceData,
-                                       context,
-                                       baseGenerator,
-                                       baseState,
-                                       destination,
-                                       inputBaseTexture,
-                                       strokeCount,
-                                       input);
+        bool rendered = false;
+        if (hasBase && strokeCount == 0 && inputBaseTexture != nullptr) {
+            const int32_t resolution = destination->GetWidth();
+            glCopyImageSubData(inputBaseTexture->GetRendererID(),
+                               GL_TEXTURE_2D,
+                               0,
+                               0,
+                               0,
+                               0,
+                               destination->GetRendererID(),
+                               GL_TEXTURE_2D,
+                               0,
+                               0,
+                               0,
+                               0,
+                               resolution,
+                               resolution,
+                               1);
+            glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+            rendered = true;
+        } else {
+            rendered = Dispatch(sourceData,
+                                context,
+                                baseGenerator,
+                                baseState,
+                                destination,
+                                inputBaseTexture,
+                                strokeCount,
+                                input);
+        }
         if (rendered) {
             destination->GenerateMipmaps();
         }

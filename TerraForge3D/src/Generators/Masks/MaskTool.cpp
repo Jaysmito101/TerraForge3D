@@ -289,7 +289,7 @@ namespace tf3d::generators
                                 GeneratorTexture *previewTexture,
                                 bool showViewportMask)
     {
-        m_RequireUpdation = false;
+        bool changed = std::exchange(m_RequireUpdation, false);
 
         ImGui::Separator();
         ImGui::Text("Mask Tool");
@@ -304,7 +304,7 @@ namespace tf3d::generators
         }
 
         const int resolution = maskTexture != nullptr ? glm::max(maskTexture->GetWidth(), 1) : 1;
-        bool changed         = ShowStrokeSettings(resolution);
+        changed |= ShowStrokeSettings(resolution);
 
         misc::ViewportManager *activeViewport = nullptr;
         if (m_AppState != nullptr) {
@@ -363,9 +363,20 @@ namespace tf3d::generators
 
         UpdateViewportOverlay(maskTexture, showBrush, showViewportMask || m_IsEditing);
 
-        if (changed)
-            m_RequireUpdation = true;
-        return m_RequireUpdation;
+        changed |= std::exchange(m_RequireUpdation, false);
+        return changed;
+    }
+
+    bool MaskTool::HideViewportOverlay(GeneratorTexture *maskTexture)
+    {
+        const bool hadActiveStroke = m_HasActiveStroke;
+        FinishActiveStroke();
+        m_IsEditing = false;
+        if (s_CurrentlyEditingMaskTool == this) {
+            s_CurrentlyEditingMaskTool = nullptr;
+        }
+        UpdateViewportOverlay(maskTexture, false, false);
+        return hadActiveStroke;
     }
 
     MaskTool::State MaskTool::GetState() const

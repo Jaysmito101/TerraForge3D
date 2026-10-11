@@ -87,6 +87,7 @@ namespace tf3d::generators
             }
         } else if (m_MaskLayer != nullptr) {
             m_MaskLayer->SetInvertPreview(false);
+            changed |= m_MaskLayer->HideViewportOverlay();
             ImGui::TextDisabled("Mask: Global");
         }
         ImGui::PopID();

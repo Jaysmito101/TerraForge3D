@@ -43,6 +43,7 @@ namespace tf3d::generators
 
         void Resize(int size);
         bool ShowSettings(bool showViewportMask = true);
+        bool HideViewportOverlay();
         bool Apply(const State &state,
                    const GenerationContext *context,
                    GeneratorData *sourceData);

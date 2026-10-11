@@ -292,7 +292,9 @@ namespace tf3d::generators
             return false;
         }
         if (runtime.maskLayer != nullptr && state.mask.has_value()) {
-            runtime.maskLayer->Apply(state.mask->value, context, biomeData);
+            if (!runtime.maskLayer->Apply(state.mask->value, context, biomeData)) {
+                return false;
+            }
         }
 
         return true;

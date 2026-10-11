@@ -174,6 +174,17 @@ namespace tf3d::generators
         return changed;
     }
 
+    bool MaskLayer::HideViewportOverlay()
+    {
+        if (!m_MaskTool.HideViewportOverlay(m_Texture.get())) {
+            return false;
+        }
+
+        m_UIState = CaptureState();
+        m_State.Replace(m_UIState);
+        return true;
+    }
+
     bool MaskLayer::Apply(const State &state,
                           const GenerationContext *context,
                           GeneratorData *sourceData)

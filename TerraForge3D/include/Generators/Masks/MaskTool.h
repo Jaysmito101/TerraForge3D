@@ -43,6 +43,7 @@ namespace tf3d::generators
         bool ShowSettings(tf3d::generators::GeneratorTexture *maskTexture,
                           tf3d::generators::GeneratorTexture *previewTexture,
                           bool showViewportMask = true);
+        bool HideViewportOverlay(tf3d::generators::GeneratorTexture *maskTexture);
         State GetState() const;
         SerializerNode Save() const;
         void Load(SerializerNode data);
