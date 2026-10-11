@@ -59,12 +59,43 @@ namespace tf3d::generators
         {
             return m_State.PublishedRevision();
         }
+        inline Snapshot::Revision GetProcessedRevision() const
+        {
+            return m_State.ProcessedRevision();
+        }
         inline bool RequireUpdation() const
         {
             return m_State.RequiresUpdate();
         }
 
+        inline int GetResolution() const
+        {
+            return m_Texture != nullptr ? m_Texture->GetWidth() : 0;
+        }
+        bool UpdateBaseMaskSettings(const SerializerNode &patch, std::string &error);
+        bool BeginStroke(MaskStroke stroke);
+        bool AppendStrokePoints(const std::vector<glm::vec2> &points);
+        bool FinishStroke();
+        bool UndoStroke();
+        bool ClearStrokes();
+        inline void SetPreviewSettings(bool visible, bool inverted)
+        {
+            m_MaskTool.SetPreviewSettings(visible, inverted, m_Texture.get());
+        }
+        inline bool GetPreviewVisible() const
+        {
+            return m_MaskTool.GetPreviewVisible();
+        }
+        inline bool GetInvertPreview() const
+        {
+            return m_MaskTool.GetInvertPreview();
+        }
+
         void SaveTo(SerializerNode node) const;
+        inline SerializerNode SaveBaseMaskSettings() const
+        {
+            return m_BaseMaskGenerator.Save();
+        }
         void LoadFrom(SerializerNode node);
         bool ValidateBaseMask(const SerializerNode &settings) const;
         nlohmann::json GetBaseMaskSchema() const;
@@ -92,6 +123,7 @@ namespace tf3d::generators
 
         bool ShowBaseSettings();
         State CaptureState() const;
+        void PublishState();
         bool Render(const State &state,
                     const GenerationContext *context,
                     GeneratorData *sourceData);

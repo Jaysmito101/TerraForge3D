@@ -121,6 +121,12 @@ namespace tf3d::generators
         return State{m_BaseMaskGenerator.GetState(), m_MaskTool.GetState()};
     }
 
+    void MaskLayer::PublishState()
+    {
+        m_UIState = CaptureState();
+        m_State.Replace(m_UIState);
+    }
+
     bool MaskLayer::Render(const State &state,
                            const GenerationContext *context,
                            GeneratorData *sourceData)
@@ -168,8 +174,7 @@ namespace tf3d::generators
         changed |= m_MaskTool.ShowSettings(m_Texture.get(), previewTexture, showViewportMask);
 
         if (changed) {
-            m_UIState = CaptureState();
-            m_State.Replace(m_UIState);
+            PublishState();
         }
         return changed;
     }
@@ -180,8 +185,7 @@ namespace tf3d::generators
             return false;
         }
 
-        m_UIState = CaptureState();
-        m_State.Replace(m_UIState);
+        PublishState();
         return true;
     }
 
@@ -261,9 +265,74 @@ namespace tf3d::generators
         return m_BaseMaskGenerator.GetSchema();
     }
 
+    bool MaskLayer::UpdateBaseMaskSettings(const SerializerNode &patch, std::string &error)
+    {
+        error.clear();
+        if (patch == nullptr || !patch->ToJson().is_object()) {
+            error = "BaseMask must be an object.";
+            return false;
+        }
+
+        SerializerNode merged = m_BaseMaskGenerator.Save();
+        merged->Merge(*patch);
+        if (!m_BaseMaskGenerator.ValidateState(merged)) {
+            error = "BaseMask settings do not match the selected base-mask schema.";
+            return false;
+        }
+
+        m_BaseMaskGenerator.Load(merged);
+        PublishState();
+        return true;
+    }
+
+    bool MaskLayer::BeginStroke(MaskStroke stroke)
+    {
+        if (!m_MaskTool.BeginStroke(std::move(stroke))) {
+            return false;
+        }
+        PublishState();
+        return true;
+    }
+
+    bool MaskLayer::AppendStrokePoints(const std::vector<glm::vec2> &points)
+    {
+        if (!m_MaskTool.AppendStrokePoints(points)) {
+            return false;
+        }
+        PublishState();
+        return true;
+    }
+
+    bool MaskLayer::FinishStroke()
+    {
+        if (!m_MaskTool.FinishStroke()) {
+            return false;
+        }
+        PublishState();
+        return true;
+    }
+
+    bool MaskLayer::UndoStroke()
+    {
+        if (!m_MaskTool.UndoStroke()) {
+            return false;
+        }
+        PublishState();
+        return true;
+    }
+
+    bool MaskLayer::ClearStrokes()
+    {
+        if (!m_MaskTool.ClearStrokes()) {
+            return false;
+        }
+        PublishState();
+        return true;
+    }
+
     void MaskLayer::SetInvertPreview(bool invert)
     {
-        m_MaskTool.SetInvertPreview(invert);
+        m_MaskTool.SetPreviewSettings(m_MaskTool.GetPreviewVisible(), invert, m_Texture.get());
         if (!invert)
             m_VisualizationTexture.reset();
     }
