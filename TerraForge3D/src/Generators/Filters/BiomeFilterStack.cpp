@@ -69,6 +69,49 @@ namespace tf3d::generators
         return true;
     }
 
+    std::shared_ptr<BiomeFilter> BiomeFilterStack::FindFilter(std::string_view filterId) const
+    {
+        const auto filter = std::find_if(m_Filters.begin(), m_Filters.end(), [filterId](const auto &candidate) {
+            return candidate != nullptr && candidate->GetID() == filterId;
+        });
+        return filter != m_Filters.end() ? *filter : nullptr;
+    }
+
+    bool BiomeFilterStack::ReorderFilter(std::string_view filterId, int targetIndex)
+    {
+        if (targetIndex < 0 || targetIndex >= static_cast<int>(m_Filters.size())) {
+            return false;
+        }
+
+        const auto filter = std::find_if(m_Filters.begin(), m_Filters.end(), [filterId](const auto &candidate) {
+            return candidate != nullptr && candidate->GetID() == filterId;
+        });
+        if (filter == m_Filters.end()) {
+            return false;
+        }
+
+        const int sourceIndex = static_cast<int>(std::distance(m_Filters.begin(), filter));
+        if (sourceIndex == targetIndex) {
+            return true;
+        }
+
+        auto selected = std::move(*filter);
+        m_Filters.erase(filter);
+        m_Filters.insert(m_Filters.begin() + targetIndex, std::move(selected));
+        PublishState();
+        return true;
+    }
+
+    bool BiomeFilterStack::LoadFilter(std::string_view filterId, const SerializerNode &settings)
+    {
+        const auto filter = FindFilter(filterId);
+        if (filter == nullptr || !filter->Load(settings)) {
+            return false;
+        }
+        PublishState();
+        return true;
+    }
+
     bool BiomeFilterStack::ShowSettings(int filterIndex)
     {
         if (filterIndex < 0 || filterIndex >= static_cast<int>(m_Filters.size()))

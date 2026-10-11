@@ -7,6 +7,7 @@
 #include "Generators/GenerationContext.h"
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 TF3D_FWD_DEC_CLASS(ApplicationState, tf3d::data)
@@ -45,6 +46,9 @@ namespace tf3d::generators
         bool ShowSettings(int filterIndex);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
+        std::shared_ptr<BiomeFilter> FindFilter(std::string_view filterId) const;
+        bool ReorderFilter(std::string_view filterId, int targetIndex);
+        bool LoadFilter(std::string_view filterId, const SerializerNode &settings);
         void Load(SerializerNode data);
         SerializerNode Save() const;
 
