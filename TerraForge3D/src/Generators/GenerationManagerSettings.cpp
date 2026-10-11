@@ -113,6 +113,9 @@ namespace tf3d::generators
                                 const std::string &popupId,
                                 char *filterSearch)
         {
+            const float maxPopupHeight = std::min(480.0f, ImGui::GetMainViewport()->WorkSize.y * 0.8f);
+            ImGui::SetNextWindowSizeConstraints(
+                ImVec2(0.0f, 0.0f), ImVec2(std::numeric_limits<float>::max(), maxPopupHeight));
             if (!ImGui::BeginPopup(popupId.c_str())) {
                 return;
             }
@@ -129,32 +132,40 @@ namespace tf3d::generators
                 }
             }
 
-            if (definitionsByCategory.empty()) {
-                ImGui::TextDisabled("No filters match the search.");
-            }
-
-            for (const auto &[category, categoryDefinitions] : definitionsByCategory) {
-                const std::string categoryLabel = category + "##FilterCategory";
-                const bool categoryOpen         = ImGui::TreeNodeEx(
-                    categoryLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth);
-                if (!categoryOpen) {
-                    continue;
+            const float resultLineHeight = ImGui::GetTextLineHeightWithSpacing();
+            const float resultContentHeight = static_cast<float>(std::max<std::size_t>(definitionsByCategory.size(), 1)) *
+                                              resultLineHeight + ImGui::GetStyle().WindowPadding.y * 2.0f;
+            const float resultsHeight = std::clamp(resultContentHeight, 64.0f, 360.0f);
+            if (ImGui::BeginChild("##FilterResults", ImVec2(0.0f, resultsHeight), false)) {
+                if (definitionsByCategory.empty()) {
+                    ImGui::TextDisabled("No filters match the search.");
                 }
 
-                for (const int definitionIndex : categoryDefinitions) {
-                    const auto &definition        = definitions[static_cast<std::size_t>(definitionIndex)];
-                    const std::string filterLabel = definition->GetName() + "##" + definition->GetID();
-                    if (ImGui::Selectable(filterLabel.c_str())) {
-                        const int filterIndex = biome.AddFilter(definition);
-                        if (filterIndex >= 0) {
-                            SelectFilterNode(ui, biome, biomeIndex, filterIndex);
-                        }
-                        ImGui::CloseCurrentPopup();
+                for (const auto &[category, categoryDefinitions] : definitionsByCategory) {
+                    const std::string categoryLabel = category + "##FilterCategory";
+                    ImGui::SetNextItemOpen(false, ImGuiCond_Appearing);
+                    const bool categoryOpen =
+                        ImGui::TreeNodeEx(categoryLabel.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth);
+                    if (!categoryOpen) {
+                        continue;
                     }
-                }
 
-                ImGui::TreePop();
+                    for (const int definitionIndex : categoryDefinitions) {
+                        const auto &definition        = definitions[static_cast<std::size_t>(definitionIndex)];
+                        const std::string filterLabel = definition->GetName() + "##" + definition->GetID();
+                        if (ImGui::Selectable(filterLabel.c_str())) {
+                            const int filterIndex = biome.AddFilter(definition);
+                            if (filterIndex >= 0) {
+                                SelectFilterNode(ui, biome, biomeIndex, filterIndex);
+                            }
+                            ImGui::CloseCurrentPopup();
+                        }
+                    }
+
+                    ImGui::TreePop();
+                }
             }
+            ImGui::EndChild();
 
             ImGui::EndPopup();
         }
