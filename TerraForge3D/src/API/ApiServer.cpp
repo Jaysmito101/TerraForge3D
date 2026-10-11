@@ -440,6 +440,124 @@ namespace tf3d::api
             operation["responses"][statusKey]["content"]["application/problem+json"]["schema"] = {
                 {"$ref", "#/components/schemas/Problem"}};
         }
+
+        bool ValidateOperationInventory(const OperationRegistry &operations)
+        {
+            const std::filesystem::path definitionsRoot = ApiSchemaTemplate::DefaultRoot() / "Operations";
+            std::error_code error;
+            if (!std::filesystem::is_directory(definitionsRoot, error) || error) {
+                TF3D_LOG_ERROR(
+                    "API operation definitions directory '{}' is unavailable: {}",
+                    definitionsRoot.generic_string(),
+                    error ? error.message() : "directory does not exist");
+                return false;
+            }
+
+            std::set<std::string> expectedNames;
+            std::filesystem::recursive_directory_iterator iterator(definitionsRoot, error);
+            const std::filesystem::recursive_directory_iterator end;
+            if (error) {
+                TF3D_LOG_ERROR(
+                    "Could not enumerate API operation definitions in '{}': {}",
+                    definitionsRoot.generic_string(),
+                    error.message());
+                return false;
+            }
+
+            while (iterator != end) {
+                const std::filesystem::path definitionPath = iterator->path();
+                const bool isDefinitionFile                = iterator->is_regular_file(error) &&
+                                              definitionPath.extension() == ".json" &&
+                                              definitionPath.parent_path().filename() == "Definitions";
+                if (error) {
+                    TF3D_LOG_ERROR(
+                        "Could not inspect API operation definition '{}': {}",
+                        definitionPath.generic_string(),
+                        error.message());
+                    return false;
+                }
+
+                if (isDefinitionFile) {
+                    std::ifstream definitionFile(definitionPath);
+                    if (!definitionFile.is_open()) {
+                        TF3D_LOG_ERROR(
+                            "Could not read API operation definition '{}'",
+                            definitionPath.generic_string());
+                        return false;
+                    }
+
+                    nlohmann::json definition;
+                    try {
+                        definitionFile >> definition;
+                    } catch (const std::exception &exception) {
+                        TF3D_LOG_ERROR(
+                            "Could not parse API operation definition '{}': {}",
+                            definitionPath.generic_string(),
+                            exception.what());
+                        return false;
+                    }
+
+                    if (!definition.is_object()) {
+                        TF3D_LOG_ERROR(
+                            "API operation definition '{}' must be a JSON object",
+                            definitionPath.generic_string());
+                        return false;
+                    }
+
+                    const auto name = definition.find("Name");
+                    if (name == definition.end() || !name->is_string() ||
+                        name->get_ref<const std::string &>().empty()) {
+                        TF3D_LOG_ERROR(
+                            "API operation definition '{}' must declare a non-empty string Name",
+                            definitionPath.generic_string());
+                        return false;
+                    }
+
+                    const std::string operationName = name->get<std::string>();
+                    if (!expectedNames.insert(operationName).second) {
+                        TF3D_LOG_ERROR("API operation name '{}' is declared more than once", operationName);
+                        return false;
+                    }
+                }
+
+                iterator.increment(error);
+                if (error) {
+                    TF3D_LOG_ERROR(
+                        "Could not enumerate API operation definitions in '{}': {}",
+                        definitionsRoot.generic_string(),
+                        error.message());
+                    return false;
+                }
+            }
+
+            const std::vector<OperationEntry> registeredEntries = operations.Snapshot();
+            std::set<std::string> registeredNames;
+            for (const OperationEntry &entry : registeredEntries) {
+                registeredNames.insert(entry.name);
+            }
+
+            for (const std::string &name : expectedNames) {
+                if (!registeredNames.contains(name)) {
+                    TF3D_LOG_ERROR("API operation '{}' was not registered", name);
+                }
+            }
+            for (const std::string &name : registeredNames) {
+                if (!expectedNames.contains(name)) {
+                    TF3D_LOG_ERROR("API operation '{}' has no schema definition", name);
+                }
+            }
+
+            if (expectedNames.empty() || expectedNames != registeredNames) {
+                TF3D_LOG_ERROR(
+                    "API operation registration is incomplete: {} definitions, {} registered",
+                    expectedNames.size(),
+                    registeredNames.size());
+                return false;
+            }
+
+            TF3D_LOG_INFO("Registered all {} API operations", registeredNames.size());
+            return true;
+        }
     } // namespace
 
     ApiServer::ApiServer(tf3d::data::ApplicationState *applicationState, std::string logsDirectory)
@@ -460,10 +578,16 @@ namespace tf3d::api
         RegisterCoreOperations(operations, applicationState);
         RegisterViewportOperations(operations, applicationState);
         RegisterSceneOperations(operations, applicationState);
+        operationRegistryComplete = ValidateOperationInventory(operations);
     }
 
     bool ApiServer::Start()
     {
+        if (!operationRegistryComplete) {
+            TF3D_LOG_ERROR("API server will not start with an incomplete operation registry");
+            return false;
+        }
+
         if (server && server->is_running()) {
             return true;
         }

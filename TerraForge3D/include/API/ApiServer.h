@@ -89,6 +89,7 @@ namespace tf3d::api
         int port               = 9823;
         std::string endpoint;
         OperationRegistry operations;
+        bool operationRegistryComplete = false;
         nlohmann::json openApiDocument = nlohmann::json::object();
         MainThreadRequestQueue requestQueue;
         std::unique_ptr<httplib::Server> server;
