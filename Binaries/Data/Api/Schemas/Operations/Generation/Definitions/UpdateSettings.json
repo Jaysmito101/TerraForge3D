@@ -1,0 +1,18 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.settings.update",
+  "Method": "PATCH",
+  "Path": "/api/v1/generation/settings",
+  "Title": "Update global generation settings",
+  "Description": "Update selected generation-wide settings. Tile resolution changes resize generation resources and must fit the active GPU's texture-size limit; tile size maps to an integer tile count. Seed source mainModel resolves the current application mainModel slot, not a GPU handle or file path. Field storage changes are saved and report when restart is required. Applying resource changes may wait for current generation work to finish.",
+  "InputSchema": {
+    "$include": "Operations/Generation/GlobalSettingsUpdateInput.json"
+  },
+  "ResponseSchema": {
+    "$include": "Operations/Generation/GlobalSettingsResponse.json"
+  },
+  "Annotations": {
+    "readOnlyHint": false
+  },
+  "Flags": ["LongRunning"]
+}

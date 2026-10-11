@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "resolution": { "type": "integer", "minimum": 16, "maximum": 1048576 },
+    "count": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+    "mapResolution": { "type": "integer", "minimum": 1 },
+    "size": { "type": "number", "minimum": 0.000001, "maximum": 1 }
+  },
+  "required": ["resolution", "count", "mapResolution", "size"],
+  "additionalProperties": false
+}

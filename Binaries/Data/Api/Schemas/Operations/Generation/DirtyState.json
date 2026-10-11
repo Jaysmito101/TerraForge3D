@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "isDirty": { "type": "boolean" },
+    "revision": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "scopes": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["biomes", "mixer", "force", "allBiomes"] }
+    },
+    "causes": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["uiEdit", "fileLoad", "resize", "external", "force", "unknown"] }
+    }
+  },
+  "required": ["isDirty", "revision", "scopes", "causes"],
+  "additionalProperties": false
+}

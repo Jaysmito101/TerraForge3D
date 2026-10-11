@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "tile": { "$include": "Operations/Generation/TileSettingsUpdate.json" },
+    "autoUpdatePaused": { "type": "boolean" },
+    "seedTexture": { "$include": "Operations/Generation/SeedTextureSettingsUpdate.json" },
+    "fieldStorage": { "type": "string", "enum": ["R32F", "R16F"] }
+  },
+  "additionalProperties": false
+}

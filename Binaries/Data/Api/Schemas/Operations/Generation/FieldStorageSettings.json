@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "active": { "type": "string", "enum": ["R32F", "R16F"] },
+    "requested": { "type": "string", "enum": ["R32F", "R16F"] },
+    "restartRequired": { "type": "boolean" }
+  },
+  "required": ["active", "requested", "restartRequired"],
+  "additionalProperties": false
+}

@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "tile": { "$include": "Operations/Generation/TileSettings.json" },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "maximumTextureSize": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["maximumTextureSize"],
+      "additionalProperties": false
+    },
+    "autoUpdatePaused": { "type": "boolean" },
+    "dirty": { "$include": "Operations/Generation/DirtyState.json" },
+    "seedTexture": { "$include": "Operations/Generation/SeedTextureSettings.json" },
+    "fieldStorage": { "$include": "Operations/Generation/FieldStorageSettings.json" }
+  },
+  "required": ["tile", "limits", "autoUpdatePaused", "dirty", "seedTexture", "fieldStorage"],
+  "additionalProperties": false
+}

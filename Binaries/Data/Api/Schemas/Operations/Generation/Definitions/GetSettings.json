@@ -1,0 +1,18 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.settings.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/settings",
+  "Title": "Get global generation settings",
+  "Description": "Read tile resolution and size, current dirty scopes and causes, auto-update pause state, seed texture settings, and active versus requested field storage precision.",
+  "InputSchema": {
+    "$include": "Operations/Generation/EmptyInput.json"
+  },
+  "ResponseSchema": {
+    "$include": "Operations/Generation/GlobalSettingsResponse.json"
+  },
+  "Annotations": {
+    "readOnlyHint": true
+  },
+  "Flags": ["ReadOnly"]
+}
