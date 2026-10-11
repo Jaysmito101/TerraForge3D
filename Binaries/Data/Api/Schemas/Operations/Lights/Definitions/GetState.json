@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.renderer.lights.get_state",
+  "Method": "GET",
+  "Path": "/api/v1/scene/lights",
+  "Title": "Get renderer light settings",
+  "Description": "Return the current renderer lighting settings, including sky-light and primary sun controls.",
+  "InputSchema": {
+    "$include": "Operations/Lights/GetState.json"
+  },
+  "Annotations": {
+    "readOnlyHint": true
+  },
+  "Flags": [
+    "ReadOnly"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.renderer.sea.reload_shaders",
+  "Method": "POST",
+  "Path": "/api/v1/scene/sea/actions/reload-shaders",
+  "Title": "Reload sea shaders",
+  "Description": "Reload the sea vertex and fragment shaders.",
+  "InputSchema": {
+    "$include": "Common/Object.json"
+  },
+  "Annotations": {
+    "readOnlyHint": false
+  },
+  "Flags": [
+    "None"
+  ]
+}

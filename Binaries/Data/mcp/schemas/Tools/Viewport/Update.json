@@ -1,8 +1,0 @@
-{
-  "$include": "Common/Object.json",
-  "properties": {
-    "ViewportId": { "$include": "Common/ViewportId.json" },
-    "State": { "$include": "Tools/Viewport/UpdateState.json" }
-  },
-  "required": ["ViewportId", "State"]
-}

@@ -1,4 +1,0 @@
-{
-  "$include": "Common/Object.json",
-  "description": "The TerraForge3D MCP bridge status response."
-}

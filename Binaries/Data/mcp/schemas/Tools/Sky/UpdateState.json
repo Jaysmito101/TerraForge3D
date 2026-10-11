@@ -1,7 +1,0 @@
-{
-  "$include": "Common/Object.json",
-  "properties": {
-    "State": { "$include": "Tools/Sky/State.json" }
-  },
-  "required": ["State"]
-}

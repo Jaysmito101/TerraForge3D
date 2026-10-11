@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.renderer.sea.update_state",
+  "Method": "PATCH",
+  "Path": "/api/v1/scene/sea",
+  "Title": "Update sea renderer settings",
+  "Description": "Update procedural sea renderer settings using a partial hierarchical State object.",
+  "InputSchema": {
+    "$include": "Operations/Sea/UpdateState.json"
+  },
+  "Annotations": {
+    "readOnlyHint": false
+  },
+  "Flags": [
+    "None"
+  ]
+}

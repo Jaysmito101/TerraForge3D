@@ -221,7 +221,7 @@ refine fields without duplicating the inspector definition.
 
 ## Includes
 
-Inspector files support the same `$include` directive as MCP schemas:
+Inspector files support the same `$include` directive as API schemas:
 
 ```json
 {

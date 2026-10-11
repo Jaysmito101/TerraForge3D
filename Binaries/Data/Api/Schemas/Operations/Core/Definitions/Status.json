@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.api.status",
+  "Method": "GET",
+  "Path": "/api/v1/status",
+  "Title": "API status",
+  "Description": "Return the TerraForge3D API server status and API version.",
+  "InputSchema": {
+    "$include": "Operations/Core/Status.json"
+  },
+  "Annotations": {
+    "readOnlyHint": true
+  },
+  "Flags": [
+    "ReadOnly"
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "$include": "Common/Object.json",
+  "description": "The TerraForge3D API bridge status response."
+}

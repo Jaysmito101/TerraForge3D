@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TerraForge3D API Playground</title>
+  <style>
+    :root { color-scheme: dark; font: 15px/1.5 system-ui, sans-serif; background: #111820; color: #e7edf4; }
+    body { margin: 0; }
+    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 48px; }
+    header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+    h1 { margin: 0; font-size: 1.5rem; }
+    nav { display: flex; gap: 14px; }
+    a { color: #8cc8ff; }
+    .layout { display: grid; grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.7fr); gap: 18px; }
+    section { min-width: 0; border: 1px solid #33404d; border-radius: 9px; background: #19232d; padding: 16px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    select, textarea, button { font: inherit; }
+    textarea { box-sizing: border-box; width: 100%; min-height: 220px; resize: vertical; border: 1px solid #465664; border-radius: 6px; background: #10171e; color: inherit; padding: 9px; font: 13px/1.5 ui-monospace, monospace; tab-size: 2; }
+    pre { overflow: auto; max-height: 360px; margin: 8px 0 0; padding: 12px; border-radius: 6px; background: #10171e; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .muted { color: #a8b4c0; }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0; }
+    button { border: 1px solid #465664; border-radius: 6px; background: #233343; color: inherit; padding: 8px 12px; cursor: pointer; text-align: left; }
+    button:hover:not(:disabled) { background: #2e465d; }
+    button:disabled { opacity: .55; cursor: wait; }
+    .primary { border: 0; background: #347cb5; }
+    #directory { display: grid; gap: 7px; margin-top: 12px; }
+    #directory button { width: 100%; }
+    .directory-kind { display: block; color: #a8b4c0; font-size: .82rem; }
+    .error { color: #ff9c9c; }
+    #resultImage { display: none; max-width: 100%; height: auto; margin-top: 12px; border: 1px solid #465664; border-radius: 6px; }
+    @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } main { padding: 18px 12px 32px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>TerraForge3D API Playground</h1>
+      <nav aria-label="API documents">
+        <a href="/api/v1/status">Status</a>
+        <a href="/api/v1/openapi.json">OpenAPI</a>
+        <a href="/api/skill.md">API skill</a>
+      </nav>
+    </header>
+    <div class="layout">
+      <section aria-labelledby="browseTitle">
+        <h2 id="browseTitle">Browse operations</h2>
+        <div class="row">
+          <button id="back" type="button" disabled>Up one level</button>
+          <span id="breadcrumb" class="muted">Loading…</span>
+        </div>
+        <div id="directory" aria-live="polite"></div>
+        <p id="description" class="muted"></p>
+        <p id="endpoint" class="muted"></p>
+        <p><a id="skillLink" href="#" hidden>Operation skill</a> <a id="schemaLink" href="#" hidden>Argument schema</a></p>
+      </section>
+      <section aria-labelledby="requestTitle">
+        <h2 id="requestTitle">Try an operation</h2>
+        <label for="arguments">JSON arguments</label>
+        <textarea id="arguments" spellcheck="false" aria-describedby="argumentHelp" disabled>{}</textarea>
+        <p id="argumentHelp" class="muted">Choose an operation to load its composed schema and prepare arguments.</p>
+        <div class="row">
+          <button id="send" class="primary" type="button" disabled>Send request</button>
+          <span id="requestStatus" class="muted" role="status"></span>
+        </div>
+        <h3>Response</h3>
+        <pre id="response" aria-live="polite">Browse a group, then choose one operation.</pre>
+        <img id="resultImage" alt="Viewport capture returned by the API">
+      </section>
+    </div>
+  </main>
+  <script>
+    const directoryView = document.querySelector("#directory");
+    const breadcrumb = document.querySelector("#breadcrumb");
+    const backButton = document.querySelector("#back");
+    const description = document.querySelector("#description");
+    const endpoint = document.querySelector("#endpoint");
+    const argumentEditor = document.querySelector("#arguments");
+    const sendButton = document.querySelector("#send");
+    const requestStatus = document.querySelector("#requestStatus");
+    const responseView = document.querySelector("#response");
+    const resultImage = document.querySelector("#resultImage");
+    const skillLink = document.querySelector("#skillLink");
+    const schemaLink = document.querySelector("#schemaLink");
+    const history = [];
+    let selectedOperation = null;
+    let imageUrl = null;
+
+    function exampleFor(schema) {
+      if (schema && Object.hasOwn(schema, "const")) return schema.const;
+      if (Array.isArray(schema?.enum) && schema.enum.length > 0) return schema.enum[0];
+      if (schema?.type === "object") {
+        const result = {};
+        const required = new Set(schema.required || []);
+        for (const [key, child] of Object.entries(schema.properties || {})) {
+          if (required.has(key)) result[key] = exampleFor(child);
+        }
+        return result;
+      }
+      if (schema?.type === "array") return [];
+      if (schema?.type === "integer" || schema?.type === "number") return schema.minimum ?? 0;
+      if (schema?.type === "boolean") return false;
+      if (schema?.type === "string") return "";
+      return null;
+    }
+
+    async function readJson(path) {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`);
+      return response.json();
+    }
+
+    function clearSelectedOperation() {
+      selectedOperation = null;
+      description.textContent = "";
+      endpoint.textContent = "";
+      skillLink.hidden = true;
+      schemaLink.hidden = true;
+      argumentEditor.disabled = true;
+      argumentEditor.value = "{}";
+      sendButton.disabled = true;
+      responseView.textContent = "Choose an operation to load its schema and prepare arguments.";
+      responseView.classList.remove("error");
+      resultImage.style.display = "none";
+    }
+
+    function addDirectoryButton(label, kind, activate) {
+      const button = document.createElement("button");
+      const title = document.createElement("span");
+      const detail = document.createElement("span");
+      title.textContent = label;
+      detail.className = "directory-kind";
+      detail.textContent = kind;
+      button.append(title, detail);
+      button.addEventListener("click", activate);
+      directoryView.append(button);
+    }
+
+    function renderDirectory(catalog) {
+      directoryView.replaceChildren();
+      const currentPath = catalog.path.replace("/api/v1/operations", "").replaceAll("/", " › ");
+      breadcrumb.textContent = currentPath || "All operation groups";
+      backButton.disabled = history.length === 0;
+
+      for (const child of catalog.children || []) {
+        addDirectoryButton(child.name, "Group", () => {
+          history.push(catalog.path);
+          openDirectory(child.path);
+        });
+      }
+
+      for (const operation of catalog.operations || []) {
+        addDirectoryButton(`${operation.title} · ${operation.method}`, operation.path, () => {
+          openOperation(operation);
+        });
+      }
+
+      if (directoryView.childElementCount === 0) {
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.textContent = "This group has no child groups or operations.";
+        directoryView.append(empty);
+      }
+    }
+
+    async function openDirectory(path) {
+      clearSelectedOperation();
+      try {
+        renderDirectory(await readJson(path));
+      } catch (error) {
+        directoryView.replaceChildren();
+        breadcrumb.textContent = "Could not open group";
+        responseView.textContent = error.message;
+        responseView.classList.add("error");
+      }
+    }
+
+    async function openOperation(summary) {
+      clearSelectedOperation();
+      responseView.textContent = "Loading operation details and schema…";
+      try {
+        const operation = await readJson(summary.document);
+        const schemaResponse = await fetch(operation.schema);
+        if (!schemaResponse.ok) throw new Error(`${operation.schema} returned HTTP ${schemaResponse.status}`);
+        operation.inputSchema = await schemaResponse.json();
+        selectedOperation = operation;
+        description.textContent = operation.description;
+        endpoint.textContent = `${operation.method} ${operation.path}`;
+        skillLink.href = operation.skill;
+        schemaLink.href = operation.schema;
+        skillLink.hidden = false;
+        schemaLink.hidden = false;
+        argumentEditor.disabled = false;
+        argumentEditor.value = JSON.stringify(exampleFor(operation.inputSchema), null, 2);
+        sendButton.disabled = false;
+        responseView.textContent = "Ready to send. Edit the JSON arguments if needed.";
+        responseView.classList.remove("error");
+      } catch (error) {
+        responseView.textContent = error.message;
+        responseView.classList.add("error");
+      }
+    }
+
+    function parameterText(value, name) {
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+        return String(value);
+      }
+      throw new Error(`Argument ${name} must be a string, number, or boolean.`);
+    }
+
+    async function sendRequest() {
+      if (!selectedOperation) return;
+      sendButton.disabled = true;
+      requestStatus.textContent = "Sending…";
+      responseView.classList.remove("error");
+      resultImage.style.display = "none";
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+
+      try {
+        const argumentsObject = JSON.parse(argumentEditor.value);
+        if (argumentsObject === null || Array.isArray(argumentsObject) || typeof argumentsObject !== "object") {
+          throw new Error("JSON arguments must be an object.");
+        }
+
+        const remainingArguments = { ...argumentsObject };
+        let requestPath = selectedOperation.path;
+        for (const parameter of selectedOperation.pathParameters || []) {
+          if (!Object.hasOwn(remainingArguments, parameter.name)) {
+            throw new Error(`Missing path argument: ${parameter.name}`);
+          }
+          const value = encodeURIComponent(parameterText(remainingArguments[parameter.name], parameter.name));
+          requestPath = requestPath.replace(`{${parameter.name}}`, value);
+          delete remainingArguments[parameter.name];
+        }
+
+        const options = { method: selectedOperation.method, headers: {} };
+        if (selectedOperation.method === "GET") {
+          const query = new URLSearchParams();
+          for (const parameter of selectedOperation.queryParameters || []) {
+            if (!Object.hasOwn(remainingArguments, parameter.name)) continue;
+            query.set(parameter.name, parameterText(remainingArguments[parameter.name], parameter.name));
+            delete remainingArguments[parameter.name];
+          }
+          if (Object.keys(remainingArguments).length > 0) {
+            throw new Error(`Unknown GET argument: ${Object.keys(remainingArguments).join(", ")}`);
+          }
+          if (query.size > 0) requestPath += `?${query.toString()}`;
+        } else {
+          options.headers["Content-Type"] = "application/json";
+          options.body = JSON.stringify(remainingArguments);
+        }
+
+        const response = await fetch(requestPath, options);
+        const contentType = response.headers.get("Content-Type") || "";
+        requestStatus.textContent = `HTTP ${response.status}`;
+        if (contentType.startsWith("image/")) {
+          imageUrl = URL.createObjectURL(await response.blob());
+          resultImage.src = imageUrl;
+          resultImage.style.display = "block";
+          responseView.textContent = `${contentType} · ${response.headers.get("X-Image-Width") || "?"} × ${response.headers.get("X-Image-Height") || "?"}`;
+        } else {
+          const responseText = await response.text();
+          try { responseView.textContent = JSON.stringify(JSON.parse(responseText), null, 2); }
+          catch { responseView.textContent = responseText; }
+          if (!response.ok) responseView.classList.add("error");
+        }
+      } catch (error) {
+        requestStatus.textContent = "Request failed";
+        responseView.textContent = error.message;
+        responseView.classList.add("error");
+      } finally {
+        sendButton.disabled = selectedOperation === null;
+      }
+    }
+
+    backButton.addEventListener("click", () => {
+      const previousPath = history.pop();
+      if (previousPath) openDirectory(previousPath);
+    });
+    sendButton.addEventListener("click", sendRequest);
+    openDirectory("/api/v1/operations");
+  </script>
+</body>
+</html>

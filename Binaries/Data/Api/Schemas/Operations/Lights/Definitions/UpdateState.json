@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.renderer.lights.update_state",
+  "Method": "PATCH",
+  "Path": "/api/v1/scene/lights",
+  "Title": "Update renderer light settings",
+  "Description": "Update renderer lighting settings using a partial hierarchical State object.",
+  "InputSchema": {
+    "$include": "Operations/Lights/UpdateState.json"
+  },
+  "Annotations": {
+    "readOnlyHint": false
+  },
+  "Flags": [
+    "None"
+  ]
+}
