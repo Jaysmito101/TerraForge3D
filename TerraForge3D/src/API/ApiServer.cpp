@@ -4,6 +4,7 @@
 
 #include "API/Operations/CoreOperations.h"
 #include "API/Operations/GenerationOperations.h"
+#include "API/Operations/GenerationSettingsOperations.h"
 #include "API/Operations/SceneOperations.h"
 #include "API/Operations/ViewportOperations.h"
 #include "API/SchemaTemplate.h"
@@ -591,6 +592,7 @@ namespace tf3d::api
     {
         RegisterCoreOperations(operations, applicationState);
         RegisterGenerationOperations(operations, applicationState);
+        RegisterGenerationSettingsOperations(operations, applicationState);
         RegisterViewportOperations(operations, applicationState);
         RegisterSceneOperations(operations, applicationState);
         operationRegistryComplete = ValidateOperationInventory(operations);
@@ -711,6 +713,22 @@ namespace tf3d::api
         };
         server->Get(StaticRoutePattern("/api/docs"), servePlayground);
         server->Get(StaticRoutePattern("/api/docs/"), servePlayground);
+
+        const auto servePlaygroundLogo = [this](const httplib::Request &request, httplib::Response &response) {
+            ActiveRequestScope active(activeRequests);
+            const auto logoPath = ApiSchemaTemplate::DefaultRoot().parent_path() /
+                                  "Playground" / "logo.png";
+            const auto logo = ReadTextFile(logoPath);
+            if (!logo) {
+                response.status = 404;
+                response.set_content("API playground logo is unavailable.", "text/plain");
+            } else {
+                response.set_content(*logo, "image/png");
+            }
+            RecordRequest(request, response);
+        };
+        server->Get(StaticRoutePattern("/api/docs/logo.png"), servePlaygroundLogo);
+        server->Get(StaticRoutePattern("/favicon.ico"), servePlaygroundLogo);
 
         const std::vector<OperationEntry> entries = operations.Snapshot();
         std::set<std::string> groupPaths;

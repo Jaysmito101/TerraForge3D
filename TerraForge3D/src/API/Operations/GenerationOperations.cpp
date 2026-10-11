@@ -201,8 +201,7 @@ namespace tf3d::api
                 {"requestId", request.id},
                 {"status", std::string(RequestStatusName(outcome))},
                 {"inputRevision", RevisionString(request.inputRevision)},
-                {"progress", {{"stage", std::string(RequestStage(outcome))},
-                               {"percent", published ? nlohmann::json(100) : nlohmann::json(nullptr)}}},
+                {"progress", {{"stage", std::string(RequestStage(outcome))}, {"percent", published ? nlohmann::json(100) : nlohmann::json(nullptr)}}},
                 {"output", published ? request.terminalOutput : nlohmann::json(nullptr)},
                 {"failure", failed ? request.terminalFailure : nlohmann::json(nullptr)},
                 {"cancellationSupported", false}};
