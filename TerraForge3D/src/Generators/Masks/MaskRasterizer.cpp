@@ -184,14 +184,18 @@ namespace tf3d::generators
             input            = DispatchInput::CachedBaseTexture;
         }
 
-        return Dispatch(sourceData,
-                        context,
-                        baseGenerator,
-                        baseState,
-                        destination,
-                        inputBaseTexture,
-                        strokeCount,
-                        input);
+        const bool rendered = Dispatch(sourceData,
+                                       context,
+                                       baseGenerator,
+                                       baseState,
+                                       destination,
+                                       inputBaseTexture,
+                                       strokeCount,
+                                       input);
+        if (rendered) {
+            destination->GenerateMipmaps();
+        }
+        return rendered;
     }
 
     GeneratorTexture *MaskRasterizer::GetPreviewTexture(GeneratorTexture *sourceTexture,

@@ -81,8 +81,9 @@ namespace tf3d::generators
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
         const int32_t largestDimension = std::max(m_Width, m_Height);
         int32_t mipLevels              = 1;
-        for (int32_t mipSize = largestDimension; mipSize > 1; mipSize >>= 1)
+        for (int32_t mipSize = largestDimension; mipSize > 1; mipSize >>= 1) {
             ++mipLevels;
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
