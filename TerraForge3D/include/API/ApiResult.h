@@ -22,7 +22,10 @@ namespace tf3d::api
         ViewportReadFailed,
         JpegEncodeFailed,
         ViewportNotFound,
-        GenerationRequestNotFound
+        GenerationRequestNotFound,
+        BiomeNotFound,
+        FilterNotFound,
+        FilterDefinitionNotFound
     };
 
     inline constexpr std::string_view ApiErrorTypeToCode(ApiErrorType type)
@@ -48,6 +51,12 @@ namespace tf3d::api
                 return "viewport_not_found";
             case ApiErrorType::GenerationRequestNotFound:
                 return "generation_request_not_found";
+            case ApiErrorType::BiomeNotFound:
+                return "biome_not_found";
+            case ApiErrorType::FilterNotFound:
+                return "filter_not_found";
+            case ApiErrorType::FilterDefinitionNotFound:
+                return "filter_definition_not_found";
         }
         return "unknown";
     }
@@ -59,6 +68,9 @@ namespace tf3d::api
                 return 400;
             case ApiErrorType::ViewportNotFound:
             case ApiErrorType::GenerationRequestNotFound:
+            case ApiErrorType::BiomeNotFound:
+            case ApiErrorType::FilterNotFound:
+            case ApiErrorType::FilterDefinitionNotFound:
                 return 404;
             case ApiErrorType::Timeout:
                 return 504;
