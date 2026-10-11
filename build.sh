@@ -74,9 +74,14 @@ cleanup_build_lock() {
     fi
 }
 
+interrupt_build() {
+    cleanup_build_lock
+    exit "$1"
+}
+
 trap cleanup_build_lock EXIT
-trap 'exit 130' INT
-trap 'exit 143' TERM
+trap 'interrupt_build 130' INT
+trap 'interrupt_build 143' TERM
 
 build_lock_owner_is_alive() {
     local owner_pid="$1"
@@ -138,7 +143,9 @@ acquire_build_lock() {
         sleep 1
     done
 
-    printf '%s %s\n' "$$" "$(ps -p "$$" -o lstart= 2>/dev/null | sed 's/^[[:space:]]*//')" > "$BUILD_LOCK_DIR/owner"
+    local owner_tmp="$BUILD_LOCK_DIR/owner.tmp.$$"
+    printf '%s %s\n' "$$" "$(ps -p "$$" -o lstart= 2>/dev/null | sed 's/^[[:space:]]*//')" > "$owner_tmp"
+    mv -- "$owner_tmp" "$BUILD_LOCK_DIR/owner"
     BUILD_LOCK_HELD=1
     if [[ "$wait_logged" -eq 1 ]]; then
         echo "Previous TerraForge3D session finished; continuing." >&2

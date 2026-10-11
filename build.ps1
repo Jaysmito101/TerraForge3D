@@ -223,8 +223,7 @@ function Enter-BuildLock {
         }
     }
     catch {
-        $script:BuildMutex.Dispose()
-        $script:BuildMutex = $null
+        Exit-BuildLock
         throw
     }
 }
@@ -588,8 +587,9 @@ if ($Command -eq "help") {
     exit 0
 }
 
-Enter-BuildLock
 try {
+    Enter-BuildLock
+
     if ($Command -eq "setup") {
         Invoke-Setup
         return
