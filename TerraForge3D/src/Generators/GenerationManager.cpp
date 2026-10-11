@@ -4,6 +4,8 @@
 #include "Profiler.h"
 #include "Utils/Utils.h"
 #include <exception>
+#include <algorithm>
+#include <cctype>
 
 namespace tf3d::generators
 {
@@ -173,6 +175,125 @@ namespace tf3d::generators
     void GenerationManager::MarkForRegeneration()
     {
         m_DirtyManager.MarkForce(GenerationDirtyCause::External);
+    }
+
+    const std::vector<std::shared_ptr<BiomeManager>> &GenerationManager::GetBiomes() const
+    {
+        return m_Field.biomeManagers;
+    }
+
+    BiomeManager *GenerationManager::FindBiome(std::string_view biomeId) const
+    {
+        const auto biome = std::find_if(
+            m_Field.biomeManagers.begin(), m_Field.biomeManagers.end(), [biomeId](const auto &candidate) {
+                return candidate != nullptr && candidate->GetBiomeID().GetValue() == biomeId;
+            });
+        return biome != m_Field.biomeManagers.end() ? biome->get() : nullptr;
+    }
+
+    BiomeMixer *GenerationManager::GetBiomeMixer() const
+    {
+        return m_Field.biomeMixer.get();
+    }
+
+    exporters::SerializerNode GenerationManager::SaveBiomeMixerSettings() const
+    {
+        return m_Field.biomeMixer != nullptr
+                   ? m_Field.biomeMixer->Save(m_Field.biomeManagers)
+                   : exporters::CreateSerializerNode();
+    }
+
+    bool GenerationManager::LoadBiomeMixerSettings(const exporters::SerializerNode &settings,
+                                                   std::string &error)
+    {
+        if (m_Field.biomeMixer == nullptr ||
+            !m_Field.biomeMixer->Load(settings, m_Field.biomeManagers, error)) {
+            if (error.empty()) {
+                error = "Biome mixer settings are unavailable.";
+            }
+            return false;
+        }
+        m_DirtyManager.MarkMixer();
+        return true;
+    }
+
+    bool GenerationManager::CreateBiome(const std::string &name,
+                                        std::string &biomeId,
+                                        std::string &error)
+    {
+        error.clear();
+        biomeId.clear();
+        if (name.empty() || name.size() >= 64 || name.find('\0') != std::string::npos ||
+            std::none_of(name.begin(), name.end(), [](unsigned char character) {
+                return std::isspace(character) == 0;
+            })) {
+            error = "Name must contain visible text and fit in 63 UTF-8 bytes.";
+            return false;
+        }
+        if (m_Field.biomeManagers.size() >= 64) {
+            error = "The generation graph supports at most 64 biomes.";
+            return false;
+        }
+        if (m_AppState == nullptr) {
+            error = "Generation is unavailable.";
+            return false;
+        }
+
+        auto biome = std::make_shared<BiomeManager>(m_AppState, &m_DirtyManager, name);
+        biomeId    = biome->GetBiomeID().GetValue();
+        m_Field.biomeManagers.push_back(std::move(biome));
+        m_DirtyManager.MarkMixer();
+        return true;
+    }
+
+    bool GenerationManager::RemoveBiome(std::string_view biomeId, std::string &error)
+    {
+        error.clear();
+        if (m_Field.biomeManagers.size() <= 1) {
+            error = "The final biome is required; a generation graph must contain at least one biome.";
+            return false;
+        }
+        const auto biome = std::find_if(
+            m_Field.biomeManagers.begin(), m_Field.biomeManagers.end(), [biomeId](const auto &candidate) {
+                return candidate != nullptr && candidate->GetBiomeID().GetValue() == biomeId;
+            });
+        if (biome == m_Field.biomeManagers.end()) {
+            error = "BiomeId does not exist in the generation graph.";
+            return false;
+        }
+
+        m_Field.biomeManagers.erase(biome);
+        m_DirtyManager.MarkBiomes();
+        m_DirtyManager.MarkMixer();
+        return true;
+    }
+
+    bool GenerationManager::MoveBiome(std::string_view biomeId, int32_t targetIndex, std::string &error)
+    {
+        error.clear();
+        if (targetIndex < 0 || targetIndex >= static_cast<int32_t>(m_Field.biomeManagers.size())) {
+            error = "TargetIndex is outside the biome directory.";
+            return false;
+        }
+        const auto biome = std::find_if(
+            m_Field.biomeManagers.begin(), m_Field.biomeManagers.end(), [biomeId](const auto &candidate) {
+                return candidate != nullptr && candidate->GetBiomeID().GetValue() == biomeId;
+            });
+        if (biome == m_Field.biomeManagers.end()) {
+            error = "BiomeId does not exist in the generation graph.";
+            return false;
+        }
+
+        const int32_t sourceIndex = static_cast<int32_t>(std::distance(m_Field.biomeManagers.begin(), biome));
+        if (sourceIndex == targetIndex) {
+            return true;
+        }
+        auto selected = std::move(*biome);
+        m_Field.biomeManagers.erase(biome);
+        m_Field.biomeManagers.insert(m_Field.biomeManagers.begin() + targetIndex, std::move(selected));
+        m_DirtyManager.MarkBiomes();
+        m_DirtyManager.MarkMixer();
+        return true;
     }
 
     bool GenerationManager::OnForceUpdate(const std::string &, void *)

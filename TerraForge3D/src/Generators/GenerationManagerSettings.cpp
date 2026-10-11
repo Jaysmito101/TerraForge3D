@@ -262,19 +262,27 @@ namespace tf3d::generators
                 biome->GetBiomeName(), ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap);
             ImGui::SameLine();
 
-            if (ImGui::Button("Delete")) {
-                TF3D_LOG_DEBUG("Loaded {} biome managers", context.field.biomeManagers.size());
-                context.field.biomeManagers.erase(context.field.biomeManagers.begin() + biomeIndex);
-                TF3D_LOG_DEBUG("Active biome managers: {}", context.field.biomeManagers.size());
-                context.dirtyManager.MarkBiomes();
-                context.dirtyManager.MarkMixer();
-                context.ui.selectedNode = SelectedUINode(-1, SelectedUINodeObjectType_None, "None");
+            const bool canDeleteBiome = context.field.biomeManagers.size() > 1;
+            ImGui::BeginDisabled(!canDeleteBiome);
+            const bool deleteBiome = ImGui::Button("Delete");
+            ImGui::EndDisabled();
+            if (ImGui::IsItemHovered() && !canDeleteBiome) {
+                ImGui::SetTooltip("At least one biome is required by the generation graph.");
+            }
 
-                if (biomeOpen) {
-                    ImGui::TreePop();
+            if (deleteBiome && context.appState.generationManager != nullptr) {
+                std::string error;
+                if (context.appState.generationManager->RemoveBiome(biome->GetBiomeID().GetValue(), error)) {
+                    context.ui.selectedNode = SelectedUINode(-1, SelectedUINodeObjectType_None, "None");
+
+                    if (biomeOpen) {
+                        ImGui::TreePop();
+                    }
+                    ImGui::PopID();
+                    return false;
+                } else {
+                    TF3D_LOG_WARN("Could not remove biome: {}", error);
                 }
-                ImGui::PopID();
-                return false;
             }
 
             if (biomeOpen) {
@@ -295,9 +303,13 @@ namespace tf3d::generators
 
             if (ImGui::Button("Add##BiomeAdd")) {
                 const std::string biomeName = "Biome " + std::to_string(context.field.biomeManagers.size() + 1);
-                context.field.biomeManagers.push_back(
-                    std::make_shared<BiomeManager>(&context.appState, &context.dirtyManager, biomeName));
-                context.dirtyManager.MarkMixer();
+                if (context.appState.generationManager != nullptr) {
+                    std::string biomeId;
+                    std::string error;
+                    if (!context.appState.generationManager->CreateBiome(biomeName, biomeId, error)) {
+                        TF3D_LOG_WARN("Could not add biome: {}", error);
+                    }
+                }
             }
 
             if (!biomesOpen) {

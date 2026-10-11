@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -176,6 +177,15 @@ namespace tf3d::generators
         GenerationGlobalSettingsApplyResult LoadGlobalSettings(
             const exporters::SerializerNode &settings,
             std::string &error);
+
+        const std::vector<std::shared_ptr<BiomeManager>> &GetBiomes() const;
+        BiomeManager *FindBiome(std::string_view biomeId) const;
+        BiomeMixer *GetBiomeMixer() const;
+        exporters::SerializerNode SaveBiomeMixerSettings() const;
+        bool LoadBiomeMixerSettings(const exporters::SerializerNode &settings, std::string &error);
+        bool CreateBiome(const std::string &name, std::string &biomeId, std::string &error);
+        bool RemoveBiome(std::string_view biomeId, std::string &error);
+        bool MoveBiome(std::string_view biomeId, int32_t targetIndex, std::string &error);
 
         bool OnTileResolutionChange(const std::string params, void *paramsPtr);
 
