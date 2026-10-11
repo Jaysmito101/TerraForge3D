@@ -172,6 +172,16 @@ namespace tf3d::generators
         m_DirtyManager->MarkBiomes();
     }
 
+    void BiomeManager::MarkMaskUpdated()
+    {
+        MarkUpdateRequired();
+    }
+
+    bool BiomeManager::PublishFilterMaskState(std::string_view filterId)
+    {
+        return m_FilterStack != nullptr && m_FilterStack->PublishFilterMaskState(filterId);
+    }
+
     void BiomeManager::Resize()
     {
         auto size = m_AppState->mainMap.tileResolution * m_AppState->mainMap.tileResolution * sizeof(float);

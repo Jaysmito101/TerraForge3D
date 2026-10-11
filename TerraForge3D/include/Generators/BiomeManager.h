@@ -156,6 +156,20 @@ namespace tf3d::generators
         {
             return m_FilterStack->GetDefinitions();
         }
+        inline MaskLayer *GetMaskLayer() const
+        {
+            return m_MaskLayer.get();
+        }
+        inline BaseNoiseGenerator *GetBaseNoiseGenerator() const
+        {
+            return m_BaseNoiseGenerator.get();
+        }
+        inline BiomeCustomizeBaseShape *GetCustomBaseShape() const
+        {
+            return m_CustomizeBaseShape.get();
+        }
+        bool PublishFilterMaskState(std::string_view filterId);
+        void MarkMaskUpdated();
         inline const std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> &GetBaseShapeGenerators() const
         {
             return m_BaseShapeGenerators;
