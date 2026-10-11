@@ -16,7 +16,7 @@ if(NOT TF3D_PROFILER_MODE_UPPER STREQUAL "OFF" AND
     message(FATAL_ERROR "TF3D_PROFILER_MODE must be OFF, CPU, or FULL")
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/MCP.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/API.cmake)
 
 if(APPLE)
     set(EXECUTABLE_NAME "tf3d")
@@ -45,7 +45,6 @@ set(TF3D_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/fmt/include
     ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/spdlog/include
     ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/glm
-    ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/httplib
     ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/imgui-node-editor
     ${CMAKE_CURRENT_SOURCE_DIR}/TerraForge3D/vendor/json/single_include
@@ -76,7 +75,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 list(REMOVE_DUPLICATES SOURCES)
-list(FILTER SOURCES EXCLUDE REGEX "/MCP/.*\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "/API/.*\\.cpp$")
 
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_glfw.cpp)
 # list(APPEND SOURCES ./TerraForge3D/vendor/imgui/backends/imgui_impl_opengl3.cpp)
@@ -85,7 +84,7 @@ add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-tf3d_configure_mcp(${EXECUTABLE_NAME})
+tf3d_configure_api(${EXECUTABLE_NAME})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${EXECUTABLE_NAME} PRIVATE
