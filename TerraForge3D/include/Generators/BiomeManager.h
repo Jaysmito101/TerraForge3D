@@ -19,6 +19,7 @@
 #include <functional>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -155,10 +156,38 @@ namespace tf3d::generators
         {
             return m_FilterStack->GetDefinitions();
         }
+        inline const std::vector<std::shared_ptr<BiomeBaseShapeGenerator>> &GetBaseShapeGenerators() const
+        {
+            return m_BaseShapeGenerators;
+        }
+        nlohmann::json GetBaseNoiseParameterSchema() const
+        {
+            return m_BaseNoiseGenerator != nullptr ? m_BaseNoiseGenerator->GetSettingsSchema()
+                                                   : nlohmann::json::object();
+        }
+        nlohmann::json GetBaseMaskSchema() const
+        {
+            return m_BaseNoiseGenerator != nullptr ? m_BaseNoiseGenerator->GetBaseMaskSchema()
+                                                   : nlohmann::json::object();
+        }
         inline const BiomeID &GetBiomeID() const
         {
             return m_BiomeID;
         }
+        exporters::SerializerNode SaveGeneralSettings() const;
+        bool LoadGeneralSettings(const exporters::SerializerNode &settings, std::string &error);
+        exporters::SerializerNode SaveBaseShapeSettings();
+        bool LoadBaseShapeSettings(const exporters::SerializerNode &settings, std::string &error);
+        exporters::SerializerNode SaveBaseNoiseSettings();
+        bool LoadBaseNoiseSettings(const exporters::SerializerNode &settings, std::string &error);
+        exporters::SerializerNode SaveCustomBaseShapeSettings() const;
+        bool LoadCustomBaseShapeSettings(const exporters::SerializerNode &settings, std::string &error);
+        std::shared_ptr<BiomeFilter> FindFilter(std::string_view filterId) const;
+        bool ReorderFilter(std::string_view filterId, int32_t targetIndex, std::string &error);
+        bool LoadFilter(std::string_view filterId,
+                        const exporters::SerializerNode &settings,
+                        std::string &error);
+        int AddFilterByDefinitionID(std::string_view definitionId, std::string &filterId, std::string &error);
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
         bool LoadUpResources();

@@ -6,7 +6,11 @@
 #include "Utils/Utils.h"
 
 #include <algorithm>
+#include <cctype>
+#include <cmath>
+#include <cstdio>
 #include <filesystem>
+#include <string_view>
 #include <unordered_set>
 
 #include "Generators/BiomeBaseShapeGenerator.h"
@@ -448,6 +452,282 @@ namespace tf3d::generators
             MarkUpdateRequired();
         }
         ImGui::PopID();
+    }
+
+    SerializerNode BiomeManager::SaveGeneralSettings() const
+    {
+        auto settings = CreateSerializerNode();
+        settings->Set("Name", std::string(m_BiomeName));
+        settings->Set("Enabled", m_IsEnabled);
+        settings->Set("Color", glm::vec3(m_Color.x, m_Color.y, m_Color.z));
+        return settings;
+    }
+
+    bool BiomeManager::LoadGeneralSettings(const SerializerNode &settings, std::string &error)
+    {
+        error.clear();
+        if (settings == nullptr) {
+            error = "Biome settings must be an object.";
+            return false;
+        }
+
+        const std::string name    = settings->Get<std::string>("Name", m_BiomeName);
+        const bool enabled        = settings->Get<bool>("Enabled", m_IsEnabled);
+        const glm::vec3 color     = settings->Get<glm::vec3>("Color", glm::vec3(m_Color.x, m_Color.y, m_Color.z));
+        const bool nameHasContent = std::any_of(name.begin(), name.end(), [](unsigned char character) {
+            return std::isspace(character) == 0;
+        });
+        if (name.empty() || name.size() >= sizeof(m_BiomeName) || !nameHasContent ||
+            name.find('\0') != std::string::npos) {
+            error = "Name must contain visible text and fit in 63 UTF-8 bytes.";
+            return false;
+        }
+        if (!std::isfinite(color.x) || !std::isfinite(color.y) || !std::isfinite(color.z) ||
+            color.x < 0.0f || color.x > 1.0f || color.y < 0.0f || color.y > 1.0f ||
+            color.z < 0.0f || color.z > 1.0f) {
+            error = "Color components must be finite values between 0 and 1.";
+            return false;
+        }
+
+        const bool enabledChanged = m_IsEnabled != enabled;
+        const bool colorChanged   = m_Color.x != color.x || m_Color.y != color.y || m_Color.z != color.z;
+        std::snprintf(m_BiomeName, sizeof(m_BiomeName), "%s", name.c_str());
+        m_IsEnabled = enabled;
+        m_Color     = ImVec4(color.x, color.y, color.z, 1.0f);
+        if (colorChanged && m_MaskLayer != nullptr) {
+            m_MaskLayer->SetVizColor(color.x, color.y, color.z);
+        }
+        if (enabledChanged) {
+            MarkUpdateRequired();
+        }
+        return true;
+    }
+
+    SerializerNode BiomeManager::SaveBaseShapeSettings()
+    {
+        auto settings   = CreateSerializerNode();
+        const auto mode = m_SelectedBaseShapeGeneratorMode.load(std::memory_order_acquire);
+        settings->Set("Mode", mode == BiomeBaseShapeGeneratorMode_GlobalElevation ? "dem" : "algorithm");
+
+        const int selected = m_SelectedBaseShapeGenerator.load(std::memory_order_acquire);
+        if (selected >= 0 && selected < static_cast<int>(m_BaseShapeGenerators.size())) {
+            const auto &generator = m_BaseShapeGenerators[static_cast<size_t>(selected)];
+            settings->Set("AlgorithmID", generator->GetID());
+            const auto algorithmSettings = generator->Save()->Get<SerializerNode>("Inspector");
+            if (algorithmSettings != nullptr) {
+                settings->Set("AlgorithmSettings", algorithmSettings);
+            }
+        }
+        if (m_DEMBaseShapeGenerator != nullptr) {
+            settings->Set("DEM", m_DEMBaseShapeGenerator->Save());
+        }
+        return settings;
+    }
+
+    bool BiomeManager::LoadBaseShapeSettings(const SerializerNode &settings, std::string &error)
+    {
+        error.clear();
+        if (settings == nullptr || settings->GetKeys().empty()) {
+            error = "At least one base-shape setting must be provided.";
+            return false;
+        }
+
+        const auto algorithmSettings = settings->Get<SerializerNode>("AlgorithmSettings");
+        const auto demSettings       = settings->Get<SerializerNode>("DEM");
+        if (algorithmSettings != nullptr && demSettings != nullptr) {
+            error = "Update algorithm settings and DEM settings in separate requests.";
+            return false;
+        }
+
+        auto nextMode = m_SelectedBaseShapeGeneratorMode.load(std::memory_order_acquire);
+        if (settings->HasKey("Mode")) {
+            const std::string mode = settings->Get<std::string>("Mode", "");
+            if (mode == "algorithm") {
+                nextMode = BiomeBaseShapeGeneratorMode_Algorithm;
+            } else if (mode == "dem") {
+                nextMode = BiomeBaseShapeGeneratorMode_GlobalElevation;
+            } else {
+                error = "Mode must be 'algorithm' or 'dem'.";
+                return false;
+            }
+        }
+
+        int nextAlgorithm = m_SelectedBaseShapeGenerator.load(std::memory_order_acquire);
+        if (settings->HasKey("AlgorithmID") || algorithmSettings != nullptr) {
+            const std::string algorithmId = settings->Get<std::string>(
+                "AlgorithmID",
+                nextAlgorithm >= 0 && nextAlgorithm < static_cast<int>(m_BaseShapeGenerators.size())
+                    ? m_BaseShapeGenerators[static_cast<size_t>(nextAlgorithm)]->GetID()
+                    : std::string{});
+            const auto algorithm = std::find_if(
+                m_BaseShapeGenerators.begin(), m_BaseShapeGenerators.end(), [&algorithmId](const auto &candidate) {
+                    return candidate != nullptr && candidate->GetID() == algorithmId;
+                });
+            if (algorithm == m_BaseShapeGenerators.end()) {
+                error = "AlgorithmID does not match an available base-shape algorithm.";
+                return false;
+            }
+            nextAlgorithm = static_cast<int>(std::distance(m_BaseShapeGenerators.begin(), algorithm));
+            nextMode      = BiomeBaseShapeGeneratorMode_Algorithm;
+        }
+
+        if (algorithmSettings != nullptr) {
+            if (nextAlgorithm < 0 || nextAlgorithm >= static_cast<int>(m_BaseShapeGenerators.size())) {
+                error = "No base-shape algorithm is selected.";
+                return false;
+            }
+            const auto &generator = m_BaseShapeGenerators[static_cast<size_t>(nextAlgorithm)];
+            auto generatorState   = generator->Save();
+            const auto inspector  = generatorState->Get<SerializerNode>("Inspector");
+            if (inspector == nullptr) {
+                error = "The selected base-shape algorithm has no editable settings.";
+                return false;
+            }
+            inspector->Merge(*algorithmSettings);
+            generatorState->Set("Inspector", inspector);
+            if (!generator->Load(generatorState)) {
+                error = "AlgorithmSettings did not match the selected algorithm's parameter schema.";
+                return false;
+            }
+        }
+
+        if (demSettings != nullptr) {
+            if (m_DEMBaseShapeGenerator == nullptr) {
+                error = "DEM base-shape settings are unavailable.";
+                return false;
+            }
+            auto nextDemSettings = m_DEMBaseShapeGenerator->Save();
+            nextDemSettings->Merge(*demSettings);
+            if (!m_DEMBaseShapeGenerator->Load(nextDemSettings)) {
+                error = "DEM settings contain an unsupported value.";
+                return false;
+            }
+            nextMode = BiomeBaseShapeGeneratorMode_GlobalElevation;
+        }
+
+        const bool changed = nextMode != m_SelectedBaseShapeGeneratorMode.load(std::memory_order_acquire) ||
+                             nextAlgorithm != m_SelectedBaseShapeGenerator.load(std::memory_order_acquire) ||
+                             algorithmSettings != nullptr || demSettings != nullptr;
+        m_SelectedBaseShapeGenerator.store(nextAlgorithm, std::memory_order_release);
+        m_SelectedBaseShapeGeneratorMode.store(nextMode, std::memory_order_release);
+        if (changed) {
+            MarkUpdateRequired();
+        }
+        return true;
+    }
+
+    SerializerNode BiomeManager::SaveBaseNoiseSettings()
+    {
+        return m_BaseNoiseGenerator != nullptr ? m_BaseNoiseGenerator->Save() : CreateSerializerNode();
+    }
+
+    bool BiomeManager::LoadBaseNoiseSettings(const SerializerNode &settings, std::string &error)
+    {
+        error.clear();
+        if (m_BaseNoiseGenerator == nullptr || !m_BaseNoiseGenerator->Load(settings)) {
+            error = "Base-noise settings were rejected by the inspector schema.";
+            return false;
+        }
+        MarkUpdateRequired();
+        return true;
+    }
+
+    SerializerNode BiomeManager::SaveCustomBaseShapeSettings() const
+    {
+        return m_CustomizeBaseShape != nullptr ? m_CustomizeBaseShape->Save() : CreateSerializerNode();
+    }
+
+    bool BiomeManager::LoadCustomBaseShapeSettings(const SerializerNode &settings, std::string &error)
+    {
+        error.clear();
+        if (settings == nullptr || m_CustomizeBaseShape == nullptr) {
+            error = "Custom base-shape settings are unavailable.";
+            return false;
+        }
+        nlohmann::json merged      = m_CustomizeBaseShape->Save()->ToJson();
+        const nlohmann::json patch = settings->ToJson();
+        for (const auto &[key, value] : patch.items()) {
+            if (key != "Masks" || !value.is_array() || !merged.contains("Masks") || !merged["Masks"].is_array()) {
+                if (merged.contains(key) && merged[key].is_object() && value.is_object()) {
+                    utils::MergeObjects(merged[key], value);
+                } else {
+                    merged[key] = value;
+                }
+                continue;
+            }
+
+            nlohmann::json masks = value;
+            for (std::size_t index = 0; index < masks.size() && index < merged["Masks"].size(); ++index) {
+                if (masks[index].is_object() && merged["Masks"][index].is_object()) {
+                    utils::MergeObjects(merged["Masks"][index], masks[index]);
+                }
+            }
+            merged["Masks"] = std::move(masks);
+        }
+
+        m_CustomizeBaseShape->Load(CreateSerializerNodeFromJson(merged));
+        MarkUpdateRequired();
+        return true;
+    }
+
+    std::shared_ptr<BiomeFilter> BiomeManager::FindFilter(std::string_view filterId) const
+    {
+        return m_FilterStack != nullptr ? m_FilterStack->FindFilter(filterId) : nullptr;
+    }
+
+    bool BiomeManager::ReorderFilter(std::string_view filterId, int32_t targetIndex, std::string &error)
+    {
+        error.clear();
+        if (m_FilterStack == nullptr || targetIndex < 0 ||
+            targetIndex >= static_cast<int32_t>(m_FilterStack->GetFilters().size())) {
+            error = "TargetIndex is outside the filter stack.";
+            return false;
+        }
+        if (!m_FilterStack->ReorderFilter(filterId, targetIndex)) {
+            error = "FilterId does not exist in this biome.";
+            return false;
+        }
+        MarkUpdateRequired();
+        return true;
+    }
+
+    bool BiomeManager::LoadFilter(std::string_view filterId,
+                                  const SerializerNode &settings,
+                                  std::string &error)
+    {
+        error.clear();
+        if (m_FilterStack == nullptr || FindFilter(filterId) == nullptr) {
+            error = "FilterId does not exist in this biome.";
+            return false;
+        }
+        if (settings == nullptr || !m_FilterStack->LoadFilter(filterId, settings)) {
+            error = "Filter settings did not match the filter's composed schema.";
+            return false;
+        }
+        MarkUpdateRequired();
+        return true;
+    }
+
+    int BiomeManager::AddFilterByDefinitionID(std::string_view definitionId,
+                                              std::string &filterId,
+                                              std::string &error)
+    {
+        error.clear();
+        const auto definition = std::find_if(
+            GetFilterDefinitions().begin(), GetFilterDefinitions().end(), [definitionId](const auto &candidate) {
+                return candidate != nullptr && candidate->GetID() == definitionId;
+            });
+        if (definition == GetFilterDefinitions().end()) {
+            error = "FilterDefinitionId does not exist in the filter catalog.";
+            return -1;
+        }
+        const int index = AddFilter(*definition);
+        if (index < 0 || static_cast<size_t>(index) >= GetFilters().size()) {
+            error = "The filter could not be added to the biome.";
+            return -1;
+        }
+        filterId = GetFilters()[static_cast<size_t>(index)]->GetID();
+        return index;
     }
 
 } // namespace tf3d::generators
