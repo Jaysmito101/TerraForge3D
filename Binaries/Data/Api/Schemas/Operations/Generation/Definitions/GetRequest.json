@@ -1,0 +1,18 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.get_request",
+  "Method": "GET",
+  "Path": "/api/v1/generation/requests/{RequestId}",
+  "Title": "Get generation request status",
+  "Description": "Return the current or terminal state of an API generation request. Request status is retained in memory for the most recent requests. The terminal outcome is published, superseded, or failed.",
+  "InputSchema": {
+    "$include": "Operations/Generation/GetRequest.json"
+  },
+  "ResponseSchema": {
+    "$include": "Operations/Generation/RequestStatus.json"
+  },
+  "Annotations": {
+    "readOnlyHint": true
+  },
+  "Flags": ["ReadOnly", "LongRunning"]
+}

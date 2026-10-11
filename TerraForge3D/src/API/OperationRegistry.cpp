@@ -336,6 +336,14 @@ namespace tf3d::api
         }
         entry.inputSchema = definition.at("InputSchema");
 
+        if (definition.contains("ResponseSchema")) {
+            if (!definition.at("ResponseSchema").is_object()) {
+                TF3D_LOG_ERROR("API operation definition field 'ResponseSchema' must be a JSON object");
+                return std::nullopt;
+            }
+            entry.responseSchema = definition.at("ResponseSchema");
+        }
+
         if (!ParseOperationRoute(definition, entry)) {
             return std::nullopt;
         }

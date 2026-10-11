@@ -21,7 +21,8 @@ namespace tf3d::api
         Cancelled,
         ViewportReadFailed,
         JpegEncodeFailed,
-        ViewportNotFound
+        ViewportNotFound,
+        GenerationRequestNotFound
     };
 
     inline constexpr std::string_view ApiErrorTypeToCode(ApiErrorType type)
@@ -45,6 +46,8 @@ namespace tf3d::api
                 return "jpeg_encode_failed";
             case ApiErrorType::ViewportNotFound:
                 return "viewport_not_found";
+            case ApiErrorType::GenerationRequestNotFound:
+                return "generation_request_not_found";
         }
         return "unknown";
     }
@@ -55,6 +58,7 @@ namespace tf3d::api
             case ApiErrorType::InvalidArguments:
                 return 400;
             case ApiErrorType::ViewportNotFound:
+            case ApiErrorType::GenerationRequestNotFound:
                 return 404;
             case ApiErrorType::Timeout:
                 return 504;

@@ -81,6 +81,8 @@ namespace tf3d::api
         nlohmann::json BuildSkillsDocument(std::string_view groupPath) const;
         nlohmann::json BuildOperationDocument(const OperationEntry &entry) const;
         nlohmann::json BuildOperationSchema(const OperationEntry &entry, std::string_view idReference) const;
+        nlohmann::json BuildOperationResponseSchema(const OperationEntry &entry,
+                                                    std::string_view idReference) const;
         std::string BuildOperationSkill(const OperationEntry &entry) const;
 
         tf3d::data::ApplicationState *applicationState = nullptr;

@@ -1,0 +1,18 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.status",
+  "Method": "GET",
+  "Path": "/api/v1/generation",
+  "Title": "Get generation status",
+  "Description": "Return generation activity and input revisions, committed output metadata, available field statistics, and the latest API request. Progress is reported at the queue/generation level because the generation worker has no reliable per-stage counters.",
+  "InputSchema": {
+    "$include": "Operations/Generation/EmptyInput.json"
+  },
+  "ResponseSchema": {
+    "$include": "Operations/Generation/StatusResponse.json"
+  },
+  "Annotations": {
+    "readOnlyHint": true
+  },
+  "Flags": ["ReadOnly"]
+}

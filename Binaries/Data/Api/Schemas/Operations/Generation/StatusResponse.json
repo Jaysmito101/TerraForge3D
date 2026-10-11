@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "available": { "type": "boolean", "const": true },
+    "generation": {
+      "type": "object",
+      "properties": {
+        "state": { "type": "string", "enum": ["idle", "queued", "running", "failed"] },
+        "stage": { "type": "string", "enum": ["idle", "queued", "generation", "failed"] },
+        "progressPercent": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "activeInputRevision": {
+          "type": ["string", "null"],
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "inputRevision": { "$include": "Operations/Generation/Revision.json" },
+        "paused": { "type": "boolean" }
+      },
+      "required": ["state", "stage", "progressPercent", "activeInputRevision", "inputRevision", "paused"],
+      "additionalProperties": false
+    },
+    "output": { "$include": "Operations/Generation/Output.json" },
+    "statistics": { "$include": "Operations/Generation/Statistics.json" },
+    "lastFailedRevision": {
+      "type": ["string", "null"],
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "lastFailure": { "$include": "Operations/Generation/Failure.json" },
+    "latestRequest": {
+      "oneOf": [
+        { "$include": "Operations/Generation/RequestStatus.json" },
+        { "type": "null" }
+      ]
+    },
+    "cancellation": {
+      "type": "object",
+      "properties": {
+        "supported": { "type": "boolean", "const": false },
+        "supersession": { "type": "string" }
+      },
+      "required": ["supported", "supersession"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["available", "generation", "output", "statistics", "lastFailedRevision", "lastFailure", "latestRequest", "cancellation"],
+  "additionalProperties": false
+}

@@ -1,0 +1,13 @@
+{
+  "type": ["object", "null"],
+  "properties": {
+    "terrainRevision": { "$include": "Operations/Generation/Revision.json" },
+    "inputRevision": { "$include": "Operations/Generation/Revision.json" },
+    "resolution": { "type": "integer", "minimum": 1 },
+    "tileSize": { "type": ["number", "null"] },
+    "isCurrent": { "type": "boolean" },
+    "stale": { "type": "boolean" }
+  },
+  "required": ["terrainRevision", "inputRevision", "resolution", "tileSize", "isCurrent", "stale"],
+  "additionalProperties": false
+}

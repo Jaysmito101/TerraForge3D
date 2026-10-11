@@ -1,0 +1,10 @@
+{
+  "type": ["object", "null"],
+  "properties": {
+    "inputRevision": { "$include": "Operations/Generation/Revision.json" },
+    "code": { "type": "string" },
+    "message": { "type": "string" }
+  },
+  "required": ["inputRevision", "code", "message"],
+  "additionalProperties": false
+}

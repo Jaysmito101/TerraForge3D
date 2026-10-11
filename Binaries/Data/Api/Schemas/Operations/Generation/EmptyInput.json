@@ -1,0 +1,4 @@
+{
+  "$include": "Common/Object.json",
+  "description": "This operation does not require input fields."
+}

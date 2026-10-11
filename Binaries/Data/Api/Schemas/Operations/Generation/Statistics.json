@@ -1,0 +1,24 @@
+{
+  "type": ["object", "null"],
+  "properties": {
+    "terrainRevision": { "$include": "Operations/Generation/Revision.json" },
+    "minimum": { "type": ["number", "null"] },
+    "maximum": { "type": ["number", "null"] },
+    "histogramValid": { "type": "boolean" },
+    "histogram": {
+      "type": "array",
+      "items": { "type": ["number", "null"] },
+      "minItems": 256,
+      "maxItems": 256
+    },
+    "percentiles": {
+      "type": "array",
+      "items": { "type": ["number", "null"] },
+      "minItems": 7,
+      "maxItems": 7
+    },
+    "requestedPercentile": { "type": ["number", "null"] }
+  },
+  "required": ["terrainRevision", "minimum", "maximum", "histogramValid", "histogram", "percentiles", "requestedPercentile"],
+  "additionalProperties": false
+}

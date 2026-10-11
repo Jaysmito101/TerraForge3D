@@ -1,0 +1,18 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.request",
+  "Method": "POST",
+  "Path": "/api/v1/generation/actions/regenerate",
+  "Title": "Request terrain generation",
+  "Description": "Queue regeneration when the manager is idle. The response distinguishes accepted, busy, and unavailable admission. An accepted request ID is tied to its input revision and can be followed with get_request. Requests are not cancellable; newer input revisions supersede stale results.",
+  "InputSchema": {
+    "$include": "Operations/Generation/EmptyInput.json"
+  },
+  "ResponseSchema": {
+    "$include": "Operations/Generation/AdmissionResponse.json"
+  },
+  "Annotations": {
+    "readOnlyHint": false
+  },
+  "Flags": ["LongRunning"]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "RequestId": {
+      "type": "string",
+      "pattern": "^generation-[1-9][0-9]*$",
+      "description": "Request ID returned by the generation request operation."
+    }
+  },
+  "required": ["RequestId"],
+  "additionalProperties": false
+}

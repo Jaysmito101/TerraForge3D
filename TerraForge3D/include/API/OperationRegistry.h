@@ -52,6 +52,7 @@ namespace tf3d::api
         nlohmann::json inputSchema = nlohmann::json{
             {"type", "object"},
             {"properties", nlohmann::json::object()}};
+        std::optional<nlohmann::json> responseSchema;
         nlohmann::json annotations = nlohmann::json::object();
         OperationFlags flags       = OperationFlags::None;
         ApiOperationHandler invoke;

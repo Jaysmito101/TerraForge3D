@@ -3,6 +3,7 @@
 #include <httplib.h>
 
 #include "API/Operations/CoreOperations.h"
+#include "API/Operations/GenerationOperations.h"
 #include "API/Operations/SceneOperations.h"
 #include "API/Operations/ViewportOperations.h"
 #include "API/SchemaTemplate.h"
@@ -194,9 +195,19 @@ namespace tf3d::api
             return OperationDocumentPath(entry) + "/schema";
         }
 
+        std::string OperationResponseSchemaPath(const OperationEntry &entry)
+        {
+            return OperationDocumentPath(entry) + "/response-schema";
+        }
+
         std::string OpenApiOperationSchemaReference(const OperationEntry &entry)
         {
             return "operations/" + entry.resourcePath + "/schema";
+        }
+
+        std::string OpenApiOperationResponseSchemaReference(const OperationEntry &entry)
+        {
+            return "operations/" + entry.resourcePath + "/response-schema";
         }
 
         std::string OperationSkillPath(const OperationEntry &entry)
@@ -276,6 +287,9 @@ namespace tf3d::api
                     summary["operation"] = OperationDocumentPath(entry);
                     summary["schema"]    = OperationSchemaPath(entry);
                     summary["skill"]     = OperationSkillPath(entry);
+                    if (entry.responseSchema) {
+                        summary["responseSchema"] = OperationResponseSchemaPath(entry);
+                    }
                     operations.push_back(std::move(summary));
                     continue;
                 }
@@ -576,6 +590,7 @@ namespace tf3d::api
     void ApiServer::RegisterOperations()
     {
         RegisterCoreOperations(operations, applicationState);
+        RegisterGenerationOperations(operations, applicationState);
         RegisterViewportOperations(operations, applicationState);
         RegisterSceneOperations(operations, applicationState);
         operationRegistryComplete = ValidateOperationInventory(operations);
@@ -743,6 +758,18 @@ namespace tf3d::api
                 response.set_content(BuildOperationSchema(entry, "./schema").dump(2), "application/schema+json");
                 RecordRequest(request, response);
             });
+
+            if (entry.responseSchema) {
+                const std::string responseSchemaPath = OperationResponseSchemaPath(entry);
+                server->Get(StaticRoutePattern(responseSchemaPath), [this, entry](const httplib::Request &request,
+                                                                                  httplib::Response &response) {
+                    ActiveRequestScope active(activeRequests);
+                    response.set_content(
+                        BuildOperationResponseSchema(entry, "./response-schema").dump(2),
+                        "application/schema+json");
+                    RecordRequest(request, response);
+                });
+            }
 
             const std::string skillPath = OperationSkillPath(entry);
             server->Get(StaticRoutePattern(skillPath), [this, entry](const httplib::Request &request, httplib::Response &response) {
@@ -957,6 +984,9 @@ namespace tf3d::api
             {"longRunning", HasFlag(entry.flags, OperationFlags::LongRunning)},
             {"schema", OperationSchemaPath(entry)},
             {"skill", OperationSkillPath(entry)}};
+        if (entry.responseSchema) {
+            document["responseSchema"] = OperationResponseSchemaPath(entry);
+        }
         if (entry.method != ApiHttpMethod::Get) {
             document["requestBodySchema"] = NonPathArgumentSchema(entry);
         }
@@ -970,6 +1000,18 @@ namespace tf3d::api
         schema["$id"]         = idReference;
         schema["title"]       = entry.title;
         schema["description"] = entry.description;
+        return schema;
+    }
+
+    nlohmann::json ApiServer::BuildOperationResponseSchema(
+        const OperationEntry &entry,
+        std::string_view idReference) const
+    {
+        nlohmann::json schema = entry.responseSchema.value_or(nlohmann::json::object());
+        schema["$schema"]     = "https://json-schema.org/draft/2020-12/schema";
+        schema["$id"]         = idReference;
+        schema["title"]       = entry.title + " response";
+        schema["description"] = "Response returned by " + entry.name + ".";
         return schema;
     }
 
@@ -1010,8 +1052,12 @@ namespace tf3d::api
               << "The composed argument schema is available at `GET " << OperationSchemaPath(entry) << "`.\n\n"
               << "```json\n"
               << argumentSchema.dump(2)
-              << "\n```\n\n"
-              << "The operation details are available at `GET " << OperationDocumentPath(entry) << "`.\n";
+              << "\n```\n\n";
+        if (entry.responseSchema) {
+            skill << "The response schema is available at `GET " << OperationResponseSchemaPath(entry)
+                  << "`.\n\n";
+        }
+        skill << "The operation details are available at `GET " << OperationDocumentPath(entry) << "`.\n";
         return skill.str();
     }
 
@@ -1057,6 +1103,7 @@ namespace tf3d::api
             {"document", stringSchema},
             {"operation", stringSchema},
             {"schema", stringSchema},
+            {"responseSchema", stringSchema},
             {"skill", stringSchema}};
 
         nlohmann::json directorySchema = nlohmann::json::object();
@@ -1084,6 +1131,7 @@ namespace tf3d::api
             {"longRunning", booleanSchema},
             {"schema", stringSchema},
             {"skill", stringSchema},
+            {"responseSchema", stringSchema},
             {"requestBodySchema", {{"type", "object"}}}};
         operationDocumentSchema["required"]                    = nlohmann::json::array({"operationId", "title", "description", "method", "path", "pathParameters", "queryParameters",
                                                                                         "readOnly", "destructive", "longRunning", "schema", "skill"});
@@ -1137,6 +1185,9 @@ namespace tf3d::api
             if (entry.name == "tf3d.viewport.capture") {
                 operation["responses"]["200"]["content"]["image/jpeg"]["schema"] = {
                     {"type", "string"}, {"format", "binary"}};
+            } else if (entry.responseSchema) {
+                operation["responses"]["200"]["content"]["application/json"]["schema"] =
+                    *entry.responseSchema;
             } else {
                 operation["responses"]["200"]["content"]["application/json"]["schema"] = {{"type", "object"}};
             }
@@ -1164,6 +1215,14 @@ namespace tf3d::api
                 {"summary", "Get the composed argument schema for " + entry.title},
                 {"responses", {{"200", {{"description", "Composed JSON Schema."}, {"content", {{"application/schema+json", {{"schema", BuildOperationSchema(entry, OpenApiOperationSchemaReference(entry))}}}}}}}}}};
             document["paths"][OperationSchemaPath(entry)]["get"] = std::move(getSchema);
+
+            if (entry.responseSchema) {
+                nlohmann::json getResponseSchema = {
+                    {"operationId", "getResponseSchema_" + entry.name},
+                    {"summary", "Get the response schema for " + entry.title},
+                    {"responses", {{"200", {{"description", "Composed JSON Schema."}, {"content", {{"application/schema+json", {{"schema", BuildOperationResponseSchema(entry, OpenApiOperationResponseSchemaReference(entry))}}}}}}}}}};
+                document["paths"][OperationResponseSchemaPath(entry)]["get"] = std::move(getResponseSchema);
+            }
 
             nlohmann::json getSkill = {
                 {"operationId", "getSkill_" + entry.name},

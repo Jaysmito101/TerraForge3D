@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "admission": { "type": "string", "enum": ["accepted", "busy", "unavailable"] },
+    "requestId": {
+      "type": ["string", "null"],
+      "pattern": "^generation-[1-9][0-9]*$"
+    },
+    "reason": { "type": "string" }
+  },
+  "required": ["admission", "requestId", "reason"],
+  "additionalProperties": false
+}

@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "requestId": { "type": "string", "pattern": "^generation-[1-9][0-9]*$" },
+    "status": { "type": "string", "enum": ["queued", "running", "published", "superseded", "failed"] },
+    "inputRevision": { "$include": "Operations/Generation/Revision.json" },
+    "progress": {
+      "type": "object",
+      "properties": {
+        "stage": { "type": "string", "enum": ["queued", "generation", "terminal"] },
+        "percent": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+      },
+      "required": ["stage", "percent"],
+      "additionalProperties": false
+    },
+    "output": { "$include": "Operations/Generation/Output.json" },
+    "failure": { "$include": "Operations/Generation/Failure.json" },
+    "cancellationSupported": { "type": "boolean", "const": false }
+  },
+  "required": ["requestId", "status", "inputRevision", "progress", "output", "failure", "cancellationSupported"],
+  "additionalProperties": false
+}
