@@ -82,11 +82,9 @@ namespace tf3d::generators
         if (m_UIState.useMask && m_MaskLayer != nullptr) {
             if (ImGui::CollapsingHeader("Mask Tool")) {
                 changed |= ImGui::Checkbox("Invert mask", &m_UIState.invertMask);
-                m_MaskLayer->SetInvertPreview(m_UIState.invertMask);
                 changed |= m_MaskLayer->ShowSettings(true);
             }
         } else if (m_MaskLayer != nullptr) {
-            m_MaskLayer->SetInvertPreview(false);
             changed |= m_MaskLayer->HideViewportOverlay();
             ImGui::TextDisabled("Mask: Global");
         }
@@ -212,7 +210,6 @@ namespace tf3d::generators
 
         if (m_MaskLayer != nullptr && (data->HasKey("BaseMask") || data->HasKey("MaskTool"))) {
             m_MaskLayer->LoadFrom(data);
-            m_MaskLayer->SetInvertPreview(m_UIState.invertMask);
         }
         PublishState();
         return true;

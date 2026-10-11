@@ -71,6 +71,14 @@ namespace tf3d::generators
             return m_Inspector != nullptr ? m_Inspector->BuildSchema() : nlohmann::json::object();
         }
         nlohmann::json GetBaseMaskSchema() const;
+        MaskLayer *GetMaskLayer() const
+        {
+            return m_MaskLayer.get();
+        }
+        inline void PublishMaskState()
+        {
+            PublishState();
+        }
 
         inline bool RequireUpdation() const
         {
