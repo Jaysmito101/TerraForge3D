@@ -52,7 +52,10 @@ namespace tf3d::generators
             if (stroke.points.empty()) {
                 return;
             }
-            settings.emplace_back(stroke.strength, stroke.size, stroke.falloff, static_cast<float>(stroke.mode));
+            settings.emplace_back(stroke.strength,
+                                  stroke.size,
+                                  stroke.falloff,
+                                  static_cast<float>(static_cast<int>(stroke.mode)));
             ranges.emplace_back(static_cast<int>(points.size()), static_cast<int>(stroke.points.size()), 0, 0);
             for (const auto &point : stroke.points) {
                 points.emplace_back(point.x, point.y, 0.0f, 0.0f);
