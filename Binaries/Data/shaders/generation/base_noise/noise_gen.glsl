@@ -59,25 +59,39 @@ void main(void)
 	}
 
 	float n = 0.0f;
+	float detailNoise = 0.0f;
 	float amplitude = 1.0f;
-	float amplitudeSum = 0.0f;
+	float baseAmplitudeSum = 0.0f;
 	int octaveCount = clamp(min(u_NoiseOctaves, u_NoiseOctaveStrengthsCount), 0, 16);
+	const int baseOctaveCount = 10;
 	const mat2 octaveRotation = mat2(0.8f, -0.6f, 0.6f, 0.8f);
 	float octaveFrequency = frequencyInput;
 	for (int i = 0; i < octaveCount; ++i)
 	{
 		float octaveStrength = clamp(u_NoiseOctaveStrengths[i], 0.0f, 1.0f);
 		float pixelsPerFeature = float(u_Resolution) / max(2.0f * octaveFrequency, 0.0001f);
-		float antiAliasWeight = smoothstep(2.0f, 4.0f, pixelsPerFeature);
+		float antiAliasWeight = i < baseOctaveCount
+			? smoothstep(2.0f, 4.0f, pixelsPerFeature)
+			: smoothstep(4.0f, 8.0f, pixelsPerFeature);
+		if (i >= baseOctaveCount && pixelsPerFeature <= 4.0f) break;
 		float effectiveStrength = octaveStrength * antiAliasWeight;
-		n += tf3d_noise2(noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_NoiseSeed) + float(i) * 11.73f)
-			* amplitude * effectiveStrength;
-		amplitudeSum += amplitude * effectiveStrength;
+		float octaveValue = tf3d_noise2(
+			noiseDomain, u_NoiseAlgorithm, u_NoiseJitter, float(u_NoiseSeed) + float(i) * 11.73f);
+		if (i < baseOctaveCount)
+		{
+			n += octaveValue * amplitude * effectiveStrength;
+			baseAmplitudeSum += amplitude * effectiveStrength;
+		}
+		else
+		{
+			detailNoise += octaveValue * amplitude * effectiveStrength;
+		}
 		noiseDomain = octaveRotation * noiseDomain * lacunarity + vec2(17.13f, 9.71f);
 		amplitude *= persistence;
 		octaveFrequency *= lacunarity;
 	}
-	n /= max(amplitudeSum, 0.0001f);
+	float baseNormalization = max(baseAmplitudeSum, 0.0001f);
+	n = n / baseNormalization + detailNoise / baseNormalization;
 
 	float sourceValue = imageLoad(DataSourceTexture, ivec2(offsetv2)).r;
 	float noiseValue = n * clamp(u_Strength, -4.0f, 4.0f);
