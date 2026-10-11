@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.filters.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/filters/{FilterId}",
+  "Title": "Get biome filter",
+  "Description": "Read one filter by stable FilterId, including its DefinitionID, parameters, execution position, and schema operation reference.",
+  "InputSchema": { "$include": "Operations/Generation/FilterIdInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterStateResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

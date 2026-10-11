@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "State": {
+      "type": "object",
+      "properties": {
+        "Method": { "type": "string", "enum": ["simple"] },
+        "Simple": {
+          "type": "object",
+          "properties": {
+            "Biomes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "BiomeID": { "type": "string", "minLength": 1 },
+                  "Enabled": { "type": "boolean" },
+                  "Strength": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "UseBiomeMask": { "type": "boolean" }
+                },
+                "required": ["BiomeID", "Enabled", "Strength", "UseBiomeMask"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["Biomes"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["State"],
+  "additionalProperties": false
+}

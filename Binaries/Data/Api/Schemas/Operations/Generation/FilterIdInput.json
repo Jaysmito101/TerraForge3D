@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "BiomeId": { "type": "string", "minLength": 1 },
+    "FilterId": { "type": "string", "minLength": 1 }
+  },
+  "required": ["BiomeId", "FilterId"],
+  "additionalProperties": false
+}

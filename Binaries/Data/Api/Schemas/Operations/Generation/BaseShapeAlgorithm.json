@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "schema": { "$include": "Operations/Generation/OperationReference.json" }
+  },
+  "required": ["id", "name", "description", "schema"],
+  "additionalProperties": false
+}

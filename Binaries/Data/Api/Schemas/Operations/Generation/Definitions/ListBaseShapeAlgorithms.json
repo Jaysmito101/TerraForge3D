@@ -1,0 +1,16 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.base_shape_algorithms.list",
+  "Method": "GET",
+  "Path": "/api/v1/generation/base-shape-algorithms",
+  "Title": "List base-shape algorithms",
+  "Description": "List all available base-shape algorithms with stable IDs and operation references for retrieving each algorithm's parameter schema.",
+  "InputSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/BaseShapeAlgorithmCatalogResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

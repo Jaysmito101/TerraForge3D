@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.update",
+  "Method": "PATCH",
+  "Path": "/api/v1/generation/biomes/{BiomeId}",
+  "Title": "Update biome settings",
+  "Description": "Partially update a biome's name, enabled state, or display color. Enabling or disabling the biome marks biome generation dirty; name and color edits update presentation state.",
+  "InputSchema": { "$include": "Operations/Generation/BiomeUpdateInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeGeneralState.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

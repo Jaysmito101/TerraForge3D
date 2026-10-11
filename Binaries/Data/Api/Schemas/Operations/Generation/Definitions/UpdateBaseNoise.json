@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.base_noise.update",
+  "Method": "PATCH",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/base-noise",
+  "Title": "Update biome base noise",
+  "Description": "Partially update base-noise enablement, optional mask usage, and inspector values. Inspector values use the same generated schema and validation as the in-app inspector. Mask drawing state is read-only here.",
+  "InputSchema": { "$include": "Operations/Generation/BaseNoiseUpdateInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

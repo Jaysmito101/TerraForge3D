@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "order": { "type": "integer", "minimum": 0 },
+          "name": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "summary": { "$include": "Operations/Generation/BiomeSummary.json" }
+        },
+        "required": ["id", "order", "name", "enabled", "summary"],
+        "additionalProperties": false
+      }
+    },
+    "count": { "type": "integer", "minimum": 0 },
+    "minimumCount": { "const": 1 },
+    "maximumCount": { "const": 64 }
+  },
+  "required": ["items", "count", "minimumCount", "maximumCount"],
+  "additionalProperties": false
+}

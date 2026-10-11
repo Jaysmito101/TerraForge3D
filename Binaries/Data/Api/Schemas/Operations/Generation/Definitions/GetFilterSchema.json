@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.filter_catalog.get_schema",
+  "Method": "GET",
+  "Path": "/api/v1/generation/filter-catalog/{FilterDefinitionId}/schema",
+  "Title": "Get filter parameter schema",
+  "Description": "Return one filter definition's composed parameter schema, including inspector types, ranges, dropdown values, labels, and descriptions.",
+  "InputSchema": { "$include": "Operations/Generation/FilterDefinitionIdInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterSchemaResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

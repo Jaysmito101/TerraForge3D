@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "properties": {
+    "Method": { "type": "string", "enum": ["simple", "alphaBlend"] },
+    "Simple": {
+      "type": "object",
+      "properties": {
+        "Biomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "BiomeID": { "type": "string" },
+              "Enabled": { "type": "boolean" },
+              "Strength": { "type": "number", "minimum": 0, "maximum": 1 },
+              "UseBiomeMask": { "type": "boolean" }
+            },
+            "required": ["BiomeID", "Enabled", "Strength", "UseBiomeMask"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["Biomes"],
+      "additionalProperties": false
+    },
+    "Methods": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "available": { "type": "boolean" },
+          "reason": { "type": "string" }
+        },
+        "required": ["id", "name", "available"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["Method", "Simple", "Methods"],
+  "additionalProperties": false
+}

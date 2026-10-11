@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.custom_base_shape.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/custom-base-shape",
+  "Title": "Get custom base shape",
+  "Description": "Read custom base-shape enablement, flattening, ordered mask layers, and each layer's mask and drawing state.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
+    "required": ["BiomeId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

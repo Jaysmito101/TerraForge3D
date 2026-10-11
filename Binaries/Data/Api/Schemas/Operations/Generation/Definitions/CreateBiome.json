@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.create",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes",
+  "Title": "Create biome",
+  "Description": "Append a biome to the generation graph. Names must contain visible text and fit within 63 UTF-8 bytes. The generated BiomeId is stable for the lifetime of this biome.",
+  "InputSchema": { "$include": "Operations/Generation/BiomeCreateInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeCreateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

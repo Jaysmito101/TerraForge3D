@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "order": { "type": "integer", "minimum": 0 },
+    "general": { "$include": "Operations/Generation/BiomeGeneralState.json" },
+    "baseShape": { "$include": "Operations/Generation/GenericObject.json" },
+    "baseNoise": { "$include": "Operations/Generation/GenericObject.json" },
+    "customBaseShape": { "$include": "Operations/Generation/GenericObject.json" },
+    "filters": { "type": "array", "items": { "$include": "Operations/Generation/FilterStateResponse.json" } }
+  },
+  "required": ["id", "order", "general", "baseShape", "baseNoise", "customBaseShape", "filters"],
+  "additionalProperties": false
+}

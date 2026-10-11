@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.remove",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/remove",
+  "Title": "Remove biome",
+  "Description": "Remove a biome by stable ID. The final remaining biome is required, so removal is rejected when the directory contains one biome.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
+    "required": ["BiomeId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeDirectoryResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["Destructive"]
+}

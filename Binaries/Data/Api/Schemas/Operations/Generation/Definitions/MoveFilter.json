@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.filters.move",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/filters/{FilterId}/move",
+  "Title": "Reorder biome filter",
+  "Description": "Move a filter to a zero-based position in the biome's ordered filter stack. The filter is addressed by stable FilterId rather than its current array position.",
+  "InputSchema": { "$include": "Operations/Generation/FilterMoveInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

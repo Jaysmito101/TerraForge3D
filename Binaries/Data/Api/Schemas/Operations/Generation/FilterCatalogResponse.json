@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "description": { "type": "string" },
+          "schema": { "$include": "Operations/Generation/OperationReference.json" }
+        },
+        "required": ["id", "name", "category", "description", "schema"],
+        "additionalProperties": false
+      }
+    },
+    "limit": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "search": { "type": "string" }
+  },
+  "required": ["items", "limit", "search"],
+  "additionalProperties": false
+}

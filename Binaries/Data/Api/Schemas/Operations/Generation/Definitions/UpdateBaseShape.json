@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.base_shape.update",
+  "Method": "PATCH",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/base-shape",
+  "Title": "Update biome base shape",
+  "Description": "Update the base-shape mode, select an algorithm by stable AlgorithmID, update that algorithm's parameters, or update DEM settings. Algorithm-specific parameters are validated against the schema for the selected algorithm. Update AlgorithmSettings and DEM separately.",
+  "InputSchema": { "$include": "Operations/Generation/BaseShapeUpdateInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BaseShapeStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

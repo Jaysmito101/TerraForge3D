@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.move",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/move",
+  "Title": "Reorder biome",
+  "Description": "Move a biome to a zero-based position in the generation order. This marks both biome and mixer scopes dirty because order can affect the mixed output.",
+  "InputSchema": { "$include": "Operations/Generation/BiomeMoveInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeDirectoryResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

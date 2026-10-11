@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.filters.get_stack",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/filters",
+  "Title": "Get biome filter stack",
+  "Description": "Read filters in execution order. Use each filter's stable ID for update, reorder, and remove operations; use DefinitionID to resolve its parameter schema.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
+    "required": ["BiomeId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterStackResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

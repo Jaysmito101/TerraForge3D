@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "BiomeId": { "type": "string", "minLength": 1 },
+    "State": { "$include": "Operations/Generation/BiomeGeneralState.json" }
+  },
+  "required": ["BiomeId", "State"],
+  "additionalProperties": false
+}

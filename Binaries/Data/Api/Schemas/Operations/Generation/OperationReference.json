@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "operationId": { "type": "string" },
+    "parameters": { "type": "object", "additionalProperties": { "type": "string" } }
+  },
+  "required": ["operationId", "parameters"],
+  "additionalProperties": false
+}

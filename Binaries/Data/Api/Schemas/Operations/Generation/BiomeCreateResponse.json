@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "directory": { "$include": "Operations/Generation/BiomeDirectoryResponse.json" }
+  },
+  "required": ["id", "directory"],
+  "additionalProperties": false
+}

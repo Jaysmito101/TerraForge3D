@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}",
+  "Title": "Get biome graph",
+  "Description": "Read one biome's general settings, base-shape state, base-noise state, custom base-shape state, and ordered filter stack. Use the operation links in this response to discover node parameter schemas.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
+    "required": ["BiomeId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeGraphResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

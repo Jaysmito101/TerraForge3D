@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "filterCount": { "type": "integer", "minimum": 0 },
+    "baseShapeMode": { "type": "string", "enum": ["algorithm", "dem"] },
+    "baseShapeAlgorithmId": { "type": "string" },
+    "baseNoiseEnabled": { "type": "boolean" },
+    "customBaseShapeEnabled": { "type": "boolean" }
+  },
+  "required": ["filterCount", "baseShapeMode", "baseShapeAlgorithmId", "baseNoiseEnabled", "customBaseShapeEnabled"],
+  "additionalProperties": false
+}

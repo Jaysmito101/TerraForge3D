@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.base_noise.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/base-noise",
+  "Title": "Get biome base noise",
+  "Description": "Read base-noise enablement, optional mask usage, and composed inspector settings. BaseMask and MaskTool state is included for discovery; drawing inputs are handled by the mask operations.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
+    "required": ["BiomeId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/GenericObject.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

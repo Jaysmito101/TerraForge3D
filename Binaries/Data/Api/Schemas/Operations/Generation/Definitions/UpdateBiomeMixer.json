@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.mixer.update",
+  "Method": "PATCH",
+  "Path": "/api/v1/generation/mixer",
+  "Title": "Update biome mixer",
+  "Description": "Update the global mixer method or Simple settings keyed by stable BiomeID. The full Simple.Biomes list is validated before mixer state is published. Alpha Blend is catalogued but is not yet implemented.",
+  "InputSchema": { "$include": "Operations/Generation/BiomeMixerUpdateInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeMixerStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

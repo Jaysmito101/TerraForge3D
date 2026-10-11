@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "BiomeId": { "type": "string", "minLength": 1 },
+    "TargetIndex": { "type": "integer", "minimum": 0, "maximum": 63 }
+  },
+  "required": ["BiomeId", "TargetIndex"],
+  "additionalProperties": false
+}

@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.filters.add",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/filters",
+  "Title": "Add biome filter",
+  "Description": "Add a filter definition to the end of the biome stack or insert it at Position. Resolve the filter's parameter schema from its FilterDefinitionId before setting parameters.",
+  "InputSchema": { "$include": "Operations/Generation/FilterAddInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterStateResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["None"]
+}

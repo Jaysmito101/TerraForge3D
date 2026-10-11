@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "FilterDefinitionId": { "type": "string", "minLength": 1 }
+  },
+  "required": ["FilterDefinitionId"],
+  "additionalProperties": false
+}

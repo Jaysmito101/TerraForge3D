@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "Enabled": { "type": "boolean" },
+    "UseMask": { "type": "boolean" },
+    "InvertMask": { "type": "boolean" },
+    "Inspector": { "$runtime": "Generation.BaseNoiseInspector" },
+    "BaseMask": { "$runtime": "Generation.BaseMask" }
+  },
+  "additionalProperties": false
+}

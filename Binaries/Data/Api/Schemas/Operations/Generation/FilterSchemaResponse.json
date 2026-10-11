@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "category": { "type": "string" },
+    "description": { "type": "string" },
+    "parameters": { "$include": "Operations/Generation/GenericObject.json" }
+  },
+  "required": ["id", "name", "category", "description", "parameters"],
+  "additionalProperties": false
+}

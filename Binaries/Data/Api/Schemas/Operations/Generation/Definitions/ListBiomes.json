@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.list",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes",
+  "Title": "List biomes",
+  "Description": "List stable biome IDs in generation order with enabled state and a compact summary of each biome's graph.",
+  "InputSchema": { "$include": "Operations/Generation/EmptyInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeDirectoryResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

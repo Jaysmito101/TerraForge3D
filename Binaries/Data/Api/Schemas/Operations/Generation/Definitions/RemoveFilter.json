@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.filters.remove",
+  "Method": "POST",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/filters/{FilterId}/remove",
+  "Title": "Remove biome filter",
+  "Description": "Remove one filter by stable FilterId and return the remaining ordered filter stack.",
+  "InputSchema": { "$include": "Operations/Generation/FilterIdInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterStackResponse.json" },
+  "Annotations": { "readOnlyHint": false },
+  "Flags": ["Destructive"]
+}

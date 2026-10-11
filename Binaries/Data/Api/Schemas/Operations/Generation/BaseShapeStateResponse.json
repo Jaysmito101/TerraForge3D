@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "Mode": { "type": "string", "enum": ["algorithm", "dem"] },
+    "AlgorithmID": { "type": "string" },
+    "AlgorithmSettings": { "$include": "Operations/Generation/GenericObject.json" },
+    "DEM": { "$include": "Operations/Generation/DEMBaseShapeSettings.json" },
+    "Algorithms": {
+      "type": "array",
+      "items": { "$include": "Operations/Generation/BaseShapeAlgorithm.json" }
+    },
+    "AlgorithmSchema": { "$include": "Operations/Generation/OperationReference.json" }
+  },
+  "required": ["Mode", "Algorithms", "AlgorithmSchema"],
+  "additionalProperties": false
+}

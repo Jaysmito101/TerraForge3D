@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "Enabled": { "type": "boolean" },
+    "UseMask": { "type": "boolean" },
+    "InvertMask": { "type": "boolean" },
+    "Strength": { "type": "number", "minimum": 0, "maximum": 1 },
+    "MergeMode": { "type": "string", "enum": ["override", "add", "subtract", "multiply", "blend"] },
+    "Parameters": { "$runtime": "Generation.FilterParameters" }
+  },
+  "additionalProperties": false
+}

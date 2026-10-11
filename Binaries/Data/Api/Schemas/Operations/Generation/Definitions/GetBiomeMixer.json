@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.mixer.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/mixer",
+  "Title": "Get biome mixer",
+  "Description": "Read the global biome mixer method and method-specific settings. Simple is currently the only implemented mixer method.",
+  "InputSchema": { "$include": "Operations/Generation/EmptyInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/BiomeMixerStateResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

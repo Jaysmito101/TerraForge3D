@@ -1,0 +1,12 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.filter_catalog.list",
+  "Method": "GET",
+  "Path": "/api/v1/generation/filter-catalog",
+  "Title": "List filter catalog",
+  "Description": "Search the compact filter catalog by ID, name, category, or description. Each result includes a schema operation reference so clients can inspect one filter at a time.",
+  "InputSchema": { "$include": "Operations/Generation/FilterCatalogInput.json" },
+  "ResponseSchema": { "$include": "Operations/Generation/FilterCatalogResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

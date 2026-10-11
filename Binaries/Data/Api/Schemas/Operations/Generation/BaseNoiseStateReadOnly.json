@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "Enabled": { "type": "boolean" },
+    "UseMask": { "type": "boolean" },
+    "InvertMask": { "type": "boolean" },
+    "Inspector": { "$runtime": "Generation.BaseNoiseInspector" },
+    "BaseMask": { "$runtime": "Generation.BaseMask" },
+    "MaskTool": { "$include": "Operations/Generation/GenericObject.json", "readOnly": true }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": { "$include": "Operations/Generation/BaseShapeAlgorithm.json" }
+    },
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "required": ["items", "count"],
+  "additionalProperties": false
+}

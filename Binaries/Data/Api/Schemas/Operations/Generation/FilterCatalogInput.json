@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "Search": { "type": "string", "maxLength": 128 },
+    "Limit": { "type": "integer", "minimum": 1, "maximum": 100 }
+  },
+  "additionalProperties": false
+}

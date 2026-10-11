@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.biomes.base_shape.get",
+  "Method": "GET",
+  "Path": "/api/v1/generation/biomes/{BiomeId}/base-shape",
+  "Title": "Get biome base shape",
+  "Description": "Read the selected base-shape mode and configuration. AlgorithmSettings is paired with the selected AlgorithmID. Use the base-shape algorithm catalog operation to discover all choices and each algorithm's parameter schema.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "BiomeId": { "type": "string", "minLength": 1 } },
+    "required": ["BiomeId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/BaseShapeStateResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}

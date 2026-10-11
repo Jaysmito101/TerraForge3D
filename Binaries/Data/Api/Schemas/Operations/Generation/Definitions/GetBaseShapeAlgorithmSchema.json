@@ -1,0 +1,17 @@
+{
+  "$include": "Common/Operation.json",
+  "Name": "tf3d.generation.base_shape_algorithms.get_schema",
+  "Method": "GET",
+  "Path": "/api/v1/generation/base-shape-algorithms/{AlgorithmId}/schema",
+  "Title": "Get base-shape algorithm schema",
+  "Description": "Return one base-shape algorithm's composed inspector schema. Discover available stable AlgorithmIds from the base-shape algorithm catalog.",
+  "InputSchema": {
+    "type": "object",
+    "properties": { "AlgorithmId": { "type": "string", "minLength": 1 } },
+    "required": ["AlgorithmId"],
+    "additionalProperties": false
+  },
+  "ResponseSchema": { "$include": "Operations/Generation/BaseShapeAlgorithmSchemaResponse.json" },
+  "Annotations": { "readOnlyHint": true },
+  "Flags": ["ReadOnly"]
+}
