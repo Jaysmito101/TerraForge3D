@@ -194,6 +194,11 @@ namespace tf3d::api
             return OperationDocumentPath(entry) + "/schema";
         }
 
+        std::string OpenApiOperationSchemaReference(const OperationEntry &entry)
+        {
+            return "operations/" + entry.resourcePath + "/schema";
+        }
+
         std::string OperationSkillPath(const OperationEntry &entry)
         {
             return std::string(ApiPrefix) + "/skills/" + entry.resourcePath + ".md";
@@ -611,7 +616,7 @@ namespace tf3d::api
             const std::string schemaPath = OperationSchemaPath(entry);
             server->Get(StaticRoutePattern(schemaPath), [this, entry](const httplib::Request &request, httplib::Response &response) {
                 ActiveRequestScope active(activeRequests);
-                response.set_content(BuildOperationSchema(entry).dump(2), "application/schema+json");
+                response.set_content(BuildOperationSchema(entry, "./schema").dump(2), "application/schema+json");
                 RecordRequest(request, response);
             });
 
@@ -834,11 +839,11 @@ namespace tf3d::api
         return document;
     }
 
-    nlohmann::json ApiServer::BuildOperationSchema(const OperationEntry &entry) const
+    nlohmann::json ApiServer::BuildOperationSchema(const OperationEntry &entry, std::string_view idReference) const
     {
         nlohmann::json schema = entry.inputSchema;
         schema["$schema"]     = "https://json-schema.org/draft/2020-12/schema";
-        schema["$id"]         = "http://" + host + ":" + std::to_string(port) + OperationSchemaPath(entry);
+        schema["$id"]         = idReference;
         schema["title"]       = entry.title;
         schema["description"] = entry.description;
         return schema;
@@ -877,7 +882,8 @@ namespace tf3d::api
             skill << "Send the remaining values as a JSON object with `Content-Type: application/json`.\n\n";
         }
 
-        skill << "The composed argument schema is available at `GET " << OperationSchemaPath(entry) << "`.\n\n"
+        skill << "Resolve route paths with the public base URL from the root API skill, preserving any proxy path prefix.\n\n"
+              << "The composed argument schema is available at `GET " << OperationSchemaPath(entry) << "`.\n\n"
               << "```json\n"
               << argumentSchema.dump(2)
               << "\n```\n\n"
@@ -891,7 +897,7 @@ namespace tf3d::api
         nlohmann::json document                      = nlohmann::json::object();
         document["openapi"]                          = "3.1.1";
         document["info"]                             = {{"title", "TerraForge3D API"}, {"version", TERR3D_VERSION_STRING}};
-        document["servers"]                          = nlohmann::json::array({{{"url", "http://" + host + ":" + std::to_string(port)}}});
+        document["servers"]                          = nlohmann::json::array({{{"url", "../.."}}});
         document["paths"]                            = nlohmann::json::object();
         document["components"]["schemas"]["Problem"] = ProblemSchema();
         const nlohmann::json stringSchema            = {{"type", "string"}};
@@ -1032,7 +1038,7 @@ namespace tf3d::api
             nlohmann::json getSchema = {
                 {"operationId", "getSchema_" + entry.name},
                 {"summary", "Get the composed argument schema for " + entry.title},
-                {"responses", {{"200", {{"description", "Composed JSON Schema."}, {"content", {{"application/schema+json", {{"schema", BuildOperationSchema(entry)}}}}}}}}}};
+                {"responses", {{"200", {{"description", "Composed JSON Schema."}, {"content", {{"application/schema+json", {{"schema", BuildOperationSchema(entry, OpenApiOperationSchemaReference(entry))}}}}}}}}}};
             document["paths"][OperationSchemaPath(entry)]["get"] = std::move(getSchema);
 
             nlohmann::json getSkill = {

@@ -116,10 +116,11 @@ The compact directory at `GET /api/v1/operations` links to one operation at a
 time. Its details link to the composed JSON Schema at
 `GET /api/v1/operations/viewport/update-state/schema` and the generated skill
 at `GET /api/v1/skills/viewport/update-state.md`. The schema endpoint returns
-the full validated argument schema with its `$schema` dialect and `$id`; the
-OpenAPI document also describes the HTTP body and parameter locations. Keep
-the composed schema as the input contract and the C++ handler as the authority
-for domain behavior.
+the full validated argument schema with its `$schema` dialect and a relative
+`$id` resolved from the schema URL. This keeps the schema usable under the
+public host and any proxy path prefix. The OpenAPI document also describes the
+HTTP body and parameter locations. Keep the composed schema as the input
+contract and the C++ handler as the authority for domain behavior.
 
 For this update, `ViewportId` is supplied in the URL and only `State` goes in
 the JSON body:

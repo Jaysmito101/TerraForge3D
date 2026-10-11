@@ -40,10 +40,10 @@ namespace tf3d::api
     };
 
     struct ApiServerStats {
-        bool running                 = false;
-        std::string host             = "127.0.0.1";
-        int port                     = 9823;
-        std::string endpoint         = "http://127.0.0.1:9823/api/v1";
+        bool running     = false;
+        std::string host = "127.0.0.1";
+        int port         = 9823;
+        std::string endpoint;
         std::uint64_t requestCount   = 0;
         std::uint64_t activeRequests = 0;
         std::vector<ApiRequestLogEntry> requestLog;
@@ -80,7 +80,7 @@ namespace tf3d::api
         nlohmann::json BuildOperationsDocument(std::string_view groupPath) const;
         nlohmann::json BuildSkillsDocument(std::string_view groupPath) const;
         nlohmann::json BuildOperationDocument(const OperationEntry &entry) const;
-        nlohmann::json BuildOperationSchema(const OperationEntry &entry) const;
+        nlohmann::json BuildOperationSchema(const OperationEntry &entry, std::string_view idReference) const;
         std::string BuildOperationSkill(const OperationEntry &entry) const;
 
         tf3d::data::ApplicationState *applicationState = nullptr;

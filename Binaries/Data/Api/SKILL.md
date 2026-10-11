@@ -1,22 +1,37 @@
 ---
 name: api
-description: Use the TerraForge3D local HTTP API to inspect and control capabilities exposed by the running application.
+description: Use the TerraForge3D HTTP API to inspect and control capabilities exposed by the running application.
 ---
 
 # TerraForge3D API
 
 Use this skill when an application or agent needs to inspect or control the
-running TerraForge3D instance over HTTP. The server listens on
-`127.0.0.1:9823` by default. `TF3D_API_PORT` changes the port. Operation routes
-use the `/api/v1` prefix.
+running TerraForge3D instance over HTTP. Get the public API base URL from the
+host application or integration that provided this skill. If this skill was
+loaded over HTTP from a URL ending in `/api/skill.md`, remove that suffix to
+get the public base URL; retain any path prefix before it. If the skill was
+installed as a local file, use the base URL supplied by the host application.
+Do not assume a host name or port. Operation routes use the `/api/v1` prefix.
+If the host application provides no connection details and this skill was not
+loaded over HTTP, request the API base URL from that application instead of
+guessing one.
+
+Directory and operation links are route paths. To request one, append the
+route path to the public base URL, keeping any path prefix in that base URL.
+Concatenate the base URL without its trailing slash and the returned route
+path, including the route path's leading slash. Do not resolve a leading-slash
+route as a new origin-root URL, since that discards a proxy path prefix.
 
 ## Browse one level at a time
 
 Start with the compact operation directory:
 
 ```sh
-curl http://127.0.0.1:9823/api/v1/operations
+curl "${API_BASE_URL}/api/v1/operations"
 ```
+
+Set `API_BASE_URL` to the public base URL discovered above, without a trailing
+slash.
 
 Follow a returned child `path` to open that group. Each group response lists
 only its immediate child groups and operations. An operation summary links to
@@ -43,7 +58,7 @@ complete validated argument object, including path parameters.
 For example, status is a read-only operation:
 
 ```sh
-curl http://127.0.0.1:9823/api/v1/status
+curl "${API_BASE_URL}/api/v1/status"
 ```
 
 Viewport capture returns JPEG bytes with `Content-Type: image/jpeg`; its
@@ -51,5 +66,5 @@ dimensions are returned in `X-Image-Width` and `X-Image-Height`. Other
 successful operations return JSON. Errors use `application/problem+json` and
 include a stable `code` field.
 
-The playground and skill pages are served by the same local process, so no
+The playground and skill pages are served by the same API service, so no
 external site or package is needed to inspect or try an operation.

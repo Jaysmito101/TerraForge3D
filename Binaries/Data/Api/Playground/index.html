@@ -37,9 +37,9 @@
     <header>
       <h1>TerraForge3D API Playground</h1>
       <nav aria-label="API documents">
-        <a href="/api/v1/status">Status</a>
-        <a href="/api/v1/openapi.json">OpenAPI</a>
-        <a href="/api/skill.md">API skill</a>
+        <a id="statusLink" href="#">Status</a>
+        <a id="openApiLink" href="#">OpenAPI</a>
+        <a id="rootSkillLink" href="#">API skill</a>
       </nav>
     </header>
     <div class="layout">
@@ -104,8 +104,24 @@
       return null;
     }
 
+    const publicPathPrefix = window.location.pathname.replace(/\/api\/docs\/?$/, "");
+
+    function apiUrl(path) {
+      const route = new URL(path, window.location.origin);
+      const routePath = route.pathname.replace(/^\/+/, "");
+      const pathname = `${publicPathPrefix}/${routePath}`.replace(/\/{2,}/g, "/");
+      const url = new URL(pathname, window.location.origin);
+      url.search = route.search;
+      url.hash = route.hash;
+      return url;
+    }
+
+    document.querySelector("#statusLink").href = apiUrl("/api/v1/status");
+    document.querySelector("#openApiLink").href = apiUrl("/api/v1/openapi.json");
+    document.querySelector("#rootSkillLink").href = apiUrl("/api/skill.md");
+
     async function readJson(path) {
-      const response = await fetch(path);
+      const response = await fetch(apiUrl(path));
       if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`);
       return response.json();
     }
@@ -180,14 +196,14 @@
       responseView.textContent = "Loading operation details and schema…";
       try {
         const operation = await readJson(summary.document);
-        const schemaResponse = await fetch(operation.schema);
+        const schemaResponse = await fetch(apiUrl(operation.schema));
         if (!schemaResponse.ok) throw new Error(`${operation.schema} returned HTTP ${schemaResponse.status}`);
         operation.inputSchema = await schemaResponse.json();
         selectedOperation = operation;
         description.textContent = operation.description;
         endpoint.textContent = `${operation.method} ${operation.path}`;
-        skillLink.href = operation.skill;
-        schemaLink.href = operation.schema;
+        skillLink.href = apiUrl(operation.skill);
+        schemaLink.href = apiUrl(operation.schema);
         skillLink.hidden = false;
         schemaLink.hidden = false;
         argumentEditor.disabled = false;
@@ -250,7 +266,7 @@
           options.body = JSON.stringify(remainingArguments);
         }
 
-        const response = await fetch(requestPath, options);
+        const response = await fetch(apiUrl(requestPath), options);
         const contentType = response.headers.get("Content-Type") || "";
         requestStatus.textContent = `HTTP ${response.status}`;
         if (contentType.startsWith("image/")) {
