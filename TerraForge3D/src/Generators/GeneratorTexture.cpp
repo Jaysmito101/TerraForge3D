@@ -64,6 +64,9 @@ namespace tf3d::generators
         m_Width  = width;
         m_Height = height;
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_Format, m_PixelType, nullptr);
         ClearTexture();
         glBindTexture(GL_TEXTURE_2D, 0);
