@@ -113,7 +113,7 @@ namespace tf3d::generators
                                 const std::string &popupId,
                                 char *filterSearch)
         {
-            const float maxPopupHeight = std::min(480.0f, ImGui::GetMainViewport()->WorkSize.y * 0.8f);
+            const float maxPopupHeight = std::min(700.0f, ImGui::GetMainViewport()->WorkSize.y * 0.8f);
             ImGui::SetNextWindowSizeConstraints(
                 ImVec2(0.0f, 0.0f), ImVec2(std::numeric_limits<float>::max(), maxPopupHeight));
             if (!ImGui::BeginPopup(popupId.c_str())) {
@@ -132,9 +132,10 @@ namespace tf3d::generators
                 }
             }
 
-            const float resultLineHeight = ImGui::GetTextLineHeightWithSpacing();
+            const float resultLineHeight    = ImGui::GetTextLineHeightWithSpacing();
             const float resultContentHeight = static_cast<float>(std::max<std::size_t>(definitionsByCategory.size(), 1)) *
-                                              resultLineHeight + ImGui::GetStyle().WindowPadding.y * 2.0f;
+                                                  resultLineHeight +
+                                              ImGui::GetStyle().WindowPadding.y * 2.0f;
             const float resultsHeight = std::clamp(resultContentHeight, 64.0f, 360.0f);
             if (ImGui::BeginChild("##FilterResults", ImVec2(0.0f, resultsHeight), false)) {
                 if (definitionsByCategory.empty()) {
