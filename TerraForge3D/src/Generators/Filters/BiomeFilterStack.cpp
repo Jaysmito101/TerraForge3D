@@ -77,6 +77,17 @@ namespace tf3d::generators
         return filter != m_Filters.end() ? *filter : nullptr;
     }
 
+    bool BiomeFilterStack::PublishFilterMaskState(std::string_view filterId)
+    {
+        const auto filter = FindFilter(filterId);
+        if (filter == nullptr) {
+            return false;
+        }
+        filter->PublishMaskState();
+        PublishState();
+        return true;
+    }
+
     bool BiomeFilterStack::ReorderFilter(std::string_view filterId, int targetIndex)
     {
         if (targetIndex < 0 || targetIndex >= static_cast<int>(m_Filters.size())) {

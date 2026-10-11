@@ -47,6 +47,7 @@ namespace tf3d::generators
         int AddFilter(const std::shared_ptr<BiomeFilterDefinition> &definition);
         bool RemoveFilter(int filterIndex);
         std::shared_ptr<BiomeFilter> FindFilter(std::string_view filterId) const;
+        bool PublishFilterMaskState(std::string_view filterId);
         bool ReorderFilter(std::string_view filterId, int targetIndex);
         bool LoadFilter(std::string_view filterId, const SerializerNode &settings);
         void Load(SerializerNode data);
