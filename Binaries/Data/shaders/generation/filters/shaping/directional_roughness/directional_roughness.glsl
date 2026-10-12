@@ -17,10 +17,15 @@ uniform float u_Frequency;
 uniform int u_Octaves;
 uniform float u_Strength;
 
+float directionalRoughnessBaseFrequency()
+{
+	return clamp(u_Frequency, 32.0f, 512.0f) * float(u_Resolution) / 1024.0f;
+}
+
 float evaluateDirectionalRoughness(vec2 terrainPosition, vec2 direction)
 {
 	int octaveCount = clamp(u_Octaves, 1, 6);
-	float frequency = clamp(u_Frequency, 32.0f, 512.0f);
+	float frequency = directionalRoughnessBaseFrequency();
 	vec2 acrossDirection = vec2(-direction.y, direction.x);
 	vec2 domain = vec2(
 		dot(terrainPosition, direction) * 0.5f,
@@ -70,11 +75,6 @@ void main()
 	vec2 terrainPosition = (vec2(coordinate) + 0.5f) / float(u_Resolution) - 0.5f;
 	float current = sampleInput(coordinate);
 	float detail = evaluateDirectionalRoughness(terrainPosition, angleDirection);
-	float normalizedSlope = length(upwardSlope) * float(u_Resolution) / tf3dFieldFullRange();
-	float baseFrequency = clamp(u_Frequency, 32.0f, 512.0f);
-	float localFeatureRelief = normalizedSlope / max(baseFrequency, 1.0f);
-	float strength = clamp(u_Strength, 0.0f, 0.5f);
-	float localReliefLimit = localFeatureRelief * 1.25f;
-	float effectiveStrength = min(strength, localReliefLimit);
-	writeOutput(coordinate, current + detail * effectiveStrength * tf3dFieldFullRange() * slopeAlignment);
+	float strength = clamp(u_Strength, 0.0f, 0.5f) * 0.04f;
+	writeOutput(coordinate, current + detail * strength * tf3dFieldFullRange() * slopeAlignment);
 }
