@@ -32,6 +32,12 @@
       "$include": "./Shaping/Dome.json"
     },
     {
+      "$include": "./Shaping/DirectionalRoughness.json"
+    },
+    {
+      "$include": "./Shaping/DirectionalSmooth.json"
+    },
+    {
       "$include": "./Shaping/Flatten.json"
     },
     {

@@ -1,0 +1,112 @@
+{
+  "ID": "directional_smooth",
+  "Name": "Directional Smooth",
+  "Category": "Shaping",
+  "Description": "Smooths fine terrain variation along the chosen horizontal angle where that direction faces uphill.",
+  "Runtime": {
+    "Implementation": "PhaseChain",
+    "Statistics": {
+      "NeedsMinMax": true,
+      "NeedsHistogram": false
+    },
+    "Shaders": {
+      "Phases": {
+        "Smooth": "generation/filters/shaping/directional_smooth/directional_smooth",
+        "Merge": "generation/filters/common/merge"
+      }
+    },
+    "Resources": {
+      "Temps": [
+        {
+          "Name": "Smoothed",
+          "Type": "Field"
+        }
+      ]
+    },
+    "Execution": {
+      "Passes": [
+        {
+          "Phase": "Smooth",
+          "Input": "Current",
+          "Output": "Smoothed",
+          "Uniforms": {
+            "u_DirectionAngle": {
+              "Parameter": "Direction.Angle"
+            },
+            "u_Radius": {
+              "Parameter": "Smoothing.Radius"
+            },
+            "u_Strength": {
+              "Parameter": "Smoothing.Strength"
+            }
+          }
+        }
+      ],
+      "Merge": {
+        "Phase": "Merge",
+        "Input": "Current",
+        "Operation": "Smoothed",
+        "Output": "Next"
+      }
+    }
+  },
+  "Inspector": {
+    "ShowResetButton": true,
+    "Sections": [
+      {
+        "Name": "Direction",
+        "Label": "Direction",
+        "Description": "Angle sets a horizontal direction. The effect follows its positive alignment with the local uphill slope.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Angle",
+            "Type": "Float",
+            "Default": 0.0,
+            "Widget": "Slider",
+            "Constraints": [
+              -180.0,
+              180.0
+            ],
+            "Label": "Angle",
+            "Description": "Sets the horizontal smoothing direction; strength is masked by uphill slope alignment."
+          }
+        ]
+      },
+      {
+        "Name": "Smoothing",
+        "Label": "Fine smoothing",
+        "Description": "Applies a Gaussian blur along the angle direction with a terrain-resolution-scaled radius.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Radius",
+            "Type": "Float",
+            "Default": 12.0,
+            "Widget": "Slider",
+            "Constraints": [
+              1.0,
+              32.0
+            ],
+            "Label": "Radius",
+            "Description": "Radius in pixels at 1K map resolution. It scales with map resolution to keep the terrain-space effect consistent."
+          },
+          {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 1.0,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              1.0
+            ],
+            "Label": "Strength",
+            "Description": "Blends between the original height and the directionally smoothed result."
+          }
+        ]
+      }
+    ]
+  }
+}

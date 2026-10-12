@@ -1,0 +1,127 @@
+{
+  "ID": "directional_roughness",
+  "Name": "Directional Roughness",
+  "Category": "Shaping",
+  "Description": "Adds smooth, band-limited fractal roughness along the chosen angle, scaled by local uphill slope.",
+  "Runtime": {
+    "Implementation": "PhaseChain",
+    "Statistics": {
+      "NeedsMinMax": true,
+      "NeedsHistogram": false
+    },
+    "Shaders": {
+      "Phases": {
+        "Roughness": "generation/filters/shaping/directional_roughness/directional_roughness",
+        "Merge": "generation/filters/common/merge"
+      }
+    },
+    "Resources": {
+      "Temps": [
+        {
+          "Name": "Roughness",
+          "Type": "Field"
+        }
+      ]
+    },
+    "Execution": {
+      "Passes": [
+        {
+          "Phase": "Roughness",
+          "Input": "Current",
+          "Output": "Roughness",
+          "Uniforms": {
+            "u_DirectionAngle": {
+              "Parameter": "Direction.Angle"
+            },
+            "u_Frequency": {
+              "Parameter": "Detail.Frequency"
+            },
+            "u_Octaves": {
+              "Parameter": "Detail.Octaves"
+            },
+            "u_Strength": {
+              "Parameter": "Detail.Strength"
+            }
+          }
+        }
+      ],
+      "Merge": {
+        "Phase": "Merge",
+        "Input": "Current",
+        "Operation": "Roughness",
+        "Output": "Next"
+      }
+    }
+  },
+  "Inspector": {
+    "ShowResetButton": true,
+    "Sections": [
+      {
+        "Name": "Direction",
+        "Label": "Direction",
+        "Description": "Angle sets a horizontal direction. The effect follows its positive alignment with the local uphill slope.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Angle",
+            "Type": "Float",
+            "Default": 0.0,
+            "Widget": "Slider",
+            "Constraints": [
+              -180.0,
+              180.0
+            ],
+            "Label": "Angle",
+            "Description": "Sets the horizontal detail direction; strength is masked by uphill slope alignment."
+          }
+        ]
+      },
+      {
+        "Name": "Detail",
+        "Label": "Fine detail",
+        "Description": "Adds layered Perlin noise. Each octave doubles frequency and halves amplitude; undersampled layers fade out.",
+        "Collapsible": true,
+        "DefaultOpen": true,
+        "Params": [
+          {
+            "Name": "Frequency",
+            "Type": "Float",
+            "Default": 160.0,
+            "Widget": "Slider",
+            "Constraints": [
+              64.0,
+              512.0
+            ],
+            "Label": "Detail frequency",
+            "Description": "Controls the fine feature size at 1K resolution. Higher values create smaller detail; frequency scales with resolution."
+          },
+          {
+            "Name": "Octaves",
+            "Type": "Int",
+            "Default": 4,
+            "Widget": "Slider",
+            "Constraints": [
+              1,
+              6
+            ],
+            "Label": "Fine layers",
+            "Description": "Adds progressively finer detail layers. Layers too small for the map resolution are automatically faded out."
+          },
+          {
+            "Name": "Strength",
+            "Type": "Float",
+            "Default": 0.15,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              0.5
+            ],
+            "Label": "Detail strength",
+            "Description": "Maximum amplitude as a fraction of terrain height range; displacement is capped at three times local relief measured at the 1K reference frequency, so detail strength stays consistent as resolution rises."
+          }
+        ]
+      }
+    ]
+  }
+}
