@@ -17,7 +17,7 @@ vec2 tf3dUpwardSlopeAt(ivec2 coordinate)
 		sampleInput(coordinate + offsetY) - sampleInput(coordinate - offsetY)) * inverseSpan;
 }
 
-float tf3dUpwardSlopeAlignment(vec2 upwardSlope, vec2 angleDirection)
+float tf3dUpwardSlopeAlignment(vec2 upwardSlope, vec2 angleDirection, float feather)
 {
 	vec2 slope = upwardSlope;
 	float slopeLengthSquared = dot(slope, slope);
@@ -28,7 +28,7 @@ float tf3dUpwardSlopeAlignment(vec2 upwardSlope, vec2 angleDirection)
 
 	vec2 upwardHorizontalDirection = slope * inversesqrt(slopeLengthSquared);
 	float alignment = clamp(dot(upwardHorizontalDirection, angleDirection), 0.0f, 1.0f);
-	float alignmentWeight = alignment * alignment * (3.0f - 2.0f * alignment);
+	float alignmentWeight = smoothstep(0.0f, max(feather, 0.001f), alignment);
 	float slopeMagnitude = length(slope) * float(u_Resolution) / tf3dFieldFullRange();
 	float slopeConfidence = smoothstep(0.015f, 0.10f, slopeMagnitude);
 	return alignmentWeight * slopeConfidence;

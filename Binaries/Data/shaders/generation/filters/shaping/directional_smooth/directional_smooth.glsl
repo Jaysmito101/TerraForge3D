@@ -5,6 +5,7 @@ layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 #include "../../common/directional_guide.glsl"
 
 uniform float u_DirectionAngle;
+uniform float u_Feather;
 uniform float u_Radius;
 uniform float u_Strength;
 
@@ -18,7 +19,7 @@ void main()
 
 	vec2 angleDirection = tf3dAngleDirection(u_DirectionAngle);
 	vec2 upwardSlope = tf3dUpwardSlopeAt(coordinate);
-	float slopeAlignment = tf3dUpwardSlopeAlignment(upwardSlope, angleDirection);
+	float slopeAlignment = tf3dUpwardSlopeAlignment(upwardSlope, angleDirection, u_Feather);
 	float radius = max(clamp(u_Radius, 1.0f, 32.0f) * float(u_Resolution) / 1024.0f, 0.5f);
 	float sigma = max(radius * 0.5f, 0.5f);
 	float center = sampleInput(coordinate);

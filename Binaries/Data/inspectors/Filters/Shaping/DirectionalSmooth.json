@@ -33,6 +33,9 @@
             "u_DirectionAngle": {
               "Parameter": "Direction.Angle"
             },
+            "u_Feather": {
+              "Parameter": "Direction.Feather"
+            },
             "u_Radius": {
               "Parameter": "Smoothing.Radius"
             },
@@ -56,7 +59,7 @@
       {
         "Name": "Direction",
         "Label": "Direction",
-        "Description": "Angle sets a horizontal direction. The effect follows its positive alignment with the local uphill slope.",
+        "Description": "Angle sets the horizontal direction; feather softens the transition as the terrain turns away from the uphill direction.",
         "Collapsible": true,
         "DefaultOpen": true,
         "Params": [
@@ -71,6 +74,18 @@
             ],
             "Label": "Angle",
             "Description": "Sets the horizontal smoothing direction; strength is masked by uphill slope alignment."
+          },
+          {
+            "Name": "Feather",
+            "Type": "Float",
+            "Default": 0.3,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              1.0
+            ],
+            "Label": "Feather",
+            "Description": "Softens the fade where the uphill slope turns away from the selected direction."
           }
         ]
       },

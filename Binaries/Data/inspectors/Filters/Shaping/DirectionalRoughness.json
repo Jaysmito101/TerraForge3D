@@ -2,7 +2,7 @@
   "ID": "directional_roughness",
   "Name": "Directional Roughness",
   "Category": "Shaping",
-  "Description": "Adds smooth, band-limited fractal roughness along the chosen angle, scaled by local uphill slope.",
+  "Description": "Adds band-limited fractal Perlin detail along the chosen angle, scaled by local uphill slope.",
   "Runtime": {
     "Implementation": "PhaseChain",
     "Statistics": {
@@ -33,6 +33,9 @@
             "u_DirectionAngle": {
               "Parameter": "Direction.Angle"
             },
+            "u_Feather": {
+              "Parameter": "Direction.Feather"
+            },
             "u_Frequency": {
               "Parameter": "Detail.Frequency"
             },
@@ -59,7 +62,7 @@
       {
         "Name": "Direction",
         "Label": "Direction",
-        "Description": "Angle sets a horizontal direction. The effect follows its positive alignment with the local uphill slope.",
+        "Description": "Angle sets the horizontal direction; feather softens the transition as the terrain turns away from the uphill direction.",
         "Collapsible": true,
         "DefaultOpen": true,
         "Params": [
@@ -74,6 +77,18 @@
             ],
             "Label": "Angle",
             "Description": "Sets the horizontal detail direction; strength is masked by uphill slope alignment."
+          },
+          {
+            "Name": "Feather",
+            "Type": "Float",
+            "Default": 0.3,
+            "Widget": "Slider",
+            "Constraints": [
+              0.0,
+              1.0
+            ],
+            "Label": "Feather",
+            "Description": "Softens the fade where the uphill slope turns away from the selected direction."
           }
         ]
       },
@@ -94,7 +109,7 @@
               512.0
             ],
             "Label": "Detail frequency",
-            "Description": "Controls the fine feature size at 1K resolution. Higher values create smaller detail; frequency scales with resolution."
+            "Description": "Controls the base feature size in terrain space. Higher map resolutions retain finer octave layers without changing the larger noise features."
           },
           {
             "Name": "Octaves",
@@ -118,7 +133,7 @@
               0.5
             ],
             "Label": "Detail strength",
-            "Description": "Maximum amplitude as a fraction of terrain height range; displacement is capped at three times local relief measured at the 1K reference frequency, so detail strength stays consistent as resolution rises."
+            "Description": "Maximum amplitude as a fraction of terrain height range; displacement is capped at 1.25 times local relief at the base frequency."
           }
         ]
       }

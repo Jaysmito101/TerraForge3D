@@ -12,16 +12,15 @@ layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 #include "../../../../common/noise_2d.glsl"
 
 uniform float u_DirectionAngle;
+uniform float u_Feather;
 uniform float u_Frequency;
 uniform int u_Octaves;
 uniform float u_Strength;
 
-const float kReferenceResolution = 1024.0f;
-
 float evaluateDirectionalRoughness(vec2 terrainPosition, vec2 direction)
 {
 	int octaveCount = clamp(u_Octaves, 1, 6);
-	float frequency = clamp(u_Frequency, 32.0f, 512.0f) * float(u_Resolution) / kReferenceResolution;
+	float frequency = clamp(u_Frequency, 32.0f, 512.0f);
 	vec2 acrossDirection = vec2(-direction.y, direction.x);
 	vec2 domain = vec2(
 		dot(terrainPosition, direction) * 0.5f,
@@ -67,15 +66,15 @@ void main()
 
 	vec2 angleDirection = tf3dAngleDirection(u_DirectionAngle);
 	vec2 upwardSlope = tf3dUpwardSlopeAt(coordinate);
-	float slopeAlignment = tf3dUpwardSlopeAlignment(upwardSlope, angleDirection);
+	float slopeAlignment = tf3dUpwardSlopeAlignment(upwardSlope, angleDirection, u_Feather);
 	vec2 terrainPosition = (vec2(coordinate) + 0.5f) / float(u_Resolution) - 0.5f;
 	float current = sampleInput(coordinate);
 	float detail = evaluateDirectionalRoughness(terrainPosition, angleDirection);
 	float normalizedSlope = length(upwardSlope) * float(u_Resolution) / tf3dFieldFullRange();
-	float referenceFrequency = clamp(u_Frequency, 32.0f, 512.0f);
-	float localFeatureRelief = normalizedSlope / max(referenceFrequency, 1.0f);
+	float baseFrequency = clamp(u_Frequency, 32.0f, 512.0f);
+	float localFeatureRelief = normalizedSlope / max(baseFrequency, 1.0f);
 	float strength = clamp(u_Strength, 0.0f, 0.5f);
-	float localReliefLimit = localFeatureRelief * 3.0f;
+	float localReliefLimit = localFeatureRelief * 1.25f;
 	float effectiveStrength = min(strength, localReliefLimit);
 	writeOutput(coordinate, current + detail * effectiveStrength * tf3dFieldFullRange() * slopeAlignment);
 }
